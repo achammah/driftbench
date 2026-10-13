@@ -4,6 +4,7 @@ import { inconclusive, type JudgeRequest, type JudgeResult, MAX_TOKENS } from '.
 import { isRecord, JudgeError, postJson, requireEnv } from '../http';
 import { buildPrompt } from '../prompt';
 import { googleResponseSchema, isPairLedgerRequest, JUDGE_DIALECTS, withJudgeDialect } from './dialects';
+import { postReasoningJson, validateTokenBudget } from './reasoning-budget';
 import { buildDialectRequest } from './transport';
 
 /**
@@ -52,6 +53,7 @@ function truncated(raw: string, model: string): JudgeResult {
  * Reads OPENAI_API_KEY, OPENAI_JUDGE_MODEL and OPENAI_BASE_URL (default https://api.openai.com).
  */
 export function createOpenAiJudge(options: ClientOptions = {}): JudgeClient {
+  validateTokenBudget(options.tokenBudget, 'openai');
   const env = options.env ?? process.env;
   const key = requireEnv(env, 'OPENAI_API_KEY');
   const model = modelOf(options, env, 'OPENAI_JUDGE_MODEL');
@@ -70,6 +72,7 @@ export function createOpenAiJudge(options: ClientOptions = {}): JudgeClient {
       temperatureRetry: 'drop on a 400 that names it',
       responseFormat: 'json_schema',
       ...(reasoning === undefined ? {} : { reasoning }),
+      ...(options.tokenBudget === undefined ? {} : { tokenBudget: options.tokenBudget }),
     }),
     async judge(original) {
       const request = withJudgeDialect(original, JUDGE_DIALECTS.openai.id, options.reasoning);
@@ -105,34 +108,52 @@ export function createOpenAiJudge(options: ClientOptions = {}): JudgeClient {
               ],
             };
       const send = (withTemperature: boolean) =>
-        postJson(url, { authorization: `Bearer ${key}` }, body(withTemperature), options);
-      let payload: unknown;
+        postReasoningJson('openai', url, { authorization: `Bearer ${key}` }, body(withTemperature), options);
+      let sent: Awaited<ReturnType<typeof postReasoningJson>>;
       const sentTemperature = sendTemperature;
       try {
-        payload = await send(sentTemperature);
+        sent = await send(sentTemperature);
       } catch (cause) {
         // Retry a rejected temperature once, then omit it on subsequent calls from this client.
         const text = cause instanceof Error ? cause.message : '';
         if (!sentTemperature || !/answered 400/.test(text) || !/temperature/i.test(text)) throw cause;
         sendTemperature = false;
-        payload = await send(false);
+        sent = await send(false);
       }
 
+      const { payload, recovery, accounting } = sent;
       const choice = isRecord(payload) && Array.isArray(payload.choices) ? payload.choices[0] : undefined;
       const message = isRecord(choice) ? choice.message : undefined;
       const raw = JSON.stringify(payload);
       if (!isRecord(choice) || !isRecord(message)) {
-        return { answer: inconclusive(`${model} answered without a choice`), raw, unparsed: true };
+        return {
+          answer: inconclusive(`${model} answered without a choice`),
+          raw,
+          unparsed: true,
+          ...accounting,
+          ...(recovery ? { recovery } : {}),
+        };
       }
       if (typeof message.refusal === 'string' && message.refusal !== '') {
-        return { answer: inconclusive(`${model} declined: ${message.refusal}`), raw };
+        return {
+          answer: inconclusive(`${model} declined: ${message.refusal}`),
+          raw,
+          ...accounting,
+          ...(recovery ? { recovery } : {}),
+        };
       }
       if (choice.finish_reason === 'content_filter') {
-        return { answer: inconclusive(`${model} declined: its content filter stopped the answer`), raw };
+        return {
+          answer: inconclusive(`${model} declined: its content filter stopped the answer`),
+          raw,
+          ...accounting,
+          ...(recovery ? { recovery } : {}),
+        };
       }
       const content = contentText(message.content);
-      if (choice.finish_reason === 'length') return truncated(content, model);
-      return parseJudgeText(content, request);
+      if (choice.finish_reason === 'length')
+        return { ...truncated(content, model), ...(recovery ? { recovery } : {}), ...accounting };
+      return { ...parseJudgeText(content, request), ...(recovery ? { recovery } : {}), ...accounting };
     },
   };
 }
@@ -142,6 +163,7 @@ export function createOpenAiJudge(options: ClientOptions = {}): JudgeClient {
  * ANTHROPIC_JUDGE_MODEL and ANTHROPIC_BASE_URL (default https://api.anthropic.com).
  */
 export function createAnthropicJudge(options: ClientOptions = {}): JudgeClient {
+  validateTokenBudget(options.tokenBudget, 'anthropic');
   if (options.reasoning !== undefined)
     throw new JudgeError('config', 'reasoning is not supported by the Anthropic chat client');
   const env = options.env ?? process.env;
@@ -201,6 +223,7 @@ export function createAnthropicJudge(options: ClientOptions = {}): JudgeClient {
  * https://generativelanguage.googleapis.com). The key goes in the x-goog-api-key header, never the URL.
  */
 export function createGoogleJudge(options: ClientOptions = {}): JudgeClient {
+  validateTokenBudget(options.tokenBudget, 'google');
   const env = options.env ?? process.env;
   const key = env.GEMINI_API_KEY?.trim() || env.GOOGLE_API_KEY?.trim();
   if (!key) throw new JudgeError('config', 'GEMINI_API_KEY is not set (nor GOOGLE_API_KEY)');
@@ -219,6 +242,7 @@ export function createGoogleJudge(options: ClientOptions = {}): JudgeClient {
     settings: settingsOf('google-generate-content', {
       responseMimeType: 'application/json',
       ...(reasoning === undefined ? {} : { reasoning }),
+      ...(options.tokenBudget === undefined ? {} : { tokenBudget: options.tokenBudget }),
     }),
     async judge(original) {
       const request = withJudgeDialect(original, JUDGE_DIALECTS.google.id, options.reasoning);
@@ -227,7 +251,8 @@ export function createGoogleJudge(options: ClientOptions = {}): JudgeClient {
       const ledgerPayload = isPairLedgerRequest(request)
         ? buildDialectRequest('google', { ...prompt, schema: responseSchema(request), reasoning }).payload
         : undefined;
-      const payload = await postJson(
+      const { payload, recovery, accounting } = await postReasoningJson(
+        'google',
         url,
         { 'x-goog-api-key': key },
         ledgerPayload
@@ -262,20 +287,36 @@ export function createGoogleJudge(options: ClientOptions = {}): JudgeClient {
         return {
           answer: inconclusive(`${model} declined: the prompt was blocked (${feedback.blockReason})`),
           raw,
+          ...accounting,
+          ...(recovery ? { recovery } : {}),
         };
       }
       if (!isRecord(candidate)) {
-        return { answer: inconclusive(`${model} answered without a candidate`), raw, unparsed: true };
+        return {
+          answer: inconclusive(`${model} answered without a candidate`),
+          raw,
+          unparsed: true,
+          ...accounting,
+          ...(recovery ? { recovery } : {}),
+        };
       }
       const content = candidate.content;
       const parts = isRecord(content) && Array.isArray(content.parts) ? content.parts : [];
       const text = parts
-        .map((part) => (isRecord(part) && typeof part.text === 'string' ? part.text : ''))
+        .map((part) =>
+          isRecord(part) && part.thought !== true && typeof part.text === 'string' ? part.text : '',
+        )
         .join('');
-      if (candidate.finishReason === 'MAX_TOKENS') return truncated(text, model);
+      if (candidate.finishReason === 'MAX_TOKENS')
+        return { ...truncated(text, model), ...(recovery ? { recovery } : {}), ...accounting };
       if (candidate.finishReason === 'SAFETY' || candidate.finishReason === 'RECITATION')
-        return { answer: inconclusive(`${model} declined the request`), raw };
-      return parseJudgeText(text, request);
+        return {
+          answer: inconclusive(`${model} declined the request`),
+          raw,
+          ...accounting,
+          ...(recovery ? { recovery } : {}),
+        };
+      return { ...parseJudgeText(text, request), ...(recovery ? { recovery } : {}), ...accounting };
     },
   };
 }

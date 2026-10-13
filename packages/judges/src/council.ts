@@ -480,7 +480,14 @@ async function castVote(
   const retries = () => (spent.length > 0 ? { retries: spent } : {});
   const ask = (asked: Budget) => {
     counter.cost += judge.cost;
-    return retriesInto(spent, () => judge.judge({ ...request, budget: asked }));
+    return retriesInto(spent, async () => {
+      const result = await judge.judge({ ...request, budget: asked });
+      if (result.recovery) {
+        counter.errors += 1;
+        counter.cost += judge.cost;
+      }
+      return result;
+    });
   };
   try {
     let result = await ask(budget);

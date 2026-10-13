@@ -6,6 +6,13 @@ import { isRecord, JudgeError, postJson, requireEnv } from '../http';
 import { promptFingerprint } from '../prompt';
 import { CLAUDE_JUDGE_FLAGS, CLAUDE_SETTINGS, runClaudeCommand } from './claude-cli';
 import { googleResponseSchema, JUDGE_DIALECTS, type JudgeDialect } from './dialects';
+import {
+  budgetBody,
+  postReasoningJson,
+  type ReasoningRecovery,
+  recoveryBody,
+  validateTokenBudget,
+} from './reasoning-budget';
 import { type TokenUsage, usageFromResponse } from './usage';
 
 export type DialectProvider = 'openai' | 'google' | 'anthropic' | 'claude-cli';
@@ -27,6 +34,11 @@ export type DialectCompletionRequest = {
 };
 
 export type DialectCompletion = {
+  readonly requestCount?: number;
+  readonly reaskReason?: 'reasoning-budget-exhausted';
+  readonly usageComplete?: boolean;
+  readonly costComplete?: boolean;
+  readonly recovery?: ReasoningRecovery;
   readonly text: string;
   readonly raw: string;
   readonly dialect: JudgeDialect;
@@ -152,6 +164,7 @@ export function buildDialectRequest(
 /** Raw text transport for any prompt or schema, including pointwise uncertainty cascades. No verdict parser runs. */
 export function createDialectTransport(options: DialectTransportOptions): DialectTransport {
   const provider = options.provider;
+  validateTokenBudget(options.tokenBudget, provider);
   const env = options.env ?? process.env;
   const variables = {
     openai: 'OPENAI_JUDGE_MODEL',
@@ -200,6 +213,7 @@ export function createDialectTransport(options: DialectTransportOptions): Dialec
     dialect,
     model,
     maxTokens,
+    ...(options.tokenBudget === undefined ? {} : { tokenBudget: options.tokenBudget }),
     base,
     ...(options.reasoning === undefined ? {} : { reasoning: options.reasoning }),
     ...(provider !== 'claude-cli'
@@ -281,8 +295,32 @@ export function createDialectTransport(options: DialectTransportOptions): Dialec
               ...built.payload,
               ...(provider === 'openai' ? { max_completion_tokens: maxTokens } : { max_tokens: maxTokens }),
             };
-      const value = await postJson(url, headers, body, options);
-      return { ...identity, ...readCompletion(provider, value) };
+      const sent =
+        provider === 'openai' || provider === 'google'
+          ? await postReasoningJson(provider, url, headers, body, options)
+          : {
+              payload: await postJson(url, headers, body, options),
+              accounting: undefined,
+              recovery: undefined,
+            };
+      const result = { ...identity, ...readCompletion(provider, sent.payload), ...sent.accounting };
+      if (sent.recovery)
+        return {
+          ...result,
+          fingerprint: promptFingerprint({
+            initial: identity.fingerprint,
+            recovery: recoveryBody(provider, budgetBody(provider, body, options.tokenBudget)),
+          }),
+          recovery: sent.recovery,
+          usage: sent.recovery.attempts.reduce(
+            (sum, a) => ({
+              input: (sum.input ?? 0) + (a.usage.input ?? 0),
+              output: (sum.output ?? 0) + (a.usage.output ?? 0),
+            }),
+            {} as TokenUsage,
+          ),
+        };
+      return result;
     },
   };
 }

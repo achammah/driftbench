@@ -25,7 +25,13 @@ export type HttpOptions = {
   sleep?: (ms: number) => Promise<void>;
 };
 
-export type JudgeErrorCode = 'config' | 'http' | 'network' | 'bad_response' | 'cassette_miss';
+export type JudgeErrorCode =
+  | 'config'
+  | 'http'
+  | 'network'
+  | 'bad_response'
+  | 'cassette_miss'
+  | 'reasoning-budget-exhausted';
 
 /** A judge call that gave no answer. The message never holds a key or a header. */
 export class JudgeError extends Error {

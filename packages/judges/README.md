@@ -207,3 +207,17 @@ judge is unchanged. Add `grounding: 'strict'` inside `assessment` to reject copi
 text that cannot be grounded in its reference or reply.
 
 See the [API and recorded results](https://github.com/achammah/driftbench/blob/main/docs/concepts/judges.md#pointwise-fact-ledger-against-a-trusted-reference).
+
+
+### Reasoning headroom and empty token-limit responses
+
+OpenAI and Google clients accept `tokenBudget: { answerTokens: 4096, reasoningTokens: 8192 }`.
+Unset preserves the existing request bytes and fingerprint. The provider receives the sum as its output limit.
+This is headroom, not a guaranteed partition on OpenAI or Gemini thinking-level models.
+For Gemini models supporting numeric thinking budgets, set `googleThinkingBudget: true` inside `tokenBudget`.
+That replaces `thinkingLevel` with `thinkingBudget`; do not enable it on a model that does not support it.
+
+An empty `length` or `MAX_TOKENS` response triggers one recovery with twice the total allowance and low reasoning when an effort was specified.
+Successful calls are unchanged. Recovery retains both raw receipts and usage under `recovery`, and transport usage includes both attempts.
+A second empty token-limit response throws `JudgeError` with code `reasoning-budget-exhausted`.
+Councils count recovered grader failures separately from verdicts. The token budget is opt-in until the next deliberate fingerprint change.
