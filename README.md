@@ -59,30 +59,41 @@ npm install @agent-nexus/driftbench
 mkdir specs
 ```
 
-**2. Create `agent.mjs`.** It reads the user message on standard input and prints the reply. Replace it with a call to your own agent later.
+**2. Create `agent.mjs`.** It reads the user message on standard input, looks the order up in `orders.json` in its working folder, and prints the reply. Replace it with a call to your own agent later.
 
 ```js
 // A stand-in for your agent: reads the user message on stdin, prints the reply.
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const message = readFileSync(0, 'utf8').trim();
 const history = JSON.parse(readFileSync(process.env.DRIFTBENCH_HISTORY_FILE, 'utf8'));
+// The orders the spec seeds in the agent's working folder.
+const orders = existsSync('orders.json') ? JSON.parse(readFileSync('orders.json', 'utf8')) : {};
+const order = message.match(/\bA-\d+\b/)?.[0];
 
 if (/refund/i.test(message)) {
   console.log('I can help with a refund. What is your order number?');
-} else if (/\bA-\d+\b/.test(message)) {
-  console.log(`Refund started for order ${message.match(/A-\d+/)[0]}. You will get an email within 2 days.`);
+} else if (order && orders[order]) {
+  console.log(`Refund started for order ${order}. You will get an email within 2 days.`);
+} else if (order) {
+  console.log(`I cannot find order ${order}.`);
 } else {
   console.log(`Sorry, I did not get that. (${history.length} messages so far)`);
 }
 ```
 
-**3. Create `specs/refund.yaml`.** Two blocks: what the user says, and what the reply must and must not contain.
+**3. Create `specs/refund.yaml`.** Each block is one test, with its starting conditions (`given`), the user's message and the expected reply. The spec-level `given` seeds order A-1042 in the agent's working folder and sets the channel; block 2 starts from a `prefix`, so it runs without replaying block 1.
 
 ```yaml
 id: refund-happy-path
 title: A customer asks for a refund and gives an order number
 target: { adapter: process, agent: my-agent }
+
+given:
+  world:
+    workspace:
+      files: { orders.json: '{"A-1042": {"status": "paid", "total": 49.90}}' }
+  vars: { channel: web-chat }
 
 blocks:
   - user: Hi, I would like a refund please.
@@ -90,7 +101,11 @@ blocks:
       must: ['order number']
       must_not: ['Refund started']
 
-  - user: It is A-1042.
+  - given:
+      prefix:
+        - { role: user, content: 'Hi, I would like a refund please.' }
+        - { role: assistant, content: 'I can help with a refund. What is your order number?' }
+    user: It is A-1042.
     expect:
       must: ['Refund started', 'A-1042']
       must_not: ['Sorry']
@@ -107,7 +122,7 @@ npx driftbench campaign run specs --target process:my-agent \
 The output, trimmed to its verdict lines:
 
 ```
-✓ specs/refund.yaml  refund-happy-path · 2 blocks · hash c985453f6be7
+✓ specs/refund.yaml  refund-happy-path · 2 blocks · hash 7cfacf8c527b
 Checked 1 spec: 1 valid, 0 invalid, 0 warnings.
 
 ✓ refund-happy-path · process:my-agent · F · repeat 0  pass  2 blocks
