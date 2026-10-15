@@ -5,6 +5,7 @@ commands: []
 see_also:
   - core-global-options
   - core-objects
+  - authoring-rule-files
   - core-project-layout
   - core-exit-codes
 next:
@@ -71,7 +72,8 @@ The six top-level keys, all optional. Which command checks the rest of the file:
 * `objects`: a list of objects of the rules framework written inline, each a map with `kind`, `id` and the
   fields of its kind, such as `{ kind: check-set, id: acme, extends: default, items: [...] }`. They join the
   project layer, as the files under `driftbench/<kind>/<id>.yaml` beside the config do. `driftbench object
-  validate` checks them; the format is in `driftbench help core-objects`.
+  validate` checks them; the format is in `driftbench help authoring-rule-files`. A broken entry is
+  reported on every spec below the file, as `OBJECT_*` errors.
 * `prices`: a dated table of USD token prices by model, read by `campaign run` and `campaign resume` for
   `--budget-usd` when `--prices <file>` is not given. The format is in the running topics.
 
@@ -166,5 +168,7 @@ without `--store` on the line or in the file, nothing is kept.
 * `OPENAI_MODEL is not set: name the model the server should run`: an OpenAI-compatible key without a model.
 * `A nexus target reads its key from NEXUS_API_KEY, which is not set.` (exit 2).
 * `An http target needs its URL: set target.options.url in the spec, or DRIFTBENCH_HTTP_URL.` (exit 2).
+* `<path>/driftbench.yaml: objects is a list of object definitions` (`OBJECT_INVALID`, on every spec below the
+  file): write `objects:` as a list of objects, each with `kind` and `id`.
 * `Credentials cannot be stored in target options`: move the key to an environment variable and name it in
   `api_key_env` or `headers_env`.
