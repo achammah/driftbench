@@ -1,0 +1,15 @@
+{
+ "citations": [
+  {
+   "cited": "Refunds are allowed within 30 days of delivery. ",
+   "start_char_index": 23,
+   "end_char_index": 71,
+   "code_point_start": 23,
+   "utf16_start": 25
+  }
+ ],
+ "usage": {
+  "in": 879,
+  "out": 55
+ }
+}

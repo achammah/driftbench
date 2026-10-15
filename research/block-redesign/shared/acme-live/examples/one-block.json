@@ -1,0 +1,62 @@
+{
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "turns": [
+  {
+   "user": "I want home internet at 7 Quarry Lane, Acmeville",
+   "text": "Hi, I'm the Acme Telecom sales assistant. I checked 7 Quarry Lane, Acmeville, and it is in our coverage map, but no Acme home internet plan is available there yet, as neither fiber nor 5G reaches it. I can have a sales advisor call you when that changes. What is the best phone number to reach you on?",
+   "calls": [
+    {
+     "name": "coverage_check",
+     "input": {
+      "address": "7 Quarry Lane, Acmeville"
+     },
+     "ok": true,
+     "output": {
+      "found": true,
+      "address_id": "addr-104",
+      "address": "7 Quarry Lane, Acmeville",
+      "fiber_mbps": 0,
+      "five_g": false
+     }
+    }
+   ],
+   "usage": {
+    "in": 318,
+    "out": 305,
+    "cw": 3382,
+    "cr": 3382,
+    "calls": 2
+   }
+  },
+  {
+   "user": "+1 202 555 0177",
+   "text": "Thank you. A sales advisor will call you on +1 202 555 0177 when home internet becomes available at 7 Quarry Lane, and your reference is LEAD-9A6047. Is there anything else I can help you with today?",
+   "calls": [
+    {
+     "name": "notify_sales",
+     "input": {
+      "reason": "no_coverage",
+      "customer": {
+       "phone": "+1 202 555 0177"
+      },
+      "summary": "Customer wants home internet at 7 Quarry Lane, Acmeville (addr-104), which has no fiber and no 5G. Asked to be contacted when coverage becomes available."
+     },
+     "ok": true,
+     "output": {
+      "ticket_id": "LEAD-9A6047",
+      "queued": true
+     }
+    }
+   ],
+   "usage": {
+    "in": 1155,
+    "out": 248,
+    "cw": 0,
+    "cr": 6764,
+    "calls": 2
+   }
+  }
+ ],
+ "usd": 0.00094801
+}
