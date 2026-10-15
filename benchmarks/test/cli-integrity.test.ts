@@ -17,6 +17,12 @@ import { main } from '../cli';
 import { makeRecordingClient, SpendBudget } from '../record';
 import { type BenchReport, type BenchSlice, scoreSlice, sha256 } from '../run';
 
+function at<T>(values: readonly T[], index: number): T {
+  const value = values[index];
+  if (value === undefined) throw new Error('Fixture item is missing');
+  return value;
+}
+
 const roots: string[] = [];
 const MODEL = 'gpt-6-luna';
 const SLICE = 'fictional-integrity';
@@ -231,7 +237,137 @@ async function resume(f: Fixture) {
   return cli(f, ['record', '--slice', SLICE, '--model', MODEL, '--spend-cap-usd', '1', '--resume', '--json']);
 }
 
+async function repeatManifest(f: Fixture) {
+  const raw = await readFile(f.cassettePath, 'utf8');
+  const group = { slice: SLICE, judge: MODEL, old: [] as unknown[], candidate: [] as unknown[] };
+  for (const side of ['old', 'candidate'] as const)
+    for (let repeat = 1; repeat <= 3; repeat++) {
+      const runId = `${side}-${repeat}`;
+      const receipts = {
+        format: 'driftbench-bench-repeat-receipts-v1',
+        runId,
+        side,
+        repeat,
+        ...Object.fromEntries(
+          ['head', 'fingerprint', 'judge', 'model', 'settings'].map((k) => [
+            k,
+            f.evidence.report[k as keyof BenchReport],
+          ]),
+        ),
+        calls: f.cassette.entries.map((entry, i) => ({
+          id: `${runId}-physical-${i}`,
+          caseId: at(f.slice.cases, i).id,
+          key: entry.key,
+          provider: 'openai',
+          status: 'ok',
+          raw: JSON.stringify({ choices: [{ message: { content: entry.raw }, finish_reason: 'stop' }] }),
+        })),
+      };
+      const receiptsPath = `repeat-${runId}.json`;
+      const text = await jsonWrite(join(f.root, receiptsPath), receipts);
+      group[side].push({
+        runId,
+        report: f.evidence.report,
+        cassettePath: `benchmarks/cassettes/${SLICE}@1/${MODEL}.json`,
+        cassetteSha256: sha256(raw),
+        receiptsPath,
+        receiptsSha256: sha256(text),
+      });
+    }
+  const path = join(f.root, 'repeats.json');
+  await jsonWrite(path, { format: 'driftbench-bench-repeat-files-v1', groups: [group] });
+  return path;
+}
+
 describe('bench CLI recording integrity', () => {
+  it('validates the entire default manifest while selecting a subset, including unselected corruption', async () => {
+    const f = await fixture();
+    expect(await raise(f)).toMatchObject({ code: 0 });
+    const path = await repeatManifest(f);
+    const input = JSON.parse(await readFile(path, 'utf8'));
+    const extra = structuredClone(input.groups[0]);
+    extra.slice = 'fictional-extra';
+    const spec = await readFile(join(f.root, `benchmarks/slices/${SLICE}/1/cases.spec.json`), 'utf8');
+    const folder = 'benchmarks/slices/fictional-extra/1';
+    await mkdir(join(f.root, folder), { recursive: true });
+    await writeFile(join(f.root, folder, 'cases.spec.json'), spec);
+    const manifestPath = join(f.root, 'benchmarks/manifest.json');
+    const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+    manifest.slices.push({ ...manifest.slices[0], name: extra.slice, path: folder });
+    await jsonWrite(manifestPath, manifest);
+    for (const run of [...extra.old, ...extra.candidate]) {
+      const receipts = JSON.parse(await readFile(join(f.root, run.receiptsPath), 'utf8'));
+      run.runId = `extra-${run.runId}`;
+      run.report.slice = extra.slice;
+      receipts.runId = run.runId;
+      for (const call of receipts.calls) call.id = `extra-${call.id}`;
+      run.receiptsPath = `repeat-${run.runId}.json`;
+      run.receiptsSha256 = sha256(await jsonWrite(join(f.root, run.receiptsPath), receipts));
+    }
+    input.groups.push(extra);
+    for (const group of input.groups)
+      for (const run of [...group.old, ...group.candidate]) {
+        run.cassettePath = `../../${run.cassettePath}`;
+        run.receiptsPath = `../../${run.receiptsPath}`;
+      }
+    const defaultFile = join(f.root, 'benchmarks/repeats/manifest.json');
+    await jsonWrite(defaultFile, input);
+    const selected = await cli(f, ['replay', '--slice', SLICE, '--check-floor', '--json']);
+    expect(selected.code).toBe(0);
+    expect(JSON.parse(selected.out).checks).toHaveLength(1);
+    input.groups[1].candidate[0].receiptsSha256 = '0'.repeat(64);
+    await jsonWrite(defaultFile, input);
+    const corrupt = await cli(f, ['replay', '--slice', SLICE, '--check-floor', '--json']);
+    expect(corrupt.code).not.toBe(0);
+    expect(`${corrupt.err}${corrupt.out}`).toMatch(/hash/);
+  });
+  it('automatically uses the frozen default manifest only for floor checks', async () => {
+    const f = await fixture();
+    expect(await raise(f)).toMatchObject({ code: 0 });
+    const path = await repeatManifest(f);
+    const destination = join(f.root, 'benchmarks/repeats/manifest.json');
+    const input = JSON.parse(await readFile(path, 'utf8'));
+    for (const run of [...input.groups[0].old, ...input.groups[0].candidate]) {
+      run.cassettePath = `../../${run.cassettePath}`;
+      run.receiptsPath = `../../${run.receiptsPath}`;
+    }
+    await jsonWrite(destination, input);
+    const checked = await cli(f, ['replay', '--check-floor', '--json']);
+    expect(checked.code).toBe(0);
+    expect(JSON.parse(checked.out).checks[0].noiseRelative.selectedBestRun).toBe('candidate-1');
+    await jsonWrite(destination, { format: 'invalid' });
+    expect((await cli(f, ['replay', '--check-floor', '--json'])).code).not.toBe(0);
+    expect((await cli(f, ['replay', '--json'])).code).toBe(0);
+    expect((await cli(f, ['replay', '--check-floor', '--repeat-evidence', path, '--json'])).code).toBe(0);
+  });
+  it('checks attributable repeat files offline and exposes best and median in JSON and text', async () => {
+    const f = await fixture();
+    expect(await raise(f)).toMatchObject({ code: 0, err: '' });
+    const path = await repeatManifest(f);
+    const result = await cli(f, ['replay', '--check-floor', '--repeat-evidence', path, '--json']);
+    expect(result).toMatchObject({ code: 0, err: '' });
+    expect(JSON.parse(result.out).checks[0].noiseRelative).toMatchObject({
+      selectedBestRun: 'candidate-1',
+      oldMaximumCorrectnessFlips: 0,
+      candidate: { median: 6, minimum: 6, maximum: 6 },
+    });
+    const text = await cli(f, ['replay', '--check-floor', '--repeat-evidence', path]);
+    expect(text.code).toBe(0);
+    expect(text.out).toMatch(/empirical allowance.*median.*range.*best/i);
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled();
+  });
+  it('rejects invalid repeat input without falling back to historical checks', async () => {
+    const f = await fixture();
+    expect(await raise(f)).toMatchObject({ code: 0 });
+    const path = await repeatManifest(f);
+    const input = JSON.parse(await readFile(path, 'utf8'));
+    input.groups[0].old.pop();
+    await jsonWrite(path, input);
+    const result = await cli(f, ['replay', '--check-floor', '--repeat-evidence', path, '--json']);
+    expect(result.code).not.toBe(0);
+    expect(`${result.out}${result.err}`).toMatch(/three/);
+    expect(await cli(f, ['replay', '--repeat-evidence', path])).toMatchObject({ code: 2 });
+  });
   it('accepts a complete offline recording and registers its floor through the CLI', async () => {
     const f = await fixture();
     expect(await cli(f, ['replay', '--slice', 'all', '--json'])).toMatchObject({ code: 0, err: '' });

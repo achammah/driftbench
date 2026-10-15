@@ -16,13 +16,17 @@ import {
   type CaseResult,
   checkFloor,
   playBenchClient,
+  type RepeatEvidence,
+  type RepeatRun,
   raiseFloor,
   recordBenchClient,
   replaySlice,
   scoreSlice,
   sha256,
+  type VerifiedRepeatEvidence,
   validateReport,
   validateSlice,
+  verifyRepeatEvidence,
 } from './run';
 
 type Io = { out: (text: string) => void; err: (text: string) => void; readonly cwd: string };
@@ -54,6 +58,7 @@ type Options = {
   model?: string;
   json?: boolean;
   checkFloor?: boolean;
+  repeatEvidence?: string;
   store?: string;
   spendCapUsd?: string;
   spendLedger?: string;
@@ -93,6 +98,10 @@ export async function main(
       .option('--json', 'print a JSON report');
   common(bench.command('replay').description('Replay committed cassettes without network or credentials.'))
     .option('--check-floor', 'fail below the absolute or paired floor')
+    .option(
+      '--repeat-evidence <json>',
+      'verified repeat files for the empirical paired check; requires --check-floor',
+    )
     .action(async (o: Options) => setExit(await benchReplay(o, io)));
   common(bench.command('record').description('Record a maintainer run with a required USD spend cap.'))
     .requiredOption(
@@ -293,6 +302,57 @@ async function verifiedReplay(
     throw new Error(`re-record needed: ${entry.name}/${model.id}: evidence is stale`);
   return { report, evidence };
 }
+/** Paths are relative to the repeat manifest, and content hashes bind both artifacts. */
+async function loadRepeatFiles(file: string): Promise<Map<string, RepeatEvidence>> {
+  const input = JSON.parse(await readFile(file, 'utf8'));
+  if (
+    input.format !== 'driftbench-bench-repeat-files-v1' ||
+    !Array.isArray(input.groups) ||
+    !input.groups.length
+  )
+    throw new Error('Invalid repeat file manifest');
+  const groups = new Map<string, RepeatEvidence>();
+  for (const group of input.groups) {
+    if (!Array.isArray(group.old) || !Array.isArray(group.candidate) || !group.old[0]?.report)
+      throw new Error('Incomplete repeat file group');
+    const key = keyOf(group.slice, group.old[0].report.datasetVersion, group.judge);
+    if (groups.has(key)) throw new Error('Duplicate repeat file group');
+    const load = async (
+      items: Array<
+        Omit<RepeatRun, 'cassetteText' | 'receiptsText'> & {
+          cassettePath: string;
+          receiptsPath: string;
+        }
+      >,
+    ) => {
+      const runs: RepeatRun[] = [];
+      for (const item of items) {
+        if (
+          typeof item.cassettePath !== 'string' ||
+          typeof item.receiptsPath !== 'string' ||
+          item.report?.slice !== group.slice ||
+          item.report?.judge !== group.judge
+        )
+          throw new Error('Repeat file identity or paths are incomplete');
+        runs.push({
+          runId: item.runId,
+          report: item.report,
+          cassetteSha256: item.cassetteSha256,
+          receiptsSha256: item.receiptsSha256,
+          cassetteText: await readFile(resolve(dirname(file), item.cassettePath), 'utf8'),
+          receiptsText: await readFile(resolve(dirname(file), item.receiptsPath), 'utf8'),
+        });
+      }
+      return runs;
+    };
+    groups.set(key, {
+      format: 'driftbench-bench-repeats-v1',
+      old: await load(group.old),
+      candidate: await load(group.candidate),
+    });
+  }
+  return groups;
+}
 function printReport(io: Io, report: BenchReport, floor?: ReturnType<typeof checkFloor>) {
   const interval = (x: { lower: number; upper: number }) =>
     `[${(x.lower * 100).toFixed(2)}, ${(x.upper * 100).toFixed(2)}]%`;
@@ -303,6 +363,12 @@ function printReport(io: Io, report: BenchReport, floor?: ReturnType<typeof chec
     io.out(
       `  Paired: McNemar p=${floor.paired.mcnemar.pValue.toFixed(6)}, auto margin ${(floor.paired.nonInferiority.margin * 100).toFixed(1)}%; difference bootstrap ${interval(floor.paired.familyBootstrap)}\n`,
     );
+  if (floor?.noiseRelative) {
+    const noise = floor.noiseRelative;
+    io.out(
+      `  Paired repeats: empirical allowance ${noise.oldMaximumCorrectnessFlips}/${report.n}; median losses ${noise.medianCandidateDirectionalLosses}; candidate median ${noise.candidate.median}/${report.n} +/- ${noise.candidate.margin.cases} cases; range ${noise.candidate.minimum}-${noise.candidate.maximum}; best ${noise.selectedBestRun} (selected, not median)\n`,
+    );
+  }
   if (report.zeroFailure.observedClean)
     io.out(
       `  Zero failures: a <5% claim needs ${report.zeroFailure.requiredCleanCases} independent clean cases; construction families can be dependent.\n`,
@@ -311,27 +377,79 @@ function printReport(io: Io, report: BenchReport, floor?: ReturnType<typeof chec
 }
 export async function benchReplay(options: Options, io: Io): Promise<number> {
   try {
+    if (options.repeatEvidence && !options.checkFloor)
+      throw new Error('--repeat-evidence requires --check-floor');
     const root = rootOf(io, options.root);
     const manifest = await manifestAt(root);
     const { slices, models } = selection(manifest, options);
+    const defaultRepeatFile = join(root, 'benchmarks/repeats/manifest.json');
+    const automaticRepeats = !options.repeatEvidence && options.checkFloor && existsSync(defaultRepeatFile);
+    const repeatGroups =
+      options.repeatEvidence || automaticRepeats
+        ? await loadRepeatFiles(
+            options.repeatEvidence ? resolve(io.cwd, options.repeatEvidence) : defaultRepeatFile,
+          )
+        : undefined;
+    const verifiedGroups = new Map<string, VerifiedRepeatEvidence>();
+    const cachedSlices = new Map<string, BenchSlice>();
+    if (repeatGroups) {
+      const coveredSlices = automaticRepeats ? manifest.slices : slices;
+      const coveredModels = automaticRepeats ? manifest.models.filter((m) => m.status === 'active') : models;
+      const required = new Set(
+        coveredSlices.flatMap((s) => coveredModels.map((m) => keyOf(s.name, s.version, m.id))),
+      );
+      if (repeatGroups.size !== required.size || [...required].some((key) => !repeatGroups.has(key)))
+        throw new Error(
+          automaticRepeats
+            ? 'Default repeat manifest must cover every active slice/model population'
+            : 'Repeat files must cover exactly the selected slice/model populations',
+        );
+      // Validate the complete frozen manifest before filtering a subset, so unselected corrupt evidence fails too.
+      const physical = new Set<string>();
+      for (const [key, input] of repeatGroups) {
+        const entry = manifest.slices.find(
+          (s) => key === keyOf(s.name, s.version, input.old[0]?.report.judge ?? ''),
+        );
+        if (!entry) throw new Error('Repeat manifest names an unknown population');
+        let slice = cachedSlices.get(entry.name);
+        if (!slice) {
+          slice = await loadBenchSlice(root, entry);
+          cachedSlices.set(entry.name, slice);
+        }
+        const proof = await verifyRepeatEvidence(slice, input);
+        for (const run of [...proof.old, ...proof.candidate])
+          for (const call of JSON.parse(run.receiptsText).calls) {
+            if (physical.has(call.id)) throw new Error('Physical receipt is reused across repeat groups');
+            physical.add(call.id);
+          }
+        verifiedGroups.set(key, proof);
+      }
+    }
     const floors = await readFloors(root);
     const reports: BenchReport[] = [];
     const checks = [];
     const problems: string[] = [];
     const head = headOf(root);
     for (const entry of slices) {
-      const slice = await loadBenchSlice(
-        root,
-        entry,
-        options.store ? resolve(io.cwd, options.store) : undefined,
-      );
+      const slice =
+        !options.store && cachedSlices.has(entry.name)
+          ? (cachedSlices.get(entry.name) as BenchSlice)
+          : await loadBenchSlice(root, entry, options.store ? resolve(io.cwd, options.store) : undefined);
       for (const model of models) {
         try {
-          const { report } = await verifiedReplay(root, entry, model, slice, head);
+          const current = await verifiedReplay(root, entry, model, slice, head);
+          const repeats = verifiedGroups.get(keyOf(entry.name, entry.version, model.id));
+          // Repeat identity names the physical recording source, not this offline replay's commit.
+          const report = repeats ? { ...current.report, head: current.evidence.report.head } : current.report;
           reports.push(report);
           const floor = options.checkFloor
-            ? checkFloor(report, floors.floors[keyOf(entry.name, entry.version, model.id)])
+            ? checkFloor(report, floors.floors[keyOf(entry.name, entry.version, model.id)], repeats)
             : undefined;
+          if (
+            floor?.noiseRelative &&
+            floor.noiseRelative.selectedCassetteSha256 !== current.evidence.cassetteSha256
+          )
+            throw new Error('Current cassette is not the selected best candidate repeat');
           if (floor) {
             checks.push({ slice: entry.name, model: model.id, ...floor });
             problems.push(...floor.problems);

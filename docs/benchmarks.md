@@ -136,9 +136,74 @@ pnpm bench replay --slice all --check-floor
 
 `--evidence` also accepts the individual record evidence file. The command validates the evidence against the current cassette replay before writing. Within one dataset version, the correct count cannot fall. An equal count can update the evidence after a fingerprint change; an unchanged count at the same fingerprint is refused. Previous floor records remain in history.
 
+## Optional empirical repeat check
+
+Supply frozen repeat files when old and candidate judges have independently recorded repeats:
+
+```sh
+pnpm bench replay --slice fictional-noise --model gpt-6-luna --check-floor --repeat-evidence repeats.json --json
+```
+
+The manifest uses `format: driftbench-bench-repeat-files-v1` and `groups`. Each group names `slice`, `judge`,
+`old` and `candidate`. Each side needs at least three complete runs. A run supplies `runId`, the original
+`report`, `cassettePath`, `cassetteSha256`, `receiptsPath` and `receiptsSha256`. Paths resolve from the
+manifest's folder. An explicit file must cover exactly the selected slice/model populations.
+For `--check-floor`, replay automatically uses `benchmarks/repeats/manifest.json` when it exists, unless
+`--repeat-evidence` overrides it. That default manifest must cover all active slice/model populations.
+Replay validates the full manifest, including unselected groups, before filtering `--slice` or `--model`.
+Missing, corrupt, duplicate or partial default evidence fails closed. When the default file is absent,
+the historical check runs. Replay without `--check-floor` does not load the default repeat manifest.
+
+A receipt mapping uses `format: driftbench-bench-repeat-receipts-v1`, `runId`, `head`, `fingerprint`,
+`judge`, `model`, `settings`, `side` (`old` or `candidate`), `repeat` (starting at 1), and a `calls` array in dataset case order. Each call supplies a distinct physical
+`id`, `caseId`, request `key`, `provider` (`openai`, `google` or `anthropic`), `status: ok`, and `raw` provider
+response JSON. Optional `httpStatus` must be a successful HTTP status. OpenAI text parts, Google content
+parts, and Anthropic non-thinking text parts are extracted and compared with the cassette's model text.
+Failed, interrupted and recovery-accounting receipts cannot establish successful recording occurrences.
+
+Export mappings from the original successful physical receipts. If a serialized recorder has no request
+keys in its receipts, establish the occurrence mapping from its frozen request sequence, concurrency and
+logical-call completion journal before exporting. An unprovable association is missing evidence. Retain
+the original journals for independent review; do not replace them with invented identifiers or responses.
+No headers, credentials or operator paths belong in a public proof. Provider response JSON may be reduced
+to the original response text fields required for this verification, with the original full receipt retained locally.
+Checksums detect changes relative to the supplied frozen hashes. They do not authenticate provider calls
+or prove that a self-authored mapping is truthful; source receipt attribution remains an independent-review requirement.
+
+The verifier checks hashes, unique run and physical call identities, complete case occurrences, raw replay,
+labels and families, and stable source commit, fingerprint, model, settings and recorded decoder/frame versions within each side.
+Absent decoder/frame markers mean the historical versions 1/1. Replay pins the recorded versions in
+request keys and parsing, including when the current product uses newer defaults. It never rewrites cassette keys. Old and
+candidate sides may name different source commits, fingerprints or settings. Candidate fingerprints must
+match the shipped default. Identical outcomes or cassette bytes are valid when distinct physical receipts
+prove separate recordings. Reusing one recording under several repeat names is invalid.
+
+Old repeat 1 is the declared empirical anchor; it may differ from the historical floor recording. Its
+population, judge and model must match the floor. Source and settings must agree within each side.
+Receipt side and repeat ordinal must match the manifest's frozen recording plan; repeats cannot be
+reordered after scoring to select a favorable old anchor. The current cassette must be
+the best candidate run; the first candidate wins a correct-count tie. Replay verifies that retained cassette's
+hash. Its absolute correct-count floor remains mandatory. The repeat check replaces only the historical
+paired test for this invocation. Without an explicit or default repeat manifest, the historical checks remain unchanged.
+Invalid supplied repeats fail instead of falling back to the historical test.
+
+The empirical rule is fixed:
+
+1. Count total correctness flips for every old-run pair, including losses and gains.
+2. Use the maximum old-pair flip count as the empirical allowance.
+3. Count each candidate's directional losses against old repeat 1; gains do not cancel losses.
+4. Fail when the median candidate loss count exceeds that allowance. Equality passes.
+
+JSON reports the old pairs, candidate losses, source identities, explicit old anchor, selected best run and cassette hash.
+Both JSON and text report median correct count, observed minimum/maximum, and the empirical margin.
+JSON also supplies that margin as a fraction of the case count, and exposes each side's recorded decoder/frame identity. The margin is
+the old-flip allowance, separate from the observed candidate range. A selected best score is not a median.
+The allowance is an empirical quantity, not a confidence interval or a claim about all future runs. The old
+anchor order and number of repeats can affect the result. A noisy old judge can give a conservative allowance.
+
 ## CI and protected files
 
-The [CI workflow](../.github/workflows/ci.yml) runs the public API check and `bench replay --slice all --check-floor` on pull requests and pushes to main. It makes no live model calls.
+The [CI workflow](../.github/workflows/ci.yml) runs the public API check and `bench replay --slice all --check-floor` on pull requests and pushes to main. That unchanged command loads the frozen default repeat manifest when present. It makes no live model calls.
 
 [`validate protect`](validators.md#82-the-command) rejects changes from `exec/` branches to the benchmark folders, harness entry, public API check and enforcing workflows. Maintainers change recordings and floors from a maintainer branch, with the evidence run in the commit message. Review the raw responses and measured results before committing a new floor.
 
@@ -151,7 +216,7 @@ Gemini metering counts candidate and thinking tokens, and discounts cached input
 Record the shipped default judge against immutable fictional slices, replay raw responses without model calls, and enforce per-model floors. Run from the repository checkout, or supply `--root`. The slice set, source commits, recording workflow and statistical limits are described above.
 
 ```sh
-pnpm bench replay [--slice <name|all>] [--model <id>] [--check-floor] [--root <path>] [--store <file>] [--json]
+pnpm bench replay [--slice <name|all>] [--model <id>] [--check-floor] [--repeat-evidence <json>] [--root <path>] [--store <file>] [--json]
 pnpm bench record --model <id> --spend-cap-usd <usd> [--slice <name|all>] [--resume] [--concurrency <n>] [--spend-ledger <path>] [--root <path>] [--store <file>] [--json]
 pnpm bench floors [--root <path>] [--json]
 pnpm bench floors --raise <slice> <model> --evidence <json> [--root <path>] [--json]
@@ -164,6 +229,7 @@ pnpm bench floors --raise <slice> <model> --evidence <json> [--root <path>] [--j
 | `--root <path>` | Repository containing `benchmarks/`; otherwise discovered from the working directory |
 | `--store <file>` | Also register the exact dataset versions in the store; reject a conflicting version |
 | `--check-floor` | Replay: require the absolute correct-count floor and paired regression checks |
+| `--repeat-evidence <json>` | Replay: verify independent repeat files and use the empirical paired rule; requires `--check-floor` |
 | `--spend-cap-usd <usd>` | Record: required positive spending cap for this invocation, including in-flight reservations |
 | `--spend-ledger <path>` | Record: append call spending rows here; default `benchmarks/evidence/spend.jsonl` |
 | `--concurrency <n>` | Record: parallel calls, from 1 through 16, default 4 |
