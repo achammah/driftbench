@@ -1,0 +1,9 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "paths": { "@agent-nexus/driftbench-core": ["./src/core-shim.ts"] }
+  },
+  "include": ["src/**/*.ts", "src/**/*.mts"]
+}

@@ -1,0 +1,6 @@
+kind: check-set
+id: o5
+extends: default
+items:
+  - id: forbidden.count0
+    enabled: false

@@ -1,0 +1,6 @@
+kind: run-profile
+id: p1
+extends: default
+items:
+  - id: model
+    params: { model: claude-sonnet-5-5 }

@@ -1,0 +1,7 @@
+kind: policy/value-check
+id: u8
+extends: default
+items:
+  - id: rung2b_declared
+    when: { compare: exact }
+    params: { case_insensitive: true }
