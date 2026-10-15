@@ -1,0 +1,451 @@
+{
+ "M": 17,
+ "U": 17,
+ "n_runs": 102,
+ "n_errors": 0,
+ "block_fail_rate": {
+  "uncovered": 0.11764705882352941,
+  "random": 0.35294117647058826
+ },
+ "fails": {
+  "uncovered": "2/17",
+  "random": "6/17"
+ },
+ "difference": -0.23529411764705885,
+ "newcombe95": [
+  -0.4842264876009875,
+  0.05330901861743362
+ ],
+ "fisher_one_sided_p": 0.9804515305071478,
+ "run_fail_rate": {
+  "uncovered": 0.19607843137254902,
+  "random": 0.4117647058823529
+ },
+ "run_rate_diff_bootstrap95": [
+  -0.43137254901960786,
+  0.0
+ ],
+ "reproduces_production_outcome_2of3": {
+  "uncovered": 0.8823529411764706,
+  "random": 0.6470588235294118
+ },
+ "stable_3of3": {
+  "uncovered": 0.6470588235294118,
+  "random": 0.5882352941176471
+ },
+ "verdict": "FALSIFIED",
+ "blocks": {
+  "uncovered": [
+   {
+    "convo_id": 8167,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "reset_2fa",
+    "cluster": 1
+   },
+   {
+    "convo_id": 4392,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "recover_username",
+    "cluster": 8
+   },
+   {
+    "convo_id": 8344,
+    "runs": [
+     true,
+     true,
+     false
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "status_due_date",
+    "cluster": 4
+   },
+   {
+    "convo_id": 5601,
+    "runs": [
+     false,
+     true,
+     true
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "status_shipping_question",
+    "cluster": 6
+   },
+   {
+    "convo_id": 2477,
+    "runs": [
+     false,
+     true,
+     true
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "manage_change_address",
+    "cluster": 9
+   },
+   {
+    "convo_id": 1779,
+    "runs": [
+     false,
+     false,
+     false
+    ],
+    "fails": 3,
+    "fail": true,
+    "subflow": "slow_speed",
+    "cluster": 10
+   },
+   {
+    "convo_id": 6538,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "recover_password",
+    "cluster": 17
+   },
+   {
+    "convo_id": 509,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "manage_extension",
+    "cluster": 15
+   },
+   {
+    "convo_id": 2933,
+    "runs": [
+     false,
+     true,
+     false
+    ],
+    "fails": 2,
+    "fail": true,
+    "subflow": "shopping_cart",
+    "cluster": 3
+   },
+   {
+    "convo_id": 5913,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "status_credit_missing",
+    "cluster": 21
+   },
+   {
+    "convo_id": 8550,
+    "runs": [
+     false,
+     true,
+     true
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "shopping_cart",
+    "cluster": 18
+   },
+   {
+    "convo_id": 2820,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "missing",
+    "cluster": 16
+   },
+   {
+    "convo_id": 208,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "search_results",
+    "cluster": 20
+   },
+   {
+    "convo_id": 8638,
+    "runs": [
+     false,
+     true,
+     true
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "manage_downgrade",
+    "cluster": 22
+   },
+   {
+    "convo_id": 9751,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "out_of_stock_one_item",
+    "cluster": 27
+   },
+   {
+    "convo_id": 7312,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "bad_price_competitor",
+    "cluster": 29
+   },
+   {
+    "convo_id": 7379,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "credit_card",
+    "cluster": 26
+   }
+  ],
+  "random": [
+   {
+    "convo_id": 8831,
+    "runs": [
+     false,
+     false,
+     false
+    ],
+    "fails": 3,
+    "fail": true,
+    "subflow": "mistimed_billing_never_bought",
+    "cluster": 23
+   },
+   {
+    "convo_id": 7048,
+    "runs": [
+     true,
+     false,
+     true
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "status_quantity",
+    "cluster": 14
+   },
+   {
+    "convo_id": 5936,
+    "runs": [
+     false,
+     false,
+     true
+    ],
+    "fails": 2,
+    "fail": true,
+    "subflow": "manage_dispute_bill",
+    "cluster": 5
+   },
+   {
+    "convo_id": 9451,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "bad_price_competitor",
+    "cluster": 29
+   },
+   {
+    "convo_id": 6357,
+    "runs": [
+     false,
+     true,
+     true
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "shopping_cart",
+    "cluster": 18
+   },
+   {
+    "convo_id": 5262,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "status_quantity",
+    "cluster": 14
+   },
+   {
+    "convo_id": 4163,
+    "runs": [
+     true,
+     false,
+     true
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "slow_speed",
+    "cluster": 10
+   },
+   {
+    "convo_id": 7035,
+    "runs": [
+     true,
+     false,
+     true
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "manage_dispute_bill",
+    "cluster": 5
+   },
+   {
+    "convo_id": 967,
+    "runs": [
+     true,
+     true,
+     false
+    ],
+    "fails": 1,
+    "fail": false,
+    "subflow": "status_due_date",
+    "cluster": 4
+   },
+   {
+    "convo_id": 8747,
+    "runs": [
+     false,
+     false,
+     false
+    ],
+    "fails": 3,
+    "fail": true,
+    "subflow": "status_delivery_time",
+    "cluster": 12
+   },
+   {
+    "convo_id": 10179,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "recover_username",
+    "cluster": 8
+   },
+   {
+    "convo_id": 10199,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "recover_password",
+    "cluster": 17
+   },
+   {
+    "convo_id": 4459,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "recover_password",
+    "cluster": 17
+   },
+   {
+    "convo_id": 2361,
+    "runs": [
+     false,
+     false,
+     true
+    ],
+    "fails": 2,
+    "fail": true,
+    "subflow": "status",
+    "cluster": 14
+   },
+   {
+    "convo_id": 7631,
+    "runs": [
+     true,
+     true,
+     true
+    ],
+    "fails": 0,
+    "fail": false,
+    "subflow": "return_color",
+    "cluster": 2
+   },
+   {
+    "convo_id": 7420,
+    "runs": [
+     false,
+     false,
+     false
+    ],
+    "fails": 3,
+    "fail": true,
+    "subflow": "manage_cancel",
+    "cluster": 18
+   },
+   {
+    "convo_id": 523,
+    "runs": [
+     false,
+     false,
+     false
+    ],
+    "fails": 3,
+    "fail": true,
+    "subflow": "slow_speed",
+    "cluster": 0
+   }
+  ]
+ }
+}

@@ -1,0 +1,180 @@
+{
+ "n_conversations": {
+  "free": 100,
+  "findings": 100,
+  "engine": 100
+ },
+ "n_errors": 0,
+ "n_human": 100,
+ "rates": {
+  "free": {
+   "Short%": 1.7944535073409462,
+   "Polite%": 27.895595432300162,
+   "FrntId%": 43.93280592752791,
+   "IDs/turn": 0.47797716150081565,
+   "Uncert%": 3.4257748776508974,
+   "Quest%": 21.207177814029365
+  },
+  "findings": {
+   "Short%": 1.953125,
+   "Polite%": 30.078125,
+   "FrntId%": 28.020002675583346,
+   "IDs/turn": 0.4791666666666667,
+   "Uncert%": 5.078125,
+   "Quest%": 50.0
+  },
+  "engine": {
+   "Short%": 38.02469135802469,
+   "Polite%": 14.444444444444445,
+   "FrntId%": 34.392595002552596,
+   "IDs/turn": 0.454320987654321,
+   "Uncert%": 5.679012345679013,
+   "Quest%": 10.74074074074074
+  },
+  "human": {
+   "Short%": 38.21917808219178,
+   "Polite%": 20.684931506849313,
+   "FrntId%": 49.56629653309392,
+   "IDs/turn": 0.2726027397260274,
+   "Uncert%": 4.109589041095891,
+   "Quest%": 8.904109589041095
+  }
+ },
+ "dice_vs_human": {
+  "free": {
+   "Short%": 8.969210921661817,
+   "Polite%": 85.15729577309295,
+   "FrntId%": 93.9748185198477,
+   "IDs/turn": 72.6379001836982,
+   "Uncert%": 90.92526690391459,
+   "Quest%": 59.14134105161601
+  },
+  "findings": {
+   "Short%": 9.723739243945973,
+   "Polite%": 81.49600489110956,
+   "FrntId%": 72.2292542919732,
+   "IDs/turn": 72.52296712474376,
+   "Uncert%": 89.45835760046593,
+   "Quest%": 30.23255813953488
+  },
+  "engine": {
+   "Short%": 99.74491493467603,
+   "Polite%": 82.23570190641249,
+   "FrntId%": 81.92722503476716,
+   "IDs/turn": 75.00174487588116,
+   "Uncert%": 83.96682791983415,
+   "Quest%": 90.65082644628099
+  }
+ },
+ "engine_better_than_findings": {
+  "Short%": true,
+  "Polite%": true,
+  "FrntId%": true,
+  "IDs/turn": true,
+  "Uncert%": false,
+  "Quest%": true
+ },
+ "n_better": 5,
+ "verdict": "SUPPORTED",
+ "dice_diff_engine_minus_findings_bootstrap95": {
+  "Short%": [
+   79.54122961940675,
+   93.1477532659987
+  ],
+  "Polite%": [
+   -15.371731613333822,
+   17.533504538744097
+  ],
+  "FrntId%": [
+   2.1592017402656154,
+   17.91708481447509
+  ],
+  "IDs/turn": [
+   -5.002682708757476,
+   10.003075739515722
+  ],
+  "Uncert%": [
+   -22.531661071939098,
+   15.352312261816792
+  ],
+  "Quest%": [
+   48.07659942682032,
+   68.1923065122407
+  ]
+ },
+ "ceiling_split_half": {
+  "Short%": 99.49505774685097,
+  "Polite%": 96.4351947249124,
+  "FrntId%": 97.88711762286673,
+  "IDs/turn": 98.93705806937356,
+  "Uncert%": 54.379515781467866,
+  "Quest%": 81.45207033465682
+ },
+ "m23_metric_check": {
+  "Polite_dice_free": 85.15729577309295,
+  "Polite_dice_free_forced_please": 34.279228149829734,
+  "metric_ok": true
+ },
+ "secondary": {
+  "free": {
+   "turns/dialogue": 6.13,
+   "words/turn": 17.936378466557912
+  },
+  "findings": {
+   "turns/dialogue": 7.68,
+   "words/turn": 25.919270833333332
+  },
+  "engine": {
+   "turns/dialogue": 8.1,
+   "words/turn": 7.644444444444445
+  },
+  "human": {
+   "turns/dialogue": 7.3,
+   "words/turn": 7.916438356164384
+  }
+ },
+ "secondary_dice": {
+  "free": {
+   "turns/dialogue": 91.28816083395384,
+   "words/turn": 61.24236604814797
+  },
+  "findings": {
+   "turns/dialogue": 97.46328437917222,
+   "words/turn": 46.79339399584136
+  },
+  "engine": {
+   "turns/dialogue": 94.80519480519482,
+   "words/turn": 98.25206631779723
+  }
+ },
+ "cvm_turns_per_dialogue": {
+  "free": 0.31840938210637787,
+  "findings": 0.05883949823174739,
+  "engine": 0.14345910397344191
+ },
+ "agent_pass_rate": {
+  "free": 0.57,
+  "findings": 0.54,
+  "engine": 0.57
+ },
+ "stop_reasons": {
+  "free": {
+   "###STOP###": 100
+  },
+  "findings": {
+   "###STOP###": 100
+  },
+  "engine": {
+   "###STOP###": 94,
+   "###ABANDON###": 6
+  }
+ },
+ "engine_checks": {
+  "unplanned_fact_disclosures": 122,
+  "turns_with_dont_know_and_unmatched_id": 0,
+  "act_recovery": "386/420",
+  "goodbye_before_last_agent_tool_call": 0,
+  "unplanned_fact_disclosures_excluding_substring_overlap": 23,
+  "note": "The first count matches a fact value anywhere in the text, so a zip code inside a planned full address or a username inside a planned e-mail counts as a leak (71 zip codes, 27 usernames). Excluding values contained in a planned value: 23 disclosures in 23 of 810 engine turns, 19 of them order ids, mostly re-mentioned after an earlier disclosure."
+ }
+}

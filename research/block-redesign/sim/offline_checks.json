@@ -1,0 +1,99 @@
+{
+ "m25_estimator_equals_bruteforce": true,
+ "m25_stub_flip_share": {
+  "X": 0.0,
+  "W": 0.0
+ },
+ "m21_determinism_identical_10_runs": true,
+ "m21_example_plan": [
+  [
+   {
+    "act": "inform_intent"
+   }
+  ],
+  [
+   [
+    {
+     "act": "answer",
+     "slot": "customer_name"
+    }
+   ],
+   {
+    "polite": false,
+    "question": false,
+    "short": false,
+    "uncertain": false
+   },
+   null
+  ],
+  [
+   [
+    {
+     "act": "answer",
+     "slot": "username"
+    }
+   ],
+   {
+    "polite": false,
+    "question": false,
+    "short": true,
+    "uncertain": false
+   },
+   null
+  ],
+  [
+   [
+    {
+     "act": "repeat_request"
+    }
+   ],
+   {
+    "polite": false,
+    "question": false,
+    "short": false,
+    "uncertain": false
+   },
+   null
+  ],
+  [
+   [
+    {
+     "act": "answer",
+     "slot": "email"
+    },
+    {
+     "act": "dont_know",
+     "slot": "order_id"
+    }
+   ],
+   {
+    "polite": false,
+    "question": false,
+    "short": true,
+    "uncertain": true
+   },
+   null
+  ]
+ ],
+ "human_E_rates": {
+  "Short%": 38.21917808219178,
+  "Polite%": 20.684931506849313,
+  "FrntId%": 49.56629653309392,
+  "IDs/turn": 0.2726027397260274,
+  "Uncert%": 4.109589041095891,
+  "Quest%": 8.904109589041095
+ },
+ "human_E_secondary": {
+  "turns/dialogue": 7.3,
+  "words/turn": 7.916438356164384
+ },
+ "ceiling_split_half_dice": {
+  "Short%": 99.49505774685097,
+  "Polite%": 96.4351947249124,
+  "FrntId%": 97.88711762286673,
+  "IDs/turn": 98.93705806937356,
+  "Uncert%": 54.379515781467866,
+  "Quest%": 81.45207033465682
+ },
+ "n_test_action_pool": 791
+}

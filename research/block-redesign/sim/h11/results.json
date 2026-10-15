@@ -1,0 +1,819 @@
+{
+ "n_blocks": 20,
+ "n_conversations": 320,
+ "n_errors": 0,
+ "X_cross_family_flip_share": 0.15000000000000002,
+ "W_within_family_flip_share": 0.2,
+ "X_minus_W": -0.04999999999999999,
+ "X_minus_W_bootstrap95": [
+  -0.125,
+  0.0
+ ],
+ "verdict": "FALSIFIED",
+ "passhat4_mean": {
+  "O": 0.48928571428571427,
+  "G": 0.43214285714285716
+ },
+ "pass_rate_per_trial": {
+  "O": 0.60625,
+  "G": 0.575
+ },
+ "paired_pass_rate_diff_O_minus_G": 0.03125,
+ "paired_diff_bootstrap95": [
+  -0.0375,
+  0.1125
+ ],
+ "secondary_majority_flip": {
+  "X": 0.15000000000000002,
+  "W": 0.1
+ },
+ "missing_buttons_by_family": {
+  "O": {
+   "validate-purchase": 17,
+   "update-order": 15,
+   "ask-the-oracle": 11,
+   "shipping-status": 11,
+   "search-membership": 8,
+   "select-faq": 8,
+   "record-reason": 8,
+   "update-account": 8,
+   "membership": 8,
+   "search-faq": 7,
+   "log-out-in": 2,
+   "enter-details": 2,
+   "send-link": 2,
+   "try-again": 1,
+   "pull-up-account": 1
+  },
+  "G": {
+   "update-order": 15,
+   "validate-purchase": 15,
+   "shipping-status": 12,
+   "ask-the-oracle": 9,
+   "search-faq": 8,
+   "search-membership": 8,
+   "select-faq": 8,
+   "record-reason": 8,
+   "update-account": 8,
+   "membership": 7,
+   "pull-up-account": 6,
+   "log-out-in": 3,
+   "promo-code": 3,
+   "enter-details": 1
+  }
+ },
+ "stop_reasons": {
+  "O": {
+   "###STOP###": 160
+  },
+  "G": {
+   "###STOP###": 160
+  }
+ },
+ "user_turns_mean": {
+  "O": 7.20625,
+  "G": 6.125
+ },
+ "per_block": [
+  {
+   "block": 1539,
+   "flow": "troubleshoot_site",
+   "subflow": "search_results",
+   "O": [
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "passhat4_O": 0.5,
+   "passhat4_G": 0.0,
+   "verdicts": {
+    "GA": 0,
+    "GB": 0,
+    "OA": 0,
+    "OB": 1
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "fail/fail"
+   }
+  },
+  {
+   "block": 2062,
+   "flow": "shipping_issue",
+   "subflow": "status",
+   "O": [
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 0.5,
+   "passhat4_G": 0.5,
+   "verdicts": {
+    "GA": 0,
+    "GB": 1,
+    "OA": 0,
+    "OB": 1
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "pass/pass"
+   }
+  },
+  {
+   "block": 2463,
+   "flow": "troubleshoot_site",
+   "subflow": "credit_card",
+   "O": [
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    false,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "passhat4_O": 0.07142857142857142,
+   "passhat4_G": 0.21428571428571427,
+   "verdicts": {
+    "GA": 0,
+    "GB": 0,
+    "OA": 0,
+    "OB": 0
+   },
+   "majority": {
+    "O": "tie/pass",
+    "G": "pass/pass"
+   }
+  },
+  {
+   "block": 2929,
+   "flow": "order_issue",
+   "subflow": "manage_downgrade",
+   "O": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "G": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "passhat4_O": 0.0,
+   "passhat4_G": 0.0,
+   "verdicts": {
+    "GA": 0,
+    "GB": 0,
+    "OA": 0,
+    "OB": 0
+   },
+   "majority": {
+    "O": "fail/fail",
+    "G": "fail/fail"
+   }
+  },
+  {
+   "block": 3079,
+   "flow": "shipping_issue",
+   "subflow": "manage",
+   "O": [
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false
+   ],
+   "G": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false
+   ],
+   "passhat4_O": 0.0,
+   "passhat4_G": 0.0,
+   "verdicts": {
+    "GA": 0,
+    "GB": 0,
+    "OA": 0,
+    "OB": 0
+   },
+   "majority": {
+    "O": "fail/fail",
+    "G": "fail/fail"
+   }
+  },
+  {
+   "block": 3630,
+   "flow": "product_defect",
+   "subflow": "return_size",
+   "O": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "G": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "passhat4_O": 0.0,
+   "passhat4_G": 0.0,
+   "verdicts": {
+    "GA": 0,
+    "GB": 0,
+    "OA": 0,
+    "OB": 0
+   },
+   "majority": {
+    "O": "fail/fail",
+    "G": "fail/fail"
+   }
+  },
+  {
+   "block": 5440,
+   "flow": "subscription_inquiry",
+   "subflow": "manage_extension",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 1.0,
+   "passhat4_G": 1.0,
+   "verdicts": {
+    "GA": 1,
+    "GB": 1,
+    "OA": 1,
+    "OB": 1
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "pass/pass"
+   }
+  },
+  {
+   "block": 5795,
+   "flow": "account_access",
+   "subflow": "reset_2fa",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 1.0,
+   "passhat4_G": 1.0,
+   "verdicts": {
+    "GA": 1,
+    "GB": 1,
+    "OA": 1,
+    "OB": 1
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "pass/pass"
+   }
+  },
+  {
+   "block": 6275,
+   "flow": "purchase_dispute",
+   "subflow": "promo_code_invalid",
+   "O": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "G": [
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "passhat4_O": 0.0,
+   "passhat4_G": 0.0,
+   "verdicts": {
+    "GA": 0,
+    "GB": 0,
+    "OA": 0,
+    "OB": 0
+   },
+   "majority": {
+    "O": "fail/fail",
+    "G": "fail/fail"
+   }
+  },
+  {
+   "block": 6771,
+   "flow": "order_issue",
+   "subflow": "status_payment_method",
+   "O": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "G": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "passhat4_O": 0.0,
+   "passhat4_G": 0.0,
+   "verdicts": {
+    "OA": 0,
+    "OB": 0,
+    "GA": 0,
+    "GB": 0
+   },
+   "majority": {
+    "O": "fail/fail",
+    "G": "fail/fail"
+   }
+  },
+  {
+   "block": 6798,
+   "flow": "subscription_inquiry",
+   "subflow": "manage_pay_bill",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 1.0,
+   "passhat4_G": 1.0,
+   "verdicts": {
+    "OA": 1,
+    "OB": 1,
+    "GA": 1,
+    "GB": 1
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "pass/pass"
+   }
+  },
+  {
+   "block": 7077,
+   "flow": "troubleshoot_site",
+   "subflow": "search_results",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "G": [
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 0.5,
+   "passhat4_G": 0.21428571428571427,
+   "verdicts": {
+    "GA": 0,
+    "GB": 1,
+    "OA": 1,
+    "OB": 0
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "tie/pass"
+   }
+  },
+  {
+   "block": 7279,
+   "flow": "product_defect",
+   "subflow": "refund_update",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 1.0,
+   "passhat4_G": 1.0,
+   "verdicts": {
+    "GA": 1,
+    "GB": 1,
+    "OA": 1,
+    "OB": 1
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "pass/pass"
+   }
+  },
+  {
+   "block": 7321,
+   "flow": "account_access",
+   "subflow": "recover_password",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 1.0,
+   "passhat4_G": 1.0,
+   "verdicts": {
+    "GA": 1,
+    "GB": 1,
+    "OA": 1,
+    "OB": 1
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "pass/pass"
+   }
+  },
+  {
+   "block": 7666,
+   "flow": "manage_account",
+   "subflow": "status_shipping_question",
+   "O": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "G": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "passhat4_O": 0.0,
+   "passhat4_G": 0.0,
+   "verdicts": {
+    "OA": 0,
+    "OB": 0,
+    "GA": 0,
+    "GB": 0
+   },
+   "majority": {
+    "O": "fail/fail",
+    "G": "fail/fail"
+   }
+  },
+  {
+   "block": 7860,
+   "flow": "manage_account",
+   "subflow": "status_shipping_question",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "G": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 0.21428571428571427,
+   "passhat4_G": 1.0,
+   "verdicts": {
+    "GA": 1,
+    "GB": 1,
+    "OA": 1,
+    "OB": 0
+   },
+   "majority": {
+    "O": "pass/tie",
+    "G": "pass/pass"
+   }
+  },
+  {
+   "block": 8032,
+   "flow": "purchase_dispute",
+   "subflow": "bad_price_yesterday",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 1.0,
+   "passhat4_G": 0.5,
+   "verdicts": {
+    "OA": 1,
+    "OB": 1,
+    "GA": 1,
+    "GB": 0
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "pass/pass"
+   }
+  },
+  {
+   "block": 8115,
+   "flow": "order_issue",
+   "subflow": "manage_cancel",
+   "O": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "G": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "passhat4_O": 0.0,
+   "passhat4_G": 0.0,
+   "verdicts": {
+    "OA": 0,
+    "OB": 0,
+    "GA": 0,
+    "GB": 0
+   },
+   "majority": {
+    "O": "fail/fail",
+    "G": "fail/fail"
+   }
+  },
+  {
+   "block": 8196,
+   "flow": "purchase_dispute",
+   "subflow": "bad_price_competitor",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 1.0,
+   "passhat4_G": 0.21428571428571427,
+   "verdicts": {
+    "OA": 1,
+    "OB": 1,
+    "GA": 0,
+    "GB": 1
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "tie/pass"
+   }
+  },
+  {
+   "block": 10341,
+   "flow": "account_access",
+   "subflow": "reset_2fa",
+   "O": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "G": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "passhat4_O": 1.0,
+   "passhat4_G": 1.0,
+   "verdicts": {
+    "OA": 1,
+    "OB": 1,
+    "GA": 1,
+    "GB": 1
+   },
+   "majority": {
+    "O": "pass/pass",
+    "G": "pass/pass"
+   }
+  }
+ ]
+}

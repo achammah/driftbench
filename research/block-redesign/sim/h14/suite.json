@@ -1,0 +1,21 @@
+{
+ "model": "gpt-5.4-nano",
+ "prompt": "Below is the system prompt of a customer support agent. Write 15 distinct test scenarios a QA engineer would write for this agent. Each scenario is one line: the customer's goal, in one sentence. Return JSON: {\"scenarios\": [\"...\", ...]}.\n\n",
+ "scenarios": [
+  "Customer wants a refund because an item arrived damaged and asks to start the refund process.",
+  "Customer wants to update an existing refund by adding a second item to return.",
+  "Customer asks what the status is of their refund and how it was paid (online/by phone/by chat).",
+  "Customer wants to return an item because of a stain and needs the return steps started.",
+  "Customer wants to return an item because the color is different than expected and needs return eligibility checked.",
+  "Customer wants to return an item because it doesn\u2019t fit and needs return eligibility checked before getting a shipping label.",
+  "Customer believes an extra fee was added to their order and wants the charge removed.",
+  "Customer says the delivery time is wrong (wants evening instead of morning) and asks if it can be changed.",
+  "Customer wants to change the payment method used for their order and asks what\u2019s possible based on shipment status.",
+  "Customer reports the email confirmation shows the wrong quantity for their order and wants it corrected or refunded.",
+  "Customer wants to upgrade shipping to overnight and asks whether the order can be upgraded based on current shipping status.",
+  "Customer accidentally ordered two items instead of one and wants the extra item refunded right away if eligible.",
+  "Customer says an unknown subscription service was added to their account and wants it removed and/or refunded.",
+  "Customer says a promo code is invalid (or out of date) and wants help getting a working discount.",
+  "Customer reports their subscription was billed twice and wants the dispute resolved with the correct refund amount based on membership rules."
+ ]
+}
