@@ -10,6 +10,7 @@ see_also:
   - authoring-prefixes
   - authoring-perturbations
   - authoring-inventory
+  - authoring-rule-files
 next:
   - authoring-inventory
 ---
@@ -23,11 +24,12 @@ Two commands check spec files without running any agent:
 
 Each spec also gets its content hash: the first 12 hex characters of the SHA-256 of the spec's canonical JSON (keys sorted at every depth). Equal content gives an equal hash. The hash, not `version`, enters the cache key and every run id, so any edit to a spec makes its runs new.
 
-Checks run in three layers, and a later layer runs only when the earlier ones pass:
+Checks run in four layers, and a later layer runs only when the earlier ones pass:
 
 1. Parse and shorthand rewrite (`SPEC_PARSE`, `SPEC_NOT_OBJECT`, `SPEC_ALIAS_CONFLICT`, `BLOCK_STIMULUS_*`).
 2. The schema (`SCHEMA_*`).
-3. The semantic rules (every other error code).
+3. The semantic rules (every other error code but `OBJECT_*`).
+4. The rule files (`OBJECT_*`). Each object the spec names is resolved against the rule files its folder sees, and so is each object a `uses.yaml` above it names. This layer runs only when something names an object, or when a rule file above the spec is broken. See authoring-rule-files.
 
 Warnings are computed only on valid specs.
 
@@ -47,7 +49,7 @@ driftbench spec validate <paths...> [--json]
 
 | Option | Meaning | Default |
 |---|---|---|
-| `<paths...>` (required) | Spec files or folders. A folder is searched recursively for `*.yaml`, `*.yml` and `*.spec.json`, sorted; names starting with a dot, `node_modules` and `dist` are skipped. A `.json` file is read as JSON, any other as YAML. | none |
+| `<paths...>` (required) | Spec files or folders. A folder is searched recursively for `*.yaml`, `*.yml` and `*.spec.json`, sorted; names starting with a dot, `node_modules`, `dist` and `_driftbench` are skipped, and so is a `driftbench` folder beside a `driftbench.yaml`. A `.json` file is read as JSON, any other as YAML. | none |
 | `--json` | Print one JSON array, one entry per spec. | off |
 
 | Exit code | When |
@@ -76,7 +78,7 @@ driftbench spec lint <paths...> [--json] [--strict]
 
 ## Inputs
 
-Spec files, in the format of authoring-spec-format. Nothing else is read: the commands never load the inventory, the criteria catalogue or the agent.
+Spec files, in the format of authoring-spec-format. Also the rule files their folders see (see authoring-rule-files): the nearest `driftbench.yaml` above the spec with its `driftbench/` folder, and every `_driftbench/` folder on the way. Nothing else is read: the commands never load the inventory, the criteria catalogue or the agent.
 
 ## Outputs and how to read them
 
@@ -115,6 +117,18 @@ The path in a spec is dotted, counting from 0: `blocks.2.expect.tools.0.label` i
 | `RETENTION_FACT_UNKNOWN` | error | `knowledge_retention` names a fact no ledger holds before the block: not in `given.ledger`, nor in an earlier block's `ledger_add` |
 | `TOOL_FORBIDDEN_EXPECTED` | error | a block expects a tool that `rules.forbidden_tools` or `rules.max_calls: 0` forbids |
 | `GIVEN_ORIGIN_WITHOUT_PREFIX` | error | a block sets `given.origin` and writes no `given.prefix` |
+| `OBJECT_INVALID` | error | a rule file, an inline object in `uses` or a `uses.yaml` does not fit the object format. Or a rule file sits at a path that does not match its kind and id |
+| `OBJECT_KIND_UNKNOWN` | error | an object names a kind no package or plugin registered |
+| `OBJECT_UNKNOWN` | error | `uses` names an object no layer defines; the message names the layers searched |
+| `OBJECT_CYCLE` | error | objects extend each other in a loop; the message prints the loop |
+| `OBJECT_DUPLICATE` | error | one kind and id are defined twice at the same layer |
+| `OBJECT_SHIPPED_IMMUTABLE` | error | a project or suite file reuses the id of a shipped object |
+| `OBJECT_ITEM_UNKNOWN` | error | an operation, an `order` or a move names an item the parent does not hold; the message lists the parent's items |
+| `OBJECT_ITEM_EXISTS` | error | `add: true` names an item the parent already holds |
+| `OBJECT_ITEM_INCOMPLETE` | error | a new item lacks `title`, `when`, `effect` or `impl`, or a root object lists an item without its full definition |
+| `OBJECT_ORDER_INVALID` | error | an `order` leaves out an enabled item or lists one twice, or a file sets `order` and moves an item |
+| `OBJECT_IMPL_UNKNOWN` | error | an enabled item names an implementation no builtin or plugin provides |
+| `OBJECT_PARAMS_INVALID` | error | an enabled item's params do not fit its implementation's schema; the message names the path |
 | `CRITERION_UNRESOLVED` | warning | blocks name criteria and the spec defines none; they must come from a shared catalogue |
 | `BLOCK_NO_EXPECTATION` | warning | a block checks nothing |
 | `TASK_WITHOUT_OUTCOME` | warning | a task spec checks none of `artifacts`, `workspace`, `execution` and `end_state` |
@@ -345,3 +359,5 @@ error: missing required argument 'paths'
 | `SPEC_PARSE` with a YAML message | bad indentation, an unquoted `:` or `{` in a value, a repeated key | quote the value, fix the indentation |
 | a semantic error appears only after a schema fix | semantic rules run only once the schema passes | run `spec validate` again after each fix |
 | exit 1 from `spec lint --strict` on a valid spec | a warning | fix it, or drop `--strict` |
+| every spec of a folder is invalid, each with an `OBJECT_*` line on `(file)` | a rule file in the project `driftbench/` folder or a suite `_driftbench/` folder is broken, and every spec below it reports it | fix the rule file the message names (see authoring-rule-files) |
+| `OBJECT_UNKNOWN` or `OBJECT_ITEM_UNKNOWN` on `uses.<key>` | `uses` names an object, or an item of its parent, that no rule file defines | fix the id; the message lists the layers searched or the parent's items |
