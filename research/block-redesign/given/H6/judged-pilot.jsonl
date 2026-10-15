@@ -1,0 +1,4 @@
+{"run":"h6-pilot:cov-750:record:0","block":"cov-750","arm":"record","rep":0,"verdict":true,"raw":"YES","status":200}
+{"run":"h6-pilot:order-id:record:0","block":"order-id","arm":"record","rep":0,"verdict":true,"raw":"YES","status":200}
+{"run":"h6-pilot:cov-750:prose:0","block":"cov-750","arm":"prose","rep":0,"verdict":true,"raw":"YES","status":200}
+{"run":"h6-pilot:order-id:prose:0","block":"order-id","arm":"prose","rep":0,"verdict":false,"raw":"NO","status":200}

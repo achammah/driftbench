@@ -1,0 +1,75 @@
+{
+ "by": {
+  "process:acme-ops": {
+   "calls": 0,
+   "without": 0,
+   "specs": 0
+  },
+  "function:acme-sales": {
+   "calls": 2698,
+   "without": 2688,
+   "specs": 421
+  },
+  "claude-code:": {
+   "calls": 4,
+   "without": 4,
+   "specs": 2
+  },
+  "http:echo": {
+   "calls": 0,
+   "without": 0,
+   "specs": 0
+  },
+  "echo:demo": {
+   "calls": 0,
+   "without": 0,
+   "specs": 0
+  }
+ },
+ "example": [
+  {
+   "role": "user",
+   "content": [
+    {
+     "type": "text",
+     "text": "Hi, do you have home internet at 3 Orchard Way, Acmeville?"
+    }
+   ]
+  },
+  {
+   "role": "assistant",
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "toolu_h1",
+     "name": "coverage_check",
+     "input": {}
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_h2",
+     "name": "catalog_search",
+     "input": {
+      "category": "home",
+      "address_id": "addr-102"
+     }
+    }
+   ]
+  },
+  {
+   "role": "user",
+   "content": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_h1",
+     "content": "null"
+    },
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_h2",
+     "content": "null"
+    }
+   ]
+  }
+ ]
+}

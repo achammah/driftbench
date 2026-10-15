@@ -1,0 +1,364 @@
+{
+ "generated": "2026-10-14T22:01:23.416Z",
+ "anthropic_model": "claude-haiku-5-5",
+ "openai_model": "gpt-6-luna",
+ "results": [
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "cov-750",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "cov-450",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "cov-2500",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "cat-price",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "cat-data",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "cat-current",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "port-balance",
+   "status": 200,
+   "text": "I should have given you the result in my last message. Your number isn't eligibl"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "port-pin",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "port-date",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "order-id",
+   "status": 200,
+   "text": "I should correct my last reply. Your \"CONFIRM\" didn't specify a customer or plan"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "order-install",
+   "status": 200,
+   "text": "OK\n\nI need to correct my last action: I created order ORD-M83PZ1 (fiber-300 plan"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "order-price",
+   "status": 200,
+   "text": "I created order ORD-J2W9TT (pending, $33.50/month) for \"Ria Shah\" on the mobile-"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "lead-ref",
+   "status": 200,
+   "text": "OK\n\nI need to correct my earlier request. I put \"about home internet\" in the cal"
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "lead-window",
+   "status": 200,
+   "text": "OK\n\nCorrection: I told the sales team the callback was about a mobile plan, but "
+  },
+  {
+   "check": 1,
+   "wire": "anthropic",
+   "id": "lead-advisor",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 2,
+   "wire": "anthropic",
+   "id": "unpaired",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 3,
+   "wire": "anthropic",
+   "id": "duplicate",
+   "status": 200,
+   "text": "OK"
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "cov-750",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cov-750",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "cov-450",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cov-450",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "cov-2500",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cov-2500",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "cat-price",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cat-price",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "cat-data",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cat-data",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "cat-current",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cat-current",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "port-balance",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "port-balance",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "port-pin",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "port-pin",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "port-date",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "port-date",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "order-id",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "order-id",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "order-install",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "order-install",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "order-price",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "order-price",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "lead-ref",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "lead-ref",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "lead-window",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "lead-window",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "lead-advisor",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "lead-advisor",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "unpaired",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "unpaired",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "duplicate",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "duplicate",
+   "status": 400,
+   "text": "Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."
+  }
+ ]
+}

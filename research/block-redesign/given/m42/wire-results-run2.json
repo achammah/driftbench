@@ -1,0 +1,147 @@
+{
+ "generated": "2026-10-14T22:02:09.143Z",
+ "anthropic_model": "claude-haiku-5-5",
+ "openai_model": "gpt-6-luna",
+ "results": [
+  {
+   "check": 2,
+   "wire": "anthropic",
+   "id": "unpaired-on-wire",
+   "status": 400,
+   "text": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_h6_cov_750. Each `tool_use` block must have a corresponding `tool_result` block in the next message.\"},\"request_id\":\"req_011Cg2tCk4wjtrgv"
+  },
+  {
+   "check": 4,
+   "wire": "openai-responses",
+   "id": "unpaired-on-wire",
+   "status": 400,
+   "text": "No tool output found for function call toolu_h6_cov_750."
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "unpaired-on-wire",
+   "status": 400,
+   "text": "An assistant message with 'tool_calls' must be followed by tool messages responding to each 'tool_call_id'. The following tool_call_ids did not have response messages: toolu_h6_cov_750"
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cov-750",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cov-450",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cov-2500",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cat-price",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cat-data",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "cat-current",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "port-balance",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "port-pin",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "port-date",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "order-id",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "order-install",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "order-price",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "lead-ref",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "lead-window",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "lead-advisor",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "duplicate",
+   "status": 200,
+   "text": ""
+  },
+  {
+   "check": 4,
+   "wire": "openai-chat",
+   "id": "null-result",
+   "status": 200,
+   "text": ""
+  }
+ ]
+}

@@ -1,0 +1,286 @@
+{
+ "note": "hand labels written blind to arm before this join; YES = gives the value as a true current fact",
+ "rows": [
+  {
+   "i": 0,
+   "run": "h6-full:order-install:record:12",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 1,
+   "run": "h6-full:lead-ref:prose:12",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 2,
+   "run": "h6-full:cov-450:record:15",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 3,
+   "run": "h6-full:cov-450:record:22",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 4,
+   "run": "h6-full:cov-2500:record:9",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 5,
+   "run": "h6-full:port-pin:record:17",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 6,
+   "run": "h6-full:port-pin:prose:20",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 7,
+   "run": "h6-full:cat-data:record:9",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 8,
+   "run": "h6-full:cat-current:record:11",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 9,
+   "run": "h6-full:cov-2500:prose:10",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 10,
+   "run": "h6-full:cat-data:prose:14",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 11,
+   "run": "h6-full:order-id:prose:17",
+   "arm": "prose",
+   "hand": false,
+   "judge": false
+  },
+  {
+   "i": 12,
+   "run": "h6-full:port-balance:prose:2",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 13,
+   "run": "h6-full:cat-data:prose:9",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 14,
+   "run": "h6-full:lead-ref:prose:20",
+   "arm": "prose",
+   "hand": true,
+   "judge": false
+  },
+  {
+   "i": 15,
+   "run": "h6-full:port-pin:record:20",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 16,
+   "run": "h6-full:cat-price:prose:28",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 17,
+   "run": "h6-full:order-id:record:5",
+   "arm": "record",
+   "hand": true,
+   "judge": false
+  },
+  {
+   "i": 18,
+   "run": "h6-full:port-pin:prose:5",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 19,
+   "run": "h6-full:order-id:record:18",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 20,
+   "run": "h6-full:lead-ref:prose:21",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 21,
+   "run": "h6-full:cov-450:prose:5",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 22,
+   "run": "h6-full:cat-data:record:3",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 23,
+   "run": "h6-full:lead-window:prose:19",
+   "arm": "prose",
+   "hand": true,
+   "judge": false
+  },
+  {
+   "i": 24,
+   "run": "h6-full:port-date:prose:8",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 25,
+   "run": "h6-full:cov-750:record:12",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 26,
+   "run": "h6-full:lead-window:prose:2",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 27,
+   "run": "h6-full:port-balance:record:24",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 28,
+   "run": "h6-full:lead-window:prose:1",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 29,
+   "run": "h6-full:cat-data:record:27",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 30,
+   "run": "h6-full:cat-current:record:1",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 31,
+   "run": "h6-full:cat-price:record:19",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 32,
+   "run": "h6-full:order-price:record:25",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 33,
+   "run": "h6-full:cov-750:record:3",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 34,
+   "run": "h6-full:cat-price:prose:13",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 35,
+   "run": "h6-full:cov-450:prose:26",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 36,
+   "run": "h6-full:port-pin:prose:26",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 37,
+   "run": "h6-full:cat-current:prose:22",
+   "arm": "prose",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 38,
+   "run": "h6-full:cov-750:record:19",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  },
+  {
+   "i": 39,
+   "run": "h6-full:order-id:record:12",
+   "arm": "record",
+   "hand": true,
+   "judge": true
+  }
+ ],
+ "agree": 37
+}
