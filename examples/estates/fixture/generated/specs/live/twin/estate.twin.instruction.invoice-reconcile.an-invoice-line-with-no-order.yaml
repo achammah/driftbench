@@ -12,6 +12,7 @@ tags:
   - test:twin
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
   - judged
 target:
@@ -33,6 +34,10 @@ blocks:
     when:
       user: Could you check, match or reconcile an invoice? Thanks.
     expect:
+      skills:
+        - name: invoice-reconcile
+          count:
+            min: 1
       workspace:
         deleted: []
       criteria:
@@ -41,6 +46,7 @@ metadata:
   estate:
     atoms:
       - instruction.invoice-reconcile.an-invoice-line-with-no-order
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: twin.instruction.invoice-reconcile.an-invoice-line-with-no-order
     cell:
       atoms.instruction: instruction.invoice-reconcile.an-invoice-line-with-no-order

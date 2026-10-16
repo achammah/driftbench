@@ -60,7 +60,7 @@ describe('driftbench estate generate', () => {
     expect(first.err).toBe('');
     expect(first.code).toBe(0);
     expect(first.out).toMatch(/total\s+44\s+44\s+0/);
-    expect(first.out).toContain('Replay: 12 specs aligned to sessions, 10 planned to pass, 2 to fail.');
+    expect(first.out).toContain('Replay: 12 specs aligned to sessions, 9 planned to pass, 3 to fail.');
     const written = await files(out);
     expect(written).toContain('estate-generate-report.json');
     expect(written.filter((path) => path.startsWith('specs/'))).toHaveLength(43);
@@ -123,6 +123,8 @@ describe('driftbench estate generate', () => {
     );
     expect(failing).toEqual({
       'estate.p01.weekly-skill-skipped': ['block 0: skills.weekly-report'],
+      // A rule written in a skill's file is tested with that skill loaded: skipping the skill fails it too.
+      'estate.p03.weekly-skill-skipped': ['block 0: skills.weekly-report'],
       'estate.p02.weekly-gate-violated': ['block 0: custom.ordered.Read.Edit'],
     });
   }

@@ -23,7 +23,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: What kinds of things can you help me with? One sentence, and please change nothing.
+      user: Without changing anything, tell me in one sentence what it would mean to delete a file under ledger/.
     expect:
       guards:
         - name: ledger-guard.py
@@ -48,7 +48,7 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: neutral
+    askFrom: guard.settings.posttooluse-bash-guard-ledger-guard-py (ruleText)
     outcome: no-change:negative
     unit:
       target:

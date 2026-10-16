@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -27,8 +28,12 @@ blocks:
     when:
       user: Please write to a supplier, answer one, or chase a late delivery or a missing credit note.
     expect:
+      skills:
+        - name: supplier-email
+          count:
+            min: 1
       workspace:
-        deleted: []
+        others_untouched: true
 rules:
   custom:
     grounded_values:
@@ -44,6 +49,7 @@ metadata:
   estate:
     atoms:
       - instruction.supplier-email.no-price-or-date-in-a
+      - skill.supplier-email.skill-supplier-email
     planRow: pairwise.1181
     cell:
       ask_class: build
@@ -64,4 +70,4 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.supplier-email.skill-supplier-email (asks it names)
-    outcome: no-delete
+    outcome: no-change:read-only

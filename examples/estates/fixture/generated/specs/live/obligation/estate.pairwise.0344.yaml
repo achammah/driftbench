@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:subagent
   - ask:code
   - judged
 target:
@@ -51,6 +52,10 @@ blocks:
     when:
       user: Which van takes which orders tomorrow? The orders are in orders/open.csv and the vans in fleet/vans.csv.
     expect:
+      subagents:
+        - name: route-planner
+          count:
+            min: 1
       workspace:
         others_untouched: true
       criteria:
@@ -66,6 +71,7 @@ metadata:
   estate:
     atoms:
       - instruction.route-planner.never-load-a-route-over-the
+      - subagent.route-planner.helper-route-planner
     planRow: pairwise.0344
     cell:
       ask_class: research

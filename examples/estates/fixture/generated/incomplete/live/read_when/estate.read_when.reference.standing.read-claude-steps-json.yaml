@@ -52,4 +52,4 @@ metadata:
     needs:
       - marker: needs-askable-act
         atom: reference.standing.read-claude-steps-json
-        detail: "no task in the atom's words (reference.standing.read-claude-steps-json (title)): the act names the file .claude/steps.json: \"read .claude/steps.json\""
+        detail: "no task in the atom's words (reference.standing.read-claude-steps-json (title)): the act does not start with a verb: \"\""

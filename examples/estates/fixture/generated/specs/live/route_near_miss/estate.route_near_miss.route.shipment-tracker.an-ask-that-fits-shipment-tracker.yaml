@@ -50,5 +50,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: route.shipment-tracker.an-ask-that-fits-shipment-tracker (asks it names)
+    askFrom: route.shipment-tracker.an-ask-that-fits-shipment-tracker (situation)
     outcome: no-change:negative

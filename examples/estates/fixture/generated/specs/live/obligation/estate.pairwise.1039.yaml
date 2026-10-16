@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -55,6 +56,10 @@ blocks:
     when:
       user: Chase Copperline Pans about the missing lids on PO-2002.
     expect:
+      skills:
+        - name: supplier-email
+          count:
+            min: 1
       workspace:
         others_untouched: true
 rules:
@@ -74,6 +79,7 @@ metadata:
   estate:
     atoms:
       - instruction.supplier-email.a-draft-stays-under-120-words
+      - skill.supplier-email.skill-supplier-email
     planRow: pairwise.1039
     cell:
       ask_class: compose

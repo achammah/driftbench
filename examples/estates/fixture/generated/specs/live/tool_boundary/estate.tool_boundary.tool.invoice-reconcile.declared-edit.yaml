@@ -12,6 +12,7 @@ tags:
   - test:tool_boundary
   - mode:live
   - kind:tool
+  - kind:skill
 target:
   adapter: claude-code
 given:
@@ -69,6 +70,7 @@ metadata:
   estate:
     atoms:
       - tool.invoice-reconcile.declared-edit
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: tool_boundary.tool.invoice-reconcile.declared-edit
     cell: {}
     seeder: estate

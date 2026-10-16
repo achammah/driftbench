@@ -12,6 +12,7 @@ tags:
   - test:register_sample
   - mode:live
   - kind:register
+  - kind:subagent
   - ask:code
 target:
   adapter: claude-code
@@ -60,6 +61,10 @@ blocks:
     when:
       user: Audit ledger/2026-W41.csv for double payments and unapplied credit notes. Answer with one JSON object.
     expect:
+      subagents:
+        - name: ledger-auditor
+          count:
+            min: 1
       must:
         - (?<![\s\S])\s*[{[][\s\S]*[}\]]\s*(?![\s\S])
       workspace:
@@ -77,6 +82,7 @@ metadata:
   estate:
     atoms:
       - register.ledger-auditor.the-auditor-answers-with-one-json
+      - subagent.ledger-auditor.helper-ledger-auditor
     planRow: pairwise.0643
     cell:
       ask_class: chat

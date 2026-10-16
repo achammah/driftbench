@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { parseSpecText, type Spec } from '@agent-nexus/driftbench-core';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { estateOwners, taskAtoms } from '../../src/estate/context';
 import {
   type EstateGenerateInput,
   type EstateGenerateResult,
@@ -229,7 +230,8 @@ describe('estate generate on the Northwind fixture and the hand plan', () => {
       'estate.p02.weekly-skill-skipped': 'pass',
       'estate.p02.weekly-gate-violated': 'fail',
       'estate.p03.weekly-clean': 'pass',
-      'estate.p03.weekly-skill-skipped': 'pass',
+      // The rule belongs to weekly-report, whose required skill the session skips.
+      'estate.p03.weekly-skill-skipped': 'fail',
       'estate.p03.weekly-gate-violated': 'pass',
       'estate.p04.weekly-clean': 'pass',
       'estate.p04.weekly-skill-skipped': 'pass',
@@ -420,12 +422,22 @@ describe('the record and the seed', () => {
   it('records atoms, plan row, cell, seeder, seed and map hash on every spec', () => {
     const result = generateEstateSuite(input, { seed: 7, paths: HAND_PATHS });
     const rows = new Map(input.plan.rows.map((row) => [row.id, row]));
+    const atoms = new Map(input.map.atoms.map((atom) => [atom.id, atom]));
+    const owners = estateOwners(input.map.atoms, input.map.edges);
     for (const spec of specs(result).values()) {
       const record = estate(spec);
       const row = rows.get(String(record.planRow));
       expect(row, spec.id).toBeDefined();
       expect(record).toMatchObject({
-        atoms: row?.atomIds,
+        atoms: taskAtoms(
+          (row?.atomIds ?? []).map((id) => {
+            const atom = atoms.get(id);
+            if (!atom) throw new Error(`missing atom ${id}`);
+            return atom;
+          }),
+          atoms,
+          owners,
+        ).map((atom) => atom.id),
         planRow: row?.id,
         cell: row?.cell,
         seeder: 'estate',
@@ -476,16 +488,16 @@ describe('the committed suite', () => {
     );
   });
 
-  it("is byte for byte what the generator writes for the planner's plan, seed 1", async () => {
+  it("matches the complete byte snapshot for the planner's plan, seed 1", async () => {
     const result = generateEstateSuite(await fixtureInputs(APPROVED_PLAN), { paths: PLANNER_PATHS });
     const committed = await tree(FIXTURE_GENERATED);
     expect(Object.keys(committed).sort()).toEqual(result.files.map((file) => file.path).sort());
     for (const file of result.files) expect(committed[file.path], file.path).toBe(file.text);
     expect(result.report.summary).toEqual({
-      specs: 1569,
-      blocks: 1564,
-      complete: 1554,
-      incomplete: 15,
+      specs: 1562,
+      blocks: 1557,
+      complete: 1535,
+      incomplete: 27,
       judged: 464,
     });
     expect(result.report.invalid).toEqual([]);
@@ -554,7 +566,14 @@ describe('a live guard_positive row forces the act', () => {
       if (meta.testType !== 'guard_positive' || meta.mode !== 'live') continue;
       if (meta.situation === 'forced-push') continue;
       expect(meta.situation, record.id).toBeNull();
-      expect(meta.ask, record.id).toBe('code');
+      // The ask is the act of the tool the guard watches. A guard that watches no tool (a prompt guard) has no
+      // act an owner asks for: its row waits for an approved phrase, under its own gap.
+      if (record.complete) expect(meta.ask, record.id).toBe('code');
+      else
+        expect(
+          (meta.needs as Array<{ marker: string }>).map((need) => need.marker),
+          record.id,
+        ).toContain(MARKERS.askable);
     }
     const ledger = result.specs.find(
       (record) =>
@@ -562,7 +581,7 @@ describe('a live guard_positive row forces the act', () => {
         record.atoms[0] === 'guard.settings.posttooluse-bash-guard-ledger-guard-py',
     );
     const when = ledger ? (only(byId, ledger.id).blocks[0]?.when as { user?: string }) : undefined;
-    expect(when?.user).toBe('Please delete a ledger file.');
+    expect(when?.user).toBe('Please delete a file under ledger/.');
   });
 
   it('leaves a live guard_positive row with no forced situation incomplete with no fallback', async () => {
@@ -582,19 +601,6 @@ describe('a live guard_positive row forces the act', () => {
     }
   }, 120_000);
 });
-
-async function tree(dir: string): Promise<Record<string, string>> {
-  const out: Record<string, string> = {};
-  const walk = async (at: string) => {
-    for (const entry of await readdir(at, { withFileTypes: true })) {
-      const full = join(at, entry.name);
-      if (entry.isDirectory()) await walk(full);
-      else out[relative(dir, full).split('\\').join('/')] = await readFile(full, 'utf8');
-    }
-  };
-  await walk(dir);
-  return out;
-}
 
 describe('focus atoms get at least five complete specs, each with its own ask or situation', () => {
   const FOCUS = [
@@ -637,3 +643,16 @@ describe('focus atoms get at least five complete specs, each with its own ask or
     expect(result.specs.some((record) => /\.v\d+$/.test(record.id))).toBe(false);
   }, 120_000);
 });
+
+async function tree(dir: string): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  const walk = async (at: string) => {
+    for (const entry of await readdir(at, { withFileTypes: true })) {
+      const full = join(at, entry.name);
+      if (entry.isDirectory()) await walk(full);
+      else out[relative(dir, full).split('\\').join('/')] = await readFile(full, 'utf8');
+    }
+  };
+  await walk(dir);
+  return out;
+}

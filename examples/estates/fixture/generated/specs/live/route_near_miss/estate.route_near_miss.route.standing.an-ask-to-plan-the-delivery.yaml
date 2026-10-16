@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: "No need to do anything: just tell me in one sentence what it would mean to help me with the delivery plan of a day."
+      user: "No need to do anything: just tell me in one sentence what it would mean to plan the delivery routes for tomorrow."
     expect:
       subagents:
         - name: route-planner
@@ -50,5 +50,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: subagent.route-planner.helper-route-planner (asks it names)
+    askFrom: route.standing.an-ask-to-plan-the-delivery (situation)
     outcome: no-change:negative

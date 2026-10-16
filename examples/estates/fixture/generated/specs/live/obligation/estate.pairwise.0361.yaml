@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -55,6 +56,10 @@ blocks:
     when:
       user: Which shipments in shipments/log.csv are late today?
     expect:
+      skills:
+        - name: shipment-tracker
+          count:
+            min: 1
       workspace:
         others_untouched: true
 rules:
@@ -72,6 +77,7 @@ metadata:
   estate:
     atoms:
       - instruction.shipment-tracker.never-guess-a-shipment-status
+      - skill.shipment-tracker.skill-shipment-tracker
     planRow: pairwise.0361
     cell:
       ask_class: research

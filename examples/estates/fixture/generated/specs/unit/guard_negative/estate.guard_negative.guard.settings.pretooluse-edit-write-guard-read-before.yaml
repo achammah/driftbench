@@ -12,6 +12,7 @@ tags:
   - test:guard_negative
   - mode:unit
   - kind:guard
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -23,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: What kinds of things can you help me with? One sentence, and please change nothing.
+      user: Without changing anything, tell me in one sentence what it would mean to change a file here.
     expect:
       guards:
         - name: read-before-edit.py
@@ -35,6 +36,7 @@ metadata:
   estate:
     atoms:
       - guard.settings.pretooluse-edit-write-guard-read-before
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: guard_negative.guard.settings.pretooluse-edit-write-guard-read-before
     cell:
       atoms.guard: guard.settings.pretooluse-edit-write-guard-read-before
@@ -48,7 +50,7 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: neutral
+    askFrom: gate.standing.read-a-file-before-editing-it (enforced by guard.settings.pretooluse-edit-write-guard-read-before)
     outcome: no-change:negative
     unit:
       target:
