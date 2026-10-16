@@ -29,6 +29,7 @@ export const IssueCodes = [
   'LINK_BLOCK_UNKNOWN',
   'LINK_TARGET_UNKNOWN',
   'LINK_STALE',
+  'WORKSPACE_PATH_TWICE',
 ] as const;
 
 export type IssueCode = (typeof IssueCodes)[number] | `SCHEMA_${string}`;

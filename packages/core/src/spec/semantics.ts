@@ -60,6 +60,8 @@ export function checkSemantics(spec: Spec): Issue[] {
   }
   const ctx: Context = { stages: spec.stages ? new Set(spec.stages) : undefined, defined, forbidden };
 
+  checkWorkspaceTwice(spec.given?.world?.workspace, 'given.world.workspace', issues);
+
   const facts = factsOf(spec);
   const blockIds = new Set<string>();
   spec.blocks.forEach((block, index) => {
@@ -80,6 +82,7 @@ export function checkSemantics(spec: Spec): Issue[] {
         ),
       );
     }
+    checkWorkspaceTwice(block.given?.world?.workspace, `blocks.${index}.given.world.workspace`, issues);
     if (block.expect) checkExpect(block.expect, `blocks.${index}.expect`, ctx, issues);
     if (block.expect)
       checkRetention(
@@ -103,6 +106,7 @@ export function checkSemantics(spec: Spec): Issue[] {
       );
     }
     perturbationIds.add(perturbation.id);
+    checkWorkspaceTwice(perturbation.world?.workspace, `${path}.world.workspace`, issues);
     if (perturbation.inject_at > spec.blocks.length) {
       issues.push(
         error(
@@ -183,6 +187,34 @@ export function checkSemantics(spec: Spec): Issue[] {
   }
 
   return issues;
+}
+
+/** A seeded file has one source: a path in both `files` and `binary` is refused, never resolved one way. */
+function checkWorkspaceTwice(
+  workspace: { files?: Record<string, string>; binary?: Record<string, string> } | undefined,
+  path: string,
+  issues: Issue[],
+): void {
+  if (workspace?.files === undefined || workspace.binary === undefined) return;
+  const text = new Set(Object.keys(workspace.files).map(workspacePath));
+  for (const name of Object.keys(workspace.binary)) {
+    if (!text.has(workspacePath(name))) continue;
+    issues.push(
+      error(
+        'WORKSPACE_PATH_TWICE',
+        `${path}.binary`,
+        `workspace path "${name}" is written in both files and binary: keep it in one`,
+      ),
+    );
+  }
+}
+
+/** The path as the sandbox writes it: empty and `.` segments dropped, so `./a//b` and `a/b` are one file. */
+function workspacePath(name: string): string {
+  return name
+    .split('/')
+    .filter((part) => part !== '' && part !== '.')
+    .join('/');
 }
 
 function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]): void {

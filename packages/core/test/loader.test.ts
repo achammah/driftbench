@@ -252,6 +252,29 @@ const INVALID: Array<{ name: string; text: string; code: string; path?: string }
     code: 'SPEC_ALIAS_CONFLICT',
   },
   {
+    name: 'a workspace path in both files and binary in the spec Given',
+    text: 'id: x\ngiven:\n  world:\n    workspace:\n      files: { data.csv: a }\n      binary: { data.csv: YQ== }\nblocks:\n  - user: hi\n',
+    code: 'WORKSPACE_PATH_TWICE',
+    path: 'given.world.workspace.binary',
+  },
+  {
+    name: 'a nested workspace path in both files and binary in a block Given',
+    text: 'id: x\nblocks:\n  - user: hi\n    given:\n      world:\n        workspace:\n          files: { in/deep/data.csv: a }\n          binary: { in/deep/data.csv: YQ== }\n',
+    code: 'WORKSPACE_PATH_TWICE',
+    path: 'blocks.0.given.world.workspace.binary',
+  },
+  {
+    name: 'the same workspace file written two ways, one with a leading ./',
+    text: 'id: x\ngiven:\n  world:\n    workspace:\n      files: { in/data.csv: a }\n      binary: { ./in/data.csv: YQ== }\nblocks:\n  - user: hi\n',
+    code: 'WORKSPACE_PATH_TWICE',
+  },
+  {
+    name: 'a workspace path in both files and binary in a perturbation world',
+    text: 'id: x\nblocks:\n  - user: hi\n    expect: { must: [a] }\nperturbations:\n  - id: p\n    class: D6_instruction_in_data\n    inject_at: 0\n    world:\n      workspace:\n        files: { data.csv: a }\n        binary: { data.csv: YQ== }\n',
+    code: 'WORKSPACE_PATH_TWICE',
+    path: 'perturbations.0.world.workspace.binary',
+  },
+  {
     name: 'guard without a name',
     text: 'id: x\nblocks:\n  - user: hi\n    expect: { guards: [{ verdict: pass }] }\n',
     code: 'SCHEMA_INVALID_TYPE',
