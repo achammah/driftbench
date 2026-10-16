@@ -759,10 +759,10 @@ function guardScript(estate: HiddenEstate, guard: HiddenGuard): string {
     case 'stop':
       return [
         '#!/bin/sh',
-        '# Answers the stop word with a nudge.',
+        '# Answers the stop word with a nudge, in any letter case.',
         'input=$(cat)',
         'case "$input" in',
-        '  *stop*) echo "the user asked to stop" >&2 ;;',
+        '  *[Ss][Tt][Oo][Pp]*) echo "the user asked to stop" >&2 ;;',
         'esac',
         'exit 0',
         '',
