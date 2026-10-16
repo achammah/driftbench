@@ -1,17 +1,19 @@
-import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { type EstateMap, loadEstateMap } from '@agent-nexus/driftbench-estate';
 import { cli } from './bench';
 import { FIXTURE, fixtureSuite, machineFailure, runOnFake, runOnFakeDetailed } from './fixture-suite';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
+import { killVerdict } from './unit';
 
 /**
  * kill.fake: the mutant kill rate per mutant class, on the fake runtime (docs/estate.md section 8, estate
  * mutants). For an atom kind and an operation (delete, or invert for prose obligations), the n-th atom of
  * that kind in the Northwind fixture's approved map is mutated with `estate mutate`; the generated suite must
  * hold a complete live spec naming that atom which passes on the original estate and fails on the mutant,
- * both run with the fixture's fake runtime. One cause per atom kind: a generated test that a change of that
+ * both run with the fixture's fake runtime. Setting, invariant and script atoms have no live spec (docs/estate.md
+ * section 5): they are judged by their static or script_fixture unit tests. One cause per atom kind: a generated test that a change of that
  * kind of atom turns red. The fixture does not depend on the seed: the family is judged once.
  */
 
@@ -85,7 +87,15 @@ export function killFamily(): Family {
         for (const cell of CELLS) {
           out.set(
             `${family}.${keyOf(cell)}`,
-            await judge(cell, map.map, suite.specs, join(FIXTURE, 'approved.yaml'), work, originalVerdict),
+            await judge(
+              cell,
+              map.map,
+              suite.specs,
+              suite.natives,
+              join(FIXTURE, 'approved.yaml'),
+              work,
+              originalVerdict,
+            ),
           );
         }
       } finally {
@@ -100,6 +110,7 @@ async function judge(
   cell: Cell,
   estate: EstateMap,
   specs: Awaited<ReturnType<typeof fixtureSuite>>['specs'],
+  natives: Awaited<ReturnType<typeof fixtureSuite>>['natives'],
   map: string,
   work: string,
   original: Map<string, boolean>,
@@ -113,6 +124,7 @@ async function judge(
   // original or a mutant copy. They never have a live spec, so they are judged by their static tests.
   if (cell.kind === 'invariant') return judgeInvariant(estate, specs, work);
   if (cell.kind === 'setting') return judgeStatic(cell, atom, specs, map, work);
+  if (cell.kind === 'script') return judgeScript(cell, atom, natives, map, work);
   const same = equivalent(cell, atom, estate);
   if (same) return { pass: true, detail: `not judged, an equivalent mutant: ${same}` };
   const naming = specs.filter((spec) => spec.complete && spec.mode === 'live' && spec.atoms.includes(atom));
@@ -180,6 +192,98 @@ export function equivalent(cell: Cell, atomId: string, estate: EstateMap): strin
       : undefined;
   }
   return undefined;
+}
+
+/**
+ * A script cell. docs/estate.md section 5 gives a script one test type, `script_fixture`, a unit test: the script
+ * run on its declared fixture. So the cell is judged by that test: recorded on the original, it passes there, and
+ * on the mutant that deletes the script it fails. A fake that ignores the deletion cannot turn it red.
+ */
+export async function judgeScript(
+  cell: Cell,
+  atom: string,
+  natives: Awaited<ReturnType<typeof fixtureSuite>>['natives'],
+  map: string,
+  work: string,
+): Promise<ItemResult> {
+  const tests = natives.filter((spec) => spec.atoms.includes(atom));
+  if (tests.length === 0) return { pass: false, detail: `no script_fixture unit test names ${atom}` };
+  const folder = join(work, `recorded-${cell.kind}-${cell.index}`);
+  await mkdir(folder, { recursive: true });
+  const copies = new Map<string, string>();
+  for (const test of tests) {
+    const path = join(folder, `${test.id}.json`);
+    await cp(test.path, path);
+    copies.set(test.id, path);
+  }
+  const recording = cli(['estate', 'unit', folder, '--estate', FIXTURE, '--record', '--json']);
+  if (recording.code > 1)
+    return {
+      pass: false,
+      detail: `estate unit --record exited ${recording.code}: ${recording.out.trim().slice(0, 140)}`,
+    };
+  const recorded = tests.map((test) => ({ id: test.id, path: copies.get(test.id) as string }));
+  const original = verdictsOf(
+    recorded.map((test) => test.path),
+    FIXTURE,
+  );
+  const mutant = join(work, `${cell.op}-${cell.kind}-${cell.index}`);
+  const made = cli(['estate', 'mutate', map, '--atom', atom, `--${cell.op}`, '--to', mutant]);
+  if (made.code !== 0)
+    return {
+      pass: false,
+      detail: `estate mutate refused the ${cell.op} of ${atom}: ${made.out.trim().slice(0, 140)}`,
+    };
+  const after = verdictsOf(
+    recorded.map((test) => test.path),
+    mutant,
+  );
+  // A kill needs a valid, parsed result of a run that happened: a test with no row, a row without a boolean pass, no
+  // JSON, or a usage error is invalid. Only the valid rows enter the comparison, so an invalid one is never a kill.
+  const valid = recorded.filter((test) => original.has(test.id) && after.has(test.id));
+  if (valid.length === 0)
+    return {
+      pass: false,
+      detail: `invalid run: no test of ${atom} gave a parsed result on both the original and the ${cell.op} mutant`,
+    };
+  const verdict = killVerdict(
+    valid,
+    new Map(valid.map((test) => [test.id, original.get(test.id) as boolean])),
+    new Map(valid.map((test) => [test.id, after.get(test.id) as boolean])),
+    `${cell.op} mutant of ${atom}`,
+  );
+  return verdict.killed
+    ? { pass: true, detail: `a script_fixture test of ${atom} turns red on the ${cell.op} mutant` }
+    : { pass: false, detail: verdict.detail };
+}
+
+/**
+ * The pass flag per test id that `estate unit` printed, for the rows that are valid: the command exited 0 or 1, printed
+ * JSON with a `runs` list, and the row names the test and carries a boolean `pass` that is not the "nothing recorded"
+ * refusal. Anything else leaves the test out, and an absent test is never read as red.
+ */
+export function validRows(result: { code: number; out: string }): Map<string, boolean> {
+  const out = new Map<string, boolean>();
+  if (result.code > 1) return out;
+  const at = result.out.indexOf('{');
+  if (at < 0) return out;
+  try {
+    const json = JSON.parse(result.out.slice(at)) as { runs?: unknown };
+    if (!Array.isArray(json.runs)) return out;
+    for (const entry of json.runs as Array<Record<string, unknown>>) {
+      if (typeof entry?.spec !== 'string' || typeof entry.pass !== 'boolean') continue;
+      const failing = Array.isArray(entry.failing) ? entry.failing.map(String).join(' ') : '';
+      if (/no outcome recorded|not a unit test|No unit test found/.test(failing)) continue;
+      out.set(entry.spec, entry.pass);
+    }
+  } catch {
+    // Not JSON: no valid row.
+  }
+  return out;
+}
+
+function verdictsOf(paths: readonly string[], root: string): Map<string, boolean> {
+  return validRows(cli(['estate', 'unit', ...paths, '--estate', root, '--json']));
 }
 
 /** A setting cell: a static test naming the atom passes on the original and fails on the mutant. */
