@@ -1,0 +1,57 @@
+{
+ "kind": "persona",
+ "id": "terse-regular",
+ "schema_version": 1,
+ "language": "en",
+ "lines": [
+  "I order from you most months."
+ ],
+ "behaviour": {
+  "verbosity": {
+   "short_turn_share": 0.57,
+   "words_per_turn": 5.49
+  },
+  "initiative": {
+   "acts_per_turn": {
+    "1": 0.8,
+    "2": 0.18,
+    "3": 0.02
+   },
+   "volunteer_default": 0.5
+  },
+  "tone": {
+   "polite_turn_share": 0.21,
+   "uncertainty_turn_share": 0.03,
+   "question_turn_share": 0.05
+  },
+  "commitment": {
+   "strategy": "single_minded",
+   "repeat_after_refusal": 1
+  },
+  "engagement": {
+   "initial": 0.8,
+   "decay_per_unhelpful_turn": 0.2,
+   "disengage_below": 0.3
+  },
+  "patience": {
+   "turn_budget": 10
+  }
+ },
+ "source": {
+  "verbosity": "measured:abcd-v1.1-train#terse-cluster (personas/terse_measured.json)",
+  "tone.question_turn_share": "measured:abcd-v1.1-train#terse-cluster",
+  "tone.polite_turn_share": "default:abcd-pooled",
+  "tone.uncertainty_turn_share": "declared",
+  "initiative": "declared",
+  "commitment": "declared",
+  "engagement": "declared",
+  "patience": "declared"
+ },
+ "weight": 0.365,
+ "stable_knowledge": {},
+ "expertise": {
+  "level": "advanced",
+  "always_known": []
+ },
+ "misconceptions": []
+}

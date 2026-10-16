@@ -1,0 +1,9573 @@
+[
+ {
+  "id": "p01_scenario_sets_language",
+  "planted": true,
+  "class": "ownership_violation",
+  "note": "Scenario sets the persona-owned top level field language.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "mara_regular",
+    "name": "Mara Velden",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 5
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.82
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4437",
+     "email": "mara.velden@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate",
+     "always_known": [
+      "where_order_id_is"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    },
+    "language": "fr"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "mara_regular"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2378113",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "ownership_violation"
+   }
+  ]
+ },
+ {
+  "id": "p02_scenario_sets_verbosity",
+  "planted": true,
+  "class": "ownership_violation",
+  "note": "Scenario sets verbosity (a part of behaviour) at its top level.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "joss_terse",
+    "name": "Joss Okafor",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 6
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.84
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4474",
+     "email": "joss.okafor@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "novice"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    },
+    "verbosity": {
+     "short_turn_share": 0.9,
+     "words_per_turn": 3
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "joss_terse"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2378226",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "ownership_violation"
+   }
+  ]
+ },
+ {
+  "id": "p03_persona_sets_goal",
+  "planted": true,
+  "class": "ownership_violation",
+  "note": "Persona sets the scenario-owned field goal.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "tilda_busy",
+    "name": "Tilda Brandt",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 7
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.86
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4511",
+     "email": "tilda.brandt@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced"
+    },
+    "misconceptions": [],
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "gift_card"
+      }
+     ],
+     "requests": [],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": []
+     },
+     "drift": []
+    }
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "tilda_busy"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2378339",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "ownership_violation"
+   }
+  ]
+ },
+ {
+  "id": "p04_persona_sets_temperature",
+  "planted": true,
+  "class": "ownership_violation",
+  "note": "Persona sets the run setting temperature.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "reno_checker",
+    "name": "Reno Castell",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 8
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.88
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4548",
+     "email": "reno.castell@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [],
+    "temperature": 0.7
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "reno_checker"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2378452",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "ownership_violation"
+   }
+  ]
+ },
+ {
+  "id": "p05_scenario_sets_seed",
+  "planted": true,
+  "class": "ownership_violation",
+  "note": "Scenario sets the run setting seed.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "ivo_planner",
+    "name": "Ivo Marek",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 9
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.9
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4585",
+     "email": "ivo.marek@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    },
+    "seed": 42
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "ivo_planner"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2378565",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "ownership_violation"
+   }
+  ]
+ },
+ {
+  "id": "p06_situational_sets_behaviour",
+  "planted": true,
+  "class": "ownership_violation",
+  "note": "Block situational carries a behaviour object, a persona-owned field.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "nia_polite",
+    "name": "Nia Salgado",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 10
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.92
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4622",
+     "email": "nia.salgado@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "nia_polite"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2378678",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": [],
+      "behaviour": {
+       "patience": {
+        "turn_budget": 3
+       }
+      }
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "ownership_violation"
+   }
+  ]
+ },
+ {
+  "id": "p07_email_different_value",
+  "planted": true,
+  "class": "slot_collision",
+  "note": "Block holds email with a value; the persona also holds email.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "tilda_mail",
+    "name": "Tilda Brandt",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 11
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.94
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4659",
+     "email": "tilda.brandt@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "tilda_mail"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "email",
+        "value": "t.brandt@example.com",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "slot_collision"
+   }
+  ]
+ },
+ {
+  "id": "p08_account_id_equal_value",
+  "planted": true,
+  "class": "slot_collision",
+  "note": "Block holds account_id with a value equal to the persona's value (still a collision).",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "pavel_acct",
+    "name": "Pavel Dunne",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 12
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.96
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4696",
+     "email": "pavel.dunne@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "pavel_acct"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "account_id",
+        "value": "ACC4696",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "slot_collision"
+   }
+  ]
+ },
+ {
+  "id": "p09_second_persona_phone",
+  "planted": true,
+  "class": "slot_collision",
+  "note": "Two personas in the block; only the second holds phone, the block holds phone by value.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "lena_plain",
+    "name": "Lena Hartog",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 4
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.8
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4733",
+     "email": "lena.hartog@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "odile_phone",
+    "name": "Odile Brandes",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 5
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.82
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4770",
+     "email": "odile.brandes@example.com",
+     "has_account": true,
+     "phone": "+12025550142"
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "lena_plain",
+      "odile_phone"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "phone",
+        "value": "+12025550177",
+        "reveal": "proactive"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "slot_collision"
+   }
+  ]
+ },
+ {
+  "id": "p10_postcode_beside_a_ref",
+  "planted": true,
+  "class": "slot_collision",
+  "note": "One holds entry is a clean ref on email; another holds postcode by value against the persona.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "hugo_postcode",
+    "name": "Hugo Fenner",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 6
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.84
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4807",
+     "email": "hugo.fenner@example.com",
+     "has_account": true,
+     "postcode": "3000"
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "hugo_postcode"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "email",
+        "ref": "persona.email",
+        "reveal": "on_request"
+       },
+       {
+        "slot": "postcode",
+        "value": "1000",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "slot_collision"
+   }
+  ]
+ },
+ {
+  "id": "p11_household_size_number",
+  "planted": true,
+  "class": "slot_collision",
+  "note": "Block holds household_size 3 as a number, equal to the persona's number.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "kira_family",
+    "name": "Kira Tolland",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 7
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.86
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4844",
+     "email": "kira.tolland@example.com",
+     "has_account": true,
+     "household_size": 3
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "warranty_claim",
+    "intent": "claim_warranty_repair",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "repair_or_replace",
+       "value": "replace"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "turnaround_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "turnaround_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "warranty_claim",
+     "personas": [
+      "kira_family"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "household_size",
+        "value": 3,
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "slot_collision"
+   }
+  ]
+ },
+ {
+  "id": "p12_preferred_contact_case",
+  "planted": true,
+  "class": "slot_collision",
+  "note": "Block holds preferred_contact Phone; the persona holds phone (values differ only in case).",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "sven_contact",
+    "name": "Sven Arkwright",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 8
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.88
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4881",
+     "email": "sven.arkwright@example.com",
+     "has_account": true,
+     "preferred_contact": "phone"
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "sven_contact"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380001",
+        "reveal": "on_request"
+       },
+       {
+        "slot": "preferred_contact",
+        "value": "Phone",
+        "reveal": "proactive"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "slot_collision"
+   }
+  ]
+ },
+ {
+  "id": "p13_refunds_instant_opposite",
+  "planted": true,
+  "class": "contradictory_belief",
+  "note": "Persona says refunds are instant is false; block belief says true, no override.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "dara_refunds",
+    "name": "Dara Quillan",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 9
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.9
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4918",
+     "email": "dara.quillan@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "refunds are instant",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "dara_refunds"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2379469",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "refunds are instant",
+        "true": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "contradictory_belief"
+   }
+  ]
+ },
+ {
+  "id": "p14_warranty_reversed",
+  "planted": true,
+  "class": "contradictory_belief",
+  "note": "Persona holds the belief as true; block belief says false (the other direction).",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "mina_warranty",
+    "name": "Mina Ferro",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 10
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.92
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4955",
+     "email": "mina.ferro@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "the warranty covers water damage",
+      "true": true
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "warranty_claim",
+    "intent": "claim_warranty_repair",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "repair_or_replace",
+       "value": "replace"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "turnaround_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "turnaround_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "warranty_claim",
+     "personas": [
+      "mina_warranty"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2379582",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "the warranty covers water damage",
+        "true": false
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "contradictory_belief"
+   }
+  ]
+ },
+ {
+  "id": "p15_fact_differs_by_case",
+  "planted": true,
+  "class": "contradictory_belief",
+  "note": "Same fact, only the letter case differs, opposite truth.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "bram_desk",
+    "name": "Bram Oduya",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 11
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.94
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC4992",
+     "email": "bram.oduya@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "The Support Desk Is Open On Weekends",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "bram_desk"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2379695",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "the support desk is open on weekends",
+        "true": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "contradictory_belief"
+   }
+  ]
+ },
+ {
+  "id": "p16_fact_has_spaces",
+  "planted": true,
+  "class": "contradictory_belief",
+  "note": "Same fact with surrounding spaces in the block, opposite truth.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "esme_history",
+    "name": "Esme Radcliffe",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 12
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.96
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5029",
+     "email": "esme.radcliffe@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "cancelling deletes my order history",
+      "true": true
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "esme_history"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2379808",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "  cancelling deletes my order history  ",
+        "true": false
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "contradictory_belief"
+   }
+  ]
+ },
+ {
+  "id": "p17_override_false",
+  "planted": true,
+  "class": "contradictory_belief",
+  "note": "Block entry carries override false (not true) and contradicts the persona.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "taro_links",
+    "name": "Taro Wexley",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 4
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.8
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5066",
+     "email": "taro.wexley@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "a reset link works for a week",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "taro_links"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2379921",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "a reset link works for a week",
+        "true": true,
+        "override": false
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "contradictory_belief"
+   }
+  ]
+ },
+ {
+  "id": "p18_two_personas_one_match",
+  "planted": true,
+  "class": "contradictory_belief",
+  "note": "Two personas; only the second has a matching misconception, and the block opposes it.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "wren_calm",
+    "name": "Wren Halloran",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 5
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.82
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5103",
+     "email": "wren.halloran@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "cato_tracking",
+    "name": "Cato Lindqvist",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 6
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.84
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5140",
+     "email": "cato.lindqvist@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "passwords expire every 30 days",
+      "true": true
+     },
+     {
+      "fact": "tracking numbers are the same as order numbers",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "wren_calm",
+      "cato_tracking"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380034",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "tracking numbers are the same as order numbers",
+        "true": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "contradictory_belief"
+   }
+  ]
+ },
+ {
+  "id": "p19_child_lists_other_persona",
+  "planted": true,
+  "class": "persona_switch_in_chain",
+  "note": "Parent uses persona A, child lists persona B.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "mara_a",
+    "name": "Mara Velden",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 7
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.86
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5177",
+     "email": "mara.velden@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "joss_b",
+    "name": "Joss Okafor",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 8
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.88
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5214",
+     "email": "joss.okafor@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "mara_a"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380147",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "joss_b"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380260",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "persona_switch_in_chain"
+   }
+  ]
+ },
+ {
+  "id": "p20_grandchild_switches",
+  "planted": true,
+  "class": "persona_switch_in_chain",
+  "note": "Grandparent A, middle block omits personas (inherits A), grandchild lists B.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "tilda_a",
+    "name": "Tilda Brandt",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 9
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.9
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5251",
+     "email": "tilda.brandt@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "reno_b",
+    "name": "Reno Castell",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 10
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.92
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5288",
+     "email": "reno.castell@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "tilda_a"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380373",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "change_address",
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380486",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b3",
+    "parent": "b2",
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "reno_b"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380599",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "persona_switch_in_chain"
+   }
+  ]
+ },
+ {
+  "id": "p21_child_superset",
+  "planted": true,
+  "class": "persona_switch_in_chain",
+  "note": "Parent set is {A}, child set is {A,B} (superset).",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "ivo_a",
+    "name": "Ivo Marek",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 11
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.94
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5325",
+     "email": "ivo.marek@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "nia_b",
+    "name": "Nia Salgado",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 12
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.96
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5362",
+     "email": "nia.salgado@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "ivo_a"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380712",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "ivo_a",
+      "nia_b"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380825",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "persona_switch_in_chain"
+   }
+  ]
+ },
+ {
+  "id": "p22_child_subset",
+  "planted": true,
+  "class": "persona_switch_in_chain",
+  "note": "Parent set is {A,B}, child set is {A} (subset).",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "pavel_a",
+    "name": "Pavel Dunne",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 4
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.8
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5399",
+     "email": "pavel.dunne@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "lena_b",
+    "name": "Lena Hartog",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 5
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.82
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5436",
+     "email": "lena.hartog@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "warranty_claim",
+    "intent": "claim_warranty_repair",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "repair_or_replace",
+       "value": "replace"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "turnaround_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "turnaround_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "warranty_claim",
+     "personas": [
+      "pavel_a",
+      "lena_b"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2380938",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "warranty_claim",
+     "personas": [
+      "pavel_a"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381051",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "persona_switch_in_chain"
+   }
+  ]
+ },
+ {
+  "id": "p23_partial_overlap",
+  "planted": true,
+  "class": "persona_switch_in_chain",
+  "note": "Parent {A,B}, child {B,C}: sets overlap but differ.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "odile_a",
+    "name": "Odile Brandes",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 6
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.84
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5473",
+     "email": "odile.brandes@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "hugo_b",
+    "name": "Hugo Fenner",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 7
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.86
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5510",
+     "email": "hugo.fenner@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "kira_c",
+    "name": "Kira Tolland",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 8
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.88
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5547",
+     "email": "kira.tolland@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "odile_a",
+      "hugo_b"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381164",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "hugo_b",
+      "kira_c"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381277",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "persona_switch_in_chain"
+   }
+  ]
+ },
+ {
+  "id": "p24_sibling_switches",
+  "planted": true,
+  "class": "persona_switch_in_chain",
+  "note": "Parent A; one child omits personas (clean), a sibling child lists B and changes scenario.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "sven_a",
+    "name": "Sven Arkwright",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 9
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.9
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5584",
+     "email": "sven.arkwright@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "dara_b",
+    "name": "Dara Quillan",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 10
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.92
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5621",
+     "email": "dara.quillan@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "sven_a"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381390",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381503",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b3",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "dara_b"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381616",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "load_error",
+    "class": "persona_switch_in_chain"
+   }
+  ]
+ },
+ {
+  "id": "p25_language_mismatch",
+  "planted": true,
+  "class": "persona_incompatible",
+  "note": "requires language en, persona language is fr.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "odile_fr",
+    "name": "Odile Brandes",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "fr",
+    "lines": [
+     "Bonjour, je commande chez vous chaque mois.",
+     "Je prefere les reponses courtes."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 11
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.94
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5658",
+     "email": "odile.brandes@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate",
+     "always_known": [
+      "where_order_id_is"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "odile_fr"
+     ],
+     "requires": {
+      "language": "en"
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381729",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "not_run",
+    "block": "b1",
+    "persona": "odile_fr",
+    "kind": "persona_incompatible",
+    "requirement": "language"
+   }
+  ]
+ },
+ {
+  "id": "p26_has_account_absent",
+  "planted": true,
+  "class": "persona_incompatible",
+  "note": "requires has_account true; the persona has no has_account field (absent counts as false).",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "mina_noacct",
+    "name": "Mina Ferro",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 12
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.96
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5695",
+     "email": "mina.ferro@example.com"
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "mina_noacct"
+     ],
+     "requires": {
+      "has_account": true
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381842",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "not_run",
+    "block": "b1",
+    "persona": "mina_noacct",
+    "kind": "persona_incompatible",
+    "requirement": "has_account"
+   }
+  ]
+ },
+ {
+  "id": "p27_always_known_missing",
+  "planted": true,
+  "class": "persona_incompatible",
+  "note": "requires concepts; the persona expertise has no always_known list.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "bram_unlisted",
+    "name": "Bram Oduya",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 4
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.8
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5732",
+     "email": "bram.oduya@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "bram_unlisted"
+     ],
+     "requires": {
+      "concepts": [
+       "where_order_id_is"
+      ]
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381955",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [
+       {
+        "id": "where_order_id_is"
+       }
+      ],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "not_run",
+    "block": "b1",
+    "persona": "bram_unlisted",
+    "kind": "persona_incompatible",
+    "requirement": "concepts"
+   }
+  ]
+ },
+ {
+  "id": "p28_min_expertise_too_low",
+  "planted": true,
+  "class": "persona_incompatible",
+  "note": "requires min_expertise advanced, persona level is intermediate.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "esme_mid",
+    "name": "Esme Radcliffe",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 5
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.82
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5769",
+     "email": "esme.radcliffe@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate",
+     "always_known": [
+      "where_order_id_is"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "warranty_claim",
+    "intent": "claim_warranty_repair",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "repair_or_replace",
+       "value": "replace"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "turnaround_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "turnaround_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "warranty_claim",
+     "personas": [
+      "esme_mid"
+     ],
+     "requires": {
+      "min_expertise": "advanced"
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2382068",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "not_run",
+    "block": "b1",
+    "persona": "esme_mid",
+    "kind": "persona_incompatible",
+    "requirement": "min_expertise"
+   }
+  ]
+ },
+ {
+  "id": "p29_three_personas_one_refused",
+  "planted": true,
+  "class": "persona_incompatible",
+  "note": "Three personas; only the second fails has_account, so exactly one cell is refused.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "taro_ok",
+    "name": "Taro Wexley",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 6
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.84
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5806",
+     "email": "taro.wexley@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "wren_noacct",
+    "name": "Wren Halloran",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 7
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.86
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5843",
+     "email": "wren.halloran@example.com",
+     "has_account": false
+    },
+    "expertise": {
+     "level": "advanced"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "cato_ok",
+    "name": "Cato Lindqvist",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 8
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.88
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5880",
+     "email": "cato.lindqvist@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "novice"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "taro_ok",
+      "wren_noacct",
+      "cato_ok"
+     ],
+     "requires": {
+      "language": "en",
+      "has_account": true
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2382181",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "not_run",
+    "block": "b1",
+    "persona": "wren_noacct",
+    "kind": "persona_incompatible",
+    "requirement": "has_account"
+   }
+  ]
+ },
+ {
+  "id": "p30_first_failing_key_listed",
+  "planted": true,
+  "class": "persona_incompatible",
+  "note": "Persona fails min_expertise, language and has_account; refusal names min_expertise, the first listed.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "ruth_multi",
+    "name": "Ruth Abernathy",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "de",
+    "lines": [
+     "Hallo, ich bestelle regelmaessig bei Ihnen.",
+     "Bitte antworten Sie knapp."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 9
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.9
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5917",
+     "email": "ruth.abernathy@example.com",
+     "has_account": false
+    },
+    "expertise": {
+     "level": "novice",
+     "always_known": []
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "ruth_multi"
+     ],
+     "requires": {
+      "min_expertise": "intermediate",
+      "language": "en",
+      "has_account": true
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2382294",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": [
+   {
+    "type": "not_run",
+    "block": "b1",
+    "persona": "ruth_multi",
+    "kind": "persona_incompatible",
+    "requirement": "min_expertise"
+   }
+  ]
+ },
+ {
+  "id": "k01_ref_not_value",
+  "planted": false,
+  "class": "clean",
+  "note": "Slots email and account_id are read by ref, not by value.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "mara_ref",
+    "name": "Mara Velden",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 10
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.92
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5954",
+     "email": "mara.velden@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate",
+     "always_known": [
+      "where_order_id_is"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "mara_ref"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "email",
+        "ref": "persona.email",
+        "reveal": "on_request"
+       },
+       {
+        "slot": "account_id",
+        "ref": "persona.account_id",
+        "reveal": "proactive"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k02_override_true",
+  "planted": false,
+  "class": "clean",
+  "note": "Block belief opposes the misconception but carries override true.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "joss_refund",
+    "name": "Joss Okafor",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 11
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.94
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC5991",
+     "email": "joss.okafor@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "refunds are instant",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "joss_refund"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2382520",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "refunds are instant",
+        "true": true,
+        "override": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k03_same_fact_same_truth",
+  "planted": false,
+  "class": "clean",
+  "note": "Same fact and same truth value in persona and block.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "tilda_weekend",
+    "name": "Tilda Brandt",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 12
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.96
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6028",
+     "email": "tilda.brandt@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "the support desk is open on weekends",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "tilda_weekend"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2382633",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "the support desk is open on weekends",
+        "true": false
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k04_child_omits_personas",
+  "planted": false,
+  "class": "clean",
+  "note": "Child omits personas and inherits the parent's set; scenario changes.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "reno_chain",
+    "name": "Reno Castell",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 4
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.8
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6065",
+     "email": "reno.castell@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "warranty_claim",
+    "intent": "claim_warranty_repair",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "repair_or_replace",
+       "value": "replace"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "turnaround_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "turnaround_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "warranty_claim",
+     "personas": [
+      "reno_chain"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2382746",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2382859",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k05_same_set_other_order",
+  "planted": false,
+  "class": "clean",
+  "note": "Parent lists {A,B}, child lists {B,A}: the same set.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "ivo_x",
+    "name": "Ivo Marek",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 5
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.82
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6102",
+     "email": "ivo.marek@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "nia_y",
+    "name": "Nia Salgado",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 6
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.84
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6139",
+     "email": "nia.salgado@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "ivo_x",
+      "nia_y"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2382972",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "nia_y",
+      "ivo_x"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2383085",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k06_scenario_changes_along_chain",
+  "planted": false,
+  "class": "clean",
+  "note": "Three-block chain, one persona, a different scenario in each block.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "pavel_three",
+    "name": "Pavel Dunne",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 7
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.86
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6176",
+     "email": "pavel.dunne@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "pavel_three"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2383198",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "pavel_three"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2383311",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b3",
+    "parent": "b2",
+    "simulated_user": {
+     "scenario": "track_package",
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2383424",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k07_all_requires_hold_equal_level",
+  "planted": false,
+  "class": "clean",
+  "note": "All four requires hold; min_expertise advanced equals the persona's level.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "lena_expert",
+    "name": "Lena Hartog",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 8
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.88
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6213",
+     "email": "lena.hartog@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced",
+     "always_known": [
+      "where_order_id_is",
+      "find_tracking_page"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "lena_expert"
+     ],
+     "requires": {
+      "language": "en",
+      "has_account": true,
+      "concepts": [
+       "where_order_id_is"
+      ],
+      "min_expertise": "advanced"
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2383537",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [
+       {
+        "id": "where_order_id_is"
+       }
+      ],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k08_misconception_unmatched",
+  "planted": false,
+  "class": "clean",
+  "note": "Persona misconception has no matching case belief; the block's belief is about another fact.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "odile_belief",
+    "name": "Odile Brandes",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 9
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.9
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6250",
+     "email": "odile.brandes@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "passwords expire every 30 days",
+      "true": true
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "odile_belief"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2383650",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "the account was locked after three tries",
+        "true": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k09_slot_no_persona_holds",
+  "planted": false,
+  "class": "clean",
+  "note": "Block holds tracking_number by value; no persona holds that slot.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "hugo_slots",
+    "name": "Hugo Fenner",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 10
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.92
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6287",
+     "email": "hugo.fenner@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "hugo_slots"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "tracking_number",
+        "value": "TRK88213045",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k10_pins_and_unknown",
+  "planted": false,
+  "class": "clean",
+  "note": "Block uses pin, unknown slots and concepts; nothing else.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "kira_pins",
+    "name": "Kira Tolland",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 11
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.94
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6324",
+     "email": "kira.tolland@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate",
+     "always_known": [
+      "where_order_id_is"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "kira_pins"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2383876",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [
+       {
+        "slot": "tracking_number"
+       },
+       {
+        "slot": "invoice_number"
+       }
+      ],
+      "case_beliefs": [],
+      "concepts": [
+       {
+        "id": "where_order_id_is"
+       }
+      ],
+      "pin": [
+       {
+        "id": "where_order_id_is"
+       }
+      ]
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k11_slot_held_by_unlisted_persona",
+  "planted": false,
+  "class": "clean",
+  "note": "A persona in the case holds phone, but the block lists only the other persona.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "sven_a2",
+    "name": "Sven Arkwright",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 12
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.96
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6361",
+     "email": "sven.arkwright@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "dara_phone",
+    "name": "Dara Quillan",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 4
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.8
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6398",
+     "email": "dara.quillan@example.com",
+     "has_account": true,
+     "phone": "+12025550118"
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "sven_a2"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "phone",
+        "value": "+12025550199",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k12_override_with_case_and_spaces",
+  "planted": false,
+  "class": "clean",
+  "note": "Fact differs by case and spaces and opposes the persona, but override is true.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "mina_hist",
+    "name": "Mina Ferro",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 5
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.82
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6435",
+     "email": "mina.ferro@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "Cancelling Deletes My Order History",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "mina_hist"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2384102",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "  cancelling deletes my order history ",
+        "true": true,
+        "override": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k13_different_proposition",
+  "planted": false,
+  "class": "clean",
+  "note": "Belief differs by one word (premium members): another proposition, opposite truth.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "bram_ship",
+    "name": "Bram Oduya",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 6
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.84
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6472",
+     "email": "bram.oduya@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "express shipping is free for members",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "bram_ship"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2384215",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "express shipping is free for premium members",
+        "true": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k14_ref_and_other_value",
+  "planted": false,
+  "class": "clean",
+  "note": "One ref on email and one value on delivery_postcode, a slot no persona holds.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "esme_mix",
+    "name": "Esme Radcliffe",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 7
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.86
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6509",
+     "email": "esme.radcliffe@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "esme_mix"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "email",
+        "ref": "persona.email",
+        "reveal": "on_request"
+       },
+       {
+        "slot": "delivery_postcode",
+        "value": "3012",
+        "reveal": "proactive"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k15_min_expertise_novice",
+  "planted": false,
+  "class": "clean",
+  "note": "requires min_expertise novice: a novice and an advanced persona both pass.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "taro_nov",
+    "name": "Taro Wexley",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 8
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.88
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6546",
+     "email": "taro.wexley@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "novice"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "wren_adv",
+    "name": "Wren Halloran",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 9
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.9
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6583",
+     "email": "wren.halloran@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "taro_nov",
+      "wren_adv"
+     ],
+     "requires": {
+      "min_expertise": "novice"
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2384441",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k16_concepts_subset",
+  "planted": false,
+  "class": "clean",
+  "note": "requires lists two concepts; the persona knows those and one more.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "cato_known",
+    "name": "Cato Lindqvist",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 10
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.92
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6620",
+     "email": "cato.lindqvist@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate",
+     "always_known": [
+      "where_order_id_is",
+      "find_tracking_page",
+      "read_invoice"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "cato_known"
+     ],
+     "requires": {
+      "concepts": [
+       "find_tracking_page",
+       "where_order_id_is"
+      ]
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2384554",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k17_has_account_false_holds",
+  "planted": false,
+  "class": "clean",
+  "note": "requires has_account false: absent counts as false and an explicit false matches.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "ruth_none",
+    "name": "Ruth Abernathy",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 11
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.94
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6657",
+     "email": "ruth.abernathy@example.com"
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "mara_false",
+    "name": "Mara Velden",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 12
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.96
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6694",
+     "email": "mara.velden@example.com",
+     "has_account": false
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "ruth_none",
+      "mara_false"
+     ],
+     "requires": {
+      "has_account": false
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2384667",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k18_three_personas_all_pass",
+  "planted": false,
+  "class": "clean",
+  "note": "Three personas all pass language, has_account and concepts.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "joss_t",
+    "name": "Joss Okafor",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 4
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.8
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6731",
+     "email": "joss.okafor@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced",
+     "always_known": [
+      "where_order_id_is"
+     ]
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "tilda_t",
+    "name": "Tilda Brandt",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 5
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.82
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6768",
+     "email": "tilda.brandt@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced",
+     "always_known": [
+      "where_order_id_is",
+      "find_tracking_page"
+     ]
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "reno_t",
+    "name": "Reno Castell",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 6
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.84
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6805",
+     "email": "reno.castell@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate",
+     "always_known": [
+      "where_order_id_is"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "joss_t",
+      "tilda_t",
+      "reno_t"
+     ],
+     "requires": {
+      "language": "en",
+      "has_account": true,
+      "concepts": [
+       "where_order_id_is"
+      ]
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2384780",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k19_four_level_chain",
+  "planted": false,
+  "class": "clean",
+  "note": "Four-block chain: sets {A,B}, inherited, {B,A}, inherited; scenario changes.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "ivo_l",
+    "name": "Ivo Marek",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 7
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.86
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6842",
+     "email": "ivo.marek@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "nia_l",
+    "name": "Nia Salgado",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 8
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.88
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6879",
+     "email": "nia.salgado@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "warranty_claim",
+    "intent": "claim_warranty_repair",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "repair_or_replace",
+       "value": "replace"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "turnaround_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "turnaround_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "ivo_l",
+      "nia_l"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2384893",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "reset_password",
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2385006",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b3",
+    "parent": "b2",
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "nia_l",
+      "ivo_l"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2385119",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b4",
+    "parent": "b3",
+    "simulated_user": {
+     "scenario": "warranty_claim",
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2385232",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k20_unrelated_blocks_other_personas",
+  "planted": false,
+  "class": "clean",
+  "note": "Two root blocks with no parent link use different persona sets.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "pavel_r",
+    "name": "Pavel Dunne",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 9
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.9
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6916",
+     "email": "pavel.dunne@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "lena_r",
+    "name": "Lena Hartog",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 10
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.92
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6953",
+     "email": "lena.hartog@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "pavel_r"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2385345",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "lena_r"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2385458",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k21_sibling_children",
+  "planted": false,
+  "class": "clean",
+  "note": "Parent A; one child omits personas, the other lists the same persona.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "odile_s",
+    "name": "Odile Brandes",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 11
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.94
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC6990",
+     "email": "odile.brandes@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "odile_s"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2385571",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "track_package",
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2385684",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b3",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "odile_s"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2385797",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k22_scenario_with_drift_and_prefs",
+  "planted": false,
+  "class": "clean",
+  "note": "Scenario has preferences, drift and success_when filled; persona has a custom weight.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "hugo_full",
+    "name": "Hugo Fenner",
+    "source": "synthetic",
+    "weight": 0.5,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 12
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.96
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7027",
+     "email": "hugo.fenner@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [
+      {
+       "slot": "refund_speed",
+       "value": "fastest"
+      }
+     ],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": [
+      {
+       "after_turn": 3,
+       "slot": "refund_method",
+       "value": "store_credit"
+      }
+     ]
+    },
+    "start_state": {
+     "prior_failed_contacts": 2
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "hugo_full"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2385910",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k23_two_personas_override",
+  "planted": false,
+  "class": "clean",
+  "note": "Two personas; one misconception is contradicted by the block, with override true.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "kira_x",
+    "name": "Kira Tolland",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 4
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.8
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7064",
+     "email": "kira.tolland@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "a reset link works for a week",
+      "true": false
+     }
+    ]
+   },
+   {
+    "kind": "persona",
+    "id": "sven_x",
+    "name": "Sven Arkwright",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 5
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.82
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7101",
+     "email": "sven.arkwright@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "kira_x",
+      "sven_x"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2386023",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "a reset link works for a week",
+        "true": true,
+        "override": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k24_contradicting_persona_unlisted",
+  "planted": false,
+  "class": "clean",
+  "note": "The persona with the opposing misconception is in the case but not in the block.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "dara_y",
+    "name": "Dara Quillan",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 6
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.23,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.84
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 8
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7138",
+     "email": "dara.quillan@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   },
+   {
+    "kind": "persona",
+    "id": "mina_y",
+    "name": "Mina Ferro",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.6,
+      "words_per_turn": 7
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.27,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.86
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 9
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7175",
+     "email": "mina.ferro@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "refunds are instant",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "refund_late_order",
+    "intent": "get_refund_for_late_order",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "refund_method",
+       "value": "original_payment"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "refund_amount"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "refund_amount"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "refund_late_order",
+     "personas": [
+      "dara_y"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2386136",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "refunds are instant",
+        "true": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k25_similar_slot_name",
+  "planted": false,
+  "class": "clean",
+  "note": "Persona holds order_reference; the block holds order_id, a different slot.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "bram_ref",
+    "name": "Bram Oduya",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.65,
+      "words_per_turn": 8
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.5
+     },
+     "tone": {
+      "polite_turn_share": 0.31,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.88
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 10
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7212",
+     "email": "bram.oduya@example.com",
+     "has_account": true,
+     "order_reference": "REF55021"
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "bram_ref"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2381007",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k26_requires_language_fr",
+  "planted": false,
+  "class": "clean",
+  "note": "requires language fr and the persona's language is fr.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "esme_fr",
+    "name": "Esme Radcliffe",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "fr",
+    "lines": [
+     "Bonjour, je commande chez vous chaque mois.",
+     "Je prefere les reponses courtes."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.35,
+      "words_per_turn": 9
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.55
+     },
+     "tone": {
+      "polite_turn_share": 0.35,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.09
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.9
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 11
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7249",
+     "email": "esme.radcliffe@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "reset_password",
+    "intent": "regain_account_access",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "contact_channel",
+       "value": "email"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "reset_link_expiry"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "reset_link_expiry"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "reset_password",
+     "personas": [
+      "esme_fr"
+     ],
+     "requires": {
+      "language": "fr"
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2386362",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k27_block_without_requires",
+  "planted": false,
+  "class": "clean",
+  "note": "Block has no requires key; it has concepts and unknown slots.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "taro_nr",
+    "name": "Taro Wexley",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.4,
+      "words_per_turn": 10
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.3
+     },
+     "tone": {
+      "polite_turn_share": 0.39,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.11
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.92
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 12
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7286",
+     "email": "taro.wexley@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate",
+     "always_known": [
+      "where_order_id_is"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "taro_nr"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2386475",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [
+       {
+        "slot": "tracking_number"
+       }
+      ],
+      "case_beliefs": [],
+      "concepts": [
+       {
+        "id": "find_tracking_page"
+       }
+      ],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k28_empty_requires",
+  "planted": false,
+  "class": "clean",
+  "note": "Block has requires as an empty object, so every persona runs.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "wren_er",
+    "name": "Wren Halloran",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I am new to this shop.",
+     "Please keep it simple."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.45,
+      "words_per_turn": 11
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.35
+     },
+     "tone": {
+      "polite_turn_share": 0.43,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.13
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.94
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 2
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 13
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7323",
+     "email": "wren.halloran@example.com",
+     "has_account": false
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "personas": [
+      "wren_er"
+     ],
+     "requires": {},
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2386588",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k29_chain_override_belief",
+  "planted": false,
+  "class": "clean",
+  "note": "Chain with the same set; the child opposes a misconception with override true and changes scenario.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "cato_o",
+    "name": "Cato Lindqvist",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I run a small office and buy supplies here.",
+     "I want a quick answer."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.5,
+      "words_per_turn": 12
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.4
+     },
+     "tone": {
+      "polite_turn_share": 0.15,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.05
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.96
+     },
+     "commitment": {
+      "strategy": "single_minded",
+      "repeat_after_refusal": 3
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 6
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7360",
+     "email": "cato.lindqvist@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "intermediate"
+    },
+    "misconceptions": [
+     {
+      "fact": "cancelling deletes my order history",
+      "true": false
+     }
+    ]
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "warranty_claim",
+    "intent": "claim_warranty_repair",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "repair_or_replace",
+       "value": "replace"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "turnaround_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "turnaround_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "cancel_subscription",
+    "intent": "cancel_subscription",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "effective_date",
+       "value": "end_of_billing_period"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "final_charge"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "final_charge"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "warranty_claim",
+     "personas": [
+      "cato_o"
+     ],
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2386701",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": "b1",
+    "simulated_user": {
+     "scenario": "cancel_subscription",
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2386814",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [
+       {
+        "fact": "cancelling deletes my order history",
+        "true": true,
+        "override": true
+       }
+      ],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ },
+ {
+  "id": "k30_two_blocks_one_persona",
+  "planted": false,
+  "class": "clean",
+  "note": "One advanced persona passes two root blocks with different requires.",
+  "personas": [
+   {
+    "kind": "persona",
+    "id": "ruth_adv",
+    "name": "Ruth Abernathy",
+    "source": "synthetic",
+    "weight": 1.0,
+    "schema_version": 1,
+    "language": "en",
+    "lines": [
+     "I order from you most months.",
+     "I usually write in the evening."
+    ],
+    "behaviour": {
+     "verbosity": {
+      "short_turn_share": 0.55,
+      "words_per_turn": 4
+     },
+     "initiative": {
+      "acts_per_turn": {
+       "1": 0.8,
+       "2": 0.18,
+       "3": 0.02
+      },
+      "volunteer_default": 0.45
+     },
+     "tone": {
+      "polite_turn_share": 0.19,
+      "uncertainty_turn_share": 0.03,
+      "question_turn_share": 0.07
+     },
+     "cooperativeness": {
+      "answer_when_asked": 0.8
+     },
+     "commitment": {
+      "strategy": "flexible",
+      "repeat_after_refusal": 1
+     },
+     "engagement": {
+      "initial": 0.8,
+      "decay_per_unhelpful_turn": 0.2,
+      "disengage_below": 0.3
+     },
+     "patience": {
+      "turn_budget": 7
+     }
+    },
+    "stable_knowledge": {
+     "account_id": "ACC7397",
+     "email": "ruth.abernathy@example.com",
+     "has_account": true
+    },
+    "expertise": {
+     "level": "advanced",
+     "always_known": [
+      "where_order_id_is"
+     ]
+    },
+    "misconceptions": []
+   }
+  ],
+  "scenarios": [
+   {
+    "kind": "scenario",
+    "id": "track_package",
+    "intent": "locate_missing_package",
+    "goal": {
+     "constraints": [],
+     "requests": [
+      {
+       "slot": "delivery_estimate"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "delivery_estimate"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   },
+   {
+    "kind": "scenario",
+    "id": "change_address",
+    "intent": "change_delivery_address",
+    "goal": {
+     "constraints": [
+      {
+       "slot": "new_postcode",
+       "value": "3012"
+      }
+     ],
+     "requests": [
+      {
+       "slot": "cutoff_time"
+      }
+     ],
+     "preferences": [],
+     "success_when": {
+      "must_be_told": [
+       "cutoff_time"
+      ]
+     },
+     "drift": []
+    },
+    "start_state": {
+     "prior_failed_contacts": 1
+    }
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "track_package",
+     "personas": [
+      "ruth_adv"
+     ],
+     "requires": {
+      "min_expertise": "advanced",
+      "concepts": [
+       "where_order_id_is"
+      ]
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2386927",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   },
+   {
+    "id": "b2",
+    "parent": null,
+    "simulated_user": {
+     "scenario": "change_address",
+     "personas": [
+      "ruth_adv"
+     ],
+     "requires": {
+      "min_expertise": "intermediate",
+      "language": "en"
+     },
+     "situational": {
+      "holds": [
+       {
+        "slot": "order_id",
+        "value": "W2387040",
+        "reveal": "on_request"
+       }
+      ],
+      "unknown": [],
+      "case_beliefs": [],
+      "concepts": [],
+      "pin": []
+     }
+    }
+   }
+  ],
+  "expect": []
+ }
+]

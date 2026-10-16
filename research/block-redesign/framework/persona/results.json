@@ -1,0 +1,112 @@
+{
+ "prereg_commit": "6fa119a04e21f73f95ffbf6f522f0fd5fdbcfe1e",
+ "amendment_1_commit": "2d61a15b9",
+ "HF10": {
+  "verdict": "FALSIFIED",
+  "real_grid_flagged": 1,
+  "real_flagged_blocks": [
+   8196
+  ],
+  "aa_flagged": 1,
+  "aa_flagged_blocks": [
+   7279
+  ],
+  "permutation_p_real_flag_count": 0.7735,
+  "null_aa_any_flag_prob_and_expected": [
+   0.5122,
+   0.6846
+  ],
+  "null_real_any_flag_prob_and_expected": [
+   0.7791,
+   1.3462
+  ],
+  "n_conversations": 640,
+  "n_errors": 0,
+  "raw": "hf10/results.json, hf10/transcripts.jsonl.gz"
+ },
+ "HF11": {
+  "verdict": "SUPPORTED",
+  "S": 0.5,
+  "U": 0.0455,
+  "S_wilson95": [
+   0.307,
+   0.693
+  ],
+  "U_wilson95": [
+   0.008,
+   0.218
+  ],
+  "by_mutation": {
+   "negate": {
+    "selected": {
+     "flips": 10,
+     "cells": 11,
+     "share": 0.909
+    },
+    "unselected": {
+     "flips": 0,
+     "cells": 11,
+     "share": 0.0
+    }
+   },
+   "drop": {
+    "selected": {
+     "flips": 1,
+     "cells": 11,
+     "share": 0.091
+    },
+    "unselected": {
+     "flips": 1,
+     "cells": 11,
+     "share": 0.091
+    }
+   }
+  },
+  "trial_level": {
+   "selected": {
+    "flips": 54,
+    "pairs": 110,
+    "share": 0.4909
+   },
+   "unselected": {
+    "flips": 26,
+    "pairs": 110,
+    "share": 0.2364
+   }
+  },
+  "n_new_conversations": 275,
+  "n_errors": 0,
+  "raw": "hf11/results.json, hf11/transcripts.jsonl.gz"
+ },
+ "HF12": {
+  "verdict": "SUPPORTED",
+  "planted": 30,
+  "caught": 30,
+  "clean": 30,
+  "false_refusals": 0,
+  "by_class": {
+   "ownership_violation": {
+    "n": 6,
+    "caught": 6
+   },
+   "slot_collision": {
+    "n": 6,
+    "caught": 6
+   },
+   "contradictory_belief": {
+    "n": 6,
+    "caught": 6
+   },
+   "persona_switch_in_chain": {
+    "n": 6,
+    "caught": 6
+   },
+   "persona_incompatible": {
+    "n": 6,
+    "caught": 6
+   }
+  },
+  "raw": "hf12/results.json"
+ },
+ "usd_total": 7.21715
+}

@@ -1,0 +1,7 @@
+{
+ "prompt": "abcd-agent (lib/agent.py system_text), language rule as its one global unit",
+ "prompt_defaults": {"language": "en"},
+ "links": [
+  {"unit": "agent.system#language-rule", "scope": "global", "relation": "constrains", "persona_field": "language"}
+ ]
+}

@@ -1,0 +1,38 @@
+{
+ "source": "ABCD v1.1 train, action flows, >=4 customer turns",
+ "dialogues": 6216,
+ "clusters": [
+  {
+   "cluster": 0,
+   "dialogues": 2723,
+   "weight": 0.4380630630630631,
+   "short_turn_share": 0.27602225738935116,
+   "words_per_turn": 8.147531778038696,
+   "question_turn_share": 0.08805962529991322
+  },
+  {
+   "cluster": 1,
+   "dialogues": 1227,
+   "weight": 0.1973938223938224,
+   "short_turn_share": 0.11844708209693373,
+   "words_per_turn": 13.061449060336301,
+   "question_turn_share": 0.14540059347181009
+  },
+  {
+   "cluster": 2,
+   "dialogues": 2266,
+   "weight": 0.36454311454311455,
+   "short_turn_share": 0.5701926404429577,
+   "words_per_turn": 5.4874841388856845,
+   "question_turn_share": 0.049544353443303726
+  }
+ ],
+ "terse": {
+  "cluster": 2,
+  "dialogues": 2266,
+  "weight": 0.36454311454311455,
+  "short_turn_share": 0.5701926404429577,
+  "words_per_turn": 5.4874841388856845,
+  "question_turn_share": 0.049544353443303726
+ }
+}

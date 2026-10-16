@@ -1,0 +1,31 @@
+{
+ "pass_hat_k_equals_brute_force": true,
+ "fisher_7of8_vs_2of8": 0.0406,
+ "fisher_8of8_vs_4of8": 0.0769,
+ "fisher_16of16_vs_10of16": 0.0177,
+ "flag_on_identical_cells": false,
+ "flag_on_8_vs_0": true,
+ "engine_determinism": {
+  "terse-regular": true,
+  "chatty-newcomer": true,
+  "persistent-skeptic": true
+ },
+ "persona_params_applied": true,
+ "routing_selected": [
+  [
+   1,
+   "terse-regular-fr"
+  ],
+  [
+   2,
+   "terse-regular-fr"
+  ]
+ ],
+ "routing_unknown_unit_selects_all": true,
+ "lang_detect_abcd_agent_en": {
+  "n": 500,
+  "en": 446,
+  "fr": 0,
+  "none": 54
+ }
+}

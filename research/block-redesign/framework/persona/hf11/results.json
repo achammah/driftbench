@@ -1,0 +1,299 @@
+{
+ "blocks": [
+  5440,
+  5795,
+  6798,
+  7279,
+  7321,
+  10341,
+  8032,
+  2062,
+  7860,
+  8196,
+  7077
+ ],
+ "n_blocks": 11,
+ "trials": 5,
+ "n_errors_hf11": 0,
+ "selected_cells": [
+  [
+   2062,
+   "terse-regular-fr"
+  ],
+  [
+   5440,
+   "terse-regular-fr"
+  ],
+  [
+   5795,
+   "terse-regular-fr"
+  ],
+  [
+   6798,
+   "terse-regular-fr"
+  ],
+  [
+   7077,
+   "terse-regular-fr"
+  ],
+  [
+   7279,
+   "terse-regular-fr"
+  ],
+  [
+   7321,
+   "terse-regular-fr"
+  ],
+  [
+   7860,
+   "terse-regular-fr"
+  ],
+  [
+   8032,
+   "terse-regular-fr"
+  ],
+  [
+   8196,
+   "terse-regular-fr"
+  ],
+  [
+   10341,
+   "terse-regular-fr"
+  ]
+ ],
+ "verdict": "SUPPORTED",
+ "primary_cell_flips": {
+  "selected": {
+   "flips": 11,
+   "cells": 22,
+   "share": 0.5
+  },
+  "unselected": {
+   "flips": 1,
+   "cells": 22,
+   "share": 0.0455
+  },
+  "by_mutation": {
+   "negate": {
+    "selected": {
+     "flips": 10,
+     "cells": 11,
+     "share": 0.909
+    },
+    "unselected": {
+     "flips": 0,
+     "cells": 11,
+     "share": 0.0
+    }
+   },
+   "drop": {
+    "selected": {
+     "flips": 1,
+     "cells": 11,
+     "share": 0.091
+    },
+    "unselected": {
+     "flips": 1,
+     "cells": 11,
+     "share": 0.091
+    }
+   }
+  }
+ },
+ "S": 0.5,
+ "U": 0.0455,
+ "secondary_language_check_only": {
+  "selected": {
+   "flips": 11,
+   "cells": 22,
+   "share": 0.5
+  },
+  "unselected": {
+   "flips": 0,
+   "cells": 22,
+   "share": 0.0
+  },
+  "by_mutation": {
+   "negate": {
+    "selected": {
+     "flips": 11,
+     "cells": 11,
+     "share": 1.0
+    },
+    "unselected": {
+     "flips": 0,
+     "cells": 11,
+     "share": 0.0
+    }
+   },
+   "drop": {
+    "selected": {
+     "flips": 0,
+     "cells": 11,
+     "share": 0.0
+    },
+    "unselected": {
+     "flips": 0,
+     "cells": 11,
+     "share": 0.0
+    }
+   }
+  }
+ },
+ "secondary_block_contract_only": {
+  "selected": {
+   "flips": 2,
+   "cells": 22,
+   "share": 0.0909
+  },
+  "unselected": {
+   "flips": 1,
+   "cells": 22,
+   "share": 0.0455
+  },
+  "by_mutation": {
+   "negate": {
+    "selected": {
+     "flips": 1,
+     "cells": 11,
+     "share": 0.091
+    },
+    "unselected": {
+     "flips": 0,
+     "cells": 11,
+     "share": 0.0
+    }
+   },
+   "drop": {
+    "selected": {
+     "flips": 1,
+     "cells": 11,
+     "share": 0.091
+    },
+    "unselected": {
+     "flips": 1,
+     "cells": 11,
+     "share": 0.091
+    }
+   }
+  }
+ },
+ "secondary_trial_level_both": {
+  "selected": {
+   "flips": 54,
+   "pairs": 110,
+   "share": 0.4909
+  },
+  "unselected": {
+   "flips": 26,
+   "pairs": 110,
+   "share": 0.2364
+  }
+ },
+ "pass_rates": {
+  "terse-regular/base": {
+   "gold": 0.855,
+   "lang": 1.0,
+   "both": 0.855
+  },
+  "terse-regular/negate": {
+   "gold": 0.836,
+   "lang": 1.0,
+   "both": 0.836
+  },
+  "terse-regular/drop": {
+   "gold": 0.836,
+   "lang": 1.0,
+   "both": 0.836
+  },
+  "terse-regular-fr/base": {
+   "gold": 0.836,
+   "lang": 0.982,
+   "both": 0.818
+  },
+  "terse-regular-fr/negate": {
+   "gold": 0.745,
+   "lang": 0.055,
+   "both": 0.055
+  },
+  "terse-regular-fr/drop": {
+   "gold": 0.8,
+   "lang": 0.964,
+   "both": 0.782
+  }
+ },
+ "per_cell": {
+  "5440/terse-regular/base": "11111 lang 11111",
+  "5440/terse-regular/negate": "11110 lang 11111",
+  "5440/terse-regular/drop": "10111 lang 11111",
+  "5440/terse-regular-fr/base": "11111 lang 11111",
+  "5440/terse-regular-fr/negate": "00000 lang 00000",
+  "5440/terse-regular-fr/drop": "01111 lang 01111",
+  "5795/terse-regular/base": "11111 lang 11111",
+  "5795/terse-regular/negate": "11111 lang 11111",
+  "5795/terse-regular/drop": "11111 lang 11111",
+  "5795/terse-regular-fr/base": "11111 lang 11111",
+  "5795/terse-regular-fr/negate": "10000 lang 10000",
+  "5795/terse-regular-fr/drop": "11111 lang 11111",
+  "6798/terse-regular/base": "01111 lang 11111",
+  "6798/terse-regular/negate": "11111 lang 11111",
+  "6798/terse-regular/drop": "11111 lang 11111",
+  "6798/terse-regular-fr/base": "01110 lang 11111",
+  "6798/terse-regular-fr/negate": "00000 lang 00000",
+  "6798/terse-regular-fr/drop": "11110 lang 11111",
+  "7279/terse-regular/base": "11111 lang 11111",
+  "7279/terse-regular/negate": "11111 lang 11111",
+  "7279/terse-regular/drop": "11111 lang 11111",
+  "7279/terse-regular-fr/base": "11111 lang 11111",
+  "7279/terse-regular-fr/negate": "01000 lang 01000",
+  "7279/terse-regular-fr/drop": "11111 lang 11111",
+  "7321/terse-regular/base": "11111 lang 11111",
+  "7321/terse-regular/negate": "11111 lang 11111",
+  "7321/terse-regular/drop": "11111 lang 11111",
+  "7321/terse-regular-fr/base": "11111 lang 11111",
+  "7321/terse-regular-fr/negate": "00000 lang 00000",
+  "7321/terse-regular-fr/drop": "11011 lang 11111",
+  "10341/terse-regular/base": "11111 lang 11111",
+  "10341/terse-regular/negate": "11111 lang 11111",
+  "10341/terse-regular/drop": "01111 lang 11111",
+  "10341/terse-regular-fr/base": "11111 lang 11111",
+  "10341/terse-regular-fr/negate": "00000 lang 00000",
+  "10341/terse-regular-fr/drop": "11111 lang 11111",
+  "8032/terse-regular/base": "11111 lang 11111",
+  "8032/terse-regular/negate": "00111 lang 11111",
+  "8032/terse-regular/drop": "11001 lang 11111",
+  "8032/terse-regular-fr/base": "11011 lang 11111",
+  "8032/terse-regular-fr/negate": "00000 lang 00000",
+  "8032/terse-regular-fr/drop": "11111 lang 11111",
+  "2062/terse-regular/base": "00010 lang 11111",
+  "2062/terse-regular/negate": "10100 lang 11111",
+  "2062/terse-regular/drop": "11001 lang 11111",
+  "2062/terse-regular-fr/base": "10001 lang 11111",
+  "2062/terse-regular-fr/negate": "00000 lang 00000",
+  "2062/terse-regular-fr/drop": "00000 lang 11110",
+  "7860/terse-regular/base": "11110 lang 11111",
+  "7860/terse-regular/negate": "11111 lang 11111",
+  "7860/terse-regular/drop": "11011 lang 11111",
+  "7860/terse-regular-fr/base": "10011 lang 10111",
+  "7860/terse-regular-fr/negate": "00000 lang 00000",
+  "7860/terse-regular-fr/drop": "00110 lang 11111",
+  "8196/terse-regular/base": "11111 lang 11111",
+  "8196/terse-regular/negate": "10111 lang 11111",
+  "8196/terse-regular/drop": "11011 lang 11111",
+  "8196/terse-regular-fr/base": "10111 lang 11111",
+  "8196/terse-regular-fr/negate": "00000 lang 00000",
+  "8196/terse-regular-fr/drop": "11111 lang 11111",
+  "7077/terse-regular/base": "10110 lang 11111",
+  "7077/terse-regular/negate": "11100 lang 11111",
+  "7077/terse-regular/drop": "11011 lang 11111",
+  "7077/terse-regular-fr/base": "11011 lang 11111",
+  "7077/terse-regular-fr/negate": "00010 lang 00010",
+  "7077/terse-regular-fr/drop": "11110 lang 11111"
+ },
+ "detector_on_fr_user_turns": {
+  "n": 1037,
+  "fr": 540,
+  "en": 0,
+  "none": 497
+ }
+}

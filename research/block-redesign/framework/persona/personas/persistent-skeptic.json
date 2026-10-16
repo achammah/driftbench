@@ -1,0 +1,47 @@
+{
+ "kind": "persona",
+ "id": "persistent-skeptic",
+ "schema_version": 1,
+ "language": "en",
+ "lines": [],
+ "behaviour": {
+  "verbosity": {
+   "short_turn_share": 0.35,
+   "words_per_turn": 9
+  },
+  "initiative": {
+   "acts_per_turn": {
+    "1": 0.7,
+    "2": 0.25,
+    "3": 0.05
+   },
+   "volunteer_default": 0.2
+  },
+  "tone": {
+   "polite_turn_share": 0.21,
+   "uncertainty_turn_share": 0.02,
+   "question_turn_share": 0.12
+  },
+  "commitment": {
+   "strategy": "blind",
+   "repeat_after_refusal": 2
+  },
+  "engagement": {
+   "initial": 0.7,
+   "decay_per_unhelpful_turn": 0.25,
+   "disengage_below": 0.3
+  },
+  "patience": {
+   "turn_budget": 12
+  }
+ },
+ "source": {
+  "all": "declared"
+ },
+ "stable_knowledge": {},
+ "expertise": {
+  "level": "intermediate",
+  "always_known": []
+ },
+ "misconceptions": []
+}

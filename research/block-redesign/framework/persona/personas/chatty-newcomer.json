@@ -1,0 +1,47 @@
+{
+ "kind": "persona",
+ "id": "chatty-newcomer",
+ "schema_version": 1,
+ "language": "en",
+ "lines": [],
+ "behaviour": {
+  "verbosity": {
+   "short_turn_share": 0.1,
+   "words_per_turn": 18
+  },
+  "initiative": {
+   "acts_per_turn": {
+    "1": 0.4,
+    "2": 0.4,
+    "3": 0.2
+   },
+   "volunteer_default": 0.1
+  },
+  "tone": {
+   "polite_turn_share": 0.21,
+   "uncertainty_turn_share": 0.15,
+   "question_turn_share": 0.2
+  },
+  "commitment": {
+   "strategy": "open_minded",
+   "repeat_after_refusal": 0
+  },
+  "engagement": {
+   "initial": 0.9,
+   "decay_per_unhelpful_turn": 0.1,
+   "disengage_below": 0.3
+  },
+  "patience": {
+   "turn_budget": 20
+  }
+ },
+ "source": {
+  "all": "declared"
+ },
+ "stable_knowledge": {},
+ "expertise": {
+  "level": "novice",
+  "always_known": []
+ },
+ "misconceptions": []
+}

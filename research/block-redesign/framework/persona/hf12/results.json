@@ -1,0 +1,907 @@
+{
+ "planted": 30,
+ "caught": 30,
+ "clean": 30,
+ "false_refusals": 0,
+ "by_class": {
+  "ownership_violation": {
+   "n": 6,
+   "caught": 6
+  },
+  "slot_collision": {
+   "n": 6,
+   "caught": 6
+  },
+  "contradictory_belief": {
+   "n": 6,
+   "caught": 6
+  },
+  "persona_switch_in_chain": {
+   "n": 6,
+   "caught": 6
+  },
+  "persona_incompatible": {
+   "n": 6,
+   "caught": 6
+  }
+ },
+ "verdict": "SUPPORTED",
+ "cases": [
+  {
+   "id": "p01_scenario_sets_language",
+   "planted": true,
+   "class": "ownership_violation",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "message": "scenario refund_late_order sets ['language'], owned by the persona or the run profile"
+  },
+  {
+   "id": "p02_scenario_sets_verbosity",
+   "planted": true,
+   "class": "ownership_violation",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "message": "scenario reset_password sets ['verbosity'], owned by the persona or the run profile"
+  },
+  {
+   "id": "p03_persona_sets_goal",
+   "planted": true,
+   "class": "ownership_violation",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "message": "persona tilda_busy sets ['goal'], owned by the scenario or the run profile"
+  },
+  {
+   "id": "p04_persona_sets_temperature",
+   "planted": true,
+   "class": "ownership_violation",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "message": "persona reno_checker sets ['temperature'], owned by the scenario or the run profile"
+  },
+  {
+   "id": "p05_scenario_sets_seed",
+   "planted": true,
+   "class": "ownership_violation",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "message": "scenario change_address sets ['seed'], owned by the persona or the run profile"
+  },
+  {
+   "id": "p06_situational_sets_behaviour",
+   "planted": true,
+   "class": "ownership_violation",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "ownership_violation"
+    }
+   ],
+   "message": "block b1 situational sets ['behaviour'], owned by another file"
+  },
+  {
+   "id": "p07_email_different_value",
+   "planted": true,
+   "class": "slot_collision",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "message": "slot email defined by persona tilda_mail and block b1"
+  },
+  {
+   "id": "p08_account_id_equal_value",
+   "planted": true,
+   "class": "slot_collision",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "message": "slot account_id defined by persona pavel_acct and block b1"
+  },
+  {
+   "id": "p09_second_persona_phone",
+   "planted": true,
+   "class": "slot_collision",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "message": "slot phone defined by persona odile_phone and block b1"
+  },
+  {
+   "id": "p10_postcode_beside_a_ref",
+   "planted": true,
+   "class": "slot_collision",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "message": "slot postcode defined by persona hugo_postcode and block b1"
+  },
+  {
+   "id": "p11_household_size_number",
+   "planted": true,
+   "class": "slot_collision",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "message": "slot household_size defined by persona kira_family and block b1"
+  },
+  {
+   "id": "p12_preferred_contact_case",
+   "planted": true,
+   "class": "slot_collision",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "slot_collision"
+    }
+   ],
+   "message": "slot preferred_contact defined by persona sven_contact and block b1"
+  },
+  {
+   "id": "p13_refunds_instant_opposite",
+   "planted": true,
+   "class": "contradictory_belief",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "message": "belief 'refunds are instant': persona dara_refunds says False, block b1 says True"
+  },
+  {
+   "id": "p14_warranty_reversed",
+   "planted": true,
+   "class": "contradictory_belief",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "message": "belief 'the warranty covers water damage': persona mina_warranty says True, block b1 says False"
+  },
+  {
+   "id": "p15_fact_differs_by_case",
+   "planted": true,
+   "class": "contradictory_belief",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "message": "belief 'the support desk is open on weekends': persona bram_desk says False, block b1 says True"
+  },
+  {
+   "id": "p16_fact_has_spaces",
+   "planted": true,
+   "class": "contradictory_belief",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "message": "belief 'cancelling deletes my order history': persona esme_history says True, block b1 says False"
+  },
+  {
+   "id": "p17_override_false",
+   "planted": true,
+   "class": "contradictory_belief",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "message": "belief 'a reset link works for a week': persona taro_links says False, block b1 says True"
+  },
+  {
+   "id": "p18_two_personas_one_match",
+   "planted": true,
+   "class": "contradictory_belief",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "contradictory_belief"
+    }
+   ],
+   "message": "belief 'tracking numbers are the same as order numbers': persona cato_tracking says False, block b1 says True"
+  },
+  {
+   "id": "p19_child_lists_other_persona",
+   "planted": true,
+   "class": "persona_switch_in_chain",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "message": "block b2 uses personas ['joss_b'], its parent b1 uses ['mara_a']"
+  },
+  {
+   "id": "p20_grandchild_switches",
+   "planted": true,
+   "class": "persona_switch_in_chain",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "message": "block b3 uses personas ['reno_b'], its parent b2 uses ['tilda_a']"
+  },
+  {
+   "id": "p21_child_superset",
+   "planted": true,
+   "class": "persona_switch_in_chain",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "message": "block b2 uses personas ['ivo_a', 'nia_b'], its parent b1 uses ['ivo_a']"
+  },
+  {
+   "id": "p22_child_subset",
+   "planted": true,
+   "class": "persona_switch_in_chain",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "message": "block b2 uses personas ['pavel_a'], its parent b1 uses ['lena_b', 'pavel_a']"
+  },
+  {
+   "id": "p23_partial_overlap",
+   "planted": true,
+   "class": "persona_switch_in_chain",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "message": "block b2 uses personas ['hugo_b', 'kira_c'], its parent b1 uses ['hugo_b', 'odile_a']"
+  },
+  {
+   "id": "p24_sibling_switches",
+   "planted": true,
+   "class": "persona_switch_in_chain",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "got": [
+    {
+     "type": "load_error",
+     "class": "persona_switch_in_chain"
+    }
+   ],
+   "message": "block b3 uses personas ['dara_b'], its parent b1 uses ['sven_a']"
+  },
+  {
+   "id": "p25_language_mismatch",
+   "planted": true,
+   "class": "persona_incompatible",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "odile_fr",
+     "kind": "persona_incompatible",
+     "requirement": "language"
+    }
+   ],
+   "got": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "odile_fr",
+     "kind": "persona_incompatible",
+     "requirement": "language"
+    }
+   ],
+   "message": null
+  },
+  {
+   "id": "p26_has_account_absent",
+   "planted": true,
+   "class": "persona_incompatible",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "mina_noacct",
+     "kind": "persona_incompatible",
+     "requirement": "has_account"
+    }
+   ],
+   "got": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "mina_noacct",
+     "kind": "persona_incompatible",
+     "requirement": "has_account"
+    }
+   ],
+   "message": null
+  },
+  {
+   "id": "p27_always_known_missing",
+   "planted": true,
+   "class": "persona_incompatible",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "bram_unlisted",
+     "kind": "persona_incompatible",
+     "requirement": "concepts"
+    }
+   ],
+   "got": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "bram_unlisted",
+     "kind": "persona_incompatible",
+     "requirement": "concepts"
+    }
+   ],
+   "message": null
+  },
+  {
+   "id": "p28_min_expertise_too_low",
+   "planted": true,
+   "class": "persona_incompatible",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "esme_mid",
+     "kind": "persona_incompatible",
+     "requirement": "min_expertise"
+    }
+   ],
+   "got": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "esme_mid",
+     "kind": "persona_incompatible",
+     "requirement": "min_expertise"
+    }
+   ],
+   "message": null
+  },
+  {
+   "id": "p29_three_personas_one_refused",
+   "planted": true,
+   "class": "persona_incompatible",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "wren_noacct",
+     "kind": "persona_incompatible",
+     "requirement": "has_account"
+    }
+   ],
+   "got": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "wren_noacct",
+     "kind": "persona_incompatible",
+     "requirement": "has_account"
+    }
+   ],
+   "message": null
+  },
+  {
+   "id": "p30_first_failing_key_listed",
+   "planted": true,
+   "class": "persona_incompatible",
+   "outcome": "caught",
+   "expected": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "ruth_multi",
+     "kind": "persona_incompatible",
+     "requirement": "min_expertise"
+    }
+   ],
+   "got": [
+    {
+     "type": "not_run",
+     "block": "b1",
+     "persona": "ruth_multi",
+     "kind": "persona_incompatible",
+     "requirement": "min_expertise"
+    }
+   ],
+   "message": null
+  },
+  {
+   "id": "k01_ref_not_value",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k02_override_true",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k03_same_fact_same_truth",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k04_child_omits_personas",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k05_same_set_other_order",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k06_scenario_changes_along_chain",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k07_all_requires_hold_equal_level",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k08_misconception_unmatched",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k09_slot_no_persona_holds",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k10_pins_and_unknown",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k11_slot_held_by_unlisted_persona",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k12_override_with_case_and_spaces",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k13_different_proposition",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k14_ref_and_other_value",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k15_min_expertise_novice",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k16_concepts_subset",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k17_has_account_false_holds",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k18_three_personas_all_pass",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k19_four_level_chain",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k20_unrelated_blocks_other_personas",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k21_sibling_children",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k22_scenario_with_drift_and_prefs",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k23_two_personas_override",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k24_contradicting_persona_unlisted",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k25_similar_slot_name",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k26_requires_language_fr",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k27_block_without_requires",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k28_empty_requires",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k29_chain_override_belief",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  },
+  {
+   "id": "k30_two_blocks_one_persona",
+   "planted": false,
+   "class": "clean",
+   "outcome": "clean_ok",
+   "expected": [],
+   "got": [],
+   "message": null
+  }
+ ]
+}
