@@ -364,6 +364,28 @@ describe('the process adapter', () => {
     });
   });
 
+  it('seeds the binary files of the Given byte for byte, at open and from a later Given', async () => {
+    const { adapter, open, folder } = setup();
+    const pdf = Buffer.from([0x25, 0x50, 0x44, 0x46, 0x00, 0xff, 0xfe, 0x80, 0x0a]);
+    const bom = Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from('plan,price\nS,15\n')]);
+    const withBinary = (binary: Record<string, string>): ResolvedGiven => {
+      const base = given();
+      return {
+        ...base,
+        world: { workspace: { files: base.world.workspace?.files ?? {}, binary } },
+        hash: `given-binary-${Object.keys(binary).length}`,
+      };
+    };
+    const session = await open(withBinary({ 'in/report.pdf': pdf.toString('base64') }));
+    expect(Buffer.compare(await readFile(join(folder(), 'in', 'report.pdf')), pdf)).toBe(0);
+    const later = withBinary({
+      'in/report.pdf': pdf.toString('base64'),
+      'in/plans.csv': bom.toString('base64'),
+    });
+    await runnerSend(adapter, session, turn(0, 'Build a price sheet from catalog.csv.', later));
+    expect(Buffer.compare(await readFile(join(folder(), 'in', 'plans.csv')), bom)).toBe(0);
+  });
+
   it('stops a slow agent at the block latency budget without failing the block', async () => {
     const { adapter, open } = setup();
     const from = given();

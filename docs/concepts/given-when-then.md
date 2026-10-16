@@ -23,7 +23,7 @@ A block's `prefix` starts the block in the middle of a conversation, without rep
 | `ledger` | the facts the agent must hold | `customer_type: existing` |
 | `world.tools` | a forced result, error or latency per tool, from this block on | `lookup_plans: { error: timeout }` |
 | `world.store` | a seeded store | an account record |
-| `world.workspace` | the files the agent starts from: a folder (`from`) or inline `files` | two CSV files |
+| `world.workspace` | the files the agent starts from: a folder (`from`), inline text `files`, or inline `binary` files in base64, written byte for byte | two CSV files |
 | `world.fixtures` | free fixtures | a price table |
 | `vars` | runtime variables | the clock, the channel, the sender |
 

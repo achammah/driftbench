@@ -344,14 +344,29 @@ function agentVariables(
 /** What a new Given adds or changes against the one already seeded. Files the agent changed since stay. */
 function workspaceDelta(seeded: Workspace | undefined, next: Workspace): Workspace | undefined {
   if (seeded !== undefined && canonicalJson(seeded) === canonicalJson(next)) return undefined;
-  const files: Record<string, string> = {};
-  for (const [path, content] of Object.entries(next.files ?? {})) {
-    const known = seeded?.files !== undefined && Object.hasOwn(seeded.files, path);
-    if (!known || seeded?.files?.[path] !== content) files[path] = content;
-  }
+  const files = changedEntries(seeded?.files, next.files);
+  const binary = changedEntries(seeded?.binary, next.binary);
   const from = next.from !== undefined && next.from !== seeded?.from ? next.from : undefined;
-  if (from === undefined && Object.keys(files).length === 0) return undefined;
-  return { ...(from === undefined ? {} : { from }), ...(Object.keys(files).length === 0 ? {} : { files }) };
+  if (from === undefined && Object.keys(files).length === 0 && Object.keys(binary).length === 0)
+    return undefined;
+  return {
+    ...(from === undefined ? {} : { from }),
+    ...(Object.keys(files).length === 0 ? {} : { files }),
+    ...(Object.keys(binary).length === 0 ? {} : { binary }),
+  };
+}
+
+/** The entries of `next` that `seeded` does not hold with the same content. */
+function changedEntries(
+  seeded: Record<string, string> | undefined,
+  next: Record<string, string> | undefined,
+): Record<string, string> {
+  const changed: Record<string, string> = {};
+  for (const [path, content] of Object.entries(next ?? {})) {
+    const known = seeded !== undefined && Object.hasOwn(seeded, path);
+    if (!known || seeded?.[path] !== content) changed[path] = content;
+  }
+  return changed;
 }
 
 function withoutControl(snapshot: WorkspaceSnapshot): WorkspaceSnapshot {

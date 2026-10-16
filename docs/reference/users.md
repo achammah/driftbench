@@ -108,6 +108,7 @@ The files the agent starts from.
 |---|---|---|---|---|
 | `from` | string, not empty | no |  | A folder the workspace starts from. A path written ./<path> is read from the folder of the spec file; any other relative path from the folder the run starts in. |
 | `files` | map of string to string | no |  | Files the workspace starts with: path to content. |
+| `binary` | map of string to string matching `^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==\|[A-Za-z0-9+/]{3}=)?$` | no |  | Files the workspace starts with that are not text: path to content in base64. Each is written byte for byte, so a binary file or a text file with a byte-order mark reaches the agent as planted. |
 
 ## Phrasing must
 
