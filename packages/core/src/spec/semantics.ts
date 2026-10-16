@@ -1,4 +1,5 @@
-import type { Assertion, Count } from '../schema/common';
+import { posix } from 'node:path';
+import type { Assertion, Count, WorldState } from '../schema/common';
 import type { Expect, Spec } from '../schema/spec';
 import { error, type Issue } from './issues';
 import { isPlainObject } from './normalize';
@@ -36,6 +37,28 @@ type Context = {
   forbidden: Set<string>;
 };
 
+/** A workspace path as the sandbox reads it: `./a//b.txt` and `a/b.txt` are the same file. */
+function workspacePath(path: string): string {
+  return posix.normalize(path);
+}
+
+/** A workspace file is written once: a path in both `files` and `binary` has no single content. */
+function checkWorkspace(world: WorldState | undefined, at: string, issues: Issue[]): void {
+  const workspace = world?.workspace;
+  if (workspace?.files === undefined || workspace.binary === undefined) return;
+  const text = new Set(Object.keys(workspace.files).map(workspacePath));
+  for (const path of Object.keys(workspace.binary)) {
+    if (!text.has(workspacePath(path))) continue;
+    issues.push(
+      error(
+        'WORKSPACE_PATH_TWICE',
+        `${at}.workspace.binary`,
+        `the workspace path "${path}" is written in files and in binary: keep it in one of them`,
+      ),
+    );
+  }
+}
+
 /** Rules a schema cannot express. Every issue returned is an error. */
 export function checkSemantics(spec: Spec): Issue[] {
   const issues: Issue[] = [];
@@ -61,6 +84,7 @@ export function checkSemantics(spec: Spec): Issue[] {
   const ctx: Context = { stages: spec.stages ? new Set(spec.stages) : undefined, defined, forbidden };
 
   const facts = factsOf(spec);
+  checkWorkspace(spec.given?.world, 'given.world', issues);
   const blockIds = new Set<string>();
   spec.blocks.forEach((block, index) => {
     if (block.id !== undefined) {
@@ -71,6 +95,7 @@ export function checkSemantics(spec: Spec): Issue[] {
       }
       blockIds.add(block.id);
     }
+    checkWorkspace(block.given?.world, `blocks.${index}.given.world`, issues);
     if (block.given?.origin !== undefined && block.given.prefix === undefined) {
       issues.push(
         error(
@@ -93,6 +118,7 @@ export function checkSemantics(spec: Spec): Issue[] {
   const perturbationIds = new Set<string>();
   spec.perturbations?.forEach((perturbation, index) => {
     const path = `perturbations.${index}`;
+    checkWorkspace(perturbation.world, `${path}.world`, issues);
     if (perturbationIds.has(perturbation.id)) {
       issues.push(
         error(

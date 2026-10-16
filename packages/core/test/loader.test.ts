@@ -215,6 +215,18 @@ const INVALID: Array<{ name: string; text: string; code: string; path?: string }
     path: 'blocks.1.id',
   },
   {
+    name: 'a workspace path in files and in binary, spec Given',
+    text: 'id: x\ngiven:\n  world:\n    workspace:\n      files: { a.csv: hi }\n      binary: { a.csv: aGk= }\nblocks:\n  - user: hi\n',
+    code: 'WORKSPACE_PATH_TWICE',
+    path: 'given.world.workspace.binary',
+  },
+  {
+    name: 'a workspace path in files and in binary, spelled another way, block Given',
+    text: 'id: x\nblocks:\n  - user: hi\n    given:\n      world:\n        workspace:\n          files: { out/a.csv: hi }\n          binary: { ./out//a.csv: aGk= }\n',
+    code: 'WORKSPACE_PATH_TWICE',
+    path: 'blocks.0.given.world.workspace.binary',
+  },
+  {
     name: 'count zero with input assertions',
     text: 'id: x\nblocks:\n  - user: hi\n    expect: { tools: [{ label: t, count: 0, input: { a: 1 } }] }\n',
     code: 'TOOL_COUNT_CONTRADICTION',
