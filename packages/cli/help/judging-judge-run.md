@@ -1,6 +1,6 @@
 ---
 title: judge run
-summary: Replay a judge council on recorded answers over every fixture pair of a criteria folder and report which criteria it separates; use it to prove a council and its assignments work before a run relies on them.
+summary: Replay a judge council on recorded answers over every fixture pair of a criteria folder and report which criteria it separates. Use it to prove a council and its assignments work before a run relies on them.
 commands:
   - judge run
 see_also:
@@ -15,7 +15,7 @@ next:
 
 ## What it is
 
-`driftbench judge run` builds a judge council whose judges replay a cassette (a JSON file of recorded judge answers), then asks that council to judge the pass fixture and the fail fixture of every criterion in a criteria folder. A criterion is separated when its pass fixture gets the verdict pass and its fail fixture gets the verdict fail. The command never calls a model: every answer comes from the cassette. A request the cassette does not hold gives no answer, which is counted as an error, never as a pass.
+`driftbench judge run` builds a judge council whose judges replay a cassette (a JSON file of recorded judge answers). It then asks that council to judge the pass fixture and the fail fixture of every criterion in a criteria folder. A criterion is separated when its pass fixture gets the verdict pass and its fail fixture gets the verdict fail. The command never calls a model: every answer comes from the cassette. A request the cassette does not hold gives no answer, which is counted as an error, never as a pass.
 
 ## When to use it
 
@@ -48,11 +48,11 @@ Exit codes:
 |---|---|
 | 0 | Every criterion is separated and every judge call gave an answer. |
 | 1 | At least one criterion is not separated, or at least one judge call gave no answer (a cassette miss or a recorded failure). |
-| 2 | Bad input: a missing required option, an unknown mode, a criteria folder with issues, a cassette that cannot be read, an assignment table for another mode, or a council that is refused (for example a judge of the agent's family, or fewer than three judges of a class the mode uses). |
+| 2 | Bad input: a missing required option, an unknown mode, a criteria folder with issues or a cassette that cannot be read. Bad input is also an assignment table for another mode, or a refused council. Examples of a refused council: a judge of the agent's family, or fewer than three judges of a class the mode uses. |
 
 ## Inputs
 
-* The criteria folder (`--criteria`). One YAML file per criterion, named after it. Each file has `criterion` (`name`, `rubric`, `pass`, `fail`, and optional `gating`, `scope`, `judge_class`, `inputs`) and `fixtures` with a `pass` and a `fail` slice (`transcript`, and optional `note`, `artifact`, `given`, `inputs`). Every field is described in `judging-criteria`.
+* The criteria folder (`--criteria`). One YAML file per criterion, named after it. Each file has `criterion` (`name`, `rubric`, `pass`, `fail`, and optional `gating`, `scope`, `judge_class`, `inputs`). It also has `fixtures` with a `pass` and a `fail` slice (`transcript`, and optional `note`, `artifact`, `given`, `inputs`). Every field is described in `judging-criteria`.
 * The cassette (`--cassette`). JSON with `version`, `judges` (each with `id`, `family`, `cls`, optional `model`, `cost`) and `entries` (one recorded answer or failure per judge and request key). See `judging-cassettes`.
 * The assignment table (`--assignments`, optional). YAML with `version: 1`, `mode`, `repeats`, `kappa_min` and one entry per criterion. See `judging-calibration`.
 
@@ -70,8 +70,8 @@ NOT separated  <criterion> [<class>]: pass fixture <outcome>, fail fixture <outc
 * `<class>` is the class of the row that judged the criterion: `system1` or `system2`.
 * `gating` appears when the criterion is declared gating and calibration did not leave it unassigned. `unassigned: not gating` appears when the assignment table leaves it unassigned: it is still judged but never gates.
 * `(split, re-judged)` after a fixture means the first three judges gave no majority and another round decided. `(cascade)` means the cheapest judge decided alone.
-* Under a `NOT separated` line, the round log of each fixture follows, one line per round, such as `pass: system1: s1p-a inconclusive, s1p-b inconclusive, openai-decisions inconclusive; split`. A judge id ending in `@large` is the retry with the large token budget.
-* The last line counts: `<n> of <m> criteria separated in mode <mode>.`, then, when calls failed, `; <k> judge call(s) gave no answer (a cassette miss or a recorded failure).`
+* Under a `NOT separated` line, the round log of each fixture follows, one line per round. An example line: `pass: system1: s1p-a inconclusive, s1p-b inconclusive, openai-decisions inconclusive; split`. A judge id ending in `@large` is the retry with the large token budget.
+* The last line counts criteria (`<n> of <m> criteria separated in mode <mode>.`). When calls failed, it adds `; <k> judge call(s) gave no answer (a cassette miss or a recorded failure).`
 
 With `--json`, one object: `mode`, `separated` (count), `criteria` (count), `errors` (judge calls with no answer) and `rows`. Each row has `criterion`, `cls`, `gating`, optional `unassigned` (the reason), `separated`, and `fixtures`. Each fixture has `fixture` (`pass` or `fail`), `outcome`, `cls`, `split`, `cascaded`, `errors`, `votes` (each `judge`, `outcome`, optional `score` and `reasoning`) and `log` (the round lines).
 
@@ -114,4 +114,4 @@ All 12 criteria are separated. The fail fixture of `holds_instructions` split am
 * `judge run: the assignment table is for mode hybrid, the run is in mode llm` (exit 2). Run in the mode the table was calibrated for, or calibrate again with `judge calibrate --mode <mode>`.
 * `judge run: ENOENT: no such file or directory, open '<path>'` (exit 2). The cassette path does not exist. Check the path; it is resolved from the current folder.
 * `judge run: the criteria folder has <n> issue(s); run judge check first.` (exit 2), after one line per issue. Fix the criteria files; `judge check` lists the same issues.
-* `0 of 12 criteria separated in mode hybrid; 216 judge call(s) gave no answer (a cassette miss or a recorded failure).` (exit 1). The cassette holds no recording for these requests: it was recorded for other requests (here `examples/acme/criteria/calibration/campaign.cassette.json`, which holds campaign blocks, not fixtures), or a rubric, fixture, prompt or client setting changed since recording, which changes the request key. Use the cassette recorded for these fixtures, or record again.
+* `0 of 12 criteria separated in mode hybrid; 216 judge call(s) gave no answer (a cassette miss or a recorded failure).` (exit 1). The cassette holds no recording for these requests. Either it was recorded for other requests (here `examples/acme/criteria/calibration/campaign.cassette.json`, which holds campaign blocks, not fixtures). Or a rubric, fixture, prompt or client setting changed since recording, which changes the request key. Use the cassette recorded for these fixtures, or record again.

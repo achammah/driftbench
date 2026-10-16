@@ -1,6 +1,6 @@
 ---
 title: The review queue
-summary: "The review queue of blocks waiting for a hand label: queue create fills it from a stored campaign, queue assign gives an item to one reviewer, queue vote records a second reviewer's label, queue agreement measures how often two reviewers agree, and queue list shows every item; the labels then feed judge calibrate."
+summary: "The review queue of blocks waiting for a hand label. queue create fills it from a stored campaign. queue assign gives an item to one reviewer. queue vote records a second reviewer's label. queue agreement measures how often two reviewers agree. queue list shows every item. The labels then feed judge calibrate."
 commands:
   - queue create
   - queue list
@@ -21,9 +21,9 @@ Calibration needs hand labels: a person's pass or fail on real blocks, per crite
 
 * `open`: nobody holds it.
 * `assigned`: one reviewer holds it; nobody else can take it.
-* `done`: its label is saved. An item becomes done when its reviewer saves the label in the local viewer (`driftbench view`, page Queue), which writes the label into the labels file of the criterion.
+* `done`: its label is saved. An item becomes done when its reviewer saves the label in the local viewer (`driftbench view`, page Queue). That save writes the label into the labels file of the criterion.
 
-A second reviewer can give an independent label on the same item with `queue vote`. Votes are stored in the queue only, never in the labels file, and `queue agreement` reports how often the first two reviewers agree, with Cohen's kappa. Labels from two reviewers who rarely agree make a weak bar for judges.
+A second reviewer can give an independent label on the same item with `queue vote`. Votes are stored in the queue only, never in the labels file. `queue agreement` reports how often the first two reviewers agree, with Cohen's kappa. Labels from two reviewers who rarely agree make a weak bar for judges.
 
 ## When to use it
 
@@ -86,14 +86,14 @@ Exit codes, all five commands:
 | Code | When |
 |---|---|
 | 0 | Done. |
-| 2 | Bad input: no store, a store that cannot be opened, an unknown campaign, an unknown item, an item held by another reviewer or already done, a repeated vote, a label other than pass or fail, or a queue file that is not a review queue. |
+| 2 | Bad input. There is no store, or a store cannot be opened. Or the campaign is unknown, or the item is unknown. Or an item is held by another reviewer or already done. Or a vote is repeated. Or a label is other than pass or fail. Or a queue file is not a review queue. |
 
 ## Inputs
 
 * For `create`: a store with the campaign (written by `campaign run --store`), its specs, and its runs. The criteria of a block are the criteria its spec defines, plus the name of any judge verdict the block carries, sorted. A block that already has a label for that criterion in the labels folder (same block id) is not queued. Items already in the queue are not queued twice.
 * The labels folder: `queue.json`, and one YAML labels file per criterion (see `judging-calibration`).
 
-`queue.json` holds `version: 1` and `entries`. Each entry has `id` (`<runId>.b<index>`), `criterion`, `campaign`, `runId`, `index`, `state` (`open`, `assigned` or `done`), and when set `assignee` and `votes` (each `reviewer`, `label`, and an optional `score`). The file is written through a temporary file, so a reader never sees half a file.
+`queue.json` holds `version: 1` and `entries`. Each entry has `id` (`<runId>.b<index>`), `criterion`, `campaign`, `runId`, `index` and `state` (`open`, `assigned` or `done`). When set, it also has `assignee` and `votes` (each `reviewer`, `label`, and an optional `score`). The file is written through a temporary file, so a reader never sees half a file.
 
 ## Outputs and how to read them
 
@@ -101,12 +101,12 @@ Exit codes, all five commands:
 * `list`: one tab-separated line per item, `<state> <criterion> <block id> <assignee or ->`, then `<n> items: <a> open, <b> assigned, <c> done.`
 * `assign`: `<block> (<criterion>) is assigned to <reviewer>.`
 * `vote`: `<reviewer> voted <label> on <block> (<criterion>).`
-* `agreement`: `Agreement over <n> items with two votes: <k> agree (<p>%), kappa <x>.`, or `No item has two votes yet: no agreement to report.` Kappa is Cohen's kappa between the first two reviewers; `n/a` when chance agreement is certain.
+* `agreement`: Kappa is Cohen's kappa between the first two reviewers, and `n/a` when chance agreement is certain. It prints `Agreement over <n> items with two votes: <k> agree (<p>%), kappa <x>.`, or `No item has two votes yet: no agreement to report.`
 * Errors print the reason on stderr.
 
 ## Worked example
 
-Store a run of the plan upgrade spec, queue its blocks, take one, record two reviewers' votes on two items, and read their agreement (no model call; the run id is the same on every run):
+Store a run of the plan upgrade spec and queue its blocks. Take one, record two reviewers' votes on two items, and read their agreement. There is no model call, and the run id is the same on every run:
 
 ```sh
 driftbench campaign run examples/acme/specs/conversations/plan-upgrade.yaml --store acme.db --campaign upgrade-demo
@@ -185,7 +185,7 @@ open	one_question_per_turn	a66a7aba9986a136.b4	-
 (exit 0)
 ```
 
-The spec names two criteria, so its 5 blocks give 10 items. The reviewers agree on block 0 and disagree on block 1: 1 of 2 items agree, and kappa is 0.00, no better than chance on this tiny sample. Votes leave the item's state as it was.
+The spec names two criteria, so its 5 blocks give 10 items. The reviewers agree on block 0 and disagree on block 1. Here 1 of 2 items agree, and kappa is 0.00, no better than chance on this tiny sample. Votes leave the item's state as it was.
 
 ## Common errors
 

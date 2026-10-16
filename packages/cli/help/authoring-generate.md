@@ -1,6 +1,6 @@
 ---
 title: Generating specs from the map
-summary: '`generate` writes a suite of specs from an approved map, by the generator alone with no model call: stage-graph paths, a t-wise covering array, boundary values, one probe per deviation class, metamorphic families, task-family instances, and a cover pass; `--model` adds model proposals that count only once the gate accepts them.'
+summary: '`generate` writes a suite of specs from an approved map, by the generator alone with no model call. The suite holds stage-graph paths, a t-wise covering array, boundary values, one probe per deviation class, metamorphic families, task-family instances, and a cover pass. `--model` adds model proposals that count only once the gate accepts them.'
 commands:
   - generate
 see_also:
@@ -17,7 +17,7 @@ next:
 
 ## What it is
 
-`generate` reads an approved map (an `extract` proposal whose every entry is approved) and writes specs. Code enumerates everything; no model is called unless `--model` is given. Each generated block carries a machine Then (stage reached, tool calls and inputs, end state, recovery) derived from the map's approved relations, never from an agent's reply.
+`generate` reads an approved map (an `extract` proposal whose every entry is approved) and writes specs. Code enumerates everything; no model is called unless `--model` is given. Each generated block carries a machine Then (stage reached, tool calls and inputs, end state, recovery). The Then comes from the map's approved relations, never from an agent's reply.
 
 Seven seeders each write specs:
 
@@ -26,7 +26,7 @@ Seven seeders each write specs:
 | `graph` | one spec per approved path: the stage graph walked along the paths |
 | `twise` | a covering array at strength `--t` over the axes; each row walks an approved path of its flow. With `--budget`, budget rows replace it (see authoring-covering-arrays) |
 | `boundary` | one spec per value of every detail data dimension (tool argument and result partitions), on a path that needs it |
-| `deviation` | one probe per deviation class, injected at a stage of a path whose flow has a recovery for the class; after `cover`, a class probed far less than the most probed one gets more probes (`gen-deviation-balance-NNN`) |
+| `deviation` | one probe per deviation class, injected at a stage of a path whose flow has a recovery for the class. After `cover`, a class probed far less than the most probed one gets more probes (`gen-deviation-balance-NNN`) |
 | `metamorphic` | families of specs that differ only in the phrasing of one value, with the same Then |
 | `task` | the instances of every task family a `task_family` relation names, with their corner and planted variants (see authoring-task-families) |
 | `cover` | runs last: one scenario for each allowed pair no complete spec of the other seeders covers |
@@ -75,8 +75,8 @@ driftbench generate --map <file> --out <dir> [--t <n>] [--seed <n>] [--max <n>] 
 | Exit code | When |
 |---|---|
 | 0 | the suite is written, and every block has an approved phrase and a Then |
-| 1 | the suite is written with incomplete specs, a seeder cut by `--max`, a spec cap that could not preserve its target, or a generator defect (an invalid spec, a lint finding, a refused task family), each listed; or the `--model` call failed |
-| 2 | usage or input error, nothing written: an invalid or unapproved map, a bad number, an invalid baseline, an earlier output without `--force`, a spec cap below the protected count |
+| 1 | the suite is written with incomplete specs, a seeder cut by `--max`, or a spec cap that could not preserve its target. Or the suite is written with a generator defect (an invalid spec, a lint finding, a refused task family). Each case is listed. Or the `--model` call failed |
+| 2 | usage or input error, nothing written. Causes: an invalid or unapproved map, a bad number, an invalid baseline, an earlier output without `--force`, a spec cap below the protected count |
 
 ## Inputs
 
@@ -95,7 +95,7 @@ Files under `--out`:
 | `incomplete/<seeder>/...` | specs with a placeholder or a block with no machine Then |
 | `generate-report.json` | everything below, in full |
 
-Each generated spec opens with comment lines naming the seeder, the seed and the map hash, and carries `version: <map hash>`, `tier: generated`, tags (`flow:`, `persona:` and the like), `covers`, the stage list, and two non-gating criteria (`behaviour.<id>`, `flow.<id>`). Do not edit generated specs; change the map and generate again.
+Each generated spec opens with comment lines naming the seeder, the seed and the map hash. It carries `version: <map hash>`, `tier: generated`, tags (`flow:`, `persona:` and the like), `covers`, the stage list, and two non-gating criteria (`behaviour.<id>`, `flow.<id>`). Do not edit generated specs; change the map and generate again.
 
 The printed summary, line by line:
 
@@ -108,13 +108,19 @@ The printed summary, line by line:
 - `Coverage on the axis map at t = <t>: complete specs ..., all specs ...`, plus one entry per `--baseline`.
 - With `--spec-cap`: `Spec cap <n>: <w> of <c> candidate specs written; <p> ... protected.`
 - `Values with no approved phrase (<n>): ...`: approve a phrase for each to make its block complete.
-- `Approved phrases no walk could say (<n>), listed under no_phrase:` each phrase with the first reason; the report's `no_phrase` entry holds it under `unsaid` with every reason.
-- `Specs with a block the map supports no machine Then for (<n>), in incomplete/: ...` then `Most frequent reasons`: each names the relation or value the map lacks.
+- `Approved phrases no walk could say (<n>), listed under no_phrase:` each phrase with the first reason. The report's `no_phrase` entry holds it under `unsaid` with every reason.
+- `Specs with a block the map supports no machine Then for (<n>), in incomplete/: ...` then `Most frequent reasons`. Each names the relation or value the map lacks.
 - `Wrote <n> files to <dir>.`
 
-`generate-report.json` keys: `generator`, `map` (path, agent, version, hash, counts), `options`, `summary` (`specs`, `blocks`, `complete`, `incomplete`), `seeders` (per seeder, with `cut`), `graph`, `twise` (`t`, `dimensions`, `rows`, `allowed`, `covered`, `share`, `unreachable`), `boundary`, `deviation`, `metamorphic`, `cover` (with `unbuilt`), `constraints`, `no_phrase` (with `unsaid` for an approved phrase no walk could say), `no_then`, `coverage` (`actual` with every uncovered tuple, `t`, `allowed`, `complete`, `all`, `measures`, and `baseline` when given), `invalid`, `lint`; plus `budget` and `spec_cap` when used.
+`generate-report.json` keys: `generator`, `map` (path, agent, version, hash, counts), `options`, `summary` (`specs`, `blocks`, `complete`, `incomplete`), `seeders` (per seeder, with `cut`), `graph`. More keys: `twise` (`t`, `dimensions`, `rows`, `allowed`, `covered`, `share`, `unreachable`), `boundary`, `deviation`, `metamorphic`, `cover` (with `unbuilt`), `constraints`. Also `no_phrase` (with `unsaid` for an approved phrase no walk could say) and `no_then`. Then `coverage` (`actual` with every uncovered tuple, `t`, `allowed`, `complete`, `all`, `measures`, and `baseline` when given), `invalid`, `lint`. The report also has `budget` and `spec_cap` when used.
 
-With `--model`, `generate` also writes `<out>/proposed/`: `candidates/` (the valid proposals), `gated/` (the gate's output on them) and `proposals.json`, and prints `Model proposals: <n> written by <family> <model>, each through the gate.`, one row per proposal (`counted` or `rejected`, blocks accepted, the gate stage that refused it) and `Counted <c> of <n> proposals.` A proposal's `target` is dropped, so the gate runs it on the first `--reference`.
+With `--model`, `generate` also writes `<out>/proposed/`. It holds `candidates/` (the valid proposals), `gated/` (the gate's output on them) and `proposals.json`. It also prints these lines:
+
+- `Model proposals: <n> written by <family> <model>, each through the gate.`
+- One row per proposal (`counted` or `rejected`, blocks accepted, the gate stage that refused it).
+- `Counted <c> of <n> proposals.`
+
+A proposal's `target` is dropped, so the gate runs it on the first `--reference`.
 
 ## Worked example
 

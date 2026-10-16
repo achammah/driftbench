@@ -1,6 +1,6 @@
 ---
 title: Perturbations and recovery
-summary: 'A perturbation is a deviation a spec declares to be injected before one of its blocks in perturbed runs (mode P), with how the agent must recover; `perturb` runs one spec with one deviation and prints whether the agent came back in time.'
+summary: 'A perturbation is a deviation a spec declares. It is injected before one of its blocks in perturbed runs (mode P). The spec also says how the agent must recover. `perturb` runs one spec with one deviation. It prints whether the agent came back in time.'
 commands:
   - perturb
   - campaign run
@@ -16,14 +16,14 @@ next:
 
 ## What it is
 
-A spec's `perturbations` list declares deviations that are not part of the normal script. In a normal run (modes T and F) they do nothing. In a perturbed run (mode P), one perturbation is inserted before block `inject_at` (counting from 0), and the runner measures the recovery: how many blocks the agent needs to get back on its flow, what it broke on the way, whether it did something unsafe, whether it asked first.
+A spec's `perturbations` list declares deviations that are not part of the normal script. In a normal run (modes T and F) they do nothing. In a perturbed run (mode P), one perturbation is inserted before block `inject_at` (counting from 0). The runner measures the recovery. It counts how many blocks the agent needs to get back on its flow. It also records what the agent broke on the way, whether it did something unsafe, and whether it asked first.
 
-A perturbation is carried by a user message (`user`), several messages at once (`burst`), or a change of the world (`world`, such as a tool forced to fail). A message perturbation is an extra injected block. A world-only perturbation adds no message: block `inject_at` runs under the changed world.
+A perturbation is carried by a user message (`user`) or several messages at once (`burst`). A change of the world (`world`, such as a tool forced to fail) also carries one. A message perturbation is an extra injected block. A world-only perturbation adds no message: block `inject_at` runs under the changed world.
 
-`perturb` runs one spec once in mode P with one deviation, beside a free-running (F) run of the same spec as the reference, and prints both block by block with the recovery. The deviation is:
+`perturb` runs one spec once in mode P with one deviation, beside a free-running (F) run of the same spec as the reference. It prints both block by block with the recovery. The deviation is:
 
 - `--perturbation <id>`: one the spec declares; or
-- `--class <D> --at <n>`: the spec's own perturbation of that class at that block when it declares one, else a phrasing drawn by `--seed` from the red-team pack (see authoring-deviation-classes). A drawn phrasing gets the class's default recovery window.
+- `--class <D> --at <n>`: the spec's own perturbation of that class at that block when it declares one. Otherwise a phrasing drawn by `--seed` from the red-team pack (see authoring-deviation-classes). A drawn phrasing gets the class's default recovery window.
 
 `campaign run --mode P` (the running area) runs one P cell per declared perturbation and repeat, and records the same recovery.
 
@@ -73,7 +73,7 @@ Give either `--perturbation`, or `--class` with `--at`.
 |---|---|
 | 0 | the run completes and the agent comes back within the window (`turnsToRecover` at most `within_blocks`) |
 | 1 | it does not come back in time, the run fails, or the recovery cannot be measured (no `recovery` set, or the deviation never went in) |
-| 2 | bad input, nothing ran: options that do not fit, an unknown class, a bad number, a position out of range, an unknown perturbation id, a pack that cannot be read or is invalid, no approved phrasing, more than one spec, no adapter |
+| 2 | bad input, nothing ran. Causes: options that do not fit, an unknown class, a bad number, a position out of range. More causes: an unknown perturbation id, a pack that cannot be read or is invalid. More causes: no approved phrasing, more than one spec, no adapter |
 
 ### driftbench campaign run (mode P)
 
@@ -108,7 +108,7 @@ A perturbation must set at least one of `user`, `burst` and `world`. `user` and 
 
 Text output:
 
-- `Perturb: <spec> on <target>, mode P. <code> <title>: <how it goes in> (<source>).` The source is `declared by the spec as <id>`, or `drawn from <pack file>, phrasing <id>, seed <s>` (plus `a draft nobody has approved yet`).
+- `Perturb: <spec> on <target>, mode P. <code> <title>: <how it goes in> (<source>).` The source is `declared by the spec as <id>`. It can also be `drawn from <pack file>, phrasing <id>, seed <s>` (plus `a draft nobody has approved yet`).
 - `Expected: <what a correct agent does>.`
 - `Reference: the F run of the same spec, <p> of <n> blocks pass; collateral counts against it.`
 - A table: `pos` (position in the run), `block` (`injected <id>` for the deviation), `stage` reached, `pass` (`✓` or `✗`), and the failing verdict ids.
@@ -116,7 +116,7 @@ Text output:
 - `Recovery record (runner): {...}` the record as the runner stored it.
 - `Reply checks: <a> of <t> applied, <n> not applicable (tied to another stage).` when a drawn phrasing adds stage-bound patterns.
 
-`--json` keys: `specId`, `target`, `perturbation` (the full perturbation as run, drawn ones included), `source`, `worldOnly`, `replyChecks`, `complete` and `warnings` (drawn phrasings), `reference` (`runId`, `status`, `used`), `run` (`runId`, `status`, `blocks`: each `index`, `injected`, `stage`, `pass`, `failing`, `text`), `recovery` (the record, or null), `within`, `met`, and `reason` when not measured.
+`--json` keys: `specId`, `target`, `perturbation` (the full perturbation as run, drawn ones included), `source`, `worldOnly`, `replyChecks`, `complete` and `warnings` (drawn phrasings). More keys: `reference` (`runId`, `status`, `used`) and `run` (`runId`, `status`, `blocks`: each `index`, `injected`, `stage`, `pass`, `failing`, `text`). More keys: `recovery` (the record, or null), `within`, `met`, and `reason` when not measured.
 
 ## Worked example
 
@@ -238,7 +238,7 @@ Recovery record (runner): {"injectedAt":3,"turnsToRecover":2,"label":"late","col
 (exit 1)
 ```
 
-Read it: the fault placed the order on "ok sounds good" (`forbidden.order.create` at the injected block), so the safe action fails, the next block breaks what passed in the reference (collateral 1), and the agent is back only two blocks later.
+Read it: the fault placed the order on "ok sounds good" (`forbidden.order.create` at the injected block). The safe action therefore fails. The next block breaks what passed in the reference (collateral 1). The agent is back only two blocks later.
 
 ## Common errors
 

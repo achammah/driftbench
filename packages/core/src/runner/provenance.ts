@@ -86,9 +86,21 @@ export function provenanceDigest(
     ...(run.realizedTextStripped === undefined ? {} : { realizedTextStripped: run.realizedTextStripped }),
     // `realized` joins only when present, so the digest of a block without it is the one it always was.
     blocks: run.blocks.map(
-      ({ index, blockId, injected, realized, realizedTextStripped, givenHash, provenance }) => ({
+      ({
         index,
         blockId,
+        parent,
+        specIndex,
+        injected,
+        realized,
+        realizedTextStripped,
+        givenHash,
+        provenance,
+      }) => ({
+        index,
+        blockId,
+        ...(parent === undefined ? {} : { parent }),
+        ...(specIndex === undefined ? {} : { specIndex }),
         injected,
         ...(realized === undefined ? {} : { realized }),
         ...(realizedTextStripped === undefined ? {} : { realizedTextStripped }),

@@ -1,6 +1,6 @@
 ---
 title: The judge of a run
-summary: The --judge, --judge-command and --judge-budget options of driftbench replay and driftbench estate run, which judge the criteria blocks name with one judge on the local claude command; without --judge every judged criterion is inconclusive and a gating one fails its block.
+summary: The --judge, --judge-command and --judge-budget options of driftbench replay and driftbench estate run judge the criteria blocks name. They use one judge on the local claude command. Without --judge every judged criterion is inconclusive and a gating one fails its block.
 commands:
   - replay
   - estate run
@@ -16,9 +16,9 @@ next:
 
 ## What it is
 
-Two commands that run specs can judge the criteria a block names (`expect.criteria`): `driftbench replay` (recorded sessions, offline) and `driftbench estate run` (an estate run live). They take one judge, not a council: `--judge claude:<model>` asks the local `claude` command (Claude Code in print mode), one call per criterion per block. The judge's cost is added to the run's cost.
+Two commands that run specs can judge the criteria a block names (`expect.criteria`). They are `driftbench replay` (recorded sessions, offline) and `driftbench estate run` (an estate run live). They take one judge, not a council: `--judge claude:<model>` asks the local `claude` command (Claude Code in print mode), one call per criterion per block. The judge's cost is added to the run's cost.
 
-Without `--judge`, the judge check still runs, and every criterion a block names gets an inconclusive verdict with the evidence `no judge is configured for this run: pass --judge claude:<model> to judge it`. That verdict gates as the criterion does (`gating: true` on the definition, or `name@gating` in the block), so a block whose result hangs on a gating criterion fails without a judge. It never passes by the judge's absence.
+Without `--judge`, the judge check still runs. Every criterion a block names gets an inconclusive verdict with the evidence `no judge is configured for this run: pass --judge claude:<model> to judge it`. That verdict gates as the criterion does (`gating: true` on the definition, or `name@gating` in the block). A block whose result hangs on a gating criterion therefore fails without a judge. It never passes by the judge's absence.
 
 A judge command is billed unless it is a stand-in: a file that carries the line `@driftbench-stand-in` in its first 2048 bytes. A billed judge needs `--judge-budget`.
 
@@ -26,7 +26,7 @@ A judge command is billed unless it is a stand-in: a file that carries the line 
 
 * To judge the criteria of recorded sessions (`replay`) or of a live estate run (`estate run`).
 * To test the judge wiring for free, with the stand-in judge `examples/estates/fixture/live/fake/judge.cjs`.
-* For a council of several judges with calibrated assignments, there is no command option yet: `campaign run` loads no judge, and prints a `Not judged:` line instead. A council is built in code (see `judging-council`) or replayed on fixtures with `judge run`.
+* For a council of several judges with calibrated assignments, there is no command option yet. `campaign run` loads no judge, and prints a `Not judged:` line instead. A council is built in code (see `judging-council`) or replayed on fixtures with `judge run`.
 
 ## Commands and every option
 
@@ -47,7 +47,7 @@ The `pii` check uses the same judge, and the same budget and cost, for a block t
 
 How the judge answers:
 
-* Each criterion a block names is one request: the transcript (for `scope: block`, the last 2 messages of the prefix, then the block), the Given, the produced files of a task block, and the criterion's `inputs`. See `judging-default-judge` for the prompt and the answer contract.
+* Each criterion a block names is one request. The request holds the transcript (for `scope: block`, the last 2 messages of the prefix, then the block). It also holds the Given, the produced files of a task block, and the criterion's `inputs`. See `judging-default-judge` for the prompt and the answer contract.
 * An answer that breaks the criterion ledger contract is asked again once with the large budget.
 * An unparsed answer, an error, or a criterion the spec does not define is inconclusive, never a pass.
 * The verdict id is `judge.<name>`, kind `judge`, with the evidence `single judge <id>, <cost> USD`. It says it came from a single judge, so it is never read as a council's verdict.
@@ -79,7 +79,7 @@ Both store the campaign with `judge: { mode: llm, judges: [claude:<model>] }`, o
 
 ## Worked example
 
-All offline: the stand-in judge `examples/estates/fixture/live/fake/judge.cjs` reads the prompt, answers fail when it holds the words `public holiday`, else pass, and reports 0.0015 USD per call.
+All offline. The stand-in judge `examples/estates/fixture/live/fake/judge.cjs` reads the prompt, answers fail when it holds the words `public holiday`, else pass, and reports 0.0015 USD per call.
 
 First the options themselves: the stand-in accepted on a replay, and a billed judge refused without a budget:
 

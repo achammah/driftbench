@@ -1,6 +1,6 @@
 ---
 title: Self-checks of the repository
-summary: The checks CI runs on driftbench itself beside the validators, such as the leak guard, the public API surface, the docs checks and the package boundaries.
+summary: The checks CI runs on driftbench itself beside the validators. They include the leak guard, the public API surface, the docs checks and the package boundaries.
 commands:
   - validate
 see_also:
@@ -18,12 +18,12 @@ root, not `driftbench` commands, and they need the source checkout (a git clone 
 
 | Check | Command | What it proves |
 |---|---|---|
-| leak guard | `node tools/guard/guard.mjs` (`pnpm guard`) | no personal data or client identifier is in the tree: IBANs with a valid checksum, Belgian national register numbers, phone numbers, real email addresses, and any term on a private denylist |
+| leak guard | `node tools/guard/guard.mjs` (`pnpm guard`) | no personal data or client identifier is in the tree. The checks cover IBANs with a valid checksum, Belgian national register numbers, phone numbers, real email addresses, and any term on a private denylist |
 | guard canary | `node tools/guard/guard.mjs --canary` (`pnpm guard:canary`) | every guard check still fires: it plants generated data in a temporary folder and expects each to be caught |
-| public API surface | `node tools/structure/api-surface.mjs --build --check` | the names each package exports equal the frozen list `tools/structure/api-surface.json`; a name is added or removed only together with that file, so the change shows in review |
+| public API surface | `node tools/structure/api-surface.mjs --build --check` | the names each package exports equal the frozen list `tools/structure/api-surface.json`. A name is added or removed only together with that file, so the change shows in review |
 | spec reference | `pnpm docs:reference --check` | the generated reference pages under `docs/reference` (spec, family and the other file formats) match the schemas they are generated from |
 | docs links | `pnpm docs:links` | every relative link in `docs/` points at a file and heading that exist, and every page is reachable from `docs/index.md` |
-| docs tests | `pnpm vitest run tools/docs` | no em or en dash on any page; runtime-specific names only under `docs/adapters`; every YAML example loads and every whole spec lints clean; the CLI reference examples show the output of their commands; the README example is the committed spec word for word; every page compiles as the docs site renders it |
+| docs tests | `pnpm vitest run tools/docs` | no em or en dash on any page. Runtime-specific names only under `docs/adapters`. Every YAML example loads and every whole spec lints clean. The CLI reference examples show the output of their commands. The README example is the committed spec word for word. Every page compiles as the docs site renders it |
 | package boundaries | `pnpm vitest run tools/structure` | no package imports across a boundary in a new way, and no import cycle between packages |
 
 The validators' own jobs (`validate all --check-floor`, `--check-handover`, `protect`) are in

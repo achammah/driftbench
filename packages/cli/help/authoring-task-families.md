@@ -1,6 +1,6 @@
 ---
 title: Task families
-summary: 'A task family is one coding-agent task written once with knobs, an oracle written as a program and a signed review; use `family instances`, `family verify` and `family review` to build, check and release its instances.'
+summary: 'A task family is one coding-agent task written once with knobs, an oracle written as a program and a signed review. Use `family instances`, `family verify` and `family review` to build, check and release its instances.'
 commands:
   - family instances
   - family verify
@@ -19,16 +19,16 @@ next:
 
 A task family is a folder that describes one code-agent task (an agent that works on files in a workspace) with parameters. It holds three files:
 
-- `family.yaml`: the knobs (what varies), the constraints between knobs, a seed grammar (tables and the files that render them), corner cases, approved phrases, the blocks of the instruction, the reader checks, and an optional planted variant.
-- the oracle (a JavaScript module, such as `oracle.mjs`): code that computes the expected outcome of every block from the seed files and the knobs alone, before any agent runs.
+- `family.yaml`: the knobs (what varies) and the constraints between knobs. The file also holds a seed grammar (tables and the files that render them) and corner cases. It holds approved phrases, the blocks of the instruction, the reader checks, and an optional planted variant.
+- the oracle (a JavaScript module, such as `oracle.mjs`): code that computes the expected outcome of every block. It uses the seed files and the knobs alone, and it runs before any agent runs.
 - the review file (such as `review.yaml`): a person signs it once per family. The signature holds for the SHA-256 of the family file and of the oracle.
 
-Code builds instances from a seed. Each instance draws one value per knob, generates the tables, renders the workspace files, renders the instruction from approved phrases, and asks the oracle for the expected outcome. The result is a set of task specs (`kind: task`). Nothing in an instance is free model output.
+Code builds instances from a seed. Each instance draws one value per knob and generates the tables. It renders the workspace files and renders the instruction from approved phrases. It asks the oracle for the expected outcome. The result is a set of task specs (`kind: task`). Nothing in an instance is free model output.
 
 Each instance has several variants, each one a spec file:
 
 - `base`: the drawn workspace.
-- one variant per chosen corner case (`corners.per_instance` at most), named by the corner id: an emptied cell, a duplicated row, rotated columns, or a unit change.
+- one variant per chosen corner case (`corners.per_instance` at most), named by the corner id. The corner kinds are exactly four: an emptied cell, a duplicated row, rotated columns and a unit change.
 - `planted`: only when the planted knob holds `with`. The workspace also holds a file with a planted instruction. The expected outcome stays the same, and the planted block gains `must_not` patterns and `safety`.
 
 Three guarantees run in code:
@@ -41,7 +41,7 @@ A space map can hand a flow to a family with a `task_family` relation. `driftben
 
 ## When to use it
 
-- You test a code agent that edits files (a spreadsheet, a CSV, a JSON file) and you want many instances of one task, not one hand-written spec.
+- You test a code agent that edits files (a spreadsheet, a CSV, a JSON file). You want many instances of one task, not one hand-written spec.
 - You want corner cases and a planted instruction (deviation class `D6_instruction_in_data`) on every instance, with expectations computed by code.
 - Use `family review --write` when you create a family, or after any change to `family.yaml` or the oracle: the old signature is stale.
 - Use `family instances` to write the specs, then `family verify` before you ship them.
@@ -68,8 +68,8 @@ The command refuses to run, exit 2, when the review is missing, invalid or stale
 | Exit code | When |
 |---|---|
 | 0 | Every instance is written. |
-| 1 | The family or its oracle has a defect: the oracle throws or returns an outcome the format refuses, the oracle answers for a block the instance does not hold, an instance spec does not validate, no draw meets the constraints after 1000 tries, or a style knob changes the expected outcome. Nothing is written. |
-| 2 | Bad input: the family does not load, a used phrase is not approved, the review is missing, invalid or stale, `--n` or `--seed` is not a valid whole number, or `--out` holds an earlier run and `--force` is absent. |
+| 1 | The family or its oracle has a defect. The oracle throws or returns an outcome the format refuses. Or the oracle answers for a block the instance does not hold. Or an instance spec does not validate. Or no draw meets the constraints after 1000 tries. Or a style knob changes the expected outcome. Nothing is written. |
+| 2 | Bad input. The family does not load, or a used phrase is not approved. Or the review is missing, invalid or stale. Or `--n` or `--seed` is not a valid whole number. Or `--out` holds an earlier run and `--force` is absent. |
 
 ### driftbench family verify
 
@@ -179,7 +179,7 @@ Generators (`gen`), one form each:
 
 ### Seed files
 
-Every entry has `path` (required; `{knob}` fills in a knob value) and `when` (optional condition: the file exists only when the knobs meet it), plus exactly one of:
+Every entry has `path` (required; `{knob}` fills in a knob value) and `when` (optional condition: the file exists only when the knobs meet it). It also has exactly one of:
 
 | Key | Fields | Meaning |
 |---|---|---|
@@ -189,7 +189,7 @@ Every entry has `path` (required; `{knob}` fills in a knob value) and `when` (op
 | `xlsx` | `table`, `sheet_by` (a column; one sheet per value, in first-seen order), `sheet_name` (`as-is` or `title`, default `as-is`), `columns` (list of `{ header, column, times? }`; `times` multiplies a number cell) | A workbook already in the workspace. |
 | `copy` | `from` (a file beside the family file) | An existing file, copied as it is. |
 
-When a variant holds a file that is not text (a workbook), its spec uses `workspace_seed.from: ./.seed-<variant>` and the files are written in that folder inside the instance folder. Otherwise the spec holds the files inline under `workspace_seed.files`.
+When a variant holds a file that is not text (a workbook), its spec uses `workspace_seed.from: ./.seed-<variant>`. The files are written in that folder inside the instance folder. Otherwise the spec holds the files inline under `workspace_seed.files`.
 
 ### Corner cases
 
@@ -221,7 +221,7 @@ A block:
 
 ### checks
 
-A list of reader check names per kind. Each name must be one the reader of that kind answers: `xlsx`: sheets, header, rows, cells, formula, value, total, no_error_cells, contains, not_contains, regex. `csv`: header, rows, cells, value, total, contains, not_contains, regex. `json`: subset, value, contains, not_contains, regex. `text`: contains, not_contains, regex, lines. The compiler emits only these from the oracle output: for xlsx `sheets`, `header`, `rows`, `cells` (a formula column is checked by `formula`, not by `cells`), `formula`, `no_error_cells`; for csv `header`, `rows`, `cells`; for json `subset`; for text `contains`.
+A list of reader check names per kind. Each name must be one the reader of that kind answers: `xlsx`: sheets, header, rows, cells, formula, value, total, no_error_cells, contains, not_contains, regex. `csv`: header, rows, cells, value, total, contains, not_contains, regex. `json`: subset, value, contains, not_contains, regex. `text`: contains, not_contains, regex, lines. The compiler emits only these from the oracle output. For xlsx: `sheets`, `header`, `rows`, `cells` (a formula column is checked by `formula`, not by `cells`), `formula`, `no_error_cells`. For csv: `header`, `rows`, `cells`. For json: `subset`. For text: `contains`.
 
 ### planted
 
@@ -236,14 +236,14 @@ A list of reader check names per kind. Each name must be one the reader of that 
 
 ### The oracle
 
-`expected(input)` gets `{ files, binary, knobs, blocks }`: text seed files by path, other files as bytes, the drawn knobs, and the ids of the blocks the instance holds. It returns:
+`expected(input)` gets `{ files, binary, knobs, blocks }`. These are text seed files by path, other files as bytes, the drawn knobs, and the ids of the blocks the instance holds. It returns:
 
 ```
 { slots: { <name>: <text> },
   blocks: { <block id>: { files: [...], workspace: { created: [], changed: [], deleted: [] }, must?: [..] } } }
 ```
 
-An expected file is one of `{ path, kind: xlsx, sheets: [{ name, header, rows, formulas? }] }` (`formulas` maps a column letter to a formula with `{row}`, such as `=C{row}*12`), `{ path, kind: csv, header, rows }`, `{ path, kind: json, value }`, `{ path, kind: text, contains: [..] }`. A cell is text, a number, a boolean, or `null`/`''` for empty. It must answer every active block and no other.
+An expected file is one of `{ path, kind: xlsx, sheets: [{ name, header, rows, formulas? }] }` (`formulas` maps a column letter to a formula with `{row}`, such as `=C{row}*12`). It can also be `{ path, kind: csv, header, rows }`, `{ path, kind: json, value }`, or `{ path, kind: text, contains: [..] }`. A cell is text, a number, a boolean, or `null`/`''` for empty. It must answer every active block and no other.
 
 ### The review file
 
@@ -257,7 +257,7 @@ An expected file is one of `{ path, kind: xlsx, sheets: [{ name, header, rows, f
 | `signed_on` | `YYYY-MM-DD` or `null` | yes | The date of the signature; `null` while pending. |
 | `notes` | string | no | The reviewer's notes. |
 
-States: `missing` (no file), `invalid` (bad YAML, bad schema, or another family id), `pending` (not signed), `stale` (signed, but a hash changed), `signed` (signed and both hashes match).
+States: `missing` (no file), `invalid` (bad YAML, bad schema, or another family id), `pending` (not signed). The other states are `stale` (signed, but a hash changed) and `signed` (signed and both hashes match).
 
 ### task_family in a map
 
@@ -330,17 +330,17 @@ Files written under `--out`:
 
 - `iNN/<variant>.yaml`: one task spec per variant. Instance folders are `i01`, `i02`, ... (at least two digits). Each file starts with a header comment: do not edit it, regenerate it. `metadata.family` records `id`, `family_sha256`, `oracle_sha256`, `review`, `instance`, `instance_seed`, `run_seed`, `knobs`, `variant` and `corner`.
 - `iNN/.seed-<variant>/`: the workspace of a variant that holds a binary file.
-- `family-report.json` (also printed by `--json`): `family`, `family_sha256`, `oracle_sha256`, `review` (`signed` or `pending`), `seed`, `n`, `specs`, `instances` (each with `name`, `seed`, `knobs`, `corners`, `variants` as `{ id, file }`, `style_alternatives_checked`), `knob_counts` (per knob, how many instances drew each value) and `corner_counts` (per corner kind). Read `knob_counts` to see whether every value you care about was drawn; raise `--n` if not.
+- `family-report.json` (also printed by `--json`): `family`, `family_sha256`, `oracle_sha256`, `review` (`signed` or `pending`), `seed`, `n` and `specs`. It also holds `instances` (each with `name`, `seed`, `knobs`, `corners`, `variants` as `{ id, file }`, `style_alternatives_checked`). The report also has `knob_counts` (per knob, how many instances drew each value) and `corner_counts` (per corner kind). Read `knob_counts` to see whether every value you care about was drawn; raise `--n` if not.
 
 ### family verify, text output
 
 - `Verify <dir> on the reference <target>: <k> specs.`
-- `✓ <file>` for a pass. `✗ <file>  <state>[: error]` otherwise, where state is `fail` (a gating verdict failed), `failed` (the run did not complete) or `invalid` (the spec does not load). Under a failure, up to 8 lines `block <i> (<id>) <check id>: <evidence>`, then `and N more`.
+- `✓ <file>` for a pass. `✗ <file>  <state>[: error]` otherwise. The state is `fail` (a gating verdict failed), `failed` (the run did not complete) or `invalid` (the spec does not load). Under a failure, up to 8 lines `block <i> (<id>) <check id>: <evidence>`, then `and N more`.
 - Summary: `✓ The reference passes all <k> specs: <m> instances may ship.` or `✗ The reference fails <x> of <k> specs. ... These instances are not shipped: <names>.` followed by the instances that pass every variant.
 - `Release also waits for a person to sign the review of <family> (...)` when the instances were built with a pending review.
 - `Wrote <dir>/verify-report.json.`
 
-`verify-report.json` keys: `reference`, `specs`, `passed`, `shipped` (instances whose every variant passed), `rejected`, `results` (per spec: `file`, `specId`, `instance`, `variant`, `state`, `failing` as `{ block, blockId, check, id, evidence }`, optional `error`). Temporary sandbox paths in evidence read `<sandbox>`.
+`verify-report.json` keys: `reference`, `specs`, `passed`, `shipped` (instances whose every variant passed), `rejected`, `results`. Each entry of `results` has, per spec: `file`, `specId`, `instance`, `variant`, `state`, `failing` as `{ block, blockId, check, id, evidence }`, and optional `error`. Temporary sandbox paths in evidence read `<sandbox>`.
 
 What to do on a failure: read the evidence. Either the oracle computes the wrong outcome (fix the oracle, then sign a new review) or the reference is wrong (fix the reference). Never ship a rejected instance.
 
@@ -499,7 +499,7 @@ Review: pending. out/authoring-task-families/noreview/review.yaml is not signed 
 (exit 1)
 ```
 
-After `--write`, `family instances` runs and records `review: pending`; `family verify` then prints `Release also waits for a person to sign the review of acme-price-sheet (1 instances wait on it).`
+After `--write`, `family instances` runs and records `review: pending`. Then `family verify` prints `Release also waits for a person to sign the review of acme-price-sheet (1 instances wait on it).`
 
 A stale review (the family file changed after the signature):
 

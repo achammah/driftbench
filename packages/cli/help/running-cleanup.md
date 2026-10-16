@@ -1,6 +1,6 @@
 ---
 title: Stop a run and clean up
-summary: How to stop a running campaign safely, what driftbench removes by itself (sandboxes, temporary folders, agent processes), what an interrupt or a hard kill leaves behind, and which files you remove yourself.
+summary: How to stop a running campaign safely. What driftbench removes by itself (sandboxes, temporary folders, agent processes). What an interrupt or a hard kill leaves behind. Which files you remove yourself.
 commands:
   - campaign run
   - campaign resume
@@ -17,12 +17,12 @@ next:
 
 ## What it is
 
-A campaign can be stopped at any moment. Each run is written to the store as soon as it finishes, so stopping loses only the cells in flight, and `campaign resume` runs them later. driftbench cleans up after itself: every sandbox folder goes when its run closes, the campaign's temporary folder goes when the command ends, and every command a sandboxed agent started runs in its own process group, killed when it exits or times out. On Ctrl-C (SIGINT) or SIGTERM the CLI kills the process groups still running, removes the sandbox folders still open, and then exits with that signal. What it cannot clean is what you asked it to keep (stores, bundles, reports) and what a SIGKILL interrupts.
+A campaign can be stopped at any moment. Each run is written to the store as soon as it finishes. So stopping loses only the cells in flight, and `campaign resume` runs them later. driftbench cleans up after itself. Every sandbox folder goes when its run closes. The campaign's temporary folder goes when the command ends. Every command a sandboxed agent started runs in its own process group, killed when it exits or times out. On Ctrl-C (SIGINT) or SIGTERM the CLI kills the process groups still running, removes the sandbox folders still open, and then exits with that signal. What it cannot clean is what you asked it to keep (stores, bundles, reports) and what a SIGKILL interrupts.
 
 ## When to use it
 
 * You need to stop a long or costly campaign now: press Ctrl-C, or send SIGTERM to its process id. Then `campaign resume --store <file>` when you want to finish it.
-* A run hangs on an agent: lower the agent's timeout (`timeout_ms` of an http target, a block's `budget.latency_ms` for a process agent), or stop and resume.
+* A run hangs on an agent: lower the agent's timeout (`timeout_ms` of an http target, a block's `budget.latency_ms` for a process agent). Or stop and resume.
 * You are freeing disk space or removing sensitive data: delete the store files, export bundles and report folders you made.
 * You see stray `driftbench-sandboxes-*` folders in the temporary folder: a run was killed with SIGKILL, or interrupted while it held an empty campaign folder.
 
@@ -32,7 +32,7 @@ driftbench has no stop or clean command. Stopping is a signal to the running pro
 
 | Action | How | Effect |
 |---|---|---|
-| Stop a campaign | Ctrl-C in its terminal, or `kill -INT <pid>` / `kill -TERM <pid>` | finished runs stay in the store; the cells in flight are lost and show `pending`; the process exits with code 130 (SIGINT) or 143 (SIGTERM) as the shell reports it. |
+| Stop a campaign | Ctrl-C in its terminal, or `kill -INT <pid>` / `kill -TERM <pid>` | finished runs stay in the store. The cells in flight are lost and show `pending`. The process exits with code 130 (SIGINT) or 143 (SIGTERM) as the shell reports it. |
 | Finish it | `driftbench campaign resume [campaignId] --store <file>` | runs only the cells with no completed run (topic running-campaign-resume). |
 | Hard kill | `kill -KILL <pid>` | no cleanup runs: sandbox folders and agent processes may remain. Avoid it. |
 | Keep nothing | omit `--store` | `campaign run` uses an in-memory store; nothing is written to disk but temporary sandbox folders, which are removed. |
@@ -41,13 +41,13 @@ driftbench has no stop or clean command. Stopping is a signal to the running pro
 What driftbench removes by itself:
 
 * Each sandbox (a temporary workspace folder) when its run closes. The command line has no flag to keep one; code can pass `keep: true` to `processAdapter`.
-* The campaign's folder, `driftbench-sandboxes-<random>` under the system temporary folder (`$TMPDIR` on macOS, usually `/tmp` on Linux), when `campaign run` or `campaign resume` ends normally or on an error.
-* Every command a sandbox runs, with everything it started (its process group), when it exits, when it passes its timeout (10 minutes by default, exit 124), and at process exit.
-* On SIGINT or SIGTERM: the open sandbox folders, any process whose command line names one of them or whose working folder is inside one (so a daemon that left its process group is found too), and the running process groups.
+* The campaign's folder, `driftbench-sandboxes-<random>` under the system temporary folder (`$TMPDIR` on macOS, usually `/tmp` on Linux). It goes when `campaign run` or `campaign resume` ends normally or on an error.
+* Every command a sandbox runs, with everything it started (its process group). It goes when it exits, when it passes its timeout (10 minutes by default, exit 124), and at process exit.
+* On SIGINT or SIGTERM: the open sandbox folders and the running process groups. Also any process whose command line names one of those folders or whose working folder is inside one. So a daemon that left its process group is found too.
 
 ## Inputs
 
-The process id of the running command (from `ps`, or `$!` when you started it in the background), and the paths you gave: `--store`, `--out`, report folders.
+The process id of the running command (from `ps`, or `$!` when you started it in the background). Also the paths you gave: `--store`, `--out`, report folders.
 
 ## Outputs and how to read them
 
@@ -63,7 +63,7 @@ The process id of the running command (from `ps`, or `$!` when you started it in
 
 ## Worked example
 
-A sandboxed task run is kept in a store; its sandbox and campaign folder are removed when the command ends, and the store keeps the run. No model is called.
+A sandboxed task run is kept in a store. Its sandbox and campaign folder are removed when the command ends, and the store keeps the run. No model is called.
 
 ```sh
 driftbench campaign run examples/acme/specs/tasks/price-sheet.yaml --store kept.db --campaign kept
@@ -75,7 +75,7 @@ driftbench campaign status kept --store kept.db
 1 cell: 1 pass, 0 fail, 0 failed. Spent $0.00.
 ```
 
-An interrupt, measured on the Acme gated suite (195 cells, kept in `kill.db`): Ctrl-C after a few seconds stopped the command with exit code 130; `campaign status --store kill.db` then read `195 cells: 73 pass, 0 fail, 0 failed, 122 pending. Spent $0.00.`, and `campaign resume --store kill.db` ended with `195 cells: 195 pass, 0 fail, 0 failed, 73 reused. Spent $0.00.` The interrupted command left one empty `driftbench-sandboxes-*` folder in the temporary folder, which is safe to remove.
+An interrupt, measured on the Acme gated suite (195 cells, kept in `kill.db`): Ctrl-C after a few seconds stopped the command with exit code 130. `campaign status --store kill.db` then read `195 cells: 73 pass, 0 fail, 0 failed, 122 pending. Spent $0.00.`, and `campaign resume --store kill.db` ended with `195 cells: 195 pass, 0 fail, 0 failed, 73 reused. Spent $0.00.` The interrupted command left one empty `driftbench-sandboxes-*` folder in the temporary folder, which is safe to remove.
 
 ## Common errors
 

@@ -1,6 +1,6 @@
 ---
 title: Testing an agent estate
-summary: The whole estate loop, from a project folder of standing instructions, skills and guards to a map, a plan, generated tests, runs and maintenance, with no model call.
+summary: The whole estate loop, from a project folder of standing instructions, skills and guards to a map, a plan, generated tests, runs and maintenance. The loop needs no model call.
 commands:
   - estate scan
   - estate lint

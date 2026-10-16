@@ -1,6 +1,6 @@
 ---
 title: Declare a campaign in driftbench.yaml
-summary: Write the settings of campaign run once, under the campaign key of driftbench.yaml or a --config file, so a bare campaign run uses them; a flag on the command line still wins.
+summary: Write the settings of campaign run once, under the campaign key of driftbench.yaml or a --config file, so a bare campaign run uses them. A flag on the command line still wins.
 commands:
   - campaign run
   - campaign plan
@@ -17,7 +17,7 @@ next:
 
 ## What it is
 
-The project config is a YAML file: `driftbench.yaml` in the folder you run the command from, or the file `--config <file>` names. Its `campaign:` key declares a campaign: each setting under it is a plain mapping onto one flag of `campaign run`, so the file and the flag mean the same thing. With the file in place, `driftbench campaign run` alone runs the declared campaign. A flag given on the command line wins over the file, flag by flag. The same file holds other keys read by other commands: `prices:` (token prices, topic running-budget-and-prices), `plugins:` (topic running-plugins), and `aggregates:` and `scales:` (read by `report`, `ci` and `view`, results area).
+The project config is a YAML file: `driftbench.yaml` in the folder you run the command from, or the file `--config <file>` names. Its `campaign:` key declares a campaign. Each setting under it is a plain mapping onto one flag of `campaign run`. The file and the flag therefore mean the same thing. With the file in place, `driftbench campaign run` alone runs the declared campaign. A flag given on the command line wins over the file, flag by flag. The same file holds other keys read by other commands. These are `prices:` (token prices, topic running-budget-and-prices) and `plugins:` (topic running-plugins). Also `aggregates:` and `scales:` (read by `report`, `ci` and `view`, results area).
 
 ## When to use it
 
@@ -61,7 +61,7 @@ The rules:
 
 * A flag on the command line wins over the file, flag by flag. A list flag such as `--target` replaces the file's whole list.
 * What to run comes from one place: the paths or `--dataset` of the command line when it gives any, else the file's `specs` and `dataset`.
-* Paths in the file (`specs`, `store`, personas, recordings) are read from the working folder, as the same paths on the command line are, not from the folder of the config file.
+* Paths in the file (`specs`, `store`, personas, recordings) are read from the working folder, as the same paths on the command line are. They are not read from the folder of the config file.
 * `campaign plan` takes only the keys it has a flag for: `targets`, `routes`, `modes`, `repeats`, `budget_usd` and `store`. Its spec paths stay on the command line.
 * The settings of a single run are never in the file: `--campaign`, `--change`, `--from`, `--audit`, `--audit-seed`, `--max-carry`, `--max-age`, `--block-reruns`, `--record-end-state-snapshots`, `--record-realized-text`, `--prices` and `--json`.
 * `campaign resume` does not read `campaign:`: a stored campaign keeps its own cells. It reads `prices:` of `driftbench.yaml` in the working folder.
@@ -88,7 +88,7 @@ The config prints nothing of its own: the command prints what it would print wit
 
 ## Worked example
 
-The Acme config plans one spec with the file's target, modes and repeats; then the declared campaign runs with mode and repeats overridden on the command line, while the specs, the target and the concurrency still come from the file. No model is called.
+The Acme config plans one spec with the file's target, modes and repeats. Then the declared campaign runs with mode and repeats overridden on the command line. The specs, the target and the concurrency still come from the file. No model is called.
 
 ```sh
 driftbench campaign plan examples/acme/specs/conversations/plan-upgrade.yaml --config examples/acme/ci/campaign.yaml

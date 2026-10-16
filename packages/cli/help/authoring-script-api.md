@@ -1,6 +1,6 @@
 ---
 title: Script API
-summary: 'The TypeScript `script` API of `@agent-nexus/driftbench-core` writes a conversation spec in code, one function call per step, and returns the same spec the command line reads from YAML, already validated.'
+summary: 'The TypeScript `script` API of `@agent-nexus/driftbench-core` writes a conversation spec in code, one function call per step. It returns the same spec the command line reads from YAML, already validated.'
 commands:
   - spec validate
   - spec lint
@@ -90,7 +90,7 @@ The arguments above. `expect` objects take the keys of a block's `expect` in the
 
 ## Worked example
 
-A script needs a TypeScript runner and the package. In your own project, install `@agent-nexus/driftbench-core` and `tsx`. In a scratch folder beside a clone of the repository (the folder holds `packages` as a link), a `tsconfig.json` maps the package name to its source instead:
+A script needs a TypeScript runner and the package. In your own project, install `@agent-nexus/driftbench-core` and `tsx`. Or work in a scratch folder beside a clone of the repository. The folder holds `packages` as a link, and a `tsconfig.json` there maps the package name to its source:
 
 ```json file=tsconfig.json
 {
@@ -218,7 +218,7 @@ Checked 1 spec: 1 valid, 0 invalid, 1 warning.
 (exit 0)
 ```
 
-An `injection()` step compiles to `when: { injection: { class, user } }`, the form the Acme off-topic spec writes by hand; the loader accepts both the same way:
+An `injection()` step compiles to `when: { injection: { class, user } }`. That is the form the Acme off-topic spec writes by hand. The loader accepts both the same way:
 
 ```sh
 driftbench spec validate examples/acme/specs/conversations/off-topic-return.yaml

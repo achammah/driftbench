@@ -1,6 +1,6 @@
 ---
 title: Personas
-summary: 'A persona file describes a fictional person the simulated user plays (who they are, their goal, the facts they give only when asked, the stop token, the spec they play); `simulate` and `campaign run --driver simulated` read it.'
+summary: 'A persona file describes a fictional person the simulated user plays. It holds who they are, their goal, the facts they give only when asked, the stop token and the spec they play. `simulate` and `campaign run --driver simulated` read it.'
 commands:
   - simulate
   - campaign run
@@ -14,12 +14,12 @@ next:
 
 ## What it is
 
-A persona is a YAML file for the simulated user. The simulated user replaces the spec's scripted user words: it writes each user turn as this person would, either through a model (`--model`, paid) or by replaying a recording (`--recording`, free).
+A persona is a YAML file for the simulated user. The simulated user replaces the spec's scripted user words. It writes each user turn as this person would, either through a model (`--model`, paid) or by replaying a recording (`--recording`, free).
 
 The persona fixes four things:
 
 - Who the person is and how they write (`name`, `persona`), and what they want (`goal`).
-- The facts the person knows (`facts`), such as an email or a phone number, and the patterns of an agent reply that ask for each fact (`reveal_when_asked`). Code enforces reveal-when-asked: a fact reaches the model only after an agent reply matches one of its patterns (case-insensitive regex). The spec's own words for a block are passed as a hint with every fact not yet asked replaced by `[your <fact>, once asked]`. An answer that holds a fact not yet asked fails the run.
+- The facts the person knows (`facts`), such as an email or a phone number. The patterns of an agent reply that ask for each fact (`reveal_when_asked`). Code enforces reveal-when-asked: a fact reaches the model only after an agent reply matches one of its patterns (case-insensitive regex). The spec's own words for a block are passed as a hint with every fact not yet asked replaced by `[your <fact>, once asked]`. An answer that holds a fact not yet asked fails the run.
 - The stop token: when an answer contains it, the run stops.
 - The spec the persona plays (`spec`), relative to the persona file. `campaign run --driver simulated` uses it to match a persona to a spec.
 
@@ -57,7 +57,7 @@ driftbench simulate <spec> --persona <file> (--model | --recording <file>) [--ta
 |---|---|
 | 0 | The run completes, at least one block ran, and every block that ran passes. |
 | 1 | A block fails, or the run fails (for example the simulated user leaks a fact, or a recording has no answer for a turn). |
-| 2 | Bad input, nothing ran: no source or both, a bad persona or recording, a bad number, more than one spec, no adapter, no agent family, a port of the agent's or a judge's family. |
+| 2 | Bad input, nothing ran. Causes: no source or both, a bad persona or recording, a bad number. More causes: more than one spec, no adapter, no agent family, a port of the agent's or a judge's family. |
 
 ### driftbench campaign run (persona options)
 
@@ -95,7 +95,7 @@ Rules checked when the user is created (exit 2):
 
 - Every fact has at least one ask pattern, and every pattern compiles.
 - Every key of `reveal_when_asked` is a fact.
-- Neither `persona` nor `goal` holds the value of a fact (the check ignores case; a value with 7 digits or more also matches the same digits with spaces, dots, dashes or brackets between them).
+- Neither `persona` nor `goal` holds the value of a fact. The check ignores case. A value with 7 digits or more also matches the same digits with spaces, dots, dashes or brackets between them.
 - The stop token is not blank.
 
 Minimal valid persona (`examples/acme/personas/sam-upgrader.yaml`):
@@ -126,7 +126,7 @@ The other Acme personas are `alex-newhome.yaml` (plays `new-customer-coverage.ya
 - `Simulate: <spec id> on <target>, persona <id> (<name>), <source>.` The source is `recording <family>` or `model <family> <model>`.
 - Per block: `<i>  user   <what the user said>`, `<i>  agent  <the agent's reply>`, then `<stage reached or ->  ✓|✗`.
 - `Facts given, each once asked: <facts or none>.` The facts the agent asked for, so the user could give them.
-- `✓|✗ <passed> of <ran> blocks pass. The run ended: <reason>.` Reasons include `the spec has no block N` (all blocks ran), `the simulated user said the stop token at block N`, `--turns N reached`, or the driver error.
+- `✓|✗ <passed> of <ran> blocks pass. The run ended: <reason>.` Reasons include `the spec has no block N` (all blocks ran). Reasons also include `the simulated user said the stop token at block N`, `--turns N reached`, or the driver error.
 
 `simulate --json` keys: `specId`, `target` (`adapter`, `agent`), `persona`, `source`, `status`, `ended`, `revealed`, `blocks` (each `index`, `user`, `agent`, `stage`, `pass`).
 

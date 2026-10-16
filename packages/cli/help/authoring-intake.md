@@ -1,6 +1,6 @@
 ---
 title: Intake, the reference set of user turns
-summary: 'Build the reference set of real user turns that generated and simulated turns are compared with: from past conversations (`intake logs`, anonymised into a private folder) or from an owner interview (`intake interview`, `intake from-interview`), then approve it (`intake approve`) and measure how close generated turns are (`intake fidelity`).'
+summary: 'Build the reference set of real user turns that generated and simulated turns are compared with. Build it from past conversations (`intake logs`, anonymised into a private folder) or from an owner interview (`intake interview`, `intake from-interview`). Then approve it (`intake approve`) and measure how close generated turns are (`intake fidelity`).'
 commands:
   - intake logs
   - intake interview
@@ -23,8 +23,8 @@ The reference set is a list of user turns, each placed on a cell of the approved
 
 There are two ways to build it:
 
-- **From past conversations** (`intake logs`): a JSON Lines file of conversations is anonymised by two privacy passes (rules and checksums, then an independent pass of rules, a model, or both), near-duplicates are dropped, openings are clustered into intents (the map's intent values first), and a spot-check sample is drawn for a person to read. Conversations flagged as failures go first. Everything is written to a private folder, which is refused inside a git work tree, so personal data never lands in a repository.
-- **From an interview** (`intake interview` then `intake from-interview`): driftbench writes a questionnaire from the approved map; the owner answers it in place (personas, the share of each intent, example messages per stage, what users never say, languages, channels); driftbench enumerates the cells, weights them by the shares, and asks a model (or a recording) for more turns per cell, checking each one. The owner's own examples count too.
+- **From past conversations** (`intake logs`): a JSON Lines file of conversations is anonymised by two privacy passes. The first pass uses rules and checksums. The second pass is independent and uses rules, a model, or both. Near-duplicates are dropped. Openings are clustered into intents (the map's intent values first). A spot-check sample is drawn for a person to read. Conversations flagged as failures go first. Everything is written to a private folder, which is refused inside a git work tree, so personal data never lands in a repository.
+- **From an interview** (`intake interview` then `intake from-interview`): driftbench writes a questionnaire from the approved map. The owner answers it in place (personas, the share of each intent, example messages per stage, what users never say, languages, channels). Then driftbench enumerates the cells and weights them by the shares. It asks a model (or a recording) for more turns per cell, checking each one. The owner's own examples count too.
 
 Nothing counts until a person approves it: `approval.yaml` holds one entry per turn with `approved: false`. `intake fidelity` then compares generated turns with the approved reference turns: cells, length, questions, vocabulary, copies. It measures; it never gates.
 
@@ -57,7 +57,7 @@ driftbench intake logs <file> --out <dir> [--map <file>] [--intent-dimension <id
 | `--cluster-threshold <cosine>` | How close two other openings must be to share a new intent. | 0.3 |
 | `--force` | Write into a folder that already holds files. | off |
 
-Exit 0 when the set is written; 1 when it is written but the model check failed on a conversation; 2 on a usage or input error, or an output folder inside a git work tree (nothing written).
+Exit 0 when the set is written. Exit 1 when it is written but the model check failed on a conversation. Exit 2 on a usage or input error, or an output folder inside a git work tree (nothing written).
 
 ### driftbench intake interview
 
@@ -92,7 +92,7 @@ driftbench intake from-interview <answers> --out <dir> [--map <file>] [--replay 
 | `--dry-run` | Print the cells, their weights and the turns to request; call no model. | off |
 | `--force` | Replace an existing set; its approvals are lost. | off |
 
-Exit 0 when the set is written and every cell got its turns; 1 when written but a cell failed or fell short (listed); 2 on a usage or input error (nothing written).
+Exit 0 when the set is written and every cell got its turns. Exit 1 when written but a cell failed or fell short (listed). Exit 2 on a usage or input error (nothing written).
 
 ### driftbench intake fidelity
 
@@ -154,15 +154,15 @@ A `share` written `null` is an unanswered question. The Acme answers are `exampl
 
 ## Outputs and how to read them
 
-- `intake logs` writes `conversations.jsonl` (the anonymised conversations), `reference-turns.jsonl` (the user turns with their cells), `spot-check.yaml` (read each one and set `clean`) and `intake-report.json`. It prints the counts of each privacy pass (what was redacted, and how many values were reserved fictional data), the residual flags (what the second pass found that the first missed: read those), the intents seen and new, and how complete the sample is (the chance the next conversation shows a new intent).
+- `intake logs` writes `conversations.jsonl` (the anonymised conversations), `reference-turns.jsonl` (the user turns with their cells), `spot-check.yaml` (read each one and set `clean`) and `intake-report.json`. It prints the counts of each privacy pass (what was redacted, and how many values were reserved fictional data). It prints the residual flags (what the second pass found that the first missed: read those). It prints the intents seen and new, and how complete the sample is (the chance the next conversation shows a new intent).
 - `intake interview` writes the questionnaire and prints the next command.
 - `intake from-interview` writes `reference.yaml` (cells with weights, requested and accepted turns, and each turn with its origin) and `approval.yaml`. `--dry-run` prints each cell with its weight and the turns to request.
 - `intake approve` lists each unapproved turn (id, origin `interview` or `model`, cell, text), or prints the approved count.
-- `intake fidelity` prints the total variation between the two cell distributions and the cells that differ most; length in words and the question rate, each with a two-sample KS test; vocabulary overlap; the share of candidate turns that copy a reference turn. Under 30 turns on a side every number is rough.
+- `intake fidelity` prints the total variation between the two cell distributions and the cells that differ most. It prints length in words and the question rate, each with a two-sample KS test. It prints vocabulary overlap, and the share of candidate turns that copy a reference turn. Under 30 turns on a side every number is rough.
 
 ## Worked example
 
-Write four fictional past conversations and three generated turns to compare. Build a private set from the logs, write the questionnaire, build the Acme reference set from the recorded interview answers (no model call), approve it, and compare the candidate turns with it:
+Write four fictional past conversations and three generated turns to compare. Build a private set from the logs, then write the questionnaire. Build the Acme reference set from the recorded interview answers (no model call). Approve it, and compare the candidate turns with it:
 
 ```jsonl file=out/logs.jsonl
 {"id": "c-001", "turns": [{"role": "user", "text": "Hi, I keep running out of data on my phone, can I get a bigger plan?"}, {"role": "agent", "text": "Sure. What is the email on your account?"}, {"role": "user", "text": "it's jo.doe@example.com"}], "channel": "chat"}

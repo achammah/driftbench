@@ -1,6 +1,6 @@
 ---
 title: Extracting and approving the map
-summary: '`extract` proposes the map of situations from an agent''s prompt or policy, its behaviour inventory and its tool schemas, every entry quoting the text that justifies it; `extract approve` records a person''s approval; `extract map` writes the space map of the approved axes.'
+summary: '`extract` proposes the map of situations from an agent''s prompt or policy, its behaviour inventory and its tool schemas. Every entry quotes the text that justifies it. `extract approve` records a person''s approval. `extract map` writes the space map of the approved axes.'
 commands:
   - extract
   - extract approve
@@ -22,11 +22,11 @@ The map is the list of situations an agent can face. `extract` writes a first ve
 
 How `extract` builds the proposal:
 
-1. A code pre-pass, with no model, reads the inventory and the tool schemas. It proposes the behaviour, flow, deviation and channel dimensions, the channel constraints, one data dimension per tool argument or result field with its boundary values, and the recoveries the inventory fixes.
+1. A code pre-pass, with no model, reads the inventory and the tool schemas. It proposes the behaviour, flow, deviation and channel dimensions, and the channel constraints. It proposes one data dimension per tool argument or result field with its boundary values, and the recoveries the inventory fixes.
 2. Unless `--no-model`, a model (or a recording, `--replay`) answers six sections on the prompt files: `stages`, `rules`, `personas`, `data`, `phrases`, `relations`. Each answer goes through the same parser and checks.
 3. Every value, constraint and relation must quote its source word for word. Code checks each quote in its source; an entry whose quote is not found is refused.
 
-Each dimension has a `role`: an `axis` enters the space map and is crossed with the other axes; a `detail` stays in the proposal and `generate` varies it inside a cell as boundary values. Code proposes the roles: every tool-schema dimension is a detail, and the first dimension of each kind is an axis.
+Each dimension has a `role`. An `axis` enters the space map and is crossed with the other axes. A `detail` stays in the proposal, and `generate` varies it inside a cell as boundary values. Code proposes the roles: every tool-schema dimension is a detail, and the first dimension of each kind is an axis.
 
 The approved proposal is what `generate`, `intake` and `pilot` read as "the approved map". The `space` commands do not read a proposal; `extract map` writes the space map they read (see authoring-map).
 
@@ -62,7 +62,7 @@ Without `--no-model` and without `--replay`, `extract` calls a model: a paid cal
 |---|---|
 | 0 | the proposal is written and every section answered |
 | 1 | the proposal is written, but a section failed or an entry was refused (both listed) |
-| 2 | usage or input error, nothing written: a missing option, `--no-model` with `--replay`, an unreadable file, a bad recording, no model key, an existing output without `--force`, invalid inputs |
+| 2 | usage or input error, nothing written. Causes: a missing option, `--no-model` with `--replay`, an unreadable file, a bad recording, no model key, an existing output without `--force`, invalid inputs |
 
 ### driftbench extract approve
 
@@ -99,7 +99,7 @@ driftbench extract map <proposal> --to <file> [--all]
 | `--to <file>` (required) | Where to write the space map, YAML. | none |
 | `--all` | Take every axis value, approved or not. | approved axes only |
 
-The space map holds the approved axis dimensions, `none` added where a spec may name no value, and the constraints among them, including the pairs the relations rule out. Edit the proposal and write the map again, rather than editing the written map.
+The space map holds the approved axis dimensions, with `none` added where a spec may name no value. It also holds the constraints among them, including the pairs the relations rule out. Edit the proposal and write the map again, rather than editing the written map.
 
 | Exit code | When |
 |---|---|
@@ -125,13 +125,13 @@ Top level:
 | `numeric_settings` | list | no | Approved numeric ranges that `generate --budget` samples into `given.vars`. |
 | `relations` | list | no | Paths, tool calls, recoveries and the rest, see below. |
 
-A dimension: `id` (lowercase, `^[a-z][a-z0-9_.-]*$`), `title`, `kind` (`stage`, `behaviour`, `deviation`, `persona`, `channel`, `data`, `task`), `role` (`axis` or `detail`), `produced_by` (`code` or `model`), `approved` (boolean), `values` (at least 1).
+A dimension: `id` (lowercase, `^[a-z][a-z0-9_.-]*$`), `title` and `kind` (`stage`, `behaviour`, `deviation`, `persona`, `channel`, `data`, `task`). A dimension also has `role` (`axis` or `detail`), `produced_by` (`code` or `model`), `approved` (boolean) and `values` (at least 1).
 
-A value: `id`, `title`, `evidence: { source, quote }` (quote at most 1000 characters, copied word for word from the source), `produced_by`, and optional `approved` (overrides the dimension's flag), `weight` (0 to 1), `required`, and for a rule: `polarity` (`must` or `must_not`), `when` and `unless` (the cell it applies in, as dimension to list of value ids), `limit` (most times per conversation), `within: { minutes }`, `priority: first`.
+A value: `id`, `title`, `evidence: { source, quote }` (quote at most 1000 characters, copied word for word from the source) and `produced_by`. Optional: `approved` (overrides the dimension's flag), `weight` (0 to 1) and `required`. A rule also takes optional `polarity` (`must` or `must_not`), `when` and `unless` (the cell it applies in, as dimension to list of value ids). It also takes optional `limit` (most times per conversation), `within: { minutes }` and `priority: first`.
 
 A constraint: `forbid` (dimension to value), `reason`, `evidence`, `produced_by`, `approved`.
 
-A phrase: `dimension`, `value`, `text` (one user message, 1 to 500 characters; `{slot}` takes a value the cell binds), `lang` (such as `en` or `pt-BR`), optional `when` (the cell values it fits), optional `binds` (slot values the phrase itself states), optional `evidence`, `produced_by`, `approved`.
+A phrase: `dimension`, `value`, `text` and `lang` (such as `en` or `pt-BR`). The `text` is one user message, 1 to 500 characters; `{slot}` takes a value the cell binds. Optional: `when` (the cell values it fits), `binds` (slot values the phrase itself states) and `evidence`. A phrase also has `produced_by` and `approved`.
 
 A numeric setting: `id` (the `given.vars` key), `min`, `max`, optional `integer`, optional `unit`, `evidence`, `produced_by`, `approved`.
 
@@ -174,7 +174,7 @@ Quotes in recorded answers name their source by its path relative to the proposa
 - `Notes:` tool fields whose schema states no partition, so no boundary values were made for them.
 - `Next:` the approve command to run.
 
-`extract approve` with no option prints `<file>: <open> of <total> decisions are open (...)`, the axes and grid line, then one line per open decision (`dimension`, `constraint`, `phrase`, `relation`, `numeric`) with its label, its role and origin, and the quote under it. After approving: `Approved <n> flags in <file>; <k> were already set.` or `Approved <n> dimensions in <file>: <ids>.` When nothing is open: `all <n> decisions are made.`
+`extract approve` with no option prints `<file>: <open> of <total> decisions are open (...)`, then the axes and grid line. Each open decision gets one line (`dimension`, `constraint`, `phrase`, `relation`, `numeric`) with its label, its role and origin, and the quote under it. After approving, it prints one of two lines (`Approved <n> flags in <file>; <k> were already set.` or `Approved <n> dimensions in <file>: <ids>.`). When nothing is open: `all <n> decisions are made.`
 
 `extract map` prints `Wrote <file>: <n> axes (<ids>), <c> constraints, a full grid of <cells> cells.`
 

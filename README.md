@@ -172,7 +172,7 @@ Nine ideas lead. Each one changes what you learn when a test fails, and what it 
 - **Why no other framework does it.** The seven tools we read score a whole scenario, test row, conversation, sample, dataset item or trace. See row 1 of our [comparison](docs/comparison.md#where-driftbench-is-ahead). A verdict per step needs each step to carry its own starting point and expected result. The block stores both.
 - **Measured impact.** On the Acme sales assistant, dropping a coverage check fails 86 conversations containing 413 blocks. A conversation score marks all 413 blocks; driftbench marks the 86 that fail. For eight of nine planted faults, failing blocks account for 18 to 40 percent of the blocks in failed conversations. Sources: [gate-report.json](examples/acme/gated/gate-report.json) and [chart-facts.csv](docs/assets/data/chart-facts.csv). [How we measured](docs/comparison/methods.md#blocks-a-failure-you-can-diagnose). The [fault study](https://github.com/achammah/driftbench/pull/441) tests the suggested fix. Changing the tool description removed 86 coverage lookup failures in 249 runs; 29 exact assertion failures remained.
 
-<sub>Counts cover 195 conversations and 861 blocks. The ninth fault, a wrong language, fails all 826 blocks in the 171 failed conversations. On its way: source links ([#423](https://github.com/achammah/driftbench/pull/423), [#429](https://github.com/achammah/driftbench/pull/429), [#433](https://github.com/achammah/driftbench/pull/433)); parents ([#416](https://github.com/achammah/driftbench/pull/416)). Parent blocks have research results; their integration is not built. Rule files and verdict stamps are on their way ([#443](https://github.com/achammah/driftbench/pull/443), [#449](https://github.com/achammah/driftbench/pull/449)). The fault finder is on its way ([#447](https://github.com/achammah/driftbench/pull/447), [#451](https://github.com/achammah/driftbench/pull/451), [#453](https://github.com/achammah/driftbench/pull/453)).</sub>
+<sub>Counts cover 195 conversations and 861 blocks. The ninth fault, a wrong language, fails all 826 blocks in the 171 failed conversations. On its way: source links ([#423](https://github.com/achammah/driftbench/pull/423), [#429](https://github.com/achammah/driftbench/pull/429), [#433](https://github.com/achammah/driftbench/pull/433)); parent execution now ships (see [Parent blocks](#parent-blocks-share-the-start-and-count-the-cause-once)); its research is in [#416](https://github.com/achammah/driftbench/pull/416). Rule files and verdict stamps are on their way ([#443](https://github.com/achammah/driftbench/pull/443), [#449](https://github.com/achammah/driftbench/pull/449)). The fault finder is on its way ([#447](https://github.com/achammah/driftbench/pull/447), [#451](https://github.com/achammah/driftbench/pull/451), [#453](https://github.com/achammah/driftbench/pull/453)).</sub>
 
 ### Trace the source: find the line to inspect
 
@@ -222,11 +222,64 @@ Nine ideas lead. Each one changes what you learn when a test fails, and what it 
 
 **Reuse an opening across tests and count an inherited failure once, instead of blaming every later step.**
 
-- **What it is.** A parent block supplies its end state as a child's starting point. Several tests can share that opening. If the parent fails, its children show as blocked. They do not add copies of the same failure. Independent failures stay separate. An isolation check tests whether a child needs state from its parent.
+- **What it is.** A parent block supplies its end state as a child's starting point. Several tests can share that opening. If the parent fails, its children show as blocked. They do not add copies of the same failure. Independent failures stay separate. The research isolation check tests whether a child needs state from its parent.
 - **Why no other framework does it.** A list of conversation turns does not itself declare which test depends on which starting state. Parent links make that dependency explicit. Our [comparison](docs/comparison.md) does not establish exclusivity for parent state or inherited failure counts.
 - **Measured impact.** In the [parent study](https://github.com/achammah/driftbench/pull/416), grouping inherited failures reduced root count error to 8.4, against 38.2 with flat linked counting. That result is a simulation on the Acme parent tree. On a live test agent, isolation checks caught 8 of 8 eligible planted dependencies and flagged 0 of 9 negative controls.
 
-<sub>Parent state sharing and blocked children are on their way ([#416](https://github.com/achammah/driftbench/pull/416), [#428](https://github.com/achammah/driftbench/pull/428)). The research does not implement parent execution in the package. Independent flaky failures can still inflate the root count. The isolation study tests conversation history; finer dependencies on stored facts or tool state remain untested.</sub>
+<details>
+<summary>Parent blocks: one opening, two branches, one independent test</summary>
+
+<br/>
+
+The whole of [`checkout.yaml`](examples/acme/parents/checkout.yaml). `plans` is the parent; `recap` and `alternative` are its children, and `order` and `receipt` continue the `recap` branch. `hours` has no parent:
+
+```yaml
+id: acme-parent-checkout
+title: Two checkout branches share one recorded opening
+given:
+  vars: { channel: web }
+blocks:
+  - id: plans
+    user: Show Acme plans.
+    expect:
+      must: [Basic]
+      tools: [{ label: catalog.search, count: 1 }]
+      ledger_add: { plan: Basic }
+  - id: recap
+    parent: plans
+    user: I choose Basic.
+    expect:
+      must: [CONFIRM]
+      tools: [{ label: order.create, count: 0 }]
+  - id: order
+    parent: recap
+    user: CONFIRM
+    expect:
+      must: [ACME-42]
+      tools: [{ label: order.create, count: 1 }]
+  - id: receipt
+    parent: order
+    user: My receipt, please.
+    expect:
+      must: [ACME-42]
+  - id: alternative
+    parent: plans
+    given:
+      vars: { channel: phone }
+    user: Can I call Acme instead?
+    expect:
+      must: ['202 555 0142']
+  - id: hours
+    user: When is Acme open?
+    expect:
+      must: ['09:00']
+```
+
+Each child starts from its parent's recorded end state: the conversation, the `catalog.search` result, the facts and the variables. Its own Given then merges facts, variables and world by key, as the `phone` channel does on `alternative`; its own prefix or workspace replaces the inherited one whole. `plans` runs once for both branches. If `recap` fails, `order` and `receipt` are blocked and the report lists them under that one cause, while `alternative` and `hours` keep their own results. A missing parent or a cycle is a spec error. For a code agent the child's sandbox starts from the files its parent left. Run it with no key: `pnpm exec tsx examples/acme/parents/run.ts`. See [the reference](docs/reference/spec.md#block), [inheritance](docs/concepts/given-when-then.md#parent-blocks) and the [worked example](examples/acme/parents/README.md).
+
+</details>
+
+<sub>Parent execution and blocked children ship. Independent flaky failures can still inflate the root count. The research isolation study tests conversation history; the isolation checker is not integrated, and finer dependencies on stored facts or tool state remain untested.</sub>
 
 ### Value checks: ask the tool what the value means
 

@@ -1,6 +1,6 @@
 ---
 title: User drivers and recordings
-summary: 'A user driver writes the user turns of a run (scripted from the spec, simulated from a persona, perturbing with an injected deviation, or an attacker); a recording replays a simulated user''s answers with no model call.'
+summary: 'A user driver writes the user turns of a run. It is scripted from the spec, simulated from a persona, perturbing with an injected deviation, or an attacker. A recording replays a simulated user''s answers with no model call.'
 commands:
   - simulate
   - campaign run
@@ -26,16 +26,16 @@ A run sends the agent one stimulus per block. A user driver decides what each st
 | perturbing | `perturbing:<perturbation id>` | A base driver (scripted or simulated), plus one deviation injected before block `inject_at`. | `campaign run --mode P`, `perturb`, `attack`. |
 | attacker | (the `attack` command) | Deviations picked round by round from the agent's last replies and drawn from the red-team pack. | `attack`. |
 
-Scripted driver. It replays block i with that block's stimulus and stops after the last block. When the spec has an `end` (`verdict`: `success` or `failure`, optional `reason`, optional `atBlock`: the index of the last block that runs, `-1` for none), it stops after `atBlock` (the last block when absent) with that verdict.
+Scripted driver. It replays block i with that block's stimulus and stops after the last block. The spec can have an `end` with `verdict` (`success` or `failure`), an optional `reason` and an optional `atBlock`. `atBlock` is the index of the last block that runs, or `-1` for none. With an `end`, the driver stops after `atBlock` (the last block when absent) with that verdict.
 
-Simulated driver. It writes each user turn as the persona would (see authoring-personas). Each request to the model holds `Turn <n>.`, the conversation so far (the agent's visible text only), the facts the agent has asked for, and, by default, the spec's words for the block with facts not yet asked redacted. It stops when the answer contains the stop token, or when the spec has no more blocks. Its model must belong to another family than the agent's and every judge's: a port of no family (`""` or `unknown`), of the agent's family, or of a judge's family is refused before the run. Families compare without case and surrounding space.
+Simulated driver. It writes each user turn as the persona would (see authoring-personas). Each request to the model holds `Turn <n>.` and the conversation so far (the agent's visible text only). It also holds the facts the agent has asked for. By default it also holds the spec's words for the block, with facts not yet asked redacted. It stops when the answer contains the stop token, or when the spec has no more blocks. Its model must belong to another family than the agent's and every judge's. A port of no family (`""` or `unknown`), of the agent's family, or of a judge's family is refused before the run. Families compare without case and surrounding space.
 
 The answers come from one of two sources:
 
 - `--model`: the model port the environment configures (`ANTHROPIC_API_KEY`, or `OPENAI_API_KEY` with `OPENAI_MODEL`). Paid.
-- `--recording <file>`: a recording file. Turn n gets answer n, where n is the simulated user's own count of the messages it wrote (a block another driver injects does not move it). A turn with no answer fails the run. Free and repeatable.
+- `--recording <file>`: a recording file. Turn n gets answer n. Here n is the simulated user's own count of the messages it wrote. A block another driver injects does not move it. A turn with no answer fails the run. Free and repeatable.
 
-Perturbing driver. It plays the base driver's blocks and injects one deviation: a user message or a burst goes in as its own block before block `inject_at`; a world-only deviation (a tool result or error, a workspace file) changes block `inject_at` itself. In `campaign run --driver simulated` mode P, the simulated user is the base. See authoring-perturbations.
+Perturbing driver. It plays the base driver's blocks and injects one deviation. A user message or a burst goes in as its own block before block `inject_at`. A world-only deviation (a tool result or error, a workspace file) changes block `inject_at` itself. In `campaign run --driver simulated` mode P, the simulated user is the base. See authoring-perturbations.
 
 Attacker. `attack` runs the spec free, then up to `--rounds` attacks, each one deviation class picked from the agent's last replies, and reads the recovery record. Without `--model` it draws phrasings from the red-team pack (free). With `--model`, a model writes the attacks a user message carries; the same family rules apply. The library also exports `createRedTeamUser` (strategies `crescendo` and `goat`), a multi-turn red-team user; no CLI command reaches it.
 
@@ -131,7 +131,7 @@ Write the answers for the agent's real replies: an answer that holds a fact befo
 
 ### The attack recording (JSON), for `attack --replay`
 
-Written by `attack --record`. It must hold `version: 1`, `spec` (string), `specHash` (string), `seed` (number) and `rounds`, a list where each round has `class` (a deviation class), `inject_at` (number) and `phrasing` (object); `--record` also writes each round's `cue`.
+Written by `attack --record`. It must hold `version: 1`, `spec` (string), `specHash` (string), `seed` (number) and `rounds`. `rounds` is a list where each round has `class` (a deviation class), `inject_at` (number) and `phrasing` (object). `--record` also writes each round's `cue`.
 
 ### The spec
 
@@ -139,7 +139,7 @@ The scripted driver reads each block's `when` stimulus and the spec's optional `
 
 ## Outputs and how to read them
 
-`simulate` prints the source on its first line: `recording <family>` or `model <family> <model>`. Then per block the user line, the agent line and the stage with `✓` or `✗`, then the facts given, then `<passed> of <ran> blocks pass. The run ended: <reason>.` The reason tells which driver event stopped the run:
+`simulate` prints the source on its first line: `recording <family>` or `model <family> <model>`. Then per block it prints the user line, the agent line and the stage with `✓` or `✗`. Then it prints the facts given, then `<passed> of <ran> blocks pass. The run ended: <reason>.` The reason tells which driver event stopped the run:
 
 - `the spec has no block N`: every block ran.
 - `the simulated user said the stop token at block N`.
@@ -215,7 +215,7 @@ The runs are not kept: pass --store <file> to keep them.
 (exit 0)
 ```
 
-The campaign id is made from the content and the clock, so it changes between runs. The P cells with 6 blocks hold one injected block; `order-service-down` is a `D8_tool_failure` carried by the world alone (a tool error), so it changes block 3 in place and keeps 5 blocks.
+The campaign id is made from the content and the clock, so it changes between runs. The P cells with 6 blocks hold one injected block. `order-service-down` is a `D8_tool_failure` carried by the world alone (a tool error). So it changes block 3 in place and keeps 5 blocks.
 
 ## Common errors
 

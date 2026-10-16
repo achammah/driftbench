@@ -1,6 +1,6 @@
 ---
 title: "Blast radius of a change"
-summary: "Print the blocks a declared change can affect, per run mode; write a manifest from a prompt diff; rerun only the radius and audit what is carried."
+summary: "Print the blocks a declared change can affect, per run mode. Write a manifest from a prompt diff. Rerun only the radius and audit what is carried."
 commands:
   - radius
   - radius auto
@@ -33,7 +33,7 @@ changes:
 | Kind | Id | Blocks it selects |
 |---|---|---|
 | `stage` | a stage of the catalogue | blocks that expect the stage, or whose cell or transition names it |
-| `tool` | a tool label; `part` `input`, `result`, `description`, `presence` or none | `input`: blocks expecting a call or asserting on its input; `result`: blocks expecting a call, forcing its result, or reading it in the end state; otherwise every block that lists the tool |
+| `tool` | a tool label; `part` `input`, `result`, `description`, `presence` or none | `input`: blocks expecting a call or asserting on its input. `result`: blocks expecting a call, forcing its result, or reading it in the end state. Otherwise every block that lists the tool |
 | `rule` | `states@<stage>`, `recovery:<class>[@<flow>]`, `uses_tool:<tool>`, `path:<id>`, a spec rule (`lang_stable`, `max_calls`, `forbidden_tools`, `one_message_per_turn`, `match_case`, `custom.<name>`), `reply_language` | the blocks that rule governs; `reply_language` is the whole suite |
 | `deviation` | `D2` or `D2_goal_shift` | blocks that carry the deviation class |
 | `prompt` | an estate atom id | blocks whose spec names the atom, and every block that names no atoms |
@@ -265,4 +265,4 @@ Saved: 403 of 515 blocks, 78.3%. The pass and fail counts above merge fresh and 
 | `The radius is the whole suite: ... no block declares a dependency on it.` (exit 1) | the change names something no block reads, or the specs are hand-written with no `metadata.depends`. Declare the dependencies, or rerun the whole suite |
 | `--prompt takes exactly two files: old then new.` (exit 2) | pass the old and the new prompt |
 | `The map has no source <path>; pass --source with its declared path.` (exit 2) | `--source` must match a `sources[].path` of the map, relative to the map |
-| a radius campaign carries nothing | the campaign names no agent version, the version is not the manifest's `to`, the `--from` campaign holds no run of the manifest's `from`, or the audit found a miss; the first lines say which |
+| a radius campaign carries nothing | the campaign names no agent version, the version is not the manifest's `to`, or the `--from` campaign holds no run of the manifest's `from`. Or the audit found a miss. The first lines say which |

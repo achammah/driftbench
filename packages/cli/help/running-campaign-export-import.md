@@ -1,6 +1,6 @@
 ---
 title: Move a campaign between stores
-summary: Write a stored campaign as a folder of JSON files (its runs, the specs it ran and the dataset and prompt versions it records) with campaign export, and store that folder in another store, all or nothing, with campaign import.
+summary: Write a stored campaign as a folder of JSON files with campaign export. The folder holds its runs, the specs it ran and the dataset and prompt versions it records. Store that folder in another store, all or nothing, with campaign import.
 commands:
   - campaign export
   - campaign import
@@ -15,7 +15,7 @@ next:
 
 ## What it is
 
-A store is one SQLite file that can hold many campaigns. `driftbench campaign export` writes one campaign as a bundle folder: the campaign record, one JSON file per run, the specs at the exact content the campaign pinned, and the files of every dataset and prompt version the campaign records. A `manifest.json` holds the SHA-256 of every file. `driftbench campaign import` reads such a folder, checks every hash, and stores the campaign, its specs, its versions and its runs in another store in one transaction: all of it or nothing. The imported campaign can then be read (`campaign status`), resumed, reported and compared there as if it had run there.
+A store is one SQLite file that can hold many campaigns. `driftbench campaign export` writes one campaign as a bundle folder. The folder holds the campaign record, one JSON file per run and the specs at the exact content the campaign pinned. It also holds the files of every dataset and prompt version the campaign records. A `manifest.json` holds the SHA-256 of every file. `driftbench campaign import` reads such a folder and checks every hash. It stores the campaign, its specs, its versions and its runs in another store in one transaction: all of it or nothing. The imported campaign can then be read (`campaign status`), resumed, reported and compared there as if it had run there.
 
 ## When to use it
 
@@ -41,7 +41,7 @@ driftbench campaign import <folder> --store <file>
 
 ## Inputs
 
-`export` reads the campaign record, its runs (with their blocks), the specs at the hashes the campaign pins, and every dataset or prompt version the campaign records (`--dataset`, `--prompt` of `campaign run`).
+`export` reads the campaign record, its runs (with their blocks) and the specs at the hashes the campaign pins. It also reads every dataset or prompt version the campaign records (`--dataset`, `--prompt` of `campaign run`).
 
 `import` reads a bundle folder:
 
@@ -56,11 +56,11 @@ driftbench campaign import <folder> --store <file>
 
 ## Outputs and how to read them
 
-* `export`: `Exported campaign <id> to <folder>: <n> runs, <n> specs, <n> sources[ (<kind> <name>@<version>, ...)].` The folder is printed relative to the working folder when it is inside it.
+* `export` prints the folder relative to the working folder when it is inside it. The line is `Exported campaign <id> to <folder>: <n> runs, <n> specs, <n> sources[ (<kind> <name>@<version>, ...)].`
 * `import`: `Imported campaign <id> into <store>: <n> runs, <n> specs, <n> sources.`
 * Importing the same bundle twice into the same store succeeds and changes nothing: a campaign equal to the one stored is accepted. A campaign with the same id and other content is refused, because a campaign never changes once written.
 
-Exit codes for both: 0 when written or stored; 2 on an unknown campaign, a store that cannot be opened or does not exist (`export`), a bundle that does not read or fails its hashes, a version the source store lacks, or a conflict with the target store.
+Exit codes for both: 0 when written or stored. 2 on an unknown campaign. 2 on a store that cannot be opened or does not exist (`export`). 2 on a bundle that does not read or fails its hashes. 2 on a version the source store lacks. 2 on a conflict with the target store.
 
 ## Worked example
 
@@ -86,7 +86,7 @@ Imported campaign acme-export into other.db: 2 runs, 1 specs, 0 sources.
 2 cells: 2 pass, 0 fail, 0 failed. Spent $0.00.
 ```
 
-The bundle holds `campaign.json`, `manifest.json`, `runs/2b7a03560cb7a80e.json`, `runs/cc92cc9eb562f586.json` and one spec file under `specs/`, named by the spec id `acme-plan-upgrade`, an at sign and its hash `5ae085d0b267`: the two run files are named by their cell ids. The second import prints the same line and changes nothing. `status` on the new store reads the imported runs.
+The bundle holds `campaign.json`, `manifest.json`, `runs/2b7a03560cb7a80e.json`, `runs/cc92cc9eb562f586.json` and one spec file under `specs/`. The spec file is named by the spec id `acme-plan-upgrade`, an at sign and its hash `5ae085d0b267`. The two run files are named by their cell ids. The second import prints the same line and changes nothing. `status` on the new store reads the imported runs.
 
 ## Common errors
 
@@ -95,6 +95,6 @@ Each exits 2.
 * `exportCampaign: campaign nope is not in the store` The id is not in the `--store`. List what it holds with `campaign status --store <file>`, which prints the latest.
 * `No store at missing.db: this command reads a store and does not make one.` `export` was given a store path that does not exist.
 * `store: the bundle at <path> is invalid: cannot read manifest.json: ENOENT: ...` The folder given to `import` is not a bundle. Give `<out>/<campaignId>`, the folder holding `manifest.json`, not `<out>`.
-* `campaign acme-export is already stored with other content; a campaign is immutable, so a re-run takes a new campaign id` The target store already holds a different campaign under this id. Import into another store, or keep the stored one.
-* `campaign <id> records dataset <name>@<n>, which this store does not hold` The source store lost a version the campaign ran with; the bundle cannot be complete.
-* `store: the bundle at <path> is invalid: runs/<runId>.json does not match the hash its manifest records: it changed after the export` A file of the bundle was edited. Nothing is imported, and no store file is created. Export the campaign again from its source store.
+* `campaign acme-export is already stored with other content; a campaign is immutable, so a re-run takes a new campaign id`. The target store already holds a different campaign under this id. Import into another store, or keep the stored one.
+* `campaign <id> records dataset <name>@<n>, which this store does not hold` The source store lost a version the campaign ran with. The bundle cannot be complete.
+* `store: the bundle at <path> is invalid: runs/<runId>.json does not match the hash its manifest records: it changed after the export`. A file of the bundle was edited. Nothing is imported, and no store file is created. Export the campaign again from its source store.

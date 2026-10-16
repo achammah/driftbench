@@ -1,6 +1,6 @@
 ---
 title: Generating estate tests
-summary: Turn an approved estate plan into task specs with no model, read the report and its gaps, and run the static tests on an estate root.
+summary: Turn an approved estate plan into task specs with no model. Read the report and its gaps. Run the static tests on an estate root.
 commands:
   - estate generate
   - estate static

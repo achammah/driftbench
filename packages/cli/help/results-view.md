@@ -61,9 +61,9 @@ Store /abs/path/driftbench.db, labels in /abs/path/labels. Stop with Ctrl+C.
 |---|---|
 | `/` | every campaign of the store, newest first, with its modes, specs, runs and how many pass |
 | `/campaign/<id>` | the campaign's scorecard (up to 400 runs in the Runs zone); each run links to its own page |
-| `/campaign/<id>/run/<runId>` | one run: its timeline, then every block in full (user turn, reply, tool calls and results, verdicts with evidence and reasoning), a label form under each block |
+| `/campaign/<id>/run/<runId>` | one run: its timeline, then every block in full (user turn, reply, tool calls and results, verdicts with evidence and reasoning). A label form sits under each block |
 | `/compare?baseline=<id>&candidate=<id>&margin=<points>` | two campaigns picked from the store; the paired comparison of `driftbench compare` with its verdict. The margin defaults to 2 points here, not auto |
-| `/queue` | the review queue: items open, assigned or done; "Take" assigns, "Label it" opens the block, saving the label marks it done; the agreement line of `queue agreement` |
+| `/queue` | the review queue: items open, assigned or done. "Take" assigns, "Label it" opens the block, and saving the label marks the item done. The agreement line of `queue agreement` |
 | `/keys` | the keyboard cheatsheet, plain HTML |
 
 Labels. A label is one entry in `<labels>/<criterion>.yaml`, id `<runId>.b<block>`, with the label, the

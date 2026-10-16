@@ -1,6 +1,6 @@
 ---
 title: Estate unit tests
-summary: Run an estate's guards on event payloads and its scripts on fixtures with no model, recording the outcomes on the original and checking any copy or mutant.
+summary: Run an estate's guards on event payloads and its scripts on fixtures with no model. The run records the outcomes on the original and checks any copy or mutant.
 commands:
   - estate unit
 see_also:

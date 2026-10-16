@@ -1,6 +1,6 @@
 ---
 title: Keeping estate tests true
-summary: Compare two estate maps, see what the change does to the tests (regenerate, re-approve, retire, new), track guard enforcement state, and replay the corpus for regressions.
+summary: Compare two estate maps. See what the change does to the tests (regenerate, re-approve, retire, new). Track guard enforcement state. Replay the corpus for regressions.
 commands:
   - estate diff
   - estate impact

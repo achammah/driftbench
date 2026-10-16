@@ -52,7 +52,7 @@ Global: `--plugin <module>`.
 |---|---|
 | 0 | the set is written and covers every required cell |
 | 1 | the set is written and a required cell stays empty |
-| 2 | a usage or input error: an invalid map or spec, no unsealed spec, `--out` overlapping `--specs`, an existing `golden.json` without `--force`, a grid over the cell limit, a sealed spec changed after sealing |
+| 2 | a usage or input error: an invalid map or spec, no unsealed spec, or `--out` overlapping `--specs`. An existing `golden.json` without `--force`, a grid over the cell limit, or a sealed spec changed after sealing |
 
 ## Inputs
 

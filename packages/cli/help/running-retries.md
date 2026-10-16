@@ -1,6 +1,6 @@
 ---
 title: Retries of agent and model calls
-summary: Which failures a run retries (408, 429, 5xx, network errors), with what backoff, how to set attempts and waits in a spec's target.retry or with --retry-attempts, --retry-base-ms and --retry-max-ms, and where each retry is recorded.
+summary: Which failures a run retries (408, 429, 5xx, network errors) and with what backoff. How to set attempts and waits in a spec's target.retry or with --retry-attempts, --retry-base-ms and --retry-max-ms. Where each retry is recorded.
 commands:
   - campaign run
   - campaign resume
@@ -16,7 +16,7 @@ next:
 
 ## What it is
 
-Model APIs and agent endpoints fail for a moment: a rate limit, an overloaded provider, a dropped connection. The runner retries these failures under one shared policy around every adapter call (`open`, `send`, `trace`), and the adapters that call a model themselves retry each model call under the same policy. A run never retries an answer it did not like, and every retry is recorded. When the attempts run out, the run ends `failed` with the error, and `campaign resume` can run the cell again later.
+Model APIs and agent endpoints fail for a moment: a rate limit, an overloaded provider, a dropped connection. The runner retries these failures under one shared policy around every adapter call (`open`, `send`, `trace`). The adapters that call a model themselves retry each model call under the same policy. A run never retries an answer it did not like, and every retry is recorded. When the attempts run out, the run ends `failed` with the error, and `campaign resume` can run the cell again later.
 
 | Failure | Retried |
 |---|---|
@@ -42,7 +42,7 @@ Model APIs and agent endpoints fail for a moment: a rate limit, an overloaded pr
 | `retry:` | the `campaign:` config key | none | `max_attempts`, `base_delay_ms`, `max_delay_ms`, the same as the three flags. |
 | `target.retry` | the spec | none | `max_attempts` (1 to 20), `base_delay_ms`, `max_delay_ms`, `jitter` (default `true`), `retry_after` (default `true`). |
 
-The order: the defaults, then the spec target's `retry`, then the run's flags (or config). Each wait is drawn at random below the exponential backoff (full jitter), capped at the maximum, and never shorter than the server's `retry-after-ms` or `Retry-After` header (seconds or an HTTP date). A Retry-After longer than the maximum wait ends the retries at once. `smoke`, `simulate` and other commands use the defaults and the spec's `target.retry`; they take no retry flags.
+The order: the defaults, then the spec target's `retry`, then the run's flags (or config). Each wait is drawn at random below the exponential backoff (full jitter) and capped at the maximum. It is never shorter than the server's `retry-after-ms` or `Retry-After` header (seconds or an HTTP date). A Retry-After longer than the maximum wait ends the retries at once. `smoke`, `simulate` and other commands use the defaults and the spec's `target.retry`; they take no retry flags.
 
 ## Inputs
 
@@ -51,7 +51,7 @@ The spec target's `retry`, the flags, and the failures the agent's transport ret
 ## Outputs and how to read them
 
 * A cell that ran out of attempts reads `! <cell>  failed  <call> failed after <n> attempts: <error>`, such as `send on block 0 failed after 4 attempts: AdapterTransportError: ...`. With one attempt the words `after <n> attempts` are absent.
-* Each retry of a completed block is recorded in the block's observed record as `retries`: the call, the attempt that failed, the status, the reason, the wait (`delayMs`), the server's `retryAfterMs` when sent, and the time. They are kept in the store with the run. A block replayed from the cache reports none.
+* Each retry of a completed block is recorded in the block's observed record as `retries`. Each entry holds the call, the attempt that failed, the status and the reason. It also holds the wait (`delayMs`), the server's `retryAfterMs` when sent, and the time. They are kept in the store with the run. A block replayed from the cache reports none.
 * Each retry is also a `retry` event of the run (topic running-campaign-resume).
 
 ## Worked example

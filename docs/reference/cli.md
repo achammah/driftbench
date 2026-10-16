@@ -236,6 +236,9 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `PERTURBATION_OUT_OF_RANGE` | error | `inject_at` is past the last position |
 | `PERTURBATION_EMPTY` | error | a perturbation has none of `user`, `burst` and `world` |
 | `DUPLICATE_BLOCK_ID` | error | two blocks share an id |
+| `PARENT_MISSING` | error | a block's `parent` names no block id in the spec |
+| `PARENT_CYCLE` | error | `parent` links form a cycle, a block naming itself included |
+| `WORKSPACE_PATH_TWICE` | error | a workspace path is in both `files` and `binary` |
 | `DUPLICATE_PERTURBATION_ID` | error | two perturbations share an id |
 | `TOOL_COUNT_CONTRADICTION` | error | a tool is expected 0 times but has input assertions |
 | `COUNT_RANGE_INVALID` | error | a count has a `min` greater than its `max` |

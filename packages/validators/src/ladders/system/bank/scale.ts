@@ -26,7 +26,7 @@ import { openMemoryStore } from '@agent-nexus/driftbench-store';
 import { createScriptedDriver } from '@agent-nexus/driftbench-users';
 import { SYSTEM_COMPONENTS } from '../components';
 import { type Behaviour, followerReply } from '../plant';
-import { measureGrowth, VISIT_GROWTH_BOUND } from './growth';
+import { measureGrowth, measureTimeGrowth, VISIT_GROWTH_BOUND } from './growth';
 import {
   type BankItem,
   type Draft,
@@ -79,7 +79,9 @@ type Subject = {
   /**
    * True for a subject whose size is the length of the history the agent is given. Its growth item reads
    * the growth measure of `growth.ts`: a count of message visits against the linear law, and the best CPU
-   * time of many runs against GROWTH_BOUND, in place of one timing over the best of three.
+   * time of many runs against GROWTH_BOUND. The other subjects take `measureTimeGrowth`: the best of single
+   * runs, as many at the smaller size as cover 50 ms of CPU time, then one at the larger size (two when the
+   * first is over the bound).
    */
   history?: boolean;
   run(seed: number, size: number): Promise<ItemResult>;
@@ -599,15 +601,10 @@ export function scaleItems(): BankItem[] {
           });
           return growth.result;
         }
-        const rows = await measure(seed, subject);
-        const ten = rows[1]?.ms ?? 0;
-        const hundred = rows[2]?.ms ?? 0;
-        const growth = hundred / Math.max(ten, 1);
-        return growth <= GROWTH_BOUND
-          ? PASS
-          : fail(
-              `${Math.round(ten)} ms at ${rows[1]?.size}, ${Math.round(hundred)} ms at ${rows[2]?.size}: ${growth.toFixed(1)} times`,
-            );
+        const growth = await measureTimeGrowth((size) => subject.run(seed, size), subject.base, {
+          timeBound: GROWTH_BOUND,
+        });
+        return growth.result;
       },
     });
   }

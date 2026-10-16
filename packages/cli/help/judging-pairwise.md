@@ -1,6 +1,6 @@
 ---
 title: Pairwise judging
-summary: "Judging which of two replies better meets a criterion, in both presentation orders so position bias shows: the named-winner contract, canonical single-order presentation, the pair ledger computed in code, the factual audit against a reference, itemized rubrics, rankings, and the compare --pairwise options."
+summary: "Judging which of two replies better meets a criterion, in both presentation orders so position bias shows. It covers the named-winner contract, canonical single-order presentation, and the pair ledger computed in code. It also covers the factual audit against a reference, itemized rubrics, rankings, and the compare --pairwise options."
 commands:
   - compare
 see_also:
@@ -15,12 +15,12 @@ next:
 
 ## What it is
 
-A pairwise judgement compares two replies to the same request against one criterion and names a winner. Judges prefer whichever reply they read first more often than they should, so `judgePairwise` asks twice by default: once in the given order and once swapped. Code maps the second answer back to the original replies:
+A pairwise judgement compares two replies to the same request against one criterion and names a winner. Judges prefer whichever reply they read first more often than they should. Because of this, `judgePairwise` asks twice by default: once in the given order and once swapped. Code maps the second answer back to the original replies:
 
 * Both orders pick the same reply: that reply wins.
 * The orders disagree: the verdict is a tie, `consistent: false`, and `positionBias: true` when the judge simply preferred the first position each time.
 
-Chat judges answer with the named-winner contract: `{"reasoning": "...", "winnerQuote": "...", "winner": "A"}`, where `winner` is `A`, `B`, `tie` or `inconclusive`. `winnerQuote` must copy a passage that appears in the winning reply and not in the other one; it is null for a tie or missing data. A decisive answer without such a quote is unparseable, re-asked once with the large budget (an ambiguous quote's re-ask says `your quote matches both replies`), then inconclusive.
+Chat judges answer with the named-winner contract: `{"reasoning": "...", "winnerQuote": "...", "winner": "A"}`, where `winner` is `A`, `B`, `tie` or `inconclusive`. `winnerQuote` must copy a passage that appears in the winning reply and not in the other one. It is null for a tie or missing data. A decisive answer without such a quote is unparseable. It is re-asked once with the large budget (an ambiguous quote's re-ask says `your quote matches both replies`), then inconclusive.
 
 ## When to use it
 
@@ -52,9 +52,9 @@ The library adds, with no CLI option:
 
 The pair ledger rules, with the rule id the verdict carries:
 
-* Stage 0 runs code checks first (an instruction planted in a reply, a final answer, the language, explicit arithmetic, format rules from the question, harm policy facts the caller supplies); a decisive row ends the comparison.
-* Per order: a hard requirement one reply loses decides (`ledger.hard-gate`), unless each loses one (`ledger.hard-conflict`, no winner); else the weighted sum of score differences decides (`ledger.weighted-sum`; weight 2 for a hard requirement, 1 otherwise); a null where it matters gives no winner (`ledger.unknown-score`).
-* Across orders: both agree (`ledger.orders-agree`), or one wins by a margin of at least 2 and the other names none (`ledger.margin-two`); else a third read in canonical order votes (`ledger.escalated-quorum`, or `ledger.escalated-tie`).
+* Stage 0 runs code checks first. The checks cover an instruction planted in a reply, a final answer, the language and explicit arithmetic. They also cover format rules from the question and harm policy facts the caller supplies. A decisive row ends the comparison.
+* Per order: a hard requirement one reply loses decides (`ledger.hard-gate`), unless each loses one (`ledger.hard-conflict`, no winner). Otherwise the weighted sum of score differences decides (`ledger.weighted-sum`; weight 2 for a hard requirement, 1 otherwise). A null where it matters gives no winner (`ledger.unknown-score`).
+* Across orders: both agree (`ledger.orders-agree`), or one wins by a margin of at least 2 and the other names none (`ledger.margin-two`). Otherwise a third read in canonical order votes (`ledger.escalated-quorum`, or `ledger.escalated-tie`).
 
 Rankings: `bradleyTerry(wins)` ranks versions from a matrix of pairwise wins; `findCycles(wins)` names three-version preference cycles (A beats B, B beats C, C beats A).
 
@@ -71,9 +71,9 @@ Rankings: `bradleyTerry(wins)` ranks versions from a matrix of pairwise wins; `f
 Pairwise: <n> pairs, baseline <b>, candidate <c>, tie <t>, inconsistent <i>, position bias <p>.
 ```
 
-`baseline` and `candidate` count the pairs each campaign won in both orders; `inconsistent` counts pairs whose orders disagreed; `position bias` counts those where the judge followed the position.
+`baseline` and `candidate` count the pairs each campaign won in both orders. `inconsistent` counts pairs whose orders disagreed. `position bias` counts those where the judge followed the position.
 
-A library verdict (both orders) has `choice` (`first`, `second` or `tie`), `ordered` and `swapped` (each order's outcome), `consistent`, `positionBias`, `calls` (actual calls, repairs included) and `recovered` (a fact-ledger recovery). A canonical verdict has `presentation: 'canonical'`, `choice`, `outcome`, `aIsFirst` and `calls`. A pair ledger result has `status`, `choice`, `calls`, every read with its parse steps, the Stage 0 rows, the verdict with its rule id, and lint codes per requirement.
+A library verdict (both orders) has `choice` (`first`, `second` or `tie`), `ordered` and `swapped` (each order's outcome). It also has `consistent`, `positionBias`, `calls` (actual calls, repairs included) and `recovered` (a fact-ledger recovery). A canonical verdict has `presentation: 'canonical'`, `choice`, `outcome`, `aIsFirst` and `calls`. A pair ledger result has `status`, `choice`, `calls`, and every read with its parse steps. It also has the Stage 0 rows, the verdict with its rule id, and lint codes per requirement.
 
 ## Worked example
 

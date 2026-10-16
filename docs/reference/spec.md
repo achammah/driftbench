@@ -179,6 +179,7 @@ The files the agent starts from.
 |---|---|---|---|---|
 | `from` | string, not empty | no |  | A folder the workspace starts from. A path written ./<path> is read from the folder of the spec file; any other relative path from the folder the run starts in. |
 | `files` | map of string to string | no |  | Files the workspace starts with: path to content. |
+| `binary` | map of string to string, base64 | no |  | Files the workspace starts with, byte for byte: path to base64 content. For files that are not text, such as the xlsx a parent block left. A path may not be in both files and binary. |
 
 ## CriterionDef
 
@@ -227,9 +228,12 @@ A judged criterion. Blocks reference it by name, with @gating when a fail fails 
 
 One block: a stimulus, its initial conditions and its expectations.
 
+A block may name `parent: <block id>` in the same spec. The runner starts it from that parent’s recorded end state, then applies its own Given. Dependencies run first; missing parents and cycles are errors. A failed or unrun parent blocks descendants, which the report lists under the original cause. See [parent blocks](../concepts/given-when-then.md#parent-blocks) and the [Acme example](../../examples/acme/parents/README.md).
+
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `id` | string, not empty | no |  | An id, unique in the spec. |
+| `parent` | string, not empty | no |  | The id of a block in this spec whose recorded end state supplies this block's Given. A failed or unrun parent blocks this block. |
 | `when` | [Stimulus](#stimulus) | yes |  | The stimulus. |
 | `given` | [Given](#given) | no |  | Initial conditions for this block. |
 | `expect` | [Expect](#expect) | no |  | The expected output and state delta. |

@@ -1,6 +1,6 @@
 ---
 title: Evidence quoting
-summary: "How a judge's evidence quote is checked against the data it was given: what counts as grounded, the source ids of evidence spans, the folding rules, ellipsis segments and empty containers, and what a grounded quote proves and does not prove."
+summary: "How a judge's evidence quote is checked against the data it was given. It covers what counts as grounded, the source ids of evidence spans, the folding rules, ellipsis segments and empty containers. It also covers what a grounded quote proves and does not prove."
 commands: []
 see_also:
   - judging-default-judge
@@ -39,7 +39,7 @@ Evidence span sources:
 | `input.<path>` | The text of that input file. |
 | `reference` | The reference answer. |
 
-When a request has exactly one input, a span whose source is that input's bare path, or `reference`, `given` or `artifact`, may also ground in that one input. The judge never guesses among several inputs.
+A request may have exactly one input. Then a span may also ground in that one input when its source is that input's bare path, `reference`, `given` or `artifact`. The judge never guesses among several inputs.
 
 The matching rules (`groundEvidence` and the span checker):
 
@@ -52,7 +52,7 @@ The matching rules (`groundEvidence` and the span checker):
 * A quote may start with the entry's rendered role prefix, such as `[agent]`, but then the role must be that entry's real role.
 * Separate quotations go in separate spans. A pipe-joined quotation is never split or guessed.
 
-Without a span source (the older single string `evidence`), the quote is searched in the transcript entries in order, then the artifact, the Given, each input and the reference.
+Without a span source (the older single string `evidence`), the quote is searched in the transcript entries in order. Then it is searched in the artifact, the Given, each input and the reference.
 
 ## Outputs and how to read them
 
@@ -65,7 +65,7 @@ Without a span source (the older single string `evidence`), the quote is searche
 
 ## Worked example
 
-Real haiku answers, replayed with no model call. They were recorded under the legacy contract, whose single `evidence` string is quoted from the rendered workbook; the ledger-era span rules are shown by the script after it:
+Real haiku answers, replayed with no model call. They were recorded under the legacy contract, whose single `evidence` string is quoted from the rendered workbook. The script after it shows the ledger-era span rules:
 
 ```sh
 driftbench judge calibrate --criteria examples/acme/criteria --labels examples/acme/labels --cassette examples/acme/criteria/calibration/claude-haiku.cassette.json --mode llm --assign cheapest --only sheet_matches_catalog --out haiku.yaml

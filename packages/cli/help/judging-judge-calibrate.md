@@ -1,6 +1,6 @@
 ---
 title: judge calibrate
-summary: Test every judge alone on the fixture pairs and the hand labels of each criterion and write the assignment table that says which judges own which criterion; replays a cassette for free, or calls the local claude command (billed) with --claude.
+summary: Test every judge alone on the fixture pairs and the hand labels of each criterion. Write the assignment table that says which judges own which criterion. It replays a cassette for free, or calls the local claude command (billed) with --claude.
 commands:
   - judge calibrate
 see_also:
@@ -28,7 +28,7 @@ The judges come from a cassette (recorded answers, free) and from `--claude <mod
 ## When to use it
 
 * Before trusting a judge on a criterion: assignments are earned, never assumed.
-* After a rubric, a fixture or the labels change: the request key changes, the old recordings no longer match, and the criterion needs recording and calibrating again.
+* After a rubric, a fixture or the labels change, the request key changes. The old recordings no longer match. The criterion needs recording and calibrating again.
 * To find the cheapest single judge that is good enough, with `--assign cheapest`.
 * To measure whether costly judges fix a cheap judge's mistakes, with `--cascade`.
 * To replay a council on a table it wrote, use `judge run --assignments`. To validate the criteria files first, use `judge check`.
@@ -49,7 +49,7 @@ driftbench judge calibrate --criteria <dir> --labels <dir> --out <file> (--casse
 | `--claude-command <path>` | The `claude` command to run for `--claude` judges. | `claude` |
 | `--record <file>` | Save every live answer, with its cost, as a cassette to replay later. | none |
 | `--spend-cap-usd <usd>` | Stop calling live judges once their calls have cost this much in all. Later calls give no answer. A positive number. | no cap |
-| `--cascade` | The first judge answers everything; the others answer only where it is unsure (inconclusive, or a score between 0.2 and 0.8) or disagrees with the truth (the fixture's side or the label). Writes the cascade report as JSON to `--out`. Needs at least two judges. With `--cascade`, `--mode`, `--assign` and `--agent-family` are not used. | off |
+| `--cascade` | The first judge answers everything. The others answer an item in two cases only. The first judge is unsure of it (inconclusive, or a score between 0.2 and 0.8). Or the first judge disagrees with the truth (the fixture's side or the label). Writes the cascade report as JSON to `--out`. Needs at least two judges. With `--cascade`, `--mode`, `--assign` and `--agent-family` are not used. | off |
 | `--assign <rule>` | `council`: three judges at the bar in one class own the criterion, the cheapest first. `cheapest`: the one cheapest judge at the bar owns it alone. | `council` |
 | `--only <criterion>` | Calibrate only this criterion. Repeat for several. | every criterion |
 | `--repeats <n>` | How many times each judge answers each fixture. A whole number from 1. | `3` |
@@ -65,7 +65,7 @@ Exit codes:
 |---|---|
 | 0 | The table is written and every gating criterion is assigned. With `--cascade`: the report is written and every call gave an answer. |
 | 1 | The table is written, but a criterion declared gating stays unassigned, or a judge call gave no answer. With `--cascade`: a call gave no answer. |
-| 2 | Bad input: a missing option, a bad `--repeats`, `--mode`, `--assign` or `--spend-cap-usd`, issues in the criteria or labels, labels for an unknown criterion, an `--only` that names no criterion, a cassette that cannot be read, or `--cascade` with fewer than two judges. |
+| 2 | Bad input: a missing option, or a bad `--repeats`, `--mode`, `--assign` or `--spend-cap-usd`. It is also issues in the criteria or labels, or labels for an unknown criterion. It is also an `--only` that names no criterion, a cassette that cannot be read, or `--cascade` with fewer than two judges. |
 
 ## Inputs
 
@@ -94,12 +94,12 @@ Then the summary lines:
 
 * `Kappa over every labelled block: <judge> <kappa> (<agree>/<n>), ...`
 * `Left out, same family as the agent: <judges>.` when `--agent-family` excluded judges.
-* `<a> of <m> criteria assigned in mode <mode> (<n> repeats, kappa at least 0.8).`, then `Unassigned, judged but never gating: <criteria>.`, `<k> judge call(s) gave no answer.` and `Spent <usd> USD.` when they apply. On a replay, the spend is the cost recorded in the cassette, not new spend.
+* `<a> of <m> criteria assigned in mode <mode> (<n> repeats, kappa at least 0.8).` is printed. Then `Unassigned, judged but never gating: <criteria>.`, `<k> judge call(s) gave no answer.` and `Spent <usd> USD.` appear when they apply. On a replay, the spend is the cost recorded in the cassette, not new spend.
 * `Wrote <table>[ and <record>].`
 
 The table written to `--out` has `version: 1`, `mode`, `repeats`, `kappa_min`, `rule: cheapest` when used, and `criteria`. An assigned entry has `criterion`, `status: assigned`, `owner`, `class`, `judges`, `rejudge`, optional `single_family`, optional `cost_per_call_usd`, `separation` (`k of n`) and `kappa`. An unassigned entry has `criterion`, `status: unassigned` and `reason`.
 
-With `--json`, the calibration report: `mode`, `repeats`, `kappaMin`, `rule`, `criteria` (per criterion: `gating`, `judges` with separation, label agreement, kappa, PABAK, AC1, confusion metrics, per block answers and anchors, calls, cost, `meetsBar`, `misses`; `alpha`; label hygiene fields `labelConflicts`, `fixtureLeaks`, `warnings`; and `assignment`), `pooled`, `excluded`, `errors`, `spentUsd`, and `table` (the path written).
+With `--json`, the calibration report has `mode`, `repeats`, `kappaMin`, `rule`, `criteria`, `pooled`, `excluded`, `errors`, `spentUsd`, and `table` (the path written). Per criterion, `criteria` holds `gating`. It holds `judges` with separation, label agreement, kappa, PABAK, AC1, confusion metrics, per block answers and anchors, calls, cost, `meetsBar` and `misses`. It holds `alpha`. It holds the label hygiene fields `labelConflicts`, `fixtureLeaks` and `warnings`. It holds `assignment`.
 
 With `--cascade`, text output:
 
@@ -186,6 +186,6 @@ Spent 0.0036 USD. Wrote cascade.json.
 * `--spend-cap-usd takes a positive number, not "0".` (exit 2).
 * `judge calibrate: --only names no criterion nope.` (exit 2). The name is not in the criteria folder.
 * `judge calibrate --cascade needs a first judge and at least one to escalate to.` (exit 2). The cassette holds one judge only; add another with a second judge in the cassette or with `--claude`.
-* `judge calibrate: <n> issue(s) in the criteria or the labels.` (exit 2), after one line per issue. Labels issues include `the labels are for <criterion>, the file is <stem>`, `block id <id> is also used in <file>`, `block <id>: anchor: ...`, `every block is labelled pass: a criterion needs a pass and a fail label`, and `labels for an unknown criterion <name>`. Here a criteria folder was passed as `--labels` by mistake.
+* `judge calibrate: <n> issue(s) in the criteria or the labels.` (exit 2), after one line per issue. Labels issues include `the labels are for <criterion>, the file is <stem>` and `block id <id> is also used in <file>`. They also include `block <id>: anchor: ...` and `every block is labelled pass: a criterion needs a pass and a fail label`. They also include `labels for an unknown criterion <name>`. Here a criteria folder was passed as `--labels` by mistake.
 * `0 of 1 criteria assigned in mode hybrid ... Unassigned, judged but never gating: plain_language.` (exit 0 when not gating). In hybrid mode a class needs three judges at the bar; a cassette of system 2 judges only cannot assign under `council` in hybrid. Use `--mode llm`, or add judges of the other class.
 * `Left out, same family as the agent: claude-haiku, claude-sonnet, claude-opus.` Every judge shares the agent's family, so nothing is assigned. The exit code is still 0 when no criterion is gating. Use judges of other families.

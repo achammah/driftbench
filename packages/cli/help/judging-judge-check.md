@@ -1,6 +1,6 @@
 ---
 title: judge check
-summary: "Validate a criteria folder with no model call: each criterion file, its FAIL and PASS pictures and its fixture pair; run it before judge run or judge calibrate, which refuse a folder with issues."
+summary: "Validate a criteria folder with no model call: each criterion file, its FAIL and PASS pictures and its fixture pair. Run it before judge run or judge calibrate, which refuse a folder with issues."
 commands:
   - judge check
 see_also:
@@ -14,7 +14,7 @@ next:
 
 ## What it is
 
-`driftbench judge check <criteria>` reads every `.yaml` and `.yml` file of a criteria folder, in name order, and checks it. A criteria folder holds one file per judged criterion, named after it. Each file defines the criterion (its rubric, its FAIL and PASS pictures) and a fixture pair: a transcript slice the criterion must pass and one it must fail. The command prints one `ok` line per valid criterion and one line per issue. It calls no model and writes nothing.
+`driftbench judge check <criteria>` reads every `.yaml` and `.yml` file of a criteria folder, in name order, and checks it. A criteria folder holds one file per judged criterion, named after it. Each file defines the criterion (its rubric, its FAIL and PASS pictures) and a fixture pair. The fixture pair is a transcript slice the criterion must pass and one it must fail. The command prints one `ok` line per valid criterion and one line per issue. It calls no model and writes nothing.
 
 ## When to use it
 
@@ -117,7 +117,7 @@ The issues the loader reports:
 
 ## Worked example
 
-Validate the 12 criteria of the Acme example, then a folder with two broken files: a copy of `one_question_per_turn.yaml` saved as `one_question.yaml`, and a copy of `plain_language.yaml` with its `pass` picture removed:
+Validate the 12 criteria of the Acme example. Then validate a folder with two broken files. One is a copy of `one_question_per_turn.yaml` saved as `one_question.yaml`. The other is a copy of `plain_language.yaml` with its `pass` picture removed:
 
 ```sh setup
 mkdir -p check-bad

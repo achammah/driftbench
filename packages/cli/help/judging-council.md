@@ -1,6 +1,6 @@
 ---
 title: The judge council
-summary: "How several judges vote on one criterion: two classes, three seats per class, a majority, a re-judge by the other class on a split, a last round with a larger token budget, an optional cascade from the cheapest judge, optional vote weights, and the judge.<name> verdict it produces."
+summary: "How several judges vote on one criterion. It uses two classes, three seats per class, and a majority. A split gets a re-judge by the other class. If it is still split, a last round runs with a larger token budget. It has an optional cascade from the cheapest judge and optional vote weights. It produces the judge.<name> verdict."
 commands:
   - judge run
 see_also:
@@ -18,7 +18,7 @@ next:
 
 A council is a set of judge clients that decide a criterion together. Every judge has an `id`, a model `family`, a class `cls` and a relative `cost`.
 
-* System 1 judges answer a fixed binary question with a probability that the criterion passes (from 0.6 a pass, up to 0.4 a fail, inconclusive between). They are cheap and low variance, for evidence inside the block.
+* System 1 judges answer a fixed binary question. The answer is a probability that the criterion passes (from 0.6 a pass, up to 0.4 a fail, inconclusive between). They are cheap and low variance, for evidence inside the block.
 * System 2 judges are chat models that reason, for criteria that read across blocks.
 
 The council seats a row per criterion: three judges of one class (`judges`) and, in hybrid mode, three judges of the other class (`rejudge`). The verdict needs more than half of the seats to agree. An inconclusive vote never supports a verdict.
@@ -27,7 +27,7 @@ The rounds:
 
 1. The seated judges vote. A majority decides.
 2. No majority is a split. In hybrid mode, the three re-judges of the other class vote.
-3. Still a split, or a mode with one class: the seated judges answer once more with the large token budget (4096 tokens instead of 1024 for a chat model). Their votes carry `@large`.
+3. Still a split, or a mode with one class. The seated judges answer once more with the large token budget (4096 tokens instead of 1024 for a chat model). Their votes carry `@large`.
 4. Still no majority: the verdict is inconclusive, never a pass or a fail.
 
 Inside a round, an answer that does not parse is asked again once with the large budget. A judge that gives no answer at all votes inconclusive and is counted as an error.
@@ -61,11 +61,11 @@ Inside a round, an answer that does not parse is asked again once with the large
 | `unassigned` | Criteria calibration left unassigned: judged, never gating. | none |
 | `cascade` | `true` (threshold 0.9), or `{ threshold, thresholds }` with a threshold above 0.5 and at most 1, and per judge thresholds by id. | off |
 
-Default seating, without a row: the class is the criterion's `judge_class`; `auto` or no class goes to system 1 until calibration earns it a class; `system1` and `llm` modes force their own class. The seats go to the cheapest judges of the class, by cost then id.
+Default seating, without a row: the class is the criterion's `judge_class`. `auto` or no class goes to system 1 until calibration earns it a class. `system1` and `llm` modes force their own class. The seats go to the cheapest judges of the class, by cost then id.
 
-The cascade: the cheapest seated judge votes first. The council stops there only on a pass whose `score` is at least the threshold (that judge's own threshold if `thresholds` names it). A fail, an inconclusive, an unsure pass or an answer without a `score` brings in the other seated judges. A request whose data holds an instruction aimed at the judge (a sentence with a judge word and a verdict word, found by the screen) never stops at the cheapest judge. Most chat judges leave `score` out, so a criterion that such a judge leads always costs every seat.
+The cascade: the cheapest seated judge votes first. The council stops there only on a pass whose `score` is at least the threshold (that judge's own threshold if `thresholds` names it). A fail, an inconclusive, an unsure pass or an answer without a `score` brings in the other seated judges. A request whose data holds an instruction aimed at the judge never stops at the cheapest judge. The screen finds such an instruction as a sentence with a judge word and a verdict word. Most chat judges leave `score` out, so a criterion that such a judge leads always costs every seat.
 
-A weighted panel with abstain, `weightedPanel(votes, weights, margin)` with a default margin of 0.3, exists in `packages/judges/src/weighted-panel.ts`, but it is not exported from the package index on main, so callers cannot import it. The council's own `weights` field is the public way to weight votes.
+A weighted panel with abstain, `weightedPanel(votes, weights, margin)`, exists in `packages/judges/src/weighted-panel.ts`. It has a default margin of 0.3. The package index on main does not export it, so callers cannot import it. The council's own `weights` field is the public way to weight votes.
 
 ## Inputs
 
@@ -75,7 +75,7 @@ A weighted panel with abstain, `weightedPanel(votes, weights, margin)` with a de
 
 ## Outputs and how to read them
 
-A council result has `criterion`, `outcome`, `cls` (the class whose round decided), `votes` (every vote of every round), `rounds`, `split` (the first round split), `cascaded`, `errors`, `cost`, `score` (the mean score of the agreeing votes that carry one) and `log`, one line per round:
+A council result has `criterion`, `outcome`, `cls`, `votes`, `rounds`, `split`, `cascaded`, `errors`, `cost`, `score` and `log`. `cls` is the class whose round decided. `votes` holds every vote of every round. `split` is the first round split. `score` is the mean score of the agreeing votes that carry one. `log` has one line per round:
 
 ```
 system1: s1p-a pass, s1p-b inconclusive, openai-decisions fail; split
@@ -84,7 +84,7 @@ system1 (large budget): s1p-a@large inconclusive, ...; split
 system1: s1p-a pass; pass, the cheapest judge was sure
 ```
 
-In a run, the council's check is the check named `judge`, placed after every machine check. Each criterion a block names gives one verdict `judge.<name>` (a character other than a letter, digit, `_`, `.` or `-` becomes `_`), of kind `judge`, with the deciding class and every vote, the round log as evidence, and the reasoning of the first agreeing vote. It gates when the definition sets `gating: true` or the block writes `name@gating`, unless calibration left it unassigned; then its evidence starts `unassigned by calibration, not gating:`. A criterion the spec does not define gives an inconclusive verdict. A judge verdict never replaces a machine verdict: a block passes only when every gating verdict passes. `combineVerdicts(machine, judged)` applies the same rule for a caller merging lists, and refuses a judge verdict of kind `machine` or one reusing a machine verdict id. A failing gating judge verdict carries drift class X1.
+In a run, the council's check is the check named `judge`, placed after every machine check. Each criterion a block names gives one verdict `judge.<name>`. In `<name>`, a character other than a letter, digit, `_`, `.` or `-` becomes `_`. The verdict is of kind `judge`. It has the deciding class and every vote, the round log as evidence, and the reasoning of the first agreeing vote. It gates when the definition sets `gating: true` or the block writes `name@gating`, unless calibration left it unassigned. In that case, its evidence starts `unassigned by calibration, not gating:`. A criterion the spec does not define gives an inconclusive verdict. A judge verdict never replaces a machine verdict: a block passes only when every gating verdict passes. `combineVerdicts(machine, judged)` applies the same rule for a caller merging lists. It refuses a judge verdict of kind `machine` or one reusing a machine verdict id. A failing gating judge verdict carries drift class X1.
 
 The council is checked when it is built, before any call. Its errors (`CouncilConfigError`):
 
@@ -104,7 +104,7 @@ The council is checked when it is built, before any call. Its errors (`CouncilCo
 
 ## Worked example
 
-The cascade on the Acme council cassette. The pass fixtures stop at the cheapest judge, whose scripted answers carry a score, except `holds_instructions`: its data holds an instruction aimed at the judge, so the screen never lets it stop early, and every seated judge votes:
+The cascade on the Acme council cassette. The pass fixtures stop at the cheapest judge, whose scripted answers carry a score. The exception is `holds_instructions`. Its data holds an instruction aimed at the judge, so the screen never lets it stop early. Every seated judge votes:
 
 ```sh
 driftbench judge run --criteria examples/acme/criteria --cassette examples/acme/criteria/council.cassette.json --cascade

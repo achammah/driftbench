@@ -1,6 +1,6 @@
 ---
 title: Recordings and replay without model calls
-summary: Every way driftbench records what happened and plays it back with no model call (the block cache of a store, simulated-user recordings, attack recordings, recorded Claude Code sessions and judge cassettes, with what each holds and the command that replays it).
+summary: Every way driftbench records what happened and plays it back with no model call. The ways are the block cache of a store, simulated-user recordings, attack recordings, recorded Claude Code sessions and judge cassettes. Each entry says what it holds and the command that replays it.
 commands:
   - campaign run
   - simulate
@@ -48,7 +48,7 @@ The run store itself keeps every run in full (topic running-store): reading a st
 
 ## Inputs
 
-The recording files and stores named above. A recording is tied to what it recorded: a user recording to a persona id, an attack recording to a spec's hash and seed, a cache entry to its full block key.
+The recording files and stores named above. A recording is tied to what it recorded. A user recording is tied to a persona id. An attack recording is tied to a spec's hash and seed. A cache entry is tied to its full block key.
 
 ## Outputs and how to read them
 
@@ -90,5 +90,5 @@ The first attack also printed `Recording written to <absolute path>/attacks.json
 * `Name where the user speaks from: --model (the model port) or --recording <file>.` (exit 2) `simulate` needs one of the two.
 * `No --recording holds the answers of the persona <id>.` (exit 2) The recording's `persona` is another id.
 * `--replay runs recorded attacks: leave out --model.` (exit 2)
-* `The recording <file> cannot be read: <reason>` (exit 2) The attack recording is missing, is not JSON, or the reason reads `it is not an attack recording: version 1, spec, specHash, seed and a list of rounds`.
+* `The recording <file> cannot be read: <reason>` (exit 2) The attack recording is missing or is not JSON. Or the reason reads `it is not an attack recording: version 1, spec, specHash, seed and a list of rounds`.
 * Cells that should replay do not: the cache key changed (another repeat, agent version, cache suite, prompt, or a sandboxed target, which is never cached). See topic running-cache.

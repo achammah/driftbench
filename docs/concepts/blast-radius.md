@@ -484,3 +484,7 @@ Snapshots hold raw values read from the agent's systems. They can hold personal 
 On Acme, a full mode T run of the planted fault `x5-drops-coverage-check` fails 86 blocks. A block rerun with the right manifest fails the same 86 blocks, and every one was sent. With the recap manifest, which does not name this fault, the failing blocks stay unsent, so the check can fail. A fault planted in an offer price, outside the coverage check radius, is found by the audit. `packages/cli/test/radius-blocks-acme.test.ts` runs these cases with no model call.
 
 A block rerun needs no new assumption about the agent beyond the one every radius makes, and one more: in mode T a block depends only on its Given, which the spec writes. [When it is sound](#when-it-is-sound) lists the rest.
+
+## Parent blocks
+
+A block that declares `parent` depends on that parent's recorded end state. A change that reaches a parent also reaches every descendant, in F, T and P, regardless of authored order. Explicit forest roots remain independent. Parent-linked specs conservatively run whole when partial block carry or input reconstruction would be needed. See [parent blocks](given-when-then.md#parent-blocks).

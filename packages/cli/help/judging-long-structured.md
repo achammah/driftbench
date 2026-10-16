@@ -1,6 +1,6 @@
 ---
 title: Long-structured and reader-first
-summary: "Two opt-in pairwise settings that prefer the longer reply: long-structured (available from the next release, PR 378) picks the longer reply when it is structured, and reader-first (on main) favours the longer complete reply unless measurements show a substantial reader-facing failure; use them only when longer answers are what you want."
+summary: "Two opt-in pairwise settings that prefer the longer reply. long-structured (available from the next release, PR 378) picks the longer reply when it is structured. reader-first (on main) favours the longer complete reply unless measurements show a substantial reader-facing failure. Use them only when longer answers are what you want."
 commands: []
 see_also:
   - judging-pairwise
@@ -15,13 +15,13 @@ next:
 
 Both settings judge a pair of replies and both prefer the longer one. They are declared preferences of the caller, not measures of quality, and neither is ever applied by the default judge.
 
-* `long-structured`: available from the next release. It is not on main today; it lives in PR 378 (branch `feat/writing-lead`, file `packages/judges/src/long-structured.ts`). After the pair ledger verdict, code decides in this order: an explicit request row (a hard requirement that decided a reading, such as a stated word limit or form) wins (`preference.hard-row`); otherwise the longer reply wins when it is structured, or when the shorter reply is not structured either (`preference.long-structured`); otherwise the ledger choice stands (`preference.ledger`), and equal lengths keep it too. A reply is structured when the reader-first structure flag is clear (paragraphs, headings or lists rather than one long block), at most 8 percent of its sentences repeat, and at most 15 percent of its four-grams repeat. Length is words in English and Han characters in Chinese. It makes no extra model call.
-* `reader-first`: on main. `createReaderFirstJudge(client, { configuration: 'reader-first' })`, then `judgePair(request, first, second)`. It favours the longer complete reply unless machine features (length, structure, filler, hedges, repetition, jargon, readability and more) and both model presentations agree on a substantial reader-facing failure. Two model calls per pair. Thresholds `judgeMargin` 4, `featureMargin` 5, `minFailures` 1; changing them changes the configuration.
+* `long-structured`: available from the next release. It is not on main today. It lives in PR 378 (branch `feat/writing-lead`, file `packages/judges/src/long-structured.ts`). After the pair ledger verdict, code decides in this order. First, an explicit request row (a hard requirement that decided a reading, such as a stated word limit or form) wins (`preference.hard-row`). Otherwise the longer reply wins when it is structured, or when the shorter reply is not structured either (`preference.long-structured`). Otherwise the ledger choice stands (`preference.ledger`), and equal lengths keep it too. A reply is structured when all three hold. The reader-first structure flag is clear (paragraphs, headings or lists rather than one long block). At most 8 percent of its sentences repeat. At most 15 percent of its four-grams repeat. Length is words in English and Han characters in Chinese. It makes no extra model call.
+* `reader-first`: on main. `createReaderFirstJudge(client, { configuration: 'reader-first' })`, then `judgePair(request, first, second)`. It favours the longer complete reply. The exception is when machine features (length, structure, filler, hedges, repetition, jargon, readability and more) and both model presentations agree on a substantial reader-facing failure. Two model calls per pair. Thresholds `judgeMargin` 4, `featureMargin` 5, `minFailures` 1; changing them changes the configuration.
 
 ## When to use it
 
 * Only when the people you serve prefer longer, structured answers: long-form writing, reports, explanations.
-* Never as a quality score. Where humans prefer the shorter reply, a length preference is almost always wrong. PR 378 reports, with Claude Haiku 5.5 on WritingPreferenceBench pairs, that long-structured picks the longer reply in 96.5 percent of games on the recorded TEST pool and is right 1.8 percent of the time when the human chose the shorter reply.
+* Never as a quality score. Where humans prefer the shorter reply, a length preference is almost always wrong. PR 378 reports a result with Claude Haiku 5.5 on WritingPreferenceBench pairs. In that report, long-structured picks the longer reply in 96.5 percent of games on the recorded TEST pool. It is right 1.8 percent of the time when the human chose the shorter reply.
 * For a neutral comparison, use the default pairwise judge (see `judging-pairwise`).
 
 ## Commands and every option
@@ -67,7 +67,7 @@ Usage: driftbench compare [options]
 (exit 0)
 ```
 
-Not run by the help test: it reads the PR 378 file with git. The long-structured rule, run with no model call from a checkout of main with the PR 378 file copied beside a script (once PR 378 lands, import `applyLongStructured` from `@agent-nexus/driftbench-judges` instead). The ledger verdict passed in says `first`; the rule overrides it with the longer reply:
+Not run by the help test: it reads the PR 378 file with git. The long-structured rule runs with no model call from a checkout of main, with the PR 378 file copied beside a script. Once PR 378 lands, import `applyLongStructured` from `@agent-nexus/driftbench-judges` instead. The ledger verdict passed in says `first`; the rule overrides it with the longer reply:
 
 ```text
 $ mkdir -p out/ls

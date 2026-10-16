@@ -1,6 +1,6 @@
 ---
 title: bench replay
-summary: Replay the committed judge benchmark recordings with no network and no key, score the shipped default judge on each slice, and with --check-floor fail when a score drops below its floor; use it to prove a judge change did not lose accuracy.
+summary: Replay the committed judge benchmark recordings with no network and no key. Score the shipped default judge on each slice. With --check-floor, fail when a score drops below its floor. Use it to prove a judge change did not lose accuracy.
 commands: []
 see_also:
   - judging-bench-record
@@ -14,9 +14,9 @@ next:
 
 ## What it is
 
-`pnpm bench replay` is a repository script, not part of the published `driftbench` command. It reads `benchmarks/manifest.json`, loads each benchmark slice (a fixed set of fictional cases whose right answer, pass or fail, is known by construction), and feeds the raw model answers recorded in `benchmarks/cassettes/<slice>@<version>/<model>.json` through the current public judge parser. It prints how many cases the judge got right, with a Wilson interval and a bootstrap interval over construction families. It makes no model call and needs no credential.
+`pnpm bench replay` is a repository script, not part of the published `driftbench` command. It reads `benchmarks/manifest.json`. It loads each benchmark slice (a fixed set of fictional cases whose right answer, pass or fail, is known by construction). It feeds the raw model answers recorded in `benchmarks/cassettes/<slice>@<version>/<model>.json` through the current public judge parser. It prints how many cases the judge got right, with a Wilson interval and a bootstrap interval over construction families. It makes no model call and needs no credential.
 
-A recording is refused as stale, with `re-record needed`, when the dataset hash, the prompt fingerprint, the client settings or the cassette hash no longer match what was recorded. A stale recording can never pass on its old score.
+A recording is refused as stale, with `re-record needed`. This happens when the dataset hash, the prompt fingerprint, the client settings or the cassette hash no longer match what was recorded. A stale recording can never pass on its old score.
 
 ## When to use it
 
@@ -38,7 +38,7 @@ pnpm bench replay [--slice <name|all>] [--model <id>] [--check-floor] [--root <p
 |---|---|---|
 | `--slice <name>` | One slice named in the manifest, or `all`. | `all` |
 | `--model <id>` | One model id from the manifest. Without it, every model whose status is `active`. A model with status `skipped` is refused. | every active model |
-| `--check-floor` | Also check each result against its floor in `benchmarks/floors.json`: the correct count must reach the floor, and a paired comparison with the floor's results must show no regression (exact two-sided McNemar at 0.05, and an automatic non-inferiority margin). | off |
+| `--check-floor` | Also check each result against its floor in `benchmarks/floors.json`. The correct count must reach the floor. A paired comparison with the floor's results must show no regression (exact two-sided McNemar at 0.05, and an automatic non-inferiority margin). | off |
 | `--root <path>` | The repository folder that holds `benchmarks/`. | found from the current folder |
 | `--store <file>` | Also register the exact dataset version of each slice in this dataset store, and refuse a version that conflicts with the manifest. | none |
 | `--json` | Print one JSON document instead of text. | off |
@@ -53,7 +53,7 @@ Exit codes:
 
 ## Inputs
 
-* `benchmarks/manifest.json`: `version: 1`, `models` (each `id`, `model`, `status` `active` or `skipped`, and `reason` when skipped) and `slices` (each `name`, `version`, `hash`, `path` = `benchmarks/slices/<name>/<version>`, `n` cases, `sourceCommit`). On main the active models are `haiku` (`claude-haiku-5-5`), `gpt-6-luna` and `gemini-3.5-flash-lite`; `gemini-3.8-flash` is skipped. There are 14 slices: `fresh-rubric` 192, `fresh-reference` 192, `map-rubric` 156, `map-reference` 180, `hard-rubric`, `hard-factuality`, `hard-pii`, `hard-goal` 120 each, `heldout-rubric`, `heldout-factuality`, `heldout-pii`, `heldout-goal` 72 each, `planted-verify` 190, `planted-rubric` 120.
+* `benchmarks/manifest.json` holds `version: 1`, `models` and `slices`. Each model has `id`, `model`, `status` `active` or `skipped`, and `reason` when skipped. Each slice has `name`, `version`, `hash`, `path` = `benchmarks/slices/<name>/<version>`, `n` cases and `sourceCommit`. On main the active models are `haiku` (`claude-haiku-5-5`), `gpt-6-luna` and `gemini-3.5-flash-lite`; `gemini-3.8-flash` is skipped. There are 14 slices in all. The first four are `fresh-rubric` 192, `fresh-reference` 192, `map-rubric` 156 and `map-reference` 180. The slices `hard-rubric`, `hard-factuality`, `hard-pii` and `hard-goal` have 120 each. The slices `heldout-rubric`, `heldout-factuality`, `heldout-pii` and `heldout-goal` have 72 each. The slice `planted-verify` has 190. The slice `planted-rubric` has 120.
 * `benchmarks/slices/<name>/<version>/`: `cases.spec.json` (a valid conversation spec whose `metadata.bench` holds the cases: id, construction family, expected pass or fail, and the judge request), `source.json` and `provenance.json`. The folder's content hash must equal the manifest `hash`.
 * `benchmarks/cassettes/<slice>@<version>/<model>.json`: the raw recorded answers.
 * `benchmarks/evidence/<slice>@<version>/<model>.json`: the record evidence, with the cassette's SHA-256; replay checks it.
@@ -72,17 +72,17 @@ Text output, per slice and model:
 
 * `<correct>/<n>` counts the cases where the judge's verdict equals the expected one. An inconclusive verdict is not correct.
 * The Wilson interval is the 95% interval on the share correct. The family bootstrap resamples whole construction families, since cases of one family are related.
-* `floor HOLDS` or `floor FAILS` and the `Paired:` line appear only with `--check-floor`. On a failure, each problem follows on stderr, such as `No floor for <slice>/<model>`, `<c>/<n> is below the floor <f>/<n>`, `Paired regression: <reason>` or `re-record needed: stale fingerprint`.
+* `floor HOLDS` or `floor FAILS` and the `Paired:` line appear only with `--check-floor`. On a failure, each problem follows on stderr. Examples are `No floor for <slice>/<model>`, `<c>/<n> is below the floor <f>/<n>`, `Paired regression: <reason>` or `re-record needed: stale fingerprint`.
 * `Zero failures: a <5% claim needs <k> independent clean cases; construction families can be dependent.` appears when every case is correct.
 * `Skipped <model>: <reason>` lists every skipped model of the manifest, whatever `--model` says.
 
-With `--json`, one object: `format` (`driftbench-bench-replay-v1`), `reports`, `checks`, `problems` and `skipped`. Each report has `format`, `slice`, `datasetVersion`, `datasetHash`, `judge`, `model`, `settings`, `fingerprint`, `head`, `startedAt`, `finishedAt`, `n`, `correct`, `wilson` (`estimate`, `lower`, `upper`), `familyBootstrap`, `zeroFailure` and `results` (each `id`, `family`, `expected`, `outcome`, `correct`). Each check has `slice`, `model`, `holds`, `problems` and `paired`.
+With `--json`, one object: `format` (`driftbench-bench-replay-v1`), `reports`, `checks`, `problems` and `skipped`. Each report has `format`, `slice`, `datasetVersion`, `datasetHash`, `judge`, `model`, `settings`, `fingerprint`, `head`, `startedAt`, `finishedAt`, `n` and `correct`. It also has `wilson` (`estimate`, `lower`, `upper`), `familyBootstrap`, `zeroFailure` and `results` (each `id`, `family`, `expected`, `outcome`, `correct`). Each check has `slice`, `model`, `holds`, `problems` and `paired`.
 
 Replay writes nothing, except that `--store` adds dataset versions to the store.
 
 ## Worked example
 
-The help test runs only `driftbench` commands, and the bench is a repository script, so the tested line here validates the criteria folder the judge prompt is built from; the bench run itself follows.
+The help test runs only `driftbench` commands. The bench is a repository script. The tested line here therefore validates the criteria folder the judge prompt is built from. The bench run itself follows.
 
 ```sh
 driftbench judge check examples/acme/criteria
@@ -109,7 +109,7 @@ ok  sheet_matches_catalog [system1, gating]: pass fixture 2 line(s), fail fixtur
 
 Replay the committed haiku recording of one slice and check its floor:
 
-Not run by the help test: the bench reads git (the commit each report records) and the repository's `benchmarks/` folder, which the help test's scratch folder does not link. From a repository checkout:
+Not run by the help test. The bench reads git (the commit each report records) and the repository's `benchmarks/` folder, which the help test's scratch folder does not link. From a repository checkout:
 
 ```text
 $ pnpm -s bench replay --slice fresh-reference --model haiku --check-floor
