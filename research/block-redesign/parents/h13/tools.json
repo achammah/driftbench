@@ -1,0 +1,149 @@
+[
+ {
+  "name": "catalog_search",
+  "description": "Plans of a category (mobile or home). With address_id (home only) only the plans available at that address. With customer_email the customer's id, name and current plan id are added (customer is null when the email is unknown).",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "category": {
+     "type": "string",
+     "enum": [
+      "mobile",
+      "home"
+     ]
+    },
+    "customer_email": {
+     "type": "string"
+    },
+    "address_id": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "category"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "coverage_check",
+  "description": "Whether Acme reaches a street address, and how fast.",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "address": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "address"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "port_check",
+  "description": "Whether a phone number held at another carrier can move to Acme.",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "number": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "number"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "order_create",
+  "description": "Places an order. Side effect. Never retry.",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "type": {
+     "type": "string",
+     "enum": [
+      "new",
+      "upgrade"
+     ]
+    },
+    "plan_id": {
+     "type": "string"
+    },
+    "customer_id": {
+     "type": "string"
+    },
+    "customer": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "email": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "name",
+      "email"
+     ]
+    },
+    "address_id": {
+     "type": "string"
+    },
+    "port_number": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "type",
+    "plan_id"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "notify_sales",
+  "description": "Hands a lead to a human sales advisor. Side effect. Never retry.",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "reason": {
+     "type": "string",
+     "enum": [
+      "callback",
+      "no_coverage",
+      "tool_failure",
+      "order_failed"
+     ]
+    },
+    "customer": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "email": {
+       "type": "string"
+      },
+      "phone": {
+       "type": "string"
+      }
+     }
+    },
+    "summary": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "reason",
+    "customer",
+    "summary"
+   ],
+   "additionalProperties": false
+  }
+ }
+]

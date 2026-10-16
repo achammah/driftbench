@@ -1,0 +1,10 @@
+{
+ "lane": "parents",
+ "base": "a7c3280c2",
+ "H12a": "SUPPORTED",
+ "H12b": "SUPPORTED",
+ "H13": "SUPPORTED",
+ "H12": "see h12/results.json",
+ "H13_detail": "see h13/results.json",
+ "cost_usd_standin_price": 6.2944
+}
