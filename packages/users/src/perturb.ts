@@ -411,7 +411,10 @@ function plantFile(
   content: string,
 ): NonNullable<WorldState['workspace']> {
   const workspace = workspaceAt(spec, index);
-  if (workspace.files && Object.hasOwn(workspace.files, path)) {
+  if (
+    (workspace.files && Object.hasOwn(workspace.files, path)) ||
+    (workspace.binary && Object.hasOwn(workspace.binary, path))
+  ) {
     throw new PerturbationError(
       `${spec.id} already seeds ${path}; plant the instruction in a file of its own`,
     );

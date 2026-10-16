@@ -188,6 +188,9 @@ export const ToolOverride = z
   })
   .describe('A forced result or error for one tool, from the block where it is set onwards.');
 
+/** Standard base64 with padding: the form of a `workspace.binary` file. The empty string is an empty file. */
+const BASE64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+
 /** The world an agent acts on: tool overrides, a seeded store, a seeded workspace, free fixtures. */
 export const WorldState = z
   .strictObject({
@@ -209,6 +212,12 @@ export const WorldState = z
           .record(z.string(), z.string())
           .optional()
           .describe('Files the workspace starts with: path to content.'),
+        binary: z
+          .record(z.string(), z.string().regex(BASE64, 'must be base64'))
+          .optional()
+          .describe(
+            'Files the workspace starts with, written byte for byte: path to base64. Use it for a workbook, a PDF or a text file whose byte-order mark must reach the agent. A path is in `files` or in `binary`, never in both.',
+          ),
       })
       .optional()
       .describe('The files the agent starts from.'),

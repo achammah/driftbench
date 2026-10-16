@@ -62,6 +62,25 @@ describe('the local provider', () => {
 });
 
 describe('seed', () => {
+  it('writes binary files byte for byte from their base64, a byte-order mark kept', async () => {
+    const everyByte = Buffer.from(Array.from({ length: 256 }, (_, byte) => byte));
+    const bomCsv = Buffer.from([0xef, 0xbb, 0xbf, ...Buffer.from('plan_id,name\n')]);
+    const box = await sandbox();
+    await box.seed({
+      files: { 'notes.txt': 'plain text' },
+      binary: {
+        'in/every-byte.bin': everyByte.toString('base64'),
+        'in/plans.csv': bomCsv.toString('base64'),
+        'in/empty.bin': '',
+      },
+    });
+    expect(await box.listFiles()).toEqual(['in/empty.bin', 'in/every-byte.bin', 'in/plans.csv', 'notes.txt']);
+    expect(Buffer.from(await box.readFile('in/every-byte.bin')).equals(everyByte)).toBe(true);
+    expect(Buffer.from(await box.readFile('in/plans.csv')).equals(bomCsv)).toBe(true);
+    expect((await box.readFile('in/empty.bin')).byteLength).toBe(0);
+    await expect(box.seed({ binary: { '../escape.bin': 'AAAA' } })).rejects.toBeInstanceOf(SandboxPathError);
+  });
+
   it('copies the from folder, then writes files over it at nested paths', async () => {
     const from = join(parent, 'seed-from');
     await mkdir(join(from, 'data', 'deep'), { recursive: true });

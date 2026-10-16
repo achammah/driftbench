@@ -284,6 +284,32 @@ describe('the process adapter', () => {
     ]);
   });
 
+  it('seeds workspace.binary byte for byte, and a binary file a later block adds', async () => {
+    const workbook = Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x00, 0xff, 0xfe, 0x80]);
+    const bomCsv = Buffer.from([0xef, 0xbb, 0xbf, ...Buffer.from('plan_id,name\n')]);
+    const { adapter, open, folder } = setup();
+    const first = given();
+    first.world = {
+      workspace: { ...first.world.workspace, binary: { 'in/sheet.xlsx': workbook.toString('base64') } },
+    };
+    const session = await open(first);
+    expect((await readFile(join(folder(), 'in', 'sheet.xlsx'))).equals(workbook)).toBe(true);
+
+    const second = given();
+    second.world = {
+      workspace: {
+        ...second.world.workspace,
+        binary: {
+          'in/sheet.xlsx': workbook.toString('base64'),
+          'in/plans.csv': bomCsv.toString('base64'),
+        },
+      },
+    };
+    await runnerSend(adapter, session, turn(0, 'Build a price sheet from catalog.csv.', second));
+    expect((await readFile(join(folder(), 'in', 'plans.csv'))).equals(bomCsv)).toBe(true);
+    expect((await readFile(join(folder(), 'in', 'sheet.xlsx'))).equals(workbook)).toBe(true);
+  });
+
   it('shows the file a destructive agent deleted', async () => {
     const { adapter, open } = setup();
     const from = given();

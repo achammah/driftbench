@@ -55,7 +55,7 @@ export abstract class FolderSandbox implements Sandbox {
   abstract exec(command: string, options?: ExecOptions): Promise<ExecutionRecord>;
   abstract destroy(): Promise<void>;
 
-  /** Copies `from` (a folder; a relative path resolves from the current directory), then writes `files` over it. */
+  /** Copies `from` (a folder; a relative path resolves from the current directory), then writes `files` (text) and `binary` (base64, byte for byte) over it. */
   async seed(workspace: Workspace): Promise<void> {
     if (workspace.from !== undefined) {
       const source = resolve(workspace.from);
@@ -69,6 +69,9 @@ export abstract class FolderSandbox implements Sandbox {
     }
     for (const [path, content] of Object.entries(workspace.files ?? {})) {
       await this.writeInside(path, Buffer.from(content, 'utf8'));
+    }
+    for (const [path, base64] of Object.entries(workspace.binary ?? {})) {
+      await this.writeInside(path, Buffer.from(base64, 'base64'));
     }
   }
 

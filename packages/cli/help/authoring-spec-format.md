@@ -129,7 +129,7 @@ Two shorthands are accepted at the top level and rewritten before validation:
 | Shorthand | Becomes | Conflict |
 |---|---|---|
 | `ledger_seed: { ... }` | `given.ledger` | both set: `SPEC_ALIAS_CONFLICT` |
-| `workspace_seed: <folder>` or `workspace_seed: { from, files }` | `given.world.workspace` (a string becomes `{ from: <string> }`) | both set: `SPEC_ALIAS_CONFLICT` |
+| `workspace_seed: <folder>` or `workspace_seed: { from, files, binary }` | `given.world.workspace` (a string becomes `{ from: <string> }`) | both set: `SPEC_ALIAS_CONFLICT` |
 
 ### Tags with a meaning
 

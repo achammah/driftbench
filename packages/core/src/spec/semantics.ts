@@ -1,4 +1,4 @@
-import type { Assertion, Count } from '../schema/common';
+import type { Assertion, Count, WorldState } from '../schema/common';
 import type { Expect, Spec } from '../schema/spec';
 import { error, type Issue } from './issues';
 import { isPlainObject } from './normalize';
@@ -61,6 +61,7 @@ export function checkSemantics(spec: Spec): Issue[] {
   const ctx: Context = { stages: spec.stages ? new Set(spec.stages) : undefined, defined, forbidden };
 
   const facts = factsOf(spec);
+  checkWorkspace(spec.given?.world?.workspace, 'given.world.workspace', issues);
   const blockIds = new Set<string>();
   spec.blocks.forEach((block, index) => {
     if (block.id !== undefined) {
@@ -71,6 +72,7 @@ export function checkSemantics(spec: Spec): Issue[] {
       }
       blockIds.add(block.id);
     }
+    checkWorkspace(block.given?.world?.workspace, `blocks.${index}.given.world.workspace`, issues);
     if (block.given?.origin !== undefined && block.given.prefix === undefined) {
       issues.push(
         error(
@@ -133,6 +135,7 @@ export function checkSemantics(spec: Spec): Issue[] {
     ) {
       issues.push(error('PERTURBATION_EMPTY', path, 'a perturbation needs `user`, `burst` or `world`'));
     }
+    checkWorkspace(perturbation.world?.workspace, `${path}.world.workspace`, issues);
     if (perturbation.expect) checkExpect(perturbation.expect, `${path}.expect`, ctx, issues);
     if (perturbation.expect) {
       checkRetention(
@@ -183,6 +186,33 @@ export function checkSemantics(spec: Spec): Issue[] {
   }
 
   return issues;
+}
+
+/** A workspace path is written once: in `files` as text or in `binary` as base64, never in both. */
+function checkWorkspace(workspace: WorldState['workspace'], path: string, issues: Issue[]): void {
+  if (workspace?.files === undefined || workspace.binary === undefined) return;
+  const text = new Set(Object.keys(workspace.files).map(workspacePath));
+  for (const name of Object.keys(workspace.binary)) {
+    if (!text.has(workspacePath(name))) continue;
+    issues.push(
+      error(
+        'WORKSPACE_PATH_TWICE',
+        `${path}.binary.${name}`,
+        `the workspace path "${name}" is in both files and binary: write it once`,
+      ),
+    );
+  }
+}
+
+/** A workspace path as the sandbox resolves it, so "./data/a.bin" and "data//a.bin" are the same path. */
+function workspacePath(path: string): string {
+  const parts: string[] = [];
+  for (const part of path.split('/')) {
+    if (part === '' || part === '.') continue;
+    if (part === '..' && parts.length > 0 && parts[parts.length - 1] !== '..') parts.pop();
+    else parts.push(part);
+  }
+  return parts.join('/');
 }
 
 function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]): void {

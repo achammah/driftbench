@@ -245,6 +245,7 @@ export function blockDependencies(spec: Spec, index: number): BlockDependencies 
       ...Object.keys(world.store ?? {}),
       ...Object.keys(world.fixtures ?? {}),
       ...Object.keys(world.workspace?.files ?? {}),
+      ...Object.keys(world.workspace?.binary ?? {}),
       ...(world.workspace?.from === undefined ? [] : [world.workspace.from]),
     ]),
     ...(isPlainObject(family) && typeof family.id === 'string' ? [`family:${family.id}`] : []),
