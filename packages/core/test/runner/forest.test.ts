@@ -162,12 +162,30 @@ describe('a block whose parent did not pass', () => {
     expect(runOutcome(run)).toBe('not_run');
   });
 
-  it('is not run, whatever its parent did, when the adapter cannot seed its ancestors', async () => {
+  it('is not run, when its parent passed, if the adapter cannot seed its ancestors', async () => {
     const adapter = acmeAdapter({ capabilities: { seedPrefix: false } });
     const run = await runSpec(forest, { adapter, driver, checks: [], mode: 'F', repeat: 0 });
+    // A child of a block that was not run is blocked, rooted at that block.
     expect(run.blocks.map(blockStatus)).toEqual(['pass', 'not_run', 'not_run', 'pass', 'not_run']);
     expect(run.blocks[1]?.notRun).toMatchObject({ kind: 'unsupported', check: 'capability' });
     expect(adapter.calls.send).toBe(2);
+  });
+
+  it('blocks the child of a child that was not run, even when the adapter could not seed it either', async () => {
+    const chain = specOf({
+      id: 'no-prefix-chain',
+      blocks: [
+        { id: 'a', user: 'start' },
+        { id: 'a1', parent: 'a', user: 'next' },
+        { id: 'a2', parent: 'a1', user: 'after' },
+      ],
+    });
+    for (const mode of ['F', 'T'] as const) {
+      const adapter = acmeAdapter({ capabilities: { seedPrefix: false } });
+      const run = await runSpec(chain, { adapter, driver, checks: [], mode, repeat: 0 });
+      expect(run.blocks.map(blockStatus), mode).toEqual(['pass', 'not_run', 'blocked']);
+      expect(run.blocks[2]?.blocked, mode).toMatchObject({ by: 'a1', root: 'a1' });
+    }
   });
 });
 

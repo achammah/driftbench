@@ -525,13 +525,12 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
               ? { prefix: 'canonical' as const }
               : {}),
       };
-      // The layers the Given needs come first: a child whose adapter cannot seed its ancestors is not run,
-      // whatever its parent did. Then a child of a parent that did not pass is blocked; a forced tool result
-      // the adapter cannot apply comes last.
+      // A child of a parent that did not pass is blocked first. A child of a parent that passed, on an adapter
+      // that cannot seed its ancestors' turns, is not run. A forced tool result the adapter cannot apply comes last.
       const historyGap = capabilityGap(run.adapter.id, run.capabilities, { ...layers, world: {} });
       // A child of a parent that did not pass is blocked: never sent, by its own parent and rooted at the first
       // failure or at the parent not run.
-      if (!historyGap && links && step.kind === 'block') {
+      if (links && step.kind === 'block') {
         const parent = links.get(step.blockIndex);
         const parentResult = parent === undefined ? undefined : resultOf.get(parent);
         if (parent !== undefined && parentResult !== undefined && blockStatus(parentResult) !== 'pass') {
