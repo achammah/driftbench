@@ -8,6 +8,7 @@ export {
   type State,
   takeTurn,
 } from './policy';
+export { ACME_TOOL_DECLARATIONS, type AcmeToolDeclaration, acmeReplayer, type ReplayedCall } from './replay';
 export {
   ACME,
   type AcmeData,

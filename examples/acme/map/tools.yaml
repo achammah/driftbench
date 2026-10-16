@@ -28,7 +28,7 @@ tools:
             current_plan_id: { type: string }
 
   - name: coverage.check
-    description: Whether Acme reaches an address, and how fast.
+    description: Whether Acme reaches an address, and how fast. Give the street type in full, for example Road, not Rd.
     input_schema:
       type: object
       additionalProperties: false

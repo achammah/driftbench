@@ -68,7 +68,7 @@ describe.each(['explicit', 'default'])('%s project config', (source) => {
       expect({ code, out, err }).toEqual({
         code: 2,
         out: '',
-        err: `${path}:3: unknown key campagin; the config defines aggregates, campaign, plugins, prices, scales only\n`,
+        err: `${path}:3: unknown key campagin; the config defines aggregates, campaign, objects, plugins, prices, scales only\n`,
       });
     },
     120_000,

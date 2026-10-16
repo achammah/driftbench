@@ -1,0 +1,72 @@
+# The shipped policy/value-check object: when a value the agent wrote is the right value.
+# The ladder of value_equivalence.md (sections 3 to 3c), with the code rungs of codeagent_equivalence_blame.md
+# (G2). No rung knows what a phone, an email or an address is: each one delegates to the block's declaration,
+# the tool, a recomputation, the workspace, the tool's contract, the user's own text, or a calibrated judge.
+# The first item whose `when` holds and that settles the value decides it. A value no item settles is
+# inconclusive, with the reason of every rung that could not decide; it never passes by a silent string compare.
+kind: policy/value-check
+id: default
+extends: null
+description: Decides when a value, a file or a state the agent produced is the right one.
+params:
+  numbers_significant_digits: 12
+items:
+  - id: rung4_exact
+    title: Exact match, only where the block declares the format is the requirement
+    when: { compare: exact }
+    effect: { settles: [pass, fail] }
+    impl: builtin:value-check/exact
+  - id: rung1_outcome
+    title: Ask the tool, same result for the gold value and the agent's value
+    when: { tool_replayable: true }
+    effect: { settles: [pass, fail] }
+    params: { resolved_fields: from_tool_declaration, distractors_required: true }
+    impl: builtin:value-check/outcome
+    cites: value_equivalence.md 3 rung 1; HF6
+  - id: rung1_recompute
+    title: Recompute a formula or a script on the given inputs and on changed inputs
+    when: { recomputable: true }
+    effect: { settles: [pass, fail], emits: [changed_inputs_fail] }
+    params: { trials: 3, seed: 1, inputs: drawn_from_seed_ranges }
+    impl: builtin:value-check/recompute
+    cites: DS-1000 2.3 p.4; EvilGenie p.7
+  - id: rung1_state_diff
+    title: Expected changes present, nothing outside expected plus allowed, on the net workspace diff
+    when: { compares: workspace }
+    effect: { settles: [pass, fail] }
+    impl: builtin:value-check/state-diff
+    cites: AppWorld p.6
+  - id: rung2_contract
+    title: The format the tool, the prompt, the instruction or a loaded skill states
+    when: { tool_replayable: false, contract: [tool, prompt, instruction, skill, error_seen] }
+    effect: { settles: [fail], lint_when: test_demands_unstated_format }
+    impl: builtin:value-check/contract
+    cites: value_equivalence.md 3c R1
+  - id: rung2b_as_given
+    title: A value the user or a workspace file gave is not changed (a copy alone passes nothing)
+    when: { tool_replayable: false, recomputable: false, source: [user, workspace_file] }
+    effect: { settles: [fail], emits: [change] }
+    params: { ignore: [surrounding_space] }
+    impl: builtin:value-check/as-given
+    cites: value_equivalence.md 3c R2; tau-bench policy p.16
+  - id: rung3_same_referent
+    title: A calibrated judge decides whether both values name the same thing
+    when: { tool_replayable: false, contract: none }
+    effect: { settles: [pass, fail, inconclusive] }
+    params:
+      design: read_each_value_first
+      orders: both
+      repeats: 3
+      max_false_acceptance: 0.02
+      min_kappa_vs_labels: labellers_minus_0.05
+      prompt_template: prompt-template/same-referent:default
+    impl: builtin:value-check/judge
+    cites: value_equivalence.md 3 rung 3; HF7
+order:
+  - rung4_exact
+  - rung1_outcome
+  - rung1_recompute
+  - rung1_state_diff
+  - rung2_contract
+  - rung2b_as_given
+  - rung3_same_referent

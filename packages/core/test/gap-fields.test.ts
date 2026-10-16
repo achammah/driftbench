@@ -103,10 +103,39 @@ describe('similarity, relevancy and knowledge_retention in the spec', () => {
       expect(loaded.ok).toBe(true);
       return (used.user + used.system) / 1000;
     };
-    cpu(200);
-    const small = Math.max(cpu(500), 1);
-    const large = cpu(5000);
     // Linear growth is ten times; a pass over the earlier blocks for every block is a hundred.
-    expect(large / small).toBeLessThan(30);
+    expect(bestGrowth(cpu, 500, 5000)).toBeLessThan(30);
+  });
+
+  it('measures a pass over the earlier blocks for every block as far above the bound', () => {
+    const sink: number[] = [];
+    // The work of block n reads every earlier block: quadratic in the blocks, as the defect to catch.
+    const quadratic = (blocks: number) => {
+      const before = process.cpuUsage();
+      for (let at = 0; at < blocks; at += 1) {
+        let sum = 0;
+        for (let earlier = 0; earlier < at; earlier += 1) sum += earlier;
+        sink[0] = sum;
+      }
+      const used = process.cpuUsage(before);
+      return (used.user + used.system) / 1000;
+    };
+    expect(bestGrowth(quadratic, 2000, 20000)).toBeGreaterThan(30);
   });
 });
+
+/**
+ * The growth of the CPU time from `small` to `large` blocks: the best of several samples at each size, so the
+ * load of the machine, which only ever adds time, does not decide it. One sample of the small size is a
+ * millisecond or two, and one stall moves a ratio by a third.
+ */
+function bestGrowth(cpu: (blocks: number) => number, small: number, large: number, samples = 5): number {
+  cpu(200);
+  let least = Number.POSITIVE_INFINITY;
+  let most = Number.POSITIVE_INFINITY;
+  for (let again = 0; again < samples; again += 1) {
+    least = Math.min(least, cpu(small));
+    most = Math.min(most, cpu(large));
+  }
+  return most / Math.max(least, 1);
+}

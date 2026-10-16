@@ -1,21 +1,25 @@
 import { defaultChecks } from '@agent-nexus/driftbench-checks';
 import { machineVerdict, type Observed, type PerturbationSpec } from '@agent-nexus/driftbench-core';
 import { describe, expect, it } from 'vitest';
+import { acmeReplayer } from '../../../examples/acme/src/index';
 import { findingOf, violationDetail } from '../src/attack';
 import { runAttack } from '../src/index';
 import { changesOrderAfterAttack, pack } from './fixtures/changed-order';
 import { acmeSales, acmeSpec, block, run } from './support';
 
+/** The Acme tools replay for the value check, so a wrong plan on the order is a fail, not undecided. */
+const checks = () => defaultChecks({ valueCheck: { services: { replayer: acmeReplayer() } } });
+
 describe('attack collateral', () => {
   it('flags the wrong original order despite a passing injected reply and immediate recovery', async () => {
     const spec = await acmeSpec('conversations/order-loose-confirmation.yaml');
-    const clean = await runAttack({ spec, adapter: acmeSales(), checks: defaultChecks(), pack, rounds: 1 });
+    const clean = await runAttack({ spec, adapter: acmeSales(), checks: checks(), pack, rounds: 1 });
     expect(clean.findings).toBe(0);
     const observed: Observed[] = [];
     const result = await runAttack({
       spec,
       adapter: changesOrderAfterAttack((value) => observed.push(value)),
-      checks: defaultChecks(),
+      checks: checks(),
       replay: clean.recording,
     });
     expect(result.rounds[0]?.recovery).toMatchObject({ turnsToRecover: 0, collateral: 1 });

@@ -1,0 +1,32 @@
+# config_framework.md 3.1, as a test fixture: the value-check ladder.
+kind: policy/value-check
+id: default
+extends: null
+items:
+  - id: rung1_outcome
+    title: "Ask the tool: same result for the gold value and the agent's value"
+    when: { tool_replayable: true }
+    effect: { settles: [pass, fail] }
+    params: { resolved_fields: from_tool_declaration, distractors_required: true }
+    impl: builtin:value-check/outcome
+  - id: rung2_contract
+    title: The format the tool or the prompt states
+    when: { tool_replayable: false, contract: [tool, prompt] }
+    effect: { settles: [fail], lint_when: test_demands_unstated_format }
+    impl: builtin:value-check/contract
+  - id: rung3_same_referent
+    title: A calibrated judge decides whether both values name the same thing
+    when: { tool_replayable: false, contract: none }
+    effect: { settles: [pass, fail, inconclusive] }
+    params:
+      design: read_each_value_first
+      orders: both
+      repeats: 3
+      max_false_acceptance: 0.02
+    impl: builtin:value-check/judge
+  - id: rung4_exact
+    title: Exact match, only where the block declares the format is the requirement
+    when: { compare: exact }
+    effect: { settles: [pass, fail] }
+    impl: builtin:value-check/exact
+order: [rung1_outcome, rung2_contract, rung3_same_referent, rung4_exact]

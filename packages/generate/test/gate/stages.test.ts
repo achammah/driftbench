@@ -1,5 +1,4 @@
 import { functionAdapter } from '@agent-nexus/driftbench-adapters';
-import { defaultChecks } from '@agent-nexus/driftbench-checks';
 import { createScriptedDriver } from '@agent-nexus/driftbench-users';
 import { describe, expect, it } from 'vitest';
 import {
@@ -13,7 +12,16 @@ import {
   thenFields,
 } from '../../src/gate';
 import { sameReferenceOutcome } from '../../src/gate/gate';
-import { gate, generated, makeSpec, orderBlock, shopAdapter, shopFault, shopFaults } from './support';
+import {
+  gate,
+  generated,
+  makeSpec,
+  orderBlock,
+  shopAdapter,
+  shopChecks,
+  shopFault,
+  shopFaults,
+} from './support';
 
 const STAGES = ['start', 'ordered'];
 const wording = GATE_DEFAULTS.wording;
@@ -401,7 +409,7 @@ describe('stage 4, contrast', () => {
     if (!record) throw new Error('no block');
     const recorded = await Promise.all(
       specs.map((spec) =>
-        runOnce(spec, shopAdapter(), 1, { checks: defaultChecks(), driver: createScriptedDriver }),
+        runOnce(spec, shopAdapter(), 1, { checks: shopChecks(), driver: createScriptedDriver }),
       ),
     );
     const outcomes = recorded.map((run) => ({ run, index: 0 }));

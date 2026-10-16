@@ -24,6 +24,7 @@
       "!comparisons/hard-peers/**/*.json",
       "!comparisons/hard-peers/**/*.jsonl",
       "!packages/validators/fixtures/generator/seed-1/oracle.mjs",
+      "!packages/checks/test/fixtures/value-ladder",
       "!comparisons/ledger-hard/**/*.json",
       "!comparisons/ledger-hard/**/*.jsonl",
       "!comparisons/ledger-hard/*.mts",

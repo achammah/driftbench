@@ -82,7 +82,9 @@ describe('a campaign bundle carries its specs and its registry sources', () => {
     try {
       const bundle = await other.importCampaign(folder);
       expect(bundle.specs.map((spec) => spec.path)).toEqual(['acme-specs@1/greeting.yaml']);
-      expect(await other.getSpec('acme-greeting', seeded.loaded.hash)).toStrictEqual(seeded.loaded);
+      expect(canonicalJson(await other.getSpec('acme-greeting', seeded.loaded.hash))).toBe(
+        canonicalJson(seeded.loaded),
+      );
       expect(await other.getVersion('dataset', 'acme-specs', '1')).toEqual(seeded.dataset);
       const prompt = await other.getVersion('prompt', 'acme-sales');
       expect(prompt).toEqual(seeded.prompt);

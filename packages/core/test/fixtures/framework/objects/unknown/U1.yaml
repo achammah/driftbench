@@ -1,0 +1,6 @@
+kind: policy/value-check
+id: u1
+extends: default
+items:
+  - id: rung5_judge
+    params: { repeats: 3 }

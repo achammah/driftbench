@@ -5,6 +5,8 @@ import type { CheckSet } from '../contracts/check';
 import type { UserDriver } from '../contracts/driver';
 import type { CostUnit, Store } from '../contracts/store';
 import type { ToolRule } from '../contracts/tool-policy';
+import { objectContextOfSpec } from '../objects/context';
+import { checkSpecObjects, shippedObjectContext } from '../objects/index';
 import type { BlockReuse } from '../radius/blocks';
 import type { TargetRef } from '../schema/common';
 import type { RunMode, RunResult } from '../schema/run';
@@ -362,6 +364,15 @@ export type CampaignRunOptions = {
  * it is still in flight. A campaign without that F cell gives P runs no reference.
  */
 export async function runCampaign(options: CampaignRunOptions): Promise<CellOutcome[]> {
+  // Validate before even a completed cell can be reused. A stored spec may outlive its object files.
+  const checkedSpecs = new Set<Spec>();
+  for (const cell of options.cells) {
+    const spec = options.specFor(cell);
+    if (checkedSpecs.has(spec)) continue;
+    checkedSpecs.add(spec);
+    const issues = checkSpecObjects(spec, objectContextOfSpec(spec) ?? shippedObjectContext());
+    if (issues.length) throw new Error(issues.map((issue) => `${issue.code}: ${issue.message}`).join('; '));
+  }
   const stored = await options.store.listRuns({ campaignId: options.campaignId });
   const done = byCell(stored);
   const { cells, budgetUsd } = options;

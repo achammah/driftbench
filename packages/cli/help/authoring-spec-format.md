@@ -122,6 +122,7 @@ YAML is parsed with unique keys: a key written twice in one mapping is a `SPEC_P
 | `rules` | mapping | no | none | Rules for the whole run. |
 | `end_state` | `none`, a mapping, or a list of mappings | no | none | The expected state of the world after the run. |
 | `perturbations` | list of mappings | no | none | Deviations a perturbed run (mode P) injects. See authoring-perturbations. |
+| `uses` | mapping | no | none | The objects every block uses: policies, the check set, diagnostics, by id or inline. See `uses` below. |
 | `metadata` | mapping | no | none | Free metadata. Some keys are read by tools, see below. |
 
 Two shorthands are accepted at the top level and rewritten before validation:
@@ -209,9 +210,34 @@ Free, with these keys read by tools:
 
 | Key | Written or read by |
 |---|---|
-| `tool_schemas` | read by the `schema_strict` check and by `extract --tools`: tool name to its JSON Schema. Unsupported schema keywords are errors. |
+| `tool_schemas` | read by the `schema_strict` check, by `extract --tools`, and by the value check of `tools` (a field's `pattern`, `enum` or `const` is its stated contract; the tool's and the field's `description` are what the same-referent judge reads): tool name to its JSON Schema. Unsupported schema keywords are errors. |
 | `depends` | read by `radius`: what each block depends on. See authoring-blast-radius. |
 | `generated`, `gate`, `family`, `imported`, `estate`, `retired`, `pilot` | written by `generate`, `gate`, `family instances`, `import`, `estate`; do not edit by hand. |
+
+### `uses`
+
+Every rule driftbench applies is an object: a kind (`policy/blame`, `policy/value-check`, `check-set`, `diagnostic`, ...), an id, an optional parent it `extends`, and items, each one rule. `uses` names the objects a spec or a block runs with. Each key is optional and has no default: a spec without `uses` loads, hashes and replays exactly as before.
+
+| Key | Kind it names |
+|---|---|
+| `value_check` | `policy/value-check` |
+| `blame` | `policy/blame` |
+| `placement` | `policy/placement` |
+| `links` | `policy/links` |
+| `selection` | `policy/selection` |
+| `gating` | `policy/gating` |
+| `stats` | `policy/stats` |
+| `check_set` | `check-set` |
+| `judges` | `judge-council` |
+| `diagnostics` | a list of `diagnostic` ids |
+
+A value is an id, such as `blame: acme`, or an inline object that extends one: `value_check: { extends: default, items: [{ id: rung3_same_referent, params: { repeats: 5 } }] }`. An item operation names an item of the parent and sets fields (`params` maps merge, lists replace, `+key: [values]` appends, `-key: [values]` removes); `enabled: false` disables it; `add: true` with `title`, `when`, `effect` and `impl` adds one; `before` or `after` moves it, or `order` lists every enabled item once. An item may carry `applies_to: { skills, tools, units }`: it then fires only when the evidence names one of those skills or tools, or a unit matching one of the unit patterns (`R#41/*`); without it, everywhere.
+
+Where an id is looked up, weakest first: the shipped objects; the project, files `driftbench/<kind>/<id>.yaml` beside `driftbench.yaml` and its `objects:` list; each `_driftbench/<kind>/<id>.yaml` suite folder from the project down to the spec, a nearer one stronger. A `uses.yaml` in a `driftbench/` or `_driftbench/` folder sets `uses` for the specs below it. A block's key replaces the spec's, which replaces the suite's and the project's.
+
+Every kind `uses` names is scoring-only: `uses` stays out of the block cache key and the re-judge compatibility hash, so changing it never reruns the agent. The spec hash does record it.
+
+The loader resolves every object a layer names. An unknown object, an unknown item, an `extends` cycle, an order that is not a permutation, a missing implementation or params of the wrong type is a load error naming the spec, the block, the kind and the id.
 
 ### A minimal valid spec
 
@@ -459,3 +485,7 @@ Checked 4 specs: 0 valid, 4 invalid, 0 warnings.
 | `schema_version  SCHEMA_INVALID_TYPE  Invalid input: expected int, received number` | `schema_version: 1.5` | a whole number |
 | `schema_version  SCHEMA_INVALID_TYPE  Invalid input: expected number, received string` | `schema_version: '1'`, a quoted number | write the number with no quotes |
 | `SPEC_PARSE` | the YAML or JSON does not parse, a key is repeated, or the path does not exist | fix the syntax or the path |
+| `OBJECT_UNKNOWN` | `uses` names an object no layer defines; the message lists the layers searched | write the object file, or fix the id |
+| `OBJECT_ITEM_UNKNOWN` | an inline or file object operates on an item its parent does not hold; the message lists the parent's items | fix the item id, or add it with `add: true`, `title`, `when`, `effect` and `impl` |
+| `OBJECT_CYCLE` | objects extend each other in a loop; the message prints the loop | break the chain |
+| `OBJECT_PARAMS_INVALID`, `OBJECT_IMPL_UNKNOWN` | an item's params do not fit its implementation, or no builtin or plugin provides it | fix the params at the path named, or load the plugin |

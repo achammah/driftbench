@@ -2,9 +2,11 @@ import type { AdapterCapabilities, AgentAdapter, Session, Turn } from '../contra
 import type { ArtifactReaderRegistry } from '../contracts/artifacts';
 import { type CheckContext, type CheckSet, machineVerdict } from '../contracts/check';
 import type { DriverStep, UserDriver } from '../contracts/driver';
-import { copyHistory, freezeMessage } from '../contracts/history';
+import { copyHistory, freezeHistory, freezeMessage } from '../contracts/history';
 import type { Store } from '../contracts/store';
 import { gateToolCalls, type ToolRule } from '../contracts/tool-policy';
+import { objectContextOfSpec } from '../objects/context';
+import { checkSpecObjects, type ObjectContext, shippedObjectContext } from '../objects/index';
 import { type BlockReuse, planBlockRerun } from '../radius/blocks';
 import { collectRetries, type RetryPolicy, retryPolicy } from '../retry';
 import type { Message, TargetRef, WorldState } from '../schema/common';
@@ -20,9 +22,16 @@ import {
 } from '../schema/run';
 import type { BlockSpec, EndState, Expect, GivenOverride, Spec, Stimulus } from '../schema/spec';
 import { cloneJson, contentHash } from '../spec/hash';
-import { specHash as specHashOf, specIdentity } from '../spec/identity';
+import { specHash as specHashOf } from '../spec/identity';
 import { compareEndState, type EndStateMatch } from './assertion';
-import { blockCacheKey, endStateCacheKey, type ObservedCache, unwrapEndState, wrapEndState } from './cache';
+import {
+  blockCacheKey,
+  cacheSpecHash as cacheSpecHashOf,
+  endStateCacheKey,
+  type ObservedCache,
+  unwrapEndState,
+  wrapEndState,
+} from './cache';
 import { capabilityGap } from './capability';
 import { recheckCarriedEndState } from './carried-end-state';
 import { cellId } from './cell';
@@ -55,6 +64,8 @@ import { blockStatus, isScored } from './verdicts';
 export type { RunEvent };
 
 export type RunOptions = {
+  /** Defaults to the context carried by the loaded spec. */
+  objects?: ObjectContext;
   /** Dated, user-supplied USD prices for token-only observations. */
   prices?: TokenPrices;
   /** A budgeted campaign cannot continue with an unpriced token-only block. */
@@ -141,12 +152,14 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
   if (options.store && options.campaignId === undefined) {
     throw new Error('runSpec: a store needs a campaignId to file the run under');
   }
+  const objects = options.objects ?? objectContextOfSpec(spec) ?? shippedObjectContext();
+  const objectErrors = checkSpecObjects(spec, objects);
+  if (objectErrors.length)
+    throw new RunnerError(objectErrors.map((issue) => `${issue.code}: ${issue.message}`).join('; '));
   const now = options.now ?? (() => new Date());
   const specHash = specHashOf(spec);
-  // The cache key leaves out the spec's version: a free label that plays no part (docs/running.md, "The
-  // cache and replay"), so relabelling a spec still replays its runs.
-  const { version: _version, ...unlabelled } = specIdentity(spec);
-  const cacheSpecHash = contentHash(unlabelled);
+  // The cache key leaves out the spec's version label and its scoring-only `uses` (cacheSpecHash).
+  const cacheSpecHash = cacheSpecHashOf(spec);
   const target = options.target ?? spec.target ?? { adapter: options.adapter.id };
   const prices = options.prices === undefined ? undefined : TokenPrices.parse(options.prices);
   if (options.requireTokenPrices) preflightTargetPrices([target], prices);
@@ -364,7 +377,9 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   const blocks: BlockResult[] = [];
   const { sources } = run;
   let state = initialGiven(spec);
-  let history: Message[] = [];
+  // The running history is private to the loop: frozen, so each copy of it for the next block or the Given is a
+  // pass over pointers, not a validation of every message again.
+  let history: readonly Message[] = [];
   /** The user messages of the history, one list that grows with it, so the ledger reads each one once. */
   let users: Message[] = [];
   /** The spec block whose user messages `users` ends with; NaN after an injected step. */
@@ -440,7 +455,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
           await channel.restart();
           sessionBase = composed;
         }
-        history = canonical.prefix;
+        history = canonical.history;
         // The canonical prefix of a block is the one of the block before, then that block's user messages
         // and a reply (canonicalGiven), unless the block writes a prefix of its own. So after the block
         // before, the user messages kept are those of this prefix already.
@@ -451,7 +466,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         state = enterBlock(state, planned.given, planned.world);
         if (planned.given?.prefix) {
           await channel.restart();
-          history = copyHistory(planned.given.prefix);
+          history = freezeHistory(planned.given.prefix);
           users = userMessagesOf(history);
           prefixWritten = planned.given.prefix.length > 0;
         }
@@ -487,7 +502,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         // it with their user messages and an empty reply, and the facts their ledger_add establishes.
         const from = step.kind === 'block' ? step.blockIndex + 1 : nextBlock;
         let laterState: RunningGiven = { ...state, ledger };
-        let laterHistory = copyHistory(history, [
+        let laterHistory = freezeHistory(history, [
           ...stimulusMessages(planned.stimulus),
           assistantMessage(NOT_SENT),
         ]);
@@ -498,11 +513,11 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
             stimulus: (spec.blocks[index] as BlockSpec).when,
           });
           laterState = enterBlock(laterState, later.given);
-          if (later.given?.prefix) laterHistory = copyHistory(later.given.prefix);
+          if (later.given?.prefix) laterHistory = freezeHistory(later.given.prefix);
           const laterHash = resolveGiven(laterState, laterHistory, run.target).hash;
           const laterLedger = addFacts(laterState.ledger, later.expect.ledger_add).ledger;
           laterState = { ...laterState, ledger: laterLedger };
-          laterHistory = copyHistory(laterHistory, [
+          laterHistory = freezeHistory(laterHistory, [
             ...stimulusMessages(later.stimulus),
             assistantMessage(NOT_SENT),
           ]);
@@ -578,7 +593,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       for (let r = 0; r < (observed.retries?.length ?? 0); r += 1) {
         run.onEvent?.({ type: 'retry', index: position, at: new Date().toISOString() });
       }
-      history = copyHistory(history, [...user, cloneJson(assistantMessage(observed))]);
+      history = freezeHistory(history, [...user, cloneJson(assistantMessage(observed))]);
       lastKey = key;
 
       const facts = addFacts(state.ledger, planned.expect.ledger_add);

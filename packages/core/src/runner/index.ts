@@ -12,6 +12,7 @@ export {
 export {
   type BlockKeyParts,
   blockCacheKey,
+  cacheSpecHash,
   endStateCacheKey,
   type ObservedCache,
   unwrapEndState,

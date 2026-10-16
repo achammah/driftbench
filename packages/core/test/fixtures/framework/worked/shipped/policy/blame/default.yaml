@@ -1,0 +1,28 @@
+# config_framework.md 3.2, as a test fixture, with R5b shipped disabled so a project file can enable it.
+kind: policy/blame
+id: default
+extends: null
+items:
+  - id: R1
+    title: A format the tool or the prompt states was broken
+    when: { contract: [tool, prompt], contract_broken: true }
+    effect: { verdict: fail, fault: [agent], fix_location: agent.behaviour }
+    impl: builtin:blame/stated-format-broken
+  - id: R3
+    title: The tool fails on a value copied from the user, with no stated format
+    when: { source: user, change: verbatim, contract: none, outcome: failed }
+    effect: { verdict: fail, fault: [tool_definition], fix_location: tool.description }
+    params: { recovery_ok: [asked_user, retried_canonical] }
+    impl: builtin:blame/copied-value-tool-failed
+  - id: R5
+    title: The tool accepted the value and nothing downstream needs another form
+    when: { outcome: accepted_as_gold, downstream_need: none }
+    effect: { verdict: pass, flag_test_when: demands_unstated_format, fault: [test] }
+    impl: builtin:blame/accepted-no-need
+  - id: R5b
+    title: A declared downstream consumer needs another form
+    enabled: false
+    when: { outcome: accepted_as_gold, downstream_need: declared }
+    effect: { verdict: fail, fault: [prompt, setup] }
+    params: { downstream_consumers: [] }
+    impl: builtin:blame/downstream-need

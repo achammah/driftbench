@@ -1,0 +1,6 @@
+kind: policy/value-check
+id: u6
+extends: default
+items:
+  - id: rung4_Exact
+    params: { case_insensitive: true }

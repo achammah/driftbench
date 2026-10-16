@@ -1,0 +1,1026 @@
+[
+ {
+  "id": "I000",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "+1 202 555 0131",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I001",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "(202) 555-0131",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I002",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "202.555.0131",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I003",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "202-555-0131",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I004",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "202.555.0132",
+  "truth": "different",
+  "subtype": "one_digit_changed"
+ },
+ {
+  "id": "I005",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "202.555.1031",
+  "truth": "different",
+  "subtype": "two_digits_swapped"
+ },
+ {
+  "id": "I006",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "+1 202 555 0188",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I007",
+  "field": "phone",
+  "gold": "+12025550188",
+  "candidate": "+1 202 555 0188",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I008",
+  "field": "phone",
+  "gold": "+12025550188",
+  "candidate": "(202) 555-0188",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I009",
+  "field": "phone",
+  "gold": "+12025550188",
+  "candidate": "202.555.0188",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I010",
+  "field": "phone",
+  "gold": "+12025550188",
+  "candidate": "202-555-0188",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I011",
+  "field": "phone",
+  "gold": "+12025550188",
+  "candidate": "202.555.0189",
+  "truth": "different",
+  "subtype": "one_digit_changed"
+ },
+ {
+  "id": "I012",
+  "field": "phone",
+  "gold": "+12025550188",
+  "candidate": "(202) 555-1088",
+  "truth": "different",
+  "subtype": "two_digits_swapped"
+ },
+ {
+  "id": "I013",
+  "field": "phone",
+  "gold": "+12025550188",
+  "candidate": "202-555-0142",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I014",
+  "field": "phone",
+  "gold": "+12025550142",
+  "candidate": "+1 202 555 0142",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I015",
+  "field": "phone",
+  "gold": "+12025550142",
+  "candidate": "(202) 555-0142",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I016",
+  "field": "phone",
+  "gold": "+12025550142",
+  "candidate": "202.555.0142",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I017",
+  "field": "phone",
+  "gold": "+12025550142",
+  "candidate": "202-555-0142",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I018",
+  "field": "phone",
+  "gold": "+12025550142",
+  "candidate": "202-555-0143",
+  "truth": "different",
+  "subtype": "one_digit_changed"
+ },
+ {
+  "id": "I019",
+  "field": "phone",
+  "gold": "+12025550142",
+  "candidate": "202-555-1042",
+  "truth": "different",
+  "subtype": "two_digits_swapped"
+ },
+ {
+  "id": "I020",
+  "field": "phone",
+  "gold": "+12025550142",
+  "candidate": "(202) 555-0118",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I021",
+  "field": "phone",
+  "gold": "+12025550118",
+  "candidate": "+1 202 555 0118",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I022",
+  "field": "phone",
+  "gold": "+12025550118",
+  "candidate": "(202) 555-0118",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I023",
+  "field": "phone",
+  "gold": "+12025550118",
+  "candidate": "202.555.0118",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I024",
+  "field": "phone",
+  "gold": "+12025550118",
+  "candidate": "202-555-0118",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I025",
+  "field": "phone",
+  "gold": "+12025550118",
+  "candidate": "202.555.0119",
+  "truth": "different",
+  "subtype": "one_digit_changed"
+ },
+ {
+  "id": "I026",
+  "field": "phone",
+  "gold": "+12025550118",
+  "candidate": "202-555-1018",
+  "truth": "different",
+  "subtype": "two_digits_swapped"
+ },
+ {
+  "id": "I027",
+  "field": "phone",
+  "gold": "+12025550118",
+  "candidate": "202.555.0125",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I028",
+  "field": "phone",
+  "gold": "+12025550125",
+  "candidate": "+1 202 555 0125",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I029",
+  "field": "phone",
+  "gold": "+12025550125",
+  "candidate": "(202) 555-0125",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I030",
+  "field": "phone",
+  "gold": "+12025550125",
+  "candidate": "202.555.0125",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I031",
+  "field": "phone",
+  "gold": "+12025550125",
+  "candidate": "202-555-0125",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I032",
+  "field": "phone",
+  "gold": "+12025550125",
+  "candidate": "202-555-0126",
+  "truth": "different",
+  "subtype": "one_digit_changed"
+ },
+ {
+  "id": "I033",
+  "field": "phone",
+  "gold": "+12025550125",
+  "candidate": "202.555.1025",
+  "truth": "different",
+  "subtype": "two_digits_swapped"
+ },
+ {
+  "id": "I034",
+  "field": "phone",
+  "gold": "+12025550125",
+  "candidate": "+1 202 555 0150",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I035",
+  "field": "phone",
+  "gold": "+12025550150",
+  "candidate": "+1 202 555 0150",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I036",
+  "field": "phone",
+  "gold": "+12025550150",
+  "candidate": "(202) 555-0150",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I037",
+  "field": "phone",
+  "gold": "+12025550150",
+  "candidate": "202.555.0150",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I038",
+  "field": "phone",
+  "gold": "+12025550150",
+  "candidate": "202-555-0150",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I039",
+  "field": "phone",
+  "gold": "+12025550150",
+  "candidate": "202-555-0151",
+  "truth": "different",
+  "subtype": "one_digit_changed"
+ },
+ {
+  "id": "I040",
+  "field": "phone",
+  "gold": "+12025550150",
+  "candidate": "+1 202 555 1050",
+  "truth": "different",
+  "subtype": "two_digits_swapped"
+ },
+ {
+  "id": "I041",
+  "field": "phone",
+  "gold": "+12025550150",
+  "candidate": "202.555.0160",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I042",
+  "field": "phone",
+  "gold": "+12025550160",
+  "candidate": "+1 202 555 0160",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I043",
+  "field": "phone",
+  "gold": "+12025550160",
+  "candidate": "(202) 555-0160",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I044",
+  "field": "phone",
+  "gold": "+12025550160",
+  "candidate": "202.555.0160",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I045",
+  "field": "phone",
+  "gold": "+12025550160",
+  "candidate": "202-555-0160",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I046",
+  "field": "phone",
+  "gold": "+12025550160",
+  "candidate": "202.555.0161",
+  "truth": "different",
+  "subtype": "one_digit_changed"
+ },
+ {
+  "id": "I047",
+  "field": "phone",
+  "gold": "+12025550160",
+  "candidate": "(202) 555-1060",
+  "truth": "different",
+  "subtype": "two_digits_swapped"
+ },
+ {
+  "id": "I048",
+  "field": "phone",
+  "gold": "+12025550160",
+  "candidate": "202.555.0165",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I049",
+  "field": "phone",
+  "gold": "+12025550165",
+  "candidate": "+1 202 555 0165",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I050",
+  "field": "phone",
+  "gold": "+12025550165",
+  "candidate": "(202) 555-0165",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I051",
+  "field": "phone",
+  "gold": "+12025550165",
+  "candidate": "202.555.0165",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I052",
+  "field": "phone",
+  "gold": "+12025550165",
+  "candidate": "202-555-0165",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I053",
+  "field": "phone",
+  "gold": "+12025550165",
+  "candidate": "202-555-0166",
+  "truth": "different",
+  "subtype": "one_digit_changed"
+ },
+ {
+  "id": "I054",
+  "field": "phone",
+  "gold": "+12025550165",
+  "candidate": "202.555.1065",
+  "truth": "different",
+  "subtype": "two_digits_swapped"
+ },
+ {
+  "id": "I055",
+  "field": "phone",
+  "gold": "+12025550165",
+  "candidate": "(202) 555-0131",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I056",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "Sam.Rivera@example.com",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I057",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "SAM.RIVERA@EXAMPLE.COM",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I058",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "SAM.RIVERS@EXAMPLE.COM",
+  "truth": "different",
+  "subtype": "one_char_changed"
+ },
+ {
+  "id": "I059",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "asm.rivera@example.com",
+  "truth": "different",
+  "subtype": "two_chars_swapped"
+ },
+ {
+  "id": "I060",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "lee.jensen@example.com",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I061",
+  "field": "email",
+  "gold": "lee.jensen@example.com",
+  "candidate": "Lee.Jensen@example.com",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I062",
+  "field": "email",
+  "gold": "lee.jensen@example.com",
+  "candidate": "LEE.JENSEN@EXAMPLE.COM",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I063",
+  "field": "email",
+  "gold": "lee.jensen@example.com",
+  "candidate": "lee.jenses@example.com",
+  "truth": "different",
+  "subtype": "one_char_changed"
+ },
+ {
+  "id": "I064",
+  "field": "email",
+  "gold": "lee.jensen@example.com",
+  "candidate": "ele.jensen@example.com",
+  "truth": "different",
+  "subtype": "two_chars_swapped"
+ },
+ {
+  "id": "I065",
+  "field": "email",
+  "gold": "lee.jensen@example.com",
+  "candidate": "MORGAN.DIAZ@EXAMPLE.COM",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I066",
+  "field": "email",
+  "gold": "morgan.diaz@example.com",
+  "candidate": "Morgan.Diaz@example.com",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I067",
+  "field": "email",
+  "gold": "morgan.diaz@example.com",
+  "candidate": "MORGAN.DIAZ@EXAMPLE.COM",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I068",
+  "field": "email",
+  "gold": "morgan.diaz@example.com",
+  "candidate": "morgan.dias@example.com",
+  "truth": "different",
+  "subtype": "one_char_changed"
+ },
+ {
+  "id": "I069",
+  "field": "email",
+  "gold": "morgan.diaz@example.com",
+  "candidate": "omrgan.diaz@example.com",
+  "truth": "different",
+  "subtype": "two_chars_swapped"
+ },
+ {
+  "id": "I070",
+  "field": "email",
+  "gold": "morgan.diaz@example.com",
+  "candidate": "ALEX.CHEN@EXAMPLE.COM",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I071",
+  "field": "email",
+  "gold": "alex.chen@example.com",
+  "candidate": "Alex.Chen@example.com",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I072",
+  "field": "email",
+  "gold": "alex.chen@example.com",
+  "candidate": "ALEX.CHEN@EXAMPLE.COM",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I073",
+  "field": "email",
+  "gold": "alex.chen@example.com",
+  "candidate": "ALEX.CHES@EXAMPLE.COM",
+  "truth": "different",
+  "subtype": "one_char_changed"
+ },
+ {
+  "id": "I074",
+  "field": "email",
+  "gold": "alex.chen@example.com",
+  "candidate": "laex.chen@example.com",
+  "truth": "different",
+  "subtype": "two_chars_swapped"
+ },
+ {
+  "id": "I075",
+  "field": "email",
+  "gold": "alex.chen@example.com",
+  "candidate": "JO.BAKER@EXAMPLE.COM",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I076",
+  "field": "email",
+  "gold": "jo.baker@example.com",
+  "candidate": "Jo.Baker@example.com",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I077",
+  "field": "email",
+  "gold": "jo.baker@example.com",
+  "candidate": "JO.BAKER@EXAMPLE.COM",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I078",
+  "field": "email",
+  "gold": "jo.baker@example.com",
+  "candidate": "jo.bakes@example.com",
+  "truth": "different",
+  "subtype": "one_char_changed"
+ },
+ {
+  "id": "I079",
+  "field": "email",
+  "gold": "jo.baker@example.com",
+  "candidate": "oj.baker@example.com",
+  "truth": "different",
+  "subtype": "two_chars_swapped"
+ },
+ {
+  "id": "I080",
+  "field": "email",
+  "gold": "jo.baker@example.com",
+  "candidate": "PAT.OKAFOR@EXAMPLE.COM",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I081",
+  "field": "email",
+  "gold": "pat.okafor@example.com",
+  "candidate": "Pat.Okafor@example.com",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I082",
+  "field": "email",
+  "gold": "pat.okafor@example.com",
+  "candidate": "PAT.OKAFOR@EXAMPLE.COM",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I083",
+  "field": "email",
+  "gold": "pat.okafor@example.com",
+  "candidate": "pat.okafos@example.com",
+  "truth": "different",
+  "subtype": "one_char_changed"
+ },
+ {
+  "id": "I084",
+  "field": "email",
+  "gold": "pat.okafor@example.com",
+  "candidate": "apt.okafor@example.com",
+  "truth": "different",
+  "subtype": "two_chars_swapped"
+ },
+ {
+  "id": "I085",
+  "field": "email",
+  "gold": "pat.okafor@example.com",
+  "candidate": "SAM.RIVERA@EXAMPLE.COM",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I086",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "14 Harbor Rd, Acmeville",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I087",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "14 harbor road acmeville",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I088",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "14 HARBOR ROAD, ACMEVILLE",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I089",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "16 Harbor Rd, Acmeville",
+  "truth": "different",
+  "subtype": "neighbouring_number"
+ },
+ {
+  "id": "I090",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "41 Harbor Road, Acmeville",
+  "truth": "different",
+  "subtype": "digit_changed_or_swapped"
+ },
+ {
+  "id": "I091",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "3 Orchard Way, Acmeville",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I092",
+  "field": "address",
+  "gold": "3 Orchard Way, Acmeville",
+  "candidate": "3 Orchard Wy, Acmeville",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I093",
+  "field": "address",
+  "gold": "3 Orchard Way, Acmeville",
+  "candidate": "3 orchard way acmeville",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I094",
+  "field": "address",
+  "gold": "3 Orchard Way, Acmeville",
+  "candidate": "3 ORCHARD WAY, ACMEVILLE",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I095",
+  "field": "address",
+  "gold": "3 Orchard Way, Acmeville",
+  "candidate": "5 Orchard Wy, Acmeville",
+  "truth": "different",
+  "subtype": "neighbouring_number"
+ },
+ {
+  "id": "I096",
+  "field": "address",
+  "gold": "3 Orchard Way, Acmeville",
+  "candidate": "8 Orchard Wy, Acmeville",
+  "truth": "different",
+  "subtype": "digit_changed_or_swapped"
+ },
+ {
+  "id": "I097",
+  "field": "address",
+  "gold": "3 Orchard Way, Acmeville",
+  "candidate": "88 Summit Ave, Acmeville",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I098",
+  "field": "address",
+  "gold": "88 Summit Avenue, Acmeville",
+  "candidate": "88 Summit Ave, Acmeville",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I099",
+  "field": "address",
+  "gold": "88 Summit Avenue, Acmeville",
+  "candidate": "88 summit avenue acmeville",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I100",
+  "field": "address",
+  "gold": "88 Summit Avenue, Acmeville",
+  "candidate": "88 SUMMIT AVENUE, ACMEVILLE",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I101",
+  "field": "address",
+  "gold": "88 Summit Avenue, Acmeville",
+  "candidate": "86 Summit Avenue, Acmeville",
+  "truth": "different",
+  "subtype": "neighbouring_number"
+ },
+ {
+  "id": "I102",
+  "field": "address",
+  "gold": "88 Summit Avenue, Acmeville",
+  "candidate": "83 Summit Avenue, Acmeville",
+  "truth": "different",
+  "subtype": "digit_changed_or_swapped"
+ },
+ {
+  "id": "I103",
+  "field": "address",
+  "gold": "88 Summit Avenue, Acmeville",
+  "candidate": "7 Quarry Ln, Acmeville",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I104",
+  "field": "address",
+  "gold": "7 Quarry Lane, Acmeville",
+  "candidate": "7 Quarry Ln, Acmeville",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I105",
+  "field": "address",
+  "gold": "7 Quarry Lane, Acmeville",
+  "candidate": "7 quarry lane acmeville",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I106",
+  "field": "address",
+  "gold": "7 Quarry Lane, Acmeville",
+  "candidate": "7 QUARRY LANE, ACMEVILLE",
+  "truth": "same",
+  "subtype": "format"
+ },
+ {
+  "id": "I107",
+  "field": "address",
+  "gold": "7 Quarry Lane, Acmeville",
+  "candidate": "9 Quarry Lane, Acmeville",
+  "truth": "different",
+  "subtype": "neighbouring_number"
+ },
+ {
+  "id": "I108",
+  "field": "address",
+  "gold": "7 Quarry Lane, Acmeville",
+  "candidate": "1 Quarry Lane, Acmeville",
+  "truth": "different",
+  "subtype": "digit_changed_or_swapped"
+ },
+ {
+  "id": "I109",
+  "field": "address",
+  "gold": "7 Quarry Lane, Acmeville",
+  "candidate": "14 Harbor Road, Acmeville",
+  "truth": "different",
+  "subtype": "another_customer"
+ },
+ {
+  "id": "I110",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I111",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "N/A",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I112",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "phone",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I113",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "unknown",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I114",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": ":",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I115",
+  "field": "phone",
+  "gold": "+12025550131",
+  "candidate": "Thought process:",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I116",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I117",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "N/A",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I118",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "email",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I119",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "unknown",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I120",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": ":",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I121",
+  "field": "email",
+  "gold": "sam.rivera@example.com",
+  "candidate": "Thought process:",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I122",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I123",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "N/A",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I124",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "address",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I125",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "unknown",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I126",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": ":",
+  "truth": "different",
+  "subtype": "contentless"
+ },
+ {
+  "id": "I127",
+  "field": "address",
+  "gold": "14 Harbor Road, Acmeville",
+  "candidate": "Thought process:",
+  "truth": "different",
+  "subtype": "contentless"
+ }
+]

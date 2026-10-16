@@ -1,4 +1,4 @@
-import { type Spec, specHash, validateSpec } from '@agent-nexus/driftbench-core';
+import { objectContextFor, type Spec, specHash, validateSpec } from '@agent-nexus/driftbench-core';
 import { type Interval, mulberry32, wilson } from '@agent-nexus/driftbench-stats';
 import { z } from 'zod';
 import { streamSeed } from '../seed/random';
@@ -81,7 +81,7 @@ export function openBundle(bundle: SealedBundle): { specs: OpenedSpec[]; problem
   const specs: OpenedSpec[] = [];
   const problems: string[] = [];
   for (const entry of bundle.specs) {
-    const result = validateSpec(entry.spec, entry.path);
+    const result = validateSpec(entry.spec, entry.path, { objects: () => objectContextFor(entry.path) });
     if (!result.ok) {
       problems.push(
         `${entry.id}: the sealed spec is no longer valid (${result.errors[0]?.message ?? 'invalid'})`,

@@ -1,0 +1,6 @@
+kind: check-set
+id: u3
+extends: default
+items:
+  - id: R3
+    impl: plugin:acme-alteration-check
