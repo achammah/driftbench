@@ -59,6 +59,58 @@ function checkWorkspace(world: WorldState | undefined, at: string, issues: Issue
   }
 }
 
+/**
+ * Parent links form a forest: every parent names a block, no chain of parents closes on itself, and a parent is
+ * listed before its children, so the blocks run in the order the spec writes them.
+ */
+function checkParents(spec: Spec, issues: Issue[]): void {
+  const firstWith = new Map<string, number>();
+  spec.blocks.forEach((block, index) => {
+    if (block.id !== undefined && !firstWith.has(block.id)) firstWith.set(block.id, index);
+  });
+  const parentOf = new Map<number, number>();
+  spec.blocks.forEach((block, index) => {
+    if (block.parent === undefined) return;
+    const parent = firstWith.get(block.parent);
+    if (parent === undefined) {
+      issues.push(
+        error(
+          'PARENT_MISSING',
+          `blocks.${index}.parent`,
+          `the parent "${block.parent}" is the id of no block: give that block an id or fix the name`,
+        ),
+      );
+      return;
+    }
+    parentOf.set(index, parent);
+  });
+  for (const [index, parent] of parentOf) {
+    const seen = new Set([index]);
+    let at: number | undefined = parent;
+    while (at !== undefined && !seen.has(at)) {
+      seen.add(at);
+      at = parentOf.get(at);
+    }
+    if (at === index) {
+      issues.push(
+        error(
+          'PARENT_CYCLE',
+          `blocks.${index}.parent`,
+          `the parent "${spec.blocks[index]?.parent}" leads back to this block: parents form a forest, never a loop`,
+        ),
+      );
+    } else if (parent >= index) {
+      issues.push(
+        error(
+          'PARENT_ORDER',
+          `blocks.${index}.parent`,
+          `the parent "${spec.blocks[index]?.parent}" is listed after this block: list a parent before its children`,
+        ),
+      );
+    }
+  }
+}
+
 /** Rules a schema cannot express. Every issue returned is an error. */
 export function checkSemantics(spec: Spec): Issue[] {
   const issues: Issue[] = [];
@@ -85,6 +137,7 @@ export function checkSemantics(spec: Spec): Issue[] {
 
   const facts = factsOf(spec);
   checkWorkspace(spec.given?.world, 'given.world', issues);
+  checkParents(spec, issues);
   const blockIds = new Set<string>();
   spec.blocks.forEach((block, index) => {
     if (block.id !== undefined) {

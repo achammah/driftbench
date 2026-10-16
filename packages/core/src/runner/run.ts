@@ -28,6 +28,7 @@ import { recheckCarriedEndState } from './carried-end-state';
 import { cellId } from './cell';
 import { driftOf } from './drift';
 import { composeStates, type EndStateSnapshot, endStateSnapshot, snapshotValues } from './end-state-snapshot';
+import { parentLinks } from './forest';
 import {
   addFacts,
   assistantMessage,
@@ -381,6 +382,12 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   let error: string | undefined;
   /** F and P: a prefix the spec wrote at a block run so far; the session holds it from there on. */
   let prefixWritten = false;
+  /** Parent links as block indices; undefined when no block names a parent, so the spec is one conversation. */
+  const links = parentLinks(spec);
+  /** F and P with parent links: the Given and the history each spec block left, for the children it has. */
+  const left = new Map<number, { state: RunningGiven; history: Message[] }>();
+  /** The spec block the open session ran last. */
+  let lastRan: number | undefined;
 
   try {
     for (let position = 0; ; position++) {
@@ -434,8 +441,11 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         // A task's workspace is part of the state the reference trajectory had at this block: the session
         // of the block before keeps it, unless this block writes its own workspace. Its history becomes the
         // canonical prefix. Every other block starts in a new session from its canonical Given.
+        // With parent links the block before is the parent, or it is another tree's block.
         const keepsWorkspace =
-          run.capabilities.sandbox && spec.blocks[step.blockIndex]?.given?.world?.workspace === undefined;
+          run.capabilities.sandbox &&
+          spec.blocks[step.blockIndex]?.given?.world?.workspace === undefined &&
+          (links === undefined || (links.get(step.blockIndex) ?? -1) === step.blockIndex - 1);
         if (!(keepsWorkspace && channel.reseat(canonical.prefix))) {
           await channel.restart();
           sessionBase = composed;
@@ -445,9 +455,24 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         // and a reply (canonicalGiven), unless the block writes a prefix of its own. So after the block
         // before, the user messages kept are those of this prefix already.
         const follows =
-          step.blockIndex === usersBlock + 1 && spec.blocks[step.blockIndex]?.given?.prefix === undefined;
+          step.blockIndex === usersBlock + 1 &&
+          spec.blocks[step.blockIndex]?.given?.prefix === undefined &&
+          (links === undefined || (links.get(step.blockIndex) ?? -1) === usersBlock);
         if (!follows) users = userMessagesOf(history);
       } else {
+        if (links && step.kind === 'block') {
+          // A block starts from its ancestors only: from the parent's end when the session is not at it, from
+          // nothing when the block is a root after another tree. The session opens again from that history.
+          const parent = links.get(step.blockIndex);
+          const base = parent === undefined ? undefined : left.get(parent);
+          if (lastRan !== undefined && lastRan !== parent && (parent === undefined || base)) {
+            await channel.restart();
+            state = base ? base.state : initialGiven(spec);
+            history = base ? copyHistory(base.history) : [];
+            users = userMessagesOf(history);
+            prefixWritten = history.length > 0;
+          }
+        }
         state = enterBlock(state, planned.given, planned.world);
         if (planned.given?.prefix) {
           await channel.restart();
@@ -662,6 +687,10 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         pass: all.every((verdict) => !verdict.gating || verdict.outcome === 'pass'),
       };
       blocks.push(block);
+      if (links && step.kind === 'block') {
+        lastRan = step.blockIndex;
+        if (run.mode !== 'T') left.set(step.blockIndex, { state, history });
+      }
       run.onEvent?.({
         type: 'block_end',
         index: position,

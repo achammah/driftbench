@@ -4,6 +4,7 @@ import type { Observed, ResolvedGiven } from '../schema/run';
 import type { Expect, GivenOverride, Spec, Stimulus } from '../schema/spec';
 import { contentHashWithList } from '../spec/hash';
 import { deepEqual } from './assertion';
+import { lineage, parentLinks } from './forest';
 
 /**
  * The Given of a free-running run, carried from block to block. The spec's `given` is the start. A block's
@@ -125,6 +126,8 @@ export function addFacts(
  * replays its past turns reads it again.
  */
 export function canonicalGiven(spec: Spec, blockIndex: number): { state: RunningGiven; prefix: Message[] } {
+  const links = parentLinks(spec);
+  if (links) return canonicalLineage(spec, lineage(links, blockIndex));
   // A run asks for block 0, 1, 2 in turn. The situation before block k's own given, kept from the last ask,
   // lets the next ask build one block more, not the whole prefix again; its messages are the same objects,
   // which the prefix cache and the hashes read once.
@@ -148,6 +151,28 @@ export function canonicalGiven(spec: Spec, blockIndex: number): { state: Running
     ]);
     state = { ...state, ledger: { ...state.ledger, ...block.expect?.ledger_add } };
   }
+  return { state, prefix: copyHistory(prefix) };
+}
+
+/**
+ * The canonical Given of a block in a forest: the same fold as above over the block's ancestors only, root first,
+ * and the block itself last. A block of another tree adds no message, fact, variable or file.
+ */
+function canonicalLineage(spec: Spec, chain: readonly number[]): { state: RunningGiven; prefix: Message[] } {
+  let state = initialGiven(spec);
+  let prefix: readonly Message[] = [];
+  chain.forEach((index, position) => {
+    const block = spec.blocks[index];
+    if (!block) return;
+    state = enterBlock(state, block.given);
+    if (block.given?.prefix) prefix = freezeHistory(block.given.prefix);
+    if (position === chain.length - 1) return;
+    prefix = freezeHistory(prefix, [
+      ...stimulusMessages(block.when),
+      canonicalReply(block.expect, state.world),
+    ]);
+    state = { ...state, ledger: { ...state.ledger, ...block.expect?.ledger_add } };
+  });
   return { state, prefix: copyHistory(prefix) };
 }
 

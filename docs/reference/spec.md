@@ -231,6 +231,7 @@ One block: a stimulus, its initial conditions and its expectations.
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `id` | string, not empty | no |  | An id, unique in the spec. |
+| `parent` | string, not empty | no |  | The id of the block this one follows. A block starts from the history, the facts and the files of its ancestors only, never from the blocks of another tree. A spec whose blocks name no parent is one conversation. |
 | `when` | [Stimulus](#stimulus) | yes |  | The stimulus. |
 | `given` | [Given](#given) | no |  | Initial conditions for this block. |
 | `expect` | [Expect](#expect) | no |  | The expected output and state delta. |

@@ -245,6 +245,9 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `TOOL_FORBIDDEN_EXPECTED` | error | a block expects a tool that the rules forbid, in `forbidden_tools` or with `max_calls` at 0 |
 | `GIVEN_ORIGIN_WITHOUT_PREFIX` | error | a block's `given.origin` says where a prefix comes from, and the block writes no `given.prefix` |
 | `WORKSPACE_PATH_TWICE` | error | a workspace seed writes the same path in `files` and in `binary` |
+| `PARENT_MISSING` | error | a block's `parent` is the id of no block |
+| `PARENT_CYCLE` | error | a chain of `parent` links leads back to its own block |
+| `PARENT_ORDER` | error | a block's `parent` is listed after the block |
 | `LINK_BLOCK_UNKNOWN` | error | a link in `metadata.links` names a block id the spec does not have, or an index past its last block |
 | `LINK_TARGET_UNKNOWN` | error or warning | `spec lint --sections` only: error when the registry of the prompt has no such section, warning when no registry was given for the prompt |
 | `LINK_STALE` | warning | `spec lint --sections` only: the link's status is `stale`, or its section was not found again in the registry's version |
