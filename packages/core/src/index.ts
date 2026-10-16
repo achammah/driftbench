@@ -92,6 +92,7 @@ export {
   type ResolvedItem,
   registerShippedObject,
   resolveCheckSet,
+  shippedCheckSet,
   shippedObject,
   shippedObjectIds,
 } from './objects';

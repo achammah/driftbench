@@ -1,5 +1,12 @@
 import type { Spec } from '../schema/spec';
-import { type CheckSetUse, type ObjectIssue, type ResolvedCheckSet, resolveCheckSet } from './resolve';
+import {
+  type CheckSetUse,
+  DEFAULT_OBJECT_ID,
+  type ObjectIssue,
+  type ResolvedCheckSet,
+  resolveCheckSet,
+  shippedCheckSet,
+} from './resolve';
 
 export {
   type CheckSetItem,
@@ -21,11 +28,12 @@ export {
   type ResolvedCheckSet,
   type ResolvedItem,
   resolveCheckSet,
+  shippedCheckSet,
 } from './resolve';
 
 /**
- * The check set a block is scored with: the shipped one, then the spec's `uses`, then the block's. Undefined
- * for a spec that uses nothing. `issues` holds every refusal; a block with a refusal has no set.
+ * The check set a block is scored with: the shipped default, then the spec's `uses`, then the block's. Undefined
+ * when no default is registered. `issues` holds every refusal; a block with a refusal has no set.
  */
 export function blockCheckSet(
   spec: Pick<Spec, 'uses' | 'blocks'>,
@@ -34,9 +42,9 @@ export function blockCheckSet(
   const specUse = spec.uses?.check_set as CheckSetUse | undefined;
   const blockUse = spec.blocks[index]?.uses?.check_set as CheckSetUse | undefined;
   const issues: ObjectIssue[] = [];
-  let set: ResolvedCheckSet | undefined;
+  let set: ResolvedCheckSet | undefined = shippedCheckSet(DEFAULT_OBJECT_ID);
   if (specUse !== undefined) {
-    const made = resolveCheckSet(specUse, undefined, 'spec', 'uses.check_set');
+    const made = resolveCheckSet(specUse, set, 'spec', 'uses.check_set');
     if (made.ok) set = made.set;
     else issues.push(...made.issues);
   }
@@ -51,10 +59,10 @@ export function blockCheckSet(
 /** Every refusal of the spec's own `uses` and of each block's, with the path it sits at. */
 export function checkUses(spec: Pick<Spec, 'uses' | 'blocks'>): ObjectIssue[] {
   const issues: ObjectIssue[] = [];
-  let specSet: ResolvedCheckSet | undefined;
+  let specSet: ResolvedCheckSet | undefined = shippedCheckSet(DEFAULT_OBJECT_ID);
   const specUse = spec.uses?.check_set as CheckSetUse | undefined;
   if (specUse !== undefined) {
-    const made = resolveCheckSet(specUse, undefined, 'spec', 'uses.check_set');
+    const made = resolveCheckSet(specUse, specSet, 'spec', 'uses.check_set');
     if (made.ok) specSet = made.set;
     else issues.push(...made.issues);
   }

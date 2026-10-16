@@ -58,6 +58,12 @@ function fromShipped(object: CheckSetObject): ResolvedCheckSet {
   );
 }
 
+/** A shipped check set as the base layer, or undefined when none is registered under that id. */
+export function shippedCheckSet(id: string): ResolvedCheckSet | undefined {
+  const object = shippedObject('check_set', id);
+  return object ? fromShipped(object) : undefined;
+}
+
 /**
  * Resolves one `uses.check_set` over a base. A string names a shipped object and replaces the base. An override
  * extends a shipped object (`extends`) or, without one, the base: its items change, add or move items, and

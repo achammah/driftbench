@@ -36,7 +36,7 @@ export function executionOrder(spec: Pick<Spec, 'blocks'>): number[] {
     if (parent !== undefined) place(parent);
     order.push(index);
   };
-  spec.blocks.forEach((_, index) => place(index));
+  for (let index = 0; index < spec.blocks.length; index++) place(index);
   return order;
 }
 
