@@ -476,6 +476,7 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
       cutAt = at;
     }
   }
+  const moveBlocks = new Map<number, number>();
   for (let index = 0; index < path.stages.length; index += 1) {
     if (index === cutAt) break;
     if (request.turn && !request.turn.call && index === (request.turn.at ?? 1)) {
@@ -692,6 +693,7 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
         id: `b${blocks.length + 1}-restated`,
         stimulus: first.stimulus,
         stage: from,
+        saidAt: from,
         carries: first.carries,
         tools: [{ ...run, input: { ...run.input, [first.call.field]: first.call.value } }],
         ...(reported.length > 0 ? { must: reported } : {}),
@@ -699,6 +701,7 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
       });
       beforePlaced = true;
     }
+    moveBlocks.set(index, blocks.length);
     const block: BlockDraft = {
       id: `b${blocks.length + 1}-${transitionId}`,
       stimulus: stimulusOf(slots, phrase, transitionKey, transitionId),
@@ -800,11 +803,11 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
     !probe &&
     !request.turn &&
     !request.aside &&
-    !request.before &&
     deviationKey !== undefined &&
     prepared.deviation !== undefined
   ) {
-    const options: Array<{ classId: string; index: number; expect: Expect; user: string }> = [];
+    const options: Array<{ classId: string; index: number; stage: string; expect: Expect; user: string }> =
+      [];
     for (const value of dimensions[prepared.deviation]?.values ?? []) {
       const classId = value.id;
       if (classId === TOOL_FAILURE) continue;
@@ -835,16 +838,20 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
         if (!text.ok) continue;
         const expect = recoveryExpect(own, stage, { ...said, ...(phrase.binds ?? {}) }, inPlay, lang);
         if (!expect) continue;
-        options.push({ classId, index, expect, user: text.value });
+        options.push({
+          classId,
+          index: moveBlocks.get(index) ?? blocks.length,
+          stage,
+          expect,
+          user: text.value,
+        });
       }
     }
     // One class is drawn, as before; a walk that declares every class adds the others at the first stage
     // each can take, with no further draw, so the rest of the walk is the same either way.
     const wanted = request.perturb;
     const drawn = wanted
-      ? options.find(
-          (option) => option.classId === wanted.classId && path.stages[option.index] === wanted.stage,
-        )
+      ? options.find((option) => option.classId === wanted.classId && option.stage === wanted.stage)
       : pick(rng, options);
     if (wanted && !drawn)
       return failedScenario(
@@ -986,7 +993,7 @@ function toolFailurePerturbation(
   lang: string | undefined,
 ): { index: number; tool: string; user: string; expect: Expect } | undefined {
   for (const [index, block] of blocks.entries()) {
-    const stage = path.stages[index];
+    const stage = block.saidAt ?? (index === 0 ? path.stages[0] : blocks[index - 1]?.stage);
     const first = (block.tools ?? []).find(calls);
     if (stage === undefined || !first || block.stimulus.kind !== 'phrase') continue;
     const recovery = recoveryFor(relations, TOOL_FAILURE, path.flow, first.label);

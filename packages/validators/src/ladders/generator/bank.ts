@@ -388,8 +388,12 @@ function combinationsOf<T>(items: readonly T[], size: number): T[][] {
 
 const TWISE_AXES = ['behaviour', 'deviation', 'channel', 'user_type'];
 
+/**
+ * Why the hidden space map forbids a cell: a written constraint, or a pair no path of the map can reach
+ * (possible.ts). The written constraints come first, so their reason wins when both forbid the cell.
+ */
 function forbidden(spec: HiddenSpec, cell: Cell): string | undefined {
-  const hit = spec.constraints.find((constraint) =>
+  const hit = hiddenSpaceMap(spec).constraints.find((constraint) =>
     Object.entries(constraint.forbid).every(([dimension, value]) => cell[dimension] === value),
   );
   return hit ? hit.reason : undefined;
@@ -530,17 +534,30 @@ function differentialItems(): BankItem[] {
       },
     },
   );
-  for (const seeder of SEEDERS) {
+  // Every seeder the generator writes is checked, and a block from a seeder no item names lands in
+  // `unlisted`, so no generated block escapes the check.
+  const feasible: Array<[string, string, (seeder: string) => boolean]> = [
+    ...SEEDERS.map((seeder): [string, string, (own: string) => boolean] => [
+      seeder,
+      C.feasible,
+      (own) => own === seeder,
+    ]),
+    ['cover', 'packages/generate/src/seed/seed-drafts.ts#coverDraft', (own) => own === 'cover'],
+    ['task', 'packages/generate/src/seed/tasks.ts', (own) => own === 'task'],
+  ];
+  const listed = feasible.map(([seeder]) => seeder);
+  feasible.push(['unlisted', 'packages/generate/src/enumerate/generate.ts', (own) => !listed.includes(own)]);
+  for (const [seeder, component, owns] of feasible) {
     items.push({
       id: `diff.feasible.${seeder}`,
       family: 'differential',
       tier: 2,
       level: 'differential',
-      component: C.feasible,
+      component,
       async check(data) {
         const generated = await data.generated();
         const bad = generatedCells(generated)
-          .filter((block) => block.seeder === seeder)
+          .filter((block) => owns(block.seeder))
           .flatMap((block) => {
             const why = forbidden(generated.hidden, block.cell);
             return why ? [`${block.key} (${why})`] : [];

@@ -11,6 +11,7 @@ import type {
 import { isPlainObject } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
 import type { ProposalPhrase } from '../extract/proposal';
+import { supplying, usedPaths, worldCarried } from './data-carrier';
 import { DEVIATION_EXPECTED, isDeviationClass } from './deviation';
 import { dimensionId, type PreparedMap, phraseKey, valueId } from './map';
 import { pick, type Rng } from './random';
@@ -229,6 +230,15 @@ export function renderDraft(prepared: PreparedMap, draft: SpecDraft, run: RunIde
 
   const ruled =
     (draft.rules?.forbidden_tools?.length ?? 0) > 0 || Object.keys(draft.rules?.max_calls ?? {}).length > 0;
+  // A class carried in the world arrives as supplied data: the approved instruction is a file's content and
+  // the turn says nothing. A written workspace replaces the one before it, so the world each block starts
+  // from is kept: `held[i]` is the workspace before block i. The file is part of the world for its own turn
+  // only: the next block returns to the workspace before it, so each later turn is judged as it was planned.
+  const used = usedPaths(draft.world, draft.blocks, draft.perturbations);
+  const deviationId =
+    prepared.deviation === undefined ? undefined : dimensionId(prepared, prepared.deviation);
+  const held: Array<NonNullable<WorldState['workspace']> | undefined> = [draft.world?.workspace];
+  let restore: NonNullable<WorldState['workspace']> | undefined;
   const blocks = draft.blocks.map((block, position) => {
     const text =
       block.stimulus.kind === 'phrase'
@@ -261,10 +271,23 @@ export function renderDraft(prepared: PreparedMap, draft: SpecDraft, run: RunIde
     }
     if (block.stimulus.kind === 'placeholder') criteria.push(PLACEHOLDER_CRITERION);
     if (criteria.length > 0) expect.criteria = criteria;
+    const supplied =
+      worldCarried(block.injection) &&
+      block.stimulus.kind === 'phrase' &&
+      block.stimulus.phrase.dimension === deviationId &&
+      block.stimulus.phrase.value === block.injection;
+    const written = block.given?.world?.workspace ?? restore;
+    const workspace = supplied ? supplying(written ?? held[position], used, text) : written;
+    restore = supplied ? (written ?? held[position] ?? { files: {} }) : undefined;
+    const given =
+      workspace === undefined ? block.given : { ...block.given, world: { ...block.given?.world, workspace } };
+    held.push(workspace ?? held[position]);
     return {
       id: block.id,
-      when: block.injection ? { injection: { class: block.injection, user: text } } : { user: text },
-      ...(block.given ? { given: block.given } : {}),
+      when: block.injection
+        ? { injection: { class: block.injection, user: supplied ? '' : text } }
+        : { user: text },
+      ...(given ? { given } : {}),
       expect,
     };
   });
@@ -288,6 +311,19 @@ export function renderDraft(prepared: PreparedMap, draft: SpecDraft, run: RunIde
     }
   }
   const perturbations = draft.perturbations?.map((perturbation) => {
+    // A world-carried class written as a message only: the message is the supplied data, sent in a turn
+    // that says nothing, with the world as it is at the injected block.
+    if (
+      worldCarried(perturbation.class) &&
+      perturbation.user !== undefined &&
+      perturbation.world === undefined
+    ) {
+      perturbation = {
+        ...perturbation,
+        user: '',
+        world: { workspace: supplying(held[perturbation.inject_at], used, perturbation.user) },
+      };
+    }
     if (perturbation.expect?.tools) {
       perturbation = {
         ...perturbation,
