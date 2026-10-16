@@ -27,6 +27,10 @@ The loader rewrites these forms before it validates a spec.
 * [WorldState](#worldstate)
 * [ToolOverride](#tooloverride)
 * [WorldState workspace](#worldstate-workspace)
+* [Spec uses](#spec-uses)
+* [Spec uses check_set](#spec-uses-check_set)
+* [Spec uses check_set items](#spec-uses-check_set-items)
+* [Spec uses check_set items effect](#spec-uses-check_set-items-effect)
 * [CriterionDef](#criteriondef)
 * [CriterionDef requirements](#criteriondef-requirements)
 * [CriterionDef items](#criteriondef-items)
@@ -64,6 +68,10 @@ The loader rewrites these forms before it validates a spec.
 * [WorkspaceExpect](#workspaceexpect)
 * [SafetyExpect](#safetyexpect)
 * [Budget](#budget)
+* [Block uses](#block-uses)
+* [Block uses check_set](#block-uses-check_set)
+* [Block uses check_set items](#block-uses-check_set-items)
+* [Block uses check_set items effect](#block-uses-check_set-items-effect)
 * [Spec end](#spec-end)
 * [Rules](#rules)
 * [EndState](#endstate)
@@ -94,6 +102,7 @@ One golden conversation, or one task for a code agent, written as a succession o
 | `covers` | list of strings | no |  | Ids of the behaviours this spec covers, from a behaviour inventory. |
 | `target` | [TargetRef](#targetref) | no |  | The default agent. A run can override it. |
 | `given` | [GivenDefaults](#givendefaults) | no |  | Initial conditions for every block. |
+| `uses` | [Spec uses](#spec-uses) | no |  | The shipped objects every block uses, such as the check set. |
 | `stages` | list of strings, each not empty | no |  | The stage catalogue of the flow. expect.stage and recovery.stage_after must name one of these. |
 | `criteria` | list of [CriterionDef](#criteriondef) | no |  | The judged criteria the blocks may reference. |
 | `blocks` | list of [Block](#block), at least 1 item | yes |  | The blocks, in order. At least one. |
@@ -181,6 +190,43 @@ The files the agent starts from.
 | `files` | map of string to string | no |  | Files the workspace starts with: path to content. |
 | `binary` | map of string to string matching `^[A-Za-z0-9+/]*={0,2}$` | no |  | Files the workspace starts with, written byte for byte: path to the base64 of the bytes. Spreadsheets, documents, PDFs and files that start with a byte-order mark belong here. |
 
+## Spec uses
+
+The shipped objects every block uses, such as the check set.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `check_set` | string, not empty or [Spec uses check_set](#spec-uses-check_set) | no |  | The checks the runner applies, and how. |
+
+## Spec uses check_set
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `extends` | string, not empty | no |  | The check set to start from. Default: the one below. |
+| `items` | list of [Spec uses check_set items](#spec-uses-check_set-items) | no |  | The changes, in order. |
+| `order` | list of strings, each not empty | no |  | The whole order of the items. |
+
+## Spec uses check_set items
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `id` | string, not empty | yes |  | The item to change, or to add. |
+| `add` | boolean | no |  | True to add a new item: it needs when, effect and impl. |
+| `enabled` | boolean | no |  | False turns the item off for this layer. |
+| `title` | string | no |  | A short name for the item. |
+| `when` | map of string to any value | no |  | When the item applies. |
+| `effect` | [Spec uses check_set items effect](#spec-uses-check_set-items-effect) | no |  | What the item does to the block. |
+| `impl` | string, not empty | no |  | The builtin implementation that runs the item. |
+| `before` | string, not empty | no |  | Moves the item before this one. |
+
+## Spec uses check_set items effect
+
+What the item does to the block.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `gating` | boolean | yes |  | True when its verdicts gate the block. |
+
 ## CriterionDef
 
 A judged criterion. Blocks reference it by name, with @gating when a fail fails the conversation.
@@ -236,6 +282,7 @@ One block: a stimulus, its initial conditions and its expectations.
 | `given` | [Given](#given) | no |  | Initial conditions for this block. |
 | `expect` | [Expect](#expect) | no |  | The expected output and state delta. |
 | `budget` | [Budget](#budget) | no |  | Limits for this block. |
+| `uses` | [Block uses](#block-uses) | no |  | The shipped objects this block overrides, over the spec layer. |
 
 ## Stimulus
 
@@ -619,6 +666,43 @@ Limits for one block.
 | `steps` | integer, at least 1 | no |  | The most agent steps. |
 | `cost_usd` | number, at least 0 | no |  | The most cost, in US dollars. |
 | `latency_ms` | number, at least 0 | no |  | The most latency, in milliseconds. |
+
+## Block uses
+
+The shipped objects this block overrides, over the spec layer.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `check_set` | string, not empty or [Block uses check_set](#block-uses-check_set) | no |  | The checks the runner applies, and how. |
+
+## Block uses check_set
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `extends` | string, not empty | no |  | The check set to start from. Default: the one below. |
+| `items` | list of [Block uses check_set items](#block-uses-check_set-items) | no |  | The changes, in order. |
+| `order` | list of strings, each not empty | no |  | The whole order of the items. |
+
+## Block uses check_set items
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `id` | string, not empty | yes |  | The item to change, or to add. |
+| `add` | boolean | no |  | True to add a new item: it needs when, effect and impl. |
+| `enabled` | boolean | no |  | False turns the item off for this layer. |
+| `title` | string | no |  | A short name for the item. |
+| `when` | map of string to any value | no |  | When the item applies. |
+| `effect` | [Block uses check_set items effect](#block-uses-check_set-items-effect) | no |  | What the item does to the block. |
+| `impl` | string, not empty | no |  | The builtin implementation that runs the item. |
+| `before` | string, not empty | no |  | Moves the item before this one. |
+
+## Block uses check_set items effect
+
+What the item does to the block.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `gating` | boolean | yes |  | True when its verdicts gate the block. |
 
 ## Spec end
 

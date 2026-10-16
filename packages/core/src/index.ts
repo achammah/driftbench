@@ -75,6 +75,27 @@ export {
   type TableMapping,
 } from './import/table';
 export {
+  blockCheckSet,
+  type CheckSetItem,
+  type CheckSetObject,
+  type CheckSetOverride,
+  type CheckSetUse,
+  checkUses,
+  DEFAULT_OBJECT_ID,
+  type ItemOverride,
+  knownImpl,
+  type ObjectIssue,
+  type ObjectIssueCode,
+  type ObjectKind,
+  type ObjectLayer,
+  type ResolvedCheckSet,
+  type ResolvedItem,
+  registerShippedObject,
+  resolveCheckSet,
+  shippedObject,
+  shippedObjectIds,
+} from './objects';
+export {
   ALLOWED_VERSION_TRANSITION_FIELDS,
   type AuditVerdict,
   agentVersionOf,
