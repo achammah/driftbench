@@ -1,0 +1,34 @@
+# diagnostic/code-agent-liability (codeagent_equivalence_blame.md E1, G5). On each block with a failing gating
+# verdict: chain, evidence, attribute, place. No agent call. The machine pass is never changed. A step whose
+# `emit` is false adds to the block's working state; the step that emits writes the diagnoses. Disable `chain`
+# to attribute every failing verdict; disable `place` (and set `attribute.emit: true`) to keep the blame item's
+# own fix location.
+kind: diagnostic
+id: code-agent-liability
+version: 1
+extends: null
+description: Who made the mistake behind each failing gating verdict, and where the fix goes.
+scope: block
+when: { any_verdict: { gating: true, outcome: fail } }
+reads: [policy/value-check, policy/blame, policy/placement]
+steps:
+  - id: chain
+    title: Only the root of each chain of failing verdicts is attributed
+    impl: builtin:blame/chain
+    params: { emit: false }
+  - id: evidence
+    title: The evidence names of each root, from the stored run and the estate map
+    impl: builtin:blame/evidence
+    params: { emit: false }
+  - id: attribute
+    title: policy/blame, first match in order
+    impl: builtin:blame/attribute
+    params: { emit: false }
+  - id: place
+    title: policy/placement, with the recurrence known so far
+    impl: builtin:placement/apply
+    params: { emit: true }
+output:
+  fields: [verdict_ref, inherits, rule, fault, disposition, fix_location, fix_target, fix_action, fix_forms,
+           placement, evidence, confidence, flags]
+cost: { model_calls: none, agent_runs: none }

@@ -1,0 +1,17 @@
+# diagnostic/flaky-block (config_framework.md 2.7). Over the repeats of a campaign: a block whose repeats both
+# pass and fail is flagged, with its pass share. One run can be a flake; blame counts a home only from two runs.
+kind: diagnostic
+id: flaky-block
+version: 1
+extends: null
+description: Blocks whose repeats disagree.
+scope: campaign
+reads: []
+steps:
+  - id: disagreement
+    title: Blocks whose repeats both pass and fail
+    impl: builtin:flaky/repeat-disagreement
+    params: { min_repeats: 2 }
+output:
+  fields: [spec, block, target, mode, repeats, passes, pass_share]
+cost: { model_calls: none, agent_runs: none }

@@ -153,10 +153,19 @@ export async function applyScoringPlan(plan: ScoringPlan, ctx: CheckContext): Pr
   return verdicts;
 }
 
-/** The block's record of the objects it resolved to: each with its key, kind, id, hash and the layer that chose it. */
+/** The keys whose objects only a diagnostic reads: the blame and placement policies. */
+const DIAGNOSTIC_INPUTS = new Set(['blame', 'placement']);
+
+/**
+ * The block's record of the objects that influenced it: each with its key, kind, id, hash and the layer that
+ * chose it. The blame and placement policies influence a block only through a diagnostic, so a block no
+ * diagnostic ran on records neither, and changing them never makes a stored result look stale.
+ */
 export function resolvedRecord(used: readonly UsedObject[]): ResolvedObjects | undefined {
-  if (used.length === 0) return undefined;
-  const objects = used.map((entry) => ({
+  const diagnosed = used.some((entry) => entry.key === 'diagnostics');
+  const influencing = diagnosed ? used : used.filter((entry) => !DIAGNOSTIC_INPUTS.has(entry.key));
+  if (influencing.length === 0) return undefined;
+  const objects = influencing.map((entry) => ({
     key: entry.key,
     kind: entry.object.kind,
     id: entry.object.id,

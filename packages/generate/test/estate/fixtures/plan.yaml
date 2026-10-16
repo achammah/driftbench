@@ -15,7 +15,9 @@ rows:
       owner_signal: go
       deviation: none
       estate_hazard: no_hazard
-    testType: route_positive
+    # This update replay checks the desired skill-load obligation. The current description
+    # says prepare, not update; this row must not assert that it covers the recorded ask.
+    testType: obligation
     mode: replay
     status: approved
     weight: 1
@@ -545,9 +547,9 @@ summary:
     register: 3
     invariant: 1
   perTestType:
-    route_positive: 3
+    route_positive: 2
     ordered_pair: 2
-    obligation: 3
+    obligation: 4
     stage_order: 1
     route_near_miss: 1
     misroute: 1

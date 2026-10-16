@@ -80,6 +80,7 @@ export {
   scopeOf,
   triggers,
 } from './diagnostics';
+export * as evidence from './evidence';
 export {
   type ImportError,
   type ImportedSpec,

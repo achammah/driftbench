@@ -736,7 +736,7 @@ $ pnpm -s driftbench replay examples/estates/fixture/sessions/weekly-clean.jsonl
 12 specs replayed: 10 pass, 2 fail. Campaign replay-4af6d9df4416 (in memory).
 ```
 
-p01 is a `route_positive` row (the weekly-report skill loads), p02 an `ordered_pair` (Read before Edit), p03 an `obligation` (only the declared path changes), p04 a `stage_order` (verify before report, closing at report). The two failures are the two planned ones.
+p01 is an `obligation` row (the desired weekly-report skill load; it does not assert that the current description covers this update ask), p02 an `ordered_pair` (Read before Edit), p03 an `obligation` (only the declared path changes), p04 a `stage_order` (verify before report, closing at report). The two failures are the two planned ones.
 
 Limits of replay today:
 

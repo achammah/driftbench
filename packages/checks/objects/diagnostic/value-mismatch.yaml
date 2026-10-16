@@ -1,0 +1,28 @@
+# diagnostic/value-mismatch (config_framework.md 2.7). On a block whose tools check failed: the value check's
+# record of each failing value, then policy/blame over its evidence. The ladder rungs themselves belong to
+# policy/value-check. TODO after PR 459 merges: call runLadder per call in the evidence step; no Verdict field.
+# Until that API is stable this diagnostic reports unknown with a lint.
+kind: diagnostic
+id: value-mismatch
+version: 1
+extends: null
+description: Why a value the agent sent failed its check, and who owns the fix.
+scope: block
+when: { any_verdict: { name: tools, outcome: fail } }
+reads: [policy/value-check, policy/blame]
+steps:
+  - id: chain
+    title: Only the root of each chain of failing verdicts is attributed
+    impl: builtin:blame/chain
+    params: { emit: false }
+  - id: evidence
+    title: The evidence names of each root, the value check's record included
+    impl: builtin:blame/value-evidence
+    params: { emit: false }
+  - id: attribute
+    title: policy/blame, first match in order
+    impl: builtin:blame/attribute
+    params: { emit: true }
+output:
+  fields: [verdict_ref, rule, fault, disposition, fix_location, evidence, flags]
+cost: { model_calls: none, agent_runs: none }

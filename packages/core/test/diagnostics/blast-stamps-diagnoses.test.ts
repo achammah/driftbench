@@ -89,8 +89,11 @@ describe('blast stamps: diagnoses beyond the block that wrote them', () => {
       expect(block.givenHash).toBe(other?.givenHash);
       expect(block.pass).toBe(other?.pass);
       expect(block.verdicts).toStrictEqual(other?.verdicts);
+      // defaultChecks() initializes the shipped blame and placement policies too.
       expect(block.resolved?.objects.map((entry) => `${entry.key}:${entry.id}`)).toEqual([
         'value_check:default',
+        'blame:default',
+        'placement:default',
         'check_set:default',
         'diagnostics:count',
       ]);

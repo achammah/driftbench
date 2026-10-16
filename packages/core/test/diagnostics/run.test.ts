@@ -152,10 +152,28 @@ describe('a diagnostic', () => {
         },
       },
     ]);
+    // defaultChecks() initializes the shipped blame and placement policies too.
     expect(result.blocks[1]?.resolved?.objects.map((entry) => [entry.key, entry.id])).toEqual([
       ['value_check', 'default'],
+      ['blame', 'default'],
+      ['placement', 'default'],
       ['check_set', 'default'],
       ['diagnostics', 'explain-fails'],
+    ]);
+  });
+
+  it('records the blame and placement policies only on a block a diagnostic ran on', async () => {
+    const keys = (result: RunResult) =>
+      result.blocks.map((block) => block.resolved?.objects.map((entry) => entry.key));
+    // No diagnostic is used: neither policy influenced the record, so neither is listed.
+    expect(keys(await run(root, 'specs/without.yaml'))).toEqual([
+      ['value_check', 'check_set'],
+      ['value_check', 'check_set'],
+    ]);
+    // A diagnostic is used: the policies it reads are listed, on every block it is used on.
+    expect(keys(await run(root, 'specs/with.yaml'))).toEqual([
+      ['value_check', 'blame', 'placement', 'check_set', 'diagnostics'],
+      ['value_check', 'blame', 'placement', 'check_set', 'diagnostics'],
     ]);
   });
 

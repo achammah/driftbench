@@ -1,0 +1,31 @@
+# diagnostic/liability-confirm (codeagent_equivalence_blame.md E3). For each diagnosis still static or
+# undecided, the cheapest run that could change it: the skill forced into context, the rule as a hint, a
+# reference agent. The budget defaults to 0: no billed run is made and the diagnoses stay static. A stand-in
+# command is free. After the runs, code-agent-liability is run again with what they stored.
+kind: diagnostic
+id: liability-confirm
+version: 1
+extends: null
+description: Runs the cheapest experiment that could change each static diagnosis, within a budget.
+scope: campaign
+when: { any_diagnosis: { confidence: [static, undecided] } }
+reads: [policy/blame]
+steps:
+  - id: plan
+    title: The cheapest run that could change each open diagnosis
+    impl: builtin:confirm/plan
+    params: { runs: 3 }
+  - id: run
+    title: The planned runs, within the budget
+    impl: builtin:confirm/run
+    params: { runs: 3, budget_usd: 0, reference_target: null }
+  - id: store
+    title: reference_pass, reference_loads, forced_load_pass and hint_pass on each diagnosis
+    impl: builtin:confirm/store
+  - id: rejudge
+    title: code-agent-liability again, with the stored evidence
+    impl: builtin:diagnostic/rerun
+    params: { diagnostic: code-agent-liability }
+output:
+  fields: [runs_made, cost_usd, changed_diagnoses, skipped_for_budget]
+cost: { agent_runs: conditional }

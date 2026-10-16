@@ -1,0 +1,27 @@
+# diagnostic/fix-plan (codeagent_equivalence_blame.md E2). Over every diagnosis of a campaign: signatures and
+# homes, re-placement of the fixes whose signature recurs in enough homes, one fix per target and action, a
+# ranked list. A core fix that replaces local ones lists them as copies to remove. No agent call.
+kind: diagnostic
+id: fix-plan
+version: 1
+extends: null
+description: The ranked list of fixes for a campaign, moved not duplicated.
+scope: campaign
+reads: [policy/placement]
+steps:
+  - id: recurrence
+    title: Signatures and homes over every diagnosis of the campaign
+    impl: builtin:placement/recurrence
+  - id: replace
+    title: Re-place each diagnosis whose signature crossed a threshold
+    impl: builtin:fix-plan/replace
+  - id: merge
+    title: One fix per target and action; local copies listed for removal
+    impl: builtin:fix-plan/merge
+  - id: rank
+    title: Rank by agent blocks, then blocks, then cost
+    impl: builtin:rank/top-n
+    params: { n: 10, by: [agent_blocks, blocks, cost_class] }
+output:
+  fields: [fix_location, fix_target, fix_action, fix_forms, blocks, agent_blocks, rules, remove_copies, confidence]
+cost: { model_calls: none, agent_runs: none }
