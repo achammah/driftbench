@@ -12,6 +12,7 @@ tags:
   - test:guard_register
   - mode:unit
   - kind:guard
+  - kind:skill
 target:
   adapter: claude-code
 given:
@@ -72,6 +73,7 @@ metadata:
   estate:
     atoms:
       - guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh
+      - skill.shipment-tracker.skill-shipment-tracker
     planRow: guard_register.guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh
     cell:
       atoms.guard: guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh

@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -54,6 +55,10 @@ blocks:
     when:
       user: Match the Fjord Kitchenware invoice INV-1001 with its order.
     expect:
+      skills:
+        - name: invoice-reconcile
+          count:
+            min: 1
       workspace:
         others_untouched: true
 rules:
@@ -78,6 +83,7 @@ metadata:
   estate:
     atoms:
       - instruction.invoice-reconcile.run-the-reconcile-script-and-show
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: pairwise.0586
     cell:
       ask_class: chat

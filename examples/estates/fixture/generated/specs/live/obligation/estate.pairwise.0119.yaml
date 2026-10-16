@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
   - judged
 target:
@@ -63,6 +64,10 @@ blocks:
     when:
       user: Which shipments in shipments/log.csv are late today?
     expect:
+      skills:
+        - name: shipment-tracker
+          count:
+            min: 1
       workspace:
         others_untouched: true
       criteria:
@@ -78,6 +83,7 @@ metadata:
   estate:
     atoms:
       - instruction.shipment-tracker.late-means-past-the-promised-date
+      - skill.shipment-tracker.skill-shipment-tracker
     planRow: pairwise.0119
     cell:
       ask_class: build

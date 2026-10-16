@@ -12,6 +12,7 @@ tags:
   - test:route_positive
   - mode:live
   - kind:route
+  - kind:skill
 target:
   adapter: claude-code
 given:
@@ -71,6 +72,7 @@ metadata:
   estate:
     atoms:
       - route.supplier-email.an-ask-that-fits-supplier-email
+      - skill.supplier-email.skill-supplier-email
     planRow: pairwise.0217
     focusVariant: 216
     cell:

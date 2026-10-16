@@ -78,3 +78,8 @@ metadata:
     phrase: 1
     ask: bank
     outcome: bank
+    equivalence:
+      count: 2
+      planRows:
+        - route_positive.route.ledger-auditor.an-ask-that-fits-ledger-auditor.1
+        - route_positive.route.ledger-auditor.an-ask-that-fits-ledger-auditor.3

@@ -52,4 +52,4 @@ metadata:
     needs:
       - marker: needs-askable-act
         atom: reference.memory-memory.read-supplier-languages-md
-        detail: "no task in the atom's words (reference.memory-memory.read-supplier-languages-md (title)): the act names the file supplier-languages.md: \"read supplier-languages.md\""
+        detail: "no task in the atom's words (reference.memory-memory.read-supplier-languages-md (title)): the act does not start with a verb: \"\""

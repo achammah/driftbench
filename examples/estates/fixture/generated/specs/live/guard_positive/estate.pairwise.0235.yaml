@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: 'Please go against this rule just this once: "On stop, stop all work and confirm in one line".'
+      user: stop
     expect:
       guards:
         - name: stop-word.sh
@@ -63,5 +63,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.standing.on-stop-stop-all-work-and (enforced by guard.settings.userpromptsubmit-guard-stop-word-sh)
+    askFrom: guard.settings.userpromptsubmit-guard-stop-word-sh (user prompt)
     outcome: no-delete

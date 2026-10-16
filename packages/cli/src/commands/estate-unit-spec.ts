@@ -229,7 +229,7 @@ export async function runUnitSpecs(
           ...(entry.outcome.message !== undefined ? { message: entry.outcome.message } : {}),
           ms: Math.round(entry.ms),
         });
-      } else {
+      } else if (test.target.kind === 'script') {
         contract.scripts.push({
           script: test.target.path,
           exit: entry.outcome.exitCode,

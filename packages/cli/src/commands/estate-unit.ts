@@ -222,6 +222,14 @@ export function contractOf(results: readonly UnitResult[], tests: readonly UnitT
           ...(entry.outcome.message !== undefined ? { message: entry.outcome.message } : {}),
           ms: Math.round(entry.ms),
         });
+      } else if (test.target.kind === 'subagent') {
+        contract.helpers ??= [];
+        contract.helpers.push({
+          helper: test.target.name,
+          exit: entry.outcome.exitCode,
+          ms: Math.round(entry.ms),
+          text: entry.outcome.output ?? '',
+        });
       } else {
         contract.scripts.push({
           script: test.target.path,

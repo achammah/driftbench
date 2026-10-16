@@ -51,6 +51,9 @@ export class MutantError extends Error {
 /** The estate's own files a copy holds by default: what the runtime reads, nothing the test harness wrote. */
 export const ESTATE_COPY_FILES = ['CLAUDE.md', 'CLAUDE.local.md', '.claude', '.mcp.json'] as const;
 
+/** Where an estate keeps the configuration the unit runner reads (`driftbench.estate.yaml`). */
+const ESTATE_CONFIG_NAMES = ['driftbench.estate.yaml', '.claude/driftbench.estate.yaml'] as const;
+
 /**
  * Copies the estate's own files, and every file an atom of the map quotes, from `root` into `to`. The files
  * are the ones the map's runtime reader lists (ignored folders such as node_modules and test runs left out,
@@ -82,6 +85,9 @@ export async function copyEstate(
     } else if (info.isFile()) files.add(file);
   };
   if (!listed) for (const name of names) await collect(name);
+  // The estate configuration (helper executors, script fixtures) is not an instruction the agent reads, yet a
+  // unit test on the copy needs it: without it the copy cannot run a helper or the script fixtures it declares.
+  for (const file of ESTATE_CONFIG_NAMES) await collect(file);
   for (const atom of map.atoms) await collect(atom.provenance.file);
   // Preflight every source and destination before the first mkdir or copy.
   const paths = await Promise.all(

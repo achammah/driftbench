@@ -135,6 +135,7 @@ export async function runUnitTests(tests: readonly UnitTest[], options: UnitRunO
     const results: UnitResult[] = new Array(tests.length);
     const runOne = async (test: UnitTest): Promise<UnitResult> => {
       if (test.target.kind === 'script') return runScriptTest(test, config, runner, options.record === true);
+      if (test.target.kind === 'subagent') return runHelperTest(test, options);
       const result = await runGuardTest(test, raw.guards, options.record === true, runner);
       const check = test.target.check;
       if (check === undefined) return result;
@@ -251,6 +252,8 @@ export async function observeUnitTests(
             });
           }
         }
+      } else if (test.target.kind === 'subagent') {
+        observed.error = 'a helper unit test is run by runUnitTests, which records and compares its answers';
       } else {
         const target = test.target;
         const guard = raw.guards.find(
@@ -433,6 +436,133 @@ async function runGuardTest(
       failed.length === 0
         ? `${active.length} of ${active.length} cases as recorded`
         : `${failed.length} of ${active.length} cases changed: ${failed.map((entry) => `${entry.case} ${entry.detail}`).join(' | ')}`,
+    cases,
+  };
+}
+
+/**
+ * A helper run alone, by the executor the estate declares for it (`helpers:` in driftbench.estate.yaml). The case
+ * holds the task and the seeded files. `record` runs the helper `RECORD_RUNS` times on the original estate and keeps
+ * its answer when the runs agree (the case is flaky otherwise, and never compared); a later run must answer the same,
+ * so an agent file that lost its body or changed its meaning turns the test red. An executor that is not configured,
+ * or fails, is a failed run, never a pass.
+ */
+async function runHelperTest(test: UnitTest, options: UnitRunOptions): Promise<UnitResult> {
+  const base = { id: test.id, testType: test.testType, atom: test.atom };
+  const target = test.target;
+  if (target.kind !== 'subagent') throw new Error('not a helper test');
+  const record = options.record === true;
+  if (!record && test.recordedOn === undefined) {
+    return {
+      ...base,
+      status: 'unrecorded',
+      detail: 'no outcome recorded: run --record on the original first',
+      cases: [],
+    };
+  }
+  const outcomeOfRun = (observation: HelperObservation): UnitOutcome =>
+    observation.status === 'executed'
+      ? { decision: 'allow', exitCode: 0, output: observation.observed.text.trim() }
+      : {
+          decision: 'error',
+          exitCode: observation.status === 'failed' ? observation.exit : 1,
+          message: observation.error,
+        };
+  const cases: UnitCaseResult[] = [];
+  const recordedCases: GuardCase[] = [];
+  for (const unitCase of test.cases) {
+    const task = typeof unitCase.payload.task === 'string' ? unitCase.payload.task : '';
+    const files =
+      typeof unitCase.payload.files === 'object' && unitCase.payload.files !== null
+        ? (unitCase.payload.files as Record<string, string>)
+        : {};
+    const outcomes: UnitOutcome[] = [];
+    let ms = 0;
+    for (let index = 0; index < (record ? RECORD_RUNS : 1); index++) {
+      const observation = await observeHelper({ name: target.name, file: target.file }, task, files, options);
+      outcomes.push(outcomeOfRun(observation));
+      if (observation.status !== 'not-run') ms = Math.max(ms, observation.ms);
+    }
+    const first = outcomes[0] as UnitOutcome;
+    if (record) {
+      const flaky = varies(outcomes) || outcomes.some((outcome) => outcome.output !== first.output);
+      const failed = first.decision === 'error';
+      recordedCases.push({
+        ...unitCase,
+        expected: first,
+        ...(flaky ? { flaky: true } : failed ? { inert: true } : {}),
+      });
+      cases.push({
+        case: unitCase.id,
+        material: unitCase.material,
+        outcome: first,
+        ...(failed ? { inert: true } : {}),
+        pass: !failed,
+        ms,
+        detail: failed ? (first.message ?? 'the helper did not run') : 'recorded',
+      });
+      continue;
+    }
+    const expected = unitCase.expected;
+    if (unitCase.flaky) {
+      cases.push({
+        case: unitCase.id,
+        material: unitCase.material,
+        outcome: first,
+        flaky: true,
+        pass: true,
+        ms,
+        detail: 'flaky on the original: not compared',
+      });
+      continue;
+    }
+    if (expected === undefined || unitCase.inert) {
+      cases.push({
+        case: unitCase.id,
+        material: unitCase.material,
+        outcome: first,
+        inert: true,
+        pass: false,
+        ms,
+        detail: 'the helper did not run on the original, so nothing is recorded to compare',
+      });
+      continue;
+    }
+    const differences = differ(expected, first);
+    cases.push({
+      case: unitCase.id,
+      material: unitCase.material,
+      outcome: first,
+      expected,
+      pass: differences.length === 0,
+      ms,
+      detail: differences.length === 0 ? 'answered as recorded' : differences.join('; '),
+    });
+  }
+  if (record) {
+    const failed = cases.filter((entry) => !entry.pass);
+    return {
+      ...base,
+      status: failed.length === 0 ? 'pass' : 'fail',
+      detail:
+        failed.length === 0
+          ? `recorded ${recordedCases.length} helper runs`
+          : failed.map((entry) => `${entry.case} ${entry.detail}`).join(' | '),
+      cases,
+      recorded: { ...test, cases: recordedCases, recordedOn: test.mapHash },
+    };
+  }
+  const active = cases.filter((entry) => !entry.flaky);
+  const failed = active.filter((entry) => !entry.pass);
+  return {
+    ...base,
+    status: active.length === 0 ? 'inert' : failed.length === 0 ? 'pass' : 'fail',
+    detail:
+      active.length === 0
+        ? 'no recorded case shows the helper at work'
+        : failed.length === 0
+          ? `${active.length} of ${active.length} runs answered as recorded`
+          : `${failed.length} of ${active.length} runs changed: ${failed.map((entry) => `${entry.case} ${entry.detail}`).join(' | ')}`,
     cases,
   };
 }

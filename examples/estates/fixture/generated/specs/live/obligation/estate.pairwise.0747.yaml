@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - judged
 target:
   adapter: claude-code
@@ -44,6 +45,10 @@ blocks:
     when:
       user: "Check INV-1004 against PO-2004 and what we received: is there a price difference to report?"
     expect:
+      skills:
+        - name: invoice-reconcile
+          count:
+            min: 1
       workspace:
         others_untouched: true
       criteria:
@@ -52,6 +57,7 @@ metadata:
   estate:
     atoms:
       - instruction.invoice-reconcile.under-0-05-eur-per-unit
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: pairwise.0747
     cell:
       ask_class: change_estate

@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:subagent
   - ask:code
   - judged
 target:
@@ -62,6 +63,10 @@ blocks:
     when:
       user: Audit ledger/2026-W41.csv for double payments and unapplied credit notes. Answer with one JSON object.
     expect:
+      subagents:
+        - name: ledger-auditor
+          count:
+            min: 1
       workspace:
         others_untouched: true
       criteria:
@@ -77,6 +82,7 @@ metadata:
   estate:
     atoms:
       - instruction.ledger-auditor.look-for-double-payments-and-unapplied
+      - subagent.ledger-auditor.helper-ledger-auditor
     planRow: pairwise.0703
     cell:
       ask_class: debug

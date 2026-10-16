@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please write to a supplier, answer one, or chase a late delivery or a missing credit note.
+      user: Please write to or chase a supplier.
     expect:
       skills:
         - name: supplier-email
@@ -51,5 +51,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: skill.supplier-email.skill-supplier-email (asks it names)
+    askFrom: route.standing.an-ask-to-write-to-or (situation)
     outcome: no-change:read-only

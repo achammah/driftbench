@@ -13,6 +13,7 @@ export {
   RESUME_ASK,
   situationProblem,
 } from './asks';
+export { estateOwners, navigationFiles, navigationReference, taskAtoms } from './context';
 export { type ReadYaml, readEstateYaml, type YamlSchema } from './files';
 export {
   type AskSource,
@@ -45,6 +46,7 @@ export {
   checkBank,
   checkSessions,
   type EstateAtom,
+  type EstateDocument,
   type EstateEvidence,
   type EstateMapInput,
   type EstatePlanInput,

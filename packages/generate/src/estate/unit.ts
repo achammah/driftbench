@@ -64,7 +64,14 @@ export type GuardCase = z.infer<typeof GuardCase>;
 export const UnitTest = z.strictObject({
   id: z.string().min(1),
   planRow: z.string().min(1),
-  testType: z.enum(['guard_positive', 'guard_negative', 'guard_hostile', 'guard_speed', 'script_fixture']),
+  testType: z.enum([
+    'guard_positive',
+    'guard_negative',
+    'guard_hostile',
+    'guard_speed',
+    'script_fixture',
+    'contract_alone',
+  ]),
   atom: z.string().min(1),
   title: z.string().min(1),
   mapHash: z.string().min(1),
@@ -81,6 +88,8 @@ export const UnitTest = z.strictObject({
       check: z.string().optional(),
     }),
     z.strictObject({ kind: z.literal('script'), path: z.string().min(1), skill: z.string().optional() }),
+    /** A helper run alone on a task, by the executor the estate declares for it: its agent file is the prompt. */
+    z.strictObject({ kind: z.literal('subagent'), name: z.string().min(1), file: z.string().min(1) }),
   ]),
   cases: z.array(GuardCase).default([]),
   /** The map hash of the estate --record ran on; absent until then. */
@@ -279,6 +288,36 @@ export function hostileForms(material: string): string[] {
     `echo ok && ${material}`,
   ];
   return [...new Set(forms)].filter((form) => form !== material);
+}
+
+/**
+ * The unit test of a helper run alone (`contract_alone`): one case holding the task the row asks and the workspace
+ * files its situation seeds. `estate unit --record` runs the helper once per record run on the original estate and
+ * writes what it answered into the case; a later run, on a copy whose agent file lost its body or was changed, must
+ * answer the same.
+ */
+export function helperUnitTestOf(
+  atom: EstateAtom,
+  run: { task: string; files: Record<string, string> },
+  mapHash: string,
+  id: string,
+  row: Pick<EstatePlanRow, 'id'>,
+): UnitTest | string {
+  const name = atom.fields?.name;
+  const file = atom.provenance?.file;
+  if (typeof name !== 'string' || typeof file !== 'string')
+    return `${atom.id} names no helper with an agent file`;
+  if (run.task.trim() === '') return `${atom.id} has no task to run the helper on`;
+  return {
+    id,
+    planRow: row.id,
+    testType: 'contract_alone',
+    atom: atom.id,
+    title: atom.title,
+    mapHash,
+    target: { kind: 'subagent', name, file },
+    cases: [{ id: 'case-01', payload: { task: run.task, files: run.files }, material: run.task }],
+  };
 }
 
 /** The unit test of a row, or the reason it has none. */

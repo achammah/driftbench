@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:subagent
 target:
   adapter: claude-code
 given:
@@ -59,12 +60,17 @@ blocks:
           count: 0
         - label: Write
           count: 0
+      subagents:
+        - name: ledger-auditor
+          count:
+            min: 1
       workspace:
         others_untouched: true
 metadata:
   estate:
     atoms:
       - instruction.ledger-auditor.the-auditor-never-edits-a-file
+      - subagent.ledger-auditor.helper-ledger-auditor
     planRow: pairwise.0341
     cell:
       ask_class: research

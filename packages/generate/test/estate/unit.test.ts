@@ -3,6 +3,7 @@ import type { EstateAtom } from '../../src/estate/inputs';
 import {
   brokenForms,
   clausesOf,
+  helperUnitTestOf,
   hostileForms,
   matcherTools,
   materialOf,
@@ -446,4 +447,45 @@ it('can exercise a zero-character limit with a truly empty negative reply', () =
     new Map([[limit.id, limit]]),
   );
   expect(typeof result !== 'string' && result.cases[0]?.payload.last_reply).toBe('');
+});
+
+describe('the JSON run record of a helper run alone', () => {
+  const helper: EstateAtom = {
+    id: 'subagent.harbour.helper-pilot',
+    kind: 'subagent',
+    title: 'Helper pilot',
+    approved: true,
+    evidence: [],
+    fields: { name: 'pilot' },
+    provenance: { quote: 'name: pilot', file: '.claude/agents/pilot.md' },
+  };
+  const at = { id: 'contract_alone.subagent.harbour.helper-pilot' };
+
+  it('holds the task and the seeded files as its one case, and the agent file as the target', () => {
+    const made = helperUnitTestOf(
+      helper,
+      { task: 'Berth the Aster.', files: { 'log/aster.txt': 'Aster, 40 m' } },
+      'hash',
+      'unit.contract_alone.pilot',
+      at,
+    );
+    if (typeof made === 'string') throw new Error(made);
+    expect(made.target).toEqual({ kind: 'subagent', name: 'pilot', file: '.claude/agents/pilot.md' });
+    expect(made.testType).toBe('contract_alone');
+    expect(made.cases).toEqual([
+      {
+        id: 'case-01',
+        payload: { task: 'Berth the Aster.', files: { 'log/aster.txt': 'Aster, 40 m' } },
+        material: 'Berth the Aster.',
+      },
+    ]);
+    expect(made.cases[0]?.expected).toBeUndefined();
+  });
+
+  it('says why a helper with no agent file or no task has none', () => {
+    expect(
+      helperUnitTestOf({ ...helper, provenance: { quote: 'x' } }, { task: 'Go.', files: {} }, 'h', 'i', at),
+    ).toMatch(/no helper with an agent file/);
+    expect(helperUnitTestOf(helper, { task: '  ', files: {} }, 'h', 'i', at)).toMatch(/no task/);
+  });
 });

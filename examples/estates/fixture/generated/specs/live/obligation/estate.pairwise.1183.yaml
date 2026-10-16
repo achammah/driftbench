@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -55,6 +56,10 @@ blocks:
     when:
       user: Write up last week in the usual weekly report.
     expect:
+      skills:
+        - name: weekly-report
+          count:
+            min: 1
       workspace:
         created:
           - reports/2026-W42.md
@@ -74,6 +79,7 @@ metadata:
   estate:
     atoms:
       - instruction.weekly-report.count-only-the-last-seven-days
+      - skill.weekly-report.skill-weekly-report
     planRow: pairwise.1183
     cell:
       ask_class: build

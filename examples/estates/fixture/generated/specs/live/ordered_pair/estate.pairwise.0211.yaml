@@ -12,6 +12,7 @@ tags:
   - test:ordered_pair
   - mode:live
   - kind:gate
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -54,6 +55,10 @@ blocks:
     when:
       user: Write up last week in the usual weekly report.
     expect:
+      skills:
+        - name: weekly-report
+          count:
+            min: 1
       references:
         - path: "**/.claude/skills/weekly-report/templates/report.md"
           count:
@@ -79,6 +84,7 @@ metadata:
   estate:
     atoms:
       - gate.weekly-report.read-templates-report-md-before-writing
+      - skill.weekly-report.skill-weekly-report
     planRow: pairwise.0211
     cell:
       ask_class: operate

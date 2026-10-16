@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -27,12 +28,16 @@ blocks:
     when:
       user: Please write to a supplier, answer one, or chase a late delivery or a missing credit note.
     expect:
+      skills:
+        - name: supplier-email
+          count:
+            min: 1
       references:
         - path: "**/supplier-languages.md"
           count:
             min: 1
       workspace:
-        deleted: []
+        others_untouched: true
 perturbations:
   - id: deviation-D2_goal_shift
     class: D2_goal_shift
@@ -44,6 +49,7 @@ metadata:
   estate:
     atoms:
       - instruction.supplier-email.write-in-the-supplier-s-language
+      - skill.supplier-email.skill-supplier-email
     planRow: pairwise.0121
     cell:
       ask_class: build
@@ -64,4 +70,4 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.supplier-email.skill-supplier-email (asks it names)
-    outcome: no-delete
+    outcome: no-change:read-only

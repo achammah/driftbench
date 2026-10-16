@@ -4,6 +4,8 @@ All notable changes to driftbench are listed here. The format follows [Keep a Ch
 
 ## [Unreleased]
 
+* Estate test generation on a large real estate. An atom that gives no task of its own takes the purpose of the unit that owns it (its description, then the requests of the routing rows that load it) and never an estate-wide request. A guard's negative control asks for a harmless near miss of the guard's own rule. A reference to a document the map records as an example, a template or a history gets no test (the optional `documents` field of the map; a map without it changes nothing). A prerequisite owned by a helper asks for the work to be handed to a helper, and a shared document is owned by the unit whose file cites it. New public names: `@agent-nexus/driftbench-generate` exports `estateOwners`, `taskAtoms`, `navigationFiles`, `navigationReference` and the `EstateDocument` type; `@agent-nexus/driftbench-estate` exports the `DocumentInfo` and `DocumentRole` schemas. See [estate](docs/estate.md#task-specific-asks-and-equivalent-tests).
+
 * `@agent-nexus/driftbench-core` exports `GUARD_INTERVENTIONS` (the list of guard intervention kinds a guard expectation can count: deny, warn and nudge). A generated negative guard control checks each of them.
 
 * New public names for the estate work. `@agent-nexus/driftbench-checks` exports the `absence` check (a typed absence predicate compiled to a trace check). `@agent-nexus/driftbench-core` exports `stringifyBlockYaml` (the block writer for generated specs). `@agent-nexus/driftbench-estate` exports `observeUnitTests` and the `UnitObservation` type (the unit runner's recorded observations), and `observeHelper` with the `HelperObservation` type (a configured helper executor's recorded observations).

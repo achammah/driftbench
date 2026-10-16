@@ -1,0 +1,158 @@
+# The Northwind fixture's estate configuration (docs/estate.md, "The estate configuration file"). The unit runner
+# reads it. Nothing here is an instruction to the agent and nothing here is read by the scan.
+#
+# helpers: a local stand-in executor for each helper agent, so a helper-only unit spec runs the helper's current
+# body on its task instead of reporting an input error. The command receives one JSON line on its input (name,
+# systemPrompt, frontmatter, task) and answers one JSON object (text, segments, toolCalls, workspaceDiff). It is
+# a stand-in for a model, not a verdict printer: it reads the instructions it is given and acts on the workspace
+# of the unit copy.
+#   - It finds no instructions in an empty body and exits 1: with nothing to follow it does no work.
+#   - A body that sorts messages into named folders is followed: each message of the folder the task names is
+#     filed under the folder whose name it holds most often, a message that fits none goes where the body says,
+#     and a filed message is removed unless the body forbids deleting.
+#   - A body that says to answer with one JSON object gets one.
+#   - It reports the workspace files it created, changed and deleted, measured before and after.
+#
+# scripts: each script's usage line and its fixtures. An expectation is written from the script's public
+# contract (its usage line and its documented exit codes and outputs), never from its source: a fixture that
+# a broken script would also satisfy is not an oracle.
+helpers:
+  inbox-triager:
+    command: &executor
+      - node
+      - -e
+      - |
+        const fs = require('node:fs');
+        const path = require('node:path');
+        const SKIP = new Set(['.claude', 'CLAUDE.md', 'driftbench.estate.yaml']);
+        const files = (dir = '', found = {}) => {
+          for (const entry of fs.readdirSync(path.join('.', dir), { withFileTypes: true })) {
+            const rel = dir ? `${dir}/${entry.name}` : entry.name;
+            if (!dir && SKIP.has(entry.name)) continue;
+            if (entry.isDirectory()) files(rel, found);
+            else found[rel] = fs.readFileSync(rel, 'utf8');
+          }
+          return found;
+        };
+        const negative = (line) => /\b(?:never|do not|don't|must not)\b/i.test(line);
+        let raw = '';
+        process.stdin.on('data', (chunk) => (raw += chunk));
+        process.stdin.on('end', () => {
+          const input = JSON.parse(raw.split('\n')[0] || '{}');
+          const body = String(input.systemPrompt || '');
+          const task = String(input.task || '');
+          if (body.trim() === '') {
+            process.stderr.write('no instructions to follow\n');
+            process.exit(1);
+          }
+          const before = files();
+          const sentences = body
+            .replace(/\n(?![\n\-*#\d])/g, ' ')
+            .split(/(?<=[.!?])\s+/)
+            .map((line) => line.trim())
+            .filter(Boolean);
+          const lines = [];
+          const sort = /\bsort\w*\b[^.\n]*?\binto\b[^:.\n]*?\bfolders?\b[^:.\n]*:\s*([^.\n]+)\./i.exec(
+            body.replace(/\n(?![\n\-*#\d])/g, ' '),
+          );
+          if (sort) {
+            const names = sort[1]
+              .split(/,|\band\b/i)
+              .map((name) => name.trim().toLowerCase())
+              .filter((name) => /^[a-z]+$/.test(name));
+            const fallback = sentences
+              .filter((line) => !negative(line))
+              .map((line) => /\bfits (?:none|no \w+)\b[^"]*"([^"]+)"/i.exec(line)?.[1])
+              .find(Boolean);
+            const keeps = sentences.some((line) => negative(line) && /\b(?:delete|remove)\b/i.test(line));
+            const folder = (task.split(/\s+/).find((word) => word.endsWith('/') && word.length > 1) || '').replace(
+              /[.,;:!?]+$/,
+              '',
+            );
+            for (const file of Object.keys(before).filter((name) => folder && name.startsWith(folder))) {
+              const text = before[file].toLowerCase();
+              let best;
+              let count = 0;
+              for (const name of names) {
+                const seen = text.split(name.replace(/s$/, '')).length - 1;
+                if (seen > count) [best, count] = [name, seen];
+              }
+              const target = best || fallback;
+              if (!target) continue;
+              lines.push(`${file}: ${target}`);
+              if (!keeps) fs.unlinkSync(file);
+            }
+          }
+          const json = sentences.some((line) => !negative(line) && /\banswer with one json object\b/i.test(line));
+          const text = lines.length > 0 ? lines.join('\n') : json ? '{"status": "done"}' : 'Done.';
+          const after = files();
+          const names = Object.keys(before);
+          const diff = {
+            created: Object.keys(after).filter((name) => !(name in before)).sort(),
+            changed: names.filter((name) => name in after && after[name] !== before[name]).sort(),
+            deleted: names.filter((name) => !(name in after)).sort(),
+          };
+          process.stdout.write(JSON.stringify({ text, segments: [], toolCalls: [], workspaceDiff: diff }));
+        });
+    timeoutMs: 20000
+  ledger-auditor:
+    command: *executor
+    timeoutMs: 20000
+  route-planner:
+    command: *executor
+    timeoutMs: 20000
+scripts:
+  .claude/skills/invoice-reconcile/scripts/reconcile.py:
+    usage: python3 reconcile.py <invoice> <order>
+    fixtures:
+      # A usage error exits 2.
+      - args: []
+        expect:
+          exitCode: 2
+      # Every line matches (the unit prices differ by less than the rounding of 0.05 EUR): exit 0, one line per article.
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,2,10.00\n"
+          order.csv: "article,quantity,unit_price\nwidget,2,10.02\n"
+        expect:
+          exitCode: 0
+          stdoutIncludes: [widget, matched, EUR]
+      # An invoice quantity above the order's is over, below it is short: a line that differs exits 1.
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,3,10.00\n"
+          order.csv: "article,quantity,unit_price\nwidget,2,10.00\n"
+        expect:
+          exitCode: 1
+          stdoutIncludes: [widget, over, "10.00 EUR"]
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,1,10.00\n"
+          order.csv: "article,quantity,unit_price\nwidget,2,10.00\n"
+        expect:
+          exitCode: 1
+          stdoutIncludes: [widget, short, "10.00 EUR"]
+      # A JSON file without a lines list is an invalid input: exit 2.
+      - args: [invoice.json, order.json]
+        files:
+          invoice.json: '{"items": []}'
+          order.json: '{"lines": []}'
+        expect:
+          exitCode: 2
+  .claude/skills/shipment-tracker/scripts/track.sh:
+    usage: ./scripts/track.sh <carrier code> <tracking number>
+    fixtures:
+      # A wrong number of arguments is a usage error: exit 2, nothing on standard output.
+      - args: []
+        expect:
+          exitCode: 2
+          stdout: ""
+      - args: [NWX]
+        expect:
+          exitCode: 2
+          stdout: ""
+      # A shipment the table does not list exits 1 and prints nothing on standard output.
+      - args: [NWX, "123"]
+        expect:
+          exitCode: 1
+          stdout: ""
