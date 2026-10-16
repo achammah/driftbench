@@ -10,6 +10,7 @@ import {
   type ResolvedObject,
 } from '@agent-nexus/driftbench-core';
 import { PLACEMENT_IMPLS } from '../placement/apply';
+import { confirmContext } from './confirm-context';
 import { SHIPPED_DIAGNOSTICS } from './diagnostics';
 import { BLAME_IMPLS } from './impls';
 import { SHIPPED_OBJECTS } from './shipped';
@@ -75,7 +76,12 @@ export function registerBlameObjects(
           return BLOCK_STEPS[name]?.run({ ...ctx, check: ctx.check });
         }
         if (ctx.scope !== 'campaign') return undefined;
-        return CAMPAIGN_STEPS[name]?.run({ ...ctx, runs: ctx.runs ?? [], diagnoses: ctx.diagnoses ?? [] });
+        return CAMPAIGN_STEPS[name]?.run({
+          ...ctx,
+          runs: ctx.runs ?? [],
+          diagnoses: ctx.diagnoses ?? [],
+          ...confirmContext(ctx),
+        });
       },
     };
     registerDiagnosticStep(name, step, registry);

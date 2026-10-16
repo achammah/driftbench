@@ -23,6 +23,7 @@ import { fixPlan } from './fixplan';
 import { flakyBlocks } from './flaky';
 import { checkEvidenceInputs, sentUser } from './inputs';
 import { shippedPolicy } from './objects';
+import { rerunProvidedTests } from './rerun';
 import { blameServices } from './services';
 import type { BlameDiagnosis } from './types';
 import { replayedValueFacts } from './values';
@@ -38,13 +39,15 @@ import { replayedValueFacts } from './values';
 /** What a block step reads: the context the checks ran with, the block's verdicts, its objects, its params. */
 export type BlockStepContext = {
   readonly check: Pick<CheckContext, 'observed' | 'expect' | 'spec' | 'block' | 'stimulus'> &
-    Partial<Pick<CheckContext, 'given' | 'blockIndex'>>;
+    Partial<Pick<CheckContext, 'given' | 'blockIndex' | 'history' | 'readArtifact'>>;
   readonly verdicts: readonly Verdict[];
   readonly objects: ReadonlyArray<{ object: ResolvedObject }>;
   readonly params: Readonly<Record<string, unknown>>;
   readonly earlier: readonly StepOutput[];
   /** Earlier diagnoses of the estate version, for recurrence, when the runner reads the store. */
   readonly history?: readonly PlacedBefore[];
+  /** Confirm evidence stored for this block, by verdict id: the re-diagnosis after a confirm run. */
+  readonly confirm?: Readonly<Record<string, evidence.ConfirmEvidence>>;
 };
 
 /** What a campaign step reads: every run of the campaign and the diagnoses its blocks hold. */
@@ -68,7 +71,7 @@ export type CampaignStepContext = {
   readonly rediagnose?: (
     block: string,
     confirm: Readonly<Record<string, evidence.ConfirmEvidence>>,
-  ) => BlameDiagnosis[];
+  ) => BlameDiagnosis[] | Promise<BlameDiagnosis[]>;
 };
 
 /** A diagnosis as a step writes it, before the runner stamps `diagnostic`, `step` and `by`. */
@@ -193,6 +196,19 @@ function blockStep(
           errors.push(`error:reply_reader_failed:${describe(cause)}`);
         }
       }
+      let testsFailReverted: boolean | undefined;
+      if (services.sandbox !== undefined && ctx.check.expect.provided_tests !== undefined) {
+        const gating = ctx.verdicts.some((verdict) => verdict.gating && verdict.outcome === 'fail');
+        try {
+          const rerun = gating
+            ? await rerunProvidedTests(ctx.check, services.sandbox)
+            : { kind: 'none' as const };
+          if (rerun.kind === 'ran') testsFailReverted = rerun.failed;
+          if (rerun.kind === 'error') errors.push(`error:rerun_failed:${rerun.reason}`);
+        } catch (cause) {
+          errors.push(`error:rerun_failed:${describe(cause)}`);
+        }
+      }
       const tools = (ctx.check.expect?.tools ?? [])
         .filter((tool) => tool.count !== 0)
         .map((tool) => tool.label);
@@ -200,8 +216,16 @@ function blockStep(
         verdicts: ctx.verdicts,
         evidenceFor: checkEvidenceInputs(ctx.check, ctx.verdicts, {
           ...(valuePolicy === undefined ? {} : { valuePolicy }),
+          ...(ctx.confirm === undefined ? {} : { confirm: ctx.confirm }),
           ...(Object.keys(values).length === 0 ? {} : { values }),
-          ...(reply === undefined ? {} : { extra: { reply } }),
+          ...(reply === undefined && testsFailReverted === undefined
+            ? {}
+            : {
+                extra: {
+                  ...(reply === undefined ? {} : { reply }),
+                  ...(testsFailReverted === undefined ? {} : { testsFailReverted }),
+                },
+              }),
         }),
         tools,
         blame: policyOf(ctx.objects, 'policy/blame'),
@@ -225,9 +249,14 @@ function describe(cause: unknown): string {
 /** A failed service as a diagnosis without a verdict: the block keeps every other diagnosis. */
 function errorOutput(flag: string): StepOutput {
   const [, kind = 'service_failed', ...rest] = flag.split(':');
-  const what = kind === 'reply_reader_failed' ? 'the reply reader' : 'the value service';
+  const what =
+    kind === 'reply_reader_failed'
+      ? 'the reply reader'
+      : kind === 'rerun_failed'
+        ? 'the re-execution of the provided tests'
+        : 'the value service';
   return {
-    summary: `${what} threw ${rest.join(':')}; the reading is unknown and the rules that need it did not match`,
+    summary: `${what} failed: ${rest.join(':')}; the reading is unknown and the rules that need it did not match`,
     flags: [`error:${kind}`],
     confidence: 'undecided',
   };
@@ -358,7 +387,7 @@ export const CAMPAIGN_STEPS: Readonly<Record<string, BlameStep<CampaignStepConte
     cost: 'static',
     summary:
       'Re-runs a block diagnostic with the stored confirm evidence; with none, the diagnoses stay static.',
-    run: (ctx) => {
+    run: async (ctx) => {
       const state = stateOf(ctx.earlier);
       const open = campaignDiagnoses(ctx.diagnoses).filter(
         (one) =>
@@ -382,7 +411,7 @@ export const CAMPAIGN_STEPS: Readonly<Record<string, BlameStep<CampaignStepConte
       }
       const out: StepOutput[] = [];
       for (const [block, confirm] of byBlock) {
-        for (const next of ctx.rediagnose(block, confirm)) {
+        for (const next of await ctx.rediagnose(block, confirm)) {
           const before = campaignDiagnoses(ctx.diagnoses).find(
             (one) =>
               one.block === block && one.verdict_ref === next.verdict_ref && one.inherits === undefined,

@@ -69,12 +69,18 @@ The params a user sets in a file that extends a shipped one:
 
 ### What needs a service
 
-The CLI makes no model call, so four rules cannot match from a CLI run alone. A caller that runs diagnostics from code gives them what they need with `blame.useBlameServices({ value, reply })`, which returns a function that puts the earlier services back:
+The CLI makes no model call, no sandbox run and no billed run, so some rules cannot match from a CLI run alone. A caller that runs diagnostics from code gives them what they need with `blame.useBlameServices({ value, reply, sandbox, confirm })`, which returns a function that puts the earlier services back:
 
 | Rule | Needs | Why |
 |---|---|---|
 | `R5`, `R5b` | `value: { judge }` | the check compared the value exactly because no judge was configured; the diagnostic asks the judge again, and a pass means the test demanded a form nobody states |
 | `I4`, `I4b` | `reply: (turn) => { task_flagged }` | whether the agent stopped and said the task is impossible is a reading of the reply, made by a classifier or a judge you own |
+| `I1b` | `sandbox: <provider>` | the tests named in `expect.provided_tests` run again in a fresh sandbox with the agent's test edits reverted; tests that then fail make the failure the agent's |
+| `confirm_missing_rule`, `confirm_model`, `confirm_forced_load_fails`, `test_reference_fails` | `confirm: { runner, quote?, free? }` | `liability-confirm` runs the skill forced into context, the rule as a hint, or a reference agent; the runner is yours (a stand-in command, or a billed target) |
+
+The confirm runs are budget-gated twice. The diagnostics budget (`diagnosticBudget: { runs: 1 }` on the campaign) lets the `run` step run at all, and the `budget_usd` param of that step bounds the spend: a run is made only while its `quote` fits what is left. At 0 nothing runs and every diagnosis stays `static`.
+
+`R6` and `tool_silent_success` need no service but a declaration in the spec: `metadata.stated_rules` (the rules the prompt, an instruction or a skill states about a tool's input: what it asks for, what the tool needs) and `metadata.tool_promises` (what a successful call of a tool prints, by tool label or command pattern). Estate specs get their rules from the estate map their `metadata.estate.map` names (a path that resolves from the folder the run starts in).
 
 The services belong to the block, not to a diagnostic: `code-agent-liability` and `value-mismatch` decide a verdict the same way, in any order. A service that throws does not drop the block's diagnoses: the reading stays unknown, the rules that need it do not match, and one more diagnosis, flagged `error:reply_reader_failed` or `error:value_service_failed`, names the error.
 

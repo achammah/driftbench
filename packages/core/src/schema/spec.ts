@@ -127,6 +127,93 @@ export const RecomputeExpect = z
   .describe('The gold computation of an argument the agent computes, and the inputs it runs on.');
 export type RecomputeExpect = z.infer<typeof RecomputeExpect>;
 
+/** What a tool, or a script, promises about a successful call, so that silence can be told from success. */
+export const ToolPromise = z
+  .strictObject({
+    prints: z
+      .literal(true)
+      .optional()
+      .describe('A successful call prints something: its output is not empty.'),
+    matches: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('A successful call prints a text that matches this regular expression (multi-line).'),
+    from: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('Where the promise is written, such as a docstring or a skill line.'),
+  })
+  .refine((promise) => promise.prints !== undefined || promise.matches !== undefined, {
+    message: 'a promise needs prints or matches',
+  })
+  .refine(
+    (promise) => {
+      if (promise.matches === undefined) return true;
+      try {
+        new RegExp(promise.matches, 'm');
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: 'matches is not a valid regular expression', path: ['matches'] },
+  )
+  .describe('What a successful call of a tool prints.');
+export type ToolPromise = z.infer<typeof ToolPromise>;
+
+/** A rule the prompt, an instruction or a skill states about the input of a tool. */
+export const StatedRule = z
+  .strictObject({
+    tool: z.string().min(1).describe('The tool label the rule is about.'),
+    field: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('The argument the rule is about. Absent means the whole call.'),
+    where: z.enum(['prompt', 'instruction', 'skill', 'tool']).describe('Where the rule is stated.'),
+    format: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('A format the rule states for the value, as a regular expression over the whole value.'),
+    asks: z
+      .array(z.string().min(1))
+      .optional()
+      .describe('The parts the rule asks the user for, such as street_number, street_name, town.'),
+    tool_needs: z
+      .array(z.string().min(1))
+      .optional()
+      .describe('The parts the tool needs. A part the rule asks for and the tool does not need is extra.'),
+    recovery: z
+      .enum(['asked_user', 'retried_canonical'])
+      .optional()
+      .describe('The next action the rule prescribes after the tool misses.'),
+    file: z.string().min(1).optional().describe('The file that states the rule.'),
+    line: z.number().int().min(1).optional().describe('The line that states the rule.'),
+  })
+  .refine(
+    (rule) => {
+      if (rule.format === undefined) return true;
+      try {
+        new RegExp(rule.format);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: 'format is not a valid regular expression', path: ['format'] },
+  )
+  .describe('A rule stated about the input of a tool.');
+export type StatedRule = z.infer<typeof StatedRule>;
+
+/** The metadata keys the framework reads, checked when the spec loads. */
+const RESERVED_METADATA: Record<string, z.ZodType> = {
+  tool_promises: z.record(z.string().min(1), ToolPromise),
+  stated_rules: z.array(StatedRule),
+};
+
 export const ToolExpect = z
   .strictObject({
     label: z.string().min(1).describe('The tool name.'),
@@ -565,6 +652,24 @@ export const Expect = z
       .describe(
         'Consumers of the block output that need a form nobody states to the agent. The checks do not read it. When a value that works fails its check, blame names the missing rule as a setup fault instead of flagging the test.',
       ),
+    provided_tests: z
+      .strictObject({
+        paths: z
+          .array(z.string().min(1))
+          .min(1)
+          .describe(
+            'The test files the task provides, as paths or globs: `*` within a folder, `**` across folders.',
+          ),
+        command: z
+          .string()
+          .min(1)
+          .describe('The command that runs them in the workspace; a nonzero exit means the tests fail.'),
+        timeout_ms: z.number().int().min(1).optional().describe('Kills the command after this long.'),
+      })
+      .optional()
+      .describe(
+        "The tests the task provides. The checks do not read it. When a gating verdict fails and the agent edited one of these files, blame runs them again in a fresh sandbox with the agent's test edits reverted (the caller gives the sandbox with blame.useBlameServices); tests that then fail make the failure the agent's as an integrity fault.",
+      ),
     protected: z
       .array(z.string().min(1))
       .optional()
@@ -925,6 +1030,14 @@ export const Spec = z
     metadata: z
       .record(z.string(), z.unknown())
       .superRefine((metadata, ctx) => {
+        for (const [key, reserved] of Object.entries(RESERVED_METADATA)) {
+          if (metadata[key] === undefined) continue;
+          const parsed = reserved.safeParse(metadata[key]);
+          if (parsed.success) continue;
+          for (const issue of parsed.error.issues) {
+            ctx.addIssue({ code: 'custom', message: issue.message, path: [key, ...issue.path] });
+          }
+        }
         if (!isPlainObject(metadata.tool_schemas)) return;
         for (const [label, definition] of Object.entries(metadata.tool_schemas)) {
           for (const issue of unsupportedSchemaKeywords(parameterSchema(definition))) {
@@ -933,7 +1046,9 @@ export const Spec = z
         }
       })
       .optional()
-      .describe('Free metadata.'),
+      .describe(
+        'Free metadata. Three keys are read: tool_schemas (the tool definitions, by tool label), tool_promises (what a successful call of a tool prints, by tool label or command pattern) and stated_rules (the rules the prompt or a skill states about a tool, which blame reads).',
+      ),
   })
   .describe('One golden conversation, or one task for a code agent, written as a succession of blocks.');
 export type Spec = z.infer<typeof Spec>;

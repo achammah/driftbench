@@ -5,7 +5,7 @@ import type { CheckSet } from '../contracts/check';
 import type { UserDriver } from '../contracts/driver';
 import type { CostUnit, Store } from '../contracts/store';
 import type { ToolRule } from '../contracts/tool-policy';
-import { runCampaignDiagnostics } from '../diagnostics/run';
+import { type DiagnosticBudget, runCampaignDiagnostics } from '../diagnostics/run';
 import { objectContextOfSpec } from '../objects/context';
 import { checkSpecObjects, shippedObjectContext } from '../objects/index';
 import type { ResolvedObject } from '../objects/resolve';
@@ -316,6 +316,8 @@ export type CampaignRunOptions = {
    * re-score) puts them in `Campaign.diagnoses`. None when absent.
    */
   diagnostics?: readonly ResolvedObject[];
+  /** What the campaign diagnostics may spend: the number of `run` and `model` steps. Default 0: static steps only. */
+  diagnosticBudget?: DiagnosticBudget;
   onDiagnoses?(diagnoses: Diagnosis[]): void | Promise<void>;
   adapterFor(target: TargetRef): AgentAdapter;
   /** A fresh driver for each run, given the cell and the spec the cell runs (a perturbing driver needs it). */
@@ -546,7 +548,17 @@ export async function runCampaign(options: CampaignRunOptions): Promise<CellOutc
   const finished = outcomes.filter((outcome): outcome is CellOutcome => outcome !== undefined);
   if (options.diagnostics?.length) {
     const runs = finished.flatMap((outcome) => (outcome.run ? [outcome.run] : []));
-    const { diagnoses } = await runCampaignDiagnostics(options.diagnostics, runs);
+    const specs = new Map(
+      finished.flatMap((outcome) =>
+        outcome.run ? [[outcome.run.runId, options.specFor(outcome.cell)] as const] : [],
+      ),
+    );
+    const { diagnoses } = await runCampaignDiagnostics(
+      options.diagnostics,
+      runs,
+      options.diagnosticBudget,
+      (run) => specs.get(run.runId),
+    );
     await options.onDiagnoses?.(diagnoses);
   }
   return finished;

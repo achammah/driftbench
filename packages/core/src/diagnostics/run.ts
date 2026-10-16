@@ -5,6 +5,7 @@ import { type ObjectRegistry, objectRegistry, type ResolvedObject } from '../obj
 import { describeError } from '../runner/retry';
 import type { By, Diagnosis, RunResult, Verdict } from '../schema/run';
 import { Diagnosis as DiagnosisSchema } from '../schema/run';
+import type { Spec } from '../schema/spec';
 
 /**
  * Diagnostics: procedures that run after a block's checks, read its verdicts and what was observed, and write
@@ -42,6 +43,8 @@ export type DiagnosticStepContext = {
   readonly diagnoses?: readonly CampaignDiagnosis[];
   readonly verdicts: readonly Verdict[];
   readonly objects: readonly UsedObject[];
+  /** The spec a run of the campaign ran, when the campaign still holds it; campaign scope only. */
+  readonly specOf?: (run: RunResult) => Spec | undefined;
   readonly params: Readonly<Record<string, unknown>>;
   /** What the earlier steps of the same diagnostic wrote on this block. */
   readonly earlier: readonly Diagnosis[];
@@ -162,7 +165,26 @@ type ScopeInput = {
   runs?: readonly RunResult[];
   verdicts: readonly Verdict[];
   objects: readonly UsedObject[];
+  specOf?: (run: RunResult) => Spec | undefined;
 };
+
+/**
+ * What makes two diagnoses one finding: the verdict, the rule that decided it and its flags, whichever diagnostic
+ * or step wrote it. Two diagnostics that attribute the same verdict the same way write it once, and so does a
+ * flagged note such as an error. A note with neither a rule nor a flag says what its own step saw, so it is one
+ * finding only with the same diagnostic, step and words.
+ */
+function sameFinding(diagnosis: Diagnosis): string {
+  const flags = [...(diagnosis.flags ?? [])].sort();
+  const decided = diagnosis.rule !== undefined || flags.length > 0;
+  return JSON.stringify([
+    diagnosis.verdictRef ?? null,
+    diagnosis.rule ?? null,
+    flags,
+    ...(diagnosis.rule === undefined ? [diagnosis.summary] : []),
+    ...(decided ? [] : [diagnosis.diagnostic, diagnosis.step ?? null]),
+  ]);
+}
 
 /**
  * Runs the diagnostics of one scope, in order, each step in its diagnostic's item order. A diagnostic of another
@@ -179,6 +201,7 @@ async function runScope(
   const diagnoses: Diagnosis[] = [];
   let left = budget.runs ?? 0;
   let skippedForBudget = 0;
+  const seen = new Set<string>();
   for (const diagnostic of diagnostics) {
     if (
       scopeOf(diagnostic) !== scope ||
@@ -228,7 +251,12 @@ async function runScope(
         own.push(stamp({ summary: `the step threw ${describeError(cause)}` }));
       }
     }
-    diagnoses.push(...own);
+    for (const diagnosis of own) {
+      const key = sameFinding(diagnosis);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      diagnoses.push(diagnosis);
+    }
   }
   return { diagnoses, skippedForBudget };
 }
@@ -289,8 +317,14 @@ export function runCampaignDiagnostics(
   diagnostics: readonly ResolvedObject[],
   runs: readonly RunResult[],
   budget: DiagnosticBudget = {},
+  specOf?: (run: RunResult) => Spec | undefined,
 ): Promise<{ diagnoses: Diagnosis[]; skippedForBudget: number }> {
   const verdicts = runs.flatMap((run) => run.blocks.flatMap((block) => block.verdicts));
   const diagnoses = runs.flatMap(diagnosesOfRun);
-  return runScope('campaign', diagnostics, { runs, verdicts, diagnoses, objects: [] }, budget);
+  return runScope(
+    'campaign',
+    diagnostics,
+    { runs, verdicts, diagnoses, objects: [], ...(specOf === undefined ? {} : { specOf }) },
+    budget,
+  );
 }

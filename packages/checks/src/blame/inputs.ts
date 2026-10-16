@@ -10,6 +10,7 @@ import {
   type Verdict,
 } from '@agent-nexus/driftbench-core';
 import type { ValuePolicy } from '../value-check/ladder';
+import { statedRulesOf, toolPromisesOf } from './spec-data';
 import { toolSchemasOf, valueFacts } from './values';
 
 /**
@@ -117,6 +118,8 @@ export function blockEvidenceInputs(source: BlockInputSource): (verdict: Verdict
   const expect = expectView(source.expect);
   if (meta.situation !== undefined) expect.situation = meta.situation;
   const toolSchemas = toolSchemasOf(source.spec);
+  const promises = toolPromisesOf(source.spec);
+  const stated = statedRulesOf(source.spec);
   return (verdict) => {
     const values =
       source.values?.[verdict.id] ??
@@ -135,6 +138,8 @@ export function blockEvidenceInputs(source: BlockInputSource): (verdict: Verdict
       expect,
       ...(values.length > 0 ? { values } : {}),
       ...(toolSchemas === undefined ? {} : { toolSchemas }),
+      ...(promises.length === 0 ? {} : { promises }),
+      ...(stated.length === 0 ? {} : { stated }),
       ...(meta.atoms.length > 0 ? { ruleAtoms: meta.atoms } : {}),
       ...(map === undefined ? {} : { atoms: map.atoms, edges: map.edges }),
       ...(source.confirm?.[verdict.id] === undefined ? {} : { confirm: source.confirm[verdict.id] }),

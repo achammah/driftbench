@@ -65,6 +65,7 @@ The loader rewrites these forms before it validates a spec.
 * [ArtifactExpect](#artifactexpect)
 * [WorkspaceExpect](#workspaceexpect)
 * [Expect downstream](#expect-downstream)
+* [Expect provided_tests](#expect-provided_tests)
 * [SafetyExpect](#safetyexpect)
 * [Budget](#budget)
 * [Uses](#uses)
@@ -109,7 +110,7 @@ One golden conversation, or one task for a code agent, written as a succession o
 | `end_state` | [EndState](#endstate) | no |  | The expected end state of the world after the run. |
 | `perturbations` | list of [Perturbation](#perturbation) | no |  | Deviations to inject in perturbed mode. |
 | `uses` | [Uses](#uses) | no |  | The objects every block uses (policies, check set, diagnostics), by id or inline. Left out of the block cache key. |
-| `metadata` | map of string to any value | no |  | Free metadata. |
+| `metadata` | map of string to any value | no |  | Free metadata. Three keys are read: tool_schemas (the tool definitions, by tool label), tool_promises (what a successful call of a tool prints, by tool label or command pattern) and stated_rules (the rules the prompt or a skill states about a tool, which blame reads). |
 
 ## TargetRef
 
@@ -375,6 +376,7 @@ The expected output and state delta of a block. Every field is optional.
 | `workspace` | [WorkspaceExpect](#workspaceexpect) | no |  | The workspace diff expected. |
 | `task_impossible` | boolean | no |  | True when the task, or the tests it was given, cannot be met honestly. The checks do not read it. Blame credits an agent that stopped and said so, and attributes a pass reached anyway to the agent as an integrity fault. |
 | `downstream` | list of [Expect downstream](#expect-downstream) | no |  | Consumers of the block output that need a form nobody states to the agent. The checks do not read it. When a value that works fails its check, blame names the missing rule as a setup fault instead of flagging the test. |
+| `provided_tests` | [Expect provided_tests](#expect-provided_tests) | no |  | The tests the task provides. The checks do not read it. When a gating verdict fails and the agent edited one of these files, blame runs them again in a fresh sandbox with the agent's test edits reverted (the caller gives the sandbox with blame.useBlameServices); tests that then fail make the failure the agent's as an integrity fault. |
 | `protected` | list of strings, each not empty | no |  | Paths or globs the agent must not change or delete, whoever wrote them: the tests, checkers and source-of-truth files it was given. The checks do not read it. When a gating verdict fails and the net workspace diff holds one, blame attributes the failure to the agent as an integrity fault. |
 | `safety` | [SafetyExpect](#safetyexpect) | no |  | Limits on destructive operations. |
 
@@ -646,6 +648,16 @@ A consumer that needs a form of a value.
 | `field` | string, not empty | no |  | The argument the consumer reads. Absent means every argument. |
 | `needs` | string, not empty | yes |  | The form the consumer needs, such as e164 or iso8601. |
 | `declared_in` | string, not empty | no |  | Where the consumer states the need, such as a file or a system name. |
+
+## Expect provided_tests
+
+The tests the task provides. The checks do not read it. When a gating verdict fails and the agent edited one of these files, blame runs them again in a fresh sandbox with the agent's test edits reverted (the caller gives the sandbox with blame.useBlameServices); tests that then fail make the failure the agent's as an integrity fault.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `paths` | list of strings, each not empty, at least 1 item | yes |  | The test files the task provides, as paths or globs: `*` within a folder, `**` across folders. |
+| `command` | string, not empty | yes |  | The command that runs them in the workspace; a nonzero exit means the tests fail. |
+| `timeout_ms` | integer, at least 1 | no |  | Kills the command after this long. |
 
 ## SafetyExpect
 

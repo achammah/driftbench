@@ -646,3 +646,385 @@ describe('a judge that throws is reported, not read as no decider', () => {
     expect(error?.summary).toContain('judge endpoint down');
   });
 });
+
+describe('a tool that succeeds without printing what it promises', () => {
+  write({
+    'specs/silent.yaml': [
+      'id: silent-tool',
+      'uses: { diagnostics: [code-agent-liability] }',
+      'metadata:',
+      '  tool_promises:',
+      '    coverage.check:',
+      '      matches: \'"found"\'',
+      '      from: coverage.check usage text',
+      'blocks:',
+      '  - user: Is fibre available at 88 Summit Avenue?',
+      '    expect:',
+      '      must: ["not available"]',
+      '',
+    ].join('\n'),
+    'specs/silent-undeclared.yaml': [
+      'id: silent-undeclared',
+      'uses: { diagnostics: [code-agent-liability] }',
+      'blocks:',
+      '  - user: Is fibre available at 88 Summit Avenue?',
+      '    expect:',
+      '      must: ["not available"]',
+      '',
+    ].join('\n'),
+    'specs/promise-bad.yaml': [
+      'id: promise-bad',
+      'metadata:',
+      '  tool_promises:',
+      '    coverage.check: { matches: "(" }',
+      'blocks:',
+      '  - user: hi',
+      '    expect: { must: ["hi"] }',
+      '',
+    ].join('\n'),
+  });
+  const reply = (output: unknown): Reply => ({
+    text: 'Yes, fibre is available.',
+    toolCalls: [{ label: 'coverage.check', input: { address: '88 Summit Avenue' }, output }],
+  });
+
+  it('tool_silent_success: the call printed nothing of what its usage text promises', async () => {
+    const diagnosis = diagnosisOf(await run('specs/silent.yaml', reply({ ok: true })), 'must.0');
+    expect(ruleOf(diagnosis.rule)).toBe('tool_silent_success');
+    expect(diagnosis.fault).toContain('tool');
+    expect(diagnosis.fixLocation).toBe('tool.impl');
+  });
+
+  it('is not tool_silent_success when the output holds what is promised, or nothing is promised', async () => {
+    const kept = await run('specs/silent.yaml', reply({ found: true }));
+    expect(ruleOf(diagnosisOf(kept, 'must.0').rule)).not.toBe('tool_silent_success');
+    const undeclared = await run('specs/silent-undeclared.yaml', reply({ ok: true }));
+    expect(ruleOf(diagnosisOf(undeclared, 'must.0').rule)).not.toBe('tool_silent_success');
+  });
+
+  it('refuses a promise whose pattern does not compile when the spec loads', async () => {
+    clearObjectContexts();
+    const loaded = await loadSpecFile(join(root, 'specs/promise-bad.yaml'));
+    expect(loaded.ok).toBe(false);
+  });
+});
+
+describe('a stricter rule than the tool needs, obeyed by the agent', () => {
+  write({
+    'specs/stricter.yaml': [
+      'id: stricter-rule',
+      'uses: { diagnostics: [code-agent-liability] }',
+      'metadata:',
+      '  stated_rules:',
+      '    - tool: coverage.check',
+      '      field: address',
+      '      where: prompt',
+      '      asks: [street_number, street_name, town]',
+      '      tool_needs: [street_name, town]',
+      '      file: prompt.md',
+      '      line: 12',
+      'blocks:',
+      '  - user: Is fibre available at Summit Avenue, Acmeville?',
+      '    expect:',
+      '      tools:',
+      '        - { label: coverage.check }',
+      '',
+    ].join('\n'),
+  });
+
+  it('R6: no call was made, and the reply asks for a part only the stated rule demands', async () => {
+    const result = await run('specs/stricter.yaml', {
+      text: 'Could you give me the street number first?',
+    });
+    const diagnosis = diagnosisOf(result, 'tools.coverage.check.count');
+    expect(ruleOf(diagnosis.rule)).toBe('R6');
+    expect(diagnosis.disposition).toBe('setup');
+  });
+
+  it('is not R6 when the reply asks for a part the tool needs', async () => {
+    const result = await run('specs/stricter.yaml', { text: 'Which town is that in?' });
+    expect(ruleOf(diagnosisOf(result, 'tools.coverage.check.count').rule)).not.toBe('R6');
+  });
+});
+
+describe('a reply that claims what the run contradicts', () => {
+  write({
+    'specs/claim.yaml': [
+      'id: false-claim',
+      'uses: { diagnostics: [code-agent-liability] }',
+      'blocks:',
+      '  - user: Save the price list to prices.csv.',
+      '    expect:',
+      '      workspace: { created: [prices.csv] }',
+      '',
+    ].join('\n'),
+  });
+
+  it('I3: the reply says prices.csv was saved and the workspace diff has no such file', async () => {
+    const result = await run('specs/claim.yaml', {
+      text: 'Done: I saved prices.csv with all 12 plans.',
+      workspaceDiff: { created: ['notes.txt'], changed: [], deleted: [] },
+    });
+    const diagnosis = diagnosisOf(result, 'workspace.created');
+    expect(ruleOf(diagnosis.rule)).toBe('I3_false_claim');
+    expect(diagnosis.disposition).toBe('agent');
+  });
+
+  it('is not I3 when the file the reply names is in the diff', async () => {
+    const result = await run('specs/claim.yaml', {
+      text: 'I saved prices.csv.',
+      workspaceDiff: { created: ['prices.csv', 'notes.txt'], changed: [], deleted: [] },
+    });
+    expect(result.blocks[0]?.verdicts.find((one) => one.id === 'workspace.created')?.outcome).toBe('pass');
+  });
+});
+
+describe('an environment failure the agent reported honestly', () => {
+  write({
+    'specs/env.yaml': [
+      'id: env-failure',
+      'uses: { diagnostics: [code-agent-liability] }',
+      'blocks:',
+      '  - user: Is fibre available at 88 Summit Avenue?',
+      '    expect:',
+      '      must: ["fibre is available"]',
+      '',
+    ].join('\n'),
+  });
+  const down = (text: string): Reply => ({
+    text,
+    toolCalls: [
+      {
+        label: 'coverage.check',
+        input: { address: '88 Summit Avenue' },
+        error: 'connect ECONNREFUSED 10.0.0.7:443',
+      },
+    ],
+  });
+
+  it('env_failure: the tool could not reach the network, and the agent says so', async () => {
+    const diagnosis = diagnosisOf(
+      await run('specs/env.yaml', down('I could not reach the coverage service.')),
+      'must.0',
+    );
+    expect(ruleOf(diagnosis.rule)).toBe('env_failure');
+    expect(diagnosis.disposition).toBe('excluded');
+    expect(diagnosis.fault).toEqual(['env']);
+  });
+
+  it('is not env_failure when the reply hides it behind a false claim of success', async () => {
+    const hidden = down('I saved the coverage result to coverage.txt.');
+    const result = await run('specs/env.yaml', {
+      ...hidden,
+      workspaceDiff: { created: [], changed: [], deleted: [] },
+    });
+    expect(ruleOf(diagnosisOf(result, 'must.0').rule)).toBe('I3_false_claim');
+  });
+});
+
+describe('a tool output that contradicts a rule the estate states', () => {
+  write({
+    'estate/map.json': JSON.stringify({
+      atoms: [
+        {
+          id: 'rule.standard-rate',
+          kind: 'instruction',
+          title: 'The standard rate is 10 EUR',
+          provenance: { file: 'CLAUDE.md', startLine: 14 },
+          fields: {},
+        },
+      ],
+      edges: [],
+    }),
+    'specs/contradicts.yaml': [
+      'id: tool-contradicts-rule',
+      'uses: { diagnostics: [code-agent-liability] }',
+      'metadata:',
+      `  estate: { map: ${join(root, 'estate/map.json')}, atoms: [rule.standard-rate] }`,
+      'blocks:',
+      '  - user: Write me a quote at the standard rate.',
+      '    expect:',
+      '      tools:',
+      '        - { label: quote.write, input: { rate: "10" } }',
+      '',
+    ].join('\n'),
+    'specs/contradicts-unlinked.yaml': [
+      'id: tool-contradicts-unlinked',
+      'uses: { diagnostics: [code-agent-liability] }',
+      'blocks:',
+      '  - user: Write me a quote at the standard rate.',
+      '    expect:',
+      '      tools:',
+      '        - { label: quote.write, input: { rate: "10" } }',
+      '',
+    ].join('\n'),
+  });
+  const relied = (rate: string): Reply => ({
+    text: 'Quote written.',
+    toolCalls: [
+      { label: 'rates.lookup', input: { plan: 'standard' }, output: `standard: ${rate} EUR` },
+      { label: 'quote.write', input: { rate }, output: { ok: true } },
+    ],
+  });
+
+  it('tool_output_contradicts_rule: the agent wrote the rate the tool returned, against the stated rule', async () => {
+    const result = await run('specs/contradicts.yaml', relied('12'));
+    const diagnosis = diagnosisOf(result, 'tools.quote.write.input.rate');
+    expect(ruleOf(diagnosis.rule)).toBe('tool_output_contradicts_rule');
+    expect(diagnosis.fault).toContain('tool');
+    expect(diagnosis.fixLocation).toBe('tool.impl');
+  });
+
+  it('needs the rule: without an atom the same failure is not charged to the tool output', async () => {
+    const result = await run('specs/contradicts-unlinked.yaml', relied('12'));
+    expect(ruleOf(diagnosisOf(result, 'tools.quote.write.input.rate').rule)).not.toBe(
+      'tool_output_contradicts_rule',
+    );
+  });
+});
+
+describe('rules that come from the estate map, read from a spec that names its atoms', () => {
+  const atoms = [
+    {
+      id: 'skill.rates.body',
+      kind: 'skill',
+      provenance: { file: '.claude/skills/rates/SKILL.md', startLine: 4 },
+      fields: {},
+    },
+    {
+      id: 'ref.rates.rule',
+      kind: 'reference',
+      provenance: { file: '.claude/skills/rates/reference/standard.md', startLine: 3 },
+      fields: {},
+    },
+    {
+      id: 'core.rule',
+      kind: 'instruction',
+      provenance: { file: 'CLAUDE.md', startLine: 9 },
+      evidence: [{ type: 'ordered', before: 'Read', after: 'Edit' }],
+      enforcement: ['guard.read-first'],
+      fields: {},
+    },
+    {
+      id: 'guard.read-first',
+      kind: 'guard',
+      provenance: { file: '.claude/settings.json', startLine: 2 },
+      fields: { name: 'read-first' },
+    },
+  ];
+  const spec = (id: string, atom: string, skills?: string) =>
+    [
+      `id: ${id}`,
+      'uses: { diagnostics: [code-agent-liability] }',
+      'metadata:',
+      `  estate: { map: ${join(root, 'estate/atoms.json')}, atoms: [${atom}] }`,
+      'blocks:',
+      '  - user: Write me a quote at the standard rate.',
+      '    expect:',
+      ...(skills === undefined ? [] : [`      skills: [{ name: ${skills} }]`]),
+      '      must: ["standard rate"]',
+      '',
+    ].join('\n');
+  write({
+    'estate/atoms.json': JSON.stringify({ atoms, edges: [] }),
+    'specs/unrouted.yaml': spec('unrouted', 'ref.rates.rule', 'billing'),
+    'specs/not-loaded.yaml': spec('not-loaded', 'skill.rates.body', 'rates'),
+    'specs/unforced.yaml': spec('unforced', 'ref.rates.rule', 'rates'),
+    'specs/caught.yaml': spec('caught', 'core.rule'),
+  });
+  const ruleFor = async (file: string, reply: Reply = {}) =>
+    ruleOf(diagnosisOf(await run(file, { text: 'Done.', ...reply }), 'must.0').rule);
+
+  it('rule_in_unrouted_skill: the rule is in a skill, and the ask routes to another', async () => {
+    expect(await ruleFor('specs/unrouted.yaml')).toBe('rule_in_unrouted_skill');
+  });
+
+  it('skill_not_loaded_undecided: the routed skill was not loaded and coverage is unknown', async () => {
+    expect(await ruleFor('specs/not-loaded.yaml')).toBe('skill_not_loaded_undecided');
+  });
+
+  it('skill_reference_unforced: the skill is loaded and the reference holding the rule was never read', async () => {
+    expect(await ruleFor('specs/unforced.yaml', { runtime: { skills: [{ name: 'rates' }] } })).toBe(
+      'skill_reference_unforced',
+    );
+  });
+
+  it('R7: the core prompt states an order of steps, and the run broke it with no guard to catch it', async () => {
+    expect(await ruleFor('specs/caught.yaml')).toBe('R7');
+  });
+
+  it('skill_rule_ignored: the skill is loaded and the reference holding the rule was read in full', async () => {
+    expect(
+      await ruleFor('specs/unforced.yaml', {
+        runtime: { skills: [{ name: 'rates' }] },
+        toolCalls: [
+          {
+            label: 'Read',
+            input: { file_path: '.claude/skills/rates/reference/standard.md' },
+            output: 'Quote at the standard rate.',
+          },
+        ],
+      }),
+    ).toBe('skill_rule_ignored');
+  });
+
+  it('core_rule_caught: a guard denied the act and the agent then complied', async () => {
+    expect(
+      await ruleFor('specs/caught.yaml', {
+        runtime: {
+          guards: [
+            { name: 'read-first', verdict: 'deny' },
+            { name: 'read-first', verdict: 'allow' },
+          ],
+        },
+      }),
+    ).toBe('core_rule_caught');
+  });
+});
+
+describe('a verdict is diagnosed once when two diagnostics are listed', () => {
+  write({
+    'specs/dedupe-both.yaml': [
+      'id: dedupe-both',
+      'uses: { diagnostics: [code-agent-liability, value-mismatch] }',
+      'blocks:',
+      '  - user: Port my number, 202 555 0150.',
+      '    expect:',
+      '      task_impossible: true',
+      '      must: ["done"]',
+      '      tools:',
+      '        - { label: port.start, input: { number: "+12025550150" } }',
+      '',
+    ].join('\n'),
+  });
+  let restore = () => {};
+  afterEach(() => restore());
+  const wrote = {
+    toolCalls: [{ label: 'port.start', input: { number: '+1 (202) 555-0150' }, output: { ok: true } }],
+  };
+
+  it('writes each verdict and rule once, and each error flag once', async () => {
+    restore = useBlameServices({
+      value: {
+        judge: {
+          model: 'scripted',
+          calibration: { falseAcceptance: 0, source: 'test script' },
+          complete: async () => {
+            throw new Error('judge endpoint down');
+          },
+        },
+      },
+      reply: () => {
+        throw new Error('classifier unreachable');
+      },
+    });
+    const result = await run('specs/dedupe-both.yaml', { ...wrote, text: 'Porting.' });
+    const diagnoses = result.blocks[0]?.diagnoses ?? [];
+    const keys = diagnoses.map((one) => `${one.verdictRef}|${one.rule}|${(one.flags ?? []).join(',')}`);
+    expect(new Set(keys).size).toBe(keys.length);
+    for (const flag of ['error:reply_reader_failed', 'error:value_service_failed']) {
+      expect(diagnoses.filter((one) => one.flags?.includes(flag))).toHaveLength(1);
+    }
+    expect(diagnoses.filter((one) => one.verdictRef === 'tools.port.start.input.number')).toHaveLength(1);
+  });
+});
