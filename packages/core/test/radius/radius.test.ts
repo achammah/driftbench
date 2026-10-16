@@ -291,3 +291,42 @@ describe('parseChangeManifest', () => {
     ).toBe(false);
   });
 });
+
+describe('the radius of a spec with parent links', () => {
+  // Two trees, listed in a shuffled order: a tool change reaches the root of the first one only.
+  const forest: Spec = {
+    id: 'bike-forest',
+    kind: 'conversation',
+    blocks: [
+      {
+        id: 'r2',
+        when: { user: 'Do you rent bikes?' },
+        expect: { tools: [{ label: 'rental.quote', count: 1 }] },
+      },
+      { id: 'c1', parent: 'r1', when: { user: 'In blue?' }, expect: { must: ['bike'] } },
+      {
+        id: 'r1',
+        when: { user: 'Which bike?' },
+        expect: { tools: [{ label: 'bikes.lookup', count: 1, input: { kind: 'city' } }] },
+      },
+      { id: 'c2', parent: 'c1', when: { user: 'With a basket?' }, expect: { must: ['bike'] } },
+      { id: 'd1', parent: 'r2', when: { user: 'For two days?' }, expect: { must: ['bike'] } },
+    ],
+    metadata: { depends: { stages: ['shop'] } },
+  } as Spec;
+  const change: Change = { kind: 'tool', id: 'bikes.lookup', part: 'input' };
+
+  for (const mode of ['F', 'T'] as const) {
+    it(`puts the descendants of a direct block in, wherever they are listed, and no other block (mode ${mode})`, () => {
+      const report = radiusOf(
+        [{ spec: forest, hash: 'h' }],
+        { from: 'a', to: 'b', changes: [change] },
+        { modes: [mode] },
+      );
+      const states = Object.fromEntries(
+        (report.specs[0]?.blocks ?? []).map((block) => [block.id, block.state[mode]]),
+      );
+      expect(states).toEqual({ r2: 'out', c1: 'forward', r1: 'direct', c2: 'forward', d1: 'out' });
+    });
+  }
+});

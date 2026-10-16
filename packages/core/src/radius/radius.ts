@@ -1,3 +1,4 @@
+import { parentLinks } from '../runner/forest';
 import type { RunMode } from '../schema/run';
 import type { PerturbationSpec, Spec } from '../schema/spec';
 import { isPlainObject } from '../spec/normalize';
@@ -11,7 +12,9 @@ import { type BlockDependencies, blockDependencies } from './depends';
  * 2. Forward closure: in mode F and P a block inherits the agent's own earlier replies, so every block
  *    after a direct block of the same run is in. In mode T a block starts from its canonical Given, so
  *    nothing follows, except in a sandbox (a task), where a step keeps the workspace the step before
- *    left until a step writes its own.
+ *    left until a step writes its own. In a spec with parent links a block inherits from its ancestors
+ *    only, in every mode: the descendants of a direct block, at any depth and wherever listed, are in, and
+ *    no other block is.
  *
  * Unknown means in. A block with unknown dependencies is in every radius; a change the radius cannot map
  * to a declared dependency makes the radius the whole suite, with the reason.
@@ -238,6 +241,27 @@ function rejectedBlocks(spec: Spec): Set<string> {
   return out;
 }
 
+/**
+ * With parent links: the blocks that descend from a direct block, at any depth, wherever the spec lists them.
+ * Undefined for a spec without links, where the blocks after a direct block follow it.
+ */
+function descendantsOfDirect(spec: Spec, blocks: readonly RadiusBlock[]): Set<number> | undefined {
+  const links = parentLinks(spec);
+  if (!links) return undefined;
+  const out = new Set<number>();
+  blocks.forEach((_, index) => {
+    const seen = new Set([index]);
+    for (let at = links.get(index); at !== undefined && !seen.has(at); at = links.get(at)) {
+      seen.add(at);
+      if (blocks[at]?.why.length) {
+        out.add(index);
+        break;
+      }
+    }
+  });
+  return out;
+}
+
 /** In mode T on a sandbox, the first block at or after `from` that starts from a workspace of its own. */
 function workspaceReset(spec: Spec, from: number): number {
   for (let index = from; index < spec.blocks.length; index++) {
@@ -305,7 +329,32 @@ export function radiusOf(
     }));
     const first = blocks.findIndex((block) => block.why.length > 0);
     const cells: RadiusCell[] = [];
+    const descendants = descendantsOfDirect(spec, blocks);
     for (const mode of modes) {
+      if (descendants) {
+        // Parent links: a block follows its ancestors, not the blocks listed before it.
+        for (const block of blocks) {
+          block.state[mode] =
+            block.why.length > 0 ? 'direct' : descendants.has(block.index) ? 'forward' : 'out';
+        }
+        if (mode === 'P') {
+          const list = perturbations[at] ?? [];
+          for (const { each, deps: own } of list) {
+            const why = whole ? [`whole:${whole.change}`] : reasons(own);
+            cells.push({
+              mode,
+              perturbationId: each.id,
+              in: first >= 0 || why.length > 0,
+              why: why.length > 0 ? why : first >= 0 ? (blocks[first]?.why ?? []) : [],
+            });
+          }
+          if (list.length === 0)
+            cells.push({ mode, in: first >= 0, why: first >= 0 ? (blocks[first]?.why ?? []) : [] });
+        } else {
+          cells.push({ mode, in: first >= 0, why: first >= 0 ? (blocks[first]?.why ?? []) : [] });
+        }
+        continue;
+      }
       if (mode === 'T') {
         // A T block starts from its canonical Given; only a sandbox carries the workspace forward.
         let until = -1;
