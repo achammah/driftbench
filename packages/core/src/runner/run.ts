@@ -9,6 +9,7 @@ import { type BlockReuse, planBlockRerun } from '../radius/blocks';
 import { collectRetries, type RetryPolicy, retryPolicy } from '../retry';
 import type { Message, TargetRef, WorldState } from '../schema/common';
 import {
+  type Blocked,
   type BlockResult,
   type NotRun,
   Observed,
@@ -23,7 +24,7 @@ import { cloneJson, contentHash } from '../spec/hash';
 import { specHash as specHashOf, specIdentity } from '../spec/identity';
 import { compareEndState, type EndStateMatch } from './assertion';
 import { blockCacheKey, endStateCacheKey, type ObservedCache, unwrapEndState, wrapEndState } from './cache';
-import { capabilityGap } from './capability';
+import { capabilityGap, type GivenLayers } from './capability';
 import { recheckCarriedEndState } from './carried-end-state';
 import { cellId } from './cell';
 import { driftOf } from './drift';
@@ -386,8 +387,10 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   const links = parentLinks(spec);
   /** F and P with parent links: the Given and the history each spec block left, for the children it has. */
   const left = new Map<number, { state: RunningGiven; history: Message[] }>();
-  /** The spec block the open session ran last. */
+  /** The spec block entered last, whatever came of it: the session is at its end only when it ran. */
   let lastRan: number | undefined;
+  /** With parent links: the result of each spec block so far, for the children it has. */
+  const resultOf = new Map<number, BlockResult>();
 
   try {
     for (let position = 0; ; position++) {
@@ -472,6 +475,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
             users = userMessagesOf(history);
             prefixWritten = history.length > 0;
           }
+          lastRan = step.blockIndex;
         }
         state = enterBlock(state, planned.given, planned.world);
         if (planned.given?.prefix) {
@@ -483,7 +487,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       }
       const given = resolveGiven(state, history, run.target);
       // The capability check: a layer the adapter cannot apply makes the block not_run, never a silent drop.
-      const notRun = capabilityGap(run.adapter.id, run.capabilities, {
+      const layers: Omit<GivenLayers, 'world'> = {
         // In mode T the block starts from the canonical history: the latest written prefix, then the blocks
         // after it; in F and P from the prefix the spec wrote, the session holding the agent's own turns.
         ...(run.mode === 'T'
@@ -496,16 +500,59 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
               }
           : prefixWritten
             ? { prefix: 'authored' as const }
-            : {}),
-        world: state.world,
-      });
+            : // A child starts from its ancestors' turns, which the adapter must seed.
+              step.kind === 'block' && links?.has(step.blockIndex)
+              ? { prefix: 'canonical' as const }
+              : {}),
+      };
+      // The layers the Given needs come first: a child whose adapter cannot seed its ancestors is not run,
+      // whatever its parent did. Then a child of a parent that did not pass is blocked; a forced tool result
+      // the adapter cannot apply comes last.
+      const historyGap = capabilityGap(run.adapter.id, run.capabilities, { ...layers, world: {} });
+      // A child of a parent that did not pass is blocked: never sent, by its own parent and rooted at the first
+      // failure or at the parent not run.
+      if (!historyGap && links && step.kind === 'block') {
+        const parent = links.get(step.blockIndex);
+        const parentResult = parent === undefined ? undefined : resultOf.get(parent);
+        if (parent !== undefined && parentResult !== undefined && blockStatus(parentResult) !== 'pass') {
+          const parentId = idOf(spec, parent);
+          const canonical = canonicalGiven(spec, step.blockIndex);
+          const skipped = blockedBlock(
+            run,
+            position,
+            planned,
+            {
+              givenHash: resolveGiven(canonical.state, canonical.prefix, run.target).hash,
+              specIndex: step.blockIndex,
+              ledger: addFacts(canonical.state.ledger, planned.expect.ledger_add).ledger,
+            },
+            {
+              by: parentId,
+              root:
+                blockStatus(parentResult) === 'blocked' ? (parentResult.blocked?.root ?? parentId) : parentId,
+            },
+          );
+          blocks.push(skipped);
+          resultOf.set(step.blockIndex, skipped);
+          continue;
+        }
+      }
+      const notRun =
+        historyGap ?? capabilityGap(run.adapter.id, run.capabilities, { ...layers, world: state.world });
       if (notRun) {
         const specIndex = step.kind === 'block' ? step.blockIndex : step.beforeBlock;
         const ledger = addFacts(state.ledger, planned.expect.ledger_add).ledger;
-        blocks.push(
-          notRunBlock(run, position, planned, { givenHash: given.hash, specIndex, ledger }, notRun),
+        const skipped = notRunBlock(
+          run,
+          position,
+          planned,
+          { givenHash: given.hash, specIndex, ledger },
+          notRun,
         );
-        if (run.mode === 'T') continue;
+        blocks.push(skipped);
+        if (step.kind === 'block') resultOf.set(step.blockIndex, skipped);
+        // With parent links the other trees still run: only this block's children are blocked.
+        if (run.mode === 'T' || links) continue;
         // In F and P the free conversation cannot go past a block it did not run: every later spec block is
         // not run either, and the driver is not asked for more steps.
         // Each later block is stamped as a run reconstructs it (a re-judge checks the stamps): the blocks before
@@ -688,7 +735,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       };
       blocks.push(block);
       if (links && step.kind === 'block') {
-        lastRan = step.blockIndex;
+        resultOf.set(step.blockIndex, block as BlockResult);
         if (run.mode !== 'T') left.set(step.blockIndex, { state, history });
       }
       run.onEvent?.({
@@ -822,12 +869,38 @@ function notRunBlock(
   stamp: { givenHash: string; specIndex: number; ledger: Record<string, unknown> },
   notRun: NotRun,
 ): BlockResult {
+  return skippedBlock(run, position, planned, stamp, { status: 'not_run', notRun });
+}
+
+/** A block that was never sent because an ancestor did not pass: it names its parent and the root of the cause. */
+function blockedBlock(
+  run: RunContext,
+  position: number,
+  planned: PlannedStep,
+  stamp: { givenHash: string; specIndex: number; ledger: Record<string, unknown> },
+  blocked: Blocked,
+): BlockResult {
+  return skippedBlock(run, position, planned, stamp, { status: 'blocked', blocked });
+}
+
+/** The id a block is known by in a verdict: its own id, else its position in the spec. */
+function idOf(spec: Spec, index: number): string {
+  return spec.blocks[index]?.id ?? String(index);
+}
+
+function skippedBlock(
+  run: RunContext,
+  position: number,
+  planned: PlannedStep,
+  stamp: { givenHash: string; specIndex: number; ledger: Record<string, unknown> },
+  mark: { status: 'not_run'; notRun: NotRun } | { status: 'blocked'; blocked: Blocked },
+): BlockResult {
   run.onEvent?.({ type: 'block_start', index: position, at: new Date().toISOString() });
   run.onEvent?.({
     type: 'block_end',
     index: position,
     pass: false,
-    status: 'not_run',
+    status: mark.status,
     at: new Date().toISOString(),
   });
   return {
@@ -850,8 +923,7 @@ function notRunBlock(
     ledgerCheck: { ok: true, contradictions: [] },
     drift: [],
     pass: false,
-    status: 'not_run',
-    notRun,
+    ...mark,
   };
 }
 

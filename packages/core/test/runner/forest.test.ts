@@ -1,7 +1,7 @@
-import { RunResult, validateSpec } from '@agent-nexus/driftbench-core';
+import { type Check, machineVerdict, RunResult, validateSpec } from '@agent-nexus/driftbench-core';
 import { createScriptedDriver } from '@agent-nexus/driftbench-users';
 import { describe, expect, it } from 'vitest';
-import { canonicalGiven, runSpec } from '../../src/runner';
+import { blockStatus, canonicalGiven, runOutcome, runSpec } from '../../src/runner';
 import { acmeAdapter, specOf } from './support';
 
 const driver = createScriptedDriver();
@@ -103,5 +103,70 @@ describe('the loader and parent links', () => {
         { parent: 'b', user: 'hi' },
       ]),
     ).toEqual([]);
+  });
+});
+
+/** A check that fails a block whose stimulus says BAD. */
+const badWords: Check = {
+  name: 'bad',
+  applies: () => true,
+  evaluate: (ctx) => [
+    machineVerdict(
+      'bad',
+      'words',
+      JSON.stringify(ctx.stimulus).includes('BAD') ? 'fail' : 'pass',
+      'the stimulus says BAD or not',
+    ),
+  ],
+};
+
+describe('a block whose parent did not pass', () => {
+  const tree = specOf({
+    id: 'bike-chain',
+    blocks: [
+      { id: 'a', user: 'BAD start' },
+      { id: 'a1', parent: 'a', user: 'next' },
+      { id: 'a2', parent: 'a1', user: 'after' },
+      { id: 'b', user: 'Do you rent bikes?' },
+      { id: 'b1', parent: 'b', user: 'For two days?' },
+    ],
+  });
+
+  for (const mode of ['F', 'T'] as const) {
+    it(`is blocked by its own parent, rooted at the first failure, and never sent (mode ${mode})`, async () => {
+      const adapter = acmeAdapter();
+      const run = await runSpec(tree, { adapter, driver, checks: [badWords], mode, repeat: 0 });
+      expect(RunResult.safeParse(run).success).toBe(true);
+      expect(run.blocks.map(blockStatus)).toEqual(['fail', 'blocked', 'blocked', 'pass', 'pass']);
+      expect(run.blocks[1]?.blocked).toMatchObject({ by: 'a', root: 'a' });
+      expect(run.blocks[2]?.blocked).toMatchObject({ by: 'a1', root: 'a' });
+      // Only the three blocks that ran were sent: the other tree ran and passed.
+      expect(adapter.calls.send).toBe(3);
+      expect(runOutcome(run)).toBe('fail');
+    });
+  }
+
+  it('blocks the children of a block that was not run, rooted at that block, and runs the other tree', async () => {
+    const stubbed = specOf({
+      id: 'bike-stub',
+      blocks: [
+        { id: 'a', user: 'start', given: { world: { tools: { lookup: { result: 1 } } } } },
+        { id: 'a1', parent: 'a', user: 'next' },
+        { id: 'b', user: 'Do you rent bikes?', given: { world: { tools: {} } } },
+      ],
+    });
+    const adapter = acmeAdapter({ capabilities: { toolStubs: false } });
+    const run = await runSpec(stubbed, { adapter, driver, checks: [], mode: 'F', repeat: 0 });
+    expect(run.blocks.map(blockStatus)).toEqual(['not_run', 'blocked', 'pass']);
+    expect(run.blocks[1]?.blocked).toMatchObject({ by: 'a', root: 'a' });
+    expect(runOutcome(run)).toBe('not_run');
+  });
+
+  it('is not run, whatever its parent did, when the adapter cannot seed its ancestors', async () => {
+    const adapter = acmeAdapter({ capabilities: { seedPrefix: false } });
+    const run = await runSpec(forest, { adapter, driver, checks: [], mode: 'F', repeat: 0 });
+    expect(run.blocks.map(blockStatus)).toEqual(['pass', 'not_run', 'not_run', 'pass', 'not_run']);
+    expect(run.blocks[1]?.notRun).toMatchObject({ kind: 'unsupported', check: 'capability' });
+    expect(adapter.calls.send).toBe(2);
   });
 });
