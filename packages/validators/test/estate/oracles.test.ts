@@ -707,3 +707,40 @@ describe('gen.task compares the ask with the rules of the estate map', { timeout
     expect((await run('guard_positive', 'Please delete a ledger file.', [])).pass).toBe(true);
   });
 });
+
+describe('gen.task: a rule of several clauses repeated whole is a rule restated', () => {
+  // Hand-written rules of several clauses, and asks that repeat them whole. Each clause alone is only a part of the rule.
+  const MULTI: Array<[rule: string, ask: string]> = [
+    ['Keep replies short; cite every figure.', 'Keep replies short; cite every figure.'],
+    [
+      'Confirm the recipient; show the draft before sending.',
+      'Confirm the recipient; show the draft before sending.',
+    ],
+    [
+      'Write to each supplier in its language; copy the buyer.',
+      'Please write to each supplier in its language; copy the buyer.',
+    ],
+    ['Read the reference first; then edit the file.', 'Read the reference first; then edit the file.'],
+    [
+      'Log each refund in the sheet; tell the manager.',
+      'Could you log each refund in the sheet; tell the manager?',
+    ],
+    ['Check the stock count; round up to the pallet.', 'Check the stock count, then round up to the pallet.'],
+  ];
+
+  it.each(MULTI)('rejects an ask that repeats a rule of several clauses: %s', (rule, ask) => {
+    expect(holdsTask(ask)).toBe(true);
+    expect(holdsTask(ask, { rules: [rule] })).toBe(false);
+  });
+
+  it.each([
+    [
+      'Keep replies short; cite every figure.',
+      'Shorten the reply to Copperline and cite the sheet it came from.',
+    ],
+    ['Read the reference first; then edit the file.', 'Edit the file without reading the reference first.'],
+    ['Confirm the recipient; show the draft before sending.', 'Send the draft to the recipient now.'],
+  ])('keeps a task that shares only some clauses with a rule: %s', (rule, ask) =>
+    expect(holdsTask(ask, { rules: [rule] })).toBe(true),
+  );
+});
