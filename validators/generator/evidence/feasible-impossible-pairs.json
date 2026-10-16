@@ -1,0 +1,693 @@
+{
+  "base": "d1567480b",
+  "scope": "diff.feasible.<seeder> against the hidden space map's impossible pairs, every seeder; scoped measurement only",
+  "contractSources": [
+    "packages/validators/src/ladders/generator/possible.ts (impossiblePairs: a move event sits at the stage it reaches)",
+    "packages/validators/src/ladders/generator/render.ts (hiddenSpaceMap)",
+    "packages/generate/src/seed/possible.ts (the generator's own model: the same event rule)"
+  ],
+  "redFirst": {
+    "failed": 3,
+    "passed": 11,
+    "command": "pnpm exec vitest run packages/validators/test/generator/feasibility-impossible.test.ts packages/validators/test/generator/feasibility.test.ts"
+  },
+  "green": {
+    "passed": 28,
+    "files": 4,
+    "visibleSeeds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+    "freshSeeds": [
+      1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017,
+      1018, 1019, 1020
+    ],
+    "baseHiddenSeed": 513104064
+  },
+  "causes": {
+    "behaviour-not-in-flow": "a cover spec's cell pairs a behaviour with a flow that does not list it (seed 2: gen-cover-001, flow change-request, behaviour B-001); every block inherits the pair",
+    "start-move-said-at": "the first move's block records the start stage it is said at (assemble.ts saidAt), while both possible.ts models place a move at the stage it reaches; flagged only where the behaviour's flows carry no first-turn class"
+  },
+  "productMeasurement": {
+    "note": "Real generation of main on each seed; blocks in a cell only the impossible pairs forbid. No block on any measured seed sits in a written-constraint cell.",
+    "seeds": [
+      {
+        "seed": 1,
+        "completeSpecs": 469,
+        "blocksPerSeeder": {
+          "boundary": 148,
+          "cover": 1204,
+          "deviation": 97,
+          "graph": 23,
+          "metamorphic": 180,
+          "task": 2,
+          "twise": 565
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 411
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 135
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 2,
+        "completeSpecs": 344,
+        "blocksPerSeeder": {
+          "boundary": 160,
+          "cover": 990,
+          "deviation": 124,
+          "graph": 21,
+          "metamorphic": 134,
+          "task": 2,
+          "twise": 450
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 39
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 39
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 3,
+        "completeSpecs": 357,
+        "blocksPerSeeder": {
+          "boundary": 109,
+          "cover": 649,
+          "deviation": 93,
+          "graph": 16,
+          "metamorphic": 127,
+          "task": 2,
+          "twise": 455
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 238
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 90
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 4,
+        "completeSpecs": 456,
+        "blocksPerSeeder": {
+          "boundary": 151,
+          "cover": 1247,
+          "deviation": 107,
+          "graph": 20,
+          "metamorphic": 165,
+          "task": 2,
+          "twise": 497
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 640
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 162
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 5,
+        "completeSpecs": 372,
+        "blocksPerSeeder": {
+          "boundary": 160,
+          "cover": 1163,
+          "deviation": 126,
+          "graph": 19,
+          "metamorphic": 154,
+          "task": 2,
+          "twise": 359
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 323
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 104
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 6,
+        "completeSpecs": 271,
+        "blocksPerSeeder": {
+          "boundary": 110,
+          "cover": 412,
+          "deviation": 90,
+          "graph": 16,
+          "metamorphic": 108,
+          "task": 2,
+          "twise": 347
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 18
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 18
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 7,
+        "completeSpecs": 319,
+        "blocksPerSeeder": {
+          "boundary": 165,
+          "cover": 749,
+          "deviation": 110,
+          "graph": 20,
+          "metamorphic": 148,
+          "task": 2,
+          "twise": 373
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 111
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 41
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 8,
+        "completeSpecs": 330,
+        "blocksPerSeeder": {
+          "boundary": 165,
+          "cover": 1010,
+          "deviation": 124,
+          "graph": 14,
+          "metamorphic": 118,
+          "task": 2,
+          "twise": 418
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 47
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 47
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 9,
+        "completeSpecs": 461,
+        "blocksPerSeeder": {
+          "boundary": 158,
+          "cover": 1450,
+          "deviation": 113,
+          "graph": 21,
+          "metamorphic": 162,
+          "task": 2,
+          "twise": 621
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 254
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 147
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 10,
+        "completeSpecs": 434,
+        "blocksPerSeeder": {
+          "boundary": 155,
+          "cover": 1078,
+          "deviation": 106,
+          "graph": 23,
+          "metamorphic": 168,
+          "task": 2,
+          "twise": 548
+        },
+        "failingItems": ["diff.feasible.cover", "diff.feasible.twise"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 214,
+          "cover/start-move-said-at": 3,
+          "twise/start-move-said-at": 9
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 106,
+          "cover/start-move-said-at": 3,
+          "twise/start-move-said-at": 9
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 11,
+        "completeSpecs": 361,
+        "blocksPerSeeder": {
+          "boundary": 164,
+          "cover": 849,
+          "deviation": 113,
+          "graph": 17,
+          "metamorphic": 134,
+          "task": 2,
+          "twise": 550
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 50
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 50
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 12,
+        "completeSpecs": 445,
+        "blocksPerSeeder": {
+          "boundary": 160,
+          "cover": 1420,
+          "deviation": 104,
+          "graph": 16,
+          "metamorphic": 141,
+          "task": 2,
+          "twise": 449
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 585
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 193
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 13,
+        "completeSpecs": 350,
+        "blocksPerSeeder": {
+          "boundary": 106,
+          "cover": 703,
+          "deviation": 85,
+          "graph": 12,
+          "metamorphic": 92,
+          "task": 2,
+          "twise": 313
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 220
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 102
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 14,
+        "completeSpecs": 305,
+        "blocksPerSeeder": {
+          "boundary": 147,
+          "cover": 669,
+          "deviation": 101,
+          "graph": 14,
+          "metamorphic": 106,
+          "task": 2,
+          "twise": 343
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 28
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 28
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 15,
+        "completeSpecs": 365,
+        "blocksPerSeeder": {
+          "boundary": 159,
+          "cover": 935,
+          "deviation": 107,
+          "graph": 18,
+          "metamorphic": 141,
+          "task": 2,
+          "twise": 489
+        },
+        "failingItems": ["diff.feasible.cover", "diff.feasible.twise"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 110,
+          "cover/start-move-said-at": 4,
+          "twise/start-move-said-at": 9
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 73,
+          "cover/start-move-said-at": 4,
+          "twise/start-move-said-at": 9
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 16,
+        "completeSpecs": 369,
+        "blocksPerSeeder": {
+          "boundary": 107,
+          "cover": 579,
+          "deviation": 89,
+          "graph": 16,
+          "metamorphic": 125,
+          "task": 2,
+          "twise": 568
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 83
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 60
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 17,
+        "completeSpecs": 273,
+        "blocksPerSeeder": {
+          "boundary": 110,
+          "cover": 494,
+          "deviation": 92,
+          "graph": 16,
+          "metamorphic": 106,
+          "task": 2,
+          "twise": 224
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 197
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 63
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 18,
+        "completeSpecs": 384,
+        "blocksPerSeeder": {
+          "boundary": 110,
+          "cover": 756,
+          "deviation": 89,
+          "graph": 16,
+          "metamorphic": 141,
+          "task": 2,
+          "twise": 408
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 433
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 135
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 19,
+        "completeSpecs": 262,
+        "blocksPerSeeder": {
+          "boundary": 113,
+          "cover": 449,
+          "deviation": 84,
+          "graph": 13,
+          "metamorphic": 96,
+          "task": 2,
+          "twise": 225
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 183
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 64
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 20,
+        "completeSpecs": 394,
+        "blocksPerSeeder": {
+          "boundary": 153,
+          "cover": 1174,
+          "deviation": 116,
+          "graph": 17,
+          "metamorphic": 136,
+          "task": 2,
+          "twise": 440
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 157
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 74
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1001,
+        "completeSpecs": 324,
+        "blocksPerSeeder": {
+          "boundary": 148,
+          "cover": 722,
+          "deviation": 93,
+          "graph": 17,
+          "metamorphic": 128,
+          "task": 2,
+          "twise": 320
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 238
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 83
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1002,
+        "completeSpecs": 325,
+        "blocksPerSeeder": {
+          "boundary": 148,
+          "cover": 603,
+          "deviation": 88,
+          "graph": 18,
+          "metamorphic": 137,
+          "task": 2,
+          "twise": 356
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 225
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 74
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1003,
+        "completeSpecs": 291,
+        "blocksPerSeeder": {
+          "boundary": 147,
+          "cover": 558,
+          "deviation": 90,
+          "graph": 14,
+          "metamorphic": 98,
+          "task": 2,
+          "twise": 326
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 33
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 33
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1004,
+        "completeSpecs": 404,
+        "blocksPerSeeder": {
+          "boundary": 162,
+          "cover": 1279,
+          "deviation": 105,
+          "graph": 19,
+          "metamorphic": 114,
+          "task": 2,
+          "twise": 333
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 415
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 146
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1005,
+        "completeSpecs": 316,
+        "blocksPerSeeder": {
+          "boundary": 105,
+          "cover": 480,
+          "deviation": 84,
+          "graph": 12,
+          "metamorphic": 109,
+          "task": 2,
+          "twise": 408
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 71
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 52
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1006,
+        "completeSpecs": 313,
+        "blocksPerSeeder": {
+          "boundary": 108,
+          "cover": 620,
+          "deviation": 85,
+          "graph": 16,
+          "metamorphic": 114,
+          "task": 2,
+          "twise": 257
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 342
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 97
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1007,
+        "completeSpecs": 389,
+        "blocksPerSeeder": {
+          "boundary": 147,
+          "cover": 1015,
+          "deviation": 99,
+          "graph": 19,
+          "metamorphic": 130,
+          "task": 2,
+          "twise": 376
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 445
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 113
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1008,
+        "completeSpecs": 361,
+        "blocksPerSeeder": {
+          "boundary": 143,
+          "cover": 918,
+          "deviation": 103,
+          "graph": 14,
+          "metamorphic": 102,
+          "task": 2,
+          "twise": 423
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 192
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 84
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1009,
+        "completeSpecs": 354,
+        "blocksPerSeeder": {
+          "boundary": 166,
+          "cover": 831,
+          "deviation": 105,
+          "graph": 20,
+          "metamorphic": 145,
+          "task": 2,
+          "twise": 513
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 139
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 62
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 1010,
+        "completeSpecs": 321,
+        "blocksPerSeeder": {
+          "boundary": 112,
+          "cover": 625,
+          "deviation": 87,
+          "graph": 16,
+          "metamorphic": 106,
+          "task": 2,
+          "twise": 357
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 193
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 63
+        },
+        "writtenConstraintBlocks": 0
+      },
+      {
+        "seed": 513104064,
+        "completeSpecs": 335,
+        "blocksPerSeeder": {
+          "boundary": 169,
+          "cover": 790,
+          "deviation": 109,
+          "graph": 14,
+          "metamorphic": 117,
+          "task": 2,
+          "twise": 479
+        },
+        "failingItems": ["diff.feasible.cover"],
+        "flaggedBlocks": {
+          "cover/behaviour-not-in-flow": 153
+        },
+        "flaggedSpecs": {
+          "cover/behaviour-not-in-flow": 69
+        },
+        "writtenConstraintBlocks": 0
+      }
+    ]
+  },
+  "baselineGoalDetour": "feeds only the replay cheater, which reads expect.tools; the detour block lists no tool, so it feeds no verdict; unchanged"
+}

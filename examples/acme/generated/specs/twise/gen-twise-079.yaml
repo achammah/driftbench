@@ -207,7 +207,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: needs-to-port_number
-          stage: needs
+          stage: port_number
         phrase:
           dimension: stage_transition
           value: needs-to-port_number
@@ -217,7 +217,7 @@ metadata:
           spec: metadata.generated.cell
           stage_transition: port_number-to-offer
           port_result: locked
-          stage: port_number
+          stage: offer
         phrase:
           dimension: stage_transition
           value: port_number-to-offer
@@ -226,7 +226,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: offer-to-details
-          stage: offer
+          stage: details
         phrase:
           dimension: stage_transition
           value: offer-to-details
@@ -235,7 +235,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: details-to-recap
-          stage: details
+          stage: recap
         phrase:
           dimension: stage_transition
           value: details-to-recap
@@ -246,7 +246,7 @@ metadata:
           stage_transition: recap-to-order_placed
           port_result: locked
           customer_details: name-and-email
-          stage: recap
+          stage: order_placed
         phrase:
           dimension: stage_transition
           value: recap-to-order_placed
@@ -255,7 +255,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: order_placed-to-closing
-          stage: order_placed
+          stage: closing
         phrase:
           dimension: stage_transition
           value: order_placed-to-closing

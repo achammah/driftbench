@@ -220,3 +220,13 @@ Product obligation: keep shared preparation intact; on the actual request assert
 Ruling item 14 above. `sequence.stages.<class>` owed a probe at every middle stage of the flows listing the class, filtered only by written constraints. The hidden space map also forbids the pairs no path can reach (`possible.ts`), and the coverage items already read that map. For D8 the map allows a tool failure only on a move that calls a recovered tool, so the item demanded probes the map rules out (seed 2: check, choice, details, recap). No product could satisfy both.
 
 The item now reads the same map as the coverage items: a stage the map rules out for the class is owed no probe, and a probe placed at such a stage fails the item. A reachable stage left unprobed still fails it, and a class with no reachable stage never passes. Measured on main's product: the old logic fails D8 on 18 of the 21 visible and hidden seeds; the new item fails none, and no probe sits at a ruled-out stage. See [the journal](SWEEP-JOURNAL.md) and [evidence](evidence/sequence-impossible-pairs.json). No historical ladder level is updated by this scoped ruling.
+## Feasibility and impossible pairs: maintainer ruling (2026-10-15)
+
+`diff.feasible.<seeder>` read only the written constraints, and only five seeders. A block in a cell no path of the hidden map can reach (`possible.ts`) passed, and blocks from the `cover` and `task` seeders were read by no item. The item now reads the hidden space map, the same map the coverage items read. It checks every seeder: `cover` and `task` have their own items, and `diff.feasible.unlisted` reads any seeder no item names. The bank grows from 2033 to 2036 items.
+
+Measured on main's product, `diff.feasible.cover` fails on every measured seed (1 to 20, the hidden seed and 1001 to 1010). `diff.feasible.twise` also fails on seeds 10 and 15. Two product causes, both against the generator's own model in `packages/generate/src/seed/possible.ts`:
+
+1. A cover spec pairs a behaviour with a flow that does not list it (seed 2: `gen-cover-001`, flow change-request, behaviour B-001). Every block inherits the pair: 6787 blocks across 31 seeds.
+2. The first move's block records the start stage it is said at (`assemble.ts`, `saidAt`), while both models place a move at the stage it reaches. It is flagged only where the behaviour's flows carry no first-turn class: 25 blocks on seeds 10 and 15.
+
+The product lane fixes these in `packages/generate`. Per-seed counts: [evidence](evidence/feasible-impossible-pairs.json) and [the journal](SWEEP-JOURNAL.md). No historical ladder level is updated by this scoped ruling.

@@ -160,6 +160,11 @@ export type GenerateReport = {
   coverage: {
     /** Actual axis-map coverage of the written complete specs, independent of the candidate array. */
     actual: Array<MeasuredCoverage & { uncovered: Record<string, string>[] }>;
+    /** Inventory ownership exclusions, with pair/triple target counts before and after applying them. */
+    reachability?: {
+      counts: Array<{ t: number; before: number; after: number }>;
+      excluded: Array<{ cell: Record<string, string>; reasons: string[] }>;
+    };
     t: number;
     allowed: number;
     complete: MeasuredCoverage;
@@ -573,6 +578,7 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
           uncovered,
         };
       }),
+      ...(prepared.reachability ? { reachability: reachabilityReport(prepared) } : {}),
       t,
       allowed: completeCoverage.allowed,
       complete: completeCoverage,
@@ -672,6 +678,35 @@ function cellKey(values: Readonly<Record<string, string>>): string {
 
 function measured(prepared: PreparedMap, specs: Spec[], t: number): MeasuredCoverage {
   return measuredCoverage(prepared, specs, t);
+}
+
+/** Each removed pair/triple stays visible, including cells excluded through a missing completion. */
+export function reachabilityReport(
+  prepared: PreparedMap,
+): NonNullable<GenerateReport['coverage']['reachability']> {
+  const reachability = prepared.reachability;
+  if (!reachability) return { counts: [], excluded: [] };
+  const before = { ...prepared, axisMap: reachability.before };
+  const counts: Array<{ t: number; before: number; after: number }> = [];
+  const excluded: Array<{ cell: Record<string, string>; reasons: string[] }> = [];
+  for (const strength of new Set([2, 3].map((t) => Math.min(t, prepared.axisMap.dimensions.length)))) {
+    const original = cellsOf(before, [], strength);
+    const current = cellsOf(prepared, [], strength);
+    const retained = new Set(current.map(({ values }) => cellKey(values)));
+    counts.push({ t: strength, before: original.length, after: current.length });
+    for (const { values } of original) {
+      if (retained.has(cellKey(values))) continue;
+      const reasons = reachability.excluded
+        .filter(({ forbid }) => Object.entries(forbid).every(([key, value]) => values[key] === value))
+        .map(({ reason }) => reason);
+      excluded.push({
+        cell: values,
+        reasons:
+          reasons.length > 0 ? reasons : ['no completion respects flow ownership; see constraints.list'],
+      });
+    }
+  }
+  return { counts, excluded };
 }
 
 /** t-wise coverage of the specs, read from the cached grid: the counts `coverage` states for the same specs. */

@@ -118,7 +118,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: needs-to-address
-          stage: needs
+          stage: address
         phrase:
           dimension: stage_transition
           value: needs-to-address
@@ -128,7 +128,7 @@ metadata:
           spec: metadata.generated.cell
           stage_transition: address-to-offer
           coverage_result: 5g-only
-          stage: address
+          stage: offer
         phrase:
           dimension: stage_transition
           value: address-to-offer

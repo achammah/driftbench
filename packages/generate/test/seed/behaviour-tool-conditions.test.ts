@@ -46,8 +46,22 @@ function specimen(calls: ProposalRelation[]) {
     approved: true,
   });
   proposal.relations = [
-    { kind: 'path', id: 'card-first', flow: 'card', stages: ['greet', 'verify'], ...by },
-    { kind: 'path', id: 'balance-second', flow: 'balance', stages: ['greet', 'verify'], ...by },
+    {
+      kind: 'path',
+      id: 'card-first',
+      flow: 'card',
+      stages: ['greet', 'verify'],
+      behaviours: [subject.value],
+      ...by,
+    },
+    {
+      kind: 'path',
+      id: 'balance-second',
+      flow: 'balance',
+      stages: ['greet', 'verify'],
+      behaviours: [subject.value],
+      ...by,
+    },
     { kind: 'binds', subject: { dimension: 'flow', value: 'balance' }, slots: { account: '821' }, ...by },
     ...calls,
   ];

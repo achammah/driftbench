@@ -82,6 +82,8 @@ export function scenarioDraft(
   candidates: { preferred: PathRelation[]; others: PathRelation[] },
   options: {
     probe?: ProbeRequest;
+    /** Reject ineligible paths after seeded ordering, preserving draws on an already eligible choice. */
+    pathAllowed?: (path: PathRelation) => boolean;
     force?: ProposalPhrase;
     rngLabel?: string;
     turn?: ScenarioRequest['turn'];
@@ -95,6 +97,7 @@ export function scenarioDraft(
   const order = [...shuffle(rng, candidates.preferred), ...shuffle(rng, candidates.others)];
   const reasons: string[] = [];
   for (const path of order) {
+    if (options.pathAllowed && !options.pathAllowed(path)) continue;
     const built = buildScenario(prepared, rng, {
       path,
       fixed,
@@ -486,7 +489,8 @@ function failingTool(prepared: PreparedMap, rng: Rng, cell: Pick[]): string | un
  * covers. Every value of the cell is fixed in the scenario's cell except the stage and the deviation: a
  * deviation is a probe, at the cell's stage when the cell names one; a stage alone is reached by a path that
  * passes it. The start stage is placed only by an event said there, so a stage-only cell on a start stage
- * takes a probe of a class a first message can carry. Returns the draft, or every reason no path fits.
+ * takes a probe of a class a first message can carry. Every behaviour must belong to the path's flow;
+ * a path annotation only ranks those eligible paths. Returns the draft, or every reason no path fits.
  */
 export function coverDraft(
   prepared: PreparedMap,
@@ -526,11 +530,20 @@ export function coverDraft(
     if (deviation !== undefined) return position >= 0;
     return position >= 0;
   });
+  const eligible = paths.filter((path) =>
+    fixed.every(
+      ([dimension, value]) =>
+        dimension === prepared.transition ||
+        prepared.space.dimensions[dimension]?.kind !== 'behaviour' ||
+        flowsOfBehaviour(prepared, valueId(prepared, dimension, value)).includes(path.flow),
+    ),
+  );
+  const pathAllowed = (path: PathRelation) => eligible.includes(path);
   const startOnly =
     stage !== undefined &&
     deviation === undefined &&
-    paths.length > 0 &&
-    paths.every((path) => path.stages.indexOf(stage as string) === 0);
+    eligible.length > 0 &&
+    eligible.every((path) => path.stages.indexOf(stage as string) === 0);
   const classes =
     deviation !== undefined
       ? [deviation]
@@ -573,6 +586,7 @@ export function coverDraft(
       [...fixed, ...extra],
       preferring(paths, behaviour),
       {
+        pathAllowed,
         ...(classId === undefined ? {} : { probe: { classId, ...(stage ? { stage } : {}) } }),
       },
     );
@@ -587,7 +601,8 @@ export function coverDraft(
   }
   // A class said on the first turn whose recovery stays there is no block (an idle reply passes it): a clean
   // walk in the cell declares it as its perturbation instead, and a perturbed run checks the recovery.
-  const start = stage !== undefined && paths.length > 0 && paths.every((path) => path.stages[0] === stage);
+  const start =
+    stage !== undefined && eligible.length > 0 && eligible.every((path) => path.stages[0] === stage);
   if (start && stage !== undefined) {
     for (const { classId, extra } of attempts) {
       if (classId === undefined) continue;
@@ -599,12 +614,13 @@ export function coverDraft(
         `Cell ${key}`,
         [...fixed, ...extra],
         preferring(paths, behaviour),
-        { perturb: { classId, stage } },
+        { pathAllowed, perturb: { classId, stage } },
       );
       if ('draft' in built) return built;
       reasons.push(...built.reasons);
     }
   }
-  if (paths.length === 0) reasons.push(`no approved path passes the stage ${stage}`);
+  if (eligible.length === 0)
+    reasons.push(`no approved path of a flow listing the behaviours fits the cell ${key}`);
   return { reasons: reasons.length > 0 ? reasons : [`no approved path fits the cell ${key}`] };
 }

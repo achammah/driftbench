@@ -15,11 +15,22 @@ const SEED = 13;
 /** Seed 13's rendered map with a `uses_tool` for every behaviour that runs a read tool, at every stage. */
 function linkedMap() {
   const hidden = hiddenSpec(SEED);
-  const rendered = renderMap(hidden);
-  const map = parse(rendered.map) as { relations: Array<Record<string, unknown>> };
   const running = hidden.behaviours.filter(
     (behaviour) => behaviour.tool && !hidden.tools.find((tool) => tool.name === behaviour.tool)?.sideEffect,
   );
+  // This positive fixture approves a reachable owner for otherwise unowned read behaviours.
+  for (const behaviour of running) {
+    if (hidden.flows.some((flow) => flow.behaviours.includes(behaviour.id))) continue;
+    const owner = hidden.flows.find(
+      (flow) =>
+        hidden.paths.some((path) => path.flow === flow.id) &&
+        hidden.uses.some((use) => use.flow === flow.id && use.tool === behaviour.tool),
+    );
+    if (!owner) throw new Error(`no reachable fixture flow calls ${behaviour.tool}`);
+    owner.behaviours.push(behaviour.id);
+  }
+  const rendered = renderMap(hidden);
+  const map = parse(rendered.map) as { relations: Array<Record<string, unknown>> };
   for (const behaviour of running) {
     const quote = `${behaviour.title}.`;
     rendered.prompt += `\n${quote}\n`;
@@ -43,6 +54,14 @@ describe('a behaviour phrase whose behaviour runs a read tool', () => {
   it('runs the tool and reads the facts its reply states, so a flipped fact fails the turn', async () => {
     const { hidden, rendered, running } = linkedMap();
     expect(running.length).toBeGreaterThan(0);
+    for (const behaviour of running)
+      expect(
+        hidden.flows.some(
+          (flow) =>
+            flow.behaviours.includes(behaviour.id) && hidden.paths.some((path) => path.flow === flow.id),
+        ),
+        `${behaviour.id} has an approved owning path in this positive fixture`,
+      ).toBe(true);
     const generated = await generateFrom(hidden, rendered, SEED, {}, { once: true });
     if (!generated.prepared) throw new Error(JSON.stringify(generated.refused));
     const titles = new Map(

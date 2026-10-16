@@ -6,7 +6,7 @@ import { FLOW_DIMENSION, type PathRelation, type ProposalPhrase } from '../extra
 import { type Pick, pickOf, type SpecDraft } from './assemble';
 import { dimensionId, type PreparedMap } from './map';
 import { slotsOf } from './relations';
-import { hasPaths, type SeedContext, scenarioDraft } from './seed-drafts';
+import { type SeedContext, scenarioDraft } from './seed-drafts';
 
 /** The dimensions whose phrases ask for something without moving the walk: a behaviour, a flow. */
 const ASKING = new Set(['behaviour', FLOW_DIMENSION]);
@@ -21,6 +21,8 @@ type Plan = {
   dimension: string;
   found: ReturnType<PreparedMap['toolDimensions']['get']>;
   tools: ToolExpect[];
+  /** A behaviour stays in its inventory flows; without an inventory, an explicit path lists it. */
+  flows?: string[];
 };
 
 /** A placed phrase that holds a (stage, flow) slot of its dimension. */
@@ -42,7 +44,6 @@ export function phraseDrafts(
   first: number,
   unsaid?: UnsaidPhrase[],
 ): SpecDraft[] {
-  if (!hasPaths(prepared)) return [];
   const sideEffecting = new Set(
     prepared.relations.paths.flatMap((path) =>
       path.end_state ? [path.end_state.source.replace(/^tool:/, '')] : [],
@@ -103,7 +104,22 @@ export function phraseDrafts(
     if (found && sideEffecting.has(found.tool.name)) tools.push({ label: found.tool.name, count: 0 });
     else if (found?.direction === 'out') tools.push({ label: found.tool.name, count: 1 });
     else if (found) return undefined;
-    return { phrase, target, dimension, found, tools };
+    const flows = found
+      ? undefined
+      : dimension === FLOW_DIMENSION
+        ? [phrase.value]
+        : prepared.inventory
+          ? prepared.inventory.flows
+              .filter((flow) => flow.behaviours.includes(phrase.value))
+              .map((flow) => flow.id)
+          : [
+              ...new Set(
+                prepared.relations.paths
+                  .filter((path) => path.behaviours?.includes(phrase.value))
+                  .map((path) => path.flow),
+              ),
+            ];
+    return { phrase, target, dimension, found, tools, ...(flows ? { flows } : {}) };
   };
 
   /**
@@ -119,6 +135,8 @@ export function phraseDrafts(
   ): { draft: SpecDraft; slot?: string } | { reasons: string[] } => {
     const { phrase, target, dimension, found, tools } = plan;
     const reasons: string[] = [];
+    if (plan.flows && !prepared.relations.paths.some((path) => plan.flows?.includes(path.flow)))
+      return { reasons: [`no approved path walks an owning flow for ${dimension}=${phrase.value}`] };
     // Two phrases of one dimension said at the same stage are one-slot siblings with the same Then; when the
     // reference answers them differently (one runs a tool, one saves a file) the gate rightly rejects the
     // pair. A phrase asking for something goes to a stage no other phrase of its dimension is said at, the
@@ -163,6 +181,7 @@ export function phraseDrafts(
       // last stage, after the walk's last move, which cuts nothing: the walk still checks its end state.
       const fits = (path: PathRelation) =>
         (only ? path === only : path.stages.length > at + 1) &&
+        (plan.flows === undefined || plan.flows.includes(path.flow)) &&
         !(fresh && taken(slotOf(path, at))) &&
         (wanted === undefined || slotOf(path, at) === wanted) &&
         (!after ||

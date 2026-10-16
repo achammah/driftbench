@@ -1,3 +1,4 @@
+import type { Inventory } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
 import { OPENING_CLASSES, TOOL_FAILURE } from '../seed/deviation';
 import { type Relations, readRelations, recoveryFor, stageAfter } from '../seed/relations';
@@ -33,7 +34,11 @@ type Picks = Record<string, string>;
 type Forbid = { forbid: Record<string, string>; reason: string };
 type Axis = { id: string; kind: string; values: string[] };
 
-export function derivedConstraints(proposal: Proposal, axes: readonly Axis[]): Forbid[] {
+export function derivedConstraints(
+  proposal: Proposal,
+  axes: readonly Axis[],
+  inventory?: Inventory,
+): Forbid[] {
   const approvedValue = (dimension: string, value: string) => {
     const found = proposal.dimensions.find((candidate) => candidate.id === dimension);
     const entry = found?.values.find((candidate) => candidate.id === value);
@@ -54,7 +59,25 @@ export function derivedConstraints(proposal: Proposal, axes: readonly Axis[]): F
    * Whether the path's flow and some choice of its branch values are allowed with `extra`, and with one of
    * the values `need` lists per dimension (what the phrase said there requires).
    */
-  const fits = (path: PathRelation, extra: Picks, need: Record<string, string[]> = {}): boolean => {
+  const fits = (
+    path: PathRelation,
+    extra: Picks,
+    need: Record<string, string[]> = {},
+    ownership = true,
+  ): boolean => {
+    if (inventory && ownership) {
+      const flow = inventory.flows?.find((entry) => entry.id === path.flow);
+      for (const axis of axes) {
+        const value = extra[axis.id];
+        if (axis.kind !== 'behaviour' || axis.id === 'stage_transition' || value === undefined) continue;
+        if (
+          axis.id === FLOW_DIMENSION
+            ? value !== path.flow
+            : value !== path.flow && !flow?.behaviours?.includes(value as never)
+        )
+          return false;
+      }
+    }
     const merged = new Map<string, string[]>(Object.entries(path.when ?? {}));
     for (const [dimension, values] of Object.entries(need)) {
       const own = merged.get(dimension);
@@ -159,7 +182,7 @@ export function derivedConstraints(proposal: Proposal, axes: readonly Axis[]): F
   }
 
   const out: Forbid[] = [];
-  const possible = (cell: Picks): boolean =>
+  const possible = (cell: Picks, ownership = true): boolean =>
     events.some((event) => {
       if (stageAxis && cell[stageAxis.id] !== undefined && cell[stageAxis.id] !== event.stage) return false;
       if (deviationAxis && cell[deviationAxis.id] !== undefined && cell[deviationAxis.id] !== event.deviation)
@@ -178,7 +201,7 @@ export function derivedConstraints(proposal: Proposal, axes: readonly Axis[]): F
       const picks: Picks = { ...cell };
       if (stageAxis) picks[stageAxis.id] = event.stage;
       if (deviationAxis) picks[deviationAxis.id] = event.deviation;
-      return fits(event.path, picks, event.need);
+      return fits(event.path, picks, event.need, ownership);
     });
   for (const [a, first] of axes.entries()) {
     for (const second of axes.slice(a + 1)) {
@@ -189,8 +212,47 @@ export function derivedConstraints(proposal: Proposal, axes: readonly Axis[]): F
           if (!possible(cell))
             out.push({
               forbid: cell,
-              reason: `derived from the relations: no approved path carries ${first.id}=${x} with ${second.id}=${y}`,
+              reason:
+                inventory && possible(cell, false)
+                  ? `derived from inventory and relations: no flow listing the behaviours can carry ${first.id}=${x} with ${second.id}=${y}`
+                  : `derived from the relations: no approved path carries ${first.id}=${x} with ${second.id}=${y}`,
             });
+        }
+      }
+    }
+  }
+  // Pairwise ownership does not imply a reachable triple: one flow may hold the behaviour and
+  // stage, another the behaviour and class, and a third the stage and class. Keep the joint ownership
+  // constraint too; otherwise a triple target still asks for an event no owning flow can supply.
+  if (inventory) {
+    for (const [a, first] of axes.entries()) {
+      for (let b = a + 1; b < axes.length; b += 1) {
+        const second = axes[b] as Axis;
+        for (const third of axes.slice(b + 1)) {
+          if (![first, second, third].some((axis) => axis.kind === 'behaviour')) continue;
+          for (const x of first.values) {
+            for (const y of second.values) {
+              for (const z of third.values) {
+                const cell = { [first.id]: x, [second.id]: y, [third.id]: z };
+                if (!allowed(cell)) continue;
+                if (
+                  out.some(({ forbid }) =>
+                    Object.entries(forbid).every(([key, value]) => cell[key] === value),
+                  )
+                )
+                  continue;
+                if (!possible(cell) && possible(cell, false))
+                  out.push({
+                    forbid: cell,
+                    reason: `derived from inventory and relations: no flow listing the behaviours can carry ${Object.entries(
+                      cell,
+                    )
+                      .map(([key, value]) => `${key}=${value}`)
+                      .join(' with ')}`,
+                  });
+              }
+            }
+          }
         }
       }
     }
