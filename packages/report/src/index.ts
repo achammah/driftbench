@@ -9,6 +9,18 @@ export {
   evaluateAggregates,
 } from './aggregate';
 export {
+  type AttributionOptions,
+  type AttributionSummary,
+  attributionOf,
+  type BlockOutcome,
+  blockDiagnoses,
+  blockOutcome,
+  nonDefaultOf,
+  type ReportDiagnosis,
+  type ReportFix,
+  type ReportObject,
+} from './attribution';
+export {
   AUTO_MARGIN_WARN,
   type AutoMargin,
   autoMargin,
@@ -43,6 +55,7 @@ export { type Estimate, type IntervalMethod, type Rate, rate } from './estimate'
 export { carriedLines, effectiveNote, headlineNote, unscoredRuns } from './format';
 export { HEADLINE_POWER, type SuiteHeadline, suiteHeadline } from './headline';
 export { type RenderOptions, renderCompare, renderHtml, renderPage, renderRun, renderSpread } from './html';
+export { attributionZone, diagnosesTable, nonDefaultBadge } from './html-attribution';
 export { failures, renderJunit } from './junit';
 export {
   comparePairwise,
@@ -86,4 +99,4 @@ export {
   type SpreadOptions,
   spread,
 } from './spread';
-export { compareText, criterionRepeatsText, headlineText, textTable } from './text';
+export { attributionText, compareText, criterionRepeatsText, headlineText, textTable } from './text';

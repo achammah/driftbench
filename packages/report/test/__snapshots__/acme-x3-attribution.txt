@@ -1,0 +1,6 @@
+Machine pass rate: 20 of 46 (43.5%) (runs that passed or failed). Agent-attributed pass rate: 43.5%; 20 of 46 assigned runs; 0 unassigned. Unassigned runs are excluded from the agent-attributed rate.
+Failing blocks: 58; the agent's 40, setup 0, excluded 0, credited 0, unassigned 18.
+Fix list:
+  #  where              target                         action           blocks  agent's  note
+  1  agent.cross_skill  core:prompts/acme-sales.md:68  strengthen_rule  40      40
+  2  agent.cross_skill  core:prompts/acme-sales.md:71  strengthen_rule  28      28

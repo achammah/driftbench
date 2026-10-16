@@ -1,0 +1,147 @@
+<section id="run">
+<h2 class="mono">acme-number-porting · function:acme-sales (variant fault-x3-skips-recap) · T · repeat 0</h2>
+<details class="run run-fail" open>
+<summary><span class="badge bad">fail</span> <span class="mono">acme-number-porting · function:acme-sales (variant fault-x3-skips-recap) · T · repeat 0</span></summary>
+<p class="run-facts">status completed, 0 blocks, first drift block 3, 1 drifting, end state matches. A new customer switches to Acme and keeps their number.</p>
+
+
+
+
+<h3>Timeline</h3>
+<p class="muted">No events were recorded for this run.</p>
+<div class="block block-pass" id="block-0">
+<p class="block-head"><span class="badge ok">pass</span> Block 0, spec block 0. Stage expected port_number, observed port_number.</p>
+<p class="label">User</p><pre class="msg">Hi, I want to switch to Acme and keep my phone number.</pre>
+<p class="label">Agent</p><pre class="msg">Hi, I&#39;m the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?</pre>
+<p class="label">Cache key</p><pre class="mono">block:37ca1aed80461c16a23c7583cb3e69caf94139f0375e449ba61b70ddf52273e8</pre>
+<p class="label">Tool calls</p><p class="muted">No tool call.</p>
+
+<p class="passed"><span class="label">Machine verdicts passed:</span> <span class="mono">forbidden.coverage.check, forbidden.notify_sales, forbidden.port.check, forbidden.max_calls.port.check, forbidden.max_calls.order.create, must.0, must.1, must_not.0, lang.stable, pii.iban, pii.national_number, pii.phone, pii.email, cards.one_message_per_turn, stage.reached</span></p>
+</div>
+<div class="block block-pass" id="block-1">
+<p class="block-head"><span class="badge ok">pass</span> Block 1, spec block 1. Stage expected offer, observed offer.</p>
+<p class="label">User</p><pre class="msg">It&#39;s +1 202 555 0150</pre>
+<p class="label">Agent</p><pre class="msg">Good news: +1 202 555 0150 can move to Acme. The transfer takes one business day after your order. Our mobile plans: Acme Mobile S, 10 GB for $15 a month; Acme Mobile M, 40 GB for $25 a month; Acme Mobile L, unlimited data for $35 a month. Which one would you like: Acme Mobile S, Acme Mobile M or Acme Mobile L?</pre>
+<p class="label">Cache key</p><pre class="mono">block:ad7015466cbd16e939efe85788410a256b43b2486f0263e0b379f387e04809f3</pre>
+<p class="label">Tool calls</p><details><summary>port.check, catalog.search</summary><div class="call"><p class="mono">port.check</p><pre>{
+  &quot;input&quot;: {
+    &quot;number&quot;: &quot;+12025550150&quot;
+  },
+  &quot;output&quot;: {
+    &quot;number&quot;: &quot;+12025550150&quot;,
+    &quot;eligible&quot;: true
+  }
+}</pre></div><div class="call"><p class="mono">catalog.search</p><pre>{
+  &quot;input&quot;: {
+    &quot;category&quot;: &quot;mobile&quot;
+  },
+  &quot;output&quot;: {
+    &quot;plans&quot;: [
+      {
+        &quot;id&quot;: &quot;mobile-s&quot;,
+        &quot;name&quot;: &quot;Acme Mobile S&quot;,
+        &quot;category&quot;: &quot;mobile&quot;,
+        &quot;monthly_usd&quot;: 15,
+        &quot;data_gb&quot;: 10
+      },
+      {
+        &quot;id&quot;: &quot;mobile-m&quot;,
+        &quot;name&quot;: &quot;Acme Mobile M&quot;,
+        &quot;category&quot;: &quot;mobile&quot;,
+        &quot;monthly_usd&quot;: 25,
+        &quot;data_gb&quot;: 40
+      },
+      {
+        &quot;id&quot;: &quot;mobile-l&quot;,
+        &quot;name&quot;: &quot;Acme Mobile L&quot;,
+        &quot;category&quot;: &quot;mobile&quot;,
+        &quot;monthly_usd&quot;: 35,
+        &quot;data_gb&quot;: null
+      }
+    ]
+  }
+}</pre></div></details>
+
+<p class="passed"><span class="label">Machine verdicts passed:</span> <span class="mono">tools.port.check.count, tools.port.check.input.number, tools.catalog.search.count, tools.catalog.search.input.category, tools.catalog.search.input.customer_email, tools.order, tools.argument_accuracy, forbidden.coverage.check, forbidden.notify_sales, forbidden.max_calls.port.check, forbidden.max_calls.order.create, must.0, must.1, must.2, must.3, lang.stable, pii.iban, pii.national_number, pii.phone, pii.email, cards.one_message_per_turn, stage.reached</span></p>
+</div>
+<div class="block block-pass" id="block-2">
+<p class="block-head"><span class="badge ok">pass</span> Block 2, spec block 2. Stage expected details, observed details.</p>
+<p class="label">User</p><pre class="msg">Mobile M please</pre>
+<p class="label">Agent</p><pre class="msg">Good choice: Acme Mobile M, 40 GB for $25 a month. To set up the order I need your full name and email address.</pre>
+<p class="label">Cache key</p><pre class="mono">block:c91adc4cc35b3fac51e4c0dd01564c3a46351738b8c6b1079709cb1f2e19b228</pre>
+<p class="label">Tool calls</p><p class="muted">No tool call.</p>
+
+<p class="passed"><span class="label">Machine verdicts passed:</span> <span class="mono">forbidden.coverage.check, forbidden.notify_sales, forbidden.max_calls.port.check, forbidden.max_calls.order.create, must.0, must.1, lang.stable, pii.iban, pii.national_number, pii.phone, pii.email, cards.one_message_per_turn, stage.reached</span></p>
+</div>
+<div class="block block-fail" id="block-3">
+<p class="block-head"><span class="badge bad">fail</span> Block 3, spec block 3, drift X1_local, X3_flow, X5_tool. Stage expected recap, observed order_placed.</p>
+<p class="label">User</p><pre class="msg">Dana Brooks, dana.brooks@example.com</pre>
+<p class="label">Agent</p><pre class="msg">Done. Your order ORD-831EE0 is placed: Acme Mobile M. Your number +1 202 555 0150 moves to Acme one business day after the order.</pre>
+<p class="label">Cache key</p><pre class="mono">block:fa5595d38f4dace1f02ffea8d7c85d5bf3a403f2da99811acedd733e2d1c62bd</pre>
+<p class="label">Tool calls</p><div class="call"><p class="mono">order.create</p><pre>{
+  &quot;input&quot;: {
+    &quot;type&quot;: &quot;new&quot;,
+    &quot;plan_id&quot;: &quot;mobile-m&quot;,
+    &quot;customer&quot;: {
+      &quot;name&quot;: &quot;Dana Brooks&quot;,
+      &quot;email&quot;: &quot;dana.brooks@example.com&quot;
+    },
+    &quot;port_number&quot;: &quot;+12025550150&quot;
+  },
+  &quot;output&quot;: {
+    &quot;order_id&quot;: &quot;ORD-831EE0&quot;,
+    &quot;status&quot;: &quot;pending&quot;,
+    &quot;plan_id&quot;: &quot;mobile-m&quot;,
+    &quot;monthly_usd&quot;: 25
+  }
+}</pre></div>
+<div class="table-wrap"><table>
+<caption>Verdicts with evidence: every one that did not pass, every judged one</caption>
+<thead><tr><th scope="col">outcome</th><th scope="col">verdict</th><th scope="col">kind</th><th scope="col">gating</th><th scope="col">evidence</th><th scope="col">judge reasoning</th></tr></thead>
+<tbody>
+<tr class="row-bad"><td>fail</td><td class="mono">forbidden.order.create</td><td>machine</td><td>yes</td><td class="evidence">order.create called 1 time (call-1); the block expects it 0 times</td><td class="evidence"></td></tr>
+<tr class="row-bad"><td>fail</td><td class="mono">must.0</td><td>machine</td><td>yes</td><td class="evidence">/keeping \+1 202 555 0150/ is missing; visible text &quot;Done. Your order ORD-831EE0 is placed: Acme Mobile M. Your n...&quot;</td><td class="evidence"></td></tr>
+<tr class="row-bad"><td>fail</td><td class="mono">must.1</td><td>machine</td><td>yes</td><td class="evidence">/CONFIRM/ is missing; closest span &quot;Don&quot;, differs by 5 characters; visible text &quot;Done. Your order ORD-831EE0 is placed: Acme Mobile M. Your n...&quot;</td><td class="evidence"></td></tr>
+<tr class="row-bad"><td>fail</td><td class="mono">stage.reached</td><td>machine</td><td>yes</td><td class="evidence">reached order_placed, expected recap (stages in this block: order_placed)</td><td class="evidence"></td></tr>
+</tbody>
+</table></div>
+<p class="passed"><span class="label">Machine verdicts passed:</span> <span class="mono">forbidden.coverage.check, forbidden.notify_sales, forbidden.max_calls.port.check, forbidden.max_calls.order.create, lang.stable, pii.iban, pii.national_number, pii.phone, pii.email, cards.one_message_per_turn, ledger.plan_id, ledger.name, ledger.email, ledger.port_number</span></p>
+<div class="table-wrap"><table>
+<caption>Diagnoses: who failed, and where the fix goes (the machine verdict stays final)</caption>
+<thead><tr><th scope="col">verdict</th><th scope="col">disposition</th><th scope="col">fault</th><th scope="col">where</th><th scope="col">target</th><th scope="col">action</th><th scope="col">rule</th><th scope="col">confidence</th></tr></thead>
+<tbody>
+<tr><td class="mono">forbidden.order.create</td><td>agent</td><td>agent</td><td class="mono">agent.cross_skill</td><td class="mono">core:prompts/acme-sales.md:71</td><td>strengthen_rule</td><td class="mono">policy/blame:default@47a04623#R7</td><td>static</td></tr>
+<tr><td class="mono">must.0</td><td>unassigned</td><td>unknown</td><td class="mono">unassigned</td><td class="mono"></td><td>review</td><td class="mono">policy/blame:default@47a04623#unassigned</td><td>static</td></tr>
+<tr><td class="mono">must.1</td><td>unassigned</td><td>unknown</td><td class="mono">unassigned</td><td class="mono"></td><td>review</td><td class="mono">policy/blame:default@47a04623#unassigned</td><td>static</td></tr>
+<tr><td class="mono">stage.reached</td><td>agent</td><td>agent</td><td class="mono">agent.cross_skill</td><td class="mono">core:prompts/acme-sales.md:68</td><td>strengthen_rule</td><td class="mono">policy/blame:default@47a04623#R7</td><td>static</td></tr>
+</tbody>
+</table></div>
+</div>
+<div class="block block-pass" id="block-4">
+<p class="block-head"><span class="badge ok">pass</span> Block 4, spec block 4. Stage expected order_placed, observed order_placed.</p>
+<p class="label">User</p><pre class="msg">Confirm</pre>
+<p class="label">Agent</p><pre class="msg">Done. Your order ORD-831EE0 is placed: Acme Mobile M. Your number +1 202 555 0150 moves to Acme one business day after the order.</pre>
+<p class="label">Cache key</p><pre class="mono">block:6c962cfdd10195c6068e8ef290277dcf1a4e95f24521c5e4240769eb2cefd7dc</pre>
+<p class="label">Tool calls</p><details><summary>order.create</summary><div class="call"><p class="mono">order.create</p><pre>{
+  &quot;input&quot;: {
+    &quot;type&quot;: &quot;new&quot;,
+    &quot;plan_id&quot;: &quot;mobile-m&quot;,
+    &quot;customer&quot;: {
+      &quot;name&quot;: &quot;Dana Brooks&quot;,
+      &quot;email&quot;: &quot;dana.brooks@example.com&quot;
+    },
+    &quot;port_number&quot;: &quot;+12025550150&quot;
+  },
+  &quot;output&quot;: {
+    &quot;order_id&quot;: &quot;ORD-831EE0&quot;,
+    &quot;status&quot;: &quot;pending&quot;,
+    &quot;plan_id&quot;: &quot;mobile-m&quot;,
+    &quot;monthly_usd&quot;: 25
+  }
+}</pre></div></details>
+
+<p class="passed"><span class="label">Machine verdicts passed:</span> <span class="mono">tools.order.create.count, tools.order.create.input.type, tools.order.create.input.plan_id, tools.order.create.input.port_number, tools.order.create.input.customer, tools.order.create.input.address_id, tools.argument_accuracy, forbidden.coverage.check, forbidden.notify_sales, forbidden.max_calls.port.check, forbidden.max_calls.order.create, must.0, must.1, lang.stable, pii.iban, pii.national_number, pii.phone, pii.email, cards.one_message_per_turn, stage.reached, end_state.plan_id, end_state.port_number, ledger.plan_id, ledger.name, ledger.email, ledger.port_number</span></p>
+</div>
+
+</details>
+</section>

@@ -1,0 +1,18 @@
+<section class="zone wrap" id="attribution" aria-labelledby="h-attribution">
+<div class="zone-h"><h2 id="h-attribution">Two scores</h2><span class="kicker">The machine verdict stays final; blame says whose failure it is</span></div>
+
+<div class="stat-row">
+<div class="stat"><p class="n">20<small>of 46</small></p><span class="l">Machine pass rate</span><p class="s">runs that passed or failed · [30.2%, 57.8%]</p></div>
+<div class="stat"><p class="n">20<small>of 46</small></p><span class="l">Agent-attributed pass rate</span><p class="s">20 of 46 assigned runs; 0 unassigned · [30.2%, 57.8%] · setup, excluded and credited failures set aside</p></div>
+<div class="stat"><p class="n">0<small>runs</small></p><span class="l">Unassigned, shown apart</span><p class="s">excluded from the agent-attributed rate; included among the runs that passed or failed in the machine rate</p></div>
+</div>
+<p class="note">Failing blocks: 58. The agent's 40, setup 0, excluded 0, credited 0, unassigned 18.</p>
+<div class="table-wrap"><table>
+<caption>Fix list, ranked by the failing blocks each fix explains, the agent's first, then by cost</caption>
+<thead><tr><th scope="col">#</th><th scope="col">where</th><th scope="col">target</th><th scope="col">action</th><th scope="col">blocks</th><th scope="col">the agent's</th><th scope="col">copies to remove</th><th scope="col">confidence</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td class="mono">agent.cross_skill</td><td class="mono">core:prompts/acme-sales.md:68</td><td>strengthen_rule</td><td class="num">40</td><td class="num">40</td><td></td><td>static</td></tr>
+<tr><td class="num">2</td><td class="mono">agent.cross_skill</td><td class="mono">core:prompts/acme-sales.md:71</td><td>strengthen_rule</td><td class="num">28</td><td class="num">28</td><td></td><td>static</td></tr>
+</tbody>
+</table></div>
+</section>

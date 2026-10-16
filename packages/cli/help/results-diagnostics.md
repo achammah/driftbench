@@ -76,6 +76,20 @@ folded into a score. `confidence` is `static` until a confirm run decides. `flag
 `run_liability_confirm`, `provisional` (placed with no history), `class_rule:<wording>` for a core fix, and
 `escape:<kind>:<text>` when a proposed fix text names a skill, a file or a value.
 
+The scorecard (`buildScorecard(data, { attribution })` of the report package) then opens a zone named "Two
+scores": the machine pass rate, unchanged and final; the agent-attributed pass rate, over the runs a rule
+decided; the unassigned runs, excluded only from the agent-attributed rate; the failing blocks by disposition;
+and the ranked fix list. A run page lists each block's diagnoses under its verdicts. A page scored with a rule file
+that is not a shipped default carries a `non-default` badge naming it.
+
+The agent-attributed score always names its denominator: for example, `20 of 20 assigned runs; 26
+unassigned`. When unassigned runs outnumber assigned failed runs, HTML and text show counts without any
+percentage or interval. JSON keeps the assigned counts (`agent.k`, `agent.n`) and `unassigned`, and omits
+the agent estimate and interval fields. With no assigned runs the counts are 0 of 0. The machine rate still
+includes every run that passed or failed, unassigned runs among them. A run with a block not run or
+blocked and no failure is in neither rate: JSON keeps it in `unmeasuredRuns` (`notRun`, `blocked`) and the
+text and HTML reports name it.
+
 ## Worked example
 
 The Northwind estate's three recorded sessions, replayed offline over specs generated from the estate tests'

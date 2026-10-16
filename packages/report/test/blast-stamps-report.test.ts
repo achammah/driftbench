@@ -1,6 +1,5 @@
-// Blast radius of unit F2 on the report: a campaign whose records carry `by`, `resolved`, `diagnoses` and
-// `skippedForBudget` reports what the same campaign without them reports. The scorecard numbers, the HTML page,
-// the JUnit file and a compare against a campaign of old records do not move; mixed campaigns compare equal.
+// Stamps and diagnoses preserve machine scores, JUnit and campaign comparisons. Stamps without diagnoses
+// preserve page bytes; diagnosed records additionally render B4 attribution and block diagnosis details.
 import { readFileSync } from 'node:fs';
 import type { RunResult, Verdict } from '@agent-nexus/driftbench-core';
 import { describe, expect, it } from 'vitest';
@@ -44,6 +43,9 @@ function stamped(run: RunResult): RunResult {
               {
                 diagnostic: 'diagnostic:probe@89abcdef',
                 summary: 'MARKER-DIAGNOSIS-SUMMARY',
+                disposition: 'setup' as const,
+                fixLocation: 'tool.definition',
+                fixAction: 'MARKER-DIAGNOSIS-FIX',
                 by: { object: 'diagnostic:probe@89abcdef', impl: 'builtin:probe', layer: 'shipped' as const },
               },
             ],
@@ -77,13 +79,14 @@ async function data(runs: RunResult[], campaignId: string): Promise<CampaignData
   };
 }
 
-/** The scorecard with every verdict's stamp taken out of its drilldown. */
-function unstampedCard(card: ReturnType<typeof buildScorecard>): unknown {
+/** Machine scores and drilldown, excluding only stamps and the additional attribution display. */
+function machineCard(card: ReturnType<typeof buildScorecard>): unknown {
+  const { attribution: _attribution, ...machine } = card;
   return {
-    ...card,
+    ...machine,
     drilldown: card.drilldown.map((run) => ({
       ...run,
-      blocks: run.blocks.map((block) => ({
+      blocks: run.blocks.map(({ diagnoses: _diagnoses, ...block }) => ({
         ...block,
         verdicts: block.verdicts.map(({ by: _by, ...verdict }: Verdict) => verdict),
       })),
@@ -91,29 +94,63 @@ function unstampedCard(card: ReturnType<typeof buildScorecard>): unknown {
   };
 }
 
-describe('blast stamps: the report reads stamped records as it reads old ones', () => {
-  it('builds the same scorecard, HTML page and JUnit file', async () => {
+function withoutDiagnoses(run: RunResult): RunResult {
+  return {
+    ...run,
+    blocks: run.blocks.map(({ diagnoses: _diagnoses, ...block }) => block),
+  };
+}
+
+describe('blast stamps: machine scores stay stable and diagnoses add their own display', () => {
+  it('preserves machine scores and JUnit for diagnosed records', async () => {
     const old = await data(oldRecords(), 'c-stamps');
     const fresh = await data(oldRecords().map(stamped), 'c-stamps');
     const before = buildScorecard(old);
     const after = buildScorecard(fresh);
-    expect(unstampedCard(after)).toStrictEqual(unstampedCard(before));
+    expect(machineCard(after)).toStrictEqual(machineCard(before));
     expect(
       after.drilldown.flatMap((run) => run.blocks.flatMap((block) => block.verdicts)).every((v) => v.by),
     ).toBe(true);
     const html = renderHtml(after);
-    expect(html).toBe(renderHtml(before));
+    expect(html).toContain('id="attribution"');
+    expect(html).toContain('Machine pass rate');
+    expect(after.attribution?.machine).toMatchObject({
+      k: before.campaign.passing,
+      n: before.campaign.passing + before.campaign.failing,
+    });
+    expect(renderHtml(before)).not.toContain('id="attribution"');
     expect(html).not.toContain('[object Object]');
     expect(renderJunit(fresh)).toBe(renderJunit(old));
   });
 
-  it('draws each run of the viewer drilldown as it draws the old record', async () => {
+  it('keeps campaign and run pages byte-identical when stamps carry no diagnoses', async () => {
     const old = await data(oldRecords(), 'c-stamps');
-    const fresh = await data(oldRecords().map(stamped), 'c-stamps');
+    const fresh = await data(oldRecords().map(stamped).map(withoutDiagnoses), 'c-stamps');
+    expect(renderHtml(buildScorecard(fresh))).toBe(renderHtml(buildScorecard(old)));
     for (const [index, run] of fresh.runs.entries()) {
       const page = renderRun(runDetailOf(fresh, run));
       expect(page).toBe(renderRun(runDetailOf(old, old.runs[index] as RunResult)));
-      expect(page).not.toContain('MARKER-DIAGNOSIS-SUMMARY');
+      expect(page).not.toContain('Diagnoses: who failed');
+      expect(page).not.toContain('[object Object]');
+    }
+  });
+
+  it('renders diagnosis details separately while preserving every run and block machine result', async () => {
+    const old = await data(oldRecords(), 'c-stamps');
+    const fresh = await data(oldRecords().map(stamped), 'c-stamps');
+    for (const [index, run] of fresh.runs.entries()) {
+      const before = runDetailOf(old, old.runs[index] as RunResult);
+      const after = runDetailOf(fresh, run);
+      expect(after.pass).toBe(before.pass);
+      expect(after.blocks.map((block) => block.pass)).toEqual(before.blocks.map((block) => block.pass));
+      expect(after.blocks[0]?.diagnoses).toMatchObject([
+        { disposition: 'setup', fixLocation: 'tool.definition', fixAction: 'MARKER-DIAGNOSIS-FIX' },
+      ]);
+      const page = renderRun(after);
+      expect(page).toContain('Diagnoses: who failed, and where the fix goes');
+      expect(page).toContain('tool.definition');
+      expect(page).toContain('MARKER-DIAGNOSIS-FIX');
+      expect(renderRun(before)).not.toContain('MARKER-DIAGNOSIS-FIX');
       expect(page).not.toContain('[object Object]');
     }
   });

@@ -17,6 +17,14 @@ import {
 } from '@agent-nexus/driftbench-core';
 import { bootstrapCI } from '@agent-nexus/driftbench-stats';
 import { type AggregateCriterion, type AggregateResult, evaluateAggregates } from './aggregate';
+import {
+  type AttributionOptions,
+  type AttributionSummary,
+  attributionOf,
+  blockDiagnoses,
+  nonDefaultOf,
+  type ReportDiagnosis,
+} from './attribution';
 import { type CompareResult, compareCampaigns } from './compare';
 import {
   blocksWithSpec,
@@ -67,6 +75,11 @@ export type ScorecardOptions = {
   incompletePolicy?: 'interval' | 'withhold';
   /** Campaign-level criteria, each scored over every run together. Absent when not given. */
   aggregates?: readonly AggregateCriterion[];
+  /**
+   * Diagnoses, a fix plan and the objects the runs were scored with, for the second score. A block's own
+   * `diagnoses` are read first. Without any, the scorecard shows the machine rate alone, as before.
+   */
+  attribution?: AttributionOptions;
 };
 
 export type ToolCall = { label: string; input?: unknown; output?: unknown; error?: string };
@@ -107,6 +120,8 @@ export type BlockDetail = {
   timelineEvents?: { id: string; label: string }[];
   runtimeEvents?: { kind: 'guard' | 'skill'; name: string; verdict?: string }[];
   verdicts: Verdict[];
+  /** What the diagnostics wrote on the block: who failed and where the fix goes. Absent when none. */
+  diagnoses?: ReportDiagnosis[];
 };
 
 export type RunDetail = {
@@ -142,6 +157,8 @@ export type RunDetail = {
    * blocks it skipped. Absent when every block ran.
    */
   stopped?: StoppedRun;
+  /** The rule files that scored the run and are not a shipped default, as `kind:id@hash8`. Absent when none. */
+  nonDefault?: string[];
 };
 
 export type StoppedRun = {
@@ -219,6 +236,8 @@ export type Scorecard = {
   pilot?: PilotReport;
   /** Campaign-level criteria, when the options asked for them. */
   aggregates?: AggregateResult[];
+  /** The machine pass rate beside the agent-attributed one, the fix list, the non-default rules. Absent with no diagnosis. */
+  attribution?: AttributionSummary;
   drilldown: RunDetail[];
   /** Runs left out of the drilldown by maxRuns. */
   omittedRuns: number;
@@ -306,13 +325,18 @@ export function buildScorecard(data: CampaignData, options: ScorecardOptions = {
     ...optional('carried', carriedSummary(runs)),
     ...optional('pilot', options.pilot),
     ...(options.aggregates ? { aggregates: evaluateAggregates(data, options.aggregates) } : {}),
-    drilldown: shown.map((run) => runDetailOf(data, run)),
+    ...optional('attribution', attributionOf(data, options.attribution)),
+    drilldown: shown.map((run) => runDetailOf(data, run, options.attribution)),
     omittedRuns: runs.length - shown.length,
   };
 }
 
 /** The drilldown of one run: its blocks with stimulus, reply, tool calls and verdicts. */
-export function runDetailOf(data: CampaignData, run: RunResult): RunDetail {
+export function runDetailOf(
+  data: CampaignData,
+  run: RunResult,
+  attribution: AttributionOptions = {},
+): RunDetail {
   const spec = specOfRun(data, run);
   const deviation = deviationOf(spec, run);
   const perturbation = spec?.perturbations?.find((entry) => entry.id === run.perturbationId);
@@ -340,6 +364,7 @@ export function runDetailOf(data: CampaignData, run: RunResult): RunDetail {
     ...optional('recovery', measuredRecovery(run)),
     ...optional('events', run.events),
     ...optional('stopped', stoppedOf(run, spec)),
+    ...(nonDefaultOf(run, attribution).length > 0 ? { nonDefault: nonDefaultOf(run, attribution) } : {}),
     blocks: blocksWithSpec(run, spec).map(({ result, specBlock }) => {
       const timelineEvents = timelineEventsOf(run, result.index);
       const injectedText =
@@ -394,6 +419,9 @@ export function runDetailOf(data: CampaignData, run: RunResult): RunDetail {
         ...optional('cacheKey', result.cacheKey),
         ...(timelineEvents.length > 0 ? { timelineEvents } : {}),
         verdicts: result.verdicts,
+        ...(blockDiagnoses(run, result, attribution).length > 0
+          ? { diagnoses: [...blockDiagnoses(run, result, attribution)] }
+          : {}),
       };
     }),
   };
