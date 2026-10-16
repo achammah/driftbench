@@ -80,6 +80,19 @@ describe('seed', () => {
     expect(await readFile(join(box.root, 'catalog-link.csv'), 'utf8')).toContain('Acme Mobile S');
   });
 
+  it('writes binary files byte for byte from their base64, at nested paths, over the from folder', async () => {
+    const bytes = Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x00, 0xff, 0xfe, 0x0d, 0x0a, 0x80]);
+    const bom = Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from('id,name\n1,a\n')]);
+    const box = await sandbox();
+    await box.seed({
+      files: { 'notes.txt': 'text' },
+      binary: { 'out/deep/book.xlsx': bytes.toString('base64'), 'data.csv': bom.toString('base64') },
+    });
+    expect(await box.listFiles()).toEqual(['data.csv', 'notes.txt', 'out/deep/book.xlsx']);
+    expect(sha256(await readFile(join(box.root, 'out', 'deep', 'book.xlsx')))).toBe(sha256(bytes));
+    expect(sha256(await readFile(join(box.root, 'data.csv')))).toBe(sha256(bom));
+  });
+
   it('refuses a path that leaves the workspace and writes nothing outside', async () => {
     const box = await sandbox();
     for (const path of ['../escape.txt', '/tmp/escape.txt', 'a/../../escape.txt', '']) {

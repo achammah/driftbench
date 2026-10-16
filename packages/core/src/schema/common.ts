@@ -209,6 +209,12 @@ export const WorldState = z
           .record(z.string(), z.string())
           .optional()
           .describe('Files the workspace starts with: path to content.'),
+        binary: z
+          .record(z.string(), z.string().regex(/^[A-Za-z0-9+/]*={0,2}$/, 'base64'))
+          .optional()
+          .describe(
+            'Files the workspace starts with, written byte for byte: path to the base64 of the bytes. Spreadsheets, documents, PDFs and files that start with a byte-order mark belong here.',
+          ),
       })
       .optional()
       .describe('The files the agent starts from.'),

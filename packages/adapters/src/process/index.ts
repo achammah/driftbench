@@ -349,9 +349,19 @@ function workspaceDelta(seeded: Workspace | undefined, next: Workspace): Workspa
     const known = seeded?.files !== undefined && Object.hasOwn(seeded.files, path);
     if (!known || seeded?.files?.[path] !== content) files[path] = content;
   }
+  const binary: Record<string, string> = {};
+  for (const [path, content] of Object.entries(next.binary ?? {})) {
+    const known = seeded?.binary !== undefined && Object.hasOwn(seeded.binary, path);
+    if (!known || seeded?.binary?.[path] !== content) binary[path] = content;
+  }
   const from = next.from !== undefined && next.from !== seeded?.from ? next.from : undefined;
-  if (from === undefined && Object.keys(files).length === 0) return undefined;
-  return { ...(from === undefined ? {} : { from }), ...(Object.keys(files).length === 0 ? {} : { files }) };
+  if (from === undefined && Object.keys(files).length === 0 && Object.keys(binary).length === 0)
+    return undefined;
+  return {
+    ...(from === undefined ? {} : { from }),
+    ...(Object.keys(files).length === 0 ? {} : { files }),
+    ...(Object.keys(binary).length === 0 ? {} : { binary }),
+  };
 }
 
 function withoutControl(snapshot: WorkspaceSnapshot): WorkspaceSnapshot {

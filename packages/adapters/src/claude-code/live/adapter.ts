@@ -727,7 +727,15 @@ function workspaceDelta(seeded: Workspace | undefined, next: Workspace): Workspa
   for (const [path, content] of Object.entries(next.files ?? {})) {
     if (seeded?.files?.[path] !== content) files[path] = content;
   }
-  return Object.keys(files).length === 0 ? undefined : { files };
+  const binary: Record<string, string> = {};
+  for (const [path, content] of Object.entries(next.binary ?? {})) {
+    if (seeded?.binary?.[path] !== content) binary[path] = content;
+  }
+  if (Object.keys(files).length === 0 && Object.keys(binary).length === 0) return undefined;
+  return {
+    ...(Object.keys(files).length === 0 ? {} : { files }),
+    ...(Object.keys(binary).length === 0 ? {} : { binary }),
+  };
 }
 
 async function lineCount(path: string): Promise<number> {
