@@ -100,7 +100,7 @@ A suite is clustered three ways: the repeats of one golden, the realisations of 
 Beside the headline the scorecard prints `n_eff` (the runs the clustering is worth), the design effect, the smallest drop two suites like it detect at 80 percent power, and the share of runs that gave no verdict (did not complete, and `blocked` or `not_run` when a run carries those states). One golden has no spread to measure, so it prints no interval. The command line prints the same line per mode. For six goldens where 5 of 5, 5 of 5, 4 of 5, 0 of 5, 2 of 5 and 2 of 2 runs pass:
 
 ```text
-Suite pass rate, mode F: 70.0% [35.4%, 88.2%] (hierarchical 95% interval); 6 goldens, n_eff 7.0 runs (design effect 3.87), detectable drop 66.4 points at 80% power.
+Suite pass rate, mode F: 70.0% [35.4%, 88.2%] (hierarchical 95% interval); 6 goldens, n_eff 7.3 runs (design effect 3.69), detectable drop 65.3 points at 80% power.
 ```
 
 Which interval to use:

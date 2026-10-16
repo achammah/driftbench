@@ -1,0 +1,37 @@
+# Fictional data only: Acme Telecom, Acmeville, people at example.com.
+# A block-linked spec for the section registry of ../acme-sales.md: each block names the prompt sections it
+# tests in metadata.links. The links stay out of the spec hash.
+id: acme-linked-order-confirm
+title: A home internet order placed only after CONFIRM
+channel: chat
+lang: EN
+target: { adapter: function, agent: acme-sales }
+blocks:
+  - id: details
+    user: Jo Okafor, jo.okafor@example.com
+    expect:
+      tools:
+        - { label: order.create, count: 0 }
+      must: ['CONFIRM']
+  - id: loose-yes
+    user: ok perfect
+    expect:
+      tools:
+        - { label: order.create, count: 0 }
+      must: ['CONFIRM']
+  - id: confirm
+    user: CONFIRM
+    expect:
+      tools:
+        - { label: order.create, count: 1 }
+  - id: thanks
+    user: Thanks, that is all.
+    expect:
+      must_not: ['\?\s*$']
+metadata:
+  links:
+    - { block: details, to: { kind: prompt_section, prompt: acme-sales, section: new_customer_details }, status: declared, created_by: author }
+    - { block: details, to: { kind: prompt_section, prompt: acme-sales, section: recap }, status: declared, created_by: author }
+    - { block: loose-yes, to: { kind: prompt_section, prompt: acme-sales, section: explicit_confirm }, status: declared, created_by: author }
+    - { block: confirm, to: { kind: prompt_section, prompt: acme-sales, section: explicit_confirm }, status: declared, created_by: author }
+    - { block: thanks, to: { kind: prompt_section, prompt: acme-sales, section: closing }, status: declared, created_by: author }

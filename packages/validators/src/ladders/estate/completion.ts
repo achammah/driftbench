@@ -9,6 +9,14 @@ import {
 } from '@agent-nexus/driftbench-core';
 import { operationWitnesses } from './operation-witnesses';
 
+/**
+ * The verdicts by which a guard acts on a run (docs/estate.md, unit section): it stops the act (deny, block) or tells
+ * the agent something and lets the act through (warn, nudge). A guard's message is judged for these and no other.
+ */
+const ACTING_VERDICTS: readonly string[] = ['deny', 'block', 'warn', 'nudge'];
+/** Of those, the ones whose spelling in another case a run may still carry (a hook's own deny and block wording). */
+const STOPPING = /^(deny|block)$/i;
+
 export type Component = {
   id: string;
   block: number;
@@ -289,7 +297,7 @@ export function completionComponents(spec: Spec): ComponentInventory {
       } else if (channel === 'custom' && check === 'guard_message') {
         keys(['name', 'mustNot', 'block']);
         const matches = (g: RecordValue) =>
-          g.name === opts.name && ['deny', 'block', 'warn'].includes(String(g.verdict));
+          g.name === opts.name && ACTING_VERDICTS.includes(String(g.verdict));
         const selected = (o: Observed) => rows(o.runtime?.guards).filter(matches);
         add('intervention.exists', (o) => {
           if (o.runtime?.guards) o.runtime.guards = o.runtime.guards.filter((g) => !matches(g));
@@ -342,13 +350,12 @@ export function completionComponents(spec: Spec): ComponentInventory {
           prepare,
         );
         required(inventory.components.at(-1)).violationOutcome = 'inconclusive';
-        const interventions = ['deny', 'block', 'warn'];
         const excludedVerdicts = new Set([
           'allow',
-          ...interventions.flatMap((value) =>
+          ...ACTING_VERDICTS.flatMap((value) =>
             comparisonWitnesses(value)
               .map((variant) => variant.value)
-              .filter((value) => !/^(deny|block)$/i.test(value) && value !== 'warn'),
+              .filter((value) => !STOPPING.test(value) && !ACTING_VERDICTS.includes(value)),
           ),
         ]);
         for (const verdict of excludedVerdicts)
