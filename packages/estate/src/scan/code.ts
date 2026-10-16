@@ -815,6 +815,12 @@ const PROHIBITION_VERBS = new Set([
 const PROHIBITION_STATES = new Set(['unable', 'inaccessible', 'refrain']);
 const OMISSION_VERBS = new Set(['forget', 'fail', 'omit']);
 
+/** The verdicts of `requiresAct`, by the marked text and the verbs asked about. */
+const MENTION_VERDICTS = new Map<string, boolean>();
+const MENTION_VERDICT_LIMIT = 16_384;
+/** Stands for the mentioned path in a text the grammar reads: the verdict does not depend on how the path is spelled. */
+const MENTION_MARKER = 'estatefilemarker';
+
 /** Whether at least one mention requires the act, rather than forbidding it in its own clause. */
 export function positiveMention(
   text: string,
@@ -823,45 +829,58 @@ export function positiveMention(
   bareNever = false,
 ): boolean {
   if (name === '') return false;
-  const actions = new Set(
-    verbs.flatMap((verb) => [verb, `${verb}s`, `${verb}es`, `${verb}ing`, `${verb}ed`]),
-  );
   let offset = text.indexOf(name);
   while (offset >= 0) {
     // Substitute the path so dots and punctuation in filenames cannot create sentence boundaries.
-    const marker = 'estatefilemarker';
-    const marked = text.slice(0, offset) + marker + text.slice(offset + name.length);
-    const clause =
-      nlp(marked.replace(/[\n;]/g, '. '))
-        .clauses()
-        .splitBefore('(and|or) (#Verb|#Negative)')
-        .out('array')
-        .find((part: string) => part.includes(marker)) ?? marked;
-    // A negation does not reach across a word that reverses or restarts the clause: "never proceed without
-    // reading X" requires the read, "do not read X unless asked" forbids it.
-    const segment = clause
-      .split(/\b(?:without|unless|until|before|but|instead)\b/i)
-      .find((part: string) => part.includes(marker));
-    const parsed = nlp((segment ?? clause).replace(/[‘’]/g, "'"));
-    const terms = parsed.termList();
-    const hasAction = terms.some((term) => actions.has(term.normal));
-    if (!hasAction && !bareNever) return true;
-    // Polarity belongs to the governing clause, including auxiliaries, passive prohibitions and
-    // intervening adverbs. A semantic verb lexicon supplements the parser's grammatical negatives.
-    const predicates = parsed.verbs().json() as Array<{ verb?: { infinitive?: string; negative?: boolean } }>;
-    const prohibits =
-      predicates.some(
-        ({ verb }) =>
-          (verb?.infinitive ?? '').split(' ').some((word) => PROHIBITION_VERBS.has(word)) && !verb?.negative,
-      ) || terms.some((term) => PROHIBITION_STATES.has(term.normal));
-    const negatives = predicates.filter(({ verb }) => verb?.negative);
-    const reminder =
-      negatives.length > 0 && negatives.every(({ verb }) => OMISSION_VERBS.has(verb?.infinitive ?? ''));
-    const negative = terms.some((term) => term.tags?.has('Negative') || term.normal === 'no');
-    if (!prohibits && (!negative || reminder)) return true;
+    const marked = text.slice(0, offset) + MENTION_MARKER + text.slice(offset + name.length);
+    // The grammar reads the marked text alone: lines that differ only in the path they name (the entries of an
+    // index) share one verdict, so each distinct sentence shape is parsed once.
+    const key = `${verbs.join(',')}\u0000${bareNever}\u0000${marked}`;
+    let verdict = MENTION_VERDICTS.get(key);
+    if (verdict === undefined) {
+      verdict = requiresAct(marked, verbs, bareNever);
+      if (MENTION_VERDICTS.size >= MENTION_VERDICT_LIMIT) MENTION_VERDICTS.clear();
+      MENTION_VERDICTS.set(key, verdict);
+    }
+    if (verdict) return true;
     offset = text.indexOf(name, offset + name.length);
   }
   return false;
+}
+
+/** Whether the mention marked in `marked` requires the act in its own clause. */
+function requiresAct(marked: string, verbs: readonly string[], bareNever: boolean): boolean {
+  const actions = new Set(
+    verbs.flatMap((verb) => [verb, `${verb}s`, `${verb}es`, `${verb}ing`, `${verb}ed`]),
+  );
+  const clause =
+    nlp(marked.replace(/[\n;]/g, '. '))
+      .clauses()
+      .splitBefore('(and|or) (#Verb|#Negative)')
+      .out('array')
+      .find((part: string) => part.includes(MENTION_MARKER)) ?? marked;
+  // A negation does not reach across a word that reverses or restarts the clause: "never proceed without
+  // reading X" requires the read, "do not read X unless asked" forbids it.
+  const segment = clause
+    .split(/\b(?:without|unless|until|before|but|instead)\b/i)
+    .find((part: string) => part.includes(MENTION_MARKER));
+  const parsed = nlp((segment ?? clause).replace(/[‘’]/g, "'"));
+  const terms = parsed.termList();
+  const hasAction = terms.some((term) => actions.has(term.normal));
+  if (!hasAction && !bareNever) return true;
+  // Polarity belongs to the governing clause, including auxiliaries, passive prohibitions and
+  // intervening adverbs. A semantic verb lexicon supplements the parser's grammatical negatives.
+  const predicates = parsed.verbs().json() as Array<{ verb?: { infinitive?: string; negative?: boolean } }>;
+  const prohibits =
+    predicates.some(
+      ({ verb }) =>
+        (verb?.infinitive ?? '').split(' ').some((word) => PROHIBITION_VERBS.has(word)) && !verb?.negative,
+    ) || terms.some((term) => PROHIBITION_STATES.has(term.normal));
+  const negatives = predicates.filter(({ verb }) => verb?.negative);
+  const reminder =
+    negatives.length > 0 && negatives.every(({ verb }) => OMISSION_VERBS.has(verb?.infinitive ?? ''));
+  const negative = terms.some((term) => term.tags?.has('Negative') || term.normal === 'no');
+  return !prohibits && (!negative || reminder);
 }
 
 /**
@@ -1197,8 +1216,12 @@ function routeTargets(
   return [...targets.values()];
 }
 
-/** Cell roles are grammatical evidence, not a vocabulary of table headings. */
-type RouteCell = 'request' | 'attribute' | 'fragment';
+/**
+ * Cell roles are grammatical evidence, not a vocabulary of table headings. A `limit` states what a unit does
+ * not do ("Cannot book a berth", "Never use for payments"): it says when not to use the unit, so no route
+ * comes from it.
+ */
+type RouteCell = 'request' | 'attribute' | 'fragment' | 'limit';
 const ROUTE_CELL_CACHE = new Map<string, RouteCell>();
 
 function routeCell(value: string): RouteCell {
@@ -1210,6 +1233,19 @@ function routeCell(value: string): RouteCell {
   ROUTE_CELL_CACHE.set(value, role);
   return role;
 }
+
+/** The first words of a prohibition addressed to the reader, as opposed to a statement about the unit. */
+const IMPERATIVE_LEADS = new Set([
+  'do',
+  "don't",
+  'never',
+  'must',
+  "mustn't",
+  'should',
+  "shouldn't",
+  'shall',
+  'please',
+]);
 
 function readRouteCell(value: string): RouteCell {
   const text = value
@@ -1241,6 +1277,13 @@ function readRouteCell(value: string): RouteCell {
     return 'attribute';
   if (/[,;]\s*\S/.test(text) && text.split(/[,;]/).every((part) => !/\s/.test(part.trim())))
     return 'attribute';
+  // A declarative negation that opens the cell ("Cannot ...", "Does not ...", "Won't ...", "Not for ...") negates
+  // what the cell says about the unit. An imperative prohibition ("Do not ...", "Never ...") is a rule addressed to
+  // the agent, which a table may bind to a unit, and a negation further in ("a tide that has not come in")
+  // belongs to the situation described.
+  const lead = terms.slice(0, 2);
+  if (lead.some((term) => term.tags?.has('Negative')) && !IMPERATIVE_LEADS.has(lead[0]?.normal ?? ''))
+    return 'limit';
 
   // Grammar may strengthen a decision, but a language-specific tagger is never a gate.
   // Distinct free multi-word phrases also describe requests in languages it cannot parse.
@@ -1291,11 +1334,19 @@ function tableRouteTargets(
   return !predicate?.tags?.has('Verb') || predicate.tags.has('Infinitive') ? targets : [];
 }
 
-/** Repeated short values identify categories; distinct free phrases identify requests. */
-function routeColumn(values: string[]): RouteCell {
-  const nonempty = values.filter((value) => value.trim() !== '');
-  if (!nonempty.length) return 'fragment';
-  const roles = nonempty.map(routeCell);
+/**
+ * Repeated short values identify categories; distinct free phrases identify requests. A column whose header
+ * holds a negation ("It cannot do", "Does not handle"), or whose cells mostly open with one, states limits.
+ * A limit cell in another column is left out of its reading.
+ */
+function routeColumn(values: string[], header = ''): RouteCell {
+  const filled = values.filter((value) => value.trim() !== '');
+  if (!filled.length) return 'fragment';
+  const roles = filled.map(routeCell);
+  const limits = roles.filter((role) => role === 'limit').length;
+  if (limits * 2 > filled.length || statesNegation(header)) return 'limit';
+  const nonempty = filled.filter((_value, index) => roles[index] !== 'limit');
+  const kept = roles.filter((role) => role !== 'limit');
   const counts = new Map<string, number>();
   for (const value of nonempty) {
     const key = value.replace(/[`*]/g, '').trim().toLowerCase();
@@ -1312,9 +1363,20 @@ function routeColumn(values: string[]): RouteCell {
     )
   )
     return 'attribute';
-  if (roles.every((role) => role === 'attribute')) return 'attribute';
-  if (roles.every((role) => role === 'request')) return 'request';
+  if (kept.every((role) => role === 'attribute')) return 'attribute';
+  if (kept.every((role) => role === 'request')) return 'request';
   return 'fragment';
+}
+
+/** Whether a heading holds a negation anywhere: "It cannot do", "Does not handle", "Never use it for". */
+function statesNegation(heading: string): boolean {
+  const text = heading.replace(/[`*]/g, '').trim();
+  return (
+    text !== '' &&
+    nlp(text)
+      .termList()
+      .some((term) => term.tags?.has('Negative'))
+  );
 }
 
 function ambiguousRouteTable(
@@ -1376,8 +1438,11 @@ function routeSources(
       cells.some((row) => (row[column]?.length ?? 0) > 0) ? [column] : [],
     );
     if (!targetColumns.length) continue;
-    const roles = table.header.map((_header, column) =>
-      routeColumn(table.rows.map((row) => row.cells[column] ?? '')),
+    const roles = table.header.map((header, column) =>
+      routeColumn(
+        table.rows.map((row) => row.cells[column] ?? ''),
+        header,
+      ),
     );
     const pairs = targetColumns.flatMap((target) =>
       roles.flatMap((role, condition) =>
@@ -1390,13 +1455,13 @@ function routeSources(
       if (condition === undefined) continue;
       for (const [index, row] of table.rows.entries()) {
         const ask = clean(row.cells[condition] ?? '');
-        if (!ask) continue;
+        if (!ask || routeCell(row.cells[condition] ?? '') === 'limit') continue;
         for (const { target: column } of pairs)
           for (const target of cells[index]?.[column] ?? []) {
             add({ ...target, ask, line: row.line, quote: row.text, via: 'table' });
           }
       }
-    } else if (!roles.every((role) => role === 'attribute')) {
+    } else if (!roles.every((role) => role === 'attribute' || role === 'limit')) {
       ambiguousRouteTable(
         raw,
         file,
