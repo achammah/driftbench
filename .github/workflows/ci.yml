@@ -24,7 +24,9 @@ concurrency:
 jobs:
   pr-fast:
     name: pr fast
-    if: github.event_name == 'pull_request'
+    # A pull request runs it. A merge train also dispatches it alone on a pre-flight branch (train/pre-<pr>,
+    # main plus one PR) to catch a defect in that PR before the train is built; the heavy jobs ignore it.
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',fast,'))
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -51,8 +53,14 @@ jobs:
       - run: node tools/structure/api-surface.mjs --build --check
       - name: CLI smoke
         run: node packages/cli/dist/bin.js --version
+      # The docs checks always run: --changed below sees no source change in a PR that only edits markdown.
+      - name: Docs reference is current
+        run: pnpm docs:reference --check
+      - name: Docs reachability and examples
+        run: pnpm exec vitest run tools/docs --maxWorkers=2
       # A merge train runs the full test suite in its build jobs, so the affected-tests subset here
-      # would only repeat it and overrun this job's time limit.
+      # would only repeat it and overrun this job's time limit. A dispatch has no head_ref, so it runs
+      # the subset, against origin/main as a pull request does.
       - name: Tests affected by this PR
         if: ${{ !startsWith(github.head_ref, 'train/') }}
         run: pnpm test --maxWorkers=2 --changed origin/main --passWithNoTests
@@ -83,6 +91,24 @@ jobs:
               echo '::error::A dispatch must list the jobs it runs'
               exit 1
             fi
+            # GitHub matches the list without regard to case, so the gate lowercases it before it reads it.
+            jobs_lc="$(printf '%s' "$JOBS" | tr '[:upper:]' '[:lower:]')"
+            # A dispatch counts only if at least one heavy job ran and passed. One that lists fast and ran no heavy job is a pre-flight run.
+            if [[ ",$RESULTS," != *,success,* ]]; then
+              if [[ ",$jobs_lc," == *,fast,* ]]; then
+                echo '::error::pre-flight run, not a train pass'
+              else
+                echo '::error::A dispatch must run at least one heavy job'
+              fi
+              exit 1
+            fi
+            # Every id in the list must be a job id, so a misspelt id cannot hide a skipped job.
+            for id in ${jobs_lc//,/ }; do
+              case ",bench,research-replay,build,python,comparison-replay,viewer-journey,guard,fast," in
+                *",$id,"*) ;;
+                *) echo "::error::Unknown job id in the dispatch list: $id"; exit 1 ;;
+              esac
+            done
           elif [ "$EVENT_NAME" != push ] && ! { [ "$EVENT_NAME" = pull_request ] && [[ "$HEAD_REF" == train/* ]]; }; then
             echo '::error::Merge through a train (train/<n>)'
             exit 1
