@@ -20,6 +20,7 @@ import {
 } from '../schema/run';
 import type { BlockSpec, EndState, Expect, GivenOverride, Spec, Stimulus } from '../schema/spec';
 import { cloneJson, contentHash } from '../spec/hash';
+import { specHash as specHashOf, specIdentity } from '../spec/identity';
 import { compareEndState, type EndStateMatch } from './assertion';
 import { blockCacheKey, endStateCacheKey, type ObservedCache, unwrapEndState, wrapEndState } from './cache';
 import { capabilityGap } from './capability';
@@ -141,10 +142,10 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
     throw new Error('runSpec: a store needs a campaignId to file the run under');
   }
   const now = options.now ?? (() => new Date());
-  const specHash = contentHash(spec);
+  const specHash = specHashOf(spec);
   // The cache key leaves out the spec's version: a free label that plays no part (docs/running.md, "The
   // cache and replay"), so relabelling a spec still replays its runs.
-  const { version: _version, ...unlabelled } = spec;
+  const { version: _version, ...unlabelled } = specIdentity(spec);
   const cacheSpecHash = contentHash(unlabelled);
   const target = options.target ?? spec.target ?? { adapter: options.adapter.id };
   const prices = options.prices === undefined ? undefined : TokenPrices.parse(options.prices);

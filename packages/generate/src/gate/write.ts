@@ -1,4 +1,4 @@
-import { type BlockSpec, contentHash, type Spec } from '@agent-nexus/driftbench-core';
+import { type BlockSpec, type Spec, specHash } from '@agent-nexus/driftbench-core';
 import { stringify } from 'yaml';
 import { formatJson } from '../enumerate/json';
 import type { BlockRecord, GateResult } from './gate';
@@ -47,7 +47,7 @@ export function gateFiles(
     const folder = split === 'holdout' ? HOLDOUT_DIR : GATED_DIR;
     const path = `${folder}/${candidate.path}`;
     files.push({ path, text: specText(gated, candidate.path, split) });
-    if (split === 'holdout') seal.push({ id: gated.id, path, hash: contentHash(gated) });
+    if (split === 'holdout') seal.push({ id: gated.id, path, hash: specHash(gated) });
   }
 
   files.push({

@@ -74,10 +74,10 @@ The hash is the first 12 hex characters of the SHA-256 of the spec's canonical J
 ## `driftbench spec lint`
 
 ```
-driftbench spec lint <paths...> [--json] [--strict]
+driftbench spec lint <paths...> [--json] [--strict] [--sections <registries...>]
 ```
 
-Validates every spec like `spec validate`, then prints the warnings of the valid ones.
+Validates every spec like `spec validate`, then prints the warnings of the valid ones. `--sections` also checks every `prompt_section` link against the section registry of its prompt (see [prompt sections and block links](../concepts/blast-radius.md#prompt-sections-and-block-links)).
 
 ```
 $ pnpm -s driftbench spec lint _captures/docs3/cli/specs
@@ -244,6 +244,9 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `RETENTION_FACT_UNKNOWN` | error | `expect.knowledge_retention` names a fact that no ledger holds before the block: not in `given.ledger`, nor in an earlier block's `ledger_add` |
 | `TOOL_FORBIDDEN_EXPECTED` | error | a block expects a tool that the rules forbid, in `forbidden_tools` or with `max_calls` at 0 |
 | `GIVEN_ORIGIN_WITHOUT_PREFIX` | error | a block's `given.origin` says where a prefix comes from, and the block writes no `given.prefix` |
+| `LINK_BLOCK_UNKNOWN` | error | a link in `metadata.links` names a block id the spec does not have, or an index past its last block |
+| `LINK_TARGET_UNKNOWN` | error or warning | `spec lint --sections` only: error when the registry of the prompt has no such section, warning when no registry was given for the prompt |
+| `LINK_STALE` | warning | `spec lint --sections` only: the link's status is `stale`, or its section was not found again in the registry's version |
 | `SCHEMA_*` | error | the schema refuses a value; the suffix is the zod issue code, such as `SCHEMA_UNRECOGNIZED_KEYS`, `SCHEMA_INVALID_TYPE`, `SCHEMA_INVALID_VALUE` or `SCHEMA_TOO_SMALL` |
 | `CRITERION_UNRESOLVED` | warning | blocks name criteria and the spec defines none; they must come from a shared catalogue |
 | `BLOCK_NO_EXPECTATION` | warning | a block checks nothing |
@@ -1662,6 +1665,8 @@ Every command `driftbench --help` lists is built. These do not exist as commands
 ### Prompt change manifests
 
 `driftbench radius auto --prompt <old> <new> --map <approved.yaml> [--source <path>] [--from-version <version>] [--to-version <version>] [--out <manifest.yaml>]` writes a manifest from approved evidence quotes. It exits 0 when the manifest is written or printed, including a conservative whole-suite manifest, and 2 on invalid input. The separate `radius <specs> --change ...` command exits 1 when its computed radius is the whole suite. `driftbench radius <specs> --change <manifest.yaml> --explain` traces anchors to block reasons. See [prompt quotes](../concepts/blast-radius.md#prompt-quotes).
+
+`driftbench radius sections init <prompt> --id <prompt-id> --prompt-version <version> [--level <n>] [--out <file>]` writes a first section registry from the markdown headings. `driftbench radius sections check <registry> --prompt <file> [--json]` exits 1 when the registry no longer describes the prompt. `driftbench radius sections reanchor <registry> --prompt <old> <new> --to-version <version> [--out <file>] [--json]` finds every section again in the new prompt and exits 1 when a section is stale, a change lies outside every section or sections changed order. See [prompt sections and block links](../concepts/blast-radius.md#prompt-sections-and-block-links).
 
 ### `campaign rejudge`
 

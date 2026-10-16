@@ -86,8 +86,10 @@ Standard output, without `--json`:
 * `Against baseline <id>: <verdict>, margin <m> points.` with `--baseline`. The verdict is
   `non-inferior`, `regressed` or `unproven`, as `driftbench compare` decides it.
 * One `aggregate` line per criterion: `passes`, `fails` or `no runs`, the value against the threshold,
-  the Wilson 95% interval over the runs, and `decided` or `undecided: <n> runs at this rate would decide
-  it`.
+  the 95% interval of the rate, and `decided` or `undecided`. Over several goldens the interval is the Wilson
+  interval on the effective runs, printed with the goldens, the design effect and the effective runs, and an
+  undecided line says how many goldens like these (and how many runs) would decide it. With one golden it is
+  the plain Wilson interval over the runs.
 * `Wrote <files>.`
 
 The HTML file is described in `results-scorecard`: an overview, three zones (pass rate charts, tests,
@@ -135,7 +137,7 @@ Suite pass rate, mode T: 50.0% [18.7%, 81.3%] (hierarchical 95% interval); 6 gol
 Suite pass rate, mode F: 50.0% [18.7%, 81.3%] (hierarchical 95% interval); 6 goldens, n_eff 5.0 runs (design effect 2.40), no drop detectable at 80% power.
 Suite pass rate, mode P: 36.4% [14.7%, 64.0%] (hierarchical 95% interval); 11 goldens, n_eff 10.0 runs (design effect 2.20), no drop detectable at 80% power.
 Against baseline c-base: regressed, margin 14.5 points.
-aggregate pass-rate >= 0.8: fails (0.43478260869565216 >= 0.8, Wilson 95% interval 0.302 to 0.578 over 46 runs, decided)
+aggregate pass-rate >= 0.8: fails (0.43478260869565216 >= 0.8, Wilson 95% interval on the effective runs 0.245 to 0.646 over 46 runs in 23 goldens (design effect 2.09, 22.0 effective runs), decided)
 Wrote x3.html.
 ```
 

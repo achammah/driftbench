@@ -6,9 +6,18 @@ import {
   type ImpactReport,
 } from '@agent-nexus/driftbench-estate';
 import { generateEstateSuite, StaticTest } from '@agent-nexus/driftbench-generate';
+import { completionComponents, componentSpec } from '../completion';
+import { completionApplies, completionContract } from '../completion-contract';
 import { agentMutants, estateMeta, type MutantVerdict, type SpecVerdict, specVerdicts } from '../levels';
 import { type EstateMutant, estateMutants } from '../mutants';
-import { type EstateRun, estateRun, scanRendered } from '../pipeline';
+import {
+  type EstateRun,
+  estateRun,
+  generationRun,
+  replayChecks,
+  replayOnFollower,
+  scanRendered,
+} from '../pipeline';
 import { renderEstate } from '../render';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
 
@@ -197,7 +206,7 @@ export function genCompleteFamily(): Family {
     component: THEN,
     items,
     async evaluate(seed) {
-      const run = await estateRun(seed);
+      const run = await generationRun(seed);
       const all = await specVerdicts(run);
       const atoms = new Map(run.scanned.map.atoms.map((atom) => [atom.id, atom]));
       const byClass = new Map<string, SpecVerdict[]>();
@@ -214,6 +223,62 @@ export function genCompleteFamily(): Family {
           const reason = verdictOf(verdict);
           return reason ? [`${verdict.spec.record.id}: ${reason}`] : [];
         });
+        if (bad.length === 0)
+          for (const verdict of list) {
+            if (!verdict.spec.loaded || !completionApplies(run, verdict.spec)) continue;
+            const inventory = completionComponents(completionContract(run, verdict.spec));
+            for (const component of inventory.components) {
+              const loaded = {
+                ...verdict.spec.loaded,
+                spec: componentSpec(verdict.spec.loaded.spec, component),
+              };
+              const control = await replayOnFollower(
+                run,
+                loaded,
+                replayChecks(),
+                undefined,
+                component.prepare,
+              );
+              const controlVerdicts =
+                control.run?.blocks[component.block]?.verdicts.filter((v) =>
+                  component.controlVerdicts.includes(v.id),
+                ) ?? [];
+              if (
+                control.run?.status !== 'completed' ||
+                controlVerdicts.length !== component.controlVerdicts.length ||
+                controlVerdicts.some((v) => v.outcome !== 'pass' || !v.gating)
+              ) {
+                bad.push(`${verdict.spec.record.id}: component control failed ${component.id}`);
+                break;
+              }
+              const result = await replayOnFollower(run, loaded, replayChecks(), undefined, (o) => {
+                component.prepare?.(o);
+                component.change(o);
+              });
+              const targeted =
+                result.run?.blocks[component.block]?.verdicts.filter((v) =>
+                  component.verdicts.includes(v.id),
+                ) ?? [];
+              const witnessed =
+                component.violationOutcome === 'absent'
+                  ? targeted.length === 0
+                  : targeted.length === component.verdicts.length &&
+                    targeted.every(
+                      (v) =>
+                        v.gating &&
+                        (component.violationOutcome
+                          ? v.outcome === component.violationOutcome
+                          : v.outcome === 'fail' || v.outcome === 'inconclusive'),
+                    );
+              if (result.run?.status !== 'completed' || !witnessed) {
+                bad.push(`${verdict.spec.record.id}: accepts component violation ${component.id}`);
+                break;
+              }
+            }
+            if (inventory.gaps.length > 0)
+              bad.push(`${verdict.spec.record.id}: component derivation gaps: ${inventory.gaps.join(', ')}`);
+          }
+
         out.set(`${family}.${keyOf(cls)}`, {
           pass: bad.length === 0,
           detail:

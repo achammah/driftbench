@@ -1,0 +1,452 @@
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import { extname } from 'node:path';
+import { parse as parseYaml } from 'yaml';
+import { z } from 'zod';
+import { normalizePrompt } from './prompt-diff';
+
+/**
+ * A section registry: the stable ids of the sections of one version of a prompt, with where each
+ * section sits, a hash of its text and an anchor to find it again in the next version. It lives beside
+ * the prompt as `prompts/<id>.sections.yaml`. Block links name a section by its id, never by offsets.
+ *
+ * Offsets are UTF-16 code units after NFC and CRLF/CR to LF, end exclusive: the unit of the radius
+ * prompt anchors (prompt-diff.ts). A pointer from another source in another unit, such as an Anthropic
+ * citation in code points, is converted first (citations.ts).
+ */
+
+export const SECTION_NORMALISATION = 'NFC; CRLF/CR->LF; offsets in UTF-16 code units; end exclusive';
+export const SECTION_KINDS = ['rule', 'persona', 'format', 'tool_guide', 'example', 'context'] as const;
+export const SECTION_ID = /^[A-Za-z0-9][A-Za-z0-9_.-]*$/;
+
+const Span = z
+  .strictObject({
+    start: z.number().int().min(0).describe('The first UTF-16 code unit of the section.'),
+    end: z.number().int().min(0).describe('One past the last UTF-16 code unit, end exclusive.'),
+  })
+  .refine((span) => span.end > span.start, { message: 'a span ends after it starts' });
+
+export const PromptSection = z
+  .strictObject({
+    id: z
+      .string()
+      .regex(SECTION_ID, 'letters, digits, dots, underscores and hyphens, starting with a letter or digit')
+      .describe('The stable id of the section. Never reused for other text.'),
+    title: z.string().optional().describe('A title for the reader.'),
+    kind: z
+      .enum(SECTION_KINDS)
+      .optional()
+      .describe(`What the section holds: ${SECTION_KINDS.join(', ')}.`),
+    scope: z
+      .enum(['local', 'global'])
+      .describe(
+        'global: the section can reach every block (persona, language, tone); a change to it selects every block and localisation cannot rank it. local: only the blocks linked to it.',
+      ),
+    span: Span.describe('Where the section sits in this version of the prompt.'),
+    sha256: z
+      .string()
+      .regex(/^[0-9a-f]{64}$/)
+      .describe('The SHA-256 of the section text.'),
+    anchor: z
+      .strictObject({
+        quote: z.string().min(1).describe('A verbatim quote inside the section, unique in the prompt.'),
+        prefix: z.string().optional().describe('The text just before the quote.'),
+        suffix: z.string().optional().describe('The text just after the quote.'),
+      })
+      .describe('How to find the section again in the next version of the prompt.'),
+    references: z
+      .array(z.string())
+      .optional()
+      .describe('Sections this one refers to ("see X"). A change to X can change how this one reads.'),
+    overrides: z
+      .array(z.string())
+      .optional()
+      .describe('Sections this one narrows or extends. A change to them can change this one.'),
+    duplicates: z
+      .array(z.string())
+      .optional()
+      .describe('Sections that state the same rule. A change to one is read as a change to all.'),
+    stale: z
+      .boolean()
+      .optional()
+      .describe(
+        'True after a re-anchoring that could not find the section again. Its span and hash are those of the last version where it was found; every link to it reads as stale until its span is declared again.',
+      ),
+  })
+  .describe('One section of the prompt.');
+export type PromptSection = z.infer<typeof PromptSection>;
+
+export const SectionRegistry = z
+  .strictObject({
+    prompt_id: z.string().min(1).describe('The id of the prompt. Links name it as `to.prompt`.'),
+    version: z.string().min(1).describe('The version of the prompt this registry describes.'),
+    normalisation: z
+      .literal(SECTION_NORMALISATION)
+      .optional()
+      .describe('The offset unit, written for the reader.'),
+    text_sha256: z
+      .string()
+      .regex(/^[0-9a-f]{64}$/)
+      .describe('The SHA-256 of the whole normalised prompt text.'),
+    sections: z.array(PromptSection).min(1).describe('The sections, in prompt order.'),
+  })
+  .describe('The section registry of one version of a prompt.');
+export type SectionRegistry = z.infer<typeof SectionRegistry>;
+
+export type RegistryResult = { ok: true; registry: SectionRegistry } | { ok: false; errors: string[] };
+
+/** The full SHA-256 in hex of a text, as the registry stores it. */
+export const sha256Hex = (text: string): string => createHash('sha256').update(text).digest('hex');
+
+/** Validates a parsed document as a registry: its schema, unique ids and known section references. */
+export function parseSectionRegistry(value: unknown): RegistryResult {
+  const parsed = SectionRegistry.safeParse(value);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      errors: parsed.error.issues.map((issue) => `${issue.path.join('.') || '(file)'}: ${issue.message}`),
+    };
+  }
+  const registry = parsed.data;
+  const errors: string[] = [];
+  const ids = new Set<string>();
+  registry.sections.forEach((section, index) => {
+    if (ids.has(section.id)) errors.push(`sections.${index}.id: the id ${section.id} is used twice`);
+    ids.add(section.id);
+  });
+  registry.sections.forEach((section, index) => {
+    for (const key of ['references', 'overrides', 'duplicates'] as const) {
+      for (const id of section[key] ?? []) {
+        if (!ids.has(id)) errors.push(`sections.${index}.${key}: no section has the id ${id}`);
+      }
+    }
+  });
+  return errors.length > 0 ? { ok: false, errors } : { ok: true, registry };
+}
+
+/** Reads a registry file, YAML or JSON. A file that does not parse is an error, never an empty registry. */
+export async function loadSectionRegistry(path: string): Promise<RegistryResult> {
+  let value: unknown;
+  try {
+    const text = await readFile(path, 'utf8');
+    value = extname(path).toLowerCase() === '.json' ? JSON.parse(text) : parseYaml(text);
+  } catch (cause) {
+    return { ok: false, errors: [cause instanceof Error ? cause.message : String(cause)] };
+  }
+  return parseSectionRegistry(value);
+}
+
+function count(text: string, quote: string): number[] {
+  const at: number[] = [];
+  if (quote === '') return at;
+  for (let from = text.indexOf(quote); from >= 0; from = text.indexOf(quote, from + 1)) at.push(from);
+  return at;
+}
+
+/**
+ * Whether the registry describes this prompt text: the whole-text hash, each section's span and hash,
+ * each anchor found once and inside its section, and no two sections overlapping. Stale sections are
+ * not checked against the text. Returns the problems; empty when the registry matches.
+ */
+export function checkSectionRegistry(registry: SectionRegistry, prompt: string): string[] {
+  const text = normalizePrompt(prompt);
+  const problems: string[] = [];
+  if (sha256Hex(text) !== registry.text_sha256)
+    problems.push('text_sha256: the registry does not describe this prompt text');
+  const live = registry.sections.filter((section) => section.stale !== true);
+  for (const section of live) {
+    const { start, end } = section.span;
+    if (end > text.length) {
+      problems.push(`${section.id}: the span ends at ${end}, past the end of the prompt (${text.length})`);
+      continue;
+    }
+    if (sha256Hex(text.slice(start, end)) !== section.sha256)
+      problems.push(`${section.id}: the text at ${start}-${end} does not match the section hash`);
+    const at = count(text, section.anchor.quote);
+    if (at.length !== 1)
+      problems.push(`${section.id}: the anchor quote is found ${at.length} times, not once`);
+    else if ((at[0] ?? -1) < start || (at[0] ?? 0) + section.anchor.quote.length > end)
+      problems.push(`${section.id}: the anchor quote lies outside the section`);
+  }
+  const sorted = [...live].sort((a, b) => a.span.start - b.span.start);
+  for (let index = 1; index < sorted.length; index++) {
+    const before = sorted[index - 1];
+    const next = sorted[index];
+    if (before && next && next.span.start < before.span.end)
+      problems.push(`${before.id} and ${next.id} overlap`);
+  }
+  return problems;
+}
+
+const WINDOW = 32;
+
+function slug(title: string): string {
+  const base = title
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return base === '' ? 'section' : base;
+}
+
+/** The shortest prefix of the section's body (at least 24 units, or all of it) found once in the text. */
+function uniqueQuote(text: string, start: number, end: number): { quote: string; at: number } | undefined {
+  let from = start;
+  // Skip the heading line, so the quote is body text when the section has a body.
+  const newline = text.indexOf('\n', start);
+  if (newline >= 0 && newline + 1 < end && /^#{1,6}\s/.test(text.slice(start, newline))) from = newline + 1;
+  while (from < end && /\s/.test(text[from] ?? '')) from++;
+  for (const origin of from < end ? [from, start] : [start]) {
+    for (let length = Math.min(24, end - origin); origin + length <= end; length++) {
+      const quote = text.slice(origin, origin + length);
+      if (quote.trim() !== '' && count(text, quote).length === 1) return { quote, at: origin };
+    }
+  }
+  return undefined;
+}
+
+/** A section entry for the text at `start` to `end`. Undefined when no quote inside it is unique. */
+export function sectionEntry(
+  text: string,
+  start: number,
+  end: number,
+  fields: Omit<PromptSection, 'span' | 'sha256' | 'anchor'>,
+): PromptSection | undefined {
+  const found = uniqueQuote(text, start, end);
+  if (!found) return undefined;
+  return {
+    ...fields,
+    span: { start, end },
+    sha256: sha256Hex(text.slice(start, end)),
+    anchor: {
+      quote: found.quote,
+      prefix: text.slice(Math.max(0, found.at - WINDOW), found.at),
+      suffix: text.slice(found.at + found.quote.length, found.at + found.quote.length + WINDOW),
+    },
+  };
+}
+
+/**
+ * A first registry for a markdown prompt: one section per heading of level 1 to `level`, from the
+ * heading to the next one, the text before the first heading as `preamble`. Ids are the slugged titles.
+ * Every section starts global, the safe reading: the author marks local the sections that reach only
+ * the blocks linked to them, and adds references and overrides.
+ */
+export function sectionsFromHeadings(
+  prompt: string,
+  options: { promptId: string; version: string; level?: number },
+): RegistryResult {
+  const text = normalizePrompt(prompt);
+  const level = options.level ?? 2;
+  const heading = new RegExp(`^#{1,${level}}[ \\t]+(.+)$`, 'gm');
+  const starts: { at: number; title: string }[] = [];
+  for (const match of text.matchAll(heading))
+    starts.push({ at: match.index, title: (match[1] ?? '').trim() });
+  if (starts.length === 0 || (starts[0]?.at ?? 0) > 0) {
+    const firstAt = starts[0]?.at ?? text.length;
+    if (text.slice(0, firstAt).trim() !== '') starts.unshift({ at: 0, title: 'preamble' });
+  }
+  const errors: string[] = [];
+  const sections: PromptSection[] = [];
+  const used = new Map<string, number>();
+  starts.forEach((each, index) => {
+    let end = starts[index + 1]?.at ?? text.length;
+    while (end > each.at + 1 && /\s/.test(text[end - 1] ?? '')) end--;
+    const base = slug(each.title);
+    const seen = (used.get(base) ?? 0) + 1;
+    used.set(base, seen);
+    const id = seen === 1 ? base : `${base}_${seen}`;
+    const entry = sectionEntry(text, each.at, end, { id, title: each.title, scope: 'global' });
+    if (entry) sections.push(entry);
+    else errors.push(`${id}: no quote inside the section is unique in the prompt`);
+  });
+  if (sections.length === 0) errors.push('the prompt has no section');
+  if (errors.length > 0) return { ok: false, errors };
+  return {
+    ok: true,
+    registry: {
+      prompt_id: options.promptId,
+      version: options.version,
+      normalisation: SECTION_NORMALISATION,
+      text_sha256: sha256Hex(text),
+      sections,
+    },
+  };
+}
+
+export type ReanchorMethod = 'same_hash' | 'quote' | 'window';
+
+export type ReanchoredSection = {
+  id: string;
+  /** kept: same text at the same offsets. moved: same text found at new offsets. stale: not found again. */
+  status: 'kept' | 'moved' | 'stale';
+  /** How the section was found again; absent when stale. */
+  method?: ReanchorMethod;
+  from: { start: number; end: number };
+  /** The new span; absent when stale. */
+  to?: { start: number; end: number };
+  /** For a stale section: why. */
+  reason?: string;
+};
+
+export type Reanchoring = {
+  /** The registry of the new version: found sections at their new spans, stale ones flagged. */
+  registry: SectionRegistry;
+  sections: ReanchoredSection[];
+  /**
+   * Text that changed outside every section, whitespace aside: such a change can reach any block. Each
+   * entry names the sections around it. Empty when every change lies inside a stale section.
+   */
+  outside: string[];
+  /** Sections whose order relative to the others changed. */
+  reordered: string[];
+};
+
+const squash = (text: string) => text.replace(/\s+/g, '');
+
+/**
+ * Re-anchors a registry on the next version of its prompt. For each section, in order: the same text
+ * found once in the new prompt (`same_hash`); else the anchor quote found once, and the old text found
+ * at the same distance from it (`quote`); else the prefix, quote and suffix window found once, the same
+ * way (`window`); else `stale`. A section is only ever placed where its text hashes as before, so a
+ * section is never anchored to the wrong text: an edit inside a section makes it stale.
+ *
+ * `before` must be the text the registry describes (its `text_sha256`); a mismatch is an error.
+ */
+export function reanchorRegistry(
+  registry: SectionRegistry,
+  before: string,
+  after: string,
+  version: string,
+): { ok: true; result: Reanchoring } | { ok: false; errors: string[] } {
+  const old = normalizePrompt(before);
+  const next = normalizePrompt(after);
+  if (sha256Hex(old) !== registry.text_sha256)
+    return {
+      ok: false,
+      errors: ['the registry does not describe the old prompt text (text_sha256 differs)'],
+    };
+  const sections: ReanchoredSection[] = [];
+  const entries: PromptSection[] = [];
+  for (const section of registry.sections) {
+    const from = section.span;
+    const body = old.slice(from.start, from.end);
+    if (section.stale === true || sha256Hex(body) !== section.sha256) {
+      sections.push({ id: section.id, status: 'stale', from, reason: 'already stale in the old registry' });
+      entries.push({ ...section, stale: true });
+      continue;
+    }
+    let to: { start: number; end: number } | undefined;
+    let method: ReanchorMethod | undefined;
+    const exact = count(next, body);
+    if (exact.length === 1 && exact[0] !== undefined) {
+      to = { start: exact[0], end: exact[0] + body.length };
+      method = 'same_hash';
+    }
+    const quoteAt = old.indexOf(section.anchor.quote, from.start);
+    const offset = quoteAt - from.start;
+    const place = (needle: string, inner: number, how: ReanchorMethod) => {
+      if (to || quoteAt < 0) return;
+      const found = count(next, needle);
+      if (found.length !== 1 || found[0] === undefined) return;
+      const start = found[0] + inner - offset;
+      if (start >= 0 && next.slice(start, start + body.length) === body) {
+        to = { start, end: start + body.length };
+        method = how;
+      }
+    };
+    place(section.anchor.quote, 0, 'quote');
+    const prefix = section.anchor.prefix ?? '';
+    place(prefix + section.anchor.quote + (section.anchor.suffix ?? ''), prefix.length, 'window');
+    if (!to || !method) {
+      const quoteFound = count(next, section.anchor.quote).length === 1;
+      sections.push({
+        id: section.id,
+        status: 'stale',
+        from,
+        reason: quoteFound
+          ? 'the anchor is found but the section text changed: edited inside'
+          : 'neither the text nor the anchor is found once: edited or removed',
+      });
+      entries.push({ ...section, stale: true });
+      continue;
+    }
+    sections.push({
+      id: section.id,
+      status: to.start === from.start ? 'kept' : 'moved',
+      method,
+      from,
+      to,
+    });
+    const { stale: _stale, ...live } = section;
+    entries.push({ ...live, span: to });
+  }
+
+  // Order: the found sections must keep their relative order.
+  const found = sections.filter((each) => each.to !== undefined);
+  const reordered: string[] = [];
+  const byNew = [...found].sort((a, b) => (a.to?.start ?? 0) - (b.to?.start ?? 0));
+  byNew.forEach((each, index) => {
+    if (found[index]?.id !== each.id) reordered.push(each.id);
+  });
+
+  // Outside: between two consecutive found sections (and the ends), the old text minus the stale
+  // sections must reappear in the new text, whitespace aside, and nothing else may be added unless a
+  // stale section lies between them (its new text is not known).
+  const outside: string[] = [];
+  if (reordered.length === 0) {
+    const bounds = [
+      { id: '(start)', from: { start: 0, end: 0 }, to: { start: 0, end: 0 } },
+      ...found,
+      {
+        id: '(end)',
+        from: { start: old.length, end: old.length },
+        to: { start: next.length, end: next.length },
+      },
+    ];
+    for (let index = 1; index < bounds.length; index++) {
+      const left = bounds[index - 1];
+      const right = bounds[index];
+      if (!left?.to || !right?.to) continue;
+      const oldGap = { start: left.from.end, end: right.from.start };
+      const stale = registry.sections.filter(
+        (section) =>
+          sections.find((each) => each.id === section.id)?.status === 'stale' &&
+          section.span.start >= oldGap.start &&
+          section.span.end <= oldGap.end,
+      );
+      const newText = squash(next.slice(left.to.end, right.to.start));
+      const label = `between ${left.id} and ${right.id}`;
+      if (stale.length === 0) {
+        if (squash(old.slice(oldGap.start, oldGap.end)) !== newText) outside.push(label);
+        continue;
+      }
+      // The text around the stale sections must survive, in order, before, between and after them.
+      const pieces: string[] = [];
+      let cursor = oldGap.start;
+      for (const section of [...stale].sort((a, b) => a.span.start - b.span.start)) {
+        pieces.push(squash(old.slice(cursor, section.span.start)));
+        cursor = section.span.end;
+      }
+      pieces.push(squash(old.slice(cursor, oldGap.end)));
+      let at = 0;
+      let ok = newText.startsWith(pieces[0] ?? '') && newText.endsWith(pieces[pieces.length - 1] ?? '');
+      for (const piece of pieces.slice(1, -1)) {
+        const found = newText.indexOf(piece, at);
+        if (found < 0) ok = false;
+        else at = found + piece.length;
+      }
+      if (!ok) outside.push(label);
+    }
+  }
+  return {
+    ok: true,
+    result: {
+      registry: { ...registry, version, text_sha256: sha256Hex(next), sections: entries },
+      sections,
+      outside,
+      reordered,
+    },
+  };
+}

@@ -26,13 +26,14 @@ import {
   carriedSummary,
   deviationOf,
   groupBy,
+  lineKey,
   measuredRecovery,
   runPassed,
   showTarget,
   specOfRun,
   stimulusText,
 } from './data';
-import { clustered, type Estimate, type Rate, rate } from './estimate';
+import { clustered, clusterRate, type Estimate, type Rate, rate } from './estimate';
 import type { PilotReport } from './pilot';
 import {
   type ModeReliability,
@@ -227,6 +228,22 @@ export type Scorecard = {
   omittedRuns: number;
 };
 
+/**
+ * The share of compared runs whose end state matched. The runs of one golden are repeats, so over several
+ * goldens the interval is the one every pass rate over goldens gets (Wilson on the effective runs); one golden
+ * keeps the plain Wilson interval.
+ */
+function endStateRate(compared: readonly RunResult[]): Rate | undefined {
+  const matched = compared.filter((run) => run.endState?.match).length;
+  const grouped = clusterRate(
+    [...groupBy(compared, lineKey).values()].map((group) => ({
+      n: group.length,
+      k: group.filter((run) => run.endState?.match).length,
+    })),
+  );
+  return grouped ? { ...grouped, k: matched } : rate(matched, compared.length);
+}
+
 /** The runs whose outcome is this one, among those that completed; undefined when there is none. */
 function countWhenAny(runs: readonly RunResult[], outcome: 'not_run' | 'blocked'): number | undefined {
   const n = runs.filter((run) => run.status === 'completed' && runOutcome(run) === outcome).length;
@@ -245,7 +262,7 @@ export function buildScorecard(data: CampaignData, options: ScorecardOptions = {
   const lines = reliability(data, options.incompletePolicy ?? 'interval');
   const runs = data.runs;
   const compared = runs.filter((run) => run.endState !== undefined);
-  const endState = rate(compared.filter((run) => run.endState?.match).length, compared.length);
+  const endState = endStateRate(compared);
   const perturbed = runs.filter((run) => run.mode === 'P');
   const recovery = recoveryOf(perturbed);
   const byClass = groupBy(

@@ -7,7 +7,7 @@ import type { z } from 'zod';
 import { SPEC_SCHEMA_VERSION, type Spec } from '../schema/spec';
 import { parseBlockYaml } from './block-yaml';
 import { parseSpecSchema } from './compiled-schema';
-import { contentHash } from './hash';
+import { specHash } from './identity';
 import { error, type Issue } from './issues';
 import { lintSpec } from './lint';
 import { normalizeSpec } from './normalize';
@@ -47,7 +47,7 @@ export function validateSpec(raw: unknown, path = '<inline>'): LoadResult {
     ok: true,
     path: checked.path,
     spec: checked.spec,
-    hash: contentHash(checked.spec),
+    hash: specHash(checked.spec),
     warnings: checked.warnings,
   };
 }
@@ -128,7 +128,7 @@ function anchorWorkspace(result: LoadResult): LoadResult {
   const from = resolve(dirname(result.path), workspace.from);
   const world = { ...result.spec.given?.world, workspace: { ...workspace, from } };
   const spec = { ...result.spec, given: { ...result.spec.given, world } } as Spec;
-  return { ...result, spec, hash: contentHash(spec) };
+  return { ...result, spec, hash: specHash(spec) };
 }
 
 /** Expands files and folders into spec files: `*.yaml`, `*.yml` and `*.spec.json`, sorted. */

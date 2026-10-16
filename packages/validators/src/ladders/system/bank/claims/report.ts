@@ -443,6 +443,37 @@ function clusteredTruth(
   return { estimate: boot.estimate, lower: boot.lower, upper: boot.upper };
 }
 
+/**
+ * The interval of a rate over goldens as docs/concepts/statistics.md, "A rate over goldens", states it, computed
+ * here from its formulas and not from the product: `counts` holds the runs and the successes of each golden.
+ * The interval is the Wilson score interval on the effective runs with a Student t quantile on goldens less one;
+ * one golden, or one run in every golden, is the plain Wilson interval; runs that all agree count each golden once.
+ */
+function goldenRateTruth(counts: readonly { n: number; k: number }[]): Interval & { n: number; k: number } {
+  const c = counts.length;
+  const n = counts.reduce((sum, g) => sum + g.n, 0);
+  const k = counts.reduce((sum, g) => sum + g.k, 0);
+  const p = k / n;
+  if (c < 2 || counts.every((g) => g.n === 1)) return { n, k, ...stats.wilson(k, n) };
+  if (p === 0 || p === 1) return { n, k, ...stats.wilson(p === 1 ? c : 0, c), estimate: p };
+  const variance = ((c / (c - 1)) * counts.reduce((sum, g) => sum + (g.k - p * g.n) ** 2, 0)) / n ** 2;
+  const effective = variance > 0 ? Math.min(n, Math.max(1, (p * (1 - p)) / variance)) : n;
+  const x = stats.betaQuantile(0.05, (c - 1) / 2, 0.5);
+  const q = Math.sqrt(((c - 1) * (1 - x)) / x);
+  const denominator = 1 + (q * q) / effective;
+  const centre = (p + (q * q) / (2 * effective)) / denominator;
+  const half = (q * Math.sqrt((p * (1 - p)) / effective + (q * q) / (4 * effective ** 2))) / denominator;
+  return { n, k, estimate: p, lower: Math.max(0, centre - half), upper: Math.min(1, centre + half) };
+}
+
+/** The runs and successes of each golden (a line of the report) of runs, `success` deciding a success. */
+function goldenCounts(runs: readonly RunResult[], success: (run: RunResult) => boolean) {
+  return [...groups(runs, lineOf).values()].map((group) => ({
+    n: group.length,
+    k: group.filter(success).length,
+  }));
+}
+
 function sameInterval(got: Partial<Interval> | undefined, want: Interval | undefined): boolean {
   if (!want) return got === undefined;
   return near(got?.estimate, want.estimate) && near(got?.lower, want.lower) && near(got?.upper, want.upper);
@@ -1350,16 +1381,31 @@ function modeItems(): BankItem[] {
       'report-brute-force',
       2,
       SC,
-      'scorecard.endState is the Wilson rate of runs whose end state matched, over the runs that compared one',
-      'buildScorecard rates the matched end states over the runs that carry an end state.',
+      'scorecard.endState is the rate of runs whose end state matched, over the runs that compared one, with the interval over goldens (docs/concepts/statistics.md, "A rate over goldens"); with one run per golden, the plain Wilson interval',
+      'buildScorecard rates the matched end states over the runs that carry an end state, the runs of one golden being repeats.',
       (fx) => {
-        const comparedRuns = fx.rawBase.filter((run) => run.endState !== undefined);
-        const k = comparedRuns.filter((run) => run.endState?.match).length;
-        const got = cardOf(fx).endState;
-        const w = stats.wilson(k, comparedRuns.length);
-        return got?.k === k && got.n === comparedRuns.length && sameInterval(got, w)
+        const matched = (run: RunResult) => run.endState?.match === true;
+        const check = (runs: readonly RunResult[], what: string) => {
+          const compared = runs.filter((run) => run.endState !== undefined);
+          const want = goldenRateTruth(goldenCounts(compared, matched));
+          const got = report.buildScorecard({ ...fx.base, runs: [...runs] }).endState;
+          return got?.k === want.k && got.n === want.n && sameInterval(got, want)
+            ? undefined
+            : `${what}: endState ${got?.k} of ${got?.n} ${iv(got)}, expected ${want.k} of ${want.n} ${iv(want)}`;
+        };
+        // Several runs per golden: the interval over goldens.
+        const repeated = check(fx.rawBase, 'repeated goldens');
+        if (repeated) return repeated;
+        // One run per golden: the goldens are the runs, so the plain Wilson interval of k of n.
+        const first = [...groups(fx.rawBase, lineOf).values()].map((group) => group[0] as RunResult);
+        const compared = first.filter((run) => run.endState !== undefined);
+        const k = compared.filter(matched).length;
+        const single = check(first, 'one run per golden');
+        if (single) return single;
+        const got = report.buildScorecard({ ...fx.base, runs: first }).endState;
+        return sameInterval(got, stats.wilson(k, compared.length))
           ? undefined
-          : `endState ${got?.k} of ${got?.n}, expected ${k} of ${comparedRuns.length}`;
+          : `one run per golden: endState ${iv(got)}, expected the Wilson interval ${iv(stats.wilson(k, compared.length))}`;
       },
     ),
   ];

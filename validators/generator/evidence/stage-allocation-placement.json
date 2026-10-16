@@ -1,0 +1,215 @@
+{
+  "base": "119802811739d45a85c3dda5d3402a5cd31bce2c",
+  "reportedSource": "3b12d6f13",
+  "reportedSeed": 1,
+  "reportedProbe": {
+    "id": "opening-recovery-diagnostic",
+    "version": "18557d599244",
+    "kind": "conversation",
+    "title": "Cell behaviour=B-002, deviation=D1_off_topic, channel=web: Path new-request-short of new-request: opening > intake > check > recap > done, D1_off_topic at check",
+    "channel": "web",
+    "lang": "EN",
+    "tier": "generated",
+    "tags": ["flow:new-request", "persona:staff"],
+    "covers": ["B-002"],
+    "given": {
+      "world": {
+        "tools": {
+          "lookup_record": {
+            "result": {
+              "found": false,
+              "status": "daily"
+            }
+          },
+          "submit_request": {
+            "result": {
+              "accepted": true,
+              "route": "south"
+            }
+          }
+        }
+      }
+    },
+    "stages": ["opening", "intake", "check", "choice", "details", "recap", "done"],
+    "criteria": [
+      {
+        "name": "behaviour.B-002",
+        "rubric": "Answer an off-topic question in one line and resume the pending step",
+        "gating": false,
+        "scope": "conversation"
+      },
+      {
+        "name": "flow.new-request",
+        "rubric": "A user opens a new request and submits it",
+        "gating": false,
+        "scope": "conversation"
+      },
+      {
+        "name": "deviation.D1_off_topic",
+        "rubric": "A short answer, then the agent resumes its pending stage in the same block.",
+        "gating": false,
+        "scope": "block"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "b3-D1_off_topic",
+        "when": {
+          "injection": {
+            "class": "D1_off_topic",
+            "user": "By the way, is the office open on Saturday?"
+          }
+        },
+        "expect": {
+          "stage": "opening",
+          "stage_reported": true,
+          "tools": [
+            {
+              "label": "lookup_record",
+              "count": 0
+            },
+            {
+              "label": "submit_request",
+              "count": 0
+            }
+          ],
+          "must": ["keep to your request"],
+          "must_not": ["Step [0-9]+:", "list options says ", "submit request says "],
+          "lang": "EN",
+          "criteria": ["deviation.D1_off_topic"]
+        }
+      }
+    ],
+    "rules": {
+      "forbidden_tools": ["list_options"],
+      "one_message_per_turn": true
+    },
+    "metadata": {
+      "generated": {
+        "by": "driftbench generate",
+        "seeder": "cover",
+        "seed": 1,
+        "stream": 1095947528,
+        "map": {
+          "path": "../map/approved.yaml",
+          "agent": "hidden-1",
+          "version": "1",
+          "hash": "18557d599244"
+        },
+        "path": "new-request-short",
+        "cell": {
+          "behaviour": "B-002",
+          "channel": "web",
+          "flow": "new-request",
+          "lookup_record.in.kind": "lookup_record.in.kind.green",
+          "submit_request.in.plan": "submit_request.in.plan.premium",
+          "lookup_record.out.found": "lookup_record.out.found.false",
+          "lookup_record.out.status": "lookup_record.out.status.daily",
+          "submit_request.out.accepted": "submit_request.out.accepted.true",
+          "submit_request.out.route": "submit_request.out.route.south",
+          "user_type": "staff"
+        },
+        "blocks": [
+          {
+            "block": "b1-opening-to-intake",
+            "seeder": "cover",
+            "cell": {
+              "spec": "metadata.generated.cell",
+              "stage_transition": "opening-to-intake",
+              "stage": "opening"
+            },
+            "phrase": {
+              "dimension": "stage_transition",
+              "value": "opening-to-intake"
+            }
+          },
+          {
+            "block": "b2-intake-to-check",
+            "seeder": "cover",
+            "cell": {
+              "spec": "metadata.generated.cell",
+              "stage_transition": "intake-to-check",
+              "lookup_record.in.kind": "lookup_record.in.kind.green",
+              "lookup_record.out.found": "lookup_record.out.found.false",
+              "lookup_record.out.status": "lookup_record.out.status.daily",
+              "stage": "intake"
+            },
+            "phrase": {
+              "dimension": "stage_transition",
+              "value": "intake-to-check"
+            }
+          },
+          {
+            "block": "b3-D1_off_topic",
+            "seeder": "cover",
+            "cell": {
+              "spec": "metadata.generated.cell",
+              "deviation": "D1_off_topic",
+              "stage": "check"
+            },
+            "phrase": {
+              "dimension": "deviation",
+              "value": "D1_off_topic"
+            }
+          },
+          {
+            "block": "b4-check-to-recap",
+            "seeder": "cover",
+            "cell": {
+              "spec": "metadata.generated.cell",
+              "stage_transition": "check-to-recap",
+              "stage": "check"
+            },
+            "phrase": {
+              "dimension": "stage_transition",
+              "value": "check-to-recap"
+            }
+          },
+          {
+            "block": "b5-recap-to-done",
+            "seeder": "cover",
+            "cell": {
+              "spec": "metadata.generated.cell",
+              "stage_transition": "recap-to-done",
+              "submit_request.in.plan": "submit_request.in.plan.premium",
+              "submit_request.out.accepted": "submit_request.out.accepted.true",
+              "submit_request.out.route": "submit_request.out.route.south",
+              "stage": "recap"
+            },
+            "phrase": {
+              "dimension": "stage_transition",
+              "value": "recap-to-done"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "reportedOutcomes": [
+    {
+      "name": "reference",
+      "outcome": "pass"
+    },
+    {
+      "name": "echo",
+      "outcome": "pass"
+    }
+  ],
+  "ruling": "Use canonical placeSpec events for stage and deviation allocation. Count declared perturbations at their arrival stage, alongside block events. Keep spec-level strata and every threshold unchanged.",
+  "redFirst": {
+    "stage": {
+      "failed": 6,
+      "passed": 2
+    },
+    "deviation": {
+      "failed": 1,
+      "skipped": 8
+    }
+  },
+  "green": {
+    "passed": 9,
+    "freshSeeds": [1009, 2027, 4093, 8191],
+    "controls": "Deleting initial declarations fails stage presence on every fresh seed. A reference-valid standalone initial stay still passes echo and is rejected by the unchanged cheater.echo.graph item. Missing stages and skewed counts still fail."
+  },
+  "scope": "No full ladder or bank score; only stage/deviation allocation and focused cheater controls."
+}

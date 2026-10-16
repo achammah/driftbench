@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 import type { RunMode } from '@agent-nexus/driftbench-core';
 import {
+  type AggregateResult,
   buildScorecard,
   type CampaignData,
   carriedLines,
@@ -217,14 +218,35 @@ export async function reportCommand(
     for (const entry of card.aggregates ?? []) {
       const op = entry.direction === 'at-least' ? '>=' : '<=';
       const verdict = entry.passed === undefined ? 'no runs' : entry.passed ? 'passes' : 'fails';
-      const interval = entry.interval
-        ? `, Wilson 95% interval ${entry.interval.lower.toFixed(3)} to ${entry.interval.upper.toFixed(3)} over ${entry.interval.n} runs, ${entry.decided ? 'decided' : `undecided: ${entry.runsNeeded ?? 'more'} runs at this rate would decide it`}`
-        : '';
+      const interval = entry.interval ? `, ${aggregateIntervalText(entry)}` : '';
       io.out(`aggregate ${entry.name} ${op} ${entry.threshold}: ${verdict} (${entry.reason}${interval})\n`);
     }
     io.out(`Wrote ${written.join(' and ')}.\n`);
   }
   return 0;
+}
+
+/**
+ * The interval of one aggregate as text: the bounds, the runs and goldens behind them, and whether they decide the
+ * threshold. Over several goldens the interval is Wilson on the effective runs, and what would decide an undecided
+ * threshold is more goldens like these, not more repeats of them.
+ */
+function aggregateIntervalText(entry: AggregateResult): string {
+  const interval = entry.interval as NonNullable<typeof entry.interval>;
+  const bounds = `${interval.lower.toFixed(3)} to ${interval.upper.toFixed(3)}`;
+  const decision = entry.decided
+    ? 'decided'
+    : entry.goldensNeeded !== undefined
+      ? `undecided: ${entry.goldensNeeded} goldens like these (${entry.runsNeeded} runs) would decide it`
+      : `undecided: ${entry.runsNeeded ?? 'more'} runs at this rate would decide it`;
+  if (interval.method === 'wilson')
+    return `Wilson 95% interval ${bounds} over ${interval.n} runs, ${decision}`;
+  const goldens = `over ${interval.n} runs in ${interval.clusters} goldens`;
+  if (interval.method === 'wilson, clusters') {
+    return `Wilson 95% interval over the goldens ${bounds} ${goldens} (every run agrees, so each golden counts once), ${decision}`;
+  }
+  const worth = `design effect ${(interval.designEffect ?? 1).toFixed(2)}, ${(interval.effectiveRuns ?? interval.n).toFixed(1)} effective runs`;
+  return `Wilson 95% interval on the effective runs ${bounds} ${goldens} (${worth}), ${decision}`;
 }
 
 function show(io: Io, path: string): string {

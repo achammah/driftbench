@@ -12311,7 +12311,7 @@
       "level": 8,
       "source": "differential",
       "component": "packages/report/src/scorecard.ts",
-      "cause": "buildScorecard rates the matched end states over the runs that carry an end state."
+      "cause": "buildScorecard rates the matched end states over the runs that carry an end state, the runs of one golden being repeats."
     },
     {
       "id": "claim/report/tools-counts",

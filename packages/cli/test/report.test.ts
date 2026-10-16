@@ -120,6 +120,27 @@ describe('driftbench report', () => {
     expect(bad.err).toContain('unknown aggregate nope');
   });
 
+  it('prints the aggregate interval on the effective runs, with the goldens behind it', async () => {
+    const { code, out, err } = await cli([
+      'report',
+      'c-x3',
+      '--store',
+      'store.db',
+      '--out',
+      'out/agg-goldens.html',
+      '--aggregate',
+      'pass-rate:>=0.99',
+    ]);
+    expect(err).toBe('');
+    expect(code).toBe(0);
+    const line = out.split('\n').find((entry) => entry.startsWith('aggregate pass-rate')) ?? '';
+    expect(line).toMatch(
+      /Wilson 95% interval on the effective runs \d\.\d{3} to \d\.\d{3} over \d+ runs in \d+ goldens/,
+    );
+    expect(line).toMatch(/design effect \d+\.\d+/);
+    expect(line).toMatch(/undecided: \d+ goldens like these \(\d+ runs\) would decide it|, decided\)/);
+  });
+
   it('scores the aggregates of the project config --config names', async () => {
     writeFileSync(join(dir, 'project.yaml'), 'aggregates:\n  - pass-rate:>=0.99\n');
     const { code, out, err } = await cli([

@@ -1,5 +1,6 @@
 import { type Assertion, canonicalJson, type Spec } from '@agent-nexus/driftbench-core';
 import { stimulusText } from '@agent-nexus/driftbench-generate';
+import { compileSpace, placeSpec } from '@agent-nexus/driftbench-space';
 import type { BankItem, SeedData, Tier, Verdict } from './bank';
 import { DEVIATION_POOL, type HiddenSpec, readTurn, type ToolRole } from './hidden';
 import type { Generation } from './measure';
@@ -390,12 +391,23 @@ function counts(generated: Generation, dimension: string): Map<string, number> {
   const add = (value: string | undefined) => {
     if (value !== undefined && out.has(value)) out.set(value, (out.get(value) ?? 0) + 1);
   };
+  // Stage and deviation are event-level strata. Use the same placement contract as coverage:
+  // blocks and declared perturbations both count; a deviation is placed where it arrives,
+  // not at its recovery destination. Spec-level strata below retain their per-spec unit.
+  if (dimension === 'stage' || dimension === 'deviation') {
+    const space = compileSpace(hiddenSpaceMap(hidden));
+    const index = space.dimensions.findIndex((entry) => entry.id === dimension);
+    for (const { spec } of generated.complete) {
+      for (const event of placeSpec(space, spec).events) {
+        for (const position of event.values[index] ?? []) add(space.dimensions[index]?.values[position]?.id);
+      }
+    }
+    return out;
+  }
   for (const { spec } of generated.complete) {
     if (dimension === 'behaviour') for (const id of spec.covers ?? []) add(id);
     else if (dimension === 'channel') add(spec.channel);
     else if (dimension === 'user_type') add(personaOf(spec));
-    else if (dimension === 'stage') for (const block of spec.blocks) add(block.expect?.stage);
-    else for (const cls of probes(spec)) add(cls);
   }
   return out;
 }

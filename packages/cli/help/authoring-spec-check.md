@@ -6,6 +6,7 @@ commands:
   - spec lint
 see_also:
   - authoring-spec-format
+  - authoring-prompt-sections
   - authoring-blocks
   - authoring-prefixes
   - authoring-perturbations
@@ -21,7 +22,7 @@ Two commands check spec files without running any agent:
 - `spec validate` parses each file, rewrites the shorthands, checks the schema, then checks the rules a schema cannot express (regexes compile, criterion references resolve, stages exist, counts are sane, perturbation positions exist). It prints one line per spec and a summary.
 - `spec lint` does exactly the same, then also prints the warnings of the valid specs: advice on specs that are valid but weak.
 
-Each spec also gets its content hash: the first 12 hex characters of the SHA-256 of the spec's canonical JSON (keys sorted at every depth). Equal content gives an equal hash. The hash, not `version`, enters the cache key and every run id, so any edit to a spec makes its runs new.
+Each spec also gets its content hash: the first 12 hex characters of the SHA-256 of the spec's canonical JSON (keys sorted at every depth), without `metadata.links` and `metadata.provenance`. Equal content gives an equal hash. Links say what a block tests, not what it runs, so adding, promoting or refuting a link never changes the hash, a run id, a carry or a rejudge (authoring-prompt-sections). The hash, not `version`, enters the cache key and every run id, so any edit to a spec makes its runs new.
 
 Checks run in three layers, and a later layer runs only when the earlier ones pass:
 
@@ -59,7 +60,7 @@ driftbench spec validate <paths...> [--json]
 ### driftbench spec lint
 
 ```
-driftbench spec lint <paths...> [--json] [--strict]
+driftbench spec lint <paths...> [--json] [--strict] [--sections <registries...>]
 ```
 
 | Option | Meaning | Default |
@@ -67,12 +68,13 @@ driftbench spec lint <paths...> [--json] [--strict]
 | `<paths...>` (required) | As for `spec validate`. | none |
 | `--json` | Print one JSON array. | off |
 | `--strict` | Treat warnings as failures. | off |
+| `--sections <registries...>` | Section registries (authoring-prompt-sections). Every `prompt_section` link of a spec is checked against the registry of its prompt: a section the registry does not hold is the error `LINK_TARGET_UNKNOWN`; a link to a prompt no registry describes, a link whose status is `stale` and a link to a stale section are warnings. | off: links are checked for shape and block only |
 
 | Exit code | When |
 |---|---|
 | 0 | every spec is valid; warnings allowed without `--strict` |
 | 1 | a spec is invalid, no spec file was found, or a warning was printed with `--strict` |
-| 2 | usage error |
+| 2 | usage error, or a `--sections` file that is not a valid registry, or two registries for one prompt |
 
 ## Inputs
 
@@ -116,6 +118,9 @@ The path in a spec is dotted, counting from 0: `blocks.2.expect.tools.0.label` i
 | `RETENTION_FACT_UNKNOWN` | error | `knowledge_retention` names a fact no ledger holds before the block: not in `given.ledger`, nor in an earlier block's `ledger_add` |
 | `TOOL_FORBIDDEN_EXPECTED` | error | a block expects a tool that `rules.forbidden_tools` or `rules.max_calls: 0` forbids |
 | `GIVEN_ORIGIN_WITHOUT_PREFIX` | error | a block sets `given.origin` and writes no `given.prefix` |
+| `LINK_BLOCK_UNKNOWN` | error | a link in `metadata.links` names a block id the spec does not have, or an index past its last block |
+| `LINK_TARGET_UNKNOWN` | error or warning | `spec lint --sections` only: error when the registry of the prompt has no such section, warning when no registry was given for the prompt |
+| `LINK_STALE` | warning | `spec lint --sections` only: the link's status is `stale`, or its section could not be found again in the registry's version |
 | `CRITERION_UNRESOLVED` | warning | blocks name criteria and the spec defines none; they must come from a shared catalogue |
 | `BLOCK_NO_EXPECTATION` | warning | a block checks nothing |
 | `TASK_WITHOUT_OUTCOME` | warning | a task spec checks none of `artifacts`, `workspace`, `execution` and `end_state` |
