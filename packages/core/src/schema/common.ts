@@ -46,6 +46,71 @@ export const Assertion = z
   .describe('How one value is asserted. A bare string, number, boolean or null means exact equality.');
 export type Assertion = z.infer<typeof Assertion>;
 
+/** The closed set of rules that put a compared text into one canonical form before it is compared. */
+export const NormaliseName = z
+  .enum(['digits_only', 'phone_e164', 'email_lower', 'whitespace', 'case_fold', 'address_canon'])
+  .describe(
+    'digits_only keeps the digits; phone_e164 writes a phone number as + and its digits; email_lower lower-cases an address and drops mailto: and angle brackets; whitespace trims and collapses spaces; case_fold lower-cases; address_canon lower-cases, drops punctuation and expands street abbreviations.',
+  );
+export type NormaliseName = z.infer<typeof NormaliseName>;
+
+/** One other way of writing an expected value, which counts as that value once someone approves it. */
+export const SurfaceForm = z
+  .strictObject({
+    form: z
+      .string()
+      .min(1)
+      .describe('The text as the agent may write it, such as an address without its town.'),
+    approved: z
+      .boolean()
+      .describe(
+        'True once a person has signed the form off. A form not approved is listed and never matches.',
+      ),
+  })
+  .describe('Another way of writing the expected value. It matches only when approved.');
+export type SurfaceForm = z.infer<typeof SurfaceForm>;
+
+/** How a compared value is normalised: a rule name, or a rule with options and approved surface forms. */
+export const NormaliseRule = z
+  .union([
+    NormaliseName,
+    z
+      .strictObject({
+        rule: NormaliseName.optional().describe('The rule applied to both sides before they are compared.'),
+        country_code: z
+          .string()
+          .regex(/^[1-9][0-9]{0,2}$/)
+          .optional()
+          .describe(
+            'phone_e164 only: the calling code, such as 1, given to a number written without + or 00.',
+          ),
+        surface_forms: z
+          .array(SurfaceForm)
+          .min(1)
+          .optional()
+          .describe(
+            'Other writings of the expected value. An approved form matches when it equals the observed text, ignoring case and spacing.',
+          ),
+      })
+      .refine((rule) => rule.rule !== undefined || rule.surface_forms !== undefined, {
+        message: 'a normalise rule needs a rule or surface_forms',
+      })
+      .refine((rule) => rule.country_code === undefined || rule.rule === 'phone_e164', {
+        message: 'country_code applies to phone_e164 only',
+        path: ['country_code'],
+      }),
+  ])
+  .describe('A rule name, or a mapping with rule, country_code and surface_forms.');
+export type NormaliseRule = z.infer<typeof NormaliseRule>;
+
+/** Normalise rules by dotted path: the first segment names the compared field, the rest a path inside it. */
+export const NormaliseMap = z
+  .record(z.string().regex(/^[^.\s]+(\.[^.\s]+)*$/), NormaliseRule)
+  .describe(
+    'Rules by dotted path, such as phone or customer.phone. Both the observed and the expected value at the path are normalised before they are compared.',
+  );
+export type NormaliseMap = z.infer<typeof NormaliseMap>;
+
 /** The twelve deviation classes a perturbed run can inject. */
 export const DeviationClass = z
   .enum([

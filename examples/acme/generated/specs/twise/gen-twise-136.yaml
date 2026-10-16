@@ -67,6 +67,8 @@ blocks:
           input:
             address: 21 Willow Court, Acmeville
           input_closed: true
+          normalise:
+            address: address_canon
       lang: EN
   - id: b3-D5_language_switch
     when:

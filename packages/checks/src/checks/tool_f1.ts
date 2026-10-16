@@ -1,4 +1,10 @@
-import { type Check, machineVerdict, type ToolExpect, type Verdict } from '@agent-nexus/driftbench-core';
+import {
+  type Check,
+  machineVerdict,
+  rulesFor,
+  type ToolExpect,
+  type Verdict,
+} from '@agent-nexus/driftbench-core';
 import { checkAssertion } from '../support/assert';
 import { isRecord } from '../support/values';
 
@@ -11,21 +17,25 @@ import { isRecord } from '../support/values';
  * expected, and F1 is their harmonic mean. The verdict passes at `min` or above and names the unmatched
  * calls and expectations.
  */
-type Expected = { label: string; input?: ToolExpect['input'] };
+type Expected = { label: string; input?: ToolExpect['input']; normalise?: ToolExpect['normalise'] };
 
 function expand(tools: ToolExpect[]): Expected[] {
   return tools.flatMap((tool) => {
     const count = tool.count;
     const times = count === undefined ? 1 : typeof count === 'number' ? count : (count.min ?? 1);
-    return Array.from({ length: times }, () => ({ label: tool.label, input: tool.input }));
+    return Array.from({ length: times }, () => ({
+      label: tool.label,
+      input: tool.input,
+      normalise: tool.normalise,
+    }));
   });
 }
 
-function argumentsMatch(input: unknown, assertions: Expected['input']): boolean {
-  if (!assertions) return true;
-  return Object.entries(assertions).every(([field, assertion]) => {
+function argumentsMatch(input: unknown, want: Expected): boolean {
+  if (!want.input) return true;
+  return Object.entries(want.input).every(([field, assertion]) => {
     const value = isRecord(input) ? input[field] : undefined;
-    return checkAssertion(value, assertion).ok;
+    return checkAssertion(value, assertion, rulesFor(want.normalise, field)).ok;
   });
 }
 
@@ -42,7 +52,7 @@ export const toolF1: Check = {
     let matched = 0;
     for (const want of expected) {
       const at = calls.findIndex(
-        (call, index) => !used[index] && call.label === want.label && argumentsMatch(call.input, want.input),
+        (call, index) => !used[index] && call.label === want.label && argumentsMatch(call.input, want),
       );
       if (at >= 0) {
         used[at] = true;

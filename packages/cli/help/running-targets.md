@@ -88,7 +88,7 @@ driftbench campaign plan examples/acme/specs/conversations/plan-upgrade.yaml --t
 Note: acme-plan-upgrade names the function adapter; --target runs it on process:acme-ops.
 Plan: 1 spec, 3 targets, mode F, 1 repeat: 3 cells, 15 blocks.
   cell              spec               target               mode  repeat  blocks
-  cc92cc9eb562f586  acme-plan-upgrade  function:acme        F     0       5
+  a7013f45bfd4c07b  acme-plan-upgrade  function:acme        F     0       5
 ```
 
 ```text

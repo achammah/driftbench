@@ -50,6 +50,7 @@ blocks:
             category: mobile
             customer_email: sam.rivera@example.com
             address_id: { absent: true }
+          normalise: { customer_email: email_lower }
       must: ['Acme Mobile M', 'Acme Mobile L', '\$25', '\$35']
       must_not: ['Fiber', 'Air 5G']
       criteria: [no_invented_data@gating, one_question_per_turn]

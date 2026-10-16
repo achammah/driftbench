@@ -1,5 +1,6 @@
 import type {
   CriterionDef,
+  EndState,
   EndStateSpec,
   Expect,
   GuardExpect,
@@ -8,7 +9,7 @@ import type {
   ToolExpect,
   WorldState,
 } from '@agent-nexus/driftbench-core';
-import { isPlainObject } from '@agent-nexus/driftbench-core';
+import { isPlainObject, slotRules } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
 import type { ProposalPhrase } from '../extract/proposal';
 import { supplying, usedPaths, worldCarried } from './data-carrier';
@@ -252,7 +253,8 @@ export function renderDraft(prepared: PreparedMap, draft: SpecDraft, run: RunIde
       expect.stage = block.stage;
       expect.stage_reported = true;
     }
-    if (block.tools && block.tools.length > 0) expect.tools = closeKnownInputs(prepared, block.tools);
+    if (block.tools && block.tools.length > 0)
+      expect.tools = withSlotRules(closeKnownInputs(prepared, block.tools));
     if (block.guards && block.guards.length > 0) expect.guards = block.guards;
     if (block.must && block.must.length > 0) expect.must = block.must;
     if (block.must_not && block.must_not.length > 0) expect.must_not = block.must_not;
@@ -327,7 +329,10 @@ export function renderDraft(prepared: PreparedMap, draft: SpecDraft, run: RunIde
     if (perturbation.expect?.tools) {
       perturbation = {
         ...perturbation,
-        expect: { ...perturbation.expect, tools: closeKnownInputs(prepared, perturbation.expect.tools) },
+        expect: {
+          ...perturbation.expect,
+          tools: withSlotRules(closeKnownInputs(prepared, perturbation.expect.tools)),
+        },
       };
     }
     if (!incomplete || !perturbation.expect?.criteria) return perturbation;
@@ -388,7 +393,7 @@ export function renderDraft(prepared: PreparedMap, draft: SpecDraft, run: RunIde
   if (prepared.relations.repliesPerTurn === 'one')
     spec.rules = { ...(draft.rules ?? {}), one_message_per_turn: true };
   else if (draft.rules) spec.rules = draft.rules;
-  if (draft.end_state) spec.end_state = draft.end_state;
+  if (draft.end_state) spec.end_state = endStateWithSlotRules(draft.end_state);
   if (perturbations && perturbations.length > 0) spec.perturbations = perturbations;
   const generated: Record<string, unknown> = {
     by: 'driftbench generate',
@@ -450,6 +455,28 @@ export function renderDraft(prepared: PreparedMap, draft: SpecDraft, run: RunIde
   for (const placeholder of placeholders) plain.add(placeholder);
   plainNodes.set(rendered, plain);
   return rendered;
+}
+
+/**
+ * Each tool expectation with a `normalise` rule on every phone, email and address its input compares, so
+ * a paraphrase that changes how the agent writes the slot does not fail the block. A rule the draft
+ * already holds is kept.
+ */
+function withSlotRules(tools: ToolExpect[]): ToolExpect[] {
+  return tools.map((tool) => {
+    const rules = { ...slotRules(tool.input), ...(tool.normalise ?? {}) };
+    return Object.keys(rules).length === 0 ? tool : { ...tool, normalise: rules };
+  });
+}
+
+/** The end state with the same rules on the fields it compares. */
+function endStateWithSlotRules(endState: EndState): EndState {
+  if (endState === 'none') return endState;
+  const ruled = (entry: EndStateSpec): EndStateSpec => {
+    const rules = { ...slotRules(entry.expect), ...(entry.normalise ?? {}) };
+    return Object.keys(rules).length === 0 ? entry : { ...entry, normalise: rules };
+  };
+  return Array.isArray(endState) ? endState.map(ruled) : ruled(endState);
 }
 
 /** A partial map assertion cannot establish that other schema-declared arguments are forbidden. */

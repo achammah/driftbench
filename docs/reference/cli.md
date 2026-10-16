@@ -38,12 +38,12 @@ Parses, normalises and validates every spec, then prints one line per spec and a
 
 ```
 $ pnpm -s driftbench spec validate examples/acme/specs
-✓ examples/acme/specs/conversations/new-customer-coverage.yaml  acme-new-customer-coverage · 4 blocks · 2 perturbations · hash be195c993d4f
-✓ examples/acme/specs/conversations/number-porting.yaml  acme-number-porting · 5 blocks · 2 perturbations · hash 134c8e993f95
+✓ examples/acme/specs/conversations/new-customer-coverage.yaml  acme-new-customer-coverage · 4 blocks · 2 perturbations · hash 698fc3743de6
+✓ examples/acme/specs/conversations/number-porting.yaml  acme-number-porting · 5 blocks · 2 perturbations · hash 90141899b92e
 ✓ examples/acme/specs/conversations/off-topic-return.yaml  acme-off-topic-return · 5 blocks · 1 perturbation · hash cca285407040
-✓ examples/acme/specs/conversations/order-loose-confirmation.yaml  acme-order-loose-confirmation · 4 blocks · 2 perturbations · hash ae116e6312eb
-✓ examples/acme/specs/conversations/plan-upgrade.yaml  acme-plan-upgrade · 5 blocks · 3 perturbations · hash 5ae085d0b267
-✓ examples/acme/specs/conversations/tool-failure.yaml  acme-tool-failure · 3 blocks · 1 perturbation · hash e5bc5c9ba9d2
+✓ examples/acme/specs/conversations/order-loose-confirmation.yaml  acme-order-loose-confirmation · 4 blocks · 2 perturbations · hash 8b751231a29f
+✓ examples/acme/specs/conversations/plan-upgrade.yaml  acme-plan-upgrade · 5 blocks · 3 perturbations · hash 3577d4c43a98
+✓ examples/acme/specs/conversations/tool-failure.yaml  acme-tool-failure · 3 blocks · 1 perturbation · hash 9f55c5e3ba96
 ✓ examples/acme/specs/tasks/price-sheet.yaml  acme-price-sheet · 2 blocks · 1 perturbation · hash d96437659138
 Checked 7 specs: 7 valid, 0 invalid, 0 warnings.
 ```
@@ -244,6 +244,7 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `RETENTION_FACT_UNKNOWN` | error | `expect.knowledge_retention` names a fact that no ledger holds before the block: not in `given.ledger`, nor in an earlier block's `ledger_add` |
 | `TOOL_FORBIDDEN_EXPECTED` | error | a block expects a tool that the rules forbid, in `forbidden_tools` or with `max_calls` at 0 |
 | `GIVEN_ORIGIN_WITHOUT_PREFIX` | error | a block's `given.origin` says where a prefix comes from, and the block writes no `given.prefix` |
+| `NORMALISE_INVALID` | error | a `normalise` rule names a field with no assertion, a `regex`, `nonempty` or `absent` assertion, a path that holds no expected text, or surface forms beside an assertion with more than one expected value |
 | `LINK_BLOCK_UNKNOWN` | error | a link in `metadata.links` names a block id the spec does not have, or an index past its last block |
 | `LINK_TARGET_UNKNOWN` | error or warning | `spec lint --sections` only: error when the registry of the prompt has no such section, warning when no registry was given for the prompt |
 | `LINK_STALE` | warning | `spec lint --sections` only: the link's status is `stale`, or its section was not found again in the registry's version |
@@ -253,6 +254,8 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `TASK_WITHOUT_OUTCOME` | warning | a task spec checks none of `artifacts`, `workspace`, `execution` and `end_state` |
 | `PERTURBATION_NO_RECOVERY` | warning | a perturbation has no `recovery`, so its recovery is not measured |
 | `PREFIX_PROSE_HISTORY` | warning | an assistant message of a prefix states a ledger fact in its text that no recorded tool call of the prefix holds and the user never said, in a spec that names tools: the agent may call the tool again |
+| `SLOT_FIELD_NO_RULE` | warning | a tool input or end state compares a phone, an email or an address with no `normalise` rule, so a writing of the same value fails |
+| `SURFACE_FORM_UNAPPROVED` | warning | a `normalise` surface form is not approved, so it never matches |
 
 ## Global options
 

@@ -71,6 +71,17 @@ export const VALUE_LINES: Record<string, Record<string, string>> = {
     canonical:
       'The prefix is the replay of a spec as it is written, such as a teacher-forced history: the calls the blocks expect, with the results the world forces.',
   },
+  NormaliseName: {
+    digits_only: 'Keeps the digits only: `order #4417` reads as `4417`.',
+    phone_e164:
+      'Writes a phone number as + and its digits: `+1 202 555 0131` and `(202) 555-0131` (with `country_code: "1"`) both read as `+12025550131`. A number with + or 00 keeps its own calling code; without one, and without `country_code`, it stays as its digits.',
+    email_lower:
+      'Trims an email address, drops a trailing dot, angle brackets and `mailto:`, and lower-cases it: `SAM.RIVERA@EXAMPLE.COM` reads as `sam.rivera@example.com`.',
+    whitespace: 'Trims the text and collapses each run of spaces, tabs and line breaks to one space.',
+    case_fold: 'Lower-cases the text.',
+    address_canon:
+      'Lower-cases an address, turns punctuation into spaces and expands street abbreviations (`Ave` to `avenue`, `Rd` to `road`, `Ln` to `lane`, and so on). The town stays: an address without its town matches only through an approved surface form. Inside `contains`, whole words only.',
+  },
   KnobClass: {
     difficulty: 'A count: rows, files or sheets.',
     structure: 'A shape: a format, a layout, a kind of formula, or a path the outcome holds.',

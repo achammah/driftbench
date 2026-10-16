@@ -1,6 +1,7 @@
 import type { Assertion } from '../schema/common';
 import type { EndState, EndStateSpec } from '../schema/spec';
 import { isPlainObject as isRecord } from '../spec/normalize';
+import { matchNormalised, rulesFor } from './normalise';
 
 /**
  * Assertion semantics, shared by the runner's end-state compare and any check that asserts values.
@@ -47,7 +48,8 @@ export type EndStateMatch = { match: boolean; diff: EndStateDiff[] };
  * source itself, expected `{ nonempty: true }`. `none` holds when nothing was
  * recorded (undefined, null, an empty list or object) and otherwise gives one entry per payload found,
  * `*.<index>`, expected absent. A value that is absent is written `{ absent: true }`, the assertion that
- * names it, so a diff keeps its meaning through JSON, where an undefined value would vanish.
+ * names it, so a diff keeps its meaning through JSON, where an undefined value would vanish. A field
+ * with a `normalise` rule is compared after the rule; its diff keeps the raw observed value.
  */
 export function compareEndState(endState: EndState, value: unknown): EndStateMatch {
   if (endState === 'none') {
@@ -82,7 +84,7 @@ export function compareEndState(endState: EndState, value: unknown): EndStateMat
     const record = state;
     for (const [field, assertion] of expected) {
       const observed = record?.[field];
-      if (!matchAssertion(observed, assertion)) {
+      if (!matchNormalised(observed, assertion, rulesFor(entry.normalise, field), matchAssertion).ok) {
         diff.push({ field: name(field), expected: assertion, observed: shown(observed) });
       }
     }

@@ -192,6 +192,34 @@ When a spec has no `criteria` key, blocks may still name criteria; they must the
 | `source` | string | yes | Where the adapter reads the state, such as `tool:order.create` (the payload the tool recorded). |
 | `mode` | `subset` or `exact` | no | `subset` compares the listed fields; `exact` compares the whole state. |
 | `expect` | mapping of field to assertion | yes | Assertions on fields of the state. An assertion is a bare value, compared for exact equality. Or it is one of seven forms. Four take a value: `{ exact }`, `{ regex }`, `{ contains }` and `{ one_of }`. The others are `{ nonempty: true }`, `{ absent: true }` and `{ subset }`. |
+| `normalise` | mapping of field path to rule | no | Rules by field path, such as `customer.phone`: the field and its expected value are normalised before they are compared. The same rules as a tool's `normalise`, below. |
+
+### Normalised values
+
+A tool expectation (`tools[].normalise`), an `end_state` (`normalise`) and a `json` path (`normalise`) can compare a value after a rule, so a writing of the same value is not a failure. The key is a dotted path: `number`, or `customer.phone` inside a `subset`. Without a rule the comparison is exact.
+
+| Rule | Reads |
+|---|---|
+| `digits_only` | the digits only: `order #4417` as `4417` |
+| `phone_e164` | + and the digits: `+1 202 555 0131` as `+12025550131`; with `country_code: "1"`, `(202) 555-0131` too. A number without + or 00 and without `country_code` stays as its digits |
+| `email_lower` | the address trimmed and lower-cased, without `mailto:`, angle brackets or a trailing dot |
+| `whitespace` | the text trimmed, each run of spaces collapsed to one |
+| `case_fold` | the text lower-cased |
+| `address_canon` | the address lower-cased, punctuation as spaces, street abbreviations expanded (`Ave` as `avenue`, `Rd` as `road`, `Ln` as `lane`). The town stays. Inside `contains`, whole words only |
+
+```yaml
+tools:
+  - label: notify_sales
+    count: 1
+    input:
+      customer: { subset: { phone: '+12025550131' } }
+      summary: { contains: 88 Summit Avenue }
+    normalise:
+      customer.phone: { rule: phone_e164, country_code: '1' }
+      summary: address_canon
+```
+
+A surface form is another writing of the expected value that no rule makes equal, such as an address without its town: `{ rule: address_canon, surface_forms: [{ form: 88 Summit Avenue, approved: true }] }`. It matches only with `approved: true`, ignoring case and spacing. Sign a form off as you would a phrase; an address without its town is approved only where the agent's own tool resolves it.
 
 The end state is checked on the last block of a run in modes T and F.
 
@@ -242,12 +270,12 @@ driftbench campaign run examples/acme/specs/conversations/plan-upgrade.yaml exam
 
 ```text
 $ driftbench spec validate examples/acme/specs
-✓ examples/acme/specs/conversations/new-customer-coverage.yaml  acme-new-customer-coverage · 4 blocks · 2 perturbations · hash be195c993d4f
-✓ examples/acme/specs/conversations/number-porting.yaml  acme-number-porting · 5 blocks · 2 perturbations · hash 134c8e993f95
+✓ examples/acme/specs/conversations/new-customer-coverage.yaml  acme-new-customer-coverage · 4 blocks · 2 perturbations · hash 698fc3743de6
+✓ examples/acme/specs/conversations/number-porting.yaml  acme-number-porting · 5 blocks · 2 perturbations · hash 90141899b92e
 ✓ examples/acme/specs/conversations/off-topic-return.yaml  acme-off-topic-return · 5 blocks · 1 perturbation · hash cca285407040
-✓ examples/acme/specs/conversations/order-loose-confirmation.yaml  acme-order-loose-confirmation · 4 blocks · 2 perturbations · hash ae116e6312eb
-✓ examples/acme/specs/conversations/plan-upgrade.yaml  acme-plan-upgrade · 5 blocks · 3 perturbations · hash 5ae085d0b267
-✓ examples/acme/specs/conversations/tool-failure.yaml  acme-tool-failure · 3 blocks · 1 perturbation · hash e5bc5c9ba9d2
+✓ examples/acme/specs/conversations/order-loose-confirmation.yaml  acme-order-loose-confirmation · 4 blocks · 2 perturbations · hash 8b751231a29f
+✓ examples/acme/specs/conversations/plan-upgrade.yaml  acme-plan-upgrade · 5 blocks · 3 perturbations · hash 3577d4c43a98
+✓ examples/acme/specs/conversations/tool-failure.yaml  acme-tool-failure · 3 blocks · 1 perturbation · hash 9f55c5e3ba96
 ✓ examples/acme/specs/tasks/price-sheet.yaml  acme-price-sheet · 2 blocks · 1 perturbation · hash d96437659138
 Checked 7 specs: 7 valid, 0 invalid, 0 warnings.
 (exit 0)

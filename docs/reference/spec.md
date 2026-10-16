@@ -42,6 +42,9 @@ The loader rewrites these forms before it validates a spec.
 * [ToolExpect](#toolexpect)
 * [Count](#count)
 * [Assertion](#assertion)
+* [NormaliseRule](#normaliserule)
+* [NormaliseName](#normalisename)
+* [SurfaceForm](#surfaceform)
 * [ToolsOfferedExpect](#toolsofferedexpect)
 * [Expect rouge_l](#expect-rouge_l)
 * [Expect bleu](#expect-bleu)
@@ -376,6 +379,7 @@ One expected tool call.
 | `count` | [Count](#count) | no |  | How many calls are expected. 0 means the tool must not be called. |
 | `input` | map of string to [Assertion](#assertion) | no |  | Assertions on the arguments, by argument name. |
 | `input_closed` | boolean | no |  | True requires every call input to be an object with only the top-level keys named in input. An absent input allows no keys. False or absent leaves other keys allowed. |
+| `normalise` | map of string to [NormaliseRule](#normaliserule) | no |  | Rules by argument path, such as phone or customer.phone: the argument and its expected value are normalised before they are compared. Without a rule the comparison is exact. |
 
 ## Count
 
@@ -412,6 +416,43 @@ Write one of these forms.
 | `nonempty` | `true` | Present and not empty. |
 | `absent` | `true` | Absent. |
 | `subset` | map of string to JSON value | Holds at least these keys with these values. |
+
+## NormaliseRule
+
+A rule name, or a mapping with rule, country_code and surface_forms.
+
+Write one of these forms.
+
+* [NormaliseName](#normalisename)
+* a mapping with the fields below
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `rule` | [NormaliseName](#normalisename) | no |  | The rule applied to both sides before they are compared. |
+| `country_code` | string matching `^[1-9][0-9]{0,2}$` | no |  | phone_e164 only: the calling code, such as 1, given to a number written without + or 00. |
+| `surface_forms` | list of [SurfaceForm](#surfaceform), at least 1 item | no |  | Other writings of the expected value. An approved form matches when it equals the observed text, ignoring case and spacing. |
+
+## NormaliseName
+
+digits_only keeps the digits; phone_e164 writes a phone number as + and its digits; email_lower lower-cases an address and drops mailto: and angle brackets; whitespace trims and collapses spaces; case_fold lower-cases; address_canon lower-cases, drops punctuation and expands street abbreviations.
+
+| Value | Meaning |
+|---|---|
+| `digits_only` | Keeps the digits only: `order #4417` reads as `4417`. |
+| `phone_e164` | Writes a phone number as + and its digits: `+1 202 555 0131` and `(202) 555-0131` (with `country_code: "1"`) both read as `+12025550131`. A number with + or 00 keeps its own calling code; without one, and without `country_code`, it stays as its digits. |
+| `email_lower` | Trims an email address, drops a trailing dot, angle brackets and `mailto:`, and lower-cases it: `SAM.RIVERA@EXAMPLE.COM` reads as `sam.rivera@example.com`. |
+| `whitespace` | Trims the text and collapses each run of spaces, tabs and line breaks to one space. |
+| `case_fold` | Lower-cases the text. |
+| `address_canon` | Lower-cases an address, turns punctuation into spaces and expands street abbreviations (`Ave` to `avenue`, `Rd` to `road`, `Ln` to `lane`, and so on). The town stays: an address without its town matches only through an approved surface form. Inside `contains`, whole words only. |
+
+## SurfaceForm
+
+Another way of writing the expected value. It matches only when approved.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `form` | string, not empty | yes |  | The text as the agent may write it, such as an address without its town. |
+| `approved` | boolean | yes |  | True once a person has signed the form off. A form not approved is listed and never matches. |
 
 ## ToolsOfferedExpect
 
@@ -468,6 +509,7 @@ The reply is JSON, optionally with a schema and paths.
 |---|---|---|---|---|
 | `path` | string, not empty | yes |  | A dotted path; a number indexes an array. |
 | `assert` | [Assertion](#assertion) | yes |  | What the value at the path must be, in the spec assertion vocabulary. |
+| `normalise` | [NormaliseRule](#normaliserule) | no |  | A rule applied to the value at the path and to its expected value before they are compared. |
 
 ## Expect tool_f1
 
@@ -660,6 +702,7 @@ The expected end state of the world, read from a source the adapter knows, such 
 | `source` | string, not empty | yes |  | Where the adapter reads the state, such as tool:submit_order. |
 | `mode` | `subset` or `exact` | no |  | subset compares the listed fields; exact compares the whole state. |
 | `expect` | map of string to [Assertion](#assertion) | yes |  | Assertions on fields of the state. |
+| `normalise` | map of string to [NormaliseRule](#normaliserule) | no |  | Rules by field path, such as customer.phone: the field and its expected value are normalised before they are compared. |
 
 ## Perturbation
 

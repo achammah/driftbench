@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="c-acme-proof" tests="78" failures="0" errors="0" time="91.337">
-  <testsuite name="acme-new-customer-coverage" tests="12" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-13T19:07:53.062Z">
+<testsuites name="c-acme-proof" tests="78" failures="0" errors="0" time="155.351">
+  <testsuite name="acme-new-customer-coverage" tests="12" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-16T14:49:52.672Z">
     <testcase classname="acme-new-customer-coverage" name="function:acme-sales · T · repeat 0" time="0.000"/>
     <testcase classname="acme-new-customer-coverage" name="function:acme-sales · T · repeat 1" time="0.000"/>
     <testcase classname="acme-new-customer-coverage" name="function:acme-sales · T · repeat 2" time="0.000"/>
@@ -14,7 +14,7 @@
     <testcase classname="acme-new-customer-coverage" name="function:acme-sales · P · repeat 1 · free-fiber" time="0.000"/>
     <testcase classname="acme-new-customer-coverage" name="function:acme-sales · P · repeat 2 · free-fiber" time="0.000"/>
   </testsuite>
-  <testsuite name="acme-number-porting" tests="12" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-13T19:07:53.062Z">
+  <testsuite name="acme-number-porting" tests="12" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-16T14:49:52.672Z">
     <testcase classname="acme-number-porting" name="function:acme-sales · T · repeat 0" time="0.000"/>
     <testcase classname="acme-number-porting" name="function:acme-sales · T · repeat 1" time="0.000"/>
     <testcase classname="acme-number-porting" name="function:acme-sales · T · repeat 2" time="0.000"/>
@@ -28,7 +28,7 @@
     <testcase classname="acme-number-porting" name="function:acme-sales · P · repeat 1 · are-you-there" time="0.000"/>
     <testcase classname="acme-number-porting" name="function:acme-sales · P · repeat 2 · are-you-there" time="0.000"/>
   </testsuite>
-  <testsuite name="acme-off-topic-return" tests="9" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-13T19:07:53.062Z">
+  <testsuite name="acme-off-topic-return" tests="9" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-16T14:49:52.672Z">
     <testcase classname="acme-off-topic-return" name="function:acme-sales · T · repeat 0" time="0.000"/>
     <testcase classname="acme-off-topic-return" name="function:acme-sales · T · repeat 1" time="0.000"/>
     <testcase classname="acme-off-topic-return" name="function:acme-sales · T · repeat 2" time="0.000"/>
@@ -39,7 +39,7 @@
     <testcase classname="acme-off-topic-return" name="function:acme-sales · P · repeat 1 · options-again" time="0.000"/>
     <testcase classname="acme-off-topic-return" name="function:acme-sales · P · repeat 2 · options-again" time="0.000"/>
   </testsuite>
-  <testsuite name="acme-order-loose-confirmation" tests="12" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-13T19:07:53.062Z">
+  <testsuite name="acme-order-loose-confirmation" tests="12" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-16T14:49:52.672Z">
     <testcase classname="acme-order-loose-confirmation" name="function:acme-sales · T · repeat 0" time="0.000"/>
     <testcase classname="acme-order-loose-confirmation" name="function:acme-sales · T · repeat 1" time="0.000"/>
     <testcase classname="acme-order-loose-confirmation" name="function:acme-sales · T · repeat 2" time="0.000"/>
@@ -53,7 +53,7 @@
     <testcase classname="acme-order-loose-confirmation" name="function:acme-sales · P · repeat 1 · order-service-down" time="0.000"/>
     <testcase classname="acme-order-loose-confirmation" name="function:acme-sales · P · repeat 2 · order-service-down" time="0.000"/>
   </testsuite>
-  <testsuite name="acme-plan-upgrade" tests="15" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-13T19:07:53.062Z">
+  <testsuite name="acme-plan-upgrade" tests="15" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-16T14:49:52.672Z">
     <testcase classname="acme-plan-upgrade" name="function:acme-sales · T · repeat 0" time="0.000"/>
     <testcase classname="acme-plan-upgrade" name="function:acme-sales · T · repeat 1" time="0.000"/>
     <testcase classname="acme-plan-upgrade" name="function:acme-sales · T · repeat 2" time="0.000"/>
@@ -70,7 +70,7 @@
     <testcase classname="acme-plan-upgrade" name="function:acme-sales · P · repeat 1 · loose-ok" time="0.000"/>
     <testcase classname="acme-plan-upgrade" name="function:acme-sales · P · repeat 2 · loose-ok" time="0.000"/>
   </testsuite>
-  <testsuite name="acme-tool-failure" tests="9" failures="0" errors="0" skipped="0" time="54.000" timestamp="2026-10-13T19:07:53.062Z">
+  <testsuite name="acme-tool-failure" tests="9" failures="0" errors="0" skipped="0" time="54.000" timestamp="2026-10-16T14:49:52.672Z">
     <testcase classname="acme-tool-failure" name="function:acme-sales · T · repeat 0" time="6.000"/>
     <testcase classname="acme-tool-failure" name="function:acme-sales · T · repeat 1" time="6.000"/>
     <testcase classname="acme-tool-failure" name="function:acme-sales · T · repeat 2" time="6.000"/>
@@ -81,15 +81,15 @@
     <testcase classname="acme-tool-failure" name="function:acme-sales · P · repeat 1 · sales-queue-down" time="6.000"/>
     <testcase classname="acme-tool-failure" name="function:acme-sales · P · repeat 2 · sales-queue-down" time="6.000"/>
   </testsuite>
-  <testsuite name="acme-price-sheet" tests="9" failures="0" errors="0" skipped="0" time="37.337" timestamp="2026-10-13T19:07:53.062Z">
-    <testcase classname="acme-price-sheet" name="process:acme-ops · T · repeat 0" time="3.993"/>
-    <testcase classname="acme-price-sheet" name="process:acme-ops · T · repeat 1" time="3.985"/>
-    <testcase classname="acme-price-sheet" name="process:acme-ops · T · repeat 2" time="4.543"/>
-    <testcase classname="acme-price-sheet" name="process:acme-ops · F · repeat 0" time="3.406"/>
-    <testcase classname="acme-price-sheet" name="process:acme-ops · F · repeat 1" time="3.400"/>
-    <testcase classname="acme-price-sheet" name="process:acme-ops · F · repeat 2" time="4.580"/>
-    <testcase classname="acme-price-sheet" name="process:acme-ops · P · repeat 0 · instruction-in-notes" time="4.374"/>
-    <testcase classname="acme-price-sheet" name="process:acme-ops · P · repeat 1 · instruction-in-notes" time="4.588"/>
-    <testcase classname="acme-price-sheet" name="process:acme-ops · P · repeat 2 · instruction-in-notes" time="4.467"/>
+  <testsuite name="acme-price-sheet" tests="9" failures="0" errors="0" skipped="0" time="101.351" timestamp="2026-10-16T14:49:52.672Z">
+    <testcase classname="acme-price-sheet" name="process:acme-ops · T · repeat 0" time="13.489"/>
+    <testcase classname="acme-price-sheet" name="process:acme-ops · T · repeat 1" time="11.606"/>
+    <testcase classname="acme-price-sheet" name="process:acme-ops · T · repeat 2" time="15.908"/>
+    <testcase classname="acme-price-sheet" name="process:acme-ops · F · repeat 0" time="15.918"/>
+    <testcase classname="acme-price-sheet" name="process:acme-ops · F · repeat 1" time="9.468"/>
+    <testcase classname="acme-price-sheet" name="process:acme-ops · F · repeat 2" time="11.453"/>
+    <testcase classname="acme-price-sheet" name="process:acme-ops · P · repeat 0 · instruction-in-notes" time="8.730"/>
+    <testcase classname="acme-price-sheet" name="process:acme-ops · P · repeat 1 · instruction-in-notes" time="7.421"/>
+    <testcase classname="acme-price-sheet" name="process:acme-ops · P · repeat 2 · instruction-in-notes" time="7.358"/>
   </testsuite>
 </testsuites>

@@ -86,6 +86,8 @@ blocks:
           input:
             category: mobile
             customer_email: sam.rivera@example.com
+          normalise:
+            customer_email: email_lower
         - label: order.create
           count: 0
       must:

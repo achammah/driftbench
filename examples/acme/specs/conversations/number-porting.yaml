@@ -52,6 +52,7 @@ blocks:
         - label: port.check
           count: 1
           input: { number: '+12025550150' }
+          normalise: { number: { rule: phone_e164, country_code: '1' } }
         - label: catalog.search
           count: 1
           input: { category: mobile, customer_email: { absent: true } }
@@ -84,6 +85,9 @@ blocks:
             port_number: '+12025550150'
             customer: { exact: { name: Dana Brooks, email: dana.brooks@example.com } }
             address_id: { absent: true }
+          normalise:
+            port_number: { rule: phone_e164, country_code: '1' }
+            customer.email: email_lower
       must: ['ORD-[0-9A-F]{6}', 'one business day']
 
 rules:
@@ -97,6 +101,8 @@ end_state:
   expect:
     plan_id: mobile-m
     port_number: '+12025550150'
+  normalise:
+    port_number: { rule: phone_e164, country_code: '1' }
 
 perturbations:
   - id: spanish-line

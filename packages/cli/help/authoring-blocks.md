@@ -160,7 +160,7 @@ driftbench campaign run examples/acme/specs/conversations/plan-upgrade.yaml exam
 
 ```text
 $ driftbench spec lint examples/acme/specs/conversations/plan-upgrade.yaml
-✓ examples/acme/specs/conversations/plan-upgrade.yaml  acme-plan-upgrade · 5 blocks · 3 perturbations · hash 5ae085d0b267
+✓ examples/acme/specs/conversations/plan-upgrade.yaml  acme-plan-upgrade · 5 blocks · 3 perturbations · hash 3577d4c43a98
 Checked 1 spec: 1 valid, 0 invalid, 0 warnings.
 (exit 0)
 $ driftbench campaign run examples/acme/specs/conversations/plan-upgrade.yaml examples/acme/specs/conversations/tool-failure.yaml --no-cache --mode T,F

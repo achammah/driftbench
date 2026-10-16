@@ -66,6 +66,8 @@ blocks:
           input:
             category: mobile
             customer_email: pat.quinn@example.com
+          normalise:
+            customer_email: email_lower
       lang: EN
   - id: b3-D10_return
     when:

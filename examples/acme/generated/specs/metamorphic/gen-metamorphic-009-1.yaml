@@ -55,6 +55,8 @@ blocks:
           input:
             category: mobile
             customer_email: pat.quinn@example.com
+          normalise:
+            customer_email: email_lower
       lang: EN
 rules:
   forbidden_tools:

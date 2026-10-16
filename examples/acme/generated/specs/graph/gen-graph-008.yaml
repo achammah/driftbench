@@ -60,6 +60,8 @@ blocks:
           input:
             address: 14 Harbor Road, Acmeville
           input_closed: true
+          normalise:
+            address: address_canon
         - label: catalog.search
           count: 1
           input:
@@ -100,6 +102,10 @@ blocks:
             customer:
               subset:
                 phone: "+12025550131"
+          normalise:
+            customer.phone:
+              rule: phone_e164
+              country_code: "1"
         - label: coverage.check
           count: 0
         - label: catalog.search
@@ -118,6 +124,10 @@ end_state:
     customer:
       subset:
         phone: "+12025550131"
+  normalise:
+    customer.phone:
+      rule: phone_e164
+      country_code: "1"
 perturbations:
   - id: p1-D6_instruction_in_data
     class: D6_instruction_in_data

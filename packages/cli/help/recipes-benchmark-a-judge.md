@@ -250,17 +250,17 @@ driftbench queue list --labels labels
 ```text
 6 cells: 6 pass, 0 fail, 0 failed. Spent $0.00.
 Queued 49 items in labels.
-open	coverage_before_offer	ae0bc0cdf9df9f4e.b0	-
-open	one_question_per_turn	ae0bc0cdf9df9f4e.b0	-
+open	coverage_before_offer	49156dd6361b05e4.b0	-
+open	one_question_per_turn	49156dd6361b05e4.b0	-
 ...
-open	checks_before_promising	8f5541041b373b2e.b1	-
-open	one_question_per_turn	8f5541041b373b2e.b1	-
+open	checks_before_promising	59fdb2f229540c43.b1	-
+open	one_question_per_turn	59fdb2f229540c43.b1	-
 ...
 ```
 
 Each item is a state (`open`, `assigned`, `done`), a criterion, a block id `<runId>.b<index>`, and its
 holder. The queue is `labels/queue.json`, beside the label files. A run id is a hash of the spec, target,
-mode and repeat, so the same cell has the same id in every campaign: `8f5541041b373b2e` is
+mode and repeat, so the same cell has the same id in every campaign: `59fdb2f229540c43` is
 `acme-number-porting` on `function:acme-sales`, mode F, repeat 0.
 
 ### 8. Take items, vote, and measure reviewer agreement
@@ -269,22 +269,22 @@ A reviewer takes an item, so no one else labels it. A second reviewer records a 
 measure how far people agree before their labels become the truth a judge is held to.
 
 ```sh
-driftbench queue assign 8f5541041b373b2e.b1 --criterion one_question_per_turn --reviewer ana --labels labels
-driftbench queue assign 8f5541041b373b2e.b1 --criterion one_question_per_turn --reviewer ben --labels labels  # exit 2
-driftbench queue vote 8f5541041b373b2e.b1 --criterion one_question_per_turn --reviewer ana --label pass --labels labels
-driftbench queue vote 8f5541041b373b2e.b1 --criterion one_question_per_turn --reviewer ben --label pass --labels labels
-driftbench queue vote 8f5541041b373b2e.b2 --criterion one_question_per_turn --reviewer ana --label pass --labels labels
-driftbench queue vote 8f5541041b373b2e.b2 --criterion one_question_per_turn --reviewer ben --label fail --labels labels
+driftbench queue assign 59fdb2f229540c43.b1 --criterion one_question_per_turn --reviewer ana --labels labels
+driftbench queue assign 59fdb2f229540c43.b1 --criterion one_question_per_turn --reviewer ben --labels labels  # exit 2
+driftbench queue vote 59fdb2f229540c43.b1 --criterion one_question_per_turn --reviewer ana --label pass --labels labels
+driftbench queue vote 59fdb2f229540c43.b1 --criterion one_question_per_turn --reviewer ben --label pass --labels labels
+driftbench queue vote 59fdb2f229540c43.b2 --criterion one_question_per_turn --reviewer ana --label pass --labels labels
+driftbench queue vote 59fdb2f229540c43.b2 --criterion one_question_per_turn --reviewer ben --label fail --labels labels
 driftbench queue agreement --labels labels
 ```
 
 ```text
-8f5541041b373b2e.b1 (one_question_per_turn) is assigned to ana.
-8f5541041b373b2e.b1 is assigned to ana
-ana voted pass on 8f5541041b373b2e.b1 (one_question_per_turn).
-ben voted pass on 8f5541041b373b2e.b1 (one_question_per_turn).
-ana voted pass on 8f5541041b373b2e.b2 (one_question_per_turn).
-ben voted fail on 8f5541041b373b2e.b2 (one_question_per_turn).
+59fdb2f229540c43.b1 (one_question_per_turn) is assigned to ana.
+59fdb2f229540c43.b1 is assigned to ana
+ana voted pass on 59fdb2f229540c43.b1 (one_question_per_turn).
+ben voted pass on 59fdb2f229540c43.b1 (one_question_per_turn).
+ana voted pass on 59fdb2f229540c43.b2 (one_question_per_turn).
+ben voted fail on 59fdb2f229540c43.b2 (one_question_per_turn).
 Agreement over 2 items with two votes: 1 agree (50%), kappa 0.00.
 ```
 

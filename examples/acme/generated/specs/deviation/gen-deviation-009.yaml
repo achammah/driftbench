@@ -62,6 +62,8 @@ blocks:
           input:
             address: 7 Quarry Lane, Acmeville
           input_closed: true
+          normalise:
+            address: address_canon
         - label: notify_sales
           count: 0
       lang: EN
@@ -79,6 +81,10 @@ blocks:
             customer:
               subset:
                 phone: "+12025550131"
+          normalise:
+            customer.phone:
+              rule: phone_e164
+              country_code: "1"
         - label: coverage.check
           count: 0
       lang: EN
@@ -132,6 +138,10 @@ end_state:
     customer:
       subset:
         phone: "+12025550131"
+  normalise:
+    customer.phone:
+      rule: phone_e164
+      country_code: "1"
 metadata:
   generated:
     by: driftbench generate

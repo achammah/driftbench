@@ -1,0 +1,174 @@
+{
+  "source": "research/block-phrasing (PR 415), phrasing/src/blocks.ts and data/sanity-oracle.json: the ten blocks of H1 and H3, the slot forms of the slot_surface axis and the minimal pairs",
+  "blocks": [
+    {
+      "id": "B1",
+      "spec": "examples/acme/specs/conversations/new-customer-coverage.yaml",
+      "index": 1,
+      "tool": "coverage.check",
+      "input": { "address": "88 Summit Avenue, Acmeville" },
+      "normalise": {
+        "address": {
+          "rule": "address_canon",
+          "surface_forms": [{ "form": "88 Summit Avenue", "approved": true }]
+        }
+      },
+      "forms": [
+        { "field": "address", "form": "88 Summit Avenue, Acmeville" },
+        { "field": "address", "form": "88 Summit Ave, Acmeville" },
+        { "field": "address", "form": "88 summit avenue" }
+      ],
+      "minimal": [{ "field": "address", "value": "8 Summit Avenue, Acmeville" }]
+    },
+    {
+      "id": "B2",
+      "spec": "examples/acme/specs/conversations/new-customer-coverage.yaml",
+      "index": 3,
+      "tool": "notify_sales",
+      "normalise": {
+        "customer.phone": { "rule": "phone_e164", "country_code": "1" },
+        "summary": "address_canon"
+      },
+      "forms": [
+        { "field": "customer.phone", "form": "+1 202 555 0131" },
+        { "field": "customer.phone", "form": "(202) 555-0131" },
+        { "field": "customer.phone", "form": "202.555.0131" },
+        { "field": "customer.phone", "form": "+12025550131" },
+        { "field": "summary", "form": "88 Summit Avenue" },
+        { "field": "summary", "form": "88 Summit Ave" },
+        { "field": "summary", "form": "88 summit avenue" }
+      ],
+      "minimal": [{ "field": "customer.phone", "value": "+1 202 555 0113" }]
+    },
+    {
+      "id": "B3",
+      "spec": "examples/acme/specs/conversations/number-porting.yaml",
+      "index": 1,
+      "tool": "port.check",
+      "normalise": { "number": { "rule": "phone_e164", "country_code": "1" } },
+      "forms": [
+        { "field": "number", "form": "+1 202 555 0150" },
+        { "field": "number", "form": "(202) 555-0150" },
+        { "field": "number", "form": "2025550150" },
+        { "field": "number", "form": "+12025550150" }
+      ],
+      "minimal": [{ "field": "number", "value": "+1 202 555 0105" }]
+    },
+    {
+      "id": "B4",
+      "spec": "examples/acme/specs/conversations/plan-upgrade.yaml",
+      "index": 1,
+      "tool": "catalog.search",
+      "normalise": { "customer_email": "email_lower" },
+      "forms": [
+        { "field": "customer_email", "form": "sam.rivera@example.com" },
+        { "field": "customer_email", "form": "Sam.Rivera@example.com" },
+        { "field": "customer_email", "form": "SAM.RIVERA@EXAMPLE.COM" }
+      ],
+      "minimal": [{ "field": "customer_email", "value": "sam.rivers@example.com" }]
+    },
+    {
+      "id": "B5",
+      "spec": "examples/acme/specs/conversations/order-loose-confirmation.yaml",
+      "index": 0,
+      "tool": "coverage.check",
+      "input": { "address": "14 Harbor Road, Acmeville" },
+      "normalise": {
+        "address": {
+          "rule": "address_canon",
+          "surface_forms": [{ "form": "14 Harbor Road", "approved": true }]
+        }
+      },
+      "forms": [
+        { "field": "address", "form": "14 Harbor Road, Acmeville" },
+        { "field": "address", "form": "14 Harbor Rd, Acmeville" },
+        { "field": "address", "form": "14 harbor road" }
+      ],
+      "minimal": [{ "field": "address", "value": "41 Harbor Road, Acmeville" }]
+    },
+    {
+      "id": "B6",
+      "spec": "examples/acme/specs/conversations/off-topic-return.yaml",
+      "index": 0,
+      "tool": "coverage.check",
+      "input": { "address": "3 Orchard Way, Acmeville" },
+      "normalise": {
+        "address": {
+          "rule": "address_canon",
+          "surface_forms": [{ "form": "3 Orchard Way", "approved": true }]
+        }
+      },
+      "forms": [
+        { "field": "address", "form": "3 Orchard Way, Acmeville" },
+        { "field": "address", "form": "3 Orchard Way Acmeville" },
+        { "field": "address", "form": "3 orchard way" }
+      ],
+      "minimal": [{ "field": "address", "value": "13 Orchard Way, Acmeville" }]
+    },
+    {
+      "id": "B7",
+      "spec": "examples/acme/specs/conversations/tool-failure.yaml",
+      "index": 1,
+      "tool": "notify_sales",
+      "normalise": {
+        "customer.phone": { "rule": "phone_e164", "country_code": "1" },
+        "summary": "address_canon"
+      },
+      "forms": [
+        { "field": "customer.phone", "form": "+1 202 555 0188" },
+        { "field": "customer.phone", "form": "(202) 555-0188" },
+        { "field": "customer.phone", "form": "202 555 0188" },
+        { "field": "customer.phone", "form": "+12025550188" },
+        { "field": "summary", "form": "7 Quarry Lane" },
+        { "field": "summary", "form": "7 Quarry Ln" },
+        { "field": "summary", "form": "7 quarry lane" }
+      ],
+      "minimal": [{ "field": "customer.phone", "value": "+1 202 555 0181" }]
+    },
+    {
+      "id": "B8",
+      "spec": "examples/acme/golden/specs/twise/gen-twise-023.yaml",
+      "index": 1,
+      "tool": "coverage.check",
+      "normalise": {
+        "address": {
+          "rule": "address_canon",
+          "surface_forms": [{ "form": "7 Quarry Lane", "approved": true }]
+        }
+      },
+      "forms": [
+        { "field": "address", "form": "7 Quarry Lane, Acmeville" },
+        { "field": "address", "form": "7 Quarry Ln, Acmeville" },
+        { "field": "address", "form": "7 quarry lane" }
+      ],
+      "minimal": [{ "field": "address", "value": "17 Quarry Lane, Acmeville" }]
+    },
+    {
+      "id": "B9",
+      "spec": "examples/acme/golden/specs/twise/gen-twise-066.yaml",
+      "index": 1,
+      "tool": "port.check",
+      "normalise": { "number": { "rule": "phone_e164", "country_code": "1" } },
+      "forms": [
+        { "field": "number", "form": "+1 202 555 0160" },
+        { "field": "number", "form": "(202) 555-0160" },
+        { "field": "number", "form": "202-555-0160" },
+        { "field": "number", "form": "+12025550160" }
+      ],
+      "minimal": [{ "field": "number", "value": "+1 202 555 0106" }]
+    },
+    {
+      "id": "B10",
+      "spec": "examples/acme/golden/specs/twise/gen-twise-018.yaml",
+      "index": 2,
+      "tool": "catalog.search",
+      "normalise": { "customer_email": "email_lower" },
+      "forms": [
+        { "field": "customer_email", "form": "morgan.diaz@example.com" },
+        { "field": "customer_email", "form": "Morgan.Diaz@example.com" },
+        { "field": "customer_email", "form": "MORGAN.DIAZ@EXAMPLE.COM" }
+      ],
+      "minimal": [{ "field": "customer_email", "value": "morgan.dias@example.com" }]
+    }
+  ]
+}

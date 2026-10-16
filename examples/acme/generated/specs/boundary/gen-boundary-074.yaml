@@ -65,6 +65,10 @@ blocks:
           input:
             number: "+12025550165"
           input_closed: true
+          normalise:
+            number:
+              rule: phone_e164
+              country_code: "1"
         - label: catalog.search
           count: 0
       lang: EN

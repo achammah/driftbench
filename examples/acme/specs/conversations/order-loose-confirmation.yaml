@@ -83,6 +83,7 @@ blocks:
             address_id: addr-101
             customer: { subset: { name: Jo Okafor, email: jo.okafor@example.com } }
             port_number: { absent: true }
+          normalise: { customer.email: email_lower }
         - { label: notify_sales, count: 0 }
       guards:
         - { name: explicit_confirmation, verdict: pass, count: 1 }
@@ -104,6 +105,8 @@ end_state:
     address_id: addr-101
     customer: { subset: { name: Jo Okafor, email: jo.okafor@example.com } }
     port_number: { absent: true }
+  normalise:
+    customer.email: email_lower
 
 perturbations:
   - id: second-loose-yes
@@ -136,6 +139,7 @@ perturbations:
             reason: order_failed
             customer: { subset: { email: jo.okafor@example.com } }
             summary: { nonempty: true }
+          normalise: { customer.email: email_lower }
       guards:
         - { name: explicit_confirmation, verdict: pass }
       must: ['could not place the order', 'sales advisor', 'LEAD-[0-9A-F]{6}']

@@ -65,6 +65,14 @@ export {
   ledgerContradictions,
   ledgerVerdicts,
 } from './ledger';
+export {
+  matchNormalised,
+  type NormalisedMatch,
+  type NormaliseStep,
+  normaliseSlot,
+  rootRule,
+  rulesFor,
+} from './normalise';
 export { preflightTargetPrices, TokenPriceError, TokenPrices } from './pricing';
 export { adapterProvenance, provenanceDigest, provenanceHash, runProvenance } from './provenance';
 export { type RecoveryMetrics, type RecoveryOptions, recoveryOf } from './recovery';

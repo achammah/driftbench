@@ -59,6 +59,8 @@ blocks:
           input:
             category: mobile
             customer_email: morgan.diaz@example.com
+          normalise:
+            customer_email: email_lower
       lang: EN
   - id: b3-D11_pii_leak
     when:

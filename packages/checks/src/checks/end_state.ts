@@ -6,9 +6,12 @@ import {
   type EndStateDiff,
   type EndStateSpec,
   machineVerdict,
+  matchAssertion,
+  matchNormalised,
+  rulesFor,
   type Verdict,
 } from '@agent-nexus/driftbench-core';
-import { describeAssertion, message } from '../support/assert';
+import { describeAssertion, describeSteps, message } from '../support/assert';
 import { isRecord, plural, show } from '../support/values';
 
 const NAME = 'end_state';
@@ -137,11 +140,16 @@ function fieldVerdict(
       `${entry.source}: ${why}, so ${field} is absent; expected ${expected}`,
     );
   }
+  const rules = rulesFor(entry.normalise, field);
+  const normalised =
+    rules.length === 0
+      ? ''
+      : describeSteps(matchNormalised(state[field], assertion, rules, matchAssertion).steps);
   return machineVerdict(
     NAME,
     id,
     miss ? 'fail' : 'pass',
-    `${entry.source} ${field} is ${show(state[field])}, expected ${expected}`,
+    `${entry.source} ${field} is ${show(state[field])}, expected ${expected}${normalised}`,
   );
 }
 

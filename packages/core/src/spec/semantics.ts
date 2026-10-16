@@ -1,4 +1,5 @@
-import type { Assertion, Count } from '../schema/common';
+import { normaliseProblem } from '../runner/normalise';
+import type { Assertion, Count, NormaliseMap } from '../schema/common';
 import type { Expect, Spec } from '../schema/spec';
 import { error, type Issue } from './issues';
 import { isPlainObject } from './normalize';
@@ -160,6 +161,7 @@ export function checkSemantics(spec: Spec): Issue[] {
     for (const [field, assertion] of Object.entries(endState.expect)) {
       checkAssertion(assertion, `${base}.${field}`, issues);
     }
+    checkNormalise(endState.normalise, endState.expect, base.replace(/expect$/, 'normalise'), issues);
   });
 
   const links = spec.metadata?.links;
@@ -226,6 +228,14 @@ function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]
     for (const [field, assertion] of Object.entries(tool.input ?? {})) {
       checkAssertion(assertion, `${toolPath}.input.${field}`, issues);
     }
+    checkNormalise(tool.normalise, tool.input, `${toolPath}.normalise`, issues);
+  });
+  expect.json?.paths?.forEach((entry, index) => {
+    if (entry.normalise === undefined) return;
+    const problem = normaliseProblem(entry.assert, [], entry.normalise);
+    if (problem) {
+      issues.push(error('NORMALISE_INVALID', `${path}.json.paths.${index}.normalise`, problem));
+    }
   });
   for (const [index, card] of (expect.cards ?? []).entries()) {
     checkCount(card.count, `${path}.cards.${index}.count`, issues);
@@ -277,6 +287,24 @@ function checkAssertion(assertion: Assertion, path: string, issues: Issue[]): vo
   if (assertion !== null && typeof assertion === 'object' && 'regex' in assertion) {
     const problem = patternError(assertion.regex);
     if (problem) issues.push(error('REGEX_INVALID', `${path}.regex`, problem));
+  }
+}
+
+/** Each rule of a normalise map names a compared field, at a path that holds an expected text. */
+function checkNormalise(
+  map: NormaliseMap | undefined,
+  assertions: Record<string, Assertion> | undefined,
+  path: string,
+  issues: Issue[],
+): void {
+  for (const [key, rule] of Object.entries(map ?? {})) {
+    const [field, ...rest] = key.split('.') as [string, ...string[]];
+    const assertion = assertions && Object.hasOwn(assertions, field) ? assertions[field] : undefined;
+    const problem =
+      assertion === undefined
+        ? `"${field}" has no assertion to normalise`
+        : normaliseProblem(assertion, rest, rule);
+    if (problem) issues.push(error('NORMALISE_INVALID', `${path}.${key}`, problem));
   }
 }
 

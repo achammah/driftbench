@@ -86,7 +86,7 @@ Imported campaign acme-export into other.db: 2 runs, 1 specs, 0 sources.
 2 cells: 2 pass, 0 fail, 0 failed. Spent $0.00.
 ```
 
-The bundle holds `campaign.json`, `manifest.json`, `runs/2b7a03560cb7a80e.json`, `runs/cc92cc9eb562f586.json` and one spec file under `specs/`, named by the spec id `acme-plan-upgrade`, an at sign and its hash `5ae085d0b267`: the two run files are named by their cell ids. The second import prints the same line and changes nothing. `status` on the new store reads the imported runs.
+The bundle holds `campaign.json`, `manifest.json`, `runs/1c0b2d1ab8c8d2ee.json`, `runs/a7013f45bfd4c07b.json` and one spec file under `specs/`, named by the spec id `acme-plan-upgrade`, an at sign and its hash `3577d4c43a98`: the two run files are named by their cell ids. The second import prints the same line and changes nothing. `status` on the new store reads the imported runs.
 
 ## Common errors
 

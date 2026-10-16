@@ -112,14 +112,14 @@ Store a run of the plan upgrade spec, queue its blocks, take one, record two rev
 driftbench campaign run examples/acme/specs/conversations/plan-upgrade.yaml --store acme.db --campaign upgrade-demo
 driftbench queue create --store acme.db --campaign upgrade-demo --labels labels
 driftbench queue list --labels labels
-driftbench queue assign a66a7aba9986a136.b0 --criterion one_question_per_turn --reviewer sam --labels labels
-driftbench queue assign a66a7aba9986a136.b0 --criterion one_question_per_turn --reviewer jo --labels labels  # exit 2
-driftbench queue vote a66a7aba9986a136.b0 --criterion one_question_per_turn --reviewer sam --label pass --labels labels
-driftbench queue vote a66a7aba9986a136.b0 --criterion one_question_per_turn --reviewer jo --label pass --labels labels
-driftbench queue vote a66a7aba9986a136.b1 --criterion one_question_per_turn --reviewer sam --label pass --labels labels
-driftbench queue vote a66a7aba9986a136.b1 --criterion one_question_per_turn --reviewer jo --label fail --labels labels
+driftbench queue assign 1e37522e1bc1cb1f.b0 --criterion one_question_per_turn --reviewer sam --labels labels
+driftbench queue assign 1e37522e1bc1cb1f.b0 --criterion one_question_per_turn --reviewer jo --labels labels  # exit 2
+driftbench queue vote 1e37522e1bc1cb1f.b0 --criterion one_question_per_turn --reviewer sam --label pass --labels labels
+driftbench queue vote 1e37522e1bc1cb1f.b0 --criterion one_question_per_turn --reviewer jo --label pass --labels labels
+driftbench queue vote 1e37522e1bc1cb1f.b1 --criterion one_question_per_turn --reviewer sam --label pass --labels labels
+driftbench queue vote 1e37522e1bc1cb1f.b1 --criterion one_question_per_turn --reviewer jo --label fail --labels labels
 driftbench queue agreement --labels labels
-driftbench queue vote a66a7aba9986a136.b1 --criterion one_question_per_turn --reviewer jo --label maybe --labels labels  # exit 2
+driftbench queue vote 1e37522e1bc1cb1f.b1 --criterion one_question_per_turn --reviewer jo --label maybe --labels labels  # exit 2
 driftbench queue list --labels labels
 ```
 
@@ -134,53 +134,53 @@ $ driftbench queue create --store acme.db --campaign upgrade-demo --labels label
 Queued 10 items in labels.
 (exit 0)
 $ driftbench queue list --labels labels
-open	no_invented_data	a66a7aba9986a136.b0	-
-open	one_question_per_turn	a66a7aba9986a136.b0	-
-open	no_invented_data	a66a7aba9986a136.b1	-
-open	one_question_per_turn	a66a7aba9986a136.b1	-
-open	no_invented_data	a66a7aba9986a136.b2	-
-open	one_question_per_turn	a66a7aba9986a136.b2	-
-open	no_invented_data	a66a7aba9986a136.b3	-
-open	one_question_per_turn	a66a7aba9986a136.b3	-
-open	no_invented_data	a66a7aba9986a136.b4	-
-open	one_question_per_turn	a66a7aba9986a136.b4	-
+open	no_invented_data	1e37522e1bc1cb1f.b0	-
+open	one_question_per_turn	1e37522e1bc1cb1f.b0	-
+open	no_invented_data	1e37522e1bc1cb1f.b1	-
+open	one_question_per_turn	1e37522e1bc1cb1f.b1	-
+open	no_invented_data	1e37522e1bc1cb1f.b2	-
+open	one_question_per_turn	1e37522e1bc1cb1f.b2	-
+open	no_invented_data	1e37522e1bc1cb1f.b3	-
+open	one_question_per_turn	1e37522e1bc1cb1f.b3	-
+open	no_invented_data	1e37522e1bc1cb1f.b4	-
+open	one_question_per_turn	1e37522e1bc1cb1f.b4	-
 10 items: 10 open, 0 assigned, 0 done.
 (exit 0)
-$ driftbench queue assign a66a7aba9986a136.b0 --criterion one_question_per_turn --reviewer sam --labels labels
-a66a7aba9986a136.b0 (one_question_per_turn) is assigned to sam.
+$ driftbench queue assign 1e37522e1bc1cb1f.b0 --criterion one_question_per_turn --reviewer sam --labels labels
+1e37522e1bc1cb1f.b0 (one_question_per_turn) is assigned to sam.
 (exit 0)
-$ driftbench queue assign a66a7aba9986a136.b0 --criterion one_question_per_turn --reviewer jo --labels labels  # exit 2
-a66a7aba9986a136.b0 is assigned to sam
+$ driftbench queue assign 1e37522e1bc1cb1f.b0 --criterion one_question_per_turn --reviewer jo --labels labels  # exit 2
+1e37522e1bc1cb1f.b0 is assigned to sam
 (exit 2)
-$ driftbench queue vote a66a7aba9986a136.b0 --criterion one_question_per_turn --reviewer sam --label pass --labels labels
-sam voted pass on a66a7aba9986a136.b0 (one_question_per_turn).
+$ driftbench queue vote 1e37522e1bc1cb1f.b0 --criterion one_question_per_turn --reviewer sam --label pass --labels labels
+sam voted pass on 1e37522e1bc1cb1f.b0 (one_question_per_turn).
 (exit 0)
-$ driftbench queue vote a66a7aba9986a136.b0 --criterion one_question_per_turn --reviewer jo --label pass --labels labels
-jo voted pass on a66a7aba9986a136.b0 (one_question_per_turn).
+$ driftbench queue vote 1e37522e1bc1cb1f.b0 --criterion one_question_per_turn --reviewer jo --label pass --labels labels
+jo voted pass on 1e37522e1bc1cb1f.b0 (one_question_per_turn).
 (exit 0)
-$ driftbench queue vote a66a7aba9986a136.b1 --criterion one_question_per_turn --reviewer sam --label pass --labels labels
-sam voted pass on a66a7aba9986a136.b1 (one_question_per_turn).
+$ driftbench queue vote 1e37522e1bc1cb1f.b1 --criterion one_question_per_turn --reviewer sam --label pass --labels labels
+sam voted pass on 1e37522e1bc1cb1f.b1 (one_question_per_turn).
 (exit 0)
-$ driftbench queue vote a66a7aba9986a136.b1 --criterion one_question_per_turn --reviewer jo --label fail --labels labels
-jo voted fail on a66a7aba9986a136.b1 (one_question_per_turn).
+$ driftbench queue vote 1e37522e1bc1cb1f.b1 --criterion one_question_per_turn --reviewer jo --label fail --labels labels
+jo voted fail on 1e37522e1bc1cb1f.b1 (one_question_per_turn).
 (exit 0)
 $ driftbench queue agreement --labels labels
 Agreement over 2 items with two votes: 1 agree (50%), kappa 0.00.
 (exit 0)
-$ driftbench queue vote a66a7aba9986a136.b1 --criterion one_question_per_turn --reviewer jo --label maybe --labels labels  # exit 2
+$ driftbench queue vote 1e37522e1bc1cb1f.b1 --criterion one_question_per_turn --reviewer jo --label maybe --labels labels  # exit 2
 --label takes pass or fail, not "maybe".
 (exit 2)
 $ driftbench queue list --labels labels
-open	no_invented_data	a66a7aba9986a136.b0	-
-assigned	one_question_per_turn	a66a7aba9986a136.b0	sam
-open	no_invented_data	a66a7aba9986a136.b1	-
-open	one_question_per_turn	a66a7aba9986a136.b1	-
-open	no_invented_data	a66a7aba9986a136.b2	-
-open	one_question_per_turn	a66a7aba9986a136.b2	-
-open	no_invented_data	a66a7aba9986a136.b3	-
-open	one_question_per_turn	a66a7aba9986a136.b3	-
-open	no_invented_data	a66a7aba9986a136.b4	-
-open	one_question_per_turn	a66a7aba9986a136.b4	-
+open	no_invented_data	1e37522e1bc1cb1f.b0	-
+assigned	one_question_per_turn	1e37522e1bc1cb1f.b0	sam
+open	no_invented_data	1e37522e1bc1cb1f.b1	-
+open	one_question_per_turn	1e37522e1bc1cb1f.b1	-
+open	no_invented_data	1e37522e1bc1cb1f.b2	-
+open	one_question_per_turn	1e37522e1bc1cb1f.b2	-
+open	no_invented_data	1e37522e1bc1cb1f.b3	-
+open	one_question_per_turn	1e37522e1bc1cb1f.b3	-
+open	no_invented_data	1e37522e1bc1cb1f.b4	-
+open	one_question_per_turn	1e37522e1bc1cb1f.b4	-
 10 items: 9 open, 1 assigned, 0 done.
 (exit 0)
 ```

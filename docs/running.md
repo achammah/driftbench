@@ -29,18 +29,18 @@ Expands the cells, projects their cost and prints the minimum detectable effect.
 $ pnpm -s driftbench campaign plan examples/acme/specs/conversations --target function:acme --repeats 2
 Plan: 6 specs, 1 target, mode F, 2 repeats: 12 cells, 52 blocks.
   cell              spec                           target         mode  repeat  blocks
-  68a19d33ffb63206  acme-new-customer-coverage     function:acme  F     0       4
-  31f113843f6e1e22  acme-new-customer-coverage     function:acme  F     1       4
-  4033227538c49cf8  acme-number-porting            function:acme  F     0       5
-  dd2305bd7041897b  acme-number-porting            function:acme  F     1       5
+  5e0f99b0757a5a78  acme-new-customer-coverage     function:acme  F     0       4
+  22fdb1e96faed82b  acme-new-customer-coverage     function:acme  F     1       4
+  2a4c74199ae12844  acme-number-porting            function:acme  F     0       5
+  7807770fe378b66f  acme-number-porting            function:acme  F     1       5
   8a546e9028cd7d10  acme-off-topic-return          function:acme  F     0       5
   3969e3c2e0988fb1  acme-off-topic-return          function:acme  F     1       5
-  479eb10c52e2f431  acme-order-loose-confirmation  function:acme  F     0       4
-  58bb8357be2ee702  acme-order-loose-confirmation  function:acme  F     1       4
-  cc92cc9eb562f586  acme-plan-upgrade              function:acme  F     0       5
-  2b7a03560cb7a80e  acme-plan-upgrade              function:acme  F     1       5
-  d44b9dfe9d1cf87a  acme-tool-failure              function:acme  F     0       3
-  0e486429b58c635e  acme-tool-failure              function:acme  F     1       3
+  6692410e5a14649c  acme-order-loose-confirmation  function:acme  F     0       4
+  c98be3bb047e254e  acme-order-loose-confirmation  function:acme  F     1       4
+  a7013f45bfd4c07b  acme-plan-upgrade              function:acme  F     0       5
+  1c0b2d1ab8c8d2ee  acme-plan-upgrade              function:acme  F     1       5
+  64be6d77cf4da3ba  acme-tool-failure              function:acme  F     0       3
+  6721de6043492578  acme-tool-failure              function:acme  F     1       3
 Projected cost: $0.00 (function: no unit measured).
 Minimum detectable effect, mode F: 47.8 points on a 50% pass rate, with 12 runs per arm over 6 specs (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
 ```
@@ -51,16 +51,16 @@ With several modes, the cells come in the order T, F, P, and each P cell names i
 $ pnpm -s driftbench campaign plan examples/acme/specs/conversations/plan-upgrade.yaml --target function:acme --mode T,F,P --repeats 2
 Plan: 1 spec, 1 target, modes T, F, P, 2 repeats: 10 cells, 54 blocks.
   cell              spec               target         mode  repeat  perturbation        blocks
-  850ffcff3927f170  acme-plan-upgrade  function:acme  T     0                           5
-  40e3484e079a0e33  acme-plan-upgrade  function:acme  T     1                           5
-  cc92cc9eb562f586  acme-plan-upgrade  function:acme  F     0                           5
-  2b7a03560cb7a80e  acme-plan-upgrade  function:acme  F     1                           5
-  e5fd30b27f5451f2  acme-plan-upgrade  function:acme  P     0       billing-aside       6
-  92de4e0dd994705c  acme-plan-upgrade  function:acme  P     1       billing-aside       6
-  d331b9f8ffb1a5fb  acme-plan-upgrade  function:acme  P     0       order-service-down  5
-  869fa63484786221  acme-plan-upgrade  function:acme  P     1       order-service-down  5
-  e5f5fa45081fd718  acme-plan-upgrade  function:acme  P     0       loose-ok            6
-  679e9be4b0b4ad7c  acme-plan-upgrade  function:acme  P     1       loose-ok            6
+  3a248543060bb020  acme-plan-upgrade  function:acme  T     0                           5
+  1e4dbf9d12f7b967  acme-plan-upgrade  function:acme  T     1                           5
+  a7013f45bfd4c07b  acme-plan-upgrade  function:acme  F     0                           5
+  1c0b2d1ab8c8d2ee  acme-plan-upgrade  function:acme  F     1                           5
+  3c7b2734011b6fa5  acme-plan-upgrade  function:acme  P     0       billing-aside       6
+  debc764411107d88  acme-plan-upgrade  function:acme  P     1       billing-aside       6
+  7654f7c2a6665b0b  acme-plan-upgrade  function:acme  P     0       order-service-down  5
+  766166b76e6e287a  acme-plan-upgrade  function:acme  P     1       order-service-down  5
+  4d13360f3df875f3  acme-plan-upgrade  function:acme  P     0       loose-ok            6
+  d5a39a55078831aa  acme-plan-upgrade  function:acme  P     1       loose-ok            6
 Projected cost: $0.00 (function: no unit measured).
 Minimum detectable effect, mode T: none detectable on a 50% pass rate, with 2 runs per arm over 1 spec (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
 Minimum detectable effect, mode F: none detectable on a 50% pass rate, with 2 runs per arm over 1 spec (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
@@ -73,12 +73,12 @@ Without `--target`, each spec is planned on its own target:
 $ pnpm -s driftbench campaign plan examples/acme/specs
 Plan: 7 specs, each on its own target (function:acme-sales, process:acme-ops), mode F, 1 repeat: 7 cells, 28 blocks.
   cell              spec                           target               mode  repeat  blocks
-  ae0bc0cdf9df9f4e  acme-new-customer-coverage     function:acme-sales  F     0       4
-  8f5541041b373b2e  acme-number-porting            function:acme-sales  F     0       5
+  49156dd6361b05e4  acme-new-customer-coverage     function:acme-sales  F     0       4
+  59fdb2f229540c43  acme-number-porting            function:acme-sales  F     0       5
   1db8182e57b23352  acme-off-topic-return          function:acme-sales  F     0       5
-  b33724145e0a8911  acme-order-loose-confirmation  function:acme-sales  F     0       4
-  a66a7aba9986a136  acme-plan-upgrade              function:acme-sales  F     0       5
-  c72578fc24c33e86  acme-tool-failure              function:acme-sales  F     0       3
+  6c751afcbeb7273a  acme-order-loose-confirmation  function:acme-sales  F     0       4
+  1e37522e1bc1cb1f  acme-plan-upgrade              function:acme-sales  F     0       5
+  41bf11525cc11b50  acme-tool-failure              function:acme-sales  F     0       3
   fbb8f12c6c884035  acme-price-sheet               process:acme-ops     F     0       2
 Projected cost: $0.00 (function: no unit measured; process: no unit measured).
 Minimum detectable effect, mode F: none detectable on a 50% pass rate, with 7 runs per arm over 7 specs (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
@@ -615,7 +615,7 @@ A campaign pins the specs by id and content hash, the target of each spec run on
 
 `planCampaign` expands specs, targets, modes and repeats into cells. In mode P a spec gives one cell per perturbation and repeat. A cell sends the spec's blocks, plus the injected block in mode P, except for a perturbation that writes only a world: it runs under its own block, so the cell sends the spec's blocks alone (`order-service-down` and `sales-queue-down` above).
 
-A cell's id is also the run id of its run: the first 16 hex characters of the SHA-256 of the canonical JSON of the spec hash, the target, the mode, the repeat and the perturbation. The campaign plays no part, so the same cell in two campaigns has the same id: `acme-plan-upgrade` in mode F at repeat 0 on `function:acme` is `cc92cc9eb562f586` in every Acme campaign above.
+A cell's id is also the run id of its run: the first 16 hex characters of the SHA-256 of the canonical JSON of the spec hash, the target, the mode, the repeat and the perturbation. The campaign plays no part, so the same cell in two campaigns has the same id: `acme-plan-upgrade` in mode F at repeat 0 on `function:acme` is `a7013f45bfd4c07b` in every Acme campaign above.
 
 ### Outcomes
 

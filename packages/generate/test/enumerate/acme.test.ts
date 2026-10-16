@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
-import { type LoadedSpec, loadSpecs, type Spec } from '@agent-nexus/driftbench-core';
+import { type LoadedSpec, loadSpecs, type Spec, slotRules } from '@agent-nexus/driftbench-core';
 import {
   compileSpace,
   isForbidden,
@@ -323,6 +323,32 @@ describe('generate on the approved Acme map', () => {
         }
       }
     }
+  });
+
+  it('writes a normalise rule on every phone, email and address a tool input or an end state compares', () => {
+    const rules = new Map<string, number>();
+    const count = (normalise: Record<string, unknown> | undefined) => {
+      for (const rule of Object.values(normalise ?? {})) {
+        const name = typeof rule === 'string' ? rule : JSON.stringify(rule);
+        rules.set(name, (rules.get(name) ?? 0) + 1);
+      }
+    };
+    for (const spec of result.complete) {
+      for (const block of spec.blocks) {
+        for (const tool of block.expect?.tools ?? []) {
+          expect(slotRules(tool.input), `${spec.id} ${tool.label}`).toEqual(
+            Object.fromEntries(Object.entries(tool.normalise ?? {})),
+          );
+          count(tool.normalise);
+        }
+      }
+      for (const entry of [spec.end_state ?? []].flat()) if (entry !== 'none') count(entry.normalise);
+    }
+    expect([...rules.keys()].sort()).toEqual([
+      'address_canon',
+      'email_lower',
+      '{"rule":"phone_e164","country_code":"1"}',
+    ]);
   });
 
   it('sends every spec the paths cannot build to incomplete/, with the reason', () => {

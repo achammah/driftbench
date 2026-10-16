@@ -1,5 +1,5 @@
-import { type Check, machineVerdict, type Verdict } from '@agent-nexus/driftbench-core';
-import { checkAssertion, message } from '../support/assert';
+import { type Check, machineVerdict, rootRule, type Verdict } from '@agent-nexus/driftbench-core';
+import { checkAssertion, describeSteps, message } from '../support/assert';
 import { validateStrict } from '../support/schema';
 import { visibleText } from '../support/text';
 import { show } from '../support/values';
@@ -12,7 +12,11 @@ import { show } from '../support/values';
  * is read as that JSON. A path is dotted, and a number in it indexes an array. An unreadable reply fails
  * every verdict after validity, with the reason, so a path is never passed on nothing.
  */
-type Paths = { path: string; assert: Parameters<typeof checkAssertion>[1] }[];
+type Paths = {
+  path: string;
+  assert: Parameters<typeof checkAssertion>[1];
+  normalise?: Parameters<typeof rootRule>[0];
+}[];
 
 const FENCE = /^```(?:json)?[ \t]*\n([\s\S]*?)\n```$/i;
 
@@ -163,14 +167,16 @@ export const replyJson: Check = {
         );
         return;
       }
-      const result = checkAssertion(found.value, entry.assert);
-      const detail = result.problem ?? `${entry.path} is ${show(found.value)}, expected ${result.expected}`;
+      const result = checkAssertion(found.value, entry.assert, rootRule(entry.normalise));
+      const normalised = describeSteps(result.steps);
+      const detail =
+        result.problem ?? `${entry.path} is ${show(found.value)}, expected ${result.expected}${normalised}`;
       verdicts.push(
         machineVerdict(
           'json',
           id,
           result.ok ? 'pass' : 'fail',
-          result.ok ? `${entry.path} is ${show(found.value)}` : detail,
+          result.ok ? `${entry.path} is ${show(found.value)}${normalised}` : detail,
         ),
       );
     });

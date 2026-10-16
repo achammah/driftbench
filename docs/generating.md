@@ -317,6 +317,8 @@ A `states` relation names a `subject` (`dimension` and `value`), the departing `
 
 Generated tool expectations set `input_closed: true` when their explicit `input` names every property of the tool's input schema. A turn where the user asks directly for one run of a tool, to send a value or to report a returned value, expects one call. With a value of one argument, the call carries that value and, for every other argument whose schema gives a `default`, that default; the input is closed when that names every property. Asked for a returned value, the call carries every argument whose schema gives a `default`, closed the same way. Partial map assertions keep allowing other arguments. List every permitted top-level input key to close a generated call. Existing saved specs do not gain these optional assertions automatically.
 
+Every phone, email and address that a generated tool input or end state compares carries a `normalise` rule: `phone_e164` (with `country_code: "1"` on a North American number), `email_lower` or `address_canon`. The kind is read from the value's shape. A paraphrase that changes how the agent writes the slot then passes, and a different value still fails. The generator writes no surface form: a form such as an address without its town needs a person's approval (see [checks](reference/checks.md#normalised-values)).
+
 Two blocks of `gen-graph-001`, the path `upgrade-order`. The email in the When and the expected input come from the same `binds` relation; the order's inputs come from the path's `uses_tool` relation:
 
 ```yaml

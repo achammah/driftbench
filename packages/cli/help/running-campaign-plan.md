@@ -84,18 +84,18 @@ driftbench campaign plan examples/acme/specs/conversations/tool-failure.yaml --t
 ```text
 Plan: 6 specs, 1 target, mode F, 2 repeats: 12 cells, 52 blocks.
   cell              spec                           target         mode  repeat  blocks
-  68a19d33ffb63206  acme-new-customer-coverage     function:acme  F     0       4
-  31f113843f6e1e22  acme-new-customer-coverage     function:acme  F     1       4
-  4033227538c49cf8  acme-number-porting            function:acme  F     0       5
-  dd2305bd7041897b  acme-number-porting            function:acme  F     1       5
+  5e0f99b0757a5a78  acme-new-customer-coverage     function:acme  F     0       4
+  22fdb1e96faed82b  acme-new-customer-coverage     function:acme  F     1       4
+  2a4c74199ae12844  acme-number-porting            function:acme  F     0       5
+  7807770fe378b66f  acme-number-porting            function:acme  F     1       5
   8a546e9028cd7d10  acme-off-topic-return          function:acme  F     0       5
   3969e3c2e0988fb1  acme-off-topic-return          function:acme  F     1       5
-  479eb10c52e2f431  acme-order-loose-confirmation  function:acme  F     0       4
-  58bb8357be2ee702  acme-order-loose-confirmation  function:acme  F     1       4
-  cc92cc9eb562f586  acme-plan-upgrade              function:acme  F     0       5
-  2b7a03560cb7a80e  acme-plan-upgrade              function:acme  F     1       5
-  d44b9dfe9d1cf87a  acme-tool-failure              function:acme  F     0       3
-  0e486429b58c635e  acme-tool-failure              function:acme  F     1       3
+  6692410e5a14649c  acme-order-loose-confirmation  function:acme  F     0       4
+  c98be3bb047e254e  acme-order-loose-confirmation  function:acme  F     1       4
+  a7013f45bfd4c07b  acme-plan-upgrade              function:acme  F     0       5
+  1c0b2d1ab8c8d2ee  acme-plan-upgrade              function:acme  F     1       5
+  64be6d77cf4da3ba  acme-tool-failure              function:acme  F     0       3
+  6721de6043492578  acme-tool-failure              function:acme  F     1       3
 Projected cost: $0.00 (function: no unit measured).
 Minimum detectable effect, mode F: 47.8 points on a 50% pass rate, with 12 runs per arm over 6 specs (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
 ```
@@ -105,26 +105,26 @@ Twelve cells would run. With six specs the design detects only a drop of about 4
 ```text
 Plan: 1 spec, 1 target, modes T, F, P, 1 repeat: 5 cells, 27 blocks.
   cell              spec               target         mode  repeat  perturbation        blocks
-  850ffcff3927f170  acme-plan-upgrade  function:acme  T     0                           5
-  cc92cc9eb562f586  acme-plan-upgrade  function:acme  F     0                           5
-  e5fd30b27f5451f2  acme-plan-upgrade  function:acme  P     0       billing-aside       6
-  d331b9f8ffb1a5fb  acme-plan-upgrade  function:acme  P     0       order-service-down  5
-  e5f5fa45081fd718  acme-plan-upgrade  function:acme  P     0       loose-ok            6
+  3a248543060bb020  acme-plan-upgrade  function:acme  T     0                           5
+  a7013f45bfd4c07b  acme-plan-upgrade  function:acme  F     0                           5
+  3c7b2734011b6fa5  acme-plan-upgrade  function:acme  P     0       billing-aside       6
+  7654f7c2a6665b0b  acme-plan-upgrade  function:acme  P     0       order-service-down  5
+  4d13360f3df875f3  acme-plan-upgrade  function:acme  P     0       loose-ok            6
 Projected cost: $0.00 (function: no unit measured). Within the budget of $1.00.
 Minimum detectable effect, mode T: none detectable on a 50% pass rate, with 1 run per arm over 1 spec (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
 Minimum detectable effect, mode F: none detectable on a 50% pass rate, with 1 run per arm over 1 spec (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
 Minimum detectable effect, mode P: none detectable on a 50% pass rate, with 3 runs per arm over 1 spec (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
 ```
 
-The spec declares three perturbations, so mode P makes three cells. `order-service-down` sends 5 blocks, not 6: it only changes the world, so it adds no block. The F cell `cc92cc9eb562f586` has the same id as in the first plan: a cell id does not depend on the campaign.
+The spec declares three perturbations, so mode P makes three cells. `order-service-down` sends 5 blocks, not 6: it only changes the world, so it adds no block. The F cell `a7013f45bfd4c07b` has the same id as in the first plan: a cell id does not depend on the campaign.
 
 ```text
 {
   "cells": [
     {
-      "cellId": "d44b9dfe9d1cf87a",
+      "cellId": "64be6d77cf4da3ba",
       "specId": "acme-tool-failure",
-      "specHash": "e5bc5c9ba9d2",
+      "specHash": "9f55c5e3ba96",
       "target": {
         "adapter": "function",
         "agent": "acme"

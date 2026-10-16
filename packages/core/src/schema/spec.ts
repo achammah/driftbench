@@ -8,6 +8,8 @@ import {
   GivenOrigin,
   Lang,
   Message,
+  NormaliseMap,
+  NormaliseRule,
   Pattern,
   TargetRef,
   WorldState,
@@ -96,6 +98,9 @@ export const ToolExpect = z
       .describe(
         'True requires every call input to be an object with only the top-level keys named in input. An absent input allows no keys. False or absent leaves other keys allowed.',
       ),
+    normalise: NormaliseMap.optional().describe(
+      'Rules by argument path, such as phone or customer.phone: the argument and its expected value are normalised before they are compared. Without a rule the comparison is exact.',
+    ),
   })
   .describe('One expected tool call.');
 export type ToolExpect = z.infer<typeof ToolExpect>;
@@ -155,6 +160,9 @@ export const JsonExpect = z
         z.strictObject({
           path: z.string().min(1).describe('A dotted path; a number indexes an array.'),
           assert: Assertion.describe('What the value at the path must be, in the spec assertion vocabulary.'),
+          normalise: NormaliseRule.optional().describe(
+            'A rule applied to the value at the path and to its expected value before they are compared.',
+          ),
         }),
       )
       .optional()
@@ -560,6 +568,9 @@ export const EndStateSpec = z
       .optional()
       .describe('subset compares the listed fields; exact compares the whole state.'),
     expect: z.record(z.string(), Assertion).describe('Assertions on fields of the state.'),
+    normalise: NormaliseMap.optional().describe(
+      'Rules by field path, such as customer.phone: the field and its expected value are normalised before they are compared.',
+    ),
   })
   .describe(
     'The expected end state of the world, read from a source the adapter knows, such as a tool payload.',

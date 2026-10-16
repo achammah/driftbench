@@ -127,6 +127,12 @@ expects the recap with a request to type CONFIRM, and the agent placed the order
 planted fault. Only gating verdicts fail a block; a verdict with `"gating": false` is reported and never
 fails it.
 
+When a `tools.<label>.input.<field>` verdict fails on the right value written another way, such as
+`input.number is "+1 202 555 0150"` against `+12025550150`, the agent is not wrong: the spec compares the
+text exactly. Add a `normalise` rule to that field (`phone_e164`, `email_lower`, `address_canon`, see
+`authoring-spec-format`); the verdict then gives the raw and the normalised value. A field with a rule
+that still fails holds a different value.
+
 ### 4. Find the first block that drifted, and its drift class
 
 `--detail` adds the succession of every run: the first failing block, how many blocks fail, the longest

@@ -1,4 +1,10 @@
-import { type Assertion, matchAssertion } from '@agent-nexus/driftbench-core';
+import {
+  type Assertion,
+  matchAssertion,
+  matchNormalised,
+  type NormaliseStep,
+  type rulesFor,
+} from '@agent-nexus/driftbench-core';
 import { show } from './values';
 
 /**
@@ -12,12 +18,23 @@ export type AssertionResult = {
   expected: string;
   /** Set when the assertion itself is broken, such as a regex that does not compile. */
   problem?: string;
+  /** The normalised comparisons, raw and normalised, when a rule applied. */
+  steps?: NormaliseStep[];
 };
 
-export function checkAssertion(value: unknown, assertion: Assertion): AssertionResult {
+/** The rules of one compared value, as core's `rulesFor` or `rootRule` gives them. */
+export type ValueRules = ReturnType<typeof rulesFor>;
+
+export function checkAssertion(
+  value: unknown,
+  assertion: Assertion,
+  rules: ValueRules = [],
+): AssertionResult {
   const expected = describeAssertion(assertion);
   try {
-    return { ok: matchAssertion(value, assertion), expected };
+    if (rules.length === 0) return { ok: matchAssertion(value, assertion), expected };
+    const { ok, steps } = matchNormalised(value, assertion, rules, matchAssertion);
+    return { ok, expected, ...(steps.length > 0 ? { steps } : {}) };
   } catch (cause) {
     const what = isPattern(assertion) ? 'the pattern does not compile' : 'the assertion cannot be applied';
     return { ok: false, expected, problem: `${what}: ${message(cause)}` };
@@ -42,4 +59,19 @@ function isPattern(assertion: Assertion): boolean {
 
 export function message(cause: unknown): string {
   return cause instanceof Error ? cause.message : String(cause);
+}
+
+/**
+ * The normalised comparisons of a verdict, as evidence prints them: `normalised by phone_e164:
+ * "+1 202 555 0131" read as "+12025550131"`. Empty when no rule applied.
+ */
+export function describeSteps(steps: readonly NormaliseStep[] | undefined): string {
+  if (!steps || steps.length === 0) return '';
+  const parts = steps.map((step) => {
+    const at = step.path === '' ? '' : `${step.path} `;
+    const how = step.surfaceForm ? ', an approved surface form' : '';
+    return `${at}${show(step.raw)} read as ${show(step.normalised)}${how}`;
+  });
+  const rules = [...new Set(steps.map((step) => step.rule))].join(', ');
+  return `; normalised by ${rules}: ${parts.join('; ')}`;
 }

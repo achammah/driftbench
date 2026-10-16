@@ -90,7 +90,7 @@ Campaign second, created 2026-10-14T13:54:31.870Z.
 1 cell: 1 pass, 0 fail, 0 failed. Spent $0.00.
 ```
 
-The folder `stores` was created. The store now holds two campaigns, each with a run whose id is `d44b9dfe9d1cf87a` (the cell id), and the cache entries of the first campaign's blocks.
+The folder `stores` was created. The store now holds two campaigns, each with a run whose id is `64be6d77cf4da3ba` (the cell id), and the cache entries of the first campaign's blocks.
 
 ## Common errors
 

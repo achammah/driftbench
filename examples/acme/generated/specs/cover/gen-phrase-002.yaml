@@ -63,6 +63,8 @@ blocks:
           input:
             category: mobile
             customer_email: sam.rivera@example.com
+          normalise:
+            customer_email: email_lower
         - label: coverage.check
           count: 0
         - label: port.check

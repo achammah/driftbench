@@ -140,12 +140,12 @@ driftbench spec lint packages/core/test/coverage/fixtures/specs/broken.yaml --js
 
 ```text
 $ driftbench spec validate examples/acme/specs
-✓ examples/acme/specs/conversations/new-customer-coverage.yaml  acme-new-customer-coverage · 4 blocks · 2 perturbations · hash be195c993d4f
-✓ examples/acme/specs/conversations/number-porting.yaml  acme-number-porting · 5 blocks · 2 perturbations · hash 134c8e993f95
+✓ examples/acme/specs/conversations/new-customer-coverage.yaml  acme-new-customer-coverage · 4 blocks · 2 perturbations · hash 698fc3743de6
+✓ examples/acme/specs/conversations/number-porting.yaml  acme-number-porting · 5 blocks · 2 perturbations · hash 90141899b92e
 ✓ examples/acme/specs/conversations/off-topic-return.yaml  acme-off-topic-return · 5 blocks · 1 perturbation · hash cca285407040
-✓ examples/acme/specs/conversations/order-loose-confirmation.yaml  acme-order-loose-confirmation · 4 blocks · 2 perturbations · hash ae116e6312eb
-✓ examples/acme/specs/conversations/plan-upgrade.yaml  acme-plan-upgrade · 5 blocks · 3 perturbations · hash 5ae085d0b267
-✓ examples/acme/specs/conversations/tool-failure.yaml  acme-tool-failure · 3 blocks · 1 perturbation · hash e5bc5c9ba9d2
+✓ examples/acme/specs/conversations/order-loose-confirmation.yaml  acme-order-loose-confirmation · 4 blocks · 2 perturbations · hash 8b751231a29f
+✓ examples/acme/specs/conversations/plan-upgrade.yaml  acme-plan-upgrade · 5 blocks · 3 perturbations · hash 3577d4c43a98
+✓ examples/acme/specs/conversations/tool-failure.yaml  acme-tool-failure · 3 blocks · 1 perturbation · hash 9f55c5e3ba96
 ✓ examples/acme/specs/tasks/price-sheet.yaml  acme-price-sheet · 2 blocks · 1 perturbation · hash d96437659138
 Checked 7 specs: 7 valid, 0 invalid, 0 warnings.
 (exit 0)
@@ -164,7 +164,7 @@ $ driftbench spec validate examples/acme/specs/conversations/tool-failure.yaml -
     "path": "examples/acme/specs/conversations/tool-failure.yaml",
     "ok": true,
     "id": "acme-tool-failure",
-    "hash": "e5bc5c9ba9d2",
+    "hash": "9f55c5e3ba96",
     "blocks": 3,
     "warnings": []
   }

@@ -4,11 +4,12 @@ import {
   type CheckContext,
   isZero,
   machineVerdict,
+  rulesFor,
   type ToolCall,
   type ToolExpect,
   type Verdict,
 } from '@agent-nexus/driftbench-core';
-import { checkAssertion } from '../support/assert';
+import { checkAssertion, describeSteps } from '../support/assert';
 import { countAllows, describeCount, minimumOf } from '../support/count';
 import { entryKeys, isRecord, listed, plural, show, times } from '../support/values';
 
@@ -40,7 +41,7 @@ export const tools: Check = {
       if (tool.input_closed === true) verdicts.push(closedInputVerdict(key, tool, own));
       for (const [field, assertion] of Object.entries(tool.input ?? {})) {
         argumentsExpected += 1;
-        const verdict = inputVerdict(key, tool.label, field, own, assertion);
+        const verdict = inputVerdict(key, tool, field, own, assertion);
         if (verdict.outcome !== 'pass') missed.push(`${tool.label} input.${field}`);
         verdicts.push(verdict);
       }
@@ -83,14 +84,20 @@ function countVerdict(key: string, tool: ToolExpect, own: ToolCall[], calls: Too
   );
 }
 
+/**
+ * One argument on every call of its tool. With a `normalise` rule on the argument, the raw and the
+ * normalised values both reach the evidence.
+ */
 function inputVerdict(
   key: string,
-  label: string,
+  tool: ToolExpect,
   field: string,
   own: ToolCall[],
   assertion: Assertion,
 ): Verdict {
+  const label = tool.label;
   const id = `${key}.input.${field}`;
+  const rules = rulesFor(tool.normalise, field);
   if (own.length === 0) {
     const { expected } = checkAssertion(undefined, assertion);
     return machineVerdict(
@@ -101,25 +108,34 @@ function inputVerdict(
     );
   }
   const failures: string[] = [];
+  const notes: string[] = [];
   let expected = '';
   let problem: string | undefined;
   own.forEach((call, index) => {
     const value = isRecord(call.input) ? call.input[field] : undefined;
-    const result = checkAssertion(value, assertion);
+    const result = checkAssertion(value, assertion, rules);
     expected = result.expected;
     problem = result.problem ?? problem;
+    const note = describeSteps(result.steps);
+    if (note !== '') notes.push(`call ${index + 1}${note}`);
     if (!result.ok) failures.push(`call ${index + 1}${callId(call)}: input.${field} is ${show(value)}`);
   });
+  const normalised = notes.length > 0 ? ` (${notes.join('; ')})` : '';
   if (problem) return machineVerdict(NAME, id, 'fail', `input.${field} ${expected}: ${problem}`);
   if (failures.length > 0) {
-    return machineVerdict(NAME, id, 'fail', `${label} ${failures.join('; ')}; expected ${expected}`);
+    return machineVerdict(
+      NAME,
+      id,
+      'fail',
+      `${label} ${failures.join('; ')}; expected ${expected}${normalised}`,
+    );
   }
   const values = own.map((call) => show(isRecord(call.input) ? call.input[field] : undefined));
   return machineVerdict(
     NAME,
     id,
     'pass',
-    `${label} input.${field} is ${expected} on ${plural(own.length, 'call')}: ${[...new Set(values)].join(', ')}`,
+    `${label} input.${field} is ${expected} on ${plural(own.length, 'call')}: ${[...new Set(values)].join(', ')}${normalised}`,
   );
 }
 
@@ -194,7 +210,7 @@ function argumentNote(expected: ToolExpect[], calls: ToolCall[]): string | undef
     if (!tool || !call || tool.label !== call.label) continue;
     for (const [field, assertion] of Object.entries(tool.input ?? {})) {
       const value = isRecord(call.input) ? call.input[field] : undefined;
-      const result = checkAssertion(value, assertion);
+      const result = checkAssertion(value, assertion, rulesFor(tool.normalise, field));
       if (!result.ok) {
         return `call ${index + 1} (${call.label}) input.${field}: expected ${result.expected}, saw ${show(value)}`;
       }

@@ -63,6 +63,10 @@ blocks:
           input:
             number: "+12025550165"
           input_closed: true
+          normalise:
+            number:
+              rule: phone_e164
+              country_code: "1"
         - label: catalog.search
           count: 1
           input:
@@ -137,6 +141,11 @@ blocks:
               subset:
                 name: Jo Okafor
                 email: jo.okafor@example.com
+          normalise:
+            port_number:
+              rule: phone_e164
+              country_code: "1"
+            customer.email: email_lower
         - label: port.check
           count: 0
         - label: catalog.search
@@ -158,6 +167,11 @@ end_state:
       subset:
         name: Jo Okafor
         email: jo.okafor@example.com
+  normalise:
+    port_number:
+      rule: phone_e164
+      country_code: "1"
+    customer.email: email_lower
 metadata:
   generated:
     by: driftbench generate

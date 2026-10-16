@@ -247,9 +247,13 @@ export {
   ledgerVerdicts,
   type MinimumDetectableEffect,
   matchAssertion,
+  matchNormalised,
   mdeLine,
   mergeWorld,
   minimumDetectableEffect,
+  type NormalisedMatch,
+  type NormaliseStep,
+  normaliseSlot,
   type ObservedCache,
   outcomeOf,
   type PlannedCell,
@@ -269,6 +273,8 @@ export {
   replacesBlock,
   resolveGiven,
   retryLayer,
+  rootRule,
+  rulesFor,
   runCampaign,
   runOutcome,
   runProvenance,
@@ -302,9 +308,13 @@ export {
   GivenOrigin,
   Lang,
   Message,
+  NormaliseMap,
+  NormaliseName,
+  NormaliseRule,
   Pattern,
   PrefixToolCall,
   RetrySettings,
+  SurfaceForm,
   TargetPrompt,
   TargetRef,
   ToolOverride,
@@ -391,7 +401,7 @@ export { anyGlobMatches, globMatches } from './spec/glob';
 export { canonicalJson, cloneJson, contentHash } from './spec/hash';
 export { IDENTITY_EXCLUDED_METADATA, specHash, specIdentity } from './spec/identity';
 export { error, type Issue, type IssueCode, IssueCodes, warning } from './spec/issues';
-export { lintSpec } from './spec/lint';
+export { lintSpec, slotRules } from './spec/lint';
 export {
   checkSpec,
   findSpecFiles,

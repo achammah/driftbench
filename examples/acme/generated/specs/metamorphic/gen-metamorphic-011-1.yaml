@@ -55,6 +55,8 @@ blocks:
           input:
             category: mobile
             customer_email: lee.jensen@example.com
+          normalise:
+            customer_email: email_lower
       must:
         - Acme Mobile S, 10 GB for \$15 a month
         - Acme Mobile M, 40 GB for \$25 a month

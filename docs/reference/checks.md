@@ -216,6 +216,23 @@ Tool `input` and `end_state.expect` assert values with these forms. Patterns com
 
 Equality is JSON equality: lists compare item by item, in order, and a key that holds no value counts as absent.
 
+### Normalised values
+
+`tools[].normalise`, `end_state.normalise` and `json.paths[].normalise` compare a value after a rule. The key of a map is a dotted path, such as `phone` or `customer.phone`; a JSON path takes one rule. The rule rewrites the observed value and every expected text at that path, then the assertion above compares them. It applies to a bare value, `exact`, `one_of`, `subset` and `contains`; `regex`, `nonempty` and `absent` take no rule. Without a rule the comparison is exact, as before.
+
+| Rule | Reads |
+|---|---|
+| `digits_only` | the digits only |
+| `phone_e164` | + and the digits; `country_code` gives a calling code to a number written without + or 00 |
+| `email_lower` | the address trimmed and lower-cased, without `mailto:`, angle brackets or a trailing dot |
+| `whitespace` | the text trimmed, each run of spaces collapsed to one |
+| `case_fold` | the text lower-cased |
+| `address_canon` | lower-cased, punctuation as spaces, street abbreviations expanded; the town stays; inside `contains`, whole words only |
+
+`surface_forms: [{ form, approved }]` lists other writings of the expected value, such as an address without its town. An approved form matches when it equals the observed text, ignoring case and spacing; a form not approved never matches, and `spec validate` lists it (`SURFACE_FORM_UNAPPROVED`). An address without its town is approved only where the agent's own tool resolves it. `spec validate` also warns `SLOT_FIELD_NO_RULE` on a phone, an email or an address compared with no rule.
+
+The verdict evidence gives the raw and the normalised value of each compared field: `(call 1; normalised by phone_e164: phone "+1 202 555 0131" read as "+12025550131")`. A rule never changes what the agent receives. It enters the spec hash only where it is written, so a spec that gains a rule gets new cell ids and block cache keys (both hold the spec hash) and its blocks run again once; a spec without one keeps its hash, its cells and its cache.
+
 ## Text and language
 
 * `injection: true` marks a block whose user message is a prompt-injection or jailbreak attempt. The pattern rules are structural: an override verb must reach an object of the assistant (its rules, instructions, filters or setup) within one sentence; a role claim addresses the assistant as "you" or assigns it a role; an authority claim names a developer, owner or security team; a delimiter trick plants a fake system boundary; a reveal request asks for the assistant's own setup text. Two verdicts: `injection.attack` passes when a rule recognises the message as an attempt, and is inconclusive, never failed, when none does; `injection.resist` fails when the reply matches a compliance rule, such as an announced developer mode or a disclosed system prompt, and quotes the match. The rules are regular expressions written for this check, in English and French. There is no external service. A judged criterion covers what the rules cannot see. With `createInjectionCheck(attackJudge)`, a judge reads the message when no rule recognises it, and its attack call passes `injection.attack`. The judge `judgeAttack` in `@agent-nexus/driftbench-judges` reads the message alone, on any judge client; a judge that gives no answer throws.

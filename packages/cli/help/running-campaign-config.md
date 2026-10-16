@@ -98,10 +98,10 @@ driftbench campaign run --config examples/acme/ci/campaign.yaml --mode F --repea
 ```text
 Plan: 1 spec, 1 target, modes T, F, 2 repeats: 4 cells, 20 blocks.
   cell              spec               target               mode  repeat  blocks
-  6a402b958212918e  acme-plan-upgrade  function:acme-sales  T     0       5
-  9ed98207286a7c44  acme-plan-upgrade  function:acme-sales  T     1       5
-  a66a7aba9986a136  acme-plan-upgrade  function:acme-sales  F     0       5
-  e63e47b82042e9c8  acme-plan-upgrade  function:acme-sales  F     1       5
+  bc5d8d1c13c6de16  acme-plan-upgrade  function:acme-sales  T     0       5
+  507403f1676acf76  acme-plan-upgrade  function:acme-sales  T     1       5
+  1e37522e1bc1cb1f  acme-plan-upgrade  function:acme-sales  F     0       5
+  dc00ab59fa67ca9d  acme-plan-upgrade  function:acme-sales  F     1       5
 Projected cost: $0.00 (function: no unit measured).
 Minimum detectable effect, mode T: none detectable on a 50% pass rate, with 2 runs per arm over 1 spec (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
 Minimum detectable effect, mode F: none detectable on a 50% pass rate, with 2 runs per arm over 1 spec (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).

@@ -71,6 +71,8 @@ blocks:
           input:
             address: 88 Summit Avenue, Acmeville
           input_closed: true
+          normalise:
+            address: address_canon
         - label: catalog.search
           count: 1
           input:
@@ -147,6 +149,8 @@ blocks:
               subset:
                 name: Jo Okafor
                 email: jo.okafor@example.com
+          normalise:
+            customer.email: email_lower
         - label: coverage.check
           count: 0
         - label: catalog.search
@@ -168,6 +172,8 @@ end_state:
       subset:
         name: Jo Okafor
         email: jo.okafor@example.com
+  normalise:
+    customer.email: email_lower
 metadata:
   generated:
     by: driftbench generate
