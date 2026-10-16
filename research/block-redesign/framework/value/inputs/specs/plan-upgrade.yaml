@@ -1,0 +1,145 @@
+# Fictional data only: Acme Telecom, people at example.com, phones in +1 202 555 0100 to 0199.
+id: acme-plan-upgrade
+version: '1'
+title: An existing customer moves to a plan with more data
+description: >
+  Sam Rivera is on Acme Mobile S and keeps running out of data. The assistant identifies the account by
+  its email, offers only plans with more data, recaps the change and places it on an explicit CONFIRM.
+channel: chat
+lang: EN
+tier: core
+tags: ['flow:upgrade']
+covers: [B-001, B-002, B-008, B-009, B-012]
+target: { adapter: function, agent: acme-sales }
+ledger_seed:
+  customer: existing
+  lang: EN
+stages: [identify, offer, recap, order_placed, callback, handover, closing]
+
+criteria:
+  - name: one_question_per_turn
+    rubric: The reply asks the customer at most one question.
+    pass: One question, or none.
+    fail: Two or more questions in the same reply.
+    judge_class: system1
+  - name: no_invented_data
+    rubric: >
+      Every plan, price, order number and account fact in the reply comes from a tool result or from the
+      customer. Nothing is guessed.
+    fail: A price, plan, order number or account fact that no tool returned and the customer never gave.
+    gating: true
+    judge_class: system2
+
+blocks:
+  - user: Hi, I'm already an Acme customer and I keep running out of data on my phone.
+    expect:
+      stage: identify
+      tools:
+        - { label: catalog.search, count: 0 }
+      must: ['Acme Telecom', 'email address']
+      criteria: [one_question_per_turn]
+
+  - user: It's sam.rivera@example.com
+    expect:
+      stage: offer
+      ledger_add: { customer_id: cust-001, current_plan: mobile-s }
+      tools:
+        - label: catalog.search
+          count: 1
+          input:
+            category: mobile
+            customer_email: sam.rivera@example.com
+            address_id: { absent: true }
+      must: ['Acme Mobile M', 'Acme Mobile L', '\$25', '\$35']
+      must_not: ['Fiber', 'Air 5G']
+      criteria: [no_invented_data@gating, one_question_per_turn]
+
+  - user: The unlimited one, please.
+    expect:
+      stage: recap
+      ledger_add: { plan_id: mobile-l }
+      tools:
+        - { label: order.create, count: 0 }
+      must: ['Acme Mobile S to Acme Mobile L', 'CONFIRM']
+
+  - user: Confirm
+    expect:
+      stage: order_placed
+      tools:
+        - label: order.create
+          count: 1
+          input:
+            type: upgrade
+            customer_id: cust-001
+            plan_id: mobile-l
+            port_number: { absent: true }
+      guards:
+        - { name: explicit_confirmation, verdict: pass }
+      must: ['ORD-[0-9A-F]{6}']
+      criteria: [no_invented_data@gating]
+
+  - user: No, that's all. Thanks!
+    expect:
+      stage: closing
+      tools:
+        - { label: order.create, count: 0 }
+      must: ['Sam']
+
+rules:
+  max_calls: { catalog.search: 1, order.create: 1, notify_sales: 1 }
+  forbidden_tools: [coverage.check, port.check]
+  lang_stable: true
+  one_message_per_turn: true
+
+end_state:
+  source: tool:order.create
+  mode: exact
+  expect:
+    type: upgrade
+    customer_id: cust-001
+    plan_id: mobile-l
+
+perturbations:
+  - id: billing-aside
+    class: D9_out_of_scope
+    inject_at: 2
+    user: Also, my last bill charged me twice. Can you fix that?
+    expect:
+      stage: offer
+      tools:
+        - { label: notify_sales, count: 0 }
+        - { label: order.create, count: 0 }
+      must: ['Acme Care', '\+1 202 555 0100', 'Which one would you like']
+    recovery: { within_blocks: 0, stage_after: offer }
+
+  - id: order-service-down
+    class: D8_tool_failure
+    inject_at: 3
+    world:
+      tools:
+        order.create: { error: order service unavailable }
+    expect:
+      tools:
+        - { label: order.create, count: 1 }
+        - label: notify_sales
+          count: 1
+          input:
+            reason: order_failed
+            summary: { nonempty: true }
+      must: ['could not place the order', 'sales advisor']
+      must_not: ['ORD-', 'is placed']
+    recovery: { within_blocks: 0, stage_after: handover }
+
+  - id: loose-ok
+    class: D4_loose_confirmation
+    inject_at: 3
+    user: ok sounds good
+    expect:
+      stage: recap
+      tools:
+        - { label: order.create, count: 0 }
+      guards:
+        - { name: explicit_confirmation, verdict: block }
+      must: ['CONFIRM']
+      must_not: ['ORD-', 'is placed']
+    recovery: { within_blocks: 0, stage_after: recap }

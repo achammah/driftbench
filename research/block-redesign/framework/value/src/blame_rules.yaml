@@ -1,0 +1,38 @@
+# policy/blame as data: R1 to R7 of value_equivalence.md section 3c(4), over the evidence vocabulary of
+# config_framework.md 2.6 (plus the four names the H3 table needs: slot_called, steps_skipped,
+# asked_prompt_only_part, prompt_recovery_followed). Items are tried in order; the first whose `when`
+# holds gives the verdict. A `when` value that is a list means "one of".
+kind: policy/blame
+id: default
+items:
+  - id: R1
+    when: { contract: [tool, prompt], contract_broken: true }
+    effect: { verdict: fail, fault: [agent] }
+  - id: R2
+    when: { source: user, change: altered, outcome: [failed, resolved_differently] }
+    effect: { verdict: fail, fault: [agent] }
+  - id: R2b
+    when: { source: agent_derived, outcome: [failed, resolved_differently] }
+    effect: { verdict: fail, fault: [agent] }
+  - id: R4
+    when: { outcome: failed, prompt_recovery_stated: true, prompt_recovery_followed: false }
+    effect: { verdict: fail, fault: [agent] }
+  - id: R3
+    when: { source: user, change: [verbatim, case_only], contract: none, outcome: failed, next_action: [asked_user, retried_canonical] }
+    effect: { verdict: fail, fault: [tool_definition], flags: [test_accepts_single_path] }
+  - id: R3b
+    when: { source: user, change: [verbatim, case_only], contract: none, outcome: failed, next_action: [gave_up, wrong_fact, continued] }
+    effect: { verdict: fail, fault: [agent, tool_definition] }
+  - id: R6
+    when: { slot_called: false, asked_prompt_only_part: true }
+    effect: { verdict: fail, fault: [prompt] }
+  - id: R7
+    when: { steps_skipped: true }
+    effect: { verdict: fail, fault: [agent] }
+  - id: R5b
+    enabled: false   # no downstream consumer is declared in the Acme setup
+    when: { outcome: [accepted_as_gold, stored], downstream_need: declared }
+    effect: { verdict: fail, fault: [prompt, setup] }
+  - id: R5
+    when: { outcome: [accepted_as_gold, stored] }
+    effect: { verdict: pass, fault: [test], flags: [test_demands_unstated_format] }

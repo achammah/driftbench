@@ -1,0 +1,105 @@
+# Fictional data only: Acme Telecom, Acmeville.
+id: acme-off-topic-return
+version: '1'
+title: Off-topic questions in the middle of a plan choice, then a return to the flow
+description: >
+  While choosing a home internet plan, the customer asks about store hours and about game consoles, then
+  asks where they were. Each detour gets a one-line answer, the plan question comes back, no tool runs
+  again and nothing is forgotten. The detours are written as injection blocks, so every run sees them.
+channel: chat
+lang: EN
+tier: edge
+tags: ['flow:new-home']
+covers: [B-003, B-004, B-011]
+target: { adapter: function, agent: acme-sales }
+ledger_seed:
+  customer: new
+  lang: EN
+stages: [address, offer, details, recap, order_placed, callback, handover, closing]
+
+criteria:
+  - name: resumes_pending_step
+    rubric: After a one-sentence answer to the detour, the reply asks the pending plan question again.
+    pass: The detour is answered and the same plan question follows.
+    fail: The plan question is dropped, changed, or the detour gets a long answer.
+    gating: true
+    judge_class: system1
+  - name: ledger_intact
+    rubric: >
+      The reply restates the address and the plans already found without asking for them again and
+      without a new tool call.
+    scope: conversation
+    judge_class: system2
+
+blocks:
+  - user: Hi, do you have home internet at 3 Orchard Way, Acmeville?
+    expect:
+      stage: offer
+      tool_order: in_order
+      tools:
+        - label: coverage.check
+          count: 1
+          input: { address: { regex: '^3 Orchard Way' } }
+        - label: catalog.search
+          count: 1
+          input: { category: home, address_id: addr-102 }
+      must: ['Acme Fiber 300', 'Acme Air 5G']
+      must_not: ['Fiber 1000']
+
+  - id: store-hours
+    when:
+      injection: { class: D1_off_topic, user: 'By the way, are your stores open on Sunday?' }
+    expect:
+      stage: offer
+      tools:
+        - { label: coverage.check, count: 0 }
+        - { label: catalog.search, count: 0 }
+      must: ['closed on Sunday', 'Which one would you like']
+      criteria: [resumes_pending_step@gating]
+
+  - id: consoles
+    when:
+      injection: { class: D1_off_topic, user: 'Do you also sell game consoles?' }
+    expect:
+      stage: offer
+      tools:
+        - { label: catalog.search, count: 0 }
+      must: ['only help with Acme plans', 'Which one would you like']
+      criteria: [resumes_pending_step@gating]
+
+  - id: where-were-we
+    when:
+      injection: { class: D10_return, user: 'Sorry, where were we?' }
+    expect:
+      stage: offer
+      tools:
+        - { label: coverage.check, count: 0 }
+        - { label: catalog.search, count: 0 }
+      must: ['We were choosing your plan', '3 Orchard Way', 'Acme Fiber 300', 'Acme Air 5G', '\$40', '\$35']
+      criteria: [ledger_intact]
+
+  - user: Air 5G, please.
+    expect:
+      stage: details
+      ledger_add: { plan_id: air-5g }
+      must: ['Acme Air 5G', 'full name']
+
+rules:
+  max_calls: { coverage.check: 1, catalog.search: 1, order.create: 0, notify_sales: 0 }
+  forbidden_tools: [port.check]
+  lang_stable: true
+  one_message_per_turn: true
+
+end_state: none
+
+perturbations:
+  - id: options-again
+    class: D10_return
+    inject_at: 4
+    user: Right, back to it. What were the options again?
+    expect:
+      stage: offer
+      tools:
+        - { label: catalog.search, count: 0 }
+      must: ['We were choosing your plan', 'Acme Air 5G']
+    recovery: { within_blocks: 0, stage_after: offer }

@@ -1,0 +1,48 @@
+{
+ "n": 150,
+ "rerun_flips_ladder": 3,
+ "rerun_flip_rate_ladder": 0.02,
+ "fail_rate_ladder": {
+  "base1": 0.2866666666666667,
+  "base2": 0.29333333333333333,
+  "desc": 0.2733333333333333,
+  "resolve": 0.2866666666666667,
+  "prompt": 0.28
+ },
+ "inconclusive": {
+  "base1": 0,
+  "base2": 0,
+  "desc": 0,
+  "resolve": 0,
+  "prompt": 0
+ },
+ "fail_by_block": {
+  "base1": {
+   "B9": 22,
+   "B3": 21
+  },
+  "base2": {
+   "B9": 22,
+   "B3": 22
+  },
+  "desc": {
+   "B9": 22,
+   "B3": 19
+  },
+  "resolve": {
+   "B9": 22,
+   "B3": 21
+  },
+  "prompt": {
+   "B9": 22,
+   "B3": 20
+  }
+ },
+ "worsening_ladder": {
+  "base1": 0.0,
+  "base2": 0.006666666666666654,
+  "desc": -0.013333333333333364,
+  "resolve": 0.0,
+  "prompt": -0.006666666666666654
+ }
+}

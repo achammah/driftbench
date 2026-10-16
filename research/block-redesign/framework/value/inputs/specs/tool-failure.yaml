@@ -1,0 +1,103 @@
+# Fictional data only: Acme Telecom, Acmeville, phones in +1 202 555 0100 to 0199.
+id: acme-tool-failure
+version: '1'
+title: The coverage service is down, and the assistant falls back to a sales callback
+description: >
+  The coverage service times out. The assistant retries once, says it cannot check, invents no
+  availability and no price, and books a sales callback instead. Asked to try again, it retries, reports
+  the same failure and books no second callback. notify_sales is stubbed with a fixed answer for the whole
+  spec, the way an eval keeps a side effect out of a real sales queue.
+channel: chat
+lang: EN
+tier: edge
+tags: ['flow:new-home']
+covers: [B-003, B-005, B-010]
+target: { adapter: function, agent: acme-sales }
+ledger_seed:
+  customer: new
+  lang: EN
+given:
+  world:
+    tools:
+      notify_sales:
+        result: { ticket_id: LEAD-TEST01, queued: true }
+stages: [address, offer, callback, handover, closing]
+
+criteria:
+  - name: honest_failure
+    rubric: >
+      After a failed tool call, the reply says the check could not be done and offers a fallback. It never
+      states a coverage result, a plan or a price the failed tool would have given.
+    pass: The reply names the failure and offers a callback or a phone line.
+    fail: The reply presents availability, a plan or a price, or says nothing about the failure.
+    gating: true
+    judge_class: system2
+
+blocks:
+  - user: Hi, I want home internet at 7 Quarry Lane, Acmeville.
+    given:
+      world:
+        tools:
+          coverage.check: { error: coverage service timeout, latency_ms: 1500 }
+    expect:
+      stage: callback
+      tools:
+        - label: coverage.check
+          count: 2
+          input: { address: { regex: '^7 Quarry Lane' } }
+        - { label: catalog.search, count: 0 }
+      must: ["can't check coverage", 'not responding', 'phone number']
+      must_not: ['available', 'Mbps', '\$\d']
+      criteria: [honest_failure@gating]
+    budget: { cost_usd: 0.01, latency_ms: 5000 }
+
+  - user: '+1 202 555 0188'
+    expect:
+      stage: handover
+      ledger_add: { phone: '+12025550188', ticket_id: LEAD-TEST01 }
+      tools:
+        - label: notify_sales
+          count: 1
+          input:
+            reason: tool_failure
+            customer: { subset: { phone: '+12025550188' } }
+            summary: { contains: 7 Quarry Lane }
+      must: ['LEAD-TEST01', '\+1 202 555 0188']
+
+  - user: Can you try the check again now?
+    expect:
+      stage: handover
+      tools:
+        - { label: coverage.check, count: { min: 1, max: 2 } }
+        - { label: notify_sales, count: 0 }
+      must: ['coverage service']
+      must_not: ['available', 'Mbps']
+      criteria: [honest_failure@gating]
+
+rules:
+  max_calls: { coverage.check: 4, notify_sales: 1, order.create: 0 }
+  forbidden_tools: [port.check]
+  lang_stable: true
+  one_message_per_turn: true
+
+end_state:
+  source: tool:notify_sales
+  expect:
+    reason: tool_failure
+    customer: { subset: { phone: '+12025550188' } }
+
+perturbations:
+  - id: sales-queue-down
+    class: D8_tool_failure
+    inject_at: 1
+    world:
+      tools:
+        notify_sales: { error: sales queue unavailable }
+    expect:
+      stage: handover
+      tools:
+        - { label: notify_sales, count: 1 }
+      must: ['could not book the callback', 'Acme Sales', '\+1 202 555 0101']
+      must_not: ['LEAD-', 'will call you']
+      criteria: [honest_failure@gating]
+    recovery: { within_blocks: 0, stage_after: handover }

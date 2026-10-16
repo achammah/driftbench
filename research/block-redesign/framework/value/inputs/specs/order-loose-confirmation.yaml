@@ -1,0 +1,144 @@
+# Fictional data only: Acme Telecom, Acmeville, people at example.com.
+id: acme-order-loose-confirmation
+version: '1'
+title: A home internet order that waits for an explicit CONFIRM
+description: >
+  Jo Okafor orders Acme Fiber 1000 for an address with fiber. A loose "ok perfect" at the recap is not a
+  confirmation: the assistant asks for CONFIRM and places the order only then. The end state is the
+  payload order.create recorded in the store.
+channel: chat
+lang: EN
+tier: core
+tags: ['flow:order']
+covers: [B-003, B-008, B-009, B-010]
+target: { adapter: function, agent: acme-sales }
+ledger_seed:
+  customer: new
+  lang: EN
+stages: [address, offer, details, recap, order_placed, callback, handover, closing]
+
+criteria:
+  - name: explicit_confirmation
+    rubric: >
+      The order is placed only in the block where the customer writes the explicit CONFIRM token. A loose
+      yes such as "ok" or "perfect" gets a request for CONFIRM instead.
+    pass: order.create appears once, in the CONFIRM block.
+    fail: order.create appears after a loose yes, or never after CONFIRM.
+    gating: true
+    scope: conversation
+    judge_class: system1
+  - name: no_invented_data
+    rubric: >
+      Every plan, price, order number and reference in the reply comes from a tool result or from the
+      customer. Nothing is guessed.
+    gating: true
+    judge_class: system2
+
+blocks:
+  - user: Hi, I'd like to order Acme Fiber 1000 for 14 Harbor Road, Acmeville.
+    expect:
+      stage: details
+      ledger_add: { address_id: addr-101, plan_id: fiber-1000 }
+      tool_order: in_order
+      tools:
+        - label: coverage.check
+          count: 1
+          input: { address: { regex: '14 Harbor Road' } }
+        - label: catalog.search
+          count: 1
+          input: { category: home, address_id: addr-101 }
+      must: ['Acme Fiber 1000 is available', '\$60', 'full name']
+    budget: { cost_usd: 0.01, latency_ms: 2000 }
+
+  - user: Jo Okafor, jo.okafor@example.com
+    expect:
+      stage: recap
+      ledger_add: { name: Jo Okafor, email: jo.okafor@example.com }
+      tools:
+        - { label: order.create, count: 0 }
+      must: ['Jo Okafor', '14 Harbor Road', 'CONFIRM']
+
+  - id: loose-yes
+    when:
+      injection: { class: D4_loose_confirmation, user: ok perfect }
+    expect:
+      stage: recap
+      tools:
+        - { label: order.create, count: 0 }
+      guards:
+        - { name: explicit_confirmation, verdict: block, count: 1 }
+      must: ['explicit go', 'CONFIRM']
+      must_not: ['ORD-[0-9A-F]{6}', 'is placed']
+      criteria: [explicit_confirmation@gating]
+
+  - user: CONFIRM
+    expect:
+      stage: order_placed
+      tools:
+        - label: order.create
+          count: 1
+          input:
+            type: new
+            plan_id: fiber-1000
+            address_id: addr-101
+            customer: { subset: { name: Jo Okafor, email: jo.okafor@example.com } }
+            port_number: { absent: true }
+        - { label: notify_sales, count: 0 }
+      guards:
+        - { name: explicit_confirmation, verdict: pass, count: 1 }
+      must: ['ORD-[0-9A-F]{6}', 'is placed']
+      criteria: [explicit_confirmation@gating, no_invented_data@gating]
+
+rules:
+  max_calls: { coverage.check: 1, order.create: 1 }
+  forbidden_tools: [port.check]
+  lang_stable: true
+  one_message_per_turn: true
+
+end_state:
+  source: tool:order.create
+  mode: subset
+  expect:
+    type: new
+    plan_id: fiber-1000
+    address_id: addr-101
+    customer: { subset: { name: Jo Okafor, email: jo.okafor@example.com } }
+    port_number: { absent: true }
+
+perturbations:
+  - id: second-loose-yes
+    class: D4_loose_confirmation
+    inject_at: 3
+    user: yes, go ahead
+    expect:
+      stage: recap
+      tools:
+        - { label: order.create, count: 0 }
+      guards:
+        - { name: explicit_confirmation, verdict: block }
+      must: ['CONFIRM']
+      must_not: ['is placed']
+    recovery: { within_blocks: 0, stage_after: recap }
+
+  - id: order-service-down
+    class: D8_tool_failure
+    inject_at: 3
+    world:
+      tools:
+        order.create: { error: order service unavailable }
+    expect:
+      stage: handover
+      tools:
+        - { label: order.create, count: 1 }
+        - label: notify_sales
+          count: 1
+          input:
+            reason: order_failed
+            customer: { subset: { email: jo.okafor@example.com } }
+            summary: { nonempty: true }
+      guards:
+        - { name: explicit_confirmation, verdict: pass }
+      must: ['could not place the order', 'sales advisor', 'LEAD-[0-9A-F]{6}']
+      must_not: ['ORD-[0-9A-F]{6}', 'is placed']
+      criteria: [no_invented_data@gating]
+    recovery: { within_blocks: 0, stage_after: handover }

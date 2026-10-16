@@ -1,0 +1,119 @@
+# Fictional data only: Acme Telecom, people at example.com, phones in +1 202 555 0100 to 0199.
+id: acme-number-porting
+version: '1'
+title: A new customer switches to Acme and keeps their number
+description: >
+  On WhatsApp, a new customer wants to keep their number. The assistant checks that the number can move
+  before it promises anything, sells a mobile plan, and places the order with the number attached. The
+  transfer record for the number is seeded in the store for this spec.
+channel: whatsapp
+lang: EN
+tier: core
+tags: ['flow:porting']
+covers: [B-006, B-008]
+target: { adapter: function, agent: acme-sales }
+ledger_seed:
+  customer: new
+  lang: EN
+given:
+  world:
+    store:
+      port_numbers:
+        - { number: '+12025550150', eligible: true }
+stages: [port_number, offer, details, recap, order_placed, callback, handover, closing]
+
+criteria:
+  - name: checks_before_promising
+    rubric: The reply says the number can move only after port.check returned it as eligible.
+    pass: The promise follows an eligible port.check result in the same block.
+    fail: The reply promises the transfer before port.check, or after a result that says no.
+    gating: true
+    judge_class: system1
+  - name: one_question_per_turn
+    rubric: The reply asks the customer at most one question.
+    judge_class: system1
+
+blocks:
+  - user: Hi, I want to switch to Acme and keep my phone number.
+    expect:
+      stage: port_number
+      tools:
+        - { label: port.check, count: 0 }
+      must: ['Acme Telecom', 'Which number']
+      must_not: ['can move']
+      criteria: [one_question_per_turn]
+
+  - user: "It's +1 202 555 0150"
+    expect:
+      stage: offer
+      ledger_add: { port_number: '+12025550150' }
+      tool_order: in_order
+      tools:
+        - label: port.check
+          count: 1
+          input: { number: '+12025550150' }
+        - label: catalog.search
+          count: 1
+          input: { category: mobile, customer_email: { absent: true } }
+      must: ['can move to Acme', 'Acme Mobile S', 'Acme Mobile M', 'Acme Mobile L']
+      criteria: [checks_before_promising@gating, one_question_per_turn]
+
+  - user: Mobile M please
+    expect:
+      stage: details
+      ledger_add: { plan_id: mobile-m }
+      must: ['full name', 'email address']
+
+  - user: Dana Brooks, dana.brooks@example.com
+    expect:
+      stage: recap
+      ledger_add: { name: Dana Brooks, email: dana.brooks@example.com }
+      tools:
+        - { label: order.create, count: 0 }
+      must: ['keeping \+1 202 555 0150', 'CONFIRM']
+
+  - user: Confirm
+    expect:
+      stage: order_placed
+      tools:
+        - label: order.create
+          count: 1
+          input:
+            type: new
+            plan_id: mobile-m
+            port_number: '+12025550150'
+            customer: { exact: { name: Dana Brooks, email: dana.brooks@example.com } }
+            address_id: { absent: true }
+      must: ['ORD-[0-9A-F]{6}', 'one business day']
+
+rules:
+  max_calls: { port.check: 1, order.create: 1, notify_sales: 0 }
+  forbidden_tools: [coverage.check]
+  lang_stable: true
+  one_message_per_turn: true
+
+end_state:
+  source: tool:order.create
+  expect:
+    plan_id: mobile-m
+    port_number: '+12025550150'
+
+perturbations:
+  - id: spanish-line
+    class: D5_language_switch
+    inject_at: 2
+    user: '¿Tienen un plan más barato?'
+    expect:
+      stage: offer
+      must: ['only help in English', 'Which one would you like']
+      must_not: ['¿', 'Tienen']
+    recovery: { within_blocks: 0, stage_after: offer }
+
+  - id: are-you-there
+    class: D7_silence_or_burst
+    inject_at: 3
+    burst: ['hello?', 'are you still there?']
+    expect:
+      stage: details
+      must: ["I'm here", 'full name']
+    recovery: { within_blocks: 0, stage_after: details }

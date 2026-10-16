@@ -1,0 +1,1 @@
+{"id": "B2#7#0", "error": "RuntimeError: gemini non-JSON: {\n  \"label\": \"format_only\",\n  \"verdict\": \"pass\",\n  \"reason\": \"The phone number \"+1 202 555 0131\" contains spaces compared to the gold value \"+12025550131\", which is a minor formatting difference.\"\n}"}
