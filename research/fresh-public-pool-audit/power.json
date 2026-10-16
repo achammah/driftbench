@@ -1,0 +1,82 @@
+{
+  "method": "Sum over M~Binomial(N,d) of Pr[exact two-sided binomial p<=alpha and W>M/2 | W~Binomial(M,w)]. Holm first threshold alpha=.05/5; 10-cell joint-family sensitivity also given. Target 80% directional power. Minimum N found by exhaustive integer search.",
+  "results": [
+    {
+      "benchmark": "JudgeBench",
+      "unit": "pair",
+      "priorN": 270,
+      "priorWins": 27,
+      "priorLosses": 11,
+      "discordanceRate": 0.14074074074074075,
+      "conditionalWinProbability": 0.7105263157894737,
+      "meanSignedDifference": 0.05925925925925926,
+      "HolmFamily": 5,
+      "planningAlpha": 0.01,
+      "targetPower": 0.8,
+      "requiredPairs": 481,
+      "attainedPower": 0.800655329809824,
+      "previousNPower": 0.799580739372729,
+      "powerAtPriorN": 0.46222051172954814,
+      "effectProvenance": "Earlier Haiku benchmark-only pair ledger vs promptfoo; not an observed default-v7 or all-peer effect"
+    },
+    {
+      "benchmark": "JudgeBench",
+      "unit": "pair",
+      "priorN": 270,
+      "priorWins": 27,
+      "priorLosses": 11,
+      "discordanceRate": 0.14074074074074075,
+      "conditionalWinProbability": 0.7105263157894737,
+      "meanSignedDifference": 0.05925925925925926,
+      "HolmFamily": 10,
+      "planningAlpha": 0.005,
+      "targetPower": 0.8,
+      "requiredPairs": 544,
+      "attainedPower": 0.8002666610679772,
+      "previousNPower": 0.7992643737665273,
+      "powerAtPriorN": 0.3618245080024267,
+      "effectProvenance": "Earlier Haiku benchmark-only pair ledger vs promptfoo; not an observed default-v7 or all-peer effect"
+    },
+    {
+      "benchmark": "RubricBench",
+      "unit": "pair: sign of difference in number correct over its two presentation orders",
+      "priorN": 790,
+      "priorWins": 184,
+      "priorLosses": 76,
+      "discordanceRate": 0.3291139240506329,
+      "conditionalWinProbability": 0.7076923076923077,
+      "meanSignedDifference": 0.13670886075949368,
+      "HolmFamily": 5,
+      "planningAlpha": 0.01,
+      "targetPower": 0.8,
+      "requiredPairs": 211,
+      "attainedPower": 0.8009894273181826,
+      "previousNPower": 0.798532645950137,
+      "powerAtPriorN": 0.9999895181668105,
+      "effectProvenance": "Earlier Haiku benchmark-only pair ledger vs promptfoo; not an observed default-v7 or all-peer effect"
+    },
+    {
+      "benchmark": "RubricBench",
+      "unit": "pair: sign of difference in number correct over its two presentation orders",
+      "priorN": 790,
+      "priorWins": 184,
+      "priorLosses": 76,
+      "discordanceRate": 0.3291139240506329,
+      "conditionalWinProbability": 0.7076923076923077,
+      "meanSignedDifference": 0.13670886075949368,
+      "HolmFamily": 10,
+      "planningAlpha": 0.005,
+      "targetPower": 0.8,
+      "requiredPairs": 239,
+      "attainedPower": 0.8013377692869771,
+      "previousNPower": 0.7990762989483159,
+      "powerAtPriorN": 0.9999707704750567,
+      "effectProvenance": "Earlier Haiku benchmark-only pair ledger vs promptfoo; not an observed default-v7 or all-peer effect"
+    }
+  ],
+  "limitations": [
+    "Peer-specific discordance rates for the frozen new default do not exist on fresh data. These are planning proxies, not a guarantee of power against all peers.",
+    "RubricBench games are paired presentations, not independent sample units. The primary calculation clusters them by original pair.",
+    "Power does not confer freshness or make a prior TIE retroactively become WIN."
+  ]
+}
