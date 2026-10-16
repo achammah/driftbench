@@ -1,6 +1,7 @@
 /**
  * Writes docs/reference/blame.md from the code: every evidence name a blame or placement rule can read, with
- * its cost class, its values and what it is computed from (packages/core/src/evidence).
+ * its cost class, its values and what it is computed from (packages/core/src/evidence), then every item of the
+ * shipped policy/blame and policy/placement files (packages/checks/objects), in order.
  *
  * Usage:  tsx tools/docs/blame-reference.ts [--check]
  *   (no flag)   write the page
@@ -10,6 +11,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { shippedPolicy } from '../../packages/checks/src/blame/objects';
 import { EVIDENCE_PROVIDERS } from '../../packages/core/src/evidence';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
@@ -23,6 +25,25 @@ const COST_LINE: Record<string, string> = {
 
 function cell(text: string): string {
   return text.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+}
+
+/** A condition or an effect in one line: `key value` pairs, lists in brackets. */
+function inline(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(inline).join(', ')}]`;
+  if (value !== null && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return 'always';
+    return entries.map(([key, entry]) => `${key}: ${inline(entry)}`).join('; ');
+  }
+  return String(value);
+}
+
+function itemRows(kind: 'policy/blame' | 'policy/placement'): string[] {
+  const object = shippedPolicy(kind);
+  return object.items.map(
+    (item, index) =>
+      `| ${index + 1} | \`${item.id}\` | ${cell(item.title)} | ${cell(inline(item.when))} | ${cell(inline(item.effect))} | ${cell(Object.keys(item.params).length === 0 ? '' : inline(item.params))} |`,
+  );
 }
 
 /** The page, from the code. */
@@ -48,6 +69,22 @@ export function renderBlameReference(): string {
       (provider) =>
         `| \`${provider.name}\` | ${provider.cost} | ${cell(provider.values.join(', '))} | ${cell(provider.from)} |`,
     ),
+    '',
+    '## policy/blame:default',
+    '',
+    `Who made the mistake, how it counts for the agent, and what kind of fix it needs. For each root of a chain of failing verdicts the items are tried in order and the first whose condition holds writes the diagnosis; a diagnosis never changes the machine pass. File: \`packages/checks/objects/policy/blame/default.yaml\`; object params: ${cell(inline(shippedPolicy('policy/blame').params))}.`,
+    '',
+    '| # | Item | What it says | When | Effect | Params |',
+    '|---|---|---|---|---|---|',
+    ...itemRows('policy/blame'),
+    '',
+    '## policy/placement:default',
+    '',
+    'Where a fix goes: the items not marked additive are tried in order and the first that holds places the fix; then every additive item that holds adds to it. File: `packages/checks/objects/policy/placement/default.yaml`.',
+    '',
+    '| # | Item | What it says | When | Effect | Params |',
+    '|---|---|---|---|---|---|',
+    ...itemRows('policy/placement'),
     '',
   ];
   return lines.join('\n');

@@ -433,7 +433,11 @@ export class ObjectStore {
     const found = below ? entries.find((entry) => strength(entry) < strength(below)) : entries[0];
     if (!found) {
       throw new ObjectError(
-        `unknown object ${kind}:${id}; searched layers ${LAYERS.join(', ')}`,
+        `unknown object ${kind}:${id}; searched layers ${LAYERS.join(', ')}; known ids for ${kind}: ${
+          this.list(kind)
+            .map((entry) => entry.id)
+            .join(', ') || '(none)'
+        }`,
         'OBJECT_UNKNOWN',
       );
     }

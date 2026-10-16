@@ -1,0 +1,101 @@
+# The shipped policy/placement object (codeagent_equivalence_blame.md G4): where a fix goes. First match wins
+# over the items not marked additive; then every additive item whose `when` holds adds to the result. A
+# condition reads the diagnosis the blame item wrote (place, fix_action, fix_location, home) and the
+# evidence; a bare word such as `min_homes` names a param of the item or of the object.
+kind: policy/placement
+id: default
+version: 1
+extends: null
+description: >
+  Where a fix goes. The Cue placement law (cue-retro references/plan.md, "Placement law"): cross-cutting
+  behaviour to the core prompt; skill-specific to that skill, moved not duplicated; a separate topic to a
+  reference with a forcing cross-ref that fires exactly in its situation; mechanics pushed out to guards.
+params:
+  core_sections: { skill_use: Skill use, behaviour: Rules, integrity: Rules }
+items:
+  - id: fixed
+    title: The blame item names the place; nothing to decide
+    when: { place: fixed }
+    effect: { keep: true }
+    impl: builtin:placement/fixed
+  - id: always_core
+    title: Integrity and honesty are cross-cutting by nature
+    when: { fix_action: [protect_paths, forbid_special_casing, report_only_observed] }
+    effect: { fix_location: agent.cross_skill, target: "core:{core_sections.integrity}", forms: [prose, guard] }
+    impl: builtin:placement/core
+  - id: trigger_local
+    title: A description belongs to its skill
+    when: { fix_action: rewrite_description }
+    effect: { fix_location: skill.trigger, target: "skill:{rule_skill}#description", also: routing_rows }
+    impl: builtin:placement/skill
+  - id: layout_local
+    title: A forcing pointer belongs in the main file of the situation
+    when: { fix_action: [add_forcing_ref, write_reference] }
+    effect: { fix_location: skill.layout, target: "skill:{rule_skill}#body, in the situation" }
+    impl: builtin:placement/skill
+  - id: cross_cutting
+    title: The same mistake in two or more homes goes to the core prompt
+    when: { any: [ { recurrence_homes: { gte: min_homes } }, { recurrence_class_homes: { gte: class_min_homes } } ] }
+    effect:
+      fix_location_by_act: { load_skill: agent.skill_reading, read_reference: agent.skill_reading,
+                             follow_skill_rule: agent.skill_reading, default: agent.cross_skill }
+      target: "core:{section}"
+      remove_local_copies: true
+    params: { min_homes: 2, class_min_homes: 3, min_runs_per_home: 2, count_no_skill_home: true, window: campaign }
+    impl: builtin:placement/cross-cutting
+    cites: plan.md "The list test" item 2
+  - id: shared_rule
+    title: A rule several homes need lives once
+    when: { rule_needed_by: { gte: 2 } }
+    effect:
+      to_core_when: { any: [ { core_needs_it: true }, { situation_share: { gte: core_share } } ] }
+      core: { fix_location: agent.cross_skill, target: "core:{core_sections.behaviour}" }
+      otherwise: { fix_location: skill.layout, target: "shared reference, with a forcing cross-ref from each skill" }
+      remove_local_copies: true
+    params: { core_share: 0.5 }
+    impl: builtin:placement/shared
+  - id: situational
+    title: A rule needed in one situation, or a body over budget, goes to a reference
+    when: { home: skill, any: [ { rule_situational: true }, { skill_body_lines: { gt: body_max_lines } } ] }
+    effect:
+      existing_forced_reference: { fix_location: skill.content, target: "the reference already forced in that situation" }
+      otherwise: { fix_location: skill.layout, target: "a new reference, with a forcing cross-ref in the situation" }
+    params: { body_max_lines: 500 }
+    impl: builtin:placement/reference
+  - id: skill_local
+    title: Skill-specific goes to that skill
+    when: { home: skill }
+    effect:
+      fix_location_by_action: { add_rule: skill.content, rewrite_rule: skill.content, strengthen_rule: skill.content,
+                                strengthen_ref: skill.layout, route_rule: skill.trigger, copy_given_values: skill.content,
+                                relax_rule: skill.content, add_rule_or_model: skill.content }
+      target: "skill:{rule_skill}#{atom_line}"
+    impl: builtin:placement/skill
+  - id: tool_local
+    title: A tool contract belongs to the tool
+    when: { home: tool }
+    effect: { fix_location: tool.contract, target: "tool:{tool}" }
+    impl: builtin:placement/tool
+  - id: core_local
+    title: A core rule only one skill needs stays, with a suggestion to move it
+    when: { home: core, recurrence_homes: 1, rule_needed_by: 1 }
+    effect: { fix_location: agent.cross_skill, target: "core:{atom_line}", flag: consider_moving_to_skill }
+    impl: builtin:placement/core
+  - id: core
+    title: A core rule is fixed in the core prompt
+    when: { home: core }
+    effect: { fix_location: agent.cross_skill, target: "core:{atom_line}" }
+    impl: builtin:placement/core
+  - id: mechanical_guard
+    title: Mechanics push out into a guard at the same scope
+    when: { rule_mechanical: true, fix_location: [agent.cross_skill, agent.skill_reading, skill.content, skill.layout] }
+    effect: { additive: true, add_form: guard, scope: same }
+    impl: builtin:placement/guard
+  - id: escape_test
+    title: The proposed wording names the kind, not the value
+    when: {}
+    effect: { additive: true, lint_fix_text: [skill_names, file_names, literal_values] }
+    impl: builtin:placement/escape-test
+    cites: plan.md "The escape test"
+order: [fixed, always_core, trigger_local, layout_local, cross_cutting, shared_rule, situational, skill_local,
+        tool_local, core_local, core, mechanical_guard, escape_test]

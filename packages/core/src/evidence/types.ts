@@ -192,6 +192,8 @@ export type EvidenceInput = {
   attributed?: { item: string; act?: string; home?: string };
   /** Runs per home before a home counts, for recurrence. */
   minRunsPerHome?: number;
+  /** Whether the no-skill home participates in recurrence; placement supplies its policy param. */
+  countNoSkillHome?: boolean;
 };
 
 /** A computed evidence value: a word, a number, a boolean, a list, a map, or absent. */

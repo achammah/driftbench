@@ -224,7 +224,7 @@ describe('extends', () => {
     const error = refusal(() => prototypeStore().resolve('policy/blame', 'acme'));
     expect(error.code).toBe('OBJECT_UNKNOWN');
     expect(error.message).toBe(
-      'unknown object policy/blame:acme; searched layers shipped, project, suite, spec, block, cli',
+      'unknown object policy/blame:acme; searched layers shipped, project, suite, spec, block, cli; known ids for policy/blame: (none)',
     );
     expect(refusal(() => prototypeStore().resolve('policy/blam', 'acme')).code).toBe('OBJECT_KIND_UNKNOWN');
   });
@@ -606,7 +606,7 @@ describe('the resolve pass of the loader', () => {
         code: 'OBJECT_UNKNOWN',
         path: 'blocks.0.uses.blame',
         message:
-          'spec a block b1: blocks.0.uses.blame: unknown object policy/blame:nobody; searched layers shipped, project, suite, spec, block, cli',
+          'spec a block b1: blocks.0.uses.blame: unknown object policy/blame:nobody; searched layers shipped, project, suite, spec, block, cli; known ids for policy/blame: (none)',
       },
     ]);
     const b = await loadSpecFile(join(root, 'specs/b.yaml'));

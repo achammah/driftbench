@@ -19,11 +19,12 @@ function homes(input: EvidenceInput, sameAct: boolean): number | undefined {
   const runs = new Map<string, number>();
   const match = (past: PastDiagnosis) => past.item === current.item && (!sameAct || past.act === current.act);
   for (const past of input.history ?? [])
-    if (match(past)) runs.set(past.home, (runs.get(past.home) ?? 0) + 1);
+    if (match(past) && (input.countNoSkillHome !== false || past.home !== 'none'))
+      runs.set(past.home, (runs.get(past.home) ?? 0) + 1);
   const own = current.home ?? 'none';
-  runs.set(own, (runs.get(own) ?? 0) + 1);
+  if (input.countNoSkillHome !== false || own !== 'none') runs.set(own, (runs.get(own) ?? 0) + 1);
   const counted = [...runs.values()].filter((count) => count >= min).length;
-  return Math.max(1, counted);
+  return input.countNoSkillHome === false && own === 'none' ? counted : Math.max(1, counted);
 }
 
 export const recurrence_homes: EvidenceProvider = {
