@@ -246,3 +246,27 @@ it('reads before the unit does its own work, and still stops when the later part
   expect(calls(records).map((call) => call.name)).toEqual(['Skill']);
   expect(JSON.stringify(records)).toContain('actions cannot be resolved');
 });
+
+it('reads the standing file again after a compaction when the estate says so, and not otherwise', async () => {
+  const { planStream } = await import('../../../../../examples/estates/fixture/live/fake/agent.mjs');
+  const files = (rule: string) => ({
+    'CLAUDE.md': `# Rules\n\n- ${rule}\n`,
+    '.claude/skills/parcel-lookup/SKILL.md': skill('parcel-lookup', '- Look parcels up.'),
+  });
+  const ask = 'Look up the status of a parcel by its code.';
+  const names = (dir: string, compacted: boolean) =>
+    (
+      planStream({ ask, cwd: dir, sessionId: 's', env: {}, compacted }).records as Array<{
+        message?: { content?: Array<{ type?: string; name?: string; input?: { file_path?: string } }> };
+      }>
+    ).flatMap((row) =>
+      (row.message?.content ?? [])
+        .filter((part) => part.type === 'tool_use')
+        .map((part) => `${part.name}:${(part.input?.file_path ?? '').split('/').pop()}`),
+    );
+  const told = await estate(files('After a compaction, re-read this file before you continue.'));
+  expect(names(told, true)[0]).toBe('Read:CLAUDE.md');
+  expect(names(told, false)).not.toContain('Read:CLAUDE.md');
+  const silent = await estate(files('Keep replies short.'));
+  expect(names(silent, true)).not.toContain('Read:CLAUDE.md');
+});
