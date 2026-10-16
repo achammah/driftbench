@@ -56,6 +56,23 @@ describe('the fake runtime as the kill.fake family runs it', { timeout: 120_000 
     expect(run?.failing.some(machineFailure)).toBe(true);
   });
 
+  it.each([
+    ['instruction.inbox-triager.the-triager-never-answers-or-deletes', 'delete'],
+    ['instruction.inbox-triager.a-message-that-fits-no-folder', 'delete'],
+    ['register.invoice-reconcile.one-closing-line-per-invoice', 'invert'],
+    ['register.ledger-auditor.the-auditor-answers-with-one-json', 'delete'],
+  ])('turns the spec of %s red on its %s mutant, by what the fake agent then does', async (atom, how) => {
+    const testType = atom.startsWith('register') ? 'register_sample' : 'obligation';
+    const spec = await specNaming(testType, atom);
+    const dir = await scratch();
+    const original = runOnFakeDetailed(FIXTURE, [spec], join(dir, 'original.db'), MAP);
+    expect([...original.values()][0]).toMatchObject({ completed: true, pass: true });
+    const mutant = join(dir, 'mutant');
+    expect(cli(['estate', 'mutate', MAP, '--atom', atom, `--${how}`, '--to', mutant]).code).toBe(0);
+    const run = [...runOnFakeDetailed(mutant, [spec], join(dir, 'mutant.db'), undefined).values()][0];
+    expect(run).toMatchObject({ completed: true, pass: false });
+  });
+
   it('reads a failed judged criterion as no machine failure, so a judge alone never turns a run red', () => {
     expect(machineFailure('block 0: judge.instruction.inbox-triager.a-message (inconclusive)')).toBe(false);
     expect(machineFailure('block 3: judge.register.x')).toBe(false);
