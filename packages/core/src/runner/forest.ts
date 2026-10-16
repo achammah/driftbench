@@ -20,6 +20,26 @@ export function parentLinks(spec: Pick<Spec, 'blocks'>): ReadonlyMap<number, num
   return links;
 }
 
+/**
+ * The order the blocks run in: the order the spec lists them, except that a parent runs before its children, so
+ * a parent listed after its child moves up to just before it. A spec with no parent listed late keeps its order.
+ */
+export function executionOrder(spec: Pick<Spec, 'blocks'>): number[] {
+  const links = parentLinks(spec);
+  const order: number[] = [];
+  if (!links) return spec.blocks.map((_, index) => index);
+  const placed = new Set<number>();
+  const place = (index: number) => {
+    if (placed.has(index)) return;
+    placed.add(index);
+    const parent = links.get(index);
+    if (parent !== undefined) place(parent);
+    order.push(index);
+  };
+  spec.blocks.forEach((_, index) => place(index));
+  return order;
+}
+
 /** The block indices from the root of the tree down to `index`, itself last. A cycle stops where it closes. */
 export function lineage(links: ReadonlyMap<number, number>, index: number): number[] {
   const chain = [index];

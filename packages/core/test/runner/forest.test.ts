@@ -85,13 +85,13 @@ describe('the loader and parent links', () => {
     ).toEqual(expect.arrayContaining(['PARENT_CYCLE blocks.0.parent', 'PARENT_CYCLE blocks.1.parent']));
   });
 
-  it('refuses a parent listed after its child', () => {
+  it('accepts a parent listed after its child', () => {
     expect(
       issues([
         { id: 'a', parent: 'b', user: 'hi' },
         { id: 'b', user: 'hi' },
       ]),
-    ).toEqual(['PARENT_ORDER blocks.0.parent']);
+    ).toEqual([]);
   });
 
   it('accepts a forest', () => {
@@ -168,5 +168,27 @@ describe('a block whose parent did not pass', () => {
     expect(run.blocks.map(blockStatus)).toEqual(['pass', 'not_run', 'not_run', 'pass', 'not_run']);
     expect(run.blocks[1]?.notRun).toMatchObject({ kind: 'unsupported', check: 'capability' });
     expect(adapter.calls.send).toBe(2);
+  });
+});
+
+describe('a parent listed after its child', () => {
+  it('runs first, so the child starts from it', async () => {
+    const late = specOf({
+      id: 'late-parent',
+      blocks: [
+        { id: 'child', parent: 'root', user: 'second' },
+        { id: 'root', user: 'first' },
+      ],
+    });
+    const adapter = acmeAdapter();
+    const sent: string[] = [];
+    const send = adapter.send.bind(adapter);
+    adapter.send = (session, turn) => {
+      sent.push(JSON.stringify(turn.stimulus));
+      return send(session, turn);
+    };
+    const run = await runSpec(late, { adapter, driver, checks: [], mode: 'F', repeat: 0 });
+    expect(sent).toEqual(['{"user":"first"}', '{"user":"second"}']);
+    expect(run.blocks.map((block) => block.blockId)).toEqual(['root', 'child']);
   });
 });

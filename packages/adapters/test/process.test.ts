@@ -364,6 +364,29 @@ describe('the process adapter', () => {
     });
   });
 
+  it('exports the workspace as base64, bytes intact and without its protocol files, for a child block', async () => {
+    const { adapter, open } = setup();
+    const bytes = Buffer.from([0xef, 0xbb, 0xbf, 0x50, 0x4b, 0x00, 0xff, 0x0d, 0x0a]);
+    const start = given();
+    start.world.workspace = {
+      files: { 'README.txt': README },
+      binary: { 'out/book.xlsx': bytes.toString('base64') },
+    };
+    const session = await open(start);
+    await runnerSend(adapter, session, turn(0, 'What is the cheapest mobile plan?', start));
+    const exported = await adapter.exportWorkspace?.(session);
+    expect(exported).toBeDefined();
+    expect(Buffer.from(exported?.['out/book.xlsx'] ?? '', 'base64').equals(bytes)).toBe(true);
+    expect(Buffer.from(exported?.['README.txt'] ?? '', 'base64').toString('utf8')).toBe(README);
+    for (const file of Object.values(processProtocolFiles)) expect(exported).not.toHaveProperty([file]);
+    // A new session seeded from the export holds the same files byte for byte.
+    const child = given();
+    child.world.workspace = { binary: exported ?? {} };
+    const second = await open(child);
+    const again = await adapter.exportWorkspace?.(second);
+    expect(again?.['out/book.xlsx']).toBe(exported?.['out/book.xlsx']);
+  });
+
   it('stops a slow agent at the block latency budget without failing the block', async () => {
     const { adapter, open } = setup();
     const from = given();

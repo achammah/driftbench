@@ -259,6 +259,18 @@ export function processAdapter(options: ProcessAdapterOptions): ProcessAdapter {
       return state.sandbox.readFile(path);
     },
 
+    /** Every file of the workspace but the protocol files, as base64: what a child block starts from. */
+    async exportWorkspace(session: Session): Promise<Record<string, string>> {
+      const state = stateOf(session);
+      if (state.closed) throw new Error('the process session is closed');
+      const files: Record<string, string> = {};
+      for (const path of await state.sandbox.listFiles()) {
+        if (CONTROL_FILES.includes(path)) continue;
+        files[path] = Buffer.from(await state.sandbox.readFile(path)).toString('base64');
+      }
+      return files;
+    },
+
     /** Removes the sandbox, unless the adapter keeps it. Safe to call twice. */
     async close(session: Session): Promise<void> {
       const state = session.state as ProcessState | undefined;

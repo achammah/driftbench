@@ -53,7 +53,7 @@ This is a format topic. The commands that read blocks are `spec validate`, `spec
 | Key | Type | Required | Meaning |
 |---|---|---|---|
 | `id` | non-empty string | no | An id unique in the spec. Two equal ids: `DUPLICATE_BLOCK_ID`. |
-| `parent` | non-empty string | no | The `id` of the block this one follows, listed before it. The block starts from the history, the facts and the files of its ancestors only. A spec whose blocks name no parent is one conversation. Errors: `PARENT_MISSING`, `PARENT_CYCLE`, `PARENT_ORDER`. |
+| `parent` | non-empty string | no | The `id` of the block this one follows, listed before or after it; a block runs after its parent. The block starts from the history, the facts and the files of its ancestors only. A spec whose blocks name no parent is one conversation. Errors: `PARENT_MISSING`, `PARENT_CYCLE`. |
 | `user` | string | one of three | One user message, or one instruction to a task agent. Shorthand for `when: { user }`. |
 | `burst` | list of 2 or more strings | one of three | Messages that arrive together. Shorthand for `when: { burst }`. |
 | `when` | mapping with exactly one of `user`, `burst`, `injection` | one of three | The stimulus in long form. |

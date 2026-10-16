@@ -90,6 +90,11 @@ export interface AgentAdapter {
   endState?(session: Session, source: string): Promise<unknown>;
   /** Reads a file the agent left in its workspace, bounded; the runner hands it to the artifact checks. */
   readArtifact?(session: Session, path: string): Promise<Uint8Array>;
+  /**
+   * Every file of the session's workspace as base64 by path, for a sandbox adapter: the runner hands it to the
+   * children of a block as their starting workspace, byte for byte. The adapter's own protocol files are left out.
+   */
+  exportWorkspace?(session: Session): Promise<Record<string, string>>;
   /** Releases what the session holds. Always called, also after a failure. */
   close(session: Session): Promise<void>;
 }

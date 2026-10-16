@@ -60,8 +60,8 @@ function checkWorkspace(world: WorldState | undefined, at: string, issues: Issue
 }
 
 /**
- * Parent links form a forest: every parent names a block, no chain of parents closes on itself, and a parent is
- * listed before its children, so the blocks run in the order the spec writes them.
+ * Parent links form a forest: every parent names a block and no chain of parents closes on itself. A parent may
+ * be listed after its child: the runner runs each child after its parent.
  */
 function checkParents(spec: Spec, issues: Issue[]): void {
   const firstWith = new Map<string, number>();
@@ -97,14 +97,6 @@ function checkParents(spec: Spec, issues: Issue[]): void {
           'PARENT_CYCLE',
           `blocks.${index}.parent`,
           `the parent "${spec.blocks[index]?.parent}" leads back to this block: parents form a forest, never a loop`,
-        ),
-      );
-    } else if (parent >= index) {
-      issues.push(
-        error(
-          'PARENT_ORDER',
-          `blocks.${index}.parent`,
-          `the parent "${spec.blocks[index]?.parent}" is listed after this block: list a parent before its children`,
         ),
       );
     }

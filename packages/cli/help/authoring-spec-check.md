@@ -121,7 +121,6 @@ The path in a spec is dotted, counting from 0: `blocks.2.expect.tools.0.label` i
 | `WORKSPACE_PATH_TWICE` | error | a workspace seed writes the same path in `files` and in `binary` |
 | `PARENT_MISSING` | error | a block's `parent` is the id of no block |
 | `PARENT_CYCLE` | error | a chain of `parent` links leads back to its own block |
-| `PARENT_ORDER` | error | a block's `parent` is listed after the block |
 | `LINK_BLOCK_UNKNOWN` | error | a link in `metadata.links` names a block id the spec does not have, or an index past its last block |
 | `LINK_TARGET_UNKNOWN` | error or warning | `spec lint --sections` only: error when the registry of the prompt has no such section, warning when no registry was given for the prompt |
 | `LINK_STALE` | warning | `spec lint --sections` only: the link's status is `stale`, or its section could not be found again in the registry's version |

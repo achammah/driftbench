@@ -29,7 +29,7 @@ import { recheckCarriedEndState } from './carried-end-state';
 import { cellId } from './cell';
 import { driftOf } from './drift';
 import { composeStates, type EndStateSnapshot, endStateSnapshot, snapshotValues } from './end-state-snapshot';
-import { parentLinks } from './forest';
+import { executionOrder, parentLinks } from './forest';
 import {
   addFacts,
   assistantMessage,
@@ -193,6 +193,11 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
           options.onEvent?.(event);
         }
       : undefined;
+  // A parent listed after its child runs first: the run reads the blocks in that order, the hashes read the spec.
+  const order = executionOrder(spec);
+  const executed: Spec = order.every((at, index) => at === index)
+    ? spec
+    : { ...spec, blocks: order.map((at) => spec.blocks[at] as BlockSpec) };
   const run: RunContext = {
     prices,
     requireTokenPrices: options.requireTokenPrices === true,
@@ -205,7 +210,7 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
     carriedBlocks,
     recordEndStateSnapshots: options.recordEndStateSnapshots === true,
     recordRealizedText: options.recordRealizedText === true,
-    spec,
+    spec: executed,
     specHash,
     cacheSpecHash,
     target,
@@ -352,6 +357,8 @@ type Channel = {
   observe(turn: Turn, user: Message[], key: string): Promise<Observed | undefined>;
   endState(sources: string[], key: string): Promise<EndStateRead>;
   readArtifact(): ((path: string) => Promise<Uint8Array>) | undefined;
+  /** The workspace of the open session as base64 by path; undefined when the adapter exports none. */
+  exportWorkspace(): Promise<Record<string, string> | undefined>;
   /** Closes what is open; returns a note when something could not be closed or cached. */
   close(): Promise<string | undefined>;
 };
@@ -391,6 +398,9 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   let lastRan: number | undefined;
   /** With parent links: the result of each spec block so far, for the children it has. */
   const resultOf = new Map<number, BlockResult>();
+  /** With parent links in a sandbox: the workspace each block with children left, as base64 by path. */
+  const exported = new Map<number, Record<string, string>>();
+  const parents = new Set(links?.values());
 
   try {
     for (let position = 0; ; position++) {
@@ -452,6 +462,11 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         if (!(keepsWorkspace && channel.reseat(canonical.prefix))) {
           await channel.restart();
           sessionBase = composed;
+          // A new session starts from the workspace its parent left, never from a sibling's.
+          const parent = links?.get(step.blockIndex);
+          const inherited = parent === undefined ? undefined : exported.get(parent);
+          if (inherited && spec.blocks[step.blockIndex]?.given?.world?.workspace === undefined)
+            state = { ...state, world: { ...state.world, workspace: { binary: inherited } } };
         }
         history = canonical.prefix;
         // The canonical prefix of a block is the one of the block before, then that block's user messages
@@ -470,7 +485,12 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
           const base = parent === undefined ? undefined : left.get(parent);
           if (lastRan !== undefined && lastRan !== parent && (parent === undefined || base)) {
             await channel.restart();
-            state = base ? base.state : initialGiven(spec);
+            const files = parent === undefined ? undefined : exported.get(parent);
+            state = base
+              ? files
+                ? { ...base.state, world: { ...base.state.world, workspace: { binary: files } } }
+                : base.state
+              : initialGiven(spec);
             history = base ? copyHistory(base.history) : [];
             users = userMessagesOf(history);
             prefixWritten = history.length > 0;
@@ -734,6 +754,10 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         pass: all.every((verdict) => !verdict.gating || verdict.outcome === 'pass'),
       };
       blocks.push(block);
+      if (links && run.capabilities.sandbox && step.kind === 'block' && parents.has(step.blockIndex)) {
+        const files = await channel.exportWorkspace();
+        if (files) exported.set(step.blockIndex, files);
+      }
       if (links && step.kind === 'block') {
         resultOf.set(step.blockIndex, block as BlockResult);
         if (run.mode !== 'T') left.set(step.blockIndex, { state, history });
@@ -1131,6 +1155,12 @@ function liveChannel(run: RunContext): Channel {
       return (path) =>
         session ? read.call(adapter, session, path) : Promise.reject(new Error('no session is open'));
     },
+    async exportWorkspace() {
+      const exportFiles = adapter.exportWorkspace;
+      const current = session;
+      if (!exportFiles || !current) return undefined;
+      return call('exportWorkspace', () => exportFiles.call(adapter, current));
+    },
     async close() {
       await closeSession();
       return notes.length > 0 ? notes.join('; ') : undefined;
@@ -1191,6 +1221,7 @@ function resumeChannel(
       return { kind: 'read', states };
     },
     readArtifact: live.readArtifact,
+    exportWorkspace: () => live.exportWorkspace(),
     close: () => live.close(),
   };
 }
@@ -1214,6 +1245,7 @@ function replayChannel(cache: ObservedCache, toolPolicy: readonly ToolRule[] | u
       return { kind: 'read', states };
     },
     readArtifact: () => undefined,
+    exportWorkspace: async () => undefined,
     async close() {
       return undefined;
     },
