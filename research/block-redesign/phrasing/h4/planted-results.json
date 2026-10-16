@@ -1,0 +1,642 @@
+[
+ {
+  "id": "P01",
+  "type": "swapped_digit",
+  "block": "B2",
+  "text": "You can call me on +1 202 555 0113.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.590"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite provides a different phone number: 202-555-0113 instead of 202-555-0131."
+   }
+  ]
+ },
+ {
+  "id": "P02",
+  "type": "swapped_digit",
+  "block": "B3",
+  "text": "It's +1 202 555 0105",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": false,
+    "note": "0.882"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite changes the phone number from +1 202 555 0150 to +1 202 555 0105."
+   }
+  ]
+ },
+ {
+  "id": "P03",
+  "type": "swapped_digit",
+  "block": "B9",
+  "text": "my number is (202) 555-0106",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.709"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The phone number changed from +1 202 555 0160 to (202) 555-0106."
+   }
+  ]
+ },
+ {
+  "id": "P04",
+  "type": "swapped_digit",
+  "block": "B1",
+  "text": "83 Summit Avenue, Acmeville",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": false,
+    "note": "0.917"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The street number changed from 88 to 83, so the address is different."
+   }
+  ]
+ },
+ {
+  "id": "P05",
+  "type": "swapped_digit",
+  "block": "B7",
+  "text": "Sure, it's +1 202 555 0181.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.648"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The phone number changed from +1 202 555 0188 to +1 202 555 0181."
+   }
+  ]
+ },
+ {
+  "id": "P06",
+  "type": "flipped_negation",
+  "block": "B4",
+  "text": "It's not sam.rivera@example.com.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": false,
+    "note": "1 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": false,
+    "note": "0.834"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite negates the email address, so it no longer provides the same account email as the original."
+   }
+  ]
+ },
+ {
+  "id": "P07",
+  "type": "flipped_negation",
+  "block": "B6",
+  "text": "Hi, I don't want home internet at 3 Orchard Way, Acmeville.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": false,
+    "note": "1 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.721"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The original asks whether home internet is available at the address, while the rewrite says the customer does not want it."
+   }
+  ]
+ },
+ {
+  "id": "P08",
+  "type": "flipped_negation",
+  "block": "B5",
+  "text": "Hi, I would not like to order Acme Fiber 1000 for 14 Harbor Road, Acmeville.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": false,
+    "note": "1 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": false,
+    "note": "0.878"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite negates the customer's request to order the plan."
+   }
+  ]
+ },
+ {
+  "id": "P09",
+  "type": "flipped_negation",
+  "block": "B2",
+  "text": "Please don't call me. My number is +1 202 555 0131.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": false,
+    "note": "1 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.536"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite explicitly says not to call, contradicting the requested callback, even though the phone number is the same."
+   }
+  ]
+ },
+ {
+  "id": "P10",
+  "type": "flipped_negation",
+  "block": "B8",
+  "text": "The address is not 7 Quarry Lane, Acmeville.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": false,
+    "note": "1 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": false,
+    "note": "0.899"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite negates the provided address, changing the customer's response."
+   }
+  ]
+ },
+ {
+  "id": "P11",
+  "type": "second_id",
+  "block": "B3",
+  "text": "It's +1 202 555 0150, or maybe +1 202 555 0165.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": false,
+    "note": "0.836"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite adds a second possible phone number, +1 202 555 0165, which changes the information provided."
+   }
+  ]
+ },
+ {
+  "id": "P12",
+  "type": "second_id",
+  "block": "B4",
+  "text": "It's sam.rivera@example.com or sam.r@example.com",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": false,
+    "note": "0.885"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite adds a second possible email address, changing the information provided."
+   }
+  ]
+ },
+ {
+  "id": "P13",
+  "type": "second_id",
+  "block": "B1",
+  "text": "88 Summit Avenue, Acmeville, or 14 Harbor Road if that is easier",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.627"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite adds a second possible address, changing the address information the assistant should use."
+   }
+  ]
+ },
+ {
+  "id": "P14",
+  "type": "second_id",
+  "block": "B7",
+  "text": "+1 202 555 0188, or my work line +1 202 555 0142",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.788"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite adds a second callback phone number, which changes the information the assistant should use."
+   }
+  ]
+ },
+ {
+  "id": "P15",
+  "type": "second_id",
+  "block": "B10",
+  "text": "It's morgan.diaz@example.com, my old one was mdiaz@example.com.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": true
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": false
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": false,
+    "note": "0.825"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 0.99: The rewrite adds a second email address, mdiaz@example.com, that was not in the original."
+   }
+  ]
+ },
+ {
+  "id": "P16",
+  "type": "missing_item",
+  "block": "B2",
+  "text": "Sure, call me whenever you like.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.194"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The original provides a specific callback phone number, while the rewrite omits it and instead says to call whenever."
+   }
+  ]
+ },
+ {
+  "id": "P17",
+  "type": "missing_item",
+  "block": "B3",
+  "text": "It's my usual number.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.309"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The original provides the specific phone number +1 202 555 0150, while the rewrite does not identify a number."
+   }
+  ]
+ },
+ {
+  "id": "P18",
+  "type": "missing_item",
+  "block": "B5",
+  "text": "Hi, I'd like to order Acme Fiber 1000.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.733"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite omits the requested service address, 14 Harbor Road, Acmeville."
+   }
+  ]
+ },
+ {
+  "id": "P19",
+  "type": "missing_item",
+  "block": "B8",
+  "text": "The address is on Quarry Lane, Acmeville.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": false,
+    "note": "0.880"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The rewrite omits the house number 7 from the address."
+   }
+  ]
+ },
+ {
+  "id": "P20",
+  "type": "missing_item",
+  "block": "B10",
+  "text": "It's my work email.",
+  "caught": true,
+  "stages": [
+   {
+    "stage": "slot_presence",
+    "ok": false
+   },
+   {
+    "stage": "slot_exclusivity",
+    "ok": true
+   },
+   {
+    "stage": "negation_parity",
+    "ok": true,
+    "note": "0 vs 0"
+   },
+   {
+    "stage": "near_duplicate",
+    "ok": true,
+    "note": "0.179"
+   },
+   {
+    "stage": "equivalence_judge",
+    "ok": false,
+    "note": "false 1: The original provides the specific email address morgan.diaz@example.com, while the rewrite omits it and only describes it as a work email."
+   }
+  ]
+ }
+]

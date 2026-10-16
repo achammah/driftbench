@@ -1,0 +1,16 @@
+[
+ {
+  "block": "B2",
+  "row": 2,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "For the requested callback, please use (202) 555-0131. This is the number for the call back, and I would be gratefull for your assitance.",
+  "attempt": 3
+ }
+]

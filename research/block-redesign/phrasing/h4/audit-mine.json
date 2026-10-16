@@ -1,0 +1,252 @@
+[
+ {
+  "item": 1,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 2,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 3,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 4,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 5,
+  "valid": true,
+  "reason": "Valid: the address is repeated, not a second address."
+ },
+ {
+  "item": 6,
+  "valid": true,
+  "reason": "Valid: the trailing clause restates that the address is the order's; values and request unchanged."
+ },
+ {
+  "item": 7,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 8,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 9,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 10,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 11,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 12,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 13,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 14,
+  "valid": true,
+  "reason": "Valid but awkward: the second line restates the first; the address is intact and the request unchanged."
+ },
+ {
+  "item": 15,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 16,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 17,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 18,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 19,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 20,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 21,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 22,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 23,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 24,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 25,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 26,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 27,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 28,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 29,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 30,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 31,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 32,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 33,
+  "valid": true,
+  "reason": "Valid but slightly implausible as a first message: 'the order I mentioned' refers to nothing earlier; the plan, address and request are unchanged."
+ },
+ {
+  "item": 34,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 35,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 36,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 37,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 38,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 39,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 40,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 41,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 42,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 43,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 44,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 45,
+  "valid": true,
+  "reason": "Valid: 'residential broadband' for home internet; the causal 'as the weather is lovely' is odd small talk that changes nothing."
+ },
+ {
+  "item": 46,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 47,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 48,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 49,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ },
+ {
+  "item": 50,
+  "valid": true,
+  "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+ }
+]

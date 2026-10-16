@@ -1,0 +1,402 @@
+[
+ {
+  "item": 1,
+  "block": "B9",
+  "row": 9,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?",
+  "seed": "My number is +1 202 555 0160.",
+  "text": "For the transfer, please record (202) 555-0160; the weathre has been lovley today."
+ },
+ {
+  "item": 2,
+  "block": "B6",
+  "row": 16,
+  "lastReply": "",
+  "seed": "Hi, do you have home internet at 3 Orchard Way, Acmeville?",
+  "text": "Hi can you tell me whether home internet is available at 3 orchard way"
+ },
+ {
+  "item": 3,
+  "block": "B2",
+  "row": 12,
+  "lastReply": "Sure. A sales advisor can call you back. What phone number should they use?",
+  "seed": "+1 202 555 0131",
+  "text": "Please have the sales advisor call me at (202) 555-0131 and the weather is lovely today"
+ },
+ {
+  "item": 4,
+  "block": "B1",
+  "row": 21,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can check what is available at your address. What is the street address?",
+  "seed": "88 Summit Avenue, Acmeville",
+  "text": "The address to check is 88 Summit Avenue, Acmeville and the weather is lovely today"
+ },
+ {
+  "item": 5,
+  "block": "B5",
+  "row": 5,
+  "lastReply": "",
+  "seed": "Hi, I'd like to order Acme Fiber 1000 for 14 Harbor Road, Acmeville.",
+  "text": "Hey, pleese sign me up for the Fiber 1000 plan at 14 harbor road. That’s the same spot, 14 harbor road, and this sounds reely good!"
+ },
+ {
+  "item": 6,
+  "block": "B5",
+  "row": 24,
+  "lastReply": "",
+  "seed": "Hi, I'd like to order Acme Fiber 1000 for 14 Harbor Road, Acmeville.",
+  "text": "Could you please place an order for the Fiber 1000 plan at 14 harbor road, the adress and locaton for this order?"
+ },
+ {
+  "item": 7,
+  "block": "B3",
+  "row": 10,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?",
+  "seed": "It's +1 202 555 0150",
+  "text": "Pleese port my numbr: 2025550150."
+ },
+ {
+  "item": 8,
+  "block": "B9",
+  "row": 22,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?",
+  "seed": "My number is +1 202 555 0160.",
+  "text": "My number is 202-555-0160."
+ },
+ {
+  "item": 9,
+  "block": "B4",
+  "row": 8,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can help you move to a plan with more data. What is the email address on your Acme account?",
+  "seed": "It's sam.rivera@example.com",
+  "text": "Hey could you use sam.rivera@example.com for my account email\nThe weather feels great today"
+ },
+ {
+  "item": 10,
+  "block": "B1",
+  "row": 25,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can check what is available at your address. What is the street address?",
+  "seed": "88 Summit Avenue, Acmeville",
+  "text": "88 summit avenue; my mornng has been pleasent."
+ },
+ {
+  "item": 11,
+  "block": "B7",
+  "row": 7,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can't check coverage at 7 Quarry Lane, Acmeville right now: our coverage service is not responding. A sales advisor can check it and call you back. What phone number should they use?",
+  "seed": "+1 202 555 0188",
+  "text": "The phone number is 202 555 0188, and the weather is pleasant today."
+ },
+ {
+  "item": 12,
+  "block": "B7",
+  "row": 5,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can't check coverage at 7 Quarry Lane, Acmeville right now: our coverage service is not responding. A sales advisor can check it and call you back. What phone number should they use?",
+  "seed": "+1 202 555 0188",
+  "text": "Hey, use (202) 555-0188 for the callback—that’s the number to call me back on."
+ },
+ {
+  "item": 13,
+  "block": "B8",
+  "row": 29,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can check what is available at your address. What is the street address?",
+  "seed": "The address is 7 Quarry Lane, Acmeville.",
+  "text": "Hey, can you check 7 Quarry Ln, Acmeville?"
+ },
+ {
+  "item": 14,
+  "block": "B1",
+  "row": 0,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can check what is available at your address. What is the street address?",
+  "seed": "88 Summit Avenue, Acmeville",
+  "text": "The location is 88 summit avenue\nThe street address is the location"
+ },
+ {
+  "item": 15,
+  "block": "B2",
+  "row": 6,
+  "lastReply": "Sure. A sales advisor can call you back. What phone number should they use?",
+  "seed": "+1 202 555 0131",
+  "text": "Hey use (202) 555-0131 for the advisor to call me back for that callback"
+ },
+ {
+  "item": 16,
+  "block": "B4",
+  "row": 4,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can help you move to a plan with more data. What is the email address on your Acme account?",
+  "seed": "It's sam.rivera@example.com",
+  "text": "Hey, my Acme account email is SAM.RIVERA@EXAMPLE.COM, the same email linked to my acount; just makin sure I’ve got that right."
+ },
+ {
+  "item": 17,
+  "block": "B10",
+  "row": 19,
+  "lastReply": "I can help you move to a plan with more data. What is the email address on your Acme account?",
+  "seed": "It's morgan.diaz@example.com.",
+  "text": "Hey, my Acme account email is morgan.diaz@example.com. I’m looking to move to a plan with more data."
+ },
+ {
+  "item": 18,
+  "block": "B6",
+  "row": 17,
+  "lastReply": "",
+  "seed": "Hi, do you have home internet at 3 Orchard Way, Acmeville?",
+  "text": "Hey do you have home internet at 3 Orchard Way, Acmeville\nMy day is going well"
+ },
+ {
+  "item": 19,
+  "block": "B3",
+  "row": 6,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?",
+  "seed": "It's +1 202 555 0150",
+  "text": "Mine’s (202) 555-0150."
+ },
+ {
+  "item": 20,
+  "block": "B6",
+  "row": 29,
+  "lastReply": "",
+  "seed": "Hi, do you have home internet at 3 Orchard Way, Acmeville?",
+  "text": "Hi, do you have home internet at 3 orchard way, Acmeville? Pleese let me know whether home internet is availble there; I am asking about the same address."
+ },
+ {
+  "item": 21,
+  "block": "B1",
+  "row": 12,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can check what is available at your address. What is the street address?",
+  "seed": "88 Summit Avenue, Acmeville",
+  "text": "Please check availability at 88 Summit Ave, Acmeville I would like to see what is available"
+ },
+ {
+  "item": 22,
+  "block": "B5",
+  "row": 4,
+  "lastReply": "",
+  "seed": "Hi, I'd like to order Acme Fiber 1000 for 14 Harbor Road, Acmeville.",
+  "text": "Could you please arrange an order for Fiber 1000 at 14 Harbor Rd, Acmeville? The weather has been pleasant today."
+ },
+ {
+  "item": 23,
+  "block": "B8",
+  "row": 5,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can check what is available at your address. What is the street address?",
+  "seed": "The address is 7 Quarry Lane, Acmeville.",
+  "text": "Please note the address is 7 Quarry Lane, Acmeville and the weather is pleasant"
+ },
+ {
+  "item": 24,
+  "block": "B8",
+  "row": 24,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can check what is available at your address. What is the street address?",
+  "seed": "The address is 7 Quarry Lane, Acmeville.",
+  "text": "The address is 7 Quarry Ln, Acmeville, and the weather is pleasant today."
+ },
+ {
+  "item": 25,
+  "block": "B10",
+  "row": 11,
+  "lastReply": "I can help you move to a plan with more data. What is the email address on your Acme account?",
+  "seed": "It's morgan.diaz@example.com.",
+  "text": "Please use MORGAN.DIAZ@EXAMPLE.COM."
+ },
+ {
+  "item": 26,
+  "block": "B7",
+  "row": 16,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can't check coverage at 7 Quarry Lane, Acmeville right now: our coverage service is not responding. A sales advisor can check it and call you back. What phone number should they use?",
+  "seed": "+1 202 555 0188",
+  "text": "My numbr is 202 555 0188. A callbak can reach me there."
+ },
+ {
+  "item": 27,
+  "block": "B10",
+  "row": 0,
+  "lastReply": "I can help you move to a plan with more data. What is the email address on your Acme account?",
+  "seed": "It's morgan.diaz@example.com.",
+  "text": "My account email is Morgan.Diaz@example.com. Pretty nice weather today."
+ },
+ {
+  "item": 28,
+  "block": "B3",
+  "row": 17,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?",
+  "seed": "It's +1 202 555 0150",
+  "text": "That is (202) 555-0150, and the weather is mild today."
+ },
+ {
+  "item": 29,
+  "block": "B7",
+  "row": 13,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can't check coverage at 7 Quarry Lane, Acmeville right now: our coverage service is not responding. A sales advisor can check it and call you back. What phone number should they use?",
+  "seed": "+1 202 555 0188",
+  "text": "Hey, it's 202 555 0188"
+ },
+ {
+  "item": 30,
+  "block": "B5",
+  "row": 2,
+  "lastReply": "",
+  "seed": "Hi, I'd like to order Acme Fiber 1000 for 14 Harbor Road, Acmeville.",
+  "text": "Get me Acme Fiber 1000 at 14 Harbor Road, Acmeville."
+ },
+ {
+  "item": 31,
+  "block": "B4",
+  "row": 10,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can help you move to a plan with more data. What is the email address on your Acme account?",
+  "seed": "It's sam.rivera@example.com",
+  "text": "The email for my Acme account is Sam.Rivera@example.com, which is my account email."
+ },
+ {
+  "item": 32,
+  "block": "B2",
+  "row": 10,
+  "lastReply": "Sure. A sales advisor can call you back. What phone number should they use?",
+  "seed": "+1 202 555 0131",
+  "text": "Hey, you can reach me at +1 202 555 0131. The weathr's been lovely today, and I'm having a chill mornng."
+ },
+ {
+  "item": 33,
+  "block": "B5",
+  "row": 0,
+  "lastReply": "",
+  "seed": "Hi, I'd like to order Acme Fiber 1000 for 14 Harbor Road, Acmeville.",
+  "text": "Please arrange Fiber 1000 at 14 Harbor Rd, Acmeville for the order I mentioned"
+ },
+ {
+  "item": 34,
+  "block": "B2",
+  "row": 0,
+  "lastReply": "Sure. A sales advisor can call you back. What phone number should they use?",
+  "seed": "+1 202 555 0131",
+  "text": "Hey, here's my phne number: 202.555.0131, thnks!"
+ },
+ {
+  "item": 35,
+  "block": "B6",
+  "row": 9,
+  "lastReply": "",
+  "seed": "Hi, do you have home internet at 3 Orchard Way, Acmeville?",
+  "text": "Hello, could you please confirm whether home internet is availble at 3 orchard way, Acmeville; the weather is pleasent today."
+ },
+ {
+  "item": 36,
+  "block": "B10",
+  "row": 4,
+  "lastReply": "I can help you move to a plan with more data. What is the email address on your Acme account?",
+  "seed": "It's morgan.diaz@example.com.",
+  "text": "The email for my account is MORGAN.DIAZ@EXAMPLE.COM"
+ },
+ {
+  "item": 37,
+  "block": "B8",
+  "row": 4,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can check what is available at your address. What is the street address?",
+  "seed": "The address is 7 Quarry Lane, Acmeville.",
+  "text": "Plase kindly usee 7 Quarry Ln, Acmeville."
+ },
+ {
+  "item": 38,
+  "block": "B10",
+  "row": 14,
+  "lastReply": "I can help you move to a plan with more data. What is the email address on your Acme account?",
+  "seed": "It's morgan.diaz@example.com.",
+  "text": "Please use Morgan.Diaz@example.com for my account; the wheather is sunny and pleasent today."
+ },
+ {
+  "item": 39,
+  "block": "B9",
+  "row": 7,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?",
+  "seed": "My number is +1 202 555 0160.",
+  "text": "Heye, heres this phonne: 202-555-0160"
+ },
+ {
+  "item": 40,
+  "block": "B8",
+  "row": 6,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can check what is available at your address. What is the street address?",
+  "seed": "The address is 7 Quarry Lane, Acmeville.",
+  "text": "My address 7 quarry lane"
+ },
+ {
+  "item": 41,
+  "block": "B9",
+  "row": 10,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?",
+  "seed": "My number is +1 202 555 0160.",
+  "text": "Hey, my number is 202-555-0160, and the weather's lovely today."
+ },
+ {
+  "item": 42,
+  "block": "B5",
+  "row": 18,
+  "lastReply": "",
+  "seed": "Hi, I'd like to order Acme Fiber 1000 for 14 Harbor Road, Acmeville.",
+  "text": "Hey could I get the Fiber 1000 plan at 14 harbor road the breeze feels lovely today"
+ },
+ {
+  "item": 43,
+  "block": "B7",
+  "row": 24,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can't check coverage at 7 Quarry Lane, Acmeville right now: our coverage service is not responding. A sales advisor can check it and call you back. What phone number should they use?",
+  "seed": "+1 202 555 0188",
+  "text": "Here's my numbr, calbak: +1 202 555 0188"
+ },
+ {
+  "item": 44,
+  "block": "B3",
+  "row": 9,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?",
+  "seed": "It's +1 202 555 0150",
+  "text": "The number I would like to bring is +1 202 555 0150 The weather is pleasant today"
+ },
+ {
+  "item": 45,
+  "block": "B6",
+  "row": 19,
+  "lastReply": "",
+  "seed": "Hi, do you have home internet at 3 Orchard Way, Acmeville?",
+  "text": "Would you kindly advise whether residential broadband serves the premises 3 Orchard Way Acmeville, as the weather is lovely."
+ },
+ {
+  "item": 46,
+  "block": "B6",
+  "row": 25,
+  "lastReply": "",
+  "seed": "Hi, do you have home internet at 3 Orchard Way, Acmeville?",
+  "text": "May I inquire whether residential broadband service is offered for 3 orchard way\nThe weather has been lovely today"
+ },
+ {
+  "item": 47,
+  "block": "B5",
+  "row": 3,
+  "lastReply": "",
+  "seed": "Hi, I'd like to order Acme Fiber 1000 for 14 Harbor Road, Acmeville.",
+  "text": "Hey I wanna order Acme Fiber 1000 for 14 Harbor Road, Acmeville Also the weather is pretty nice today"
+ },
+ {
+  "item": 48,
+  "block": "B7",
+  "row": 1,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can't check coverage at 7 Quarry Lane, Acmeville right now: our coverage service is not responding. A sales advisor can check it and call you back. What phone number should they use?",
+  "seed": "+1 202 555 0188",
+  "text": "Hey use 202 555 0188 for the callback\nThat is my phone number for the callback"
+ },
+ {
+  "item": 49,
+  "block": "B4",
+  "row": 24,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. I can help you move to a plan with more data. What is the email address on your Acme account?",
+  "seed": "It's sam.rivera@example.com",
+  "text": "Please use Sam.Rivera@example.com as the email address associated with my Acme account"
+ },
+ {
+  "item": 50,
+  "block": "B3",
+  "row": 7,
+  "lastReply": "Hi, I'm the Acme Telecom sales assistant. Happy to help you switch and keep your number. Which number do you want to bring to Acme?",
+  "seed": "It's +1 202 555 0150",
+  "text": "For keeping my number with Acme the number is (202) 555-0150"
+ }
+]

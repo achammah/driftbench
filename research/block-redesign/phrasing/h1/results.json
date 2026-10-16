@@ -1,0 +1,1999 @@
+{
+ "hypothesis": "H1",
+ "verdict": "FALSIFIED",
+ "blocksScored": 10,
+ "seedBeatsClassExact": 6,
+ "seedBeatsClassNorm": 3,
+ "ciExcludes0Exact": 6,
+ "ciExcludes0Norm": 3,
+ "meanGExact": 0.3026417285862563,
+ "pairedSeExact": 0.09917146433225306,
+ "meanGNorm": 0.06165308829101933,
+ "pairedSeNorm": 0.05316292304891887,
+ "blocks": [
+  {
+   "block": "B1",
+   "nSeed": 30,
+   "nClass": 29,
+   "exact": {
+    "ySeed": 1,
+    "pClass": 0.5517241379310345,
+    "G": 0.4482758620689655,
+    "se": 0.09398415777506854,
+    "ci": [
+     0.2640669128298312,
+     0.6324848113080999
+    ],
+    "beats": true,
+    "ciExcludes0": true
+   },
+   "norm": {
+    "ySeed": 1,
+    "pClass": 0.6551724137931034,
+    "G": 0.3448275862068966,
+    "se": 0.08982552969857371,
+    "ci": [
+     0.1687695479976921,
+     0.5208856244161011
+    ],
+    "beats": true,
+    "ciExcludes0": true
+   },
+   "envelopeExact": {
+    "rate": 0.5517241379310345,
+    "se": 0.09398415777506854,
+    "wilson": [
+     0.37547667068067625,
+     0.715870888512542
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 10,
+      "passes": 0,
+      "runs": 10,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2775401687666166
+      ]
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "n": 9,
+      "passes": 9,
+      "runs": 9,
+      "rate": 1,
+      "wilson": [
+       0.7008472464490407,
+       1
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 10,
+      "passes": 7,
+      "runs": 10,
+      "rate": 0.7,
+      "wilson": [
+       0.39677321997956516,
+       0.892210712513788
+      ]
+     }
+    ],
+    "minP": 0,
+    "lbMin": 2.7755575615628914e-17,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.99975
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.00025
+     }
+    ],
+    "mde": 0.26330462722839887
+   },
+   "envelopeNorm": {
+    "rate": 0.6551724137931034,
+    "se": 0.08982552969857371,
+    "minP": 0,
+    "lbMin": 2.7755575615628914e-17,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 1
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=neutral",
+     "n": 9,
+     "rate": 0.5555555555555556
+    },
+    {
+     "cell": "register=casual",
+     "n": 10,
+     "rate": 0.5
+    },
+    {
+     "cell": "register=formal",
+     "n": 10,
+     "rate": 0.6
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 12,
+     "rate": 0.5833333333333334
+    },
+    {
+     "cell": "length=terse",
+     "n": 6,
+     "rate": 0.5
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 11,
+     "rate": 0.5454545454545454
+    },
+    {
+     "cell": "noise=clean",
+     "n": 10,
+     "rate": 0.4
+    },
+    {
+     "cell": "noise=typos",
+     "n": 10,
+     "rate": 0.7
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 9,
+     "rate": 0.5555555555555556
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 9,
+     "rate": 0.4444444444444444
+    },
+    {
+     "cell": "distractor=none",
+     "n": 11,
+     "rate": 0.5454545454545454
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 9,
+     "rate": 0.6666666666666666
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 10,
+     "rate": 0.6
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 11,
+     "rate": 0.6363636363636364
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 8,
+     "rate": 0.375
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 9,
+     "rate": 1
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 10,
+     "rate": 0.7
+    }
+   ],
+   "agentErrors": 0
+  },
+  {
+   "block": "B2",
+   "nSeed": 30,
+   "nClass": 27,
+   "exact": {
+    "ySeed": 0,
+    "pClass": 0,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "norm": {
+    "ySeed": 1,
+    "pClass": 1,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "envelopeExact": {
+    "rate": 0,
+    "se": 0,
+    "wilson": [
+     6.938893903907228e-18,
+     0.12455903714463581
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 7,
+      "passes": 0,
+      "runs": 7,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.35433884297520657
+      ]
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "n": 10,
+      "passes": 0,
+      "runs": 10,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2775401687666166
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 10,
+      "passes": 0,
+      "runs": 10,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2775401687666166
+      ]
+     }
+    ],
+    "minP": 0,
+    "lbMin": 0,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.377
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.352
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.271
+     }
+    ],
+    "mde": 0
+   },
+   "envelopeNorm": {
+    "rate": 1,
+    "se": 0,
+    "minP": 1,
+    "lbMin": 0.6071868452080251,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.42725
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.296
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.27675
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=casual",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "register=neutral",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "register=formal",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 12,
+     "rate": 0
+    },
+    {
+     "cell": "length=terse",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "noise=typos",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "noise=clean",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=none",
+     "n": 12,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 10,
+     "rate": 0
+    }
+   ],
+   "agentErrors": 0
+  },
+  {
+   "block": "B3",
+   "nSeed": 30,
+   "nClass": 24,
+   "exact": {
+    "ySeed": 0,
+    "pClass": 0,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "norm": {
+    "ySeed": 0,
+    "pClass": 0.20833333333333334,
+    "G": -0.20833333333333334,
+    "se": 0.08468112965594378,
+    "ci": [
+     -0.3743083474589831,
+     -0.04235831920768354
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "envelopeExact": {
+    "rate": 0,
+    "se": 0,
+    "wilson": [
+     0,
+     0.13798057582897535
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 7,
+      "passes": 0,
+      "runs": 7,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.35433884297520657
+      ]
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "n": 9,
+      "passes": 0,
+      "runs": 9,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2991527535509594
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 8,
+      "passes": 0,
+      "runs": 8,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.3244156195108769
+      ]
+     }
+    ],
+    "minP": 0,
+    "lbMin": 0,
+    "worst": [
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.3805
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.31425
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.30525
+     }
+    ],
+    "mde": 0
+   },
+   "envelopeNorm": {
+    "rate": 0.20833333333333334,
+    "se": 0.08468112965594378,
+    "minP": 0.1111111111111111,
+    "lbMin": 0.01766589734693902,
+    "worst": [
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.52
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.448
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.032
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=formal",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "register=casual",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "register=neutral",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "length=terse",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "noise=typos",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "noise=clean",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=none",
+     "n": 12,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 5,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 4,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 8,
+     "rate": 0
+    }
+   ],
+   "agentErrors": 0
+  },
+  {
+   "block": "B4",
+   "nSeed": 30,
+   "nClass": 24,
+   "exact": {
+    "ySeed": 1,
+    "pClass": 0.3333333333333333,
+    "G": 0.6666666666666667,
+    "se": 0.0982946374365981,
+    "ci": [
+     0.4740091772909345,
+     0.859324156042399
+    ],
+    "beats": true,
+    "ciExcludes0": true
+   },
+   "norm": {
+    "ySeed": 1,
+    "pClass": 1,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "envelopeExact": {
+    "rate": 0.3333333333333333,
+    "se": 0.0982946374365981,
+    "wilson": [
+     0.17971978688379642,
+     0.5329404050591954
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 9,
+      "passes": 0,
+      "runs": 9,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2991527535509594
+      ]
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "n": 8,
+      "passes": 8,
+      "runs": 8,
+      "rate": 1,
+      "wilson": [
+       0.6755843804891231,
+       1
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 7,
+      "passes": 0,
+      "runs": 7,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.35433884297520657
+      ]
+     }
+    ],
+    "minP": 0,
+    "lbMin": 0,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.56575
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.43425
+     }
+    ],
+    "mde": 0.2753808033342799
+   },
+   "envelopeNorm": {
+    "rate": 1,
+    "se": 0,
+    "minP": 1,
+    "lbMin": 0.6071868452080251,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.3795
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.33375
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.28675
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=casual",
+     "n": 8,
+     "rate": 0.25
+    },
+    {
+     "cell": "register=formal",
+     "n": 9,
+     "rate": 0.4444444444444444
+    },
+    {
+     "cell": "register=neutral",
+     "n": 7,
+     "rate": 0.2857142857142857
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 10,
+     "rate": 0.3
+    },
+    {
+     "cell": "length=terse",
+     "n": 5,
+     "rate": 0.4
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 9,
+     "rate": 0.3333333333333333
+    },
+    {
+     "cell": "noise=clean",
+     "n": 9,
+     "rate": 0.2222222222222222
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 7,
+     "rate": 0.42857142857142855
+    },
+    {
+     "cell": "noise=typos",
+     "n": 8,
+     "rate": 0.375
+    },
+    {
+     "cell": "distractor=none",
+     "n": 10,
+     "rate": 0.2
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 7,
+     "rate": 0.42857142857142855
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 7,
+     "rate": 0.42857142857142855
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 5,
+     "rate": 0.4
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 10,
+     "rate": 0.4
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 9,
+     "rate": 0.2222222222222222
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 8,
+     "rate": 1
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 7,
+     "rate": 0
+    }
+   ],
+   "agentErrors": 0
+  },
+  {
+   "block": "B5",
+   "nSeed": 30,
+   "nClass": 28,
+   "exact": {
+    "ySeed": 0.9333333333333333,
+    "pClass": 0.6071428571428571,
+    "G": 0.32619047619047625,
+    "se": 0.10478398284548958,
+    "ci": [
+     0.12081386981331668,
+     0.5315670825676359
+    ],
+    "beats": true,
+    "ciExcludes0": true
+   },
+   "norm": {
+    "ySeed": 0.9333333333333333,
+    "pClass": 0.6071428571428571,
+    "G": 0.32619047619047625,
+    "se": 0.10478398284548958,
+    "ci": [
+     0.12081386981331668,
+     0.5315670825676359
+    ],
+    "beats": true,
+    "ciExcludes0": true
+   },
+   "envelopeExact": {
+    "rate": 0.6071428571428571,
+    "se": 0.09398983557402392,
+    "wilson": [
+     0.42408726034906297,
+     0.7643454817241996
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 9,
+      "passes": 0,
+      "runs": 9,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2991527535509594
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 11,
+      "passes": 9,
+      "runs": 11,
+      "rate": 0.8181818181818182,
+      "wilson": [
+       0.5230138624217553,
+       0.9486333993289995
+      ]
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "n": 8,
+      "passes": 8,
+      "runs": 8,
+      "rate": 1,
+      "wilson": [
+       0.6755843804891231,
+       1
+      ]
+     }
+    ],
+    "minP": 0,
+    "lbMin": 0,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.99975
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.00025
+     }
+    ],
+    "mde": 0.26332053406602784
+   },
+   "envelopeNorm": {
+    "rate": 0.6071428571428571,
+    "se": 0.09398983557402392,
+    "minP": 0,
+    "lbMin": 0,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 1
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=neutral",
+     "n": 10,
+     "rate": 0.6
+    },
+    {
+     "cell": "register=formal",
+     "n": 10,
+     "rate": 0.6
+    },
+    {
+     "cell": "register=casual",
+     "n": 8,
+     "rate": 0.625
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 10,
+     "rate": 0.6
+    },
+    {
+     "cell": "length=terse",
+     "n": 7,
+     "rate": 0.5714285714285714
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 11,
+     "rate": 0.6363636363636364
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 8,
+     "rate": 0.625
+    },
+    {
+     "cell": "noise=clean",
+     "n": 9,
+     "rate": 0.5555555555555556
+    },
+    {
+     "cell": "noise=typos",
+     "n": 11,
+     "rate": 0.6363636363636364
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 8,
+     "rate": 0.625
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 7,
+     "rate": 0.5714285714285714
+    },
+    {
+     "cell": "distractor=none",
+     "n": 13,
+     "rate": 0.6153846153846154
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 9,
+     "rate": 0.6666666666666666
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 10,
+     "rate": 0.5
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 9,
+     "rate": 0.6666666666666666
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 11,
+     "rate": 0.8181818181818182
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 8,
+     "rate": 1
+    }
+   ],
+   "agentErrors": 0
+  },
+  {
+   "block": "B6",
+   "nSeed": 30,
+   "nClass": 26,
+   "exact": {
+    "ySeed": 1,
+    "pClass": 0.8461538461538461,
+    "G": 0.15384615384615385,
+    "se": 0.07216024245882201,
+    "ci": [
+     0.012412078626862721,
+     0.295280229065445
+    ],
+    "beats": true,
+    "ciExcludes0": true
+   },
+   "norm": {
+    "ySeed": 1,
+    "pClass": 0.8461538461538461,
+    "G": 0.15384615384615385,
+    "se": 0.07216024245882201,
+    "ci": [
+     0.012412078626862721,
+     0.295280229065445
+    ],
+    "beats": true,
+    "ciExcludes0": true
+   },
+   "envelopeExact": {
+    "rate": 0.8461538461538461,
+    "se": 0.07216024245882201,
+    "wilson": [
+     0.6646841558168644,
+     0.9385006600107053
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 9,
+      "passes": 9,
+      "runs": 9,
+      "rate": 1,
+      "wilson": [
+       0.7008472464490407,
+       1
+      ]
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "n": 9,
+      "passes": 8,
+      "runs": 9,
+      "rate": 0.8888888888888888,
+      "wilson": [
+       0.5649937852319399,
+       0.9801096286728695
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 8,
+      "passes": 5,
+      "runs": 8,
+      "rate": 0.625,
+      "wilson": [
+       0.30573785458380187,
+       0.863158240538479
+      ]
+     }
+    ],
+    "minP": 0.625,
+    "lbMin": 0.28526941299056136,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.854
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.12325
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.02275
+     }
+    ],
+    "mde": 0.202163068661038
+   },
+   "envelopeNorm": {
+    "rate": 0.8461538461538461,
+    "se": 0.07216024245882201,
+    "minP": 0.625,
+    "lbMin": 0.28526941299056136,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.862
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.11525
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.02275
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=casual",
+     "n": 9,
+     "rate": 1
+    },
+    {
+     "cell": "register=formal",
+     "n": 8,
+     "rate": 0.75
+    },
+    {
+     "cell": "register=neutral",
+     "n": 9,
+     "rate": 0.7777777777777778
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 11,
+     "rate": 0.9090909090909091
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 11,
+     "rate": 0.7272727272727273
+    },
+    {
+     "cell": "length=terse",
+     "n": 4,
+     "rate": 1
+    },
+    {
+     "cell": "noise=typos",
+     "n": 9,
+     "rate": 0.8888888888888888
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 9,
+     "rate": 0.7777777777777778
+    },
+    {
+     "cell": "noise=clean",
+     "n": 8,
+     "rate": 0.875
+    },
+    {
+     "cell": "distractor=none",
+     "n": 9,
+     "rate": 0.8888888888888888
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 7,
+     "rate": 1
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 10,
+     "rate": 0.7
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 9,
+     "rate": 0.7777777777777778
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 9,
+     "rate": 0.8888888888888888
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 8,
+     "rate": 0.875
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 9,
+     "rate": 1
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 9,
+     "rate": 0.8888888888888888
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 8,
+     "rate": 0.625
+    }
+   ],
+   "agentErrors": 0
+  },
+  {
+   "block": "B7",
+   "nSeed": 30,
+   "nClass": 30,
+   "exact": {
+    "ySeed": 0,
+    "pClass": 0,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "norm": {
+    "ySeed": 1,
+    "pClass": 1,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "envelopeExact": {
+    "rate": 0,
+    "se": 0,
+    "wilson": [
+     0,
+     0.113517091390478
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=canonical",
+      "n": 11,
+      "passes": 0,
+      "runs": 11,
+      "rate": 0,
+      "wilson": [
+       2.7755575615628914e-17,
+       0.2588400172488141
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 10,
+      "passes": 0,
+      "runs": 10,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2775401687666166
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 9,
+      "passes": 0,
+      "runs": 9,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2991527535509594
+      ]
+     }
+    ],
+    "minP": 0,
+    "lbMin": 0,
+    "worst": [
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.37475
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.33625
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.289
+     }
+    ],
+    "mde": 0
+   },
+   "envelopeNorm": {
+    "rate": 1,
+    "se": 0,
+    "minP": 1,
+    "lbMin": 0.6652584619139046,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.371
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.32475
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.30425
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=formal",
+     "n": 11,
+     "rate": 0
+    },
+    {
+     "cell": "register=casual",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "register=neutral",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 11,
+     "rate": 0
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 11,
+     "rate": 0
+    },
+    {
+     "cell": "length=terse",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "noise=clean",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "noise=typos",
+     "n": 11,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=none",
+     "n": 13,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 11,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 9,
+     "rate": 0
+    }
+   ],
+   "agentErrors": 0
+  },
+  {
+   "block": "B8",
+   "nSeed": 30,
+   "nClass": 26,
+   "exact": {
+    "ySeed": 1,
+    "pClass": 0.3076923076923077,
+    "G": 0.6923076923076923,
+    "se": 0.09230769230769229,
+    "ci": [
+     0.5113846153846154,
+     0.8732307692307691
+    ],
+    "beats": true,
+    "ciExcludes0": true
+   },
+   "norm": {
+    "ySeed": 1,
+    "pClass": 1,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "envelopeExact": {
+    "rate": 0.3076923076923077,
+    "se": 0.09230769230769229,
+    "wilson": [
+     0.16501120939792674,
+     0.49988611514231246
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 10,
+      "passes": 0,
+      "runs": 10,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2775401687666166
+      ]
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "n": 7,
+      "passes": 7,
+      "runs": 7,
+      "rate": 1,
+      "wilson": [
+       0.6456611570247934,
+       1
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 9,
+      "passes": 1,
+      "runs": 9,
+      "rate": 0.1111111111111111,
+      "wilson": [
+       0.019890371327130535,
+       0.4350062147680601
+      ]
+     }
+    ],
+    "minP": 0,
+    "lbMin": 2.7755575615628914e-17,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.78625
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.21375
+     }
+    ],
+    "mde": 0.2586078663550904
+   },
+   "envelopeNorm": {
+    "rate": 1,
+    "se": 0,
+    "minP": 1,
+    "lbMin": 0.6071868452080251,
+    "worst": [
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.42475
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.2975
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.27775
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=formal",
+     "n": 9,
+     "rate": 0.3333333333333333
+    },
+    {
+     "cell": "register=casual",
+     "n": 9,
+     "rate": 0.3333333333333333
+    },
+    {
+     "cell": "register=neutral",
+     "n": 8,
+     "rate": 0.25
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 9,
+     "rate": 0.2222222222222222
+    },
+    {
+     "cell": "length=terse",
+     "n": 7,
+     "rate": 0.2857142857142857
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 10,
+     "rate": 0.4
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 9,
+     "rate": 0.4444444444444444
+    },
+    {
+     "cell": "noise=clean",
+     "n": 8,
+     "rate": 0.375
+    },
+    {
+     "cell": "noise=typos",
+     "n": 9,
+     "rate": 0.1111111111111111
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 8,
+     "rate": 0.5
+    },
+    {
+     "cell": "distractor=none",
+     "n": 10,
+     "rate": 0.2
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 8,
+     "rate": 0.25
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 7,
+     "rate": 0.2857142857142857
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 9,
+     "rate": 0.3333333333333333
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 10,
+     "rate": 0.3
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 7,
+     "rate": 1
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 9,
+     "rate": 0.1111111111111111
+    }
+   ],
+   "agentErrors": 0
+  },
+  {
+   "block": "B9",
+   "nSeed": 30,
+   "nClass": 22,
+   "exact": {
+    "ySeed": 0,
+    "pClass": 0,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "norm": {
+    "ySeed": 0,
+    "pClass": 0,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "envelopeExact": {
+    "rate": 0,
+    "se": 0,
+    "wilson": [
+     1.3877787807814457e-17,
+     0.14865952572596125
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 7,
+      "passes": 0,
+      "runs": 7,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.35433884297520657
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 7,
+      "passes": 0,
+      "runs": 7,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.35433884297520657
+      ]
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "n": 8,
+      "passes": 0,
+      "runs": 8,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.3244156195108769
+      ]
+     }
+    ],
+    "minP": 0,
+    "lbMin": 0,
+    "worst": [
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.35475
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.33475
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.3105
+     }
+    ],
+    "mde": 0
+   },
+   "envelopeNorm": {
+    "rate": 0,
+    "se": 0,
+    "minP": 0,
+    "lbMin": 0,
+    "worst": [
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.357
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.323
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.32
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=neutral",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "register=formal",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "register=casual",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "length=terse",
+     "n": 5,
+     "rate": 0
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "noise=typos",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 5,
+     "rate": 0
+    },
+    {
+     "cell": "noise=clean",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=none",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 6,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 10,
+     "rate": 0
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 3,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 7,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 8,
+     "rate": 0
+    }
+   ],
+   "agentErrors": 0
+  },
+  {
+   "block": "B10",
+   "nSeed": 30,
+   "nClass": 23,
+   "exact": {
+    "ySeed": 1,
+    "pClass": 0.2608695652173913,
+    "G": 0.7391304347826086,
+    "se": 0.09361833424764436,
+    "ci": [
+     0.5556384996572257,
+     0.9226223699079916
+    ],
+    "beats": true,
+    "ciExcludes0": true
+   },
+   "norm": {
+    "ySeed": 1,
+    "pClass": 1,
+    "G": 0,
+    "se": 0,
+    "ci": [
+     0,
+     0
+    ],
+    "beats": false,
+    "ciExcludes0": false
+   },
+   "envelopeExact": {
+    "rate": 0.2608695652173913,
+    "se": 0.09361833424764436,
+    "wilson": [
+     0.1254844588924897,
+     0.4647039054375056
+    ],
+    "cells": [
+     {
+      "cell": "slot_surface=variant_b",
+      "n": 9,
+      "passes": 0,
+      "runs": 9,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.2991527535509594
+      ]
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "n": 8,
+      "passes": 0,
+      "runs": 8,
+      "rate": 0,
+      "wilson": [
+       0,
+       0.3244156195108769
+      ]
+     },
+     {
+      "cell": "slot_surface=canonical",
+      "n": 6,
+      "passes": 6,
+      "runs": 6,
+      "rate": 1,
+      "wilson": [
+       0.6096569663469354,
+       0.9999999999999999
+      ]
+     }
+    ],
+    "minP": 0,
+    "lbMin": 0,
+    "worst": [
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.5335
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.4665
+     }
+    ],
+    "mde": 0.26227974144126087
+   },
+   "envelopeNorm": {
+    "rate": 1,
+    "se": 0,
+    "minP": 1,
+    "lbMin": 0.5698776083448196,
+    "worst": [
+     {
+      "cell": "slot_surface=canonical",
+      "pWorst": 0.4125
+     },
+     {
+      "cell": "slot_surface=variant_a",
+      "pWorst": 0.30825
+     },
+     {
+      "cell": "slot_surface=variant_b",
+      "pWorst": 0.27925
+     }
+    ]
+   },
+   "oneWayExact": [
+    {
+     "cell": "register=casual",
+     "n": 9,
+     "rate": 0.2222222222222222
+    },
+    {
+     "cell": "register=formal",
+     "n": 7,
+     "rate": 0.2857142857142857
+    },
+    {
+     "cell": "register=neutral",
+     "n": 7,
+     "rate": 0.2857142857142857
+    },
+    {
+     "cell": "length=one_sentence",
+     "n": 9,
+     "rate": 0.3333333333333333
+    },
+    {
+     "cell": "length=multi_sentence",
+     "n": 10,
+     "rate": 0.3
+    },
+    {
+     "cell": "length=terse",
+     "n": 4,
+     "rate": 0
+    },
+    {
+     "cell": "noise=typos",
+     "n": 8,
+     "rate": 0.25
+    },
+    {
+     "cell": "noise=clean",
+     "n": 7,
+     "rate": 0.2857142857142857
+    },
+    {
+     "cell": "noise=no_punctuation",
+     "n": 8,
+     "rate": 0.25
+    },
+    {
+     "cell": "distractor=redundant_detail",
+     "n": 8,
+     "rate": 0.375
+    },
+    {
+     "cell": "distractor=unrelated_aside",
+     "n": 6,
+     "rate": 0.16666666666666666
+    },
+    {
+     "cell": "distractor=none",
+     "n": 9,
+     "rate": 0.2222222222222222
+    },
+    {
+     "cell": "lexical=restructured",
+     "n": 10,
+     "rate": 0.4
+    },
+    {
+     "cell": "lexical=synonyms",
+     "n": 9,
+     "rate": 0.2222222222222222
+    },
+    {
+     "cell": "lexical=seed_words",
+     "n": 4,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_b",
+     "n": 9,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=variant_a",
+     "n": 8,
+     "rate": 0
+    },
+    {
+     "cell": "slot_surface=canonical",
+     "n": 6,
+     "rate": 1
+    }
+   ],
+   "agentErrors": 0
+  }
+ ]
+}

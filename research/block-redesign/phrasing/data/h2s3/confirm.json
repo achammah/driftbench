@@ -1,0 +1,1374 @@
+[
+ {
+  "block": "B1",
+  "row": 0,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "88 Summit Ave, Acmeville, and my day is goin realy well today.",
+  "attempt": 1
+ },
+ {
+  "block": "B1",
+  "row": 2,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "My address is 88 Summit Ave, Acmeville\nI hope your day is proceeding well",
+  "attempt": 3
+ },
+ {
+  "block": "B1",
+  "row": 5,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, could ya check what's availble at 88 Summit Ave, Acmeville? Thanks, I'd appriciate it.",
+  "attempt": 3
+ },
+ {
+  "block": "B1",
+  "row": 11,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "My address is 88 Summit Ave, Acmeville",
+  "attempt": 1
+ },
+ {
+  "block": "B1",
+  "row": 13,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "As requested, the street address is 88 Summit Ave, Acmeville.",
+  "attempt": 1
+ },
+ {
+  "block": "B1",
+  "row": 17,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, it's 88 Summit Ave, Acmeville.",
+  "attempt": 3
+ },
+ {
+  "block": "B1",
+  "row": 22,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey could you check 88 Summit Ave, Acmeville for me the weather is lovely today",
+  "attempt": 1
+ },
+ {
+  "block": "B1",
+  "row": 23,
+  "cell": {
+   "register": "formal",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Please use 88 Summit Ave, Acmeville.",
+  "attempt": 1
+ },
+ {
+  "block": "B1",
+  "row": 27,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "Heyy, here's my adress: 88 Summit Ave, Acmeville",
+  "attempt": 5
+ },
+ {
+  "block": "B1",
+  "row": 31,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, the adress is 88 Summit Ave, Acmeville. That's the street location for the availabilty check.",
+  "attempt": 5
+ },
+ {
+  "block": "B1",
+  "row": 34,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Would you please use 88 Summit Ave, Acmeville for the availability check The address I provided is the location for that check",
+  "attempt": 1
+ },
+ {
+  "block": "B1",
+  "row": 40,
+  "cell": {
+   "register": "formal",
+   "length": "terse",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Please check 88 Summit Ave, Acmeville",
+  "attempt": 4
+ },
+ {
+  "block": "B1",
+  "row": 42,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "As requestd, the adress is 88 Summit Ave, Acmeville, my street adress.",
+  "attempt": 4
+ },
+ {
+  "block": "B3",
+  "row": 1,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Please use +1 202 555 0150 as the numbr I am transfering to Acme.",
+  "attempt": 2
+ },
+ {
+  "block": "B3",
+  "row": 2,
+  "cell": {
+   "register": "formal",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "It is specifed corectly: (202) 555-0150",
+  "attempt": 5
+ },
+ {
+  "block": "B3",
+  "row": 3,
+  "cell": {
+   "register": "neutral",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "The number I want to tranfer to Acme is (202) 555-0150. This is the number I am bringing over, as discussed. The number is correcct.",
+  "attempt": 2
+ },
+ {
+  "block": "B3",
+  "row": 4,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "It's +1 202 555 0150. Had a realy busy mornng, anyway.",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 5,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "canonical"
+  },
+  "text": "The number is +1 202 555 0150, and the weather is pleasant today.",
+  "attempt": 2
+ },
+ {
+  "block": "B3",
+  "row": 6,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, the number I want to bring over is (202) 555-0150. That's the one I'd like to keep.",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 7,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_b"
+  },
+  "text": "The number for the transfer is 2025550150\nThat is the number I would like to bring",
+  "attempt": 2
+ },
+ {
+  "block": "B3",
+  "row": 8,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_b"
+  },
+  "text": "My number is 2025550150.",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 9,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "canonical"
+  },
+  "text": "yeah my number is +1 202 555 0150",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 12,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "synonyms",
+   "slot_surface": "variant_b"
+  },
+  "text": "Yup, that's my currnt number, the one I'm keepin: 2025550150.",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 13,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "The number I wish to transfer is (202) 555-0150 The weather is pleasant today",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 18,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Use (202) 555-0150",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 19,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Hey, I'm switching to Acme and bringing my number, +1 202 555 0150.",
+  "attempt": 3
+ },
+ {
+  "block": "B3",
+  "row": 20,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_b"
+  },
+  "text": "Hey, port thsi numbr: 2025550150",
+  "attempt": 2
+ },
+ {
+  "block": "B3",
+  "row": 21,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "synonyms",
+   "slot_surface": "canonical"
+  },
+  "text": "The number I want to bring over is +1 202 555 0150 and that is the number I use",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 22,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_b"
+  },
+  "text": "This is 2025550150. It is my curent numbr.",
+  "attempt": 4
+ },
+ {
+  "block": "B3",
+  "row": 23,
+  "cell": {
+   "register": "formal",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Please transfer +1 202 555 0150.",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 25,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "redundant_detail",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "My telephone number is (202) 555-0150. This is my phone number.",
+  "attempt": 2
+ },
+ {
+  "block": "B3",
+  "row": 27,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "It is +1 202 555 0150, the numbr I intend to bring to Acme, as previously discused, and I am pleased to confirm this detail.",
+  "attempt": 3
+ },
+ {
+  "block": "B3",
+  "row": 28,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "It's 2025550150.",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 29,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Hey my day is going well and could you bring over +1 202 555 0150",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 30,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "Its my numbr: +1 202 555 0150",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 31,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, my number is (202) 555-0150.",
+  "attempt": 2
+ },
+ {
+  "block": "B3",
+  "row": 35,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, the numbr I'd like to bring over is (202) 555-0150. I'm keeping my same number with Acme, just like we discused—thanks!",
+  "attempt": 3
+ },
+ {
+  "block": "B3",
+  "row": 37,
+  "cell": {
+   "register": "neutral",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Please use +1 202 555 0150 as the number I bring over I want to keep that number",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 38,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "That's (202) 555-0150",
+  "attempt": 2
+ },
+ {
+  "block": "B3",
+  "row": 39,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "It's (202) 555-0150. Hope your day's going well!",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 40,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_b"
+  },
+  "text": "The number I wish to bring is 2025550150",
+  "attempt": 1
+ },
+ {
+  "block": "B3",
+  "row": 41,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "It's 2025550150, the number I want to bring to Acme.",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 1,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Would you please place an order for Fiber 1000 at 14 Harbor Rd, Acmeville? For clarity, the service address is 14 Harbor Rd, Acmeville.",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 2,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "I would like to order Fiber 1000 for 14 Harbor Rd, Acmeville and the weather is pleasant today",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 8,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, I'd like Fiber 1000 for 14 Harbor Rd, Acmeville.",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 11,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Please set up Fiber 1000 at 14 Harbor Rd, Acmeville; the weathr seems pleasent today.",
+  "attempt": 2
+ },
+ {
+  "block": "B5",
+  "row": 14,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, could you set me up with Fiber 1000 at 14 Harbor Rd, Acmeville? I'd be realy gratefull!",
+  "attempt": 2
+ },
+ {
+  "block": "B5",
+  "row": 16,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "Hello, I would like to order the Fiber 1000 plan for 14 harbor road, which is the address I have provided, and would be gratefull for your assitance.",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 18,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Please place an order for Fiber 1000 at 14 Harbor Rd, Acmeville which is my address",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 19,
+  "cell": {
+   "register": "neutral",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "Please place an order for Fiber 1000 at 14 Harbor Rd, Acmeville. It's been a sunny day here.",
+  "attempt": 5
+ },
+ {
+  "block": "B5",
+  "row": 23,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey order Fiber 1000 for 14 Harbor Rd, Acmeville",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 25,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "I would be grateful if you could arrange Fiber 1000 service at 14 Harbor Rd, Acmeville.",
+  "attempt": 2
+ },
+ {
+  "block": "B5",
+  "row": 29,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "Hello, I would like to order the Fiber 1000 plan. Please arrange service at 14 harbor road.",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 32,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Good day I wish to subscribe to Fiber 1000 for 14 Harbor Rd, Acmeville\nI am submitting this subscription request",
+  "attempt": 2
+ },
+ {
+  "block": "B5",
+  "row": 33,
+  "cell": {
+   "register": "formal",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Kindley ordar Fiber 1000 at 14 Harbor Rd, Acmeville.",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 34,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, I'd lik to ordrr Fiber 1000 for 14 Harbor Rd, Acmeville, and yeah, that's the order I'd like to place.",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 37,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey interested in signing up with Fiber 1000 at 14 Harbor Rd, Acmeville sunny skies today",
+  "attempt": 4
+ },
+ {
+  "block": "B5",
+  "row": 40,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey can you set me up with Fiber 1000 at 14 Harbor Rd, Acmeville",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 42,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "unrelated_aside",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Could you set me up with Fiber 1000 at 14 Harbor Rd, Acmeville—it's been a wierd, busyy day.",
+  "attempt": 1
+ },
+ {
+  "block": "B6",
+  "row": 1,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "Hello, could you please tell me whether home internet is available at 3 Orchard Way, Acmeville? I am enquiring about internet for my home and would apreciate your responce.",
+  "attempt": 1
+ },
+ {
+  "block": "B6",
+  "row": 37,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_b"
+  },
+  "text": "Hey can I get broadband service for 3 orchard way",
+  "attempt": 4
+ },
+ {
+  "block": "B8",
+  "row": 10,
+  "cell": {
+   "register": "formal",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_b"
+  },
+  "text": "Kindley, could you chek 7 quarry lane?",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 0,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "hey my number is (202) 555-0160\nyep thats my number",
+  "attempt": 2
+ },
+ {
+  "block": "B9",
+  "row": 1,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "canonical"
+  },
+  "text": "Ths line iz +1 202 555 0160.",
+  "attempt": 3
+ },
+ {
+  "block": "B9",
+  "row": 2,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "unrelated_aside",
+   "lexical": "restructured",
+   "slot_surface": "variant_b"
+  },
+  "text": "The number I would like to bring to Acme is 202-555-0160. The weather has been quite pleasent and suny today.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 3,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "canonical"
+  },
+  "text": "I use +1 202 555 0160 and the weather feels great today",
+  "attempt": 6
+ },
+ {
+  "block": "B9",
+  "row": 4,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Hey, could you use +1 202 555 0160 as the number I bring over? That’s the number I’d like to keep.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 5,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "I would like to bring (202) 555-0160 to Acme.",
+  "attempt": 3
+ },
+ {
+  "block": "B9",
+  "row": 6,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_b"
+  },
+  "text": "Since I want to keep my number the one to bring is 202-555-0160",
+  "attempt": 2
+ },
+ {
+  "block": "B9",
+  "row": 7,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "My numbr is (202) 555-0160, and the weathr is lovely today.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 8,
+  "cell": {
+   "register": "formal",
+   "length": "terse",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "My number is 202-555-0160",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 10,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "My number is +1 202 555 0160, which is my phone number.",
+  "attempt": 2
+ },
+ {
+  "block": "B9",
+  "row": 11,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, plese use numbr: (202) 555-0160",
+  "attempt": 2
+ },
+ {
+  "block": "B9",
+  "row": 12,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "My number is 202-555-0160, and the weather's lovely today.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 13,
+  "cell": {
+   "register": "neutral",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "My number is +1 202 555 0160\nThe weather is lovely today and I hope your day is going well",
+  "attempt": 2
+ },
+ {
+  "block": "B9",
+  "row": 17,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "For the number transfer please use (202) 555-0160 and I hope your day is going well",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 18,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "My number is (202) 555-0160.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 19,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "Hey, the number I use comes up as (202) 555-0160. Pretty nice weather today.",
+  "attempt": 4
+ },
+ {
+  "block": "B9",
+  "row": 20,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Hey, could you bring +1 202 555 0160 over for me, since I'm swiching to Acme and keeping that same numbr?",
+  "attempt": 2
+ },
+ {
+  "block": "B9",
+  "row": 21,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "My numbr is (202) 555-0160. Please use this numbre to keep my number when switching.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 22,
+  "cell": {
+   "register": "formal",
+   "length": "terse",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Please use +1 202 555 0160",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 23,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "unrelated_aside",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Could you use +1 202 555 0160 to bring my number over? The weather is lovely today.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 24,
+  "cell": {
+   "register": "neutral",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Could you bring (202) 555-0160 over to Acme for me? It is the numbr I curently use, and I would like to keep it.",
+  "attempt": 2
+ },
+ {
+  "block": "B9",
+  "row": 25,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "variant_b"
+  },
+  "text": "Bring 202-555-0160, please.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 26,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "My numbr is 202-555-0160. I'm swiching to Acme and keeping my numbr with me, like we discussed.",
+  "attempt": 2
+ },
+ {
+  "block": "B9",
+  "row": 27,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "Here's my number: +1 202 555 0160.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 28,
+  "cell": {
+   "register": "casual",
+   "length": "terse",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_b"
+  },
+  "text": "Hey this is 202-555-0160",
+  "attempt": 3
+ },
+ {
+  "block": "B9",
+  "row": 29,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Could you please use (202) 555-0160 as the number I would like to bring to Acme? I am interested in switching and keeping my number.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 32,
+  "cell": {
+   "register": "formal",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "The linne correspods to (202) 555-0160.",
+  "attempt": 6
+ },
+ {
+  "block": "B9",
+  "row": 33,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "My numbr is +1 202 555 0160, and I hope your day is proceeding smoothly in this pleasent weather.",
+  "attempt": 3
+ },
+ {
+  "block": "B9",
+  "row": 34,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "Please bring my number to Acme +1 202 555 0160",
+  "attempt": 2
+ },
+ {
+  "block": "B9",
+  "row": 35,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "variant_b"
+  },
+  "text": "The phne I use is 202-555-0160, and the weathr is lovely today.",
+  "attempt": 5
+ },
+ {
+  "block": "B9",
+  "row": 36,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "unrelated_aside",
+   "lexical": "restructured",
+   "slot_surface": "variant_b"
+  },
+  "text": "Hey can you bring 202-555-0160 over to Acme for me\nIts a pretty chill day here",
+  "attempt": 3
+ },
+ {
+  "block": "B9",
+  "row": 37,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "synonyms",
+   "slot_surface": "variant_b"
+  },
+  "text": "The number I would like to bring is 202-555-0160 and this is the number I currently use",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 38,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "unrelated_aside",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "My number is 202-555-0160. The weather is pleasant today.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 40,
+  "cell": {
+   "register": "neutral",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "canonical"
+  },
+  "text": "My number is +1 202 555 0160 My number is the number I want to bring to Acme",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 41,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "Mye numbr iz 202-555-0160.",
+  "attempt": 1
+ },
+ {
+  "block": "B9",
+  "row": 42,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "no_punctuation",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_a"
+  },
+  "text": "Bring over my number (202) 555-0160",
+  "attempt": 3
+ }
+]

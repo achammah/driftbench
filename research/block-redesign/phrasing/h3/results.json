@@ -1,0 +1,2628 @@
+{
+ "hypothesis": "H3",
+ "verdict": "SUPPORTED",
+ "pooled": {
+  "exactFailures": 182,
+  "flipped": 116,
+  "share": 0.6373626373626373
+ },
+ "ci95ClusterBootstrap": [
+  0.3425414364640884,
+  0.8940092165898618
+ ],
+ "perBlock": [
+  {
+   "block": "B1",
+   "exactFailures": 13,
+   "flipped": 3,
+   "share": 0.23076923076923078
+  },
+  {
+   "block": "B2",
+   "exactFailures": 27,
+   "flipped": 27,
+   "share": 1
+  },
+  {
+   "block": "B3",
+   "exactFailures": 24,
+   "flipped": 5,
+   "share": 0.20833333333333334
+  },
+  {
+   "block": "B4",
+   "exactFailures": 16,
+   "flipped": 16,
+   "share": 1
+  },
+  {
+   "block": "B5",
+   "exactFailures": 11,
+   "flipped": 0,
+   "share": 0
+  },
+  {
+   "block": "B6",
+   "exactFailures": 4,
+   "flipped": 0,
+   "share": 0
+  },
+  {
+   "block": "B7",
+   "exactFailures": 30,
+   "flipped": 30,
+   "share": 1
+  },
+  {
+   "block": "B8",
+   "exactFailures": 18,
+   "flipped": 18,
+   "share": 1
+  },
+  {
+   "block": "B9",
+   "exactFailures": 22,
+   "flipped": 0,
+   "share": 0
+  },
+  {
+   "block": "B10",
+   "exactFailures": 17,
+   "flipped": 17,
+   "share": 1
+  }
+ ],
+ "seedRuns": {
+  "exactFailures": 122,
+  "flipped": 60,
+  "share": 0.4918032786885246
+ },
+ "exactFailuresOnSlotFieldsOnly": 116,
+ "exactFailuresTotal": 182,
+ "flips": [
+  {
+   "block": "B1",
+   "row": 6,
+   "text": "88 summit avenue",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "88 summit avenue",
+     "normalised": "88 summit avenue",
+     "gold": "88 Summit Avenue, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B1",
+   "row": 5,
+   "text": "88 summit avenue and the weather is nice",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "88 summit avenue",
+     "normalised": "88 summit avenue",
+     "gold": "88 Summit Avenue, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 0,
+   "text": "Hey, here's my phne number: 202.555.0131, thnks!",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202.555.0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) has no fiber yet, only 5G (Acme Air 5G offered). Wants a sales advisor callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue addr 103 has no fiber yet only 5g acme air 5g offered wants a sales advisor callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B1",
+   "row": 27,
+   "text": "Please check availability for 88 summit avenue. The weather has been pleasant today.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "88 summit avenue",
+     "normalised": "88 summit avenue",
+     "gold": "88 Summit Avenue, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 1,
+   "text": "You can reach me at +1 202 555 0131; the weather is lovely today.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) has no fiber yet, only 5G, and wants a callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue addr 103 has no fiber yet only 5g and wants a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 3,
+   "text": "Call me at +1 202 555 0131",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) wants fiber home internet; fiber is not yet available, only 5G. Asked to be called when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue addr 103 wants fiber home internet fiber is not yet available only 5g asked to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 6,
+   "text": "Hey use (202) 555-0131 for the advisor to call me back for that callback",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer at 88 Summit Avenue, Acmeville (addr-103) has 5G but no fiber and wants a callback when fiber arrives.",
+     "normalised": "customer at 88 summit avenue addr 103 has 5g but no fiber and wants a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 5,
+   "text": "Please use 202.555.0131.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202.555.0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) has no fiber yet, 5G available (Acme Air 5G). Wants a callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue addr 103 has no fiber yet 5g available acme air 5g wants a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 7,
+   "text": "The phone number is +1 202 555 0131. This is the phone number I provided.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville wants fiber home internet; fiber is not yet available there (5G only). Asked to be called when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue wants fiber home internet fiber is not yet available there 5g only asked to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 8,
+   "text": "Heres my numbr: (202) 555-0131",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville wants fiber home internet, which is not yet available there (5G only). Asked to be called when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue wants fiber home internet which is not yet available there 5g only asked to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 9,
+   "text": "Please have the advisor call me at (202) 555-0131; it's a lovely day out.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (address ID addr-103) has no fiber yet, only 5G; wants to be called when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue address id addr 103 has no fiber yet only 5g wants to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 10,
+   "text": "Hey, you can reach me at +1 202 555 0131. The weathr's been lovely today, and I'm having a chill mornng.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) has no fiber, only 5G; wants to be called when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue addr 103 has no fiber only 5g wants to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 14,
+   "text": "You can reach me at (202) 555-0131\nThanks",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) has no fiber yet, only 5G; wants a callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue addr 103 has no fiber yet only 5g wants a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 15,
+   "text": "Please use my contcat numbr, +1 202 555 0131, for the callback.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer wants a callback when fiber becomes available at 88 Summit Avenue, Acmeville; currently only 5G (Acme Air 5G) is offered there.",
+     "normalised": "new customer wants a callback when fiber becomes available at 88 summit avenue currently only 5g acme air 5g is offered there",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 4,
+   "text": "You can reach me at 202.555.0131\nThe weather is nice today",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202.555.0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer at 88 Summit Avenue, Acmeville wants fiber home internet, which is not yet available there (5G only). Asked for a callback when fiber arrives.",
+     "normalised": "customer at 88 summit avenue wants fiber home internet which is not yet available there 5g only asked for a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 12,
+   "text": "Please have the sales advisor call me at (202) 555-0131 and the weather is lovely today",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer wants fiber home internet at 88 Summit Avenue, Acmeville (addr-103), which currently has no fiber, only 5G. They asked to be called when fiber arrives.",
+     "normalised": "new customer wants fiber home internet at 88 summit avenue addr 103 which currently has no fiber only 5g they asked to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 16,
+   "text": "My phone number is +1 202 555 0131 for the call back",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) has no fiber yet, only 5G; wants a callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue addr 103 has no fiber yet only 5g wants a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 17,
+   "text": "Please use 202.555.0131 as the number for the sales advisor to call me back for the callback",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202.555.0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (address ID addr-103) has no fiber yet, only 5G; wants a callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue address id addr 103 has no fiber yet only 5g wants a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 18,
+   "text": "Please use (202) 555-0131 as my phone number.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (address ID addr-103) has no fiber, only 5G; wants fiber and asked to be called when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue address id addr 103 has no fiber only 5g wants fiber and asked to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 19,
+   "text": "Please contact me at 202.555.0131. The weather is quite pleasent today, and I appreciate your assitance.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202.555.0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville has no fiber yet (5G available, Acme Air 5G offered) and wants a callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue has no fiber yet 5g available acme air 5g offered and wants a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 21,
+   "text": "Use (202) 555-0131 for the callback; the weathr is lovley today.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville wants fiber home internet, which is not yet available there (5G only). Asked to be called when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue wants fiber home internet which is not yet available there 5g only asked to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 23,
+   "text": "Please use (202) 555-0131 for the callback. That’s the number to reach me.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (address ID addr-103) has no fiber yet, only 5G; wants to be called when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue address id addr 103 has no fiber yet only 5g wants to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 22,
+   "text": "Hey call me back at (202) 555-0131\nThat is my callback number",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville wants fiber home internet; fiber is not yet available there (5G only, Acme Air 5G offered). Customer asked for a callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue wants fiber home internet fiber is not yet available there 5g only acme air 5g offered customer asked for a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 24,
+   "text": "Please use +1 202 555 0131 for the callback Thank you",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer wants fiber home internet at 88 Summit Avenue, Acmeville (address_id addr-103), which currently has only 5G; asks to be called when fiber arrives.",
+     "normalised": "new customer wants fiber home internet at 88 summit avenue address id addr 103 which currently has only 5g asks to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 26,
+   "text": "Use 202.555.0131, please—it's sunny out today.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202.555.0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer at 88 Summit Avenue, Acmeville (address ID addr-103) has no fiber, only 5G, and wants a callback when fiber arrives.",
+     "normalised": "customer at 88 summit avenue address id addr 103 has no fiber only 5g and wants a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 27,
+   "text": "Hey, can you setp that call back to +1 202 555 0131, since it’s for a call back, and use this numbr?",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) wants fiber home internet, which is not yet available there; currently only 5G is available. Requested a callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue addr 103 wants fiber home internet which is not yet available there currently only 5g is available requested a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 20,
+   "text": "+1 202 555 0131 is best.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) wants fiber home internet; fiber is not available yet, 5G is available. Customer asked to be called when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue addr 103 wants fiber home internet fiber is not available yet 5g is available customer asked to be called when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 25,
+   "text": "Yeh, cal me at (202) 555-0131",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville wants fiber home internet, which is not yet available there (5G only, Acme Air 5G offered). Requests a callback when fiber arrives.",
+     "normalised": "new customer at 88 summit avenue wants fiber home internet which is not yet available there 5g only acme air 5g offered requests a callback when fiber arrives",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 29,
+   "text": "Kindly pleese cal +1 202 555 0131.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) has no fiber yet, only 5G; wants a callback when fiber arrives. Interested in fiber, not yet ordered.",
+     "normalised": "new customer at 88 summit avenue addr 103 has no fiber yet only 5g wants a callback when fiber arrives interested in fiber not yet ordered",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B2",
+   "row": 28,
+   "text": "You can call 202.555.0131",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202.555.0131",
+     "normalised": "12025550131",
+     "gold": "+12025550131",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "New customer at 88 Summit Avenue, Acmeville (addr-103) has 5G but no fiber yet and wants a callback when fiber arrives. Interested in fiber home internet.",
+     "normalised": "new customer at 88 summit avenue addr 103 has 5g but no fiber yet and wants a callback when fiber arrives interested in fiber home internet",
+     "gold": "88 Summit Avenue",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B3",
+   "row": 9,
+   "text": "The number I would like to bring is +1 202 555 0150 The weather is pleasant today",
+   "exactFailed": [
+    "tools.port.check.input.number"
+   ],
+   "snaps": [
+    {
+     "tool": "port.check",
+     "path": "number",
+     "raw": "+1 202 555 0150",
+     "normalised": "12025550150",
+     "gold": "+12025550150",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B3",
+   "row": 17,
+   "text": "That is (202) 555-0150, and the weather is mild today.",
+   "exactFailed": [
+    "tools.port.check.input.number"
+   ],
+   "snaps": [
+    {
+     "tool": "port.check",
+     "path": "number",
+     "raw": "(202) 555-0150",
+     "normalised": "12025550150",
+     "gold": "+12025550150",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B3",
+   "row": 23,
+   "text": "It is 2025550150 and the weather is nice",
+   "exactFailed": [
+    "tools.port.check.input.number"
+   ],
+   "snaps": [
+    {
+     "tool": "port.check",
+     "path": "number",
+     "raw": "2025550150",
+     "normalised": "12025550150",
+     "gold": "+12025550150",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 2,
+   "text": "It's Sam.Rivera@example.com. Hope that helps.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Sam.Rivera@example.com",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B3",
+   "row": 25,
+   "text": "Hey, could you bring this number over to Acme: (202) 555-0150? The weather's lovely today.",
+   "exactFailed": [
+    "tools.port.check.input.number"
+   ],
+   "snaps": [
+    {
+     "tool": "port.check",
+     "path": "number",
+     "raw": "(202) 555-0150",
+     "normalised": "12025550150",
+     "gold": "+12025550150",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B3",
+   "row": 28,
+   "text": "Hey, my number's (202) 555-0150, and the weathre's reely nice today.",
+   "exactFailed": [
+    "tools.port.check.input.number"
+   ],
+   "snaps": [
+    {
+     "tool": "port.check",
+     "path": "number",
+     "raw": "(202) 555-0150",
+     "normalised": "12025550150",
+     "gold": "+12025550150",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 4,
+   "text": "Hey, my Acme account email is SAM.RIVERA@EXAMPLE.COM, the same email linked to my acount; just makin sure I’ve got that right.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "SAM.RIVERA@EXAMPLE.COM",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 6,
+   "text": "Account email: SAM.RIVERA@EXAMPLE.COM",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "SAM.RIVERA@EXAMPLE.COM",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 5,
+   "text": "The email address on my account is Sam.Rivera@example.com, and the weather has been pleasant today.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Sam.Rivera@example.com",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 9,
+   "text": "It is SAM.RIVERA@EXAMPLE.COM The email address on my Acme account is SAM.RIVERA@EXAMPLE.COM",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "SAM.RIVERA@EXAMPLE.COM",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 10,
+   "text": "The email for my Acme account is Sam.Rivera@example.com, which is my account email.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Sam.Rivera@example.com",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 11,
+   "text": "Hey my email is Sam.Rivera@example.com",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Sam.Rivera@example.com",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 15,
+   "text": "The email address associated with my Acme account is SAM.RIVERA@EXAMPLE.COM. Thank you for your assistance.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "SAM.RIVERA@EXAMPLE.COM",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 14,
+   "text": "My account email address is SAM.RIVERA@EXAMPLE.COM. The weather is pleasent, and the afternoon has been quite enjoyble.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "SAM.RIVERA@EXAMPLE.COM",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 17,
+   "text": "My email is Sam.Rivera@example.com The weather feels pleasant today",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Sam.Rivera@example.com",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 19,
+   "text": "It's Sam.Rivera@example.com, and the weathr's lovely—hope your day's goin' well.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Sam.Rivera@example.com",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 20,
+   "text": "You can find my account under Sam.Rivera@example.com. That should be enogh to contine.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Sam.Rivera@example.com",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 21,
+   "text": "Hey, my account email is SAM.RIVERA@EXAMPLE.COM. That’s the address on my Acme account.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "SAM.RIVERA@EXAMPLE.COM",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 24,
+   "text": "Please use Sam.Rivera@example.com as the email address associated with my Acme account",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Sam.Rivera@example.com",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 27,
+   "text": "My acount email is SAM.RIVERA@EXAMPLE.COM, pleas.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "SAM.RIVERA@EXAMPLE.COM",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B4",
+   "row": 28,
+   "text": "Hey, my email's Sam.Rivera@example.com.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Sam.Rivera@example.com",
+     "normalised": "sam.rivera@example.com",
+     "gold": "sam.rivera@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 0,
+   "text": "Please have the sales advisor call me at +1 202 555 0188.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage check service timed out twice. Advisor should check coverage and help with the order.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage check service timed out twice advisor should check coverage and help with the order",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 1,
+   "text": "Hey use 202 555 0188 for the callback\nThat is my phone number for the callback",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville; the coverage check failed twice with a service timeout, so an advisor needs to check coverage and call back.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check failed twice with a service timeout so an advisor needs to check coverage and call back",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 2,
+   "text": "The number for the advisor is (202) 555-0188. My mornig has been calm, and the skys are clear today.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage service timed out twice, so coverage could not be checked. Customer asked for a callback at (202) 555-0188.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage service timed out twice so coverage could not be checked customer asked for a callback at 202 555 0188",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 3,
+   "text": "Call me on +1 202 555 0188",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage check service failed twice (timeout). Please check coverage and call back.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage check service failed twice timeout please check coverage and call back",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 5,
+   "text": "Hey, use (202) 555-0188 for the callback—that’s the number to call me back on.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville; the coverage check service timed out twice, so coverage is unconfirmed and a callback is needed.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check service timed out twice so coverage is unconfirmed and a callback is needed",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 4,
+   "text": "The appropriate callback number is 202 555 0188; the weathre has been rather pleasent today.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check failed twice with a service timeout, so an advisor should check coverage and follow up.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check failed twice with a service timeout so an advisor should check coverage and follow up",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 6,
+   "text": "Hey, my numbr, pleez: (202) 555-0188",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage check service timed out twice. Customer asked for a callback at (202) 555-0188.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage check service timed out twice customer asked for a callback at 202 555 0188",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 8,
+   "text": "The phone number for the sales advisor is +1 202 555 0188. This is the same phone number for the sales adivsor to use when calling me back, as requsted.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check service timed out twice, so coverage could not be confirmed. Customer asked for a callback at this number.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check service timed out twice so coverage could not be confirmed customer asked for a callback at this number",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 7,
+   "text": "The phone number is 202 555 0188, and the weather is pleasant today.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check service timed out twice, so coverage is unconfirmed.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check service timed out twice so coverage is unconfirmed",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 9,
+   "text": "Please call me at 202 555 0188",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check failed twice with a service timeout, so an advisor should check coverage and call back.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check failed twice with a service timeout so an advisor should check coverage and call back",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 10,
+   "text": "Hey have them call me at +1 202 555 0188 and the weather feels great today",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage check service timed out twice. Customer asked for a callback.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage check service timed out twice customer asked for a callback",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 11,
+   "text": "Please use (202) 555-0188 to reach me\nI would appreciate the callback",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check failed twice with a service timeout, so coverage is unconfirmed.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check failed twice with a service timeout so coverage is unconfirmed",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 12,
+   "text": "For the callback, the advisor can reach me at +1 202 555 0188. That number is for the callback.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage service timed out twice, so coverage could not be checked.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage service timed out twice so coverage could not be checked",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 14,
+   "text": "Use (202) 555-0188 as my phone number and that is the number to call me",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check failed twice with a service timeout, so coverage is unknown.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check failed twice with a service timeout so coverage is unknown",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 13,
+   "text": "Hey, it's 202 555 0188",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check service failed twice with timeouts, so coverage has not been confirmed.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check service failed twice with timeouts so coverage has not been confirmed",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 15,
+   "text": "You can reach me at +1 202 555 0188. The sunshine's lovely today.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check service timed out twice, so coverage is unconfirmed.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check service timed out twice so coverage is unconfirmed",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 17,
+   "text": "Could ya have the advizor call me at 202 555 0188 to check coverage, since it's a coverage check, thnaks?",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check failed twice with a service timeout, so an advisor should check coverage and follow up.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check failed twice with a service timeout so an advisor should check coverage and follow up",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 16,
+   "text": "My numbr is 202 555 0188. A callbak can reach me there.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville; the coverage check failed twice with a service timeout, so a sales advisor should check coverage and call back.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check failed twice with a service timeout so a sales advisor should check coverage and call back",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 19,
+   "text": "Please use +1 202 555 0188 as my contakt numbr.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage check service timed out twice. Advisor should check coverage and follow up.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage check service timed out twice advisor should check coverage and follow up",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 18,
+   "text": "Please use (202) 555-0188 for the callback. The weather has been pleasant today.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville; coverage_check failed twice with a timeout, so coverage is unverified.",
+     "normalised": "customer wants home internet at 7 quarry lane coverage check failed twice with a timeout so coverage is unverified",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 20,
+   "text": "Please call me at (202) 555-0188.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage check service timed out twice. Customer asked for a callback at (202) 555-0188.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage check service timed out twice customer asked for a callback at 202 555 0188",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 22,
+   "text": "The weather is lovely today\nPlease have the sales advisor call me at 202 555 0188",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage service timed out twice, so coverage could not be checked. Customer asked for a call back.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage service timed out twice so coverage could not be checked customer asked for a call back",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 23,
+   "text": "Please use 202 555 0188 as my phone number. This is the number for the call back.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants Acme home internet at 7 Quarry Lane, Acmeville. The coverage check service timed out twice, so coverage is unconfirmed.",
+     "normalised": "customer wants acme home internet at 7 quarry lane the coverage check service timed out twice so coverage is unconfirmed",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 24,
+   "text": "Here's my numbr, calbak: +1 202 555 0188",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. Coverage check failed twice with a service timeout, so a sales advisor should check coverage and call back.",
+     "normalised": "customer wants home internet at 7 quarry lane coverage check failed twice with a service timeout so a sales advisor should check coverage and call back",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 21,
+   "text": "The requested phone number is +1 202 555 0188 and that is the number you asked me to provide",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check service timed out twice, so coverage could not be confirmed.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check service timed out twice so coverage could not be confirmed",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 25,
+   "text": "Please have the sales adivsor call me at (202) 555-0188, as I would apprecaite a callback from the sales advisor.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage check service timed out twice. Customer asked for a callback at (202) 555-0188.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage check service timed out twice customer asked for a callback at 202 555 0188",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 27,
+   "text": "Please use +1 202 555 0188",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage check service timed out twice. Customer asked for a callback.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage check service timed out twice customer asked for a callback",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 0,
+   "text": "The location is 7 Quarry Ln, Acmeville\nThis is the location for your availability check",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 28,
+   "text": "Hey, use +1 202 555 0188 for the callback. It's a sunny afternon here, and I'm grabing coffee.",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "+1 202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage service timed out twice, so coverage could not be checked. Customer asked for a callback at this number.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage service timed out twice so coverage could not be checked customer asked for a callback at this number",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 26,
+   "text": "Hey just give me a ring at 202 555 0188",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "202 555 0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville, but the coverage check service timed out twice. Customer asked for a callback at 202 555 0188.",
+     "normalised": "customer wants home internet at 7 quarry lane but the coverage check service timed out twice customer asked for a callback at 202 555 0188",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B7",
+   "row": 29,
+   "text": "Pleese use ths: (202) 555-0188",
+   "exactFailed": [
+    "tools.notify_sales.input.customer"
+   ],
+   "snaps": [
+    {
+     "tool": "notify_sales",
+     "path": "customer.phone",
+     "raw": "(202) 555-0188",
+     "normalised": "12025550188",
+     "gold": "+12025550188",
+     "snapped": true
+    },
+    {
+     "tool": "notify_sales",
+     "path": "summary",
+     "raw": "Customer wants home internet at 7 Quarry Lane, Acmeville. The coverage check failed twice with a service timeout, so coverage is unknown.",
+     "normalised": "customer wants home internet at 7 quarry lane the coverage check failed twice with a service timeout so coverage is unknown",
+     "gold": "7 Quarry Lane",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 1,
+   "text": "The address is 7 quarry lane, hey, that's the adress you asked me for earlier and I'm just sharin it here.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Lane",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 3,
+   "text": "Please use 7 quarry lane as the address. The weather is mild today.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 quarry lane",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 4,
+   "text": "Plase kindly usee 7 Quarry Ln, Acmeville.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 7,
+   "text": "My adress details read 7 Quarry Ln, Acmeville, while today's skys look bright.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 9,
+   "text": "The address is 7 Quarry Ln, Acmeville. You asked for the street address, and that is the address.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 6,
+   "text": "My address 7 quarry lane",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Lane",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 12,
+   "text": "Hey, with this wierdly sunny day, could you check availabilty at 7 Quarry Ln, Acmeville for me?",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 10,
+   "text": "The location is 7 quarry lane.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Lane",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 16,
+   "text": "Hey my address is 7 Quarry Ln, Acmeville",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 14,
+   "text": "The address is 7 quarry lane. I hope your afternon is going well; the weather is pleasent.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 quarry lane",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 21,
+   "text": "Hey, here's the locashun: 7 Quarry Ln, Acmeville. That's the same spot I'm sendin over, just for the check.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 19,
+   "text": "Hey, chek availabilty at 7 quarry lane",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Lane",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 24,
+   "text": "The address is 7 Quarry Ln, Acmeville, and the weather is pleasant today.",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 26,
+   "text": "Could you check 7 Quarry Ln, Acmeville as my address My day has been pretty calm",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 29,
+   "text": "Hey, can you check 7 Quarry Ln, Acmeville?",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Ln, Acmeville",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 25,
+   "text": "Please use 7 quarry lane as the address\nI would appreciate your checking availability there",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 quarry lane",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B8",
+   "row": 28,
+   "text": "Residense iz 7 quarry lane",
+   "exactFailed": [
+    "tools.coverage.check.input.address"
+   ],
+   "snaps": [
+    {
+     "tool": "coverage.check",
+     "path": "address",
+     "raw": "7 Quarry Lane",
+     "normalised": "7 quarry lane",
+     "gold": "7 Quarry Lane, Acmeville",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 2,
+   "text": "Hey, the emial on my Acme accout is MORGAN.DIAZ@EXAMPLE.COM, and that's the address on my Acme account.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "MORGAN.DIAZ@EXAMPLE.COM",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 0,
+   "text": "My account email is Morgan.Diaz@example.com. Pretty nice weather today.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Morgan.Diaz@example.com",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 4,
+   "text": "The email for my account is MORGAN.DIAZ@EXAMPLE.COM",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "MORGAN.DIAZ@EXAMPLE.COM",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 6,
+   "text": "It is Morgan.Diaz@example.com, and it is my email address.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Morgan.Diaz@example.com",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 8,
+   "text": "Here ya go Morgan.Diaz@example.com",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Morgan.Diaz@example.com",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 5,
+   "text": "My custmer emale is Morgan.Diaz@example.com.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Morgan.Diaz@example.com",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 7,
+   "text": "It's MORGAN.DIAZ@EXAMPLE.COM. My mornign has been busy, and the weathre is nice.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "MORGAN.DIAZ@EXAMPLE.COM",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 12,
+   "text": "My Acme account is registered to Morgan.Diaz@example.com. Please use that address to find my account.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Morgan.Diaz@example.com",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 11,
+   "text": "Please use MORGAN.DIAZ@EXAMPLE.COM.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "MORGAN.DIAZ@EXAMPLE.COM",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 13,
+   "text": "Its Morgan.Diaz@example.com\nThis is my email address",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Morgan.Diaz@example.com",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 14,
+   "text": "Please use Morgan.Diaz@example.com for my account; the wheather is sunny and pleasent today.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Morgan.Diaz@example.com",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 16,
+   "text": "The email address for my Acme account is MORGAN.DIAZ@EXAMPLE.COM\nThis is the address associated with my account",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "MORGAN.DIAZ@EXAMPLE.COM",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 17,
+   "text": "It's the emial: MORGAN.DIAZ@EXAMPLE.COM. Thnks!",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "MORGAN.DIAZ@EXAMPLE.COM",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 22,
+   "text": "Thats Morgan.Diaz@example.com and thats my email address",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "Morgan.Diaz@example.com",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 20,
+   "text": "The email address on my account is MORGAN.DIAZ@EXAMPLE.COM, and the weather is pleasant today.",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "MORGAN.DIAZ@EXAMPLE.COM",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 27,
+   "text": "Hey please use MORGAN.DIAZ@EXAMPLE.COM for my account\nMy day is going pretty well",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "MORGAN.DIAZ@EXAMPLE.COM",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  },
+  {
+   "block": "B10",
+   "row": 26,
+   "text": "Thats my emial: MORGAN.DIAZ@EXAMPLE.COM",
+   "exactFailed": [
+    "tools.catalog.search.input.customer_email"
+   ],
+   "snaps": [
+    {
+     "tool": "catalog.search",
+     "path": "customer_email",
+     "raw": "MORGAN.DIAZ@EXAMPLE.COM",
+     "normalised": "morgan.diaz@example.com",
+     "gold": "morgan.diaz@example.com",
+     "snapped": true
+    }
+   ]
+  }
+ ]
+}

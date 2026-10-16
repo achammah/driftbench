@@ -1,0 +1,429 @@
+{
+  "problems": 0,
+  "rows": [
+    {
+      "block": "B1",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "address",
+          "form": "88 Summit Avenue, Acmeville",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "address",
+          "form": "88 Summit Ave, Acmeville",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "address",
+          "form": "88 summit avenue",
+          "exact": false,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "address",
+          "value": "8 Summit Avenue, Acmeville",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    },
+    {
+      "block": "B2",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "customer.phone",
+          "form": "+1 202 555 0131",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "customer.phone",
+          "form": "(202) 555-0131",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "customer.phone",
+          "form": "202.555.0131",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "customer.phone",
+          "form": "+12025550131",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "customer.phone",
+          "form": "+12025550131",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "summary",
+          "form": "88 Summit Avenue",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "summary",
+          "form": "88 Summit Ave",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "summary",
+          "form": "88 summit avenue",
+          "exact": false,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "customer.phone",
+          "value": "+1 202 555 0113",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    },
+    {
+      "block": "B3",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "number",
+          "form": "+1 202 555 0150",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "number",
+          "form": "(202) 555-0150",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "number",
+          "form": "2025550150",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "number",
+          "form": "+12025550150",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "number",
+          "form": "+12025550150",
+          "exact": true,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "number",
+          "value": "+1 202 555 0105",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    },
+    {
+      "block": "B4",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "customer_email",
+          "form": "sam.rivera@example.com",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "customer_email",
+          "form": "Sam.Rivera@example.com",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "customer_email",
+          "form": "SAM.RIVERA@EXAMPLE.COM",
+          "exact": false,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "customer_email",
+          "value": "sam.rivers@example.com",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    },
+    {
+      "block": "B5",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "address",
+          "form": "14 Harbor Road, Acmeville",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "address",
+          "form": "14 Harbor Rd, Acmeville",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "address",
+          "form": "14 harbor road",
+          "exact": false,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "address",
+          "value": "41 Harbor Road, Acmeville",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    },
+    {
+      "block": "B6",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "address",
+          "form": "3 Orchard Way, Acmeville",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "address",
+          "form": "3 Orchard Way Acmeville",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "address",
+          "form": "3 orchard way",
+          "exact": false,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "address",
+          "value": "13 Orchard Way, Acmeville",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    },
+    {
+      "block": "B7",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "customer.phone",
+          "form": "+1 202 555 0188",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "customer.phone",
+          "form": "(202) 555-0188",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "customer.phone",
+          "form": "202 555 0188",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "customer.phone",
+          "form": "+12025550188",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "customer.phone",
+          "form": "+12025550188",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "summary",
+          "form": "7 Quarry Lane",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "summary",
+          "form": "7 Quarry Ln",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "summary",
+          "form": "7 quarry lane",
+          "exact": false,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "customer.phone",
+          "value": "+1 202 555 0181",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    },
+    {
+      "block": "B8",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "address",
+          "form": "7 Quarry Lane, Acmeville",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "address",
+          "form": "7 Quarry Ln, Acmeville",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "address",
+          "form": "7 quarry lane",
+          "exact": false,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "address",
+          "value": "17 Quarry Lane, Acmeville",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    },
+    {
+      "block": "B9",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "number",
+          "form": "+1 202 555 0160",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "number",
+          "form": "(202) 555-0160",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "number",
+          "form": "202-555-0160",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "number",
+          "form": "+12025550160",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "number",
+          "form": "+12025550160",
+          "exact": true,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "number",
+          "value": "+1 202 555 0106",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    },
+    {
+      "block": "B10",
+      "gold_exact": true,
+      "gold_norm": true,
+      "gold_failed": [],
+      "forms": [
+        {
+          "field": "customer_email",
+          "form": "morgan.diaz@example.com",
+          "exact": true,
+          "norm": true
+        },
+        {
+          "field": "customer_email",
+          "form": "Morgan.Diaz@example.com",
+          "exact": false,
+          "norm": true
+        },
+        {
+          "field": "customer_email",
+          "form": "MORGAN.DIAZ@EXAMPLE.COM",
+          "exact": false,
+          "norm": true
+        }
+      ],
+      "minimal": [
+        {
+          "field": "customer_email",
+          "value": "morgan.dias@example.com",
+          "exact": false,
+          "norm": false
+        }
+      ]
+    }
+  ]
+}

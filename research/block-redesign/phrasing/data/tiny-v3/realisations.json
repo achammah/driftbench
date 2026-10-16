@@ -1,0 +1,156 @@
+[
+ {
+  "block": "B2",
+  "row": 0,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "Heres my phnoe numbr: 202.555.0131.",
+  "attempt": 1
+ },
+ {
+  "block": "B2",
+  "row": 1,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "canonical"
+  },
+  "text": "My number is +1 202 555 0131, and the weather is lovely today.",
+  "attempt": 1
+ },
+ {
+  "block": "B2",
+  "row": 2,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Please have the sales advisor use (202) 555-0131 when calling me back. This number is for the callback, as mentioned, and I would be gratefull for your assitance.",
+  "attempt": 4
+ },
+ {
+  "block": "B5",
+  "row": 0,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Please place an order for Fiber 1000 at 14 Harbor Rd, Acmeville using the address I provided",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 1,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "Helo, I would liek to order the Fiber 1000 plan for 14 harbor road, Acmeville, pleas.",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 2,
+  "cell": {
+   "register": "neutral",
+   "length": "terse",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "synonyms",
+   "slot_surface": "canonical"
+  },
+  "text": "Get me Acme Fiber 1000 at 14 Harbor Road, Acmeville.",
+  "attempt": 1
+ },
+ {
+  "block": "B7",
+  "row": 0,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "clean",
+   "distractor": "none",
+   "lexical": "restructured",
+   "slot_surface": "canonical"
+  },
+  "text": "Please have the sales advisor call me at +1 202 555 0188.",
+  "attempt": 1
+ },
+ {
+  "block": "B7",
+  "row": 1,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "Hey use 202 555 0188 for the coverage callback Also thats the number to call me back on",
+  "attempt": 2
+ },
+ {
+  "block": "B7",
+  "row": 2,
+  "cell": {
+   "register": "neutral",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "unrelated_aside",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Please use (202) 555-0188 for the sales advisor's callback. The weatherr is sunny, and my day has been prety calm.",
+  "attempt": 3
+ },
+ {
+  "block": "B10",
+  "row": 0,
+  "cell": {
+   "register": "casual",
+   "length": "multi_sentence",
+   "noise": "clean",
+   "distractor": "unrelated_aside",
+   "lexical": "synonyms",
+   "slot_surface": "variant_a"
+  },
+  "text": "That’s Morgan.Diaz@example.com. The afternoon’s been sunny here.",
+  "attempt": 3
+ },
+ {
+  "block": "B10",
+  "row": 2,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_b"
+  },
+  "text": "Hey, I'm still looking to move to a plan with more data, and my acount emial is MORGAN.DIAZ@EXAMPLE.COM.",
+  "attempt": 2
+ }
+]

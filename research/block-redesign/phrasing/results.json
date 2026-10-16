@@ -1,0 +1,50 @@
+{
+ "lane": "phrasing",
+ "prereg_commit": "ee620915c",
+ "amendments": {
+  "1": "2b361f961 gate fixes after tiny samples",
+  "2": "e5036f22b shared live Acme agent be8bb2f8f"
+ },
+ "usd_total": 1.4014,
+ "usd_cap": 40,
+ "H1": {
+  "verdict": "FALSIFIED",
+  "seed_beats_class_exact": 6,
+  "of": 10,
+  "floor_ties": 4,
+  "mean_G_exact": 0.3026417285862563,
+  "paired_se_exact": 0.09917146433225306,
+  "seed_beats_class_norm": 3
+ },
+ "H2": {
+  "verdict": "SUPPORTED",
+  "blocks_with_event_norm": 2,
+  "blocks_with_failures_norm": 5,
+  "share_level1or2_norm": 0.9838709677419355,
+  "blocks_with_event_exact": 3
+ },
+ "H3": {
+  "verdict": "SUPPORTED",
+  "share": 0.6373626373626373,
+  "flipped": 116,
+  "exact_failures": 182,
+  "ci95": [
+   0.3425414364640884,
+   0.8940092165898618
+  ]
+ },
+ "H4": {
+  "verdict": "FALSIFIED",
+  "planted_caught": 20,
+  "audit_invalid_union": 9,
+  "audit_invalid_mine": 0,
+  "audit_invalid_model": 9,
+  "human_audit": false
+ },
+ "per_hypothesis_files": {
+  "h1": "h1/results.json",
+  "h2": "h2/results.json",
+  "h3": "h3/results.json",
+  "h4": "h4/results.json"
+ }
+}

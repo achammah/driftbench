@@ -1,0 +1,58 @@
+[
+ {
+  "block": "B2",
+  "row": 0,
+  "cell": {
+   "register": "casual",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "Heres my numbr, 202.555.0131, thnks!",
+  "attempt": 1
+ },
+ {
+  "block": "B2",
+  "row": 2,
+  "cell": {
+   "register": "formal",
+   "length": "multi_sentence",
+   "noise": "typos",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "For the sales advisor's callback, please use (202) 555-0131. As previously disscussed, I would appriciate a call from the sales advisor at that number.",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 0,
+  "cell": {
+   "register": "neutral",
+   "length": "one_sentence",
+   "noise": "no_punctuation",
+   "distractor": "redundant_detail",
+   "lexical": "restructured",
+   "slot_surface": "variant_a"
+  },
+  "text": "Could you set up an order for Fiber 1000 at 14 Harbor Rd, Acmeville with the order going to 14 Harbor Rd, Acmeville",
+  "attempt": 1
+ },
+ {
+  "block": "B5",
+  "row": 1,
+  "cell": {
+   "register": "formal",
+   "length": "one_sentence",
+   "noise": "typos",
+   "distractor": "none",
+   "lexical": "seed_words",
+   "slot_surface": "variant_b"
+  },
+  "text": "I woud like to order the Fiber 1000 plan for 14 harbor road, pleas.",
+  "attempt": 1
+ }
+]

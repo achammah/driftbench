@@ -1,0 +1,44 @@
+{
+  "planner": {
+    "valid_rows": 567,
+    "strength2_rows": 15,
+    "strength2_cov2": {
+      "covered": 133,
+      "required": 133,
+      "share": 1
+    },
+    "strength3_rows": 46,
+    "strength3_cov3": {
+      "covered": 516,
+      "required": 516,
+      "share": 1
+    },
+    "h1_30_rows_cov2": {
+      "covered": 133,
+      "required": 133,
+      "share": 1
+    },
+    "h1_30_rows_cov3": {
+      "covered": 451,
+      "required": 516,
+      "share": 0.874031007751938
+    }
+  },
+  "random_same_size_cov2_mean": 0.8099248120300753,
+  "localiser_strength2": {
+    "ranked_first": "34 of 50",
+    "in_top_tie": "43 of 50"
+  },
+  "localiser_strength3": {
+    "ranked_first": "50 of 50",
+    "in_top_tie": "50 of 50"
+  },
+  "envelope": {
+    "n": 60,
+    "K": 4,
+    "sims": 1000,
+    "ci_coverage": 0.947,
+    "rho_true": 0.19999999999999998,
+    "rho_mean": 0.1960024351593887
+  }
+}

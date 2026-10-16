@@ -1,0 +1,50 @@
+{"item":1,"valid":true,"reason":"The rewrite preserves the phone number and transfer request, adding only harmless small talk."}
+{"item":2,"valid":false,"reason":"The rewrite drops Acmeville from the street address, making the location less specific than in the seed."}
+{"item":3,"valid":true,"reason":"The rewrite preserves the same phone number and callback request, adding only harmless small talk."}
+{"item":4,"valid":true,"reason":"The rewrite preserves the address and request, adding only harmless small talk about the weather."}
+{"item":5,"valid":false,"reason":"The rewrite omits Acmeville from the service address, dropping part of the address slot."}
+{"item":6,"valid":false,"reason":"The rewrite drops Acmeville from the service address."}
+{"item":7,"valid":true,"reason":"The rewrite preserves the same phone number with permissible formatting changes and plausibly answers the assistant’s question."}
+{"item":8,"valid":true,"reason":"The rewrite preserves the same phone number, changing only its formatting and omitting the country code."}
+{"item":9,"valid":true,"reason":"The rewrite provides the same account email in response to the question and adds only harmless small talk."}
+{"item":10,"valid":false,"reason":"The rewrite drops Acmeville from the street address."}
+{"item":11,"valid":true,"reason":"The rewrite preserves the phone number with an allowed omission of the country code and adds only harmless small talk."}
+{"item":12,"valid":true,"reason":"The rewrite preserves the same callback number, with only permitted formatting and country-code differences."}
+{"item":13,"valid":true,"reason":"The rewrite preserves the address using the standard abbreviation “Ln” for “Lane” and makes the same availability-check request."}
+{"item":14,"valid":false,"reason":"The rewrite omits Acmeville, dropping part of the address provided in the seed."}
+{"item":15,"valid":true,"reason":"The rewrite preserves the callback phone number with permitted formatting and country-code differences, and adds no new request or constraint."}
+{"item":16,"valid":true,"reason":"The rewrite preserves the same email address with only capitalization changes and adds no new request or constraint."}
+{"item":17,"valid":true,"reason":"The rewrite preserves the email address and simply restates the plan upgrade already established in the conversation."}
+{"item":18,"valid":true,"reason":"The rewrite preserves the home internet availability request and address, adding only harmless small talk."}
+{"item":19,"valid":true,"reason":"The rewrite preserves the same phone number, with only formatting and the optional country code changed."}
+{"item":20,"valid":true,"reason":"The rewrite preserves the address and home internet availability request, adding only repetition and harmless typos."}
+{"item":21,"valid":true,"reason":"The rewrite preserves the address using a standard abbreviation and makes the same availability-check request."}
+{"item":22,"valid":true,"reason":"The rewrite preserves the order request, the Fiber 1000 plan, and the address, with only a standard street abbreviation and harmless small talk."}
+{"item":23,"valid":true,"reason":"The rewrite preserves the address and adds only harmless small talk that does not change the request or constraints."}
+{"item":24,"valid":true,"reason":"The rewrite preserves the address using the standard abbreviation “Ln” and only adds harmless small talk."}
+{"item":25,"valid":true,"reason":"The rewrite provides the same email address with only capitalization and phrasing changes."}
+{"item":26,"valid":true,"reason":"The rewrite preserves the phone number, with only an allowed omission of the country code and harmless surrounding typos."}
+{"item":27,"valid":true,"reason":"The rewrite preserves the account email with only a capitalization change and adds harmless small talk."}
+{"item":28,"valid":true,"reason":"The rewrite preserves the same phone number with different formatting and adds only harmless small talk."}
+{"item":29,"valid":true,"reason":"The rewrite preserves the same phone number, with omission of the country code allowed, and plausibly answers the assistant's question."}
+{"item":30,"valid":true,"reason":"The rewrite preserves the plan, address, and request to order service, changing only the tone."}
+{"item":31,"valid":true,"reason":"The rewrite preserves the same account email address, with only a permitted change in capitalization and redundant wording."}
+{"item":32,"valid":true,"reason":"The rewrite preserves the phone number and only adds harmless small talk that makes no additional request."}
+{"item":33,"valid":false,"reason":"The rewrite refers to a previously mentioned order despite being the first message, whereas the seed initiates a new order."}
+{"item":34,"valid":true,"reason":"The rewrite preserves the phone number with acceptable formatting and country-code omission, and the minor typos do not change the request."}
+{"item":35,"valid":true,"reason":"The rewrite preserves the home internet availability request and address, adding only harmless small talk and minor typos."}
+{"item":36,"valid":true,"reason":"The rewrite provides the same email address with only a capitalization change."}
+{"item":37,"valid":true,"reason":"The rewrite preserves the address using the standard abbreviation “Ln” for “Lane,” and the minor typos do not affect the request."}
+{"item":38,"valid":true,"reason":"The rewrite preserves the email address apart from permitted capitalization changes and adds only harmless small talk."}
+{"item":39,"valid":true,"reason":"The rewrite preserves the phone number with only permitted formatting changes, and the surrounding typos do not affect the request."}
+{"item":40,"valid":false,"reason":"The rewrite drops Acmeville from the address, removing part of the address value."}
+{"item":41,"valid":true,"reason":"The rewrite preserves the phone number with permitted formatting changes and adds only harmless small talk."}
+{"item":42,"valid":false,"reason":"The rewrite omits Acmeville from the service address."}
+{"item":43,"valid":true,"reason":"The rewrite preserves the phone number and remains a plausible callback response despite minor typos."}
+{"item":44,"valid":true,"reason":"The rewrite preserves the phone number and request, adding only harmless small talk."}
+{"item":45,"valid":true,"reason":"The rewrite preserves the address and home internet availability request, adding only harmless small talk."}
+{"item":46,"valid":false,"reason":"The rewrite omits Acmeville from the service address, dropping part of the address slot."}
+{"item":47,"valid":true,"reason":"The rewrite preserves the plan, address, and order request, adding only harmless small talk."}
+{"item":48,"valid":true,"reason":"The rewrite preserves the callback number, with only the permitted omission of the country code and harmless repetition."}
+{"item":49,"valid":true,"reason":"The rewrite provides the same account email address, differing only in capitalization, and directly answers the assistant's question."}
+{"item":50,"valid":true,"reason":"The rewrite provides the same phone number with only formatting changes and omission of the country code, preserving the request to keep it."}

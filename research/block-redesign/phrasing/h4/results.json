@@ -1,0 +1,269 @@
+{
+ "hypothesis": "H4",
+ "verdict": "FALSIFIED",
+ "planted": {
+  "caught": 20,
+  "of": 20,
+  "byStage": {
+   "slot_presence": 10,
+   "slot_exclusivity": 10,
+   "equivalence_judge": 20,
+   "near_duplicate": 9,
+   "negation_parity": 5
+  },
+  "missed": []
+ },
+ "audit": {
+  "n": 50,
+  "invalidUnion": 9,
+  "invalidMine": 0,
+  "invalidModel": 9,
+  "agreement": 0.82,
+  "rate": 0.18,
+  "wilson95": [
+   0.0977008273245379,
+   0.3079631945470261
+  ],
+  "invalidItems": [
+   {
+    "item": 2,
+    "block": "B6",
+    "text": "Hi can you tell me whether home internet is available at 3 orchard way",
+    "mine": {
+     "item": 2,
+     "valid": true,
+     "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+    },
+    "model": {
+     "item": 2,
+     "valid": false,
+     "reason": "The rewrite drops Acmeville from the street address, making the location less specific than in the seed."
+    }
+   },
+   {
+    "item": 5,
+    "block": "B5",
+    "text": "Hey, pleese sign me up for the Fiber 1000 plan at 14 harbor road. That’s the same spot, 14 harbor road, and this sounds reely good!",
+    "mine": {
+     "item": 5,
+     "valid": true,
+     "reason": "Valid: the address is repeated, not a second address."
+    },
+    "model": {
+     "item": 5,
+     "valid": false,
+     "reason": "The rewrite omits Acmeville from the service address, dropping part of the address slot."
+    }
+   },
+   {
+    "item": 6,
+    "block": "B5",
+    "text": "Could you please place an order for the Fiber 1000 plan at 14 harbor road, the adress and locaton for this order?",
+    "mine": {
+     "item": 6,
+     "valid": true,
+     "reason": "Valid: the trailing clause restates that the address is the order's; values and request unchanged."
+    },
+    "model": {
+     "item": 6,
+     "valid": false,
+     "reason": "The rewrite drops Acmeville from the service address."
+    }
+   },
+   {
+    "item": 10,
+    "block": "B1",
+    "text": "88 summit avenue; my mornng has been pleasent.",
+    "mine": {
+     "item": 10,
+     "valid": true,
+     "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+    },
+    "model": {
+     "item": 10,
+     "valid": false,
+     "reason": "The rewrite drops Acmeville from the street address."
+    }
+   },
+   {
+    "item": 14,
+    "block": "B1",
+    "text": "The location is 88 summit avenue\nThe street address is the location",
+    "mine": {
+     "item": 14,
+     "valid": true,
+     "reason": "Valid but awkward: the second line restates the first; the address is intact and the request unchanged."
+    },
+    "model": {
+     "item": 14,
+     "valid": false,
+     "reason": "The rewrite omits Acmeville, dropping part of the address provided in the seed."
+    }
+   },
+   {
+    "item": 33,
+    "block": "B5",
+    "text": "Please arrange Fiber 1000 at 14 Harbor Rd, Acmeville for the order I mentioned",
+    "mine": {
+     "item": 33,
+     "valid": true,
+     "reason": "Valid but slightly implausible as a first message: 'the order I mentioned' refers to nothing earlier; the plan, address and request are unchanged."
+    },
+    "model": {
+     "item": 33,
+     "valid": false,
+     "reason": "The rewrite refers to a previously mentioned order despite being the first message, whereas the seed initiates a new order."
+    }
+   },
+   {
+    "item": 40,
+    "block": "B8",
+    "text": "My address 7 quarry lane",
+    "mine": {
+     "item": 40,
+     "valid": true,
+     "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+    },
+    "model": {
+     "item": 40,
+     "valid": false,
+     "reason": "The rewrite drops Acmeville from the address, removing part of the address value."
+    }
+   },
+   {
+    "item": 42,
+    "block": "B5",
+    "text": "Hey could I get the Fiber 1000 plan at 14 harbor road the breeze feels lovely today",
+    "mine": {
+     "item": 42,
+     "valid": true,
+     "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+    },
+    "model": {
+     "item": 42,
+     "valid": false,
+     "reason": "The rewrite omits Acmeville from the service address."
+    }
+   },
+   {
+    "item": 46,
+    "block": "B6",
+    "text": "May I inquire whether residential broadband service is offered for 3 orchard way\nThe weather has been lovely today",
+    "mine": {
+     "item": 46,
+     "valid": true,
+     "reason": "Same request, same slot value (allowed surface form), plausible reply; only style differs."
+    },
+    "model": {
+     "item": 46,
+     "valid": false,
+     "reason": "The rewrite omits Acmeville from the service address, dropping part of the address slot."
+    }
+   }
+  ],
+  "human": false
+ },
+ "gate": {
+  "plannedRows": 300,
+  "accepted": 259,
+  "candidates": 777,
+  "firstRejectionByStage": {
+   "axis_conformance": 415,
+   "near_duplicate": 76,
+   "equivalence_judge": 25,
+   "slot_presence": 2
+  },
+  "perBlock": [
+   {
+    "block": "B1",
+    "accepted": 29,
+    "candidates": 65,
+    "vendi": 3.81,
+    "vendiRatio": 0.131,
+    "cov2": 1,
+    "cov3": 0.864
+   },
+   {
+    "block": "B2",
+    "accepted": 27,
+    "candidates": 61,
+    "vendi": 5.77,
+    "vendiRatio": 0.214,
+    "cov2": 0.985,
+    "cov3": 0.789
+   },
+   {
+    "block": "B3",
+    "accepted": 24,
+    "candidates": 93,
+    "vendi": 5.72,
+    "vendiRatio": 0.238,
+    "cov2": 0.985,
+    "cov3": 0.725
+   },
+   {
+    "block": "B4",
+    "accepted": 24,
+    "candidates": 84,
+    "vendi": 3.15,
+    "vendiRatio": 0.131,
+    "cov2": 0.992,
+    "cov3": 0.746
+   },
+   {
+    "block": "B5",
+    "accepted": 28,
+    "candidates": 68,
+    "vendi": 2.88,
+    "vendiRatio": 0.103,
+    "cov2": 1,
+    "cov3": 0.833
+   },
+   {
+    "block": "B6",
+    "accepted": 26,
+    "candidates": 74,
+    "vendi": 2.92,
+    "vendiRatio": 0.112,
+    "cov2": 0.985,
+    "cov3": 0.791
+   },
+   {
+    "block": "B7",
+    "accepted": 30,
+    "candidates": 56,
+    "vendi": 4.94,
+    "vendiRatio": 0.165,
+    "cov2": 1,
+    "cov3": 0.884
+   },
+   {
+    "block": "B8",
+    "accepted": 26,
+    "candidates": 75,
+    "vendi": 4.13,
+    "vendiRatio": 0.159,
+    "cov2": 1,
+    "cov3": 0.787
+   },
+   {
+    "block": "B9",
+    "accepted": 22,
+    "candidates": 90,
+    "vendi": 5.11,
+    "vendiRatio": 0.232,
+    "cov2": 0.977,
+    "cov3": 0.688
+   },
+   {
+    "block": "B10",
+    "accepted": 23,
+    "candidates": 111,
+    "vendi": 3.29,
+    "vendiRatio": 0.143,
+    "cov2": 0.97,
+    "cov3": 0.733
+   }
+  ]
+ }
+}
