@@ -1,10 +1,10 @@
 ---
 title: Checks on tool calls
-summary: "The machine checks that read the agent's tool calls: tools (count, input assertions, the value-check ladder and compare, input_closed, argument accuracy), tool_order, forbidden tools and call caps, tools_offered, tool_f1, schema_strict, sql, the value assertion forms, and the run-wide tool policy."
-commands:
-  - campaign run
-  - replay
+summary: "The machine checks on tool calls: tools with the value-check ladder and compare, input_closed and argument accuracy. Also tool_order, forbidden tools, call caps, tools_offered, tool_f1, schema_strict, sql, the value assertion forms and the tool policy."
+commands: []
 see_also:
+  - running-campaign-run
+  - validate-estate-replay
   - judging-machine-checks
   - judging-check-text
   - judging-check-runtime
@@ -14,9 +14,9 @@ next:
 
 ## What it is
 
-These checks compare the tool calls the adapter recorded in a block with what the block expects. A tool is named by its `label`, the name the adapter reports. Each check is turned on by a field of `expect`, of the spec's `rules`, or `metadata.tool_schemas`, and makes no model call of its own: the only model the `tools` check can use is a same-referent judge you configure, and none is configured by default.
+These checks compare the tool calls the adapter recorded in a block with what the block expects. A tool is named by its `label`, the name the adapter reports. Each check is turned on by a field of `expect`, of the spec's `rules`, or `metadata.tool_schemas`. No check makes a model call of its own. The only model the `tools` check can use is a same-referent judge you configure. None is configured by default.
 
-An input value the block names is decided by the value-check ladder, not by string equality: a value that differs from the expected one is right when it has the same effect where it is used. The ladder asks the tool, the tool's stated contract, the source the agent copied the value from, and a calibrated judge, in that order, and never a rule per value type (phone, email, address).
+An input value the block names is decided by the value-check ladder, not by string equality. A value that differs from the expected one is right when it has the same effect where it is used. The ladder asks, in order: the tool, the tool's stated contract, the source the agent copied the value from, and a calibrated judge. It never uses a rule per value type, such as phone, email or address.
 
 ## When to use it
 
@@ -35,13 +35,13 @@ Every run command applies these checks; no command option changes them (see `jud
 
 | Field | Check | What passes | Verdict ids |
 |---|---|---|---|
-| `tools: [{ label, count, input, input_closed, compare }]` | `tools` | Each tool runs `count` times (a number, or `{ min, max }`; no `count` means at least once), and every call holds each `input` assertion; a value the assertion names goes through the value-check ladder (below). A tool not called fails each of its input assertions. `input_closed: true`: each call's input is an object with only the keys listed in `input`. `compare`: how differing values are decided, one mode for every argument or a mode by argument name; absent means `auto`. | `tools.<label>.count`, `tools.<label>.input.<field>`, `tools.<label>.input.<field>.unstated_format` and `.no_decider` (not gating: lints on the test), `tools.<label>.input_closed`, `tools.argument_accuracy` (not gating: the share of expected arguments that matched) |
+| `tools: [{ label, count, input, input_closed, compare }]` | `tools` | Each tool runs `count` times (a number, or `{ min, max }`; no `count` means at least once). Every call holds each `input` assertion. A value the assertion names goes through the value-check ladder (below). A tool not called fails each of its input assertions. `input_closed: true`: each call's input is an object with only the keys listed in `input`. `compare`: how differing values are decided, one mode for every argument or a mode by argument name; absent means `auto`. | `tools.<label>.count`, `tools.<label>.input.<field>`, `tools.<label>.input.<field>.unstated_format` and `.no_decider` (not gating: lints on the test), `tools.<label>.input_closed`, `tools.argument_accuracy` (not gating: the share of expected arguments that matched) |
 | `tool_order: exact`, `in_order` or `any_order` | `tools` | `exact`: the calls split into consecutive runs, one per expected tool, with nothing left over (a fail names the first diverging call). `in_order`: the expected calls appear in order, others may sit between. `any_order`: they all appear. | `tools.order` |
 | `tools: [{ label, count: 0 }]` | `forbidden` | The tool is not called in the block. Reported by `forbidden`, not `tools`. | `forbidden.<label>` |
 | `rules.forbidden_tools: [label...]` | `forbidden` | The tool is never called. A block that expects a forbidden tool is a spec error (`TOOL_FORBIDDEN_EXPECTED`). | `forbidden.<label>` |
 | `rules.max_calls: { <label>: n }` | `forbidden` | The calls of the run so far stay at or under `n`; a block fails only when its own calls go past it. `0` forbids the tool. | `forbidden.max_calls.<label>` |
 | `tools_offered: { include, exclude }` | `tools_offered` | The tools the runtime offered the agent include or exclude these. No offered list: gating inconclusive. | `tools_offered.include.<tool>`, `tools_offered.exclude.<tool>` |
-| `tool_f1: { min }` | `tool_f1` | Precision, recall and F1 of the calls against the expected ones (each expected tool counted `count` times, a call matching at most one expectation) reach `min`. | `tool_f1.f1` |
+| `tool_f1: { min }` | `tool_f1` | Precision, recall and F1 of the calls against the expected ones reach `min`. Each expected tool counts `count` times. A call matches at most one expectation. | `tool_f1.f1` |
 | `metadata.tool_schemas: { <label>: schema }` | `schema_strict` | Every call of a tool with a schema matches it strictly: a key the schema does not declare is an invented parameter. The schema is a JSON Schema, an OpenAI-style function with `parameters`, or an Anthropic-style tool with `input_schema`. A tool with no schema: inconclusive, not gating. | `schema_strict.<label>.<n>` (`n` counts the tool's calls from 1) |
 | `sql: { tool, golden, database }` | `sql` | The query in the named tool's `query` input returns the same rows as the golden query on the SQLite file, read-only (a write is refused). Rows compare as a multiset, in order when the golden query has `ORDER BY`. | `sql.0` |
 
@@ -74,33 +74,38 @@ In `tools[].input`, a bare value, `{ exact: <value> }` and each leaf of `{ subse
 | 7 | `rung3_same_referent` | a same-referent judge is configured, its calibration meets the policy (false acceptance at most 0.02), and the field states no contract | The judge reads each value alone, then compares the readings, 3 repeats in both orders: all say the same thing, pass; none, fail; split, inconclusive. |
 | 8 | `exact_fallback` (after the items) | no item settled the value | The exact compare of today: the differing value fails, and the `no_decider` lint names what would settle it. |
 
-A value no item settles falls back to the exact compare, the verdict of today: it fails, the evidence says `exact_fallback: no decider configured for <tool>.<arg>; compared exactly` with every item's reason, and the non-gating lint `tools.<label>.input.<field>.no_decider` names the deciders that would settle it. The ladder turns a fail into a pass only when an item decides the value. Only a configured judge that cannot decide (its votes split, or its call fails) leaves a value inconclusive.
+A value no item settles falls back to the exact compare, the verdict of today. It fails. The evidence says `exact_fallback: no decider configured for <tool>.<arg>; compared exactly` with every item's reason. The non-gating lint `tools.<label>.input.<field>.no_decider` names the deciders that would settle it. The ladder turns a fail into a pass only when an item decides the value. Only a configured judge that cannot decide (its votes split, or its call fails) leaves a value inconclusive.
 
-A spec or a block runs another policy with `uses.value_check`: an object id (shipped, or a project or suite object visible from the spec file), or an inline object that extends the shipped one, such as `uses: { value_check: { extends: default, items: [{ id: rung1_outcome, enabled: false }] } }`; a block's choice replaces the spec's, and a suite or project `uses.yaml` applies to the specs below it. An object the check cannot resolve adds a failing `tools.value_check` with the reason, and the block's values are then compared exactly; its count, input and order verdicts stay.
+A spec or a block runs another policy with `uses.value_check`. It names an object id (shipped, or a project or suite object visible from the spec file). Or it is an inline object that extends the shipped one, such as `uses: { value_check: { extends: default, items: [{ id: rung1_outcome, enabled: false }] } }`. A block's choice replaces the spec's. A suite or project `uses.yaml` applies to the specs below it. An object the check cannot resolve adds a failing `tools.value_check` with the reason. The block's values are then compared exactly. Its count, input and order verdicts stay.
 
-`compare` is scoring-only, like `uses`: it stays out of the block cache key and the re-judge compatibility hash, so after writing or changing it a cached run replays the stored observations and scores them again, and never calls the agent.
+`compare` is scoring-only, like `uses`. It stays out of the block cache key and the re-judge compatibility hash. After you write or change it, a cached run replays the stored observations and scores them again. It never calls the agent.
 
-`compare` modes: `auto` (the default) walks the ladder; `outcome`, `contract`, `as_given` or `same_referent` runs that item alone (the exact fallback when it cannot apply); `{ exact: <reason> }` declares the writing itself is the requirement. Give one mode for every argument (`compare: auto`) or a mode by argument name (`compare: { customer: same_referent }`). The other assertion forms (`regex`, `contains`, `one_of`, `nonempty`, `absent`) list their own accepted writings and compare as written.
+`compare` modes: `auto` (the default) walks the ladder. `outcome`, `contract`, `as_given` or `same_referent` runs that item alone (the exact fallback when it cannot apply). `{ exact: <reason> }` declares the writing itself is the requirement. Give one mode for every argument (`compare: auto`) or a mode by argument name (`compare: { customer: same_referent }`). The other assertion forms (`regex`, `contains`, `one_of`, `nonempty`, `absent`) list their own accepted writings and compare as written.
 
-A value the judge passes differs from the expected one only in its writing, and no contract states that writing: the check adds `tools.<label>.input.<field>.unstated_format`, not gating, which flags the test. Declare the format in the tool (a `pattern` or an `enum`) or drop it from the block.
+Sometimes the judge passes a value that differs from the expected one only in its writing, and no contract states that writing. Then the check adds `tools.<label>.input.<field>.unstated_format`, not gating, which flags the test. Declare the format in the tool (a `pattern` or an `enum`) or drop it from the block.
 
-The CLI runs the ladder with no replayer and no judge. From code, `defaultChecks({ valueCheck: { services: { replayer, judge } } })` or `createToolsCheck({ policy, services })` of `@agent-nexus/driftbench-checks` adds them: a replayer declares, per tool, the output fields that are its resolved result and, for a tool that also keeps values as given, the inputs it resolves (the Acme example exports one, `acmeReplayer`: its order tool resolves the plan, not the customer's email); a judge is a model function plus its measured calibration (`recordedJudgeModel` replays recorded calls). The research behind the ladder: on the 259 stored H1 runs of the Acme sales agent, the tool settles 59 of the 116 format-only failures (49 pass, 10 fail where `Ln` does not resolve), with 0 false passes and 0 false fails against two labellers.
+The CLI runs the ladder with no replayer and no judge. From code, `defaultChecks({ valueCheck: { services: { replayer, judge } } })` or `createToolsCheck({ policy, services })` of `@agent-nexus/driftbench-checks` adds them:
 
-The supported schema keywords are `type`, `enum`, `const`, `required`, `properties`, `additionalProperties`, string, number and list bounds, `pattern`, `items`, `nullable`, `anyOf`, `oneOf` and `allOf`, plus the annotations `title`, `description`, `default`, `examples`, `$schema`, `$id`, `$comment`. Others (`$ref`, `not`, `format`, `if`, `patternProperties`, `uniqueItems`, `multipleOf`, tuple `items`) are refused when the spec loads.
+- A replayer declares, per tool, the output fields that are its resolved result. For a tool that also keeps values as given, it declares the inputs the tool resolves. The Acme example exports one, `acmeReplayer`: its order tool resolves the plan, not the customer's email.
+- A judge is a model function plus its measured calibration. `recordedJudgeModel` replays recorded calls.
 
-Run-wide tool policy (off by default): rules `{ pattern, action }`, a glob over the tool name with `allow`, `deny` or `ask` (an `ask` is a denial); the first match decides; no match allows. Given to `defaultChecks({ toolPolicy })` it adds `tool_policy.<label>` verdicts; to `runSpec({ toolPolicy })` it marks denied calls before the checks read them; to the vercel-ai, function or process adapter it refuses the call before it runs. There is no CLI option for it.
+The research behind the ladder used the 259 stored H1 runs of the Acme sales agent. The tool settled 59 of the 116 format-only failures: 49 pass, and 10 fail where `Ln` does not resolve. Against two labellers, it gave 0 false passes and 0 false fails.
+
+The supported schema keywords are `type`, `enum`, `const`, `required`, `properties`, `additionalProperties`, string, number and list bounds, `pattern`, `items`, `nullable`, `anyOf`, `oneOf` and `allOf`. The annotations `title`, `description`, `default`, `examples`, `$schema`, `$id` and `$comment` are accepted too. Others (`$ref`, `not`, `format`, `if`, `patternProperties`, `uniqueItems`, `multipleOf`, tuple `items`) are refused when the spec loads.
+
+Run-wide tool policy (off by default). Its rules are `{ pattern, action }`: a glob over the tool name with `allow`, `deny` or `ask` (an `ask` is a denial). The first match decides, and no match allows. Given to `defaultChecks({ toolPolicy })`, it adds `tool_policy.<label>` verdicts. Given to `runSpec({ toolPolicy })`, it marks denied calls before the checks read them. Given to the vercel-ai, function or process adapter, it refuses the call before it runs. There is no CLI option for it.
 
 ## Inputs
 
-The calls the adapter recorded in the block, with their labels and inputs; the runtime's offered tools; the spec's `rules` and `metadata.tool_schemas`; the SQLite file for `sql`.
+The calls the adapter recorded in the block, with their labels and inputs. The runtime's offered tools. The spec's `rules` and `metadata.tool_schemas`. The SQLite file for `sql`.
 
 ## Outputs and how to read them
 
-The evidence names the call and the value: `catalog.search input.category is one of ["mobile","home"] on 1 call: "mobile"`. When the ladder decided a value, the evidence adds the item that settled it and why, in brackets: `(call 1 (call-2): address_id rung1_outcome: catalog.search resolves "addr-101" to ...)`; `exact_fallback` names a value no item settled, compared exactly, with every reason. The same decisions are data on the argument verdict, `valueCheck`: one entry per value a rung decided, `{ call, path, rung, outcome }`, absent when every value equalled the expected one. A failing count lists the calls the block did make. A failing order names what was expected and what was seen. `tool_f1` names the unexpected and the missed calls. `schema_strict` names each invented parameter.
+The evidence names the call and the value: `catalog.search input.category is one of ["mobile","home"] on 1 call: "mobile"`. When the ladder decided a value, the evidence adds the item that settled it and why, in brackets: `(call 1 (call-2): address_id rung1_outcome: catalog.search resolves "addr-101" to ...)`. `exact_fallback` names a value no item settled, compared exactly, with every reason. The same decisions are data on the argument verdict, `valueCheck`. It holds one entry per value a rung decided, `{ call, path, rung, outcome }`. It is absent when every value equalled the expected one. A failing count lists the calls the block did make. A failing order names what was expected and what was seen. `tool_f1` names the unexpected and the missed calls. `schema_strict` names each invented parameter.
 
 ## Worked example
 
-A scratch spec on the deterministic Acme sales agent (no model call): block 1 expects a `coverage.check` call the agent never makes, and the schema of `catalog.search` declares only `category`. The run prints the failing ids; a small script prints the tool verdicts with their evidence from `--json`:
+A scratch spec on the deterministic Acme sales agent (no model call). Block 1 expects a `coverage.check` call the agent never makes. The schema of `catalog.search` declares only `category`. The run prints the failing ids; a small script prints the tool verdicts with their evidence from `--json`:
 
 ```yaml file=tools-demo.yaml
 # A scratch copy of the first two blocks of acme-plan-upgrade, with tool expectations. Fictional data.
@@ -202,7 +207,7 @@ The run fails on `tools.coverage.check.count`, `tools.order`, `tool_f1.f1` and `
 
 ### Values the agent wrote
 
-A second scratch spec: the customer gives a phone number in block 3, the Acme agent stores it on the lead as `+12025550131`, and the block expects the writing `(202) 555-0131`, once with the default `compare` and once declared exact. `notify_sales` only stores the value, the CLI configures no judge, and nobody wrote `(202) 555-0131`, so the default comparison falls back to the exact compare and lints the test; the declared exact one fails, with its reason:
+A second scratch spec. The customer gives a phone number in block 3, and the Acme agent stores it on the lead as `+12025550131`. The block expects the writing `(202) 555-0131`, once with the default `compare` and once declared exact. `notify_sales` only stores the value, the CLI configures no judge, and nobody wrote `(202) 555-0131`. So the default comparison falls back to the exact compare and lints the test. The declared exact one fails, with its reason:
 
 ```yaml file=values-demo.yaml
 # Fictional data. The second expectation of block 3 repeats the first with an exact compare.
@@ -257,7 +262,114 @@ block 3 tools.argument_accuracy fail (not gating): 0 of 2 expected arguments mat
 (exit 0)
 ```
 
-The first expectation fails on the exact fallback and names the deciders that would settle it: a judge configured from code would pass it, and then add the `unstated_format` lint, since no contract asks for `(202) 555-0131`. The second fails on the declared writing.
+The first expectation fails on the exact fallback and names the deciders that would settle it. A judge configured from code would pass it. It would then add the `unstated_format` lint, since no contract asks for `(202) 555-0131`. The second fails on the declared writing.
+
+### A value the user gave, and a policy for one spec
+
+Here the block expects the phone exactly as the customer typed it, `202 555 0131`. The agent wrote `+12025550131`. Under the shipped policy, `rung2b_as_given` fails the value: the agent changed what the user gave. The second spec turns that item off with an inline object, so the value falls back to the exact compare. The third writes a `compare` mode that does not exist:
+
+```yaml file=values/as-given.yaml
+# Fictional data. The block expects the phone as the customer typed it.
+id: as-given
+target: { adapter: function, agent: acme-sales }
+ledger_seed: { customer: new, lang: EN }
+stages: [address, offer, details, recap, order_placed, callback, handover, closing]
+blocks:
+  - user: Hello, I'm new here and looking for home internet.
+  - user: 88 Summit Avenue, Acmeville
+  - user: I really want fiber. Can someone call me when it arrives?
+  - user: 'My number is 202 555 0131'
+    expect:
+      tools:
+        - label: notify_sales
+          input:
+            customer: { subset: { phone: '202 555 0131' } }
+```
+
+```yaml file=values/no-as-given.yaml
+# Fictional data. The block expects the phone as the customer typed it.
+id: no-as-given
+target: { adapter: function, agent: acme-sales }
+ledger_seed: { customer: new, lang: EN }
+stages: [address, offer, details, recap, order_placed, callback, handover, closing]
+uses: { value_check: { extends: default, items: [{ id: rung2b_as_given, enabled: false }] } }
+blocks:
+  - user: Hello, I'm new here and looking for home internet.
+  - user: 88 Summit Avenue, Acmeville
+  - user: I really want fiber. Can someone call me when it arrives?
+  - user: 'My number is 202 555 0131'
+    expect:
+      tools:
+        - label: notify_sales
+          input:
+            customer: { subset: { phone: '202 555 0131' } }
+```
+
+```yaml file=values/bad-mode.yaml
+# Fictional data. The block expects the phone as the customer typed it.
+id: bad-mode
+target: { adapter: function, agent: acme-sales }
+ledger_seed: { customer: new, lang: EN }
+stages: [address, offer, details, recap, order_placed, callback, handover, closing]
+blocks:
+  - user: Hello, I'm new here and looking for home internet.
+  - user: 88 Summit Avenue, Acmeville
+  - user: I really want fiber. Can someone call me when it arrives?
+  - user: 'My number is 202 555 0131'
+    expect:
+      tools:
+        - label: notify_sales
+          compare: fuzzy
+          input:
+            customer: { subset: { phone: '202 555 0131' } }
+```
+
+```sh
+driftbench campaign run values/as-given.yaml --no-cache # exit 1
+driftbench campaign run values/no-as-given.yaml --no-cache # exit 1
+driftbench spec validate values/bad-mode.yaml # exit 1
+```
+
+```text
+$ driftbench campaign run values/as-given.yaml --no-cache
+Campaign c-6b2ccbdff576: 1 cell, 4 at a time. Checks: tools, tools_offered, forbidden, must, must_not, regex, exact, injection, length, markup, starts_with, finish_reason, json, tool_f1, refusal, rouge_l, bleu, sql, similarity, relevancy, knowledge_retention, lang, pii, cards, stage, skills, guards, references, subagents, execution, workspace, safety, artifacts, schema_strict, budget, end_state, custom.
+✗ as-given · function:acme-sales · F · repeat 0  fail  block 3 tools.notify_sales.input.customer
+1 cell: 0 pass, 1 fail, 0 failed. Spent $0.00.
+The runs are not kept: pass --store <file> to keep them.
+(exit 1)
+$ driftbench campaign run values/no-as-given.yaml --no-cache
+Campaign c-02314f7eaa68: 1 cell, 4 at a time. Checks: tools, tools_offered, forbidden, must, must_not, regex, exact, injection, length, markup, starts_with, finish_reason, json, tool_f1, refusal, rouge_l, bleu, sql, similarity, relevancy, knowledge_retention, lang, pii, cards, stage, skills, guards, references, subagents, execution, workspace, safety, artifacts, schema_strict, budget, end_state, custom.
+✗ no-as-given · function:acme-sales · F · repeat 0  fail  block 3 tools.notify_sales.input.customer
+1 cell: 0 pass, 1 fail, 0 failed. Spent $0.00.
+The runs are not kept: pass --store <file> to keep them.
+(exit 1)
+$ driftbench spec validate values/bad-mode.yaml
+✗ values/bad-mode.yaml
+    blocks.3.expect.tools.0.compare  SCHEMA_INVALID_UNION  Invalid input
+Checked 1 spec: 0 valid, 1 invalid, 0 warnings.
+(exit 1)
+```
+
+```sh setup
+tsx packages/cli/src/bin.ts campaign run values/as-given.yaml --no-cache --json | node show.mjs pii.,lang.,stage.,flow.,forbidden.,tools.coverage
+tsx packages/cli/src/bin.ts campaign run values/no-as-given.yaml --no-cache --json | node show.mjs pii.,lang.,stage.,flow.,forbidden.,tools.coverage
+```
+
+```text
+$ tsx packages/cli/src/bin.ts campaign run values/as-given.yaml --no-cache --json | node show.mjs pii.,lang.,stage.,flow.,forbidden.,tools.coverage
+block 3 tools.notify_sales.count pass: notify_sales called 1 time, expected at least 1
+block 3 tools.notify_sales.input.customer fail: notify_sales call 1 (call-1): input.customer is {"phone":"+12025550131"}; expected holding at least {"phone":"202 555 0131"} (call 1 (call-1): customer.phone rung2b_as_given: the agent was given "202 555 0131" and wrote "+12025550131": it changed the value)
+block 3 tools.argument_accuracy fail (not gating): 0 of 1 expected argument matched; missed: notify_sales input.customer
+(exit 0)
+$ tsx packages/cli/src/bin.ts campaign run values/no-as-given.yaml --no-cache --json | node show.mjs pii.,lang.,stage.,flow.,forbidden.,tools.coverage
+block 3 tools.notify_sales.count pass: notify_sales called 1 time, expected at least 1
+block 3 tools.notify_sales.input.customer fail: notify_sales call 1 (call-1): input.customer is {"phone":"+12025550131"}; expected holding at least {"phone":"202 555 0131"} (call 1 (call-1): customer.phone exact_fallback: no decider configured for notify_sales.customer.phone; compared exactly: "+12025550131" is not "202 555 0131" (rung3_same_referent: no same-referent judge is configured))
+block 3 tools.notify_sales.input.customer.no_decider fail (not gating): test lint: nothing could decide whether "+12025550131" names the same thing as "202 555 0131" for notify_sales.customer.phone, so it was compared exactly; it would be settled by a replayer that declares notify_sales and resolves customer.phone (rung1_outcome), or a pattern or an enum for customer.phone in metadata.tool_schemas (rung2_contract), or a calibrated same-referent judge (rung3_same_referent)
+block 3 tools.argument_accuracy fail (not gating): 0 of 1 expected argument matched; missed: notify_sales input.customer
+(exit 0)
+```
+
+Both runs fail block 3, for two reasons. Under the shipped policy, `rung2b_as_given` names the change: the agent was given one writing and wrote another. With that item off, nothing settles the value, so it fails on the exact fallback with the `no_decider` lint. `compare: fuzzy` is refused when the spec loads.
 
 ## Common errors
 
@@ -271,4 +383,6 @@ The first expectation fails on the exact fallback and names the deciders that wo
 * `tools.<label>.input.<field>` inconclusive: a configured judge could not decide (its votes split, or its call failed).
 * `tools.<label>.input.<field>` fails with `the agent was given ... and wrote ...`: the user wrote the expected value and the agent changed it, a reformatting included (`rung2b_as_given`).
 * `tools.<label>.input.<field>.unstated_format`: the block demands a writing nobody stated to the agent; the agent passed. Declare the format in the tool or relax the block.
-* `the value-check policy ... cannot run` when the check is built: a policy names a rung no implementation provides, a `when` reads an unknown evidence name, or its `order` is not every item once.
+* `the value-check policy <id> cannot run: <problems>` (thrown when `createToolsCheck` is built from code), or the verdict `tools.value_check` fail with `the value-check object <ref> cannot run: <problems>`. A problem reads `<item>: no rung implements <impl>`, or `order must name every item once: <order>`, or names a `when` that reads an unknown evidence name. Fix the object: one known implementation per item, every item once in `order`.
+* The verdict `tools.value_check` fail with `the value-check object this block uses cannot resolve: <reason>`: the object `uses.value_check` names does not resolve.
+* `blocks.<n>.expect.tools.<m>.compare  SCHEMA_INVALID_UNION  Invalid input` from `spec validate`: a `compare` mode that does not exist. Use `auto`, `outcome`, `contract`, `as_given`, `same_referent` or `{ exact: <reason> }`, alone or by argument name.
