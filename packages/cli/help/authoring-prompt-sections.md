@@ -94,7 +94,7 @@ Exit 0 when the registry matches, 1 when it does not, 2 when a file cannot be re
 ### driftbench radius sections reanchor
 
 ```
-driftbench radius sections reanchor <registry> --prompt <old> <new> --to-version <version> [--out <file>] [--json]
+driftbench radius sections reanchor <registry> --prompt <old> <new> --to-version <version> [--out <file>] [--change-out <file>] [--json]
 ```
 
 Re-anchors the registry of the old prompt on the new one, by the rule in What it is.
@@ -105,6 +105,7 @@ Re-anchors the registry of the old prompt on the new one, by the rule in What it
 | `--prompt <old> <new>` (required) | The old and new prompt files, in that order. | none |
 | `--to-version <version>` (required) | The version of the new prompt, written into the new registry. | none |
 | `--out <file>` | Write the registry of the new prompt here: found sections at their new spans, stale sections kept with `stale: true` and their old span. | not written |
+| `--change-out <file>` | Write the change manifest of the edit, for `radius --change`: one `prompt` change per stale section, named `<prompt id>#<section id>`, and a global `prompt` change for text outside every section or sections that changed order. An unchanged prompt writes no change. | not written |
 | `--json` | Print `{sections, outside, reordered}`. | off |
 
 Exit 0 when every section was found again in order and nothing changed outside them; 1 when a section is stale, a change lies outside every section, or sections changed order; 2 on bad input, or when the registry does not describe the old prompt.

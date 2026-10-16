@@ -113,6 +113,48 @@ it('re-anchors on the next prompt version: edited sections stale, the rest moved
   ).toBe(true);
 }, 60_000);
 
+it('writes the change manifest of the edit with --change-out, empty for an unchanged prompt', async () => {
+  const prompt = await readFile(join(fixtures, 'acme-sales.md'), 'utf8');
+  await writeFile(join(dir, 'old.md'), prompt);
+  await writeFile(
+    join(dir, 'new.md'),
+    prompt.replace('Always reply in English', 'Always reply in plain English'),
+  );
+  const registry = join(fixtures, 'acme-sales.sections.yaml');
+  const edited = await cli([
+    'radius',
+    'sections',
+    'reanchor',
+    registry,
+    '--prompt',
+    'old.md',
+    'new.md',
+    '--to-version',
+    'v2',
+    '--change-out',
+    'change.yaml',
+  ]);
+  expect(edited.code).toBe(1);
+  const manifest = parse(await readFile(join(dir, 'change.yaml'), 'utf8'));
+  expect(manifest).toMatchObject({ from: 'v1', to: 'v2' });
+  expect(manifest.changes).toEqual([expect.objectContaining({ kind: 'prompt', id: 'acme-sales#language' })]);
+  const same = await cli([
+    'radius',
+    'sections',
+    'reanchor',
+    registry,
+    '--prompt',
+    'old.md',
+    'old.md',
+    '--to-version',
+    'v1',
+    '--change-out',
+    'none.yaml',
+  ]);
+  expect(same.code).toBe(0);
+  expect(parse(await readFile(join(dir, 'none.yaml'), 'utf8')).changes).toEqual([]);
+}, 60_000);
+
 it('lints prompt-section links against the registries', async () => {
   const spec = {
     id: 'acme-language',

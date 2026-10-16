@@ -1,6 +1,8 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import {
+  type Change,
+  type ChangeManifest,
   checkSectionRegistry,
   loadSectionRegistry,
   type Reanchoring,
@@ -97,12 +99,14 @@ export function registerRadiusSections(radius: Command, io: Io, setExit: (code: 
     .requiredOption('--prompt <files...>', 'the old and new prompt files, in that order')
     .requiredOption('--to-version <version>', 'the version of the new prompt')
     .option('--out <file>', 'write the registry of the new prompt here')
+    .option('--change-out <file>', 'write the change manifest of the edit here, for radius --change')
     .option('--json', 'print one JSON document')
     .action(async (registryPath: string, _own: unknown, command: Command) => {
       const options = command.optsWithGlobals<{
         prompt: string[];
         toVersion: string;
         out?: string;
+        changeOut?: string;
         json?: boolean;
       }>();
       setExit(await reanchorCommand(registryPath, options, io));
@@ -111,7 +115,7 @@ export function registerRadiusSections(radius: Command, io: Io, setExit: (code: 
 
 export async function reanchorCommand(
   registryPath: string,
-  options: { prompt: string[]; toVersion: string; out?: string; json?: boolean },
+  options: { prompt: string[]; toVersion: string; out?: string; changeOut?: string; json?: boolean },
   io: Io,
 ): Promise<number> {
   const [oldFile, newFile] = options.prompt;
@@ -130,10 +134,45 @@ export async function reanchorCommand(
   }
   const { result } = made;
   if (options.out) await writeFile(resolve(io.cwd, options.out), registryYaml(result.registry));
+  if (options.changeOut)
+    await writeFile(
+      resolve(io.cwd, options.changeOut),
+      stringify(reanchoringManifest(registry, result, options.toVersion), { lineWidth: 0 }),
+    );
   if (options.json) io.out(`${JSON.stringify(withoutRegistry(result), null, 2)}\n`);
   else io.out(renderReanchoring(registry, result, options.toVersion));
   const stale = result.sections.some((section) => section.status === 'stale');
   return stale || result.outside.length > 0 || result.reordered.length > 0 ? 1 : 0;
+}
+
+/**
+ * The change manifest of a prompt edit, for `radius --change`: one prompt change per stale section, named
+ * `<prompt id>#<section id>`, and a global prompt change for text outside every section and for sections
+ * that changed order, since either can reach any block. An unchanged prompt gives no change.
+ */
+export function reanchoringManifest(
+  registry: SectionRegistry,
+  result: Reanchoring,
+  version: string,
+): ChangeManifest {
+  const changes: Change[] = [];
+  for (const section of result.sections) {
+    if (section.status === 'stale')
+      changes.push({
+        kind: 'prompt',
+        id: `${registry.prompt_id}#${section.id}`,
+        ...(section.reason === undefined ? {} : { note: section.reason }),
+      });
+  }
+  for (const label of result.outside)
+    changes.push({ kind: 'prompt', global: true, note: `changed outside every section, ${label}` });
+  if (result.reordered.length > 0)
+    changes.push({
+      kind: 'prompt',
+      global: true,
+      note: `sections changed order: ${result.reordered.join(', ')}`,
+    });
+  return { from: registry.version, to: version, changes };
 }
 
 function withoutRegistry(result: Reanchoring): Omit<Reanchoring, 'registry'> {
