@@ -26,6 +26,9 @@ export const IssueCodes = [
   'GIVEN_ORIGIN_WITHOUT_PREFIX',
   'PREFIX_PROSE_HISTORY',
   'SPEC_SCHEMA_VERSION',
+  'LINK_BLOCK_UNKNOWN',
+  'LINK_TARGET_UNKNOWN',
+  'LINK_STALE',
 ] as const;
 
 export type IssueCode = (typeof IssueCodes)[number] | `SCHEMA_${string}`;

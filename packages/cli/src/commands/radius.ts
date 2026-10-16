@@ -11,6 +11,7 @@ import type { Command } from 'commander';
 import type { Io } from '../io';
 import { loadValidSpecs } from './campaign';
 import { registerRadiusAuto } from './radius-prompt';
+import { registerRadiusSections } from './radius-sections';
 
 type RadiusCommandOptions = { change: string; mode: string; json?: boolean; explain?: boolean };
 
@@ -38,6 +39,7 @@ export function registerRadiusCommand(program: Command, io: Io, setExit: (code: 
       setExit(await radiusCommand(paths, options, io));
     });
   registerRadiusAuto(radius, io, setExit);
+  registerRadiusSections(radius, io, setExit);
 }
 
 export async function radiusCommand(paths: string[], options: RadiusCommandOptions, io: Io): Promise<number> {

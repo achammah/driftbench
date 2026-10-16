@@ -1,0 +1,137 @@
+
+ RUN  v5.0.3 /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/sol-gen-maint/wt
+
+ ❯ packages/validators/test/generator/stage-allocation.test.ts (8 tests | 6 failed) 14936ms
+   ❯ stage allocation shares the documented block and perturbation placement contract (4)
+     × counts the initial declared recovery alongside reached block stages 16ms
+     × rejects a missing reached stage and keeps the skew thresholds unchanged 2ms
+   ❯ fresh seeds keep opening coverage and cheater resistance separate (4)
+     × seed 1009: counts real declarations, rejects lost opening coverage and still catches an echo-passable stay 4013ms
+     × seed 2027: counts real declarations, rejects lost opening coverage and still catches an echo-passable stay 4064ms
+     × seed 4093: counts real declarations, rejects lost opening coverage and still catches an echo-passable stay 3549ms
+     × seed 8191: counts real declarations, rejects lost opening coverage and still catches an echo-passable stay 3289ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/validators/test/generator/stage-allocation.test.ts > stage allocation shares the documented block and perturbation placement contract > counts the initial declared recovery alongside reached block stages
+AssertionError: expected { pass: false, …(1) } to match object { pass: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "pass": true,
++   "pass": false,
+  }
+
+ ❯ packages/validators/test/generator/stage-allocation.test.ts:40:44
+     38|     const generated = fixture();
+     39|     const spec = required(generated.complete[0]).spec;
+     40|     const first = required(spec.perturbations?.[0]);
+       |                                            ^
+     41|     spec.perturbations = generated.hidden.deviations.map((cls) => ({ .…
+     42|     for (const suffix of ['present', 'ratio', 'evenness', 'hill1']) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  packages/validators/test/generator/stage-allocation.test.ts > stage allocation shares the documented block and perturbation placement contract > rejects a missing reached stage and keeps the skew thresholds unchanged
+AssertionError: expected { pass: false, …(1) } to match object { pass: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "pass": true,
++   "pass": false,
+  }
+
+ ❯ packages/validators/test/generator/stage-allocation.test.ts:66:33
+     65|   });
+     66|
+     67|   it('rejects a missing reached stage and keeps the skew thresholds un…
+       |                                ^
+     68|     const generated = fixture();
+     69|     const spec = required(generated.complete[0]).spec;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  packages/validators/test/generator/stage-allocation.test.ts > fresh seeds keep opening coverage and cheater resistance separate > seed 1009: counts real declarations, rejects lost opening coverage and still catches an echo-passable stay
+ FAIL  packages/validators/test/generator/stage-allocation.test.ts > fresh seeds keep opening coverage and cheater resistance separate > seed 2027: counts real declarations, rejects lost opening coverage and still catches an echo-passable stay
+ FAIL  packages/validators/test/generator/stage-allocation.test.ts > fresh seeds keep opening coverage and cheater resistance separate > seed 4093: counts real declarations, rejects lost opening coverage and still catches an echo-passable stay
+ FAIL  packages/validators/test/generator/stage-allocation.test.ts > fresh seeds keep opening coverage and cheater resistance separate > seed 8191: counts real declarations, rejects lost opening coverage and still catches an echo-passable stay
+AssertionError: expected { pass: false, …(1) } to match object { pass: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "pass": true,
++   "pass": false,
+  }
+
+ ❯ packages/validators/test/generator/stage-allocation.test.ts:77:38
+     75|     other.perturbations = Array.from({ length: 100 }, () => structured…
+     76|     expect(await check(skewed)).toMatchObject({ pass: true });
+     77|     for (const name of ['ratio', 'evenness', 'hill1'])
+       |                                      ^
+     78|       expect(await check(skewed, name)).toMatchObject({ pass: false });
+     79|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 2 passed (8)
+   Start at  01:07:15
+   Duration  31.47s (tests 49%, transform 49%, import 3%)
+
+  Transform  transforming modules took 14.90s · 49% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+
+Sibling deviation regression:
+
+ RUN  v5.0.3 /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/sol-gen-maint/wt
+
+ ❯ packages/validators/test/generator/stage-allocation.test.ts (9 tests | 1 failed | 8 skipped) 24ms
+   ❯ stage allocation shares the documented block and perturbation placement contract (5)
+     × also counts declared deviation events under the same per-event contract 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/validators/test/generator/stage-allocation.test.ts > stage allocation shares the documented block and perturbation placement contract > also counts declared deviation events under the same per-event contract
+AssertionError: expected { pass: false, …(1) } to match object { pass: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "pass": true,
++   "pass": false,
+  }
+
+ ❯ packages/validators/test/generator/stage-allocation.test.ts:44:82
+     42|     for (const suffix of ['present', 'ratio', 'evenness', 'hill1']) {
+     43|       const item = required(bankItems().find((item) => item.id === `al…
+     44|       expect(await item.check({ generated: async () => generated } as …
+       |                                                                                  ^
+     45|     }
+     46|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 skipped (9)
+   Start at  01:07:47
+   Duration  11.56s (transform 94%, import 6%)
+
+  Transform  transforming modules took 10.38s · 94% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+

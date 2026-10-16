@@ -78,7 +78,9 @@ if [ "$code" -ne 2 ] && [ -f "$report" ]; then
     }
     for (const a of s.aggregates ?? []) {
       const state = a.passed === undefined ? "no runs" : a.passed ? "passes" : "fails";
-      const planned = a.decided === false && a.runsNeeded !== undefined ? `, undecided: ${a.runsNeeded} runs at this rate would decide it` : "";
+      const planned = a.decided !== false || a.runsNeeded === undefined ? ""
+        : a.goldensNeeded !== undefined ? `, undecided: ${a.goldensNeeded} goldens like these (${a.runsNeeded} runs) would decide it`
+        : `, undecided: ${a.runsNeeded} runs at this rate would decide it`;
       lines.push(`Aggregate ${a.name} ${state}${planned}.`);
     }
     console.log(lines.join("\n"));

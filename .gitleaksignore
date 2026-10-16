@@ -423,6 +423,11 @@ b1c1f43af3da53f0b3ce5c730db7e21c9e637b3d:comparisons/hard-peers/calls/old-langwa
 # 12-character content hash in a concurrency test, not a credential.
 779f6e9d3973e43bcb83e2a4b84a31f277900b5e:packages/judges/test/cassette-concurrency.test.ts:generic-api-key:157
 779f6e9d3973e43bcb83e2a4b84a31f277900b5e:packages/judges/test/cassette-concurrency.test.ts:generic-api-key:158
+# The same two fixture lines, as they reached main in the squash commit d37cc4c7 (PR 371): the made-up cassette
+# key '0123456789ab', not a credential. The leak guard scans pushed commits on main, so the lines are listed by
+# the commit that main holds.
+d37cc4c7684fb4d9d15b831a4cab9c591bdf2c98:packages/judges/test/cassette-concurrency.test.ts:generic-api-key:157
+d37cc4c7684fb4d9d15b831a4cab9c591bdf2c98:packages/judges/test/cassette-concurrency.test.ts:generic-api-key:158
 
 # BEGIN generated recording-hash fingerprints: tools/guard/gitleaks-recording-fingerprints.mjs
 # Recording content hashes inside JSONL lines. Do not edit by hand; rerun the script.

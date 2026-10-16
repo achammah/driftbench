@@ -272,11 +272,15 @@ $ driftbench ci --specs examples/acme/specs/conversations --target fault:control
       "passed": true,
       "reason": "1 >= 0.8",
       "interval": {
-        "lower": 0.8620237953250198,
+        "lower": 0.7575059933447592,
         "upper": 1,
-        "n": 24
+        "n": 24,
+        "method": "wilson, clusters",
+        "clusters": 12
       },
-      "decided": true
+      "decided": false,
+      "runsNeeded": 48,
+      "goldensNeeded": 24
     }
   ],
   "exitCode": 0,
