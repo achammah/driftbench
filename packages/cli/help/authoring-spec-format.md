@@ -13,6 +13,7 @@ see_also:
   - authoring-spec-check
   - authoring-script-api
   - authoring-inventory
+  - authoring-rule-files
 next:
   - authoring-blocks
 ---
@@ -216,7 +217,7 @@ Free, with these keys read by tools:
 
 ### `uses`
 
-Every rule driftbench applies is an object: a kind (`policy/blame`, `policy/value-check`, `check-set`, `diagnostic`, ...), an id, an optional parent it `extends`, and items, each one rule. `uses` names the objects a spec or a block runs with. Each key is optional and has no default: a spec without `uses` loads, hashes and replays exactly as before.
+Every rule driftbench applies is an object. It has a kind (`policy/blame`, `policy/value-check`, `check-set`, `diagnostic`, ...), an id, an optional parent it `extends`, and items, each one rule. `uses` names the objects a spec or a block runs with. Each key is optional and has no default: a spec without `uses` loads, hashes and replays exactly as before.
 
 | Key | Kind it names |
 |---|---|
@@ -231,13 +232,15 @@ Every rule driftbench applies is an object: a kind (`policy/blame`, `policy/valu
 | `judges` | `judge-council` |
 | `diagnostics` | a list of `diagnostic` ids |
 
-A value is an id, such as `blame: acme`, or an inline object that extends one: `value_check: { extends: default, items: [{ id: rung3_same_referent, params: { repeats: 5 } }] }`. An item operation names an item of the parent and sets fields (`params` maps merge, lists replace, `+key: [values]` appends, `-key: [values]` removes); `enabled: false` disables it; `add: true` with `title`, `when`, `effect` and `impl` adds one; `before` or `after` moves it, or `order` lists every enabled item once. An item may carry `applies_to: { skills, tools, units }`: it then fires only when the evidence names one of those skills or tools, or a unit matching one of the unit patterns (`R#41/*`); without it, everywhere.
+A value is an id, such as `blame: acme`, or an inline object that extends one: `value_check: { extends: default, items: [{ id: rung3_same_referent, params: { repeats: 5 } }] }`. An item operation names an item of the parent and sets fields. `params` maps merge, lists replace, `+key: [values]` appends, and `-key: [values]` removes. `enabled: false` disables the item. `add: true` with `title`, `when`, `effect` and `impl` adds one. `before` or `after` moves it, or `order` lists every enabled item once. An item may carry `applies_to: { skills, tools, units }`. It then fires only when the evidence names one of those skills or tools, or a unit matching one of the unit patterns (`R#41/*`). Without it, the item fires everywhere.
 
-Where an id is looked up, weakest first: the shipped objects; the project, files `driftbench/<kind>/<id>.yaml` beside `driftbench.yaml` and its `objects:` list; each `_driftbench/<kind>/<id>.yaml` suite folder from the project down to the spec, a nearer one stronger. A `uses.yaml` in a `driftbench/` or `_driftbench/` folder sets `uses` for the specs below it. A block's key replaces the spec's, which replaces the suite's and the project's.
+Where an id is looked up, weakest first: the shipped objects, then the project, then the suite folders. The project is the files `driftbench/<kind>/<id>.yaml` beside `driftbench.yaml` and its `objects:` list. The suite folders are each `_driftbench/<kind>/<id>.yaml` from the project down to the spec, and a nearer one is stronger. A `uses.yaml` in a `driftbench/` or `_driftbench/` folder sets `uses` for the specs below it. A block's key replaces the spec's, which replaces the suite's and the project's.
 
-Every kind `uses` names is scoring-only: `uses` stays out of the block cache key and the re-judge compatibility hash, so changing it never reruns the agent. The spec hash does record it.
+Every kind `uses` names is scoring-only. `uses` stays out of the block cache key and the re-judge compatibility hash, so changing it never reruns the agent. The spec hash does record it.
 
-The loader resolves every object a layer names. An unknown object, an unknown item, an `extends` cycle, an order that is not a permutation, a missing implementation or params of the wrong type is a load error naming the spec, the block, the kind and the id.
+The loader resolves every object a layer names. These are load errors: an unknown object, an unknown item, an `extends` cycle, a bad order, a missing implementation, and params of the wrong type. A bad order is one that is not a permutation. Each error names the spec, the block, the kind and the id.
+
+In this release no run reads these objects yet, and none is shipped: `uses` is checked at load and recorded in the spec hash. How to write a rule file, every operation and every `OBJECT_*` error: see authoring-rule-files.
 
 ### A minimal valid spec
 
