@@ -62,12 +62,18 @@ jobs:
           # --check-floor deliberately caps measurement at the floor (currently 9).
           # A plain full run returns the level reached, so success here is 11, not 0.
           status=0
-          if pnpm driftbench validate system --seeds 1..3 --hidden --all-levels; then
+          if pnpm -s driftbench validate system --seeds 1..3 --hidden --all-levels --json > system-run.json; then
             status=0
           else
             status=$?
           fi
           test "$status" -eq 11
+      - name: Keep the run as evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-run
+          path: system-run.json
 
   protect:
     name: executor branches leave the validators alone
