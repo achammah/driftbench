@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -27,6 +28,10 @@ blocks:
     when:
       user: Please check, match or reconcile an invoice. The total difference is above 50.00 EUR.
     expect:
+      skills:
+        - name: invoice-reconcile
+          count:
+            min: 1
       subagents:
         - name: ledger-auditor
           count:
@@ -44,6 +49,7 @@ metadata:
   estate:
     atoms:
       - instruction.invoice-reconcile.dispatch-the-ledger-auditor-above-50
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: pairwise.1142
     cell:
       ask_class: research

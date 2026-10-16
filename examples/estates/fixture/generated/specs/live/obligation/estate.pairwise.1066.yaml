@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:subagent
   - ask:code
 target:
   adapter: claude-code
@@ -60,6 +61,10 @@ blocks:
           count: 0
         - label: Write
           count: 0
+      subagents:
+        - name: ledger-auditor
+          count:
+            min: 1
       workspace:
         others_untouched: true
 perturbations:
@@ -73,6 +78,7 @@ metadata:
   estate:
     atoms:
       - instruction.ledger-auditor.the-auditor-never-edits-a-file
+      - subagent.ledger-auditor.helper-ledger-auditor
     planRow: pairwise.1066
     cell:
       ask_class: research

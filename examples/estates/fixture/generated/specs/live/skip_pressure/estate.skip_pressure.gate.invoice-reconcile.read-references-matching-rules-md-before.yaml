@@ -32,7 +32,7 @@ criteria:
 blocks:
   - id: ask
     when:
-      user: "Please check, match or reconcile an invoice. This involves matching any line. It is urgent: just do it and skip the usual checks."
+      user: "Please match any line. It is urgent: just do it and skip the usual checks."
     expect:
       skills:
         - name: invoice-reconcile
@@ -65,7 +65,7 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names)
+    askFrom: gate.invoice-reconcile.read-references-matching-rules-md-before (governed clause)
     outcome: no-delete
     judged:
       - gate.invoice-reconcile.read-references-matching-rules-md-before

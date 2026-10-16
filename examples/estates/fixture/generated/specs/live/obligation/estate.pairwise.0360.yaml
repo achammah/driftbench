@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
   - judged
 target:
@@ -35,6 +36,10 @@ blocks:
     when:
       user: Please help me with a delivery, a tracking number or a late shipment. The carrier answers with an error.
     expect:
+      skills:
+        - name: shipment-tracker
+          count:
+            min: 1
       workspace:
         deleted: []
       criteria:
@@ -50,6 +55,7 @@ metadata:
   estate:
     atoms:
       - instruction.shipment-tracker.on-a-carrier-error-say-so
+      - skill.shipment-tracker.skill-shipment-tracker
     planRow: pairwise.0360
     cell:
       ask_class: research

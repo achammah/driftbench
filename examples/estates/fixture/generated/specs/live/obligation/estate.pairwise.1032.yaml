@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
   - judged
 target:
@@ -34,6 +35,10 @@ blocks:
     when:
       user: Please check, match or reconcile an invoice.
     expect:
+      skills:
+        - name: invoice-reconcile
+          count:
+            min: 1
       workspace:
         deleted: []
       criteria:
@@ -49,6 +54,7 @@ metadata:
   estate:
     atoms:
       - instruction.invoice-reconcile.a-line-matches-on-article-code
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: pairwise.1032
     cell:
       ask_class: change_estate

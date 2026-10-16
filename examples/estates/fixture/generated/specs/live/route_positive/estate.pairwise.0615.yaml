@@ -12,6 +12,7 @@ tags:
   - test:route_positive
   - mode:live
   - kind:route
+  - kind:subagent
   - ask:code
 target:
   adapter: claude-code
@@ -72,6 +73,7 @@ metadata:
   estate:
     atoms:
       - route.route-planner.an-ask-that-fits-route-planner
+      - subagent.route-planner.helper-route-planner
     planRow: pairwise.0615
     focusVariant: 614
     cell:

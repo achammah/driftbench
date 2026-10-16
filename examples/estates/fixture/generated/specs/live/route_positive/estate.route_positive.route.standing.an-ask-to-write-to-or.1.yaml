@@ -78,3 +78,8 @@ metadata:
     phrase: 1
     ask: bank
     outcome: bank
+    equivalence:
+      count: 2
+      planRows:
+        - route_positive.route.standing.an-ask-to-write-to-or.1
+        - route_positive.route.standing.an-ask-to-write-to-or.3

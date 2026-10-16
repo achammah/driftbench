@@ -33,8 +33,8 @@ No command on this page calls a paid model. The Northwind map is scanned with re
 
 | Command | What it does | Exit codes |
 |---|---|---|
-| `driftbench estate scan <root> --out <map.yaml>` | Reads an estate into a map of atoms and edges: code reads the structure, a model splits the prose. `--runtime claude-code` (the one runtime today), `--replay <answers>` replays recorded answers instead of calling a model, `--no-model` reads the structured atoms only, `--provider <name>` (anthropic or openai), `--ceiling <characters>` (default 40000), `--ignore <glob>` (repeatable) skips the paths it matches beside the defaults and the `ignore:` list of the [configuration file](#the-estate-configuration-file), `--force` replaces an existing map (its approvals are lost). `--replay` and `--no-model` do not go together. | 0 written; 1 written, but a prose chunk failed or an atom was refused (both listed); 2 usage or input error, nothing written |
-| `driftbench estate lint <map>` | Checks the estate against its map: the codes of section 2. `--ceiling` and `--ignore` as for scan. | 0 clean (unenforced rules alone are reported, never failing); 1 findings or an invalid map; 2 the map or the estate cannot be read |
+| `driftbench estate scan <root> --out <map.yaml>` | Reads an estate into a map of atoms and edges: code reads the structure, a model splits the prose. `--runtime claude-code` (the one runtime today), `--replay <answers>` replays recorded answers instead of calling a model, `--no-model` reads the structured atoms only, `--provider <name>` (anthropic or openai), `--ceiling <characters>` (default 40000), `--ignore <glob>` (repeatable) skips the paths it matches beside the defaults and the `ignore:` list of the [configuration file](#the-estate-configuration-file), `--user-skills <folder>` also reads the user-level skill layer from that folder (none is read without it), `--force` replaces an existing map (its approvals are lost). `--replay` and `--no-model` do not go together. | 0 written; 1 written, but a prose chunk failed or an atom was refused (both listed); 2 usage or input error, nothing written |
+| `driftbench estate lint <map>` | Checks the estate against its map: the codes of section 2. `--ceiling`, `--ignore` and `--user-skills` as for scan; a map scanned with a user layer needs the folder again. | 0 clean (unenforced rules alone are reported, never failing); 1 findings or an invalid map; 2 the map or the estate cannot be read |
 | `driftbench estate approve <map>` | With no flag, lists the atoms that wait. `--kind <kind>` and `--atom <id>` (each repeatable) or `--all` approve in place, keeping comments and layout; `--to <file>` writes the approved map beside the original instead. | 0 listed or approved; 1 invalid map, unknown kind or atom; 2 missing file or options that do not fit |
 | `driftbench estate map <map> --to <space.yaml>` | Writes the space map of the situation axes and the approved axis atoms, for `driftbench space`. `--all` takes unapproved atoms too; `--agent <name>` names the agent (default: the estate folder name). | 0 written; 1 invalid map or space map; 2 missing file or `--to` |
 | `driftbench estate plan <map> --out <plan.yaml>` | Derives the test plan from the approved map, and writes `<plan>.summary.json` beside it. `--t <n>` (default 2), `--space <file>`, `--k <n>` (default 3), `--force`. | 0 written; 1 invalid map, invalid space map, or a space map that does not match the map; 2 usage or input error, nothing written |
@@ -86,7 +86,9 @@ The reader batches independent filesystem metadata checks and file reads with bo
 
 Scanner lookups index atoms, registry rows, file names and line offsets, and reuse chunk lines within a scan. These indexes preserve atom IDs, source spans, candidate order and lint findings; each scan reads its files anew.
 
-Code reads skills, helpers, guards (settings and skill frontmatter), permissions, settings (environment keys only, never a value), the check registry, the step list, references with their "read when" line, scripts, routing table rows, gates (read prerequisites), passages that name a runtime hazard, and the four invariants. Code atoms are approved as read. Routing tables are classified from cell content, not header words. A column naming declared skills or helpers pairs with a column of distinct free multi-word request descriptions to give routes, in either direction and in any language. English grammatical evidence can strengthen that decision but is never required. Target cells may use any wording and name several units. Scalar categories, quantities, paths, dates, names and code lists are attribute values; short values repeated across rows also identify inventories. Attribute columns give no routes. A mixed attribute/request column or conflicting request/target columns gives no code route when the roles cannot be decided. Such a table is recorded as ambiguous in reader notes and flagged in the model's prose request. Only that flagged table can yield a model-proposed route; its quoted span and declared target are validated, and approval remains required. These decisions do not inspect the header labels.
+Code reads skills, helpers, guards (settings and skill frontmatter), permissions, settings (environment keys only, never a value), the check registry, the step list, references with their "read when" line, scripts, routing table rows, gates (read prerequisites), passages that name a runtime hazard, and the four invariants. Code atoms are approved as read. Routing tables are classified from cell content, not header words. A column naming declared skills or helpers pairs with a column of distinct free multi-word request descriptions to give routes, in either direction and in any language. English grammatical evidence can strengthen that decision but is never required. Target cells may use any wording and name several units. Scalar categories, quantities, paths, dates, names and code lists are attribute values; short values repeated across rows also identify inventories. Attribute columns give no routes. A mixed attribute/request column or conflicting request/target columns gives no code route when the roles cannot be decided. Such a table is recorded as ambiguous in reader notes and flagged in the model's prose request. Only that flagged table can yield a model-proposed route; its quoted span and declared target are validated, and approval remains required. These decisions do not inspect the header labels, with one exception: a cell or header that states what a unit does not do gives no route, because a route states when to use it. A header that holds a negation ("It cannot do", "Does not handle"), a column whose cells mostly open with a declarative negation ("Cannot book a berth", "Does not take payments", "Won't send") and a single such cell are limits; the other columns of the table are read as before, and a table of limits only gives no route and is not ambiguous. A prohibition addressed to the agent ("Do not share the key", "Never move the shift") is a rule and stays a request a table may bind to a unit, and a negation inside the situation described ("a tide that has not come in") changes nothing. English grammar only marks a limit; in a language it cannot parse a cell is read as before.
+
+The user-level skill layer is a second skill layer beside the project's. An agent loads the skills of the current user as well as those of the project, but the layer is opt-in: the reader never reads a home folder on its own, so a scan gives the same map on every machine. It reads the user skill folder (usually `~/.claude/skills`) only when one is named: the `--user-skills <folder>` option, the `userSkills` key of the configuration file (relative to the estate root), or `userSkills` of the reader in code; the option wins over the file. Without one, a populated home folder changes nothing. A folder of the layer that holds a `SKILL.md` is a skill. A folder that holds none is a container, such as a folder of synced skills, and the folders one level inside it are looked at the same way. A link to a folder elsewhere is followed. A folder whose name starts with a dot (a trash folder) and a dependency folder are not read. Precedence: the project layer wins. A user folder that is a project skill's own folder (a link into the project) is the same skill and is read once; a user skill with the name of a project skill is left out with a note. Within the layer the first folder, by name, keeps a name. The files of the layer carry the path `~/.claude/skills/<folder>/...` in the map whatever folder they were read in, so a map holds no private path; the layer is no part of the project, so a copy of the estate (for a unit run or a mutant) holds none of it, and an atom read from it has no mutant. A scan that read a layer records `userSkills: true` in the map. `estate lint` needs the folder again (`--user-skills <folder>` or the configuration) and refuses a map that records a layer when it is given none (exit 2), because the layer's atoms cannot be checked without it. A folder that was named and cannot be read is a note. The layer feeds the graph (its skills, rules and references are atoms) but the lint reports on the project: a file of the layer is never an orphan or unreachable, a reference or script of the layer that does not exist is no finding, and the invariant "no file of the estate is an orphan" is measured on the project's files. The scan prints how many skills it read from the layer.
 
 Recovery hazards follow the participants of each event. Restart and resumption refer to the agent's runtime; rate limits affect the agent or its outgoing calls. An explicit unrelated participant or an outgoing API policy is not a recovery hazard.
 
@@ -221,6 +223,7 @@ An estate may hold `driftbench.estate.yaml` at its root, or at `.claude/driftben
 |---|---|---|
 | `ignore` | `estate scan`, `estate lint` | globs of paths no runtime loads, skipped beside the defaults: version control, dependency and cache folders, logs, test fixtures, and the files an operating system or an editor leaves. Each glob is matched like a `.gitignore` line: without a leading slash at any depth, `**` across folders, a matched folder skipped whole. `--ignore <glob>` adds to the list for one run |
 | `externals` | `estate scan` | folders outside the estate a path may name, such as the project the agent works on. They replace the defaults, `docs/` and `_meta/` |
+| `userSkills` | `estate scan`, `estate lint` | the folder of the [user-level skill layer](#reading-the-estate-estate-scan) to read as a second skill layer (relative to the estate root); without it or `--user-skills <folder>` none is read. The option wins over it |
 | `aliases` | `estate scan` | a map from an alias, such as `REF`, to the folder or folders it stands for, relative to the root: `REF/a/b.md` then reads as `<folder>/a/b.md` |
 | `helpers` | `estate unit` | per helper name, a local executor `command` argument array and optional positive `timeoutMs`; the unit runner sends the current body and task on stdin |
 | `scripts` | `estate unit` | per script path, a fixture list or `{ usage, fixtures }` contract: `args`, `stdin`, `files` (name to text, written in a fresh working folder) and `expect` (`exitCode`, default 0; `stdout`; `stdoutIncludes`, a list) |
@@ -279,7 +282,7 @@ Edges, decided by code:
 | Edge | From, to |
 |---|---|
 | route | a route atom to the skill or helper it loads |
-| reference | a skill or helper to a file its body names, and to each file those files name in turn (a chain read once per skill or helper; a shared file keeps every owner; a file in the skill folder that nothing names has no owner) |
+| reference | a skill or helper to a reference atom in a file it owns: its own file and, for a skill, the files of its own folder that its citations lead to, each read once (a file in the skill folder that nothing names has no owner). Edges are direct: a file outside the folder that several units cite, such as a shared index, is cited by each unit with one edge and its own citations belong to no unit's edges, so an index cited by 57 units and citing 3,500 files stores 57 edges and not 200,000. What a unit reaches by following citations is computed on demand (`filesReached`, `citationsByFile`) and never stored |
 | script | a skill to a script it ships |
 | dispatch | a skill or helper to a helper its body names; by an imperative or obligation clause whose object or recipient is a known helper (quoted or plain). Predicate vocabulary is open; grammatical parts of speech distinguish actions from mentions. The helper name must end its noun phrase: a possessive, path suffix or following noun does not name that helper. Dispatch uses the gate clause boundaries and negation scope: prohibitions, optional acts, quoted examples, historical descriptions and noun phrases create no dispatch edge. Transfer objects are noun phrases ending at the recipient preposition; their determiners, possessives, quantities, modifiers and coordination do not restrict dispatch. Coordinated helper targets inherit the same directive and polarity |
 | enforces | a guard to a rule it checks |
@@ -475,6 +478,7 @@ Next: driftbench estate plan approve _captures/docs3/estate/plan.yaml --all, or 
 The written plan and summary are byte for byte the committed `examples/estates/fixture/plan.yaml` and `plan.summary.json`. How to read the counts:
 
 * "Mandatory rows per kind" counts contract rows, a row once for each kind it names: the skill line (111) holds its routes, instructions, references and scripts. "Rows per test type" counts every row, journeys and pairwise included.
+* The console prints a summary, never a line per item: each list (the edges with no journey, the rows adjusted to the space map, the notes) shows its first 10 lines, then one line that counts the rest and names `<plan>.summary.json`, which holds every one under `uncoveredEdges`, `adjusted` and `notes`. A list of 10 or fewer prints whole. A real estate with thousands of unreached edges prints under 100 lines.
 * A cell is a distinct pair of atoms and situation values over the rows. The plan reads no phrase bank, so every cell counts as a cell with no approved phrase.
 * `spaceHash` in the plan is the content hash of the space map used, derived from the map or given with `--space`.
 * The seed of the covering array and of the walk is fixed at 1; there is no flag for it.
@@ -503,7 +507,8 @@ How a row becomes a spec:
 
 * Given: `vars.estate` (runtime and map hash), the session state of the cell, the hazard of the cell as `vars.event`, and the workspace seed of the situation, inlined as `world.workspace.files`.
 * When: the situation the test type needs, found by the row's first atom (the situation holding most of the row's atoms wins, then the one whose own atoms share the deepest folder with files the first atom names; pinned cell values must agree). A guard without a listed triggering situation uses a situation of a rule it enforces; a tool boundary uses a situation listing the most rules from its own file. A guard control uses a situation explicitly approved for that whole guard; an outside situation of one enforced rule is not a guard-wide certificate. Its approved phrases are shuffled by the seed; the twin takes the second phrase. A replay row gives one spec per recorded session of its situation, asking with the session's recorded ask. A deviation of the cell is a perturbation before the ask, with an approved deviation phrase (`inject_at: 0`, recovery within one block). `stop_resume` adds a resume block.
-* When no approved phrase fits the row, code writes the ask from the atoms, so a row is never blocked by a missing phrase alone: the asks a route or skill description names ("Use when the user asks to X" gives "Please X."), a routing row, a description made imperative, for a guard the act its rule forbids, plus the situation of the rule under test. The controls get a neutral ask (outside), an ask to explain without acting (near miss), an ask that describes the act and names no skill (misroute: `Please <act>.`, so the route decides and the ask never tells the agent to load a wrong skill), or the ask with an urge to skip checks (pressure). Deviation and resume messages have code-written defaults too. Such specs carry the tag `ask:code`, `metadata.estate.ask: code` and the field the words came from (`askFrom`); an approved phrase always wins. `--no-fallback` turns this off. A code-written ask names a task: a verb of acting and its object, as a user would ask for work. The title of a rule is the rule, so it is never the ask: a rule is set off by the work it applies to, which is what the trigger of a gate names, else what the skill or helper that carries the rule is for, else, for an instruction or an output rule, the work of the route whose words the rule shares most (the first route when it shares none), since a rule of the standing instructions holds over any work. A gate with no trigger and no unit that carries it holds over no route's work, so its row stays incomplete under `needs-askable-act`. The one title used as an ask is a prohibition, whose forbidden act is the ask ("Never paste a credential" asks to paste one), which breaks the rule and does not copy it. A rule with no such work stays incomplete under `needs-askable-act`. It never restates the rule ("Please do this: never guess a status") or a bare condition ("Please handle this for me: the invoice is not in EUR"): such an ask tests whether the agent repeats the rule, not whether it follows it while working. The rule's situation becomes the task ("Where is shipment NW-55012?"). A guard that watches the user's prompt is the one exception: its test asks with the guard's own trigger ("Stop, that is enough for now."). The floor refuses, with the reason, an act of fewer than three words of letters, which is a verb and no object (the parts of a hyphenated compound count apart: "force-push a branch" passes, "force-push" does not), an act that does not start with a verb (a unit's own description: "Read-only audit lane for ledger checks"), a guard's title (its event and name), a phrase cut mid-sentence, an act or situation that names a file of the estate (the ask would say which file to read) or holds code; the row gets `needs-askable-act` and waits for an approved phrase.
+* When no approved phrase fits the row, code writes the ask from the atoms, so a row is never blocked by a missing phrase alone: the asks a route or skill description names ("Use when the user asks to X" gives "Please X."), a routing row, a description made imperative, for a guard the act its rule forbids (else, for a rule that asks for an act, the act of the tool the guard watches: "Please change a file here." for an Edit or Write guard; a request for a full answer for a guard on the end of a turn; none for a guard on the user's prompt alone, which waits for an approved phrase; the ask never tells the agent to go against a rule), for a hazard a request to go on with the task after it happened, plus the situation of the rule under test. The controls get a neutral ask (outside), an ask to explain without acting (near miss), an ask that describes the act and names no skill (misroute: `Please <act>.`, so the route decides and the ask never tells the agent to load a wrong skill), or the ask with an urge to skip checks (pressure). Deviation and resume messages have code-written defaults too. Such specs carry the tag `ask:code`, `metadata.estate.ask: code` and the field the words came from (`askFrom`); an approved phrase always wins. `--no-fallback` turns this off. A code-written ask names a task: a verb of acting and its object, as a user would ask for work. The title of a rule is the rule, so it is never the ask: a rule is set off by the work it applies to, which is what the trigger of a gate names, else what the skill or helper that carries the rule is for, else the work of the route whose words the rule shares most (the first route when it shares none), since a rule of the standing instructions holds over any work. The one title used as an ask is a prohibition, whose forbidden act is the ask ("Never paste a credential" asks to paste one), which breaks the rule and does not copy it. A rule with no such work stays incomplete under `needs-askable-act`. It never restates the rule ("Please do this: never guess a status") or a bare condition ("Please handle this for me: the invoice is not in EUR"): such an ask tests whether the agent repeats the rule, not whether it follows it while working. The rule's situation becomes the task ("Where is shipment NW-55012?"). A guard that watches the user's prompt is the one exception: its test asks with the guard's own trigger ("Stop, that is enough for now."). The floor refuses, with the reason, an act of fewer than three words of letters, which is a verb and no object (the parts of a hyphenated compound count apart: "force-push a branch" passes, "force-push" does not), an act that does not start with a verb (a unit's own description: "Read-only audit lane for ledger checks"), a guard's title (its event and name), a phrase cut mid-sentence, an act or situation that names a file of the estate (the ask would say which file to read) or holds code; the row gets `needs-askable-act` and waits for an approved phrase.
+A gate with no trigger and no unit that carries it holds over no route's work, so its row stays incomplete under `needs-askable-act`. A gate trigger that opens with a gerund of a known verb is asked as the act ("editing any invoice file" asks to edit any invoice file).
 * Then, from the evidence predicates of the row's atoms:
 
 | Predicate | Check |
@@ -591,6 +596,131 @@ When an ordered obligation names a domain operation with no tool, skill or stage
 A missing reference still permits a Read attempt, which returns an error. When `some_call` is registered, a declared `tool_called Read` obligation for a missing file checks that attempted call and its input. It does not expect a successful read or invented file content. Existing references still use the successful-read check.
 
 The files of the estate copy are listed from the map's `root`. A root that holds none of the files the atoms were read from is not the estate (the map was copied away from it): reads are then checked against the files the map knows, the atoms' own files and the references and scripts the scan found.
+
+### Task-specific asks and equivalent tests
+
+A fallback ask starts with the atom's own governed action. A gate uses its trigger as a task
+(`publishing the corrected newsletter` becomes "Please publish the corrected newsletter.").
+A reference uses the action in its read-when clause. An actionable rule situation precedes a
+unit's broad description. The ask leaves the prerequisite and expected skill for the agent to discover.
+
+An atom that gives no task of its own takes the purpose of the unit that owns it, never a default of the
+estate. The purpose is the unit's description, then the requests of the routing rows that load the unit.
+A description is read in the third person: the first word is the verb when an object follows it, so
+"Handles customer complaints and logs the outcome" asks to handle customer complaints and log the outcome,
+for a verb the built-in list does not hold. A verb that states what a unit holds ("Holds", "Provides"), a
+noun followed by a function word ("Rules for ...") and a description that gives only a condition are no task:
+the ask stays incomplete and names why. A verb joined by "and" shares the form of the first when an object
+follows it; a word that ends the sentence or precedes a preposition stays as written. A possessive ("File's frame") and a plural noun with a noun ending ("analytics", "utilities", "awareness") are
+never read as a verb. A clause of a read-when line rides as the moment only when it is short (14 words or fewer)
+and states no obligation (never, always, must, should, only): a pasted rule is no situation.
+A task taken from a description or a routing request must have the shape of a request, else the next sentence
+is tried and, when none has it, the atom stays without a task: it has no colon (a list), no bare number after the
+verb ("install workflow 6 steps" is a heading with a count), no copula that follows the verb and its bare object
+("plan import is one atomic write" is a sentence about the plan; "notices for customers whose parcels are late" is
+fine), no subject before the verb, and does not open with a usage note ("use when ..."). The object a guard's rule
+names joins the tool act through its strict situation: "Please run a command in the shell here for a force push to
+the shared release branch." 
+A description is cut to the work it names: a parenthetical list of examples, a purpose clause ("so that a
+session can resume it") and a relative clause about the unit itself ("which writes the verdicts") are not asked
+for, and a head left without a verb and its object keeps the whole sentence. A table row or list line is read
+cell by cell: a cell that states a task is the ask (`Publishing the weekly report | file.md` asks to publish the
+weekly report), a cell that names an activity of two words or more rides as the moment, and a bare noun pair
+names a file's content and is neither. A read-when line that
+only lists its file ("`references/fields.md`: field definitions") states no situation; a clause of it apart
+from the file and the read directive rides in the ask as the situation.
+
+Both contract and covering-array rows retain the owning task. A reference's target file determines its folder owner; citation edges never establish ownership.
+Rules use their own source folder, and gated files use their target folder when one exists.
+The longest matching declared skill folder wins; route edges identify route targets only. A standing gate can therefore use the skill whose reference it gates.
+Ambiguous and unowned targets stay unresolved. Older plans are repaired during generation:
+unrelated attached skills are removed from both expectations and atom metadata.
+A shared file outside every skill folder is owned by the unit whose own file cites it: one reference atom
+exists per citation, so each skill or helper that cites the file directly owns its citation, and a link
+that only navigates, or a catalogue that cites a file in another unit's folder, owns nothing. A file cited
+only from the standing instructions has no owner and borrows no task. A prerequisite (reference or gate)
+owned by a helper asks for the work to be handed to a helper ("Please have a helper agent audit the ledger
+extract"), so the order applies only when the dispatch happens.
+Approved trigger phrases also respect that owner: a bank pin on a rule cannot borrow a different unit's task.
+A declared tool can use the owning helper's own situation when its permission is listed under unrelated tasks.
+The task in a source prerequisite clause is used even when the extracted trigger field is absent.
+A bare read-prerequisite title is never converted into a self-answering user ask.
+
+A guard may carry optional `fields.ruleText` and `fields.ruleSources`. Hook prose describes mechanics far
+more often than it names an act, so the ask that sets a guard off is the act of the tool the guard watches
+("change a file here" for Edit and Write, "run a command in the shell here" for Bash, "open a file here" for
+Read; a request for a full answer for a guard on the end of a turn), with the strict situation of the rule text
+as context ("This involves ..."). A phrase of the prose replaces the tool act only when it has a strict shape:
+
+* an act: a verb of the list (a hyphenated verb ends on one), then an object, three to ten words, no colon,
+  parenthesis, quotation, pronoun or relative word, no subject before the verb, no adverb or function word at
+  the end. It comes from the opening gerund ("Deploying to production without a tag"), the gerund after a
+  connective (when, while, if, before, after, until, unless, without, upon), or a rule the guard enforces;
+* a situation: a noun phrase that opens with a determiner or a number, ends on a content word (no adverb of
+  time, no participle), holds no pronoun, relative word or parenthesis, names no hook machinery (guard, hook,
+  check, script, handler, registry), and has no clause cut off inside it.
+
+Sentences about how the hook works (stdin, JSON, exit codes) are skipped, and a verb in the third person
+followed by of, on or about is a plural noun ("Calls of any tool"), never a verb. A guard rule written as an imperative to the agent ("End every reply with ...") is a rule, never an ask, and an act
+with a condition inside it ("ask before an Edit of a policy file", "add a reminder when the owner types stop") is
+a rule too: both fall back to the tool act. The subject of a gate trigger ("you discharge a patient") is dropped
+and its act is asked ("discharge a patient"); a trigger is put in the context as "The task is to ..." when it is an
+act and as "This involves ..." when it is a gerund or a noun phrase. A read-when line that opens with a condition
+("When the owner asks about boarding, read refs/boarding.md") asks about the condition. A guard on the user's prompt is set off by what the owner writes, so its ask is the message: the situation of the
+rule it enforces says it ("The user says stop" asks `stop`), when the message has up to five words and holds no
+clause word. A guard that watches no tool and has no strict prose has no ask: it stays incomplete. A replay row still needs
+its recorded session. The ask reads only the guard's own rule text and matcher: no registry state name or
+severity is read into it. A rule a guard enforces gives its forbidden act when that act is strict, else its
+trigger, else the tool act; a rule that restates itself ("go against this rule") is never the ask.
+
+The unit that owns a gate or a reference supplies the task of the ask, but its load is an expectation only when
+the rule is written in the unit's own files: a standing gate to read a file in a skill's folder does not require the
+skill. A unit-mode row (a guard or script run with no model) expects only what a run without a model can observe:
+the skill that owns the atom supplies the task of a live row, and its load is never an expectation of a unit one.
+
+A `guard_negative` row asks for a harmless near miss of the guard's own rule: without changing anything, what
+it would mean to do the strict act of the rule, what applies to its strict situation, or what it would mean to
+use the tool the guard watches. A guard on the end of a turn, which has no tool, and a guard with no strict
+prose stay incomplete. No estate-wide request stands in for either.
+
+The three types that run a guard directly with no model (`guard_hostile`, `guard_speed`,
+`guard_register`) never read their ask: it is a fixed request that names the tool the guard watches ("Please make
+one Edit or Write call in this workspace."), or the next step of the task when it watches none. No other type gets it.
+
+A map may record `documents`: each file's authority (`normative`, or a navigation role such as `example`,
+`template`, `history`, `changelog`, `journal`, `fixture`, `archive`). A reference whose target is a
+navigation document is a place to look and gets no `read_when` row, no journey edge and no covering-array
+target; the plan notes how many. A prerequisite to read such a file stays a gate. `estate stats` leaves
+those references out of the coverage counts and reports their number. A plan made before the map recorded
+roles still lists the row; generation writes it incomplete with that reason. A map without `documents`
+changes nothing: no file name is read as a role.
+A reference to a file outside the estate root (reached through a link to another repository) enters no journey:
+the run's workspace does not hold the file, so a path through it cannot be walked. Its `read_when` row stays.
+
+Complete tests with exactly equal rule semantics, asks, inputs, expectations, judge rubrics,
+run mode, test type and non-target situation values share one representative.
+Generated criterion identifiers may differ; their full rubrics and flags must remain equal.
+Different prerequisite paths, actions, event cells, unit targets or replay alignments stay separate.
+A journey is keyed by its ordered atom path: two journeys that walk different paths never merge, so every walked edge keeps its own spec.
+The representative retains every source atom in `metadata.estate.atoms` and records
+`metadata.estate.equivalence: { count, planRows }`.
+The count describes represented source tests. The report lists each group's source rows and atoms.
+`estate stats` expands those rows into their original plan cells, without replaying the representative repeatedly.
+Struck source rows count no covered cell. Missing-piece notes with `blocking: false` remain advisory.
+
+The generation report includes `incomplete[]`: spec id, path, plan row and all
+`reasons: [{ marker, atom, detail }]`. Each missing piece keeps its existing reason code.
+Aggregate gap totals remain available. Missing sessions, unsupported checks and unusable tasks
+stay incomplete; grouping never turns an incomplete test into a complete one.
+
+`quality` reports structural complete share, complete asked tests, distinct first asks and distinct asks
+per hundred complete asked tests. Static tests have no ask and stay outside that denominator.
+Event variations can legitimately repeat a task, so compare primary rule tests separately from the full suite.
+
+The fictional scale audit and its paired measurements are in
+[the task-generation audit](estate-task-generation-audit.md).
+The Northwind command transcripts and example generated tree below retain their original captured version.
+Current plan and generation byte snapshots live beside their product tests; they hash every output byte.
 
 Focus coverage counts distinct asks and situation cells. Repeated rows with the same ask and cell do not replace additional mutation opportunities. Additional identical focus variants are omitted.
 

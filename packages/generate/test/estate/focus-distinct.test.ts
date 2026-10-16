@@ -58,6 +58,7 @@ describe('focused mutation opportunities', () => {
         ]);
       });
     expect(new Set(cases).size).toBeGreaterThanOrEqual(5);
-    expect(result.specs).toHaveLength(9);
+    expect(result.specs).toHaveLength(5);
+    expect(result.report.equivalence.collapsed).toBe(4);
   });
 });

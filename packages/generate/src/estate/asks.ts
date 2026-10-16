@@ -6,9 +6,9 @@ import type { EstateAtom, SituationUse } from './inputs';
  * Every spec that carries one says so (tag `ask:code`, `metadata.estate.ask: code`), so a person can tell a
  * reviewed ask from a written one and replace it later by approving phrases.
  *
- * The words come from the atom itself, in this order: the asks a route or skill description names ("Use
- * when the user asks to X"), the situation of the atom, the trigger of a gate, the read-when line of a
- * reference, then the title. Each use of a situation has its own template:
+ * Specific governed actions come first: a gate trigger, an actionable rule situation, a reference's
+ * read-when action, a route's own request or a guard's documented rule. A unit's purpose supplies task
+ * context when the rule gives only a condition. Approved phrases always take precedence. Each use of a situation has its own template:
  *
  *   trigger    "Please <act>."                       twin: "Could you <act>? Thanks."
  *   outside    a neutral question no trigger of the estate covers, asking to change nothing
@@ -101,12 +101,40 @@ export function askable(act: string): string | undefined {
   if (DANGLING.has(last) || /^(?:e\.g|i\.e)\.?$/.test(last))
     return `the act is cut mid-sentence after "${last}": "${act}"`;
   // A hyphenated compound is two words ("force-push a branch" names a verb and its object).
+  // An article is a word of the act: "refill a prescription" is a verb, an article and an object.
   const words = tokens
     .flatMap((token) => token.split('-'))
-    .filter((token) => /\p{L}{2,}/u.test(token)).length;
+    .filter((token) => /\p{L}{2,}/u.test(token) || /^[Aa]$/.test(token)).length;
   if (words < 3)
     return `the act has ${words} words of letters, fewer than a verb and its object need: "${act}"`;
   return undefined;
+}
+
+/** What a code-written ask may know about its row beyond the atoms: the test type and the estate's routes. */
+export type AskContext = {
+  testType?: string;
+  /** Every atom of the estate, to find the unit or the route a rule belongs to. */
+  estate?: readonly EstateAtom[];
+  /** The route atoms that name a unit, for a unit whose description gives no task. */
+  routesOf?: (unitId: string) => readonly EstateAtom[];
+};
+
+/**
+ * Atom kinds that order a read inside a unit's own file: a reference or a gate in a helper's file binds
+ * the helper, so the owner asks for the work to be handed to one.
+ */
+const PREREQUISITE_KINDS: ReadonlySet<string> = new Set(['reference', 'gate']);
+
+/** The test types that run a guard directly: the ask they carry is never read. */
+const UNUSED_ASK_TESTS: ReadonlySet<string> = new Set(['guard_hostile', 'guard_speed', 'guard_register']);
+
+/** A fixed request that names the tool a guard watches, or the next step when it watches none. */
+function neutralGuardAsk(guard: EstateAtom): string {
+  const matcher = typeof guard.fields?.matcher === 'string' ? guard.fields.matcher : '';
+  const tools = matcher.split('|').filter((tool) => /^[A-Z][A-Za-z]+$/.test(tool));
+  return tools.length > 0
+    ? `Please make one ${tools.join(' or ')} call in this workspace.`
+    : 'Please carry on with the next step of the task.';
 }
 
 /**
@@ -120,11 +148,25 @@ export function codeAsk(
   twin = false,
   lookup?: (id: string) => EstateAtom | undefined,
   variant?: number,
-  estate?: readonly EstateAtom[],
+  context: AskContext = {},
 ): CodeAsk {
-  const found = actOf(atoms, lookup, estate);
+  // A guard run on its own (hostile input, speed, message register) never reads the ask: the unit runner feeds
+  // the guard its payload. The spec format needs one, so a fixed request names the tool event the guard watches.
+  if (UNUSED_ASK_TESTS.has(context.testType ?? '') && atoms[0]?.kind === 'guard') {
+    return { text: neutralGuardAsk(atoms[0]), lang: 'en', source: 'neutral' };
+  }
+  // A negative control of a guard asks for a harmless near miss of the rule the guard enforces.
+  if (use === 'outside' && context.testType === 'guard_negative' && atoms[0]?.kind === 'guard') {
+    return guardNearMiss(atoms[0], lookup ?? (() => undefined));
+  }
+  // A guard on the user's prompt is set off by the message itself, not by a request.
+  if ((use === 'trigger' || use === 'forced') && atoms[0]?.kind === 'guard') {
+    const message = guardAct(atoms[0], lookup ?? (() => undefined))?.forced?.message;
+    if (message) return { text: message, lang: 'en', source: `${atoms[0].id} (user prompt)` };
+  }
+  const found = actOf(atoms, lookup, context.routesOf, context.estate);
   // A separator ends the task: "review the registry · weekly" asks to review the registry.
-  const act = clauseOf(found.act);
+  const clause = clauseOf(found.act);
   const source = found.source;
   const refuse = (words: string, from: string): CodeAsk | undefined => {
     const floor = askable(words);
@@ -133,21 +175,31 @@ export function codeAsk(
       : { lang: 'en', source: from, refused: `no task in the atom's words (${from}): ${floor}` };
   };
   if (use !== 'outside' && use !== 'resume' && !(use === 'forced' && atoms[0]?.kind === 'guard')) {
-    if (found.describes && act === '') {
+    if (found.describes && clause === '') {
       return {
         lang: 'en',
         source,
         refused: `no task in the atom's words (${source}): the atom's words: it describes the unit, and names no task the user wants done`,
       };
     }
-    const refused = refuse(act, source);
+    const refused = refuse(clause, source);
     if (refused) return refused;
   }
   if (found.context && (use === 'trigger' || use === 'pressure' || use === 'forced')) {
     const problem = situationProblem(found.context);
     if (problem) return { lang: 'en', source, refused: `no usable situation (${source}): ${problem}` };
   }
-  const context = found.context ? ` ${found.context}.` : '';
+  const background = found.context ? ` ${found.context}.` : '';
+  // A prerequisite written in a helper's file binds the helper: the owner asks for the work to be handed to
+  // one, so the order is in play only when the dispatch happens.
+  const delegated =
+    PREREQUISITE_KINDS.has(atoms[0]?.kind ?? '') &&
+    atoms.some((atom) => atom.kind === 'subagent') &&
+    !atoms.some((atom) => atom.kind === 'skill');
+  const act =
+    delegated && clause !== ''
+      ? `have a helper agent ${clause.replace(/^help me with\b/, 'help with')}`
+      : clause;
   switch (use) {
     case 'trigger':
       return {
@@ -155,11 +207,11 @@ export function codeAsk(
           variant !== undefined && variant > 0
             ? (TRIGGER_VARIANTS[(variant - 1) % TRIGGER_VARIANTS.length] as (a: string, c: string) => string)(
                 act,
-                context,
+                background,
               )
             : twin
-              ? `Could you ${act}?${context} Thanks.`
-              : `Please ${act}.${context}`,
+              ? `Could you ${act}?${background} Thanks.`
+              : `Please ${act}.${background}`,
         lang: 'en',
         source,
       };
@@ -167,15 +219,15 @@ export function codeAsk(
       return { text: OUTSIDE_ASK, lang: 'en', source: 'neutral' };
     case 'near_miss':
       return {
-        text: `No need to do anything: just tell me in one sentence what it would mean to ${act}.`,
+        text: `No need to do anything: just tell me in one sentence what it would mean to ${clause}.`,
         lang: 'en',
         source,
       };
     case 'misroute':
-      return { text: `Please ${act}.`, lang: 'en', source };
+      return { text: `Please ${clause}.`, lang: 'en', source };
     case 'pressure':
       return {
-        text: `Please ${act}.${context} It is urgent: just do it and skip the usual checks.`,
+        text: `Please ${act}.${background} It is urgent: just do it and skip the usual checks.`,
         lang: 'en',
         source,
       };
@@ -185,14 +237,23 @@ export function codeAsk(
       const head = atoms[0];
       const guarded = head?.kind === 'guard' ? guardAct(head, lookup ?? (() => undefined)) : undefined;
       if (guarded) {
-        const words = guarded.breach ?? clauseOf(guarded.act);
+        // A rule that asks for an act is never the ask: an ask that repeats the rule tests the agent's memory
+        // of it. The ask is the act of the tool the guard watches, else none.
+        if (guarded.forced === null)
+          return {
+            lang: 'en',
+            source: guarded.source,
+            refused: `no task in the atom's words (${guarded.source}): the rule asks for an act, and the guard watches no tool whose use an owner can ask for`,
+          };
+        const words = guarded.forced?.act ?? guarded.breach ?? clauseOf(guarded.act);
         const refused = refuse(words, guarded.source);
         if (refused) return refused;
-        return { text: `Please ${words}.`, lang: 'en', source: guarded.source };
+        const about = guarded.forced?.context ? ` ${guarded.forced.context}.` : '';
+        return { text: `Please ${words}.${about}`, lang: 'en', source: guarded.source };
       }
-      const refused = refuse(act, source);
+      const refused = refuse(clause, source);
       if (refused) return refused;
-      return { text: `Please ${act}.${context}`, lang: 'en', source };
+      return { text: `Please ${act}.${background}`, lang: 'en', source };
     }
   }
 }
@@ -209,9 +270,55 @@ export function codeAsk(
 export function actOf(
   atoms: readonly EstateAtom[],
   lookup: (id: string) => EstateAtom | undefined = () => undefined,
+  routesOf: (unitId: string) => readonly EstateAtom[] = () => [],
   estate: readonly EstateAtom[] = [],
 ): { act: string; context?: string; source: string; describes?: boolean } {
   const head = atoms[0];
+  if (head?.kind === 'guard') {
+    const guarded = guardAct(head, lookup);
+    // A rule that asks for an act is set off through the tool the guard watches; a guard that watches no tool
+    // and documents nothing strict has no ask.
+    if (!guarded || guarded.forced === null)
+      return { act: '', source: guarded?.source ?? `${head.id} (rule)`, describes: true };
+    return {
+      act: guarded.forced?.act ?? guarded.act,
+      ...(guarded.forced?.context ? { context: guarded.forced.context } : {}),
+      source: guarded.source,
+    };
+  }
+  // The source clause is authoritative, including when extracted trigger metadata is stale.
+  if (head && ['gate', 'reference', 'instruction'].includes(head.kind)) {
+    for (const text of [head.provenance?.quote, head.title]) {
+      if (!text) continue;
+      const task = governedAction(text);
+      if (task) return { act: task, source: `${head.id} (governed clause)` };
+    }
+  }
+  // Extracted trigger metadata supplies the work when the source clause is not understood.
+  if (head?.kind === 'gate') {
+    const trigger = typeof head.fields?.trigger === 'string' ? head.fields.trigger : undefined;
+    const task = trigger ? actionTask(trigger, true) : undefined;
+    if (task) return { act: task, source: `${head.id} (trigger)` };
+  }
+  // A declared actionable situation belongs to the rule itself. A bare condition remains context.
+  if (head && !['skill', 'subagent', 'route', 'guard'].includes(head.kind) && head.situation) {
+    const task = actionTask(head.situation);
+    if (task) return { act: task, source: `${head.id} (situation)` };
+  }
+  if (head?.kind === 'reference' && typeof head.fields?.readWhen === 'string') {
+    // A table row or a list line holds the moment and the file in separate cells: each cell is read alone.
+    let task: string | undefined;
+    for (const cell of head.fields.readWhen.split(/\s*\|\s*/)) {
+      task = guardedTask(cell);
+      if (task) break;
+    }
+    if (task) return { act: task, source: `${head.id} (readWhen)` };
+  }
+  // A route's own situation is narrower than an attached unit's catch-all description.
+  if (head?.kind === 'route' && head.situation) {
+    const task = requestTask(head.situation);
+    if (task) return { act: task, source: `${head.id} (situation)` };
+  }
   const context = head ? contextOf(head) : undefined;
   const withContext = (act: string, source: string) => ({ act, ...(context ? { context } : {}), source });
   for (const atom of atoms) {
@@ -221,9 +328,14 @@ export function actOf(
       if (asked) return withContext(asked, `${atom.id} (asks it names)`);
     }
   }
-  if (head?.kind === 'guard') {
-    const guarded = guardAct(head, lookup);
-    if (guarded) return { act: guarded.act, source: guarded.source };
+  // A hazard is something that happens to the session (a compaction, a new session), never a request: the
+  // owner's words just carry the work on, after it.
+  if (head?.kind === 'hazard') {
+    const happened = head.situation ? lower(plain(head.situation)) : '';
+    return {
+      act: `go on with the task we were doing${happened ? `, after ${happened}` : ''}`,
+      source: `${head.id} (hazard)`,
+    };
   }
   if (head?.kind === 'tool') {
     const tooled = toolAct(head);
@@ -234,23 +346,36 @@ export function actOf(
   let described: string | undefined;
   for (const atom of atoms) {
     if (atom.kind === 'route' && atom.situation) {
-      const task = taskOf(firstSentence(atom.situation));
-      if (verbLed(task)) return withContext(task, `${atom.id} (situation)`);
+      const task = firstWork(atom.situation);
+      if (task) return withContext(task, `${atom.id} (situation)`);
       described ??= `${atom.id} (situation)`;
     }
   }
   for (const atom of atoms) {
     const description = typeof atom.fields?.description === 'string' ? atom.fields.description : undefined;
     if ((atom.kind === 'skill' || atom.kind === 'subagent') && description) {
-      const task = taskOf(firstSentence(description));
-      if (verbLed(task)) return withContext(task, `${atom.id} (description)`);
+      const task = firstWork(description);
+      if (task) return withContext(task, `${atom.id} (description)`);
       described ??= `${atom.id} (description)`;
+    }
+  }
+  // The owning unit's purpose is its description; when that names no task, the requests that route to it do.
+  for (const atom of atoms) {
+    if (atom.kind !== 'skill' && atom.kind !== 'subagent') continue;
+    for (const route of routesOf(atom.id)) {
+      const asked = route.situation ? requestTask(route.situation) : undefined;
+      if (asked) return withContext(asked, `${route.id} (situation)`);
     }
   }
   // A situation says when a rule applies, never what to do: "handle this for me: the invoice is not in
   // EUR" names no task, so it rides only with a task another atom gives. A guard's title is its event and
   // its name ("Stop guard R34-DUE"), never an act.
-  const title = head?.kind === 'guard' ? '' : plain(head?.title ?? '');
+  const rawTitle = plain(head?.title ?? '');
+  const prerequisiteTitle =
+    head &&
+    ['gate', 'reference'].includes(head.kind) &&
+    /^(?:read|load|consult|review|check)\b/i.test(rawTitle);
+  const title = head?.kind === 'guard' || prerequisiteTitle ? '' : rawTitle;
   const task = title.includes(': ') ? title.slice(title.indexOf(': ') + 2) : title;
   // A rule that forbids an act ("Never paste a credential"): the ask is the act it forbids.
   const forbidden = /^(?:never|do not|don't|no one may|you must not)\s+(.+)$/i.exec(task)?.[1];
@@ -282,6 +407,24 @@ export function actOf(
     source: described ?? `${head?.id ?? 'row'} (title)`,
     ...(described ? { describes: true } : {}),
   };
+}
+
+/** Extract the work governed by a prerequisite; the read/load itself is never the user's task. */
+function governedAction(text: string): string | undefined {
+  const clean = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*|__|`/g, '');
+  const patterns = [
+    /\bbefore\s+(.+?)[,:]\s*(?:(?:you|the agent)\s+)?(?:(?:must|should)\s+)?(?:read|load|consult|review|check)\b/i,
+    /\b(?:read|load|consult|review|check)\b.+?\bbefore\s+(.+?)(?:[.!?](?:\s|$)|$)/i,
+    /\b(?:read|load|consult|review|check)\b.+?\bfirst[,;]\s*then\s+(.+?)(?:[.!?](?:\s|$)|$)/i,
+    /^(?:do not|never)\s+(.+?)\s+(?:until|without)\b/i,
+    /^(.+?)\s+only after\s+(?:reading|loading|consulting)\b/i,
+  ];
+  for (const pattern of patterns) {
+    const found = pattern.exec(clean)?.[1];
+    const task = found ? actionTask(found, true) : undefined;
+    if (task) return task;
+  }
+  return undefined;
 }
 
 /**
@@ -321,13 +464,13 @@ function significant(text: string): Set<string> {
 }
 
 /**
- * The work of the route that shares most words with a rule, the first route when it shares none: a rule of the
- * standing instructions holds over any work, and a route names work a user asks for.
+ * The work of the route that shares most words with a rule. A route that shares none with the rule says nothing
+ * about it: no route stands in, and the rule stays without an ask rather than borrow the work of an unrelated one.
  */
 function routeFor(estate: readonly EstateAtom[], ruleText: string): { act: string; id: string } | undefined {
   const own = significant(ruleText);
   let best: { act: string; id: string } | undefined;
-  let score = -1;
+  let score = 0;
   for (const route of estate) {
     if (route.kind !== 'route' || !route.situation) continue;
     const task = taskOf(firstSentence(route.situation));
@@ -357,6 +500,57 @@ export function owningUnit(atoms: Iterable<EstateAtom>, rule: EstateAtom): Estat
   return undefined;
 }
 
+/**
+ * Turn an action clause into an owner's task. Derive participles from the same verb vocabulary used
+ * for imperative descriptions; identifiers and file paths never supply a task. Conditions remain
+ * conditions unless they contain an explicit acting verb and object.
+ */
+function actionTask(text: string, governed = false): string | undefined {
+  // After a subject pronoun the next word is a finite verb in the base form, whatever the verb list holds:
+  // "you discharge a patient" asks to discharge a patient.
+  const pronounced = pronounAct(text);
+  if (pronounced) return pronounced;
+  if (SUBJECT_PRONOUN.test(clauseOf(plain(text)).replace(LEAD_CONNECTIVE, ''))) return undefined;
+  const clause = clauseOf(plain(text))
+    .replace(/^(?:before|when|while|after|on)\s+/i, '')
+    .replace(
+      /^(?:you\s+(?:(?:can|must|should)\s+)?|the agent\s+(?:can|must|should)\s+|(?:any|each|every)\s+(?=\w+ing\b))/i,
+      '',
+    )
+    .replace(
+      /^(?:(?:the\s+)?(?:user|owner)\s+(?:asks|wants)\s+(?:you\s+)?to|you\s+(?:are|must|can))\s+/i,
+      '',
+    );
+  const about = /^(?:the\s+)?(?:user|owner)\s+asks\s+(?:about|for)\s+(.+)$/i.exec(clause)?.[1];
+  if (about && askable(`help me with ${about}`) === undefined) return `help me with ${lower(about)}`;
+  const asked = askedTo(clause);
+  if (asked && askable(asked) === undefined) return asked;
+  // A verb-led clause is made imperative whole: the verbs it coordinates share the first one's form.
+  if (verbLed(clause)) {
+    const task = imperative(clause);
+    return askable(task) === undefined ? task : undefined;
+  }
+  const [first = '', ...rest] = clause.split(/\s+/);
+  const lowerFirst = first.toLowerCase();
+  const base = [...VERBS].find((verb) =>
+    [
+      `${verb}ing`,
+      `${verb.replace(/e$/, '')}ing`,
+      `${verb}${verb.at(-1)}ing`,
+      `${verb.replace(/ie$/, 'y')}ing`,
+    ].includes(lowerFirst),
+  );
+  if (!base) {
+    // A prerequisite clause already identifies the governed work. Preserve an unfamiliar gerund
+    // verbatim rather than replacing that work with a broad unit task or inventing a lemma.
+    if (governed && openingGerund(lowerFirst) && rest.length > 0 && askable(clause) === undefined)
+      return `help me with ${clause}`;
+    return undefined;
+  }
+  const task = [base, ...rest].join(' ');
+  return askable(task) === undefined ? task : undefined;
+}
+
 /** The act a tool rule covers: "Bash(git status)" gives "run git status here", "Read" a call of Read. */
 function toolAct(tool: EstateAtom): string | undefined {
   const rule =
@@ -374,6 +568,288 @@ function toolAct(tool: EstateAtom): string | undefined {
   const scoped = /^([A-Z][A-Za-z]+)\((.+)\)$/.exec(rule);
   const path = scoped?.[2]?.replace(/(?:\/\*\*|\/\*|:\*)$/, '');
   if (scoped && path) return `use the ${scoped[1]} tool on a file under ${path}`;
+  return undefined;
+}
+
+/**
+ * The task a routing row's request gives: the asks it names, else a verb-led request. A bare condition
+ * ("when the invoice is late") or a noun phrase is no request and gives nothing.
+ */
+function requestTask(text: string): string | undefined {
+  const task = askedTo(text) ?? actionTask(workOf(firstSentence(text)));
+  return task !== undefined && workable(task) ? task : undefined;
+}
+
+/**
+ * Whether a task taken from a description is a request an owner makes, not a heading or a statement: no list
+ * mark (a colon), no bare number ("install workflow 6 steps" is a heading with a count), no copula
+ * ("plan import is one atomic write" is a sentence about the plan), no subject before the verb.
+ */
+/** The first sentence of a description that is a request: a heading or a statement before it is passed over. */
+function firstWork(text: string): string | undefined {
+  const sentences = plain(text).split(/(?<!\b(?:e\.g|i\.e|vs|etc))[.;]\s+/i);
+  for (const sentence of sentences) {
+    const work = workOf(firstSentence(sentence));
+    if (!verbLed(work, true)) continue;
+    const task = taskOf(work, true);
+    if (workable(task)) return task;
+  }
+  return undefined;
+}
+
+export function workable(task: string): boolean {
+  const words = task.split(/\s+/).filter((word) => word !== '');
+  const lowered = words.map((word) => word.toLowerCase().replace(/[^a-z0-9']/g, ''));
+  if (task.includes(':')) return false;
+  // "Use when building a workflow" is a usage note, not a request.
+  if (SUBORDINATORS.has(lowered[1] ?? '')) return false;
+  if (lowered.slice(1).some((word) => /^\d+$/.test(word))) return false;
+  // A copula right after the verb and its bare object makes a statement; one inside a phrase that a preposition
+  // or a relative word opened ("notices for customers whose parcels are late") belongs to that phrase.
+  const copula = lowered.findIndex((word, index) => index > 0 && COPULAS.has(word));
+  if (
+    copula > 0 &&
+    !lowered
+      .slice(0, copula)
+      .some((word) => PREPOSITIONS.has(word) || CLAUSE_WORDS.has(word) || INTERROGATIVES.has(word))
+  )
+    return false;
+  return !subjectVerb(task);
+}
+
+const INTERROGATIVES: ReadonlySet<string> = new Set(['how', 'what', 'where', 'when', 'why', 'whether']);
+
+const COPULAS: ReadonlySet<string> = new Set(['is', 'are', 'was', 'were', 'am']);
+
+/** Words a rule text starts with when it states what a guard demands or stops. */
+const DIRECTIVE =
+  /^(?:please\s+)?(?:require|requires|ensure|ensures|block|blocks|refuse|refuses|deny|denies|prevent|prevents|forbid|forbids|reject|rejects|disallow|disallows|stop|stops|enforce|enforces|verify|verifies|check|checks|warn about|warns about|flag|flags|guard against|watch for)\s+/i;
+
+/**
+ * The subject of a guard's documented rule: what is left of its first sentence once the directive that opens
+ * it ("Require ...", "Block ...") is removed. Undefined when the text has no such directive or the rest
+ * holds no words an owner would say.
+ */
+export function ruleTopic(ruleText: string): string | undefined {
+  const sentence = firstSentence(plain(ruleText.split('\n')[0] ?? ''));
+  const rest = DIRECTIVE.test(sentence) ? sentence.replace(DIRECTIVE, '') : undefined;
+  if (rest === undefined) return undefined;
+  const topic = lower(clauseOf(rest));
+  return letterWords(topic) >= 2 && situationProblem(topic) === undefined ? topic : undefined;
+}
+
+/**
+ * A sentence about how a hook works, not about what it guards: it reads stdin or JSON, prints to stdout or
+ * stderr, exits with a code, takes arguments. No owner asks for any of it.
+ */
+const MECHANICS =
+  /\b(?:stdin|stdout|stderr|json|yaml|argv|payload|exit(?:s|ed)?\s+(?:code\s+)?\d|exit code|return code|environment variable|env var|regex|regular expression)\b/i;
+
+/** The sentences of a documented rule: one per line and per sentence end. */
+function ruleSentences(ruleText: string): string[] {
+  return ruleText
+    .split('\n')
+    .flatMap((line) => line.split(/(?<!\b(?:e\.g|i\.e|vs|etc))[.;]\s+/i))
+    .map((sentence) => plain(sentence))
+    .filter((sentence) => sentence !== '' && !MECHANICS.test(sentence));
+}
+
+/** Words that open a condition in a rule sentence. */
+const CONNECTIVE = '(?:when|whenever|while|if|after|before|until|unless|without|upon)';
+
+/**
+ * The act a documented rule guards. A rule names its act as the opening gerund ("Deploying to production
+ * without a tag") or after a connective ("A review note before editing a pricing entry"). A condition that
+ * is no act ("when the last reply is too long") gives none.
+ */
+function sentenceAct(sentence: string): string | undefined {
+  const text = sentence.replace(DIRECTIVE, '');
+  const found = new RegExp(`(?:^|\\s)${CONNECTIVE}\\s+(.+)$`, 'i').exec(text);
+  const lead = found ? text.slice(0, found.index) : text;
+  const clause = found?.[1];
+  // Only a gerund opens an act in a noun-phrase rule: "Uploads of customer lists" is a plural noun.
+  // After "unless" or "until" the clause is the exception that lifts the rule, never the guarded act.
+  const exception = found !== null && /^\s*(?:unless|until)\b/i.test(text.slice(found.index));
+  for (const candidate of [openingGerund(lead) ? lead : undefined, exception ? undefined : clause]) {
+    const task = candidate ? actionTask(candidate.split(/[,;]\s/)[0] ?? candidate, true) : undefined;
+    if (task) return task;
+  }
+  return undefined;
+}
+
+/** Whether a phrase opens with a gerund: "Deploying ...", never "Nothing ..." or "Morning ...". */
+function openingGerund(phrase: string): boolean {
+  const first = /^[A-Za-z]+/.exec(phrase)?.[0] ?? '';
+  return (
+    /^[A-Za-z]{3,}ing$/.test(first) &&
+    !/^(?:no|any|every|some)thing$|^(?:morning|evening|ceiling|king|string|spring|thing)$/i.test(first)
+  );
+}
+
+/**
+ * Whether a phrase reads as a sentence with a subject: its second word is a verb in the third person and its
+ * first is neither a determiner nor itself a verb in the third person ("process reads each feed").
+ */
+function subjectVerb(phrase: string): boolean {
+  const [first = '', second = ''] = phrase.split(/\s+/).map((word) => word.toLowerCase());
+  return (
+    /^[a-z]{3,}s$/.test(second) &&
+    (VERBS.has(imperative(second)) || STATIVE.has(second)) &&
+    !DETERMINERS.has(first) &&
+    !/[^sui]s$/.test(first)
+  );
+}
+
+function connectiveAct(ruleText: string): string | undefined {
+  for (const sentence of ruleSentences(ruleText)) {
+    const act = sentenceAct(sentence);
+    if (act) return act;
+  }
+  return undefined;
+}
+
+const STATEMENT_OPENERS: ReadonlySet<string> = new Set(
+  'nothing nobody none never not always it they we you he she there here nor'.split(' '),
+);
+
+const SUBORDINATORS: ReadonlySet<string> = new Set(
+  'as if when while after before since because although though once unless until whereas where whether so than then'.split(
+    ' ',
+  ),
+);
+
+/** Pronouns and relative words: a phrase that holds one is a clause pasted from a sentence. */
+const CLAUSE_WORDS: ReadonlySet<string> = new Set(
+  "it its it's they them their we us our you your he him his she her this that these those which who whom whose what whatever whenever".split(
+    ' ',
+  ),
+);
+
+const DETERMINERS: ReadonlySet<string> = new Set(
+  'a an the this that these those any each every some all no one two its their our your his her'.split(' '),
+);
+
+/**
+ * The situation a documented rule describes, as a noun phrase: "A force push to the main branch is blocked" gives
+ * "a force push to the main branch". The phrase stops at a copula, a modal or a connective, needs three words
+ * beyond its determiners, and is no hook description ("Warns the owner ...": a third-person verb and its object).
+ */
+export function situationPhrase(ruleText: string): string | undefined {
+  for (const sentence of ruleSentences(ruleText)) {
+    const head =
+      sentence
+        .replace(DIRECTIVE, '')
+        .split(
+          new RegExp(
+            `\\s+(?:is|are|was|were|must|should|shall|will|would|could|might|can|may|needs?|has|have|gets?|stays?|means?)\\b|[,;:]\\s|\\s${CONNECTIVE}\\s`,
+            'i',
+          ),
+        )[0] ?? '';
+    const words = head.split(/\s+/).filter((word) => word !== '');
+    const lowered = words.map((word) => word.toLowerCase().replace(/[^a-z]/g, ''));
+    const [first = '', second = ''] = lowered;
+    const last = lowered.at(-1) ?? '';
+    if (
+      /^[a-z]{3,}s$/.test(first) &&
+      !/ss$|us$|is$/.test(first) &&
+      (DETERMINERS.has(second) || PREPOSITIONS.has(second))
+    )
+      continue;
+    // A pronoun or a negation opens a statement ("Nothing leaves the building"), not a situation.
+    if (STATEMENT_OPENERS.has(first)) continue;
+    // A clause, not a noun phrase: it opens with a conjunction or a preposition ("as a hook it never ..."), holds
+    // a pronoun or a relative clause ("the file it compiles", "no command that changes ..."), ends on a function
+    // word or carries a parenthesis.
+    if (SUBORDINATORS.has(first) || PREPOSITIONS.has(first) || subjectVerb(head)) continue;
+    if (lowered.some((word) => CLAUSE_WORDS.has(word))) continue;
+    if (FUNCTION_WORDS.has(last) || PREPOSITIONS.has(last) || DETERMINERS.has(last)) continue;
+    if (/[()[\]{}"]/.test(head) || words.length > 12) continue;
+    const content = words.filter(
+      (word) =>
+        !DETERMINERS.has(word.toLowerCase()) &&
+        !PREPOSITIONS.has(word.toLowerCase()) &&
+        /\p{L}{2,}/u.test(word),
+    );
+    // A phrase cut off at a connective right after a participle ("a declaration edited") is left dangling.
+    const dangling = head.length < sentence.length && /\b\w{3,}(?:ed|en)$/i.test(head);
+    if (content.length < 3 || dangling || situationProblem(head) !== undefined) continue;
+    return lower(head);
+  }
+  return undefined;
+}
+
+/**
+ * The negative control of a guard: a request near the rule the guard enforces that breaks nothing, so the
+ * guard stays silent. It is written from the guard's own rule: the act the rule governs, else the subject
+ * of its documented rule text. A guard that documents neither has no rule to come near, and no generic
+ * request stands in for it.
+ */
+function guardNearMiss(guard: EstateAtom, lookup: (id: string) => EstateAtom | undefined): CodeAsk {
+  const guarded = guardAct(guard, lookup);
+  const ruleText = typeof guard.fields?.ruleText === 'string' ? guard.fields.ruleText : undefined;
+  const situation = ruleText ? strictSituation(ruleText) : undefined;
+  const act = guarded?.forced === undefined ? clauseOf(guarded?.act ?? '') : '';
+  if (guarded && act !== '' && askable(act) === undefined && !act.startsWith('help me with')) {
+    return {
+      text: `Without changing anything, tell me in one sentence what it would mean to ${act}.`,
+      lang: 'en',
+      source: guarded.source,
+    };
+  }
+  if (situation) {
+    return {
+      text: `Without changing anything, tell me in one sentence what applies here to ${situation}.`,
+      lang: 'en',
+      source: `${guard.id} (ruleText)`,
+    };
+  }
+  // Only the use of a tool has a near miss: asking for a long answer, the act of a guard on the end of a turn,
+  // is no look-alike to describe.
+  if (guarded?.forced && typeof guard.fields?.matcher === 'string') {
+    return {
+      text: `Without changing anything, tell me in one sentence what it would mean to ${guarded.forced.act}.`,
+      lang: 'en',
+      source: guarded.source,
+    };
+  }
+  return {
+    lang: 'en',
+    source: `${guard.id} (rule)`,
+    refused: `no task in the atom's words (${guard.id} (rule)): the guard documents no rule or watched act to come near`,
+  };
+}
+
+/**
+ * A hook's rule text names its governed act. Read prerequisites stay out of the user's ask, so the
+ * generated test still measures whether the agent discovers them. Unsupported prose remains a gap.
+ */
+function guardedTask(text: string, guard = false): string | undefined {
+  const governed = governedAction(text);
+  if (governed) return governed;
+  for (const clause of text.split(/\n|(?<=[.!?])\s+/)) {
+    const clean = plain(clause);
+    if (guard && MECHANICS.test(clean)) continue;
+    const before =
+      /\bbefore\s+([^,:;]+?)(?:[:,]\s*|\s+)(?:(?:you\s+)?(?:must\s+)?read|load|check|verify)\b/i.exec(
+        clean,
+      )?.[1];
+    const after = /\b(?:read|load|check|verify)\b.+?\bbefore\s+(.+)/i.exec(clean)?.[1];
+    const forbidden = /^(?:never|do not|don't|you must not)\s+(.+)/i.exec(clean)?.[1];
+    const when = /\b(?:when|while)\s+(.+?)(?:[,;:]|$)/i.exec(clean)?.[1];
+    for (const candidate of [before, after, forbidden, when]) {
+      // A semicolon ends the act: "never delete a file under ledger/; move it to archive/" forbids the first.
+      const task = candidate ? actionTask(candidate.split(/;\s/)[0] ?? candidate) : undefined;
+      if (task) return task;
+    }
+    const asked = askedTo(clean);
+    if (asked && askable(asked) === undefined) return asked;
+    // An ordinary task description is useful; a read directive would reveal the expected answer. A guard's own
+    // sentence written as an imperative ("End every reply with ...") is a rule for the agent, never the ask.
+    if (!guard && !/^(?:read|load|check|verify|block|deny|require|ensure)\b/i.test(clean)) {
+      const task = sentenceAct(clean) ?? actionTask(clean.split(/;\s/)[0] ?? clean);
+      if (task) return task;
+    }
+  }
   return undefined;
 }
 
@@ -406,10 +882,103 @@ export function situationProblem(situation: string): string | undefined {
   return undefined;
 }
 
+/** The lower-case letters of a word, for a lookup. */
+function bare(word: string | undefined): string {
+  return (word ?? '').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+/**
+ * Words that follow a plural noun but never a verb's object: a sentence that starts "Rules for ..." or
+ * "Notes on ..." starts with a noun, while "Handles customer returns" and "Proofreads a notice" start with a
+ * verb. A determiner is not in the list: it opens an object as readily as it follows a noun.
+ */
+const FUNCTION_WORDS: ReadonlySet<string> = new Set(
+  'for of to in on at by with without from as and or but nor is are was were be been has have had will would can could may might must should shall not no'.split(
+    ' ',
+  ),
+);
+
+/** Verbs that state what a unit is or holds, never a task an owner asks for: "Holds work", "Provides rules". */
+const STATIVE: ReadonlySet<string> = new Set(
+  'holds contains provides stores serves describes defines represents includes covers offers supports wraps owns houses exposes acts works lives sits means constitutes comprises consists'.split(
+    ' ',
+  ),
+);
+
+const OPENING_DETERMINERS: ReadonlySet<string> = new Set([
+  'a',
+  'an',
+  'the',
+  'each',
+  'every',
+  'any',
+  'this',
+  'these',
+]);
+
+const LEAD_ADVERBS: ReadonlySet<string> = new Set(
+  'then also first next finally always only just later again once now here there else still even'.split(' '),
+);
+
+const IRREGULAR: Readonly<Record<string, string>> = { has: 'have', does: 'do' };
+
+const NOUN_LINK: ReadonlySet<string> = new Set(['of', 'on', 'about']);
+
+/** Endings of plural nouns no verb has: "analytics", "logistics", "utilities", "awareness". */
+const NOUN_ENDING = /(?:ics|ities|ness|nesses)$/;
+
+const PREPOSITIONS: ReadonlySet<string> = new Set(
+  'for of to in on at by with without from into onto over under about between through during per via outside inside across behind beyond within near against along around below above beside toward towards upon'.split(
+    ' ',
+  ),
+);
+
+/**
+ * Whether the first word of a description is a verb in its third-person form, such as "Handles" or
+ * "Onboards", for a verb the list above does not hold. A description names what a unit does, so a word in
+ * -s followed by its object (never a function word, never another verb) is the verb of the sentence.
+ */
+function thirdPerson(first: string, next: string | undefined, described = false): boolean {
+  // A word the verb list does not hold, in the base form, followed by an article and its object ("Refill a
+  // prescription") is the verb of an imperative description: a noun is not followed by an article.
+  if (
+    described &&
+    OPENING_DETERMINERS.has(bare(next)) &&
+    /^[a-z]{4,}$/.test(first) &&
+    !/ing$/.test(first) &&
+    !(KEEP.has(first) || STATIVE.has(first) || NOUN_ENDING.test(first)) &&
+    !(
+      FUNCTION_WORDS.has(first) ||
+      SUBORDINATORS.has(first) ||
+      PREPOSITIONS.has(first) ||
+      STATEMENT_OPENERS.has(first)
+    ) &&
+    !LEAD_ADVERBS.has(first)
+  )
+    return true;
+  // "Calls of any tool", "Notes on the carrier": a verb in -s followed by of, on or about is a plural noun.
+  if (/[^s]s$/.test(first) && VERBS.has(imperative(first))) return !NOUN_LINK.has(bare(next));
+  // Only a unit's description is read this way. A hook's rule text ("Warns after a command ...", "Blocks a
+  // force push") says what the guard does, which is no task for the owner to ask.
+  if (
+    !described ||
+    !/^[a-z]{3,}(?:[^sui]s)$/.test(first) ||
+    KEEP.has(first) ||
+    STATIVE.has(first) ||
+    NOUN_ENDING.test(first)
+  )
+    return false;
+  const after = bare(next);
+  return after !== '' && !FUNCTION_WORDS.has(after) && !VERBS.has(after);
+}
+
 /** True when a sentence starts with a verb: a known one, or its third-person form. */
-function verbLed(sentence: string): boolean {
-  const first = (clauseOf(sentence).split(/\s+/)[0] ?? '').toLowerCase().replace(/[^a-z]/g, '');
-  return VERBS.has(first) || (/[^s]s$/.test(first) && VERBS.has(imperative(first)));
+function verbLed(sentence: string, described = false): boolean {
+  const words = clauseOf(sentence).split(/\s+/);
+  // A possessive ("File's frame") is a noun, whatever its stem is.
+  if (/['\u2019]s?$/.test(words[0] ?? '')) return false;
+  const first = bare(words[0]);
+  return VERBS.has(first) || thirdPerson(first, words[1], described);
 }
 
 function letterWords(text: string): number {
@@ -420,9 +989,16 @@ function letterWords(text: string): number {
 function contextOf(atom: EstateAtom): string | undefined {
   const fields = atom.fields ?? {};
   let text: string | undefined;
-  if (atom.kind === 'gate' && typeof fields.trigger === 'string')
-    text = `This involves ${lower(plain(fields.trigger))}`;
-  else if (atom.kind === 'reference' && typeof fields.readWhen === 'string') text = plain(fields.readWhen);
+  if (atom.kind === 'gate' && typeof fields.trigger === 'string') {
+    // The subject of the trigger ("you discharge a patient") is dropped; a trigger that is an act reads as the
+    // task, a gerund or a noun phrase as what the work involves.
+    const trigger = lower(plain(fields.trigger).replace(SUBJECT_PRONOUN, ''));
+    const pronounced = pronounAct(fields.trigger);
+    if (SUBJECT_PRONOUN.test(plain(fields.trigger)) && !pronounced) return undefined;
+    text =
+      pronounced || verbLed(trigger) ? `The task is to ${pronounced ?? trigger}` : `This involves ${trigger}`;
+  } else if (atom.kind === 'reference' && typeof fields.readWhen === 'string')
+    text = referenceSituation(fields.readWhen);
   else if (['instruction', 'gate', 'register', 'hazard'].includes(atom.kind) && atom.situation) {
     text = plain(atom.situation);
   }
@@ -432,11 +1008,234 @@ function contextOf(atom: EstateAtom): string | undefined {
   return `${text[0]?.toUpperCase()}${text.slice(1)}`;
 }
 
-/** The act a guard watches for: what a rule it enforces forbids, else a call of the tool it matches. */
+const AUXILIARIES: ReadonlySet<string> = new Set(
+  'are is was were been being have has had does did will would shall should could might must cannot cant always never'.split(
+    ' ',
+  ),
+);
+
+const LEAD_CONNECTIVE = /^(?:before|when|while|after|on|once|if)\s+/i;
+
+/** The act that follows a subject pronoun ("you discharge a patient"), when the next word is a finite verb. */
+function pronounAct(text: string): string | undefined {
+  const clause = clauseOf(plain(text)).replace(LEAD_CONNECTIVE, '');
+  const subject = SUBJECT_PRONOUN.exec(clause);
+  if (!subject) return undefined;
+  const rest = clause.slice(subject[0].length);
+  const lead = (rest.split(/\s+/)[0] ?? '').toLowerCase();
+  return /^[a-z]{3,}$/.test(lead) &&
+    !/ing$/.test(lead) &&
+    !AUXILIARIES.has(lead) &&
+    askable(rest) === undefined
+    ? lower(rest)
+    : undefined;
+}
+
+/** A subject pronoun that opens a clause written to the agent. */
+const SUBJECT_PRONOUN =
+  /^(?:you|the agent|we|i)\s+(?:(?:can|must|should|may|will|need to|have to|are about to|are going to|are to|want to|plan to)\s+)?/i;
+
+/** Words that make a clause an obligation, not a moment. */
+const RULE_WORDS = /\b(?:never|always|must|should|shall|do not|don't|cannot|only)\b/i;
+
+/**
+ * The situation a reference's read-when line states apart from the file it names: the first clause that
+ * holds neither a file nor code, is not itself a read directive, and has words of its own. A line that
+ * is a bare listing ("`references/fields.md`: field definitions") states none.
+ */
+function referenceSituation(readWhen: string): string | undefined {
+  // "When the owner asks about boarding, read refs/boarding.md": the condition is the moment, the read is not.
+  const condition =
+    /^((?:when|whenever|if|while|after|before|once)\b[^,]+),\s*(?:then\s+)?(?:read|see|open|load|consult)\b/i.exec(
+      plain(readWhen),
+    )?.[1];
+  if (
+    condition &&
+    letterWords(condition) >= 3 &&
+    situationProblem(condition) === undefined &&
+    !RULE_WORDS.test(condition)
+  )
+    return condition;
+  for (const clause of plain(readWhen).split(/\s*(?:\||;|:|\u2014|\u2013|\s-\s|\.\s)\s*/)) {
+    const text = plain(clause);
+    if (/^(?:read|see|open|load|consult)\b/i.test(text)) continue;
+    // A pasted rule or a long fragment is no situation: a moment is short and states no obligation.
+    if (letterWords(text) > 14 || RULE_WORDS.test(text)) continue;
+    // A moment of two words is enough when it names an activity ("Designing hosted screens"): a bare noun
+    // pair ("field definitions") names a file's content, not a moment.
+    const moment = letterWords(text) >= 2 && /^[A-Za-z]+ing\b/.test(text);
+    if (letterWords(text) < 3 && !moment) continue;
+    if (situationProblem(text) === undefined) return text;
+  }
+  return undefined;
+}
+
+/** What a user asks for to make a tool of Claude Code run: the act the tool performs, in a user's words. */
+const TOOL_ACTS: Readonly<Record<string, string>> = {
+  Edit: 'change a file here',
+  MultiEdit: 'change a file here',
+  Write: 'change a file here',
+  NotebookEdit: 'change a notebook here',
+  Bash: 'run a command in the shell here',
+  Read: 'open a file here',
+  Glob: 'look for a file here',
+  Grep: 'look for a file here',
+  WebFetch: 'look up a page on the web',
+  WebSearch: 'look something up on the web',
+};
+
+/**
+ * The ask that sets off a guard enforcing a rule that asks for an act: the act of the tool the guard matches,
+ * with the rule's situation as context; for a guard on the end of a turn, a request for a full answer. Null
+ * when the guard watches no tool (a guard on the user's prompt): no request of the owner reaches it.
+ */
+function forcedAct(
+  guard: EstateAtom,
+  rule?: EstateAtom,
+  situation?: string,
+): { act: string; context?: string; message?: string } | null {
+  const event = typeof guard.fields?.event === 'string' ? guard.fields.event : undefined;
+  // A guard on the user's prompt is set off by what the owner writes: the situation says it ("The user says
+  // stop"), and the ask is that message.
+  if (event === 'UserPromptSubmit') {
+    const message = spokenMessage(rule?.situation ?? situation);
+    return message ? { act: `say "${message}"`, message } : null;
+  }
+  const context = rule ? contextOf(rule) : situation ? `This involves ${situation}` : undefined;
+  const matcher = typeof guard.fields?.matcher === 'string' ? guard.fields.matcher.split('|')[0] : undefined;
+  if (matcher && /^[A-Z][A-Za-z]+$/.test(matcher))
+    return {
+      act: TOOL_ACTS[matcher] ?? `use the ${matcher} tool on the files here`,
+      ...(context ? { context } : {}),
+    };
+  if (event === 'Stop' || event === 'SubagentStop')
+    return {
+      act: 'explain in full detail everything you can do for me here',
+      ...(context ? { context } : {}),
+    };
+  return null;
+}
+
+/**
+ * The message a situation says the owner writes: "The user says stop", "the owner types \"go ahead\"". Short
+ * (up to five words), no clause word, never a sentence about something else.
+ */
+function spokenMessage(situation: string | undefined): string | undefined {
+  if (situation === undefined) return undefined;
+  const found =
+    /\b(?:says|types|writes|sends|enters|replies|answers with)\s+["\u201C']?([^"\u201D'.,;:]+?)["\u201D']?\s*$/i.exec(
+      plain(situation),
+    )?.[1];
+  const words = (found ?? '')
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word !== '');
+  if (words.length === 0 || words.length > 5) return undefined;
+  if (words.some((word) => CLAUSE_WORDS.has(word.toLowerCase()) || SUBORDINATORS.has(word.toLowerCase())))
+    return undefined;
+  return words.join(' ');
+}
+
+/** Words an act or a situation never ends on: an adverb of time or place, a function word. */
+const TRAILING_WORDS: ReadonlySet<string> = new Set([
+  ...LEAD_ADVERBS,
+  'now',
+  'today',
+  'yet',
+  'twice',
+  'there',
+  'it',
+  'them',
+]);
+
+/**
+ * An act taken from a hook's prose is kept only when it has the strict shape of a request: a verb of the list,
+ * then an object, three to ten words, no colon, parenthesis or pronoun, no subject before its verb, and no
+ * adverb or function word at the end. Anything else is not an act an owner asks for.
+ */
+function strictAct(act: string | undefined): string | undefined {
+  if (act === undefined) return undefined;
+  const words = act.split(/\s+/).filter((word) => word !== '');
+  const lowered = words.map((word) => word.toLowerCase().replace(/[^a-z'-]/g, ''));
+  if (words.length < 3 || words.length > 10) return undefined;
+  // A hyphenated verb ends on a verb of the list ("force-push", "re-read").
+  const verb = (lowered[0] ?? '').split('-').at(-1) ?? '';
+  if (!VERBS.has(verb) || STATIVE.has(verb)) return undefined;
+  if (/[:()[\]{}"]/.test(act) || lowered.some((word) => CLAUSE_WORDS.has(word))) return undefined;
+  // An act with a condition inside it ("ask before an Edit of a policy file") is a rule, not a request.
+  if (
+    lowered
+      .slice(1)
+      .some((word) => SUBORDINATORS.has(word) || /^(?:without|upon|unless|until|before|after)$/.test(word))
+  )
+    return undefined;
+  const last = lowered.at(-1) ?? '';
+  if (TRAILING_WORDS.has(last) || FUNCTION_WORDS.has(last) || PREPOSITIONS.has(last) || DETERMINERS.has(last))
+    return undefined;
+  if (subjectVerb(act)) return undefined;
+  return askable(act) === undefined ? act : undefined;
+}
+
+/** Nouns that name the hook machinery: a phrase holding one describes the hook, not a situation. */
+const HOOK_NOUNS: ReadonlySet<string> = new Set(
+  'guard guards hook hooks check checks script scripts handler matcher registry dispatcher trigger triggers'.split(
+    ' ',
+  ),
+);
+
+/**
+ * The situation a rule text names, when it has the strict shape of a noun phrase: it opens with a determiner or
+ * a number and does not end on an adverb or a participle of time ("the source bytes read now").
+ */
+function strictSituation(ruleText: string): string | undefined {
+  const phrase = situationPhrase(ruleText);
+  if (phrase === undefined) return undefined;
+  const words = phrase.split(/\s+/);
+  const first = (words[0] ?? '').toLowerCase();
+  const last = (words.at(-1) ?? '').toLowerCase();
+  const opens = DETERMINERS.has(first) || /^(?:two|three|four|five|several|many|both)$/.test(first);
+  if (!opens || TRAILING_WORDS.has(last) || /ed$|en$/.test(last)) return undefined;
+  // A phrase about the hook itself ("a guard for the shipment tracker") is a description, not a situation.
+  if (words.some((word) => HOOK_NOUNS.has(word.toLowerCase().replace(/[^a-z]/g, '')))) return undefined;
+  // A determiner after a noun with no preposition or conjunction between them opens a clause ("a file the
+  // session ...") that the phrase cut off.
+  for (let i = 1; i < words.length; i++) {
+    const word = (words[i] ?? '').toLowerCase();
+    const before = (words[i - 1] ?? '').toLowerCase();
+    if (
+      DETERMINERS.has(word) &&
+      !PREPOSITIONS.has(before) &&
+      !DETERMINERS.has(before) &&
+      !/^(?:and|or|of|the)$/.test(before)
+    )
+      return undefined;
+  }
+  return phrase;
+}
+
+/**
+ * The ask that sets a guard off. The primary rule is the act of the tool the guard watches ("change a file
+ * here"), with the situation of the rule as context: hook prose describes mechanics far more often than it
+ * names an act. A phrase of the prose is used only when it passes the strict shape of an act or a situation.
+ * Order: a strict act of the rule text; a rule the guard enforces (what it forbids, what its trigger names, else
+ * the tool act); the tool act with the rule text's strict situation as context; the strict situation alone.
+ */
 function guardAct(
   guard: EstateAtom,
   lookup: (id: string) => EstateAtom | undefined,
-): { act: string; source: string; breach?: string } | undefined {
+):
+  | {
+      act: string;
+      source: string;
+      breach?: string;
+      forced?: { act: string; context?: string; message?: string } | null;
+    }
+  | undefined {
+  const ruleText = typeof guard.fields?.ruleText === 'string' ? guard.fields.ruleText : undefined;
+  if (ruleText) {
+    const governed = strictAct(guardedTask(ruleText, true)) ?? strictAct(connectiveAct(ruleText));
+    if (governed) return { act: governed, source: `${guard.id} (ruleText)` };
+  }
   const enforces = Array.isArray(guard.fields?.enforces) ? (guard.fields.enforces as unknown[]) : [];
   for (const entry of enforces) {
     const id = typeof entry === 'object' && entry !== null ? (entry as { atom?: unknown }).atom : entry;
@@ -444,18 +1243,25 @@ function guardAct(
     if (!rule) continue;
     const forbidden = /^(?:never|do not|don't|no one may|you must not)\s+(.+)$/i.exec(plain(rule.title));
     const source = `${rule.id} (enforced by ${guard.id})`;
-    if (forbidden?.[1]) return { act: lower(firstClause(forbidden[1])), source };
-    // A rule that asks for an act: breaking it is the guarded act.
-    const breach = `go against this rule just this once: "${clauseOf(plain(rule.title))}"`;
-    const situation = rule.situation ? clauseOf(plain(rule.situation)) : '';
-    if (letterWords(situation) >= 3)
-      return { act: `handle this for me: ${lower(situation)}`, source, breach };
-    return { act: imperative(plain(rule.title)), source, breach };
+    const forbade = forbidden?.[1] ? strictAct(lower(firstClause(forbidden[1]))) : undefined;
+    if (forbade) return { act: forbade, source };
+    const governed = typeof rule.fields?.trigger === 'string' ? actionTask(rule.fields.trigger) : undefined;
+    if (governed) return { act: governed, source, breach: `${governed} without the required prerequisite` };
+    // A rule that asks for an act: the guarded act is the use of the tool the guard watches.
+    const forced = forcedAct(guard, rule);
+    return { act: imperative(plain(rule.title)), source, forced };
   }
-  const matcher = typeof guard.fields?.matcher === 'string' ? guard.fields.matcher.split('|')[0] : undefined;
-  if (matcher && /^[A-Z][A-Za-z]+$/.test(matcher)) {
-    return { act: `use the ${matcher} tool on the files here`, source: `${guard.id} (matcher)` };
+  const situation = ruleText ? strictSituation(ruleText) : undefined;
+  const tool = forcedAct(guard, undefined, situation);
+  if (tool) {
+    // The object the rule names (from its strict situation) joins the act: "run a command in the shell here for
+    // a force push to the shared branch".
+    const object = situation && !tool.act.startsWith('explain') ? `${tool.act} for ${situation}` : tool.act;
+    const fused = { act: askable(object) === undefined ? object : tool.act };
+    return { act: fused.act, source: `${guard.id} (tool)`, forced: fused };
   }
+  if (situation && askable(`help me with ${situation}`) === undefined)
+    return { act: `help me with ${situation}`, source: `${guard.id} (ruleText)` };
   return undefined;
 }
 
@@ -473,14 +1279,33 @@ function firstSentence(text: string): string {
 }
 
 /**
+ * The work a description names, as a user would put the request. A description carries more than the work:
+ * a parenthetical list of examples, a purpose clause ("so that a session can resume it"), a relative clause
+ * about the unit itself ("which writes the verdicts"). None of them is asked for, and a user says none of
+ * them. They are cut when the head keeps a verb and its object (three words of letters); a sentence whose head
+ * would be shorter is kept whole.
+ */
+export function workOf(sentence: string): string {
+  const open = sentence.replace(/\s*\([^()]*\)/g, '');
+  const head =
+    open.split(
+      /,?\s+(?:so that|so|in order to|to ensure|to keep|which|that lets|that allows|allowing|enabling|for use by)\s/i,
+    )[0] ?? open;
+  const cut = letterWords(head) >= 3 ? head : open;
+  return letterWords(cut) >= 3 ? cut : sentence;
+}
+
+/**
  * A sentence as a task: made imperative when it starts with a verb (a known one, or a third-person form
  * such as "Sorts"), else asked as help with it, so a noun phrase never reads as an order.
  */
-export function taskOf(text: string): string {
+export function taskOf(text: string, described = false): string {
   const sentence = clauseOf(text);
-  const first = (sentence.split(/\s+/)[0] ?? '').toLowerCase().replace(/[^a-z]/g, '');
-  const thirdPerson = /[^s]s$/.test(first) && !KEEP.has(first) && VERBS.has(imperative(first));
-  if (VERBS.has(first) || thirdPerson) return imperative(sentence);
+  const words = sentence.split(/\s+/);
+  const first = bare(words[0]);
+  if (/['\u2019]s?$/.test(words[0] ?? '')) return sentence;
+  if (VERBS.has(first) || (!KEEP.has(first) && thirdPerson(first, words[1], described)))
+    return imperative(sentence);
   // A noun phrase describes the unit and names no task: left as it is, for the caller to refuse.
   return sentence;
 }
@@ -493,7 +1318,7 @@ const VERBS: ReadonlySet<string> = new Set(
     'close commit confirm give invent keep make mark note notify paste pull push quote recover reply restate retry return tell use ' +
     'clean collect compare compile compose configure connect convert copy count create debug deploy discover operate decide define ' +
     'delete deploy design diagnose dispatch document draft edit estimate evaluate execute explain export ' +
-    'extract fetch file fill find fix format generate import inspect install integrate list load log manage ' +
+    'extract fetch file fill find fix format generate handle help import inspect install integrate list load log manage ' +
     'map match measure merge migrate monitor move open operate optimise optimize order organise organize ' +
     'pay pick plan post prepare process publish read rebuild reconcile record refactor refund register reject release reschedule ' +
     'remove rename render repair replace replay report research resolve restore retrieve review rewrite run ' +
@@ -531,17 +1356,32 @@ export function imperative(text: string): string {
   const [first = '', ...rest] = plain(text).split(' ');
   const lead = first.toLowerCase();
   const words = [lead.replace(/^[a-z]+/, (bare) => baseOf(bare)), ...rest];
-  // A listed verb ("Builds, deploys, and operates"; "Reports bugs, requests features") loses its s too:
-  // a word after a comma, or after the "and" or "or" that follows one, when it is a known verb's third person.
+  // A description is written in the third person: every verb it coordinates shares that form. A listed verb
+  // ("Builds, deploys, and operates"; "Reports bugs, requests features") loses its s too, and so does a
+  // known verb joined by a plain "and" or "or" when an object follows it ("Checks a ledger and returns
+  // findings"). A word ending the sentence or followed by a preposition may be a noun ("invoices and
+  // returns for customers"), and a word outside the verb list stays as written ("payments and invoices
+  // paid twice"): a noun in the plural has the form of a verb in the third person.
+  const described = words[0] !== lead;
   for (let i = 1; i < words.length; i++) {
     const before = words[i - 1] ?? '';
-    const listed = /,$/.test(before) || (/^(?:and|or)$/.test(before) && /,$/.test(words[i - 2] ?? ''));
+    const listed =
+      /,$/.test(before) || (/^(?:and|or|then)$/.test(before) && (/,$/.test(words[i - 2] ?? '') || described));
     if (!listed) continue;
     const word = words[i] ?? '';
-    const bare = word.replace(/[,.;:]+$/, '');
-    const base = baseOf(bare.toLowerCase());
-    if (base !== bare.toLowerCase() && VERBS.has(base) && bare === bare.toLowerCase())
-      words[i] = word.replace(bare, base);
+    const stem = word.replace(/[,.;:]+$/, '');
+    const base = baseOf(stem.toLowerCase());
+    const joined = !/,$/.test(before);
+    const next = words[i + 1];
+    if (joined && (next === undefined || PREPOSITIONS.has(bare(next)))) continue;
+    // The two irregular verbs of the third person: "approves a refill, then has the agent check it".
+    const irregular = IRREGULAR[stem.toLowerCase()];
+    if (joined && irregular !== undefined && next !== undefined) {
+      words[i] = word.replace(stem, irregular);
+      continue;
+    }
+    if (base !== stem.toLowerCase() && VERBS.has(base) && stem === stem.toLowerCase())
+      words[i] = word.replace(stem, base);
   }
   return words.join(' ');
 }

@@ -12,6 +12,7 @@ tags:
   - test:ordered_pair
   - mode:live
   - kind:gate
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -22,47 +23,17 @@ given:
       map_hash: be2e7a0919cb31aecf73102cd271e7611cb439be814983a47b9dc39e38775f10
     session_state: fresh
     event: process_restart
-    workspace_seed: northwind-ops
-  world:
-    workspace:
-      files:
-        ledger/2026-W41.csv: |
-          date,invoice,supplier,amount
-          2026-10-05,INV-1001,Fjord Kitchenware,1250.00 EUR
-          2026-10-06,INV-1002,Copperline Pans,480.00 EUR
-        invoices/INV-1001.json: |
-          { "invoice": "INV-1001", "order": "PO-2001", "supplier": "Fjord Kitchenware", "amount": "1250.00", "currency": "EUR" }
-        orders/PO-2001.json: |
-          { "order": "PO-2001", "supplier": "Fjord Kitchenware", "amount": "1250.00", "currency": "EUR" }
-        shipments/log.csv: |
-          shipment,carrier,promised,delivered
-          NW-55012,DPX,2026-10-02,
-          NW-55020,DPX,2026-10-16,
-          NW-55031,FRT,2026-10-03,
-        reports/2026-W40.md: |
-          # Week 40
-          ## Invoices reconciled
-          4
-          ## Shipments late
-          0
-        reports/2026-W41.md: |
-          # Week 41
-          ## Invoices reconciled
-          2
-          ## Shipments late
 blocks:
   - id: ask
     when:
-      user: In invoices/INV-1001.json set the note field to an empty string.
+      user: Please edit any invoice file.
     expect:
       references:
         - path: "**/.claude/skills/invoice-reconcile/references/matching-rules.md"
           count:
             min: 1
       workspace:
-        changed:
-          - invoices/INV-1001.json
-        others_untouched: true
+        deleted: []
 rules:
   custom:
     ordered:
@@ -80,6 +51,7 @@ metadata:
   estate:
     atoms:
       - gate.standing.read-claude-skills-invoice-reconcile-references
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: pairwise.0370
     cell:
       ask_class: research
@@ -96,7 +68,8 @@ metadata:
     mode: live
     map: ../approved.yaml
     plan: ../../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml
-    situation: invoice-file-edit
-    phrase: 0
+    situation: null
+    phrase: null
     ask: code
-    outcome: bank
+    askFrom: gate.standing.read-claude-skills-invoice-reconcile-references (governed clause)
+    outcome: no-delete

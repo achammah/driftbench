@@ -12,6 +12,7 @@ tags:
   - test:route_positive
   - mode:live
   - kind:route
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -72,6 +73,7 @@ metadata:
   estate:
     atoms:
       - route.standing.an-ask-to-know-where-a
+      - skill.shipment-tracker.skill-shipment-tracker
     planRow: pairwise.1189
     focusVariant: 1188
     cell:

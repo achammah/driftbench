@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
   - judged
 target:
@@ -41,6 +42,10 @@ blocks:
     when:
       user: Draft an email to Copperline Pans about the 40 missing lids on PO-2002; we want them by 20 October. Show me the draft, do not send it.
     expect:
+      skills:
+        - name: supplier-email
+          count:
+            min: 1
       workspace:
         others_untouched: true
       criteria:
@@ -56,6 +61,7 @@ metadata:
   estate:
     atoms:
       - instruction.supplier-email.a-draft-has-a-subject-a
+      - skill.supplier-email.skill-supplier-email
     planRow: pairwise.0030
     cell:
       ask_class: compose

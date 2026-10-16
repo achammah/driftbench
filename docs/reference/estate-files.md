@@ -10,6 +10,9 @@ The files of an estate test suite: the map `driftbench estate scan` writes and a
 ## Contents
 
 * [EstateMap](#estatemap)
+* [DocumentInfo](#documentinfo)
+* [DocumentRole](#documentrole)
+* [DocumentInfo sections](#documentinfo-sections)
 * [Atom](#atom)
 * [AtomKind](#atomkind)
 * [Provenance](#provenance)
@@ -40,6 +43,7 @@ The files of an estate test suite: the map `driftbench estate scan` writes and a
 | `runtime` | string, not empty | yes |  | The adapter that read the estate: claude-code, nexus, ... |
 | `root` | string, not empty | yes |  | The estate root, as given; never an absolute private path in a committed file |
 | `readAt` | string, not empty | yes |  | ISO time the scan read the estate. |
+| `documents` | list of [DocumentInfo](#documentinfo) | no |  | Document authority and non-normative line spans; absent in older maps. |
 | `atoms` | list of [Atom](#atom) | yes |  | Every atom the scan read from the estate. |
 | `edges` | list of [Edge](#edge) | yes |  | The edges of the estate graph, decided by code. |
 | `space` | string | no |  | Path of the exported space map of the situation axes |
@@ -47,6 +51,36 @@ The files of an estate test suite: the map `driftbench estate scan` writes and a
 | `followedLinks` | list of strings, each not empty | no |  | Links, relative to the estate root, that the scan read through to a real path outside the root |
 | `producedBy` | [EstateMap producedBy](#estatemap-producedby) | no |  | Who proposed the model atoms; code atoms say producedBy: code on the atom itself |
 | `hash` | string, not empty | yes |  | SHA-256 over the sorted atom hashes and edges |
+
+## DocumentInfo
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `path` | string, not empty | yes |  |  |
+| `role` | [DocumentRole](#documentrole) | yes |  |  |
+| `reasons` | list of strings, each not empty, at least 1 item | yes |  |  |
+| `sections` | list of [DocumentInfo sections](#documentinfo-sections) | no |  |  |
+
+## DocumentRole
+
+| Value | Meaning |
+|---|---|
+| `normative` |  |
+| `changelog` |  |
+| `history` |  |
+| `template` |  |
+| `example` |  |
+| `journal` |  |
+| `fixture` |  |
+| `archive` |  |
+
+## DocumentInfo sections
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `startLine` | integer, at least 1 | yes |  |  |
+| `endLine` | integer, at least 1 | yes |  |  |
+| `role` | [DocumentRole](#documentrole) | yes |  |  |
 
 ## Atom
 

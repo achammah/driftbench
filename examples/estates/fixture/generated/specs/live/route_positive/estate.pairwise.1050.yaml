@@ -12,6 +12,7 @@ tags:
   - test:route_positive
   - mode:live
   - kind:route
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -71,6 +72,7 @@ metadata:
   estate:
     atoms:
       - route.standing.an-ask-to-reconcile-an-invoice
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: pairwise.1050
     focusVariant: 1049
     cell:

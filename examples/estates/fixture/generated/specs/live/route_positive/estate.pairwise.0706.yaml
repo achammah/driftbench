@@ -12,6 +12,7 @@ tags:
   - test:route_positive
   - mode:live
   - kind:route
+  - kind:subagent
   - ask:code
 target:
   adapter: claude-code
@@ -31,7 +32,7 @@ blocks:
           count:
             min: 1
       workspace:
-        deleted: []
+        others_untouched: true
 perturbations:
   - id: deviation-D1_off_topic
     class: D1_off_topic
@@ -43,6 +44,7 @@ metadata:
   estate:
     atoms:
       - route.inbox-triager.an-ask-that-fits-inbox-triager
+      - subagent.inbox-triager.helper-inbox-triager
     planRow: pairwise.0706
     focusVariant: 705
     cell:
@@ -64,4 +66,4 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.inbox-triager.an-ask-that-fits-inbox-triager (situation)
-    outcome: no-delete
+    outcome: no-change:read-only

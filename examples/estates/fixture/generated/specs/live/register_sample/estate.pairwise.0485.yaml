@@ -12,6 +12,7 @@ tags:
   - test:register_sample
   - mode:live
   - kind:register
+  - kind:subagent
   - ask:code
 target:
   adapter: claude-code
@@ -31,6 +32,10 @@ blocks:
     when:
       user: Please help me with the delivery plan of a day.
     expect:
+      subagents:
+        - name: route-planner
+          count:
+            min: 1
       must:
         - ^\s*\|.*\|
       workspace:
@@ -48,6 +53,7 @@ metadata:
   estate:
     atoms:
       - register.route-planner.the-plan-is-a-table-of
+      - subagent.route-planner.helper-route-planner
     planRow: pairwise.0485
     cell:
       ask_class: compose

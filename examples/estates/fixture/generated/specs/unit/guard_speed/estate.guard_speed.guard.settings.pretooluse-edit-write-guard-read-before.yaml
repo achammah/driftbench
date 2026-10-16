@@ -12,6 +12,7 @@ tags:
   - test:guard_speed
   - mode:unit
   - kind:guard
+  - kind:skill
 target:
   adapter: claude-code
 given:
@@ -68,6 +69,7 @@ metadata:
   estate:
     atoms:
       - guard.settings.pretooluse-edit-write-guard-read-before
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: guard_speed.guard.settings.pretooluse-edit-write-guard-read-before
     cell:
       atoms.guard: guard.settings.pretooluse-edit-write-guard-read-before

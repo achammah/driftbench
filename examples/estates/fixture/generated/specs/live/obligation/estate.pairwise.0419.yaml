@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:subagent
   - ask:code
   - judged
 target:
@@ -59,6 +60,10 @@ blocks:
     when:
       user: Sort the five messages in inbox/ into their folders and tell me where each one goes.
     expect:
+      subagents:
+        - name: inbox-triager
+          count:
+            min: 1
       workspace:
         others_untouched: true
       criteria:
@@ -74,6 +79,7 @@ metadata:
   estate:
     atoms:
       - instruction.inbox-triager.the-triager-never-answers-or-deletes
+      - subagent.inbox-triager.helper-inbox-triager
     planRow: pairwise.0419
     cell:
       ask_class: compose

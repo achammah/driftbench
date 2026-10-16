@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -26,6 +27,10 @@ blocks:
     when:
       user: Please check, match or reconcile an invoice. The invoice is not in EUR.
     expect:
+      skills:
+        - name: invoice-reconcile
+          count:
+            min: 1
       references:
         - path: "**/currency-table.md"
           count:
@@ -36,6 +41,7 @@ metadata:
   estate:
     atoms:
       - instruction.invoice-reconcile.convert-a-foreign-currency-invoice-with
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: pairwise.0744
     cell:
       ask_class: change_estate
