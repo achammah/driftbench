@@ -1,26 +1,36 @@
 import type { SpaceMap } from '@agent-nexus/driftbench-space';
 import { describe, expect, it } from 'vitest';
 import { type Atom, buildPlan, type EstateMap } from '../../src/index';
-import { situationSpace } from '../../src/plan/relevance';
+import { RELATION_OF, situationSpace, targetsOf } from '../../src/plan/relevance';
 
-function atom(
-  id: string,
-  kind: Atom['kind'],
-  quote: string,
-  evidence: Atom['evidence'],
-  fields?: Atom['fields'],
-): Atom {
+type Make = {
+  kind: Atom['kind'];
+  evidence?: Atom['evidence'];
+  fields?: Atom['fields'];
+  file?: string;
+  line?: number;
+  quote?: string;
+};
+/** A hand-written atom: its words are decoys, only its kind, evidence, fields and passage place it. */
+function atom(id: string, make: Make): Atom {
+  const line = make.line ?? 1;
   return {
     id,
-    kind,
-    title: quote,
-    provenance: { file: 'POLICY.md', startLine: 1, endLine: 1, quote, hash: id },
+    kind: make.kind,
+    title: make.quote ?? id,
+    provenance: {
+      file: make.file ?? 'POLICY.md',
+      startLine: line,
+      endLine: line,
+      quote: make.quote ?? id,
+      hash: id,
+    },
     producedBy: 'code',
     role: 'axis',
     approved: true,
-    evidence,
+    evidence: make.evidence ?? [],
     enforcement: [],
-    ...(fields ? { fields } : {}),
+    ...(make.fields ? { fields: make.fields } : {}),
   };
 }
 function estate(atoms: Atom[], edges: EstateMap['edges'] = []): EstateMap {
@@ -34,196 +44,143 @@ function estate(atoms: Atom[], edges: EstateMap['edges'] = []): EstateMap {
     edges,
   };
 }
-const samples = () =>
-  estate([
-    atom('a', 'instruction', 'Run the spectrometer and save its reading.', [
-      { type: 'tool_called', label: 'Measure' },
-    ]),
-    atom('b', 'instruction', 'Answer in the language of the customer.', [{ type: 'text', lang: 'FR' }]),
-    atom('c', 'instruction', 'Dispatch the mineral analyst with the specimen number.', [
-      { type: 'tool_called', label: 'Agent' },
-    ]),
-    atom('d', 'stage', 'Update the tracker with the specimen result.', [
-      { type: 'stage_reached', name: 'record' },
-    ]),
-    atom('e', 'instruction', 'After a restart, read the laboratory notebook.', [
-      { type: 'tool_called', label: 'Read' },
-    ]),
-  ]);
-const cells = (map: EstateMap) => buildPlan(map).plan.rows.filter((row) => row.id.startsWith('pairwise.'));
+const rowsOf = (map: EstateMap) => buildPlan(map).plan.rows.filter((row) => row.id.startsWith('pairwise.'));
+const crossed = (map: EstateMap, dimension: string, value: string) =>
+  new Set(
+    rowsOf(map)
+      .filter((row) => row.cell[dimension] === value)
+      .map((row) => row.atomIds[0]),
+  );
 
-describe('situation relevance follows the estate contract', () => {
-  it('does not cross a language event with a measurement-only instruction', () => {
-    const rows = cells(samples());
-    expect(rows.some((row) => row.atomIds[0] === 'a' && row.cell.deviation === 'D5_language_switch')).toBe(
-      false,
-    );
-    expect(rows.some((row) => row.atomIds[0] === 'b' && row.cell.deviation === 'D5_language_switch')).toBe(
-      true,
-    );
-  });
-
-  it('keeps a tool failure and a failed helper relevant to instructions that call them', () => {
-    const rows = cells(samples());
-    expect(rows.some((row) => row.atomIds[0] === 'a' && row.cell.deviation === 'D8_tool_failure')).toBe(true);
-    expect(rows.some((row) => row.atomIds[0] === 'c' && row.cell.estate_hazard === 'dead_helper')).toBe(true);
-    expect(rows.some((row) => row.atomIds[0] === 'b' && row.cell.estate_hazard === 'dead_helper')).toBe(
-      false,
-    );
-  });
-
-  it('uses tracker and restart instructions regardless of their kind or opaque id', () => {
-    const map = samples();
-    map.atoms.push(
-      atom('f', 'instruction', 'Reconcile the tracker before continuing.', [
-        { type: 'custom', name: 'lab_ledger' },
-      ]),
-    );
-    const rows = cells(map);
-    for (const id of ['d', 'f']) {
-      expect(rows.some((row) => row.atomIds[0] === id && row.cell.estate_hazard === 'stale_tracker')).toBe(
-        true,
-      );
-    }
-    expect(rows.some((row) => row.atomIds[0] === 'e' && row.cell.estate_hazard === 'process_restart')).toBe(
-      true,
-    );
-    expect(rows.some((row) => row.atomIds[0] === 'b' && row.cell.estate_hazard === 'process_restart')).toBe(
-      false,
-    );
-  });
-
-  it('does not use ids or file paths as behavioural text', () => {
-    const map = samples();
-    map.atoms.push(
-      atom('restart.helper.language', 'instruction', 'Keep the calibration seal intact.', [
-        { type: 'custom', name: 'seal' },
-      ]),
-    );
-    const sealed = map.atoms.find((candidate) => candidate.id === 'restart.helper.language');
-    if (!sealed) throw new Error('missing hand-written seal rule');
-    sealed.provenance.file = 'language/helpers/restart.md';
-    const rows = cells(map);
-    expect(
-      rows.some(
-        (row) =>
-          row.atomIds[0] === 'restart.helper.language' &&
-          (row.cell.estate_hazard === 'dead_helper' || row.cell.estate_hazard === 'process_restart'),
-      ),
-    ).toBe(false);
-  });
-
-  it('uses the called unit contract for routing relevance, without importing unrelated neighbours', () => {
-    const map = samples();
-    map.atoms.push(atom('unit', 'subagent', 'Mineral analyst', [{ type: 'tool_called', label: 'Agent' }]));
-    map.atoms.push(
-      atom('route', 'route', 'Send specimens for mineral analysis.', [
-        { type: 'custom', name: 'choose_analyst' },
-      ]),
-    );
-    map.edges.push({ from: 'route', to: 'unit', kind: 'route' });
-    const rows = cells(map);
-    expect(rows.some((row) => row.atomIds[0] === 'route' && row.cell.estate_hazard === 'dead_helper')).toBe(
-      true,
-    );
-    expect(
-      rows.some((row) => row.atomIds[0] === 'route' && row.cell.deviation === 'D5_language_switch'),
-    ).toBe(false);
-  });
-
-  it('propagates a called unit through dispatch chains and cycles without importing its callers', () => {
-    const map = samples();
-    map.atoms.push(
-      atom('middle', 'skill', 'Unused identifier', [{ type: 'skill_loaded', name: 'middle' }], {
-        description: 'Analyze the specimen.',
+/** A harbour estate: every kind of atom a relation reads, each with the typed fact and none with a telling word. */
+function harbour(): EstateMap {
+  return estate(
+    [
+      atom('pilot', { kind: 'subagent', fields: { name: 'pilot', tools: ['Read'] } }),
+      atom('route-pilot', { kind: 'route' }),
+      atom('route-chart', { kind: 'route' }),
+      atom('chart', { kind: 'skill', fields: { name: 'chart' } }),
+      atom('note', {
+        kind: 'stage',
+        fields: { id: 'note' },
+        evidence: [{ type: 'stage_reached', name: 'note' }],
       }),
-    );
-    map.atoms.push(atom('entry', 'route', 'Choose an analysis.', [{ type: 'custom', name: 'analysis' }]));
-    map.atoms.push(
-      atom('analyst', 'subagent', 'Unused identifier', [{ type: 'tool_called', label: 'Agent' }]),
-    );
-    map.edges.push(
-      { from: 'entry', to: 'middle', kind: 'route' },
-      { from: 'middle', to: 'analyst', kind: 'dispatch' },
-      { from: 'analyst', to: 'middle', kind: 'dispatch' },
-    );
-    const rows = cells(map);
-    expect(rows.some((row) => row.atomIds[0] === 'entry' && row.cell.estate_hazard === 'dead_helper')).toBe(
-      true,
-    );
-    expect(
-      rows.some((row) => row.atomIds[0] === 'analyst' && row.cell.deviation === 'D5_language_switch'),
-    ).toBe(false);
+      atom('voice', { kind: 'register', evidence: [{ type: 'text', lang: 'FR' }] }),
+      atom('spoken', { kind: 'instruction', evidence: [{ type: 'text', must: ['tide'] }] }),
+      atom('reader', { kind: 'instruction', evidence: [{ type: 'tool_called', label: 'Read' }] }),
+      atom('fetcher', { kind: 'instruction', evidence: [{ type: 'tool_called', label: 'WebFetch' }] }),
+      atom('gate', { kind: 'gate', evidence: [{ type: 'ordered', before: 'Read', after: 'Edit' }] }),
+      atom('tool-bash', { kind: 'tool', fields: { tool: 'Bash', effect: 'allow' } }),
+      atom('tool-read', { kind: 'tool', fields: { tool: 'Read', effect: 'allow' } }),
+      atom('script', { kind: 'script' }),
+      atom('prompt-guard', { kind: 'guard', fields: { event: 'UserPromptSubmit' } }),
+      atom('result-guard', { kind: 'guard', fields: { event: 'PostToolUse' } }),
+      atom('stop-rule', { kind: 'instruction', evidence: [{ type: 'tool_not_called', label: 'Edit' }] }),
+      atom('hazard-restart', {
+        kind: 'hazard',
+        line: 7,
+        fields: { hazard: 'restart' },
+        evidence: [{ type: 'custom', name: 'hazard_recovery', options: { hazard: 'restart' } }],
+      }),
+      atom('after-restart-rule', {
+        kind: 'instruction',
+        line: 7,
+        evidence: [{ type: 'tool_called', label: 'Glob' }],
+      }),
+      atom('hazard-compaction', {
+        kind: 'hazard',
+        line: 9,
+        fields: { hazard: 'compaction' },
+        evidence: [{ type: 'custom', name: 'hazard_recovery', options: { hazard: 'compaction' } }],
+      }),
+      atom('after-compaction-gate', {
+        kind: 'gate',
+        line: 9,
+        evidence: [{ type: 'ordered', before: 'Read', after: 'Edit' }],
+      }),
+      atom('decoy', {
+        kind: 'instruction',
+        quote: 'After a restart or a compaction, tell the user in French.',
+      }),
+    ],
+    [
+      { from: 'route-pilot', to: 'pilot', kind: 'route' },
+      { from: 'route-chart', to: 'chart', kind: 'route' },
+      { from: 'prompt-guard', to: 'stop-rule', kind: 'enforces' },
+    ],
+  );
+}
+
+describe('situation relevance reads the typed facts of the map', () => {
+  it.each([
+    ['helper', ['pilot', 'route-pilot']],
+    ['tool', ['pilot', 'route-pilot', 'tool-bash', 'tool-read', 'script', 'prompt-guard', 'result-guard']],
+    ['stage', ['note']],
+    ['output', ['voice', 'spoken']],
+    ['data', ['reader', 'fetcher', 'after-restart-rule', 'result-guard']],
+    ['confirmation', ['gate', 'after-compaction-gate']],
+    ['rate', ['tool-bash', 'script', 'pilot', 'fetcher']],
+    ['restart', ['after-restart-rule']],
+    ['compaction', ['after-compaction-gate']],
+    ['stoprule', ['stop-rule']],
+    ['stop', ['stop-rule', 'prompt-guard']],
+    ['prompt', ['prompt-guard']],
+    ['routing', ['route-pilot', 'route-chart', 'chart']],
+  ] as const)('the relation %s holds for exactly its typed atoms', (relation, ids) => {
+    expect([...targetsOf(relation, harbour())].sort()).toEqual([...ids].sort());
   });
 
-  it('retains situations with unresolved relevance instead of reporting vacuous coverage', () => {
-    const map = estate([
-      atom('seal', 'instruction', 'Keep the calibration seal intact.', [{ type: 'custom', name: 'seal' }]),
-    ]);
-    expect(cells(map).some((row) => row.cell.estate_hazard === 'process_restart')).toBe(true);
-    expect(
-      buildPlan(map).details.notes.some(
-        (note) => note.includes('no relevant target') && note.includes('retained'),
-      ),
-    ).toBe(true);
+  it('crosses each fixed-axis situation with the atoms of its relation and with no other atom', () => {
+    const map = harbour();
+    for (const [value, relation] of Object.entries(RELATION_OF)) {
+      const dimension = [
+        'dead_helper',
+        'rate_wave',
+        'stale_tracker',
+        'process_restart',
+        'compaction_mid_task',
+      ].includes(value)
+        ? 'estate_hazard'
+        : ['helpers_running', 'after_restart', 'after_compaction', 'resumed'].includes(value)
+          ? 'session_state'
+          : ['language_switch', 'no_questions', 'stop'].includes(value)
+            ? 'owner_signal'
+            : 'deviation';
+      const allowed = targetsOf(relation, map);
+      const seen = crossed(map, dimension, value);
+      expect(
+        [...seen].filter((id) => !allowed.has(id as string)),
+        value,
+      ).toEqual([]);
+      expect(seen.size, value).toBeGreaterThan(0);
+    }
   });
 
-  it('recognizes an estate-specific subject with opaque situation ids and no built-in kind policy', () => {
-    const map = estate([
-      atom('reactor', 'instruction', 'If the catalyst expires, reject the sample.', [
-        { type: 'custom', name: 'lab_rule' },
-      ]),
-      atom('voice', 'register', 'Keep replies concise.', [{ type: 'text', mustNot: ['verbose'] }]),
-    ]);
-    const space: SpaceMap = {
-      version: 'chemistry',
-      agent: 'lab',
-      dimensions: [
-        {
-          id: 'owner_signal',
-          kind: 'persona',
-          title: 'Condition',
-          values: [
-            { id: 'nominal', title: 'Routine operation' },
-            { id: 'cx17', title: 'A catalyst expires' },
-          ],
-        },
-        {
-          id: 'atoms.instruction',
-          kind: 'behaviour',
-          title: 'Reaction',
-          values: [{ id: 'reactor', title: 'Reaction' }],
-        },
-        {
-          id: 'atoms.register',
-          kind: 'behaviour',
-          title: 'Voice',
-          values: [{ id: 'voice', title: 'Voice' }],
-        },
-      ],
-      constraints: [],
-      prior: { kind: 'declared' },
-    };
-    const fitted = situationSpace(map, space);
-    const result = buildPlan(map, { space: fitted.space });
-    expect(
-      result.plan.rows.some(
-        (row) =>
-          row.id.startsWith('pairwise.') && row.atomIds[0] === 'reactor' && row.cell.owner_signal === 'cx17',
-      ),
-    ).toBe(true);
-    expect(
-      result.plan.rows.some(
-        (row) =>
-          row.id.startsWith('pairwise.') && row.atomIds[0] === 'voice' && row.cell.owner_signal === 'cx17',
-      ),
-    ).toBe(false);
-    expect(result.details.tuples.covered).toBe(result.details.tuples.allowed);
-    expect(fitted.space.constraints).toHaveLength(1);
+  it('does not read words: a rule that talks of a restart is not crossed with it unless its passage names the hazard', () => {
+    const map = harbour();
+    expect(crossed(map, 'estate_hazard', 'process_restart')).toEqual(new Set(['after-restart-rule']));
+    expect(crossed(map, 'deviation', 'D5_language_switch').has('decoy')).toBe(false);
   });
 
-  it('leaves an explicit user space authoritative and covers its declared tuples', () => {
-    const map = samples();
+  it('crosses a situation with no atom that holds its relation with nothing, and says so', () => {
+    const map = estate([atom('seal', { kind: 'instruction', evidence: [{ type: 'custom', name: 'seal' }] })]);
+    const rows = rowsOf(map);
+    for (const value of ['process_restart', 'dead_helper', 'stale_tracker'])
+      expect(
+        rows.some((row) => row.cell.estate_hazard === value),
+        value,
+      ).toBe(false);
+    expect(rows.some((row) => row.cell.deviation === 'D7_silence_or_burst')).toBe(false);
+    const notes = buildPlan(map).details.notes.join('\n');
+    expect(notes).toContain(
+      'estate_hazard=process_restart: no atom of the estate holds the relation "restart"',
+    );
+    expect(buildPlan(map).details.tuples.covered).toBe(buildPlan(map).details.tuples.allowed);
+  });
+
+  it('keeps every combination of a value that names no relation, and leaves a supplied space authoritative', () => {
+    const map = harbour();
+    expect(crossed(map, 'deviation', 'D3_contradiction').size).toBeGreaterThan(5);
     const space: SpaceMap = {
       version: 'lab',
       agent: 'lab',
@@ -241,13 +198,14 @@ describe('situation relevance follows the estate contract', () => {
           id: 'atoms.instruction',
           kind: 'behaviour',
           title: 'Rules',
-          values: [{ id: 'a', title: 'Measure' }],
+          values: [{ id: 'reader', title: 'Measure' }],
         },
       ],
       constraints: [],
       prior: { kind: 'declared' },
     };
-    const result = buildPlan(map, { space });
-    expect(result.details.tuples).toEqual({ allowed: 2, covered: 2 });
+    const own = buildPlan(map, { space });
+    expect(own.details.relevanceConstraints ?? []).toEqual([]);
+    expect(situationSpace(map, space).space.constraints).toEqual([]);
   });
 });
