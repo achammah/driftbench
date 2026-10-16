@@ -69,6 +69,40 @@ jobs:
           fi
           test "$status" -eq 11
 
+  generator:
+    # Dispatch only: the generator scoreboard of a train branch. Every level, every item, one seed per job.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',generator,')
+    name: generator items (${{ matrix.seeds }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        seeds: ['--seed 1', '--seed 2', '--seed 3 --hidden']
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Every generator level and item
+        shell: bash
+        env:
+          SEEDS: ${{ matrix.seeds }}
+        run: |
+          # A full run exits with the level it reached; the report is the result, not the exit code.
+          status=0
+          pnpm -s driftbench validate generator $SEEDS --all-levels --items --json > generator.json || status=$?
+          echo "exit (level reached): $status"
+          test -s generator.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: generator-${{ strategy.job-index }}
+          path: generator.json
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
