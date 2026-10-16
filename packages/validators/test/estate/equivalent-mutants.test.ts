@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { mutantFamily } from '../../src/ladders/estate/bank/loop';
 import { follow } from '../../src/ladders/estate/follower';
-import { agentMutants, type EstateRun, estateRun } from '../../src/ladders/estate/index';
-import { estateMeta } from '../../src/ladders/estate/levels';
+import {
+  agentMutants,
+  asksOf,
+  type EstateRun,
+  estateRun,
+  replayChecks,
+  replayOnFollower,
+} from '../../src/ladders/estate/index';
+import { estateMeta, specVerdicts } from '../../src/ladders/estate/levels';
 
 describe('agent mutants the rule follower cannot show (level 5)', { timeout: 300_000 }, () => {
   it('names as equivalent only atoms whose deletion changes no follower session, on asks, pairs and triples', async () => {
@@ -34,10 +41,53 @@ describe('agent mutants the rule follower cannot show (level 5)', { timeout: 300
     expect(same.map((mutant) => mutant.atom)).not.toContain('tool.settings.deny-webfetch');
   });
 
+  it('judges the read-before-edit gate killed: the follower edits before reading once the gate is deleted', async () => {
+    const run = await estateRun(1);
+    const atom = 'gate.standing.read-a-file-before-you-edit';
+    const hid = run.scanned.match.hidOf.get(atom) as string;
+    const named = (await specVerdicts(run)).filter(
+      (verdict) => (estateMeta(verdict.spec).atoms ?? []).includes(atom) && verdict.follower?.pass === true,
+    );
+    expect(named.length).toBeGreaterThan(0);
+    const order = (asks: string[], mutant?: string) =>
+      follow(run.estate, run.situations, asks, mutant ? { mutant } : {})
+        .transcript.split('\n')
+        .filter(Boolean)
+        .flatMap((line) => {
+          const content = (JSON.parse(line) as { message?: { content?: unknown } }).message?.content;
+          return Array.isArray(content)
+            ? (content as Array<{ type?: string; name?: string }>)
+                .filter((part) => part.type === 'tool_use' && (part.name === 'Read' || part.name === 'Edit'))
+                .map((part) => part.name as string)
+            : [];
+        });
+    const checks = replayChecks();
+    const killers = [];
+    for (const verdict of named) {
+      const loaded = verdict.spec.loaded;
+      if (!loaded) continue;
+      const mutant = await replayOnFollower(run, loaded, checks, hid);
+      if (mutant.pass) continue;
+      killers.push(verdict.spec.record.id);
+      // The original passes, the mutant's stream differs (the last Edit comes before the Read of its file), and
+      // it is the ordering check on that edit that fails.
+      expect((await replayOnFollower(run, loaded, checks)).pass).toBe(true);
+      const asks = asksOf(loaded);
+      const before = order(asks);
+      const after = order(asks, hid);
+      expect(after).not.toEqual(before);
+      expect(before.lastIndexOf('Read')).toBeLessThan(before.lastIndexOf('Edit'));
+      expect(after.indexOf('Edit')).toBeLessThan(after.lastIndexOf('Read'));
+      expect(mutant.failing.join('\n')).toMatch(/custom\.ordered\.Read\.Edit/);
+    }
+    expect(killers.length).toBeGreaterThan(0);
+    expect((await mutantFamily().evaluate(1)).get('mutant.agent.gate-read-before-edit')).toMatchObject({
+      pass: true,
+    });
+  });
+
   it('keeps failing the classes whose deletion shows and that no test catches', async () => {
     const results = await mutantFamily().evaluate(1);
-    // With the product on main: the keyless gate is seen by the follower and live.
-    expect(results.get('mutant.agent.gate-read-before-edit')).toMatchObject({ pass: false });
     expect(results.get('mutant.agent.register-reply-length')?.detail).toMatch(
       /no atom of the class changes the follower's session on this seed \(1 of 1 not judged/,
     );

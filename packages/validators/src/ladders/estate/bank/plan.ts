@@ -10,6 +10,7 @@ import type { SpaceMap } from '@agent-nexus/driftbench-space';
 import { requiredRows } from '../levels';
 import { estateRun } from '../pipeline';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
+import { judgeRelevance, plantedOf, RELATION_TITLE, RELEVANCE } from './relevance-typed';
 
 /**
  * Three plan families on the generated estate of each seed.
@@ -22,9 +23,14 @@ import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
  * with constraints of two and three values, a constraint on a target atom, a value no cell can take, one
  * value dimensions and wide dimensions. The oracle enumerates every allowed tuple.
  *
- * plan.relevance: a situation value is crossed only with atoms it can act on: a dead helper or running
- * helpers only with helpers and the routes to them, a stale tracker only with stages, a language switch only
- * with output rules and instructions, a tool failure only with tools, scripts, guards and helpers.
+ * plan.relevance: a situation value is crossed only with the atoms it can act on, judged from typed data and no
+ * word of the estate (relevance-typed.ts): the kind of an atom, the type of its evidence predicates, the kinds of
+ * its edges, its typed fields and what the hidden estate planted for a standing rule. Each situation has one
+ * narrow relation (a helper, a declared tool, a read of outside data, a call with a retry contract, a gate, a rule
+ * planted for a hazard or a stop, a guard on the prompt, a route). The atoms that hold it are the situation's
+ * identified targets; a crossing with any other atom is wrong, and no relation allows an atom that the kind list
+ * of the previous oracle rejected. When no atom holds the relation, no atom applies and any crossing is wrong. A
+ * plan that crosses every situation with every atom fails all 20 items.
  */
 
 const CONTRACT = 'packages/estate/src/plan/contract.ts';
@@ -671,191 +677,16 @@ export function planPairsFamily(): Family {
 
 // plan.relevance -------------------------------------------------------------------------------------------
 
-type Relevance = {
-  key: string;
-  tier: Tier;
-  dimension: string;
-  value: string;
-  title: string;
-  kinds: string[];
-  helperRoutes?: boolean;
-};
-
-const RELEVANCE: Relevance[] = [
-  {
-    key: 'dead-helper',
-    tier: 3,
-    dimension: 'estate_hazard',
-    value: 'dead_helper',
-    title: 'a dead helper',
-    kinds: ['subagent'],
-    helperRoutes: true,
-  },
-  {
-    key: 'helpers-running',
-    tier: 3,
-    dimension: 'session_state',
-    value: 'helpers_running',
-    title: 'helpers running',
-    kinds: ['subagent'],
-    helperRoutes: true,
-  },
-  {
-    key: 'stale-tracker',
-    tier: 3,
-    dimension: 'estate_hazard',
-    value: 'stale_tracker',
-    title: 'a stale tracker',
-    kinds: ['stage'],
-  },
-  {
-    key: 'language-switch',
-    tier: 3,
-    dimension: 'deviation',
-    value: 'D5_language_switch',
-    title: 'a language switch',
-    kinds: ['register', 'instruction'],
-  },
-  {
-    key: 'owner-language-switch',
-    tier: 3,
-    dimension: 'owner_signal',
-    value: 'language_switch',
-    title: 'an owner switching language',
-    kinds: ['register', 'instruction'],
-  },
-  {
-    key: 'tool-failure',
-    tier: 3,
-    dimension: 'deviation',
-    value: 'D8_tool_failure',
-    title: 'a tool failure',
-    kinds: ['tool', 'script', 'guard', 'subagent', 'skill', 'route'],
-  },
-  {
-    key: 'instruction-in-data',
-    tier: 3,
-    dimension: 'deviation',
-    value: 'D6_instruction_in_data',
-    title: 'an instruction in the data',
-    kinds: ['instruction', 'gate', 'guard', 'register'],
-  },
-  {
-    key: 'loose-confirmation',
-    tier: 3,
-    dimension: 'deviation',
-    value: 'D4_loose_confirmation',
-    title: 'a loose confirmation',
-    kinds: ['instruction', 'gate', 'guard'],
-  },
-  {
-    key: 'rate-wave',
-    tier: 3,
-    dimension: 'estate_hazard',
-    value: 'rate_wave',
-    title: 'a wave of rate limits',
-    kinds: ['tool', 'script', 'subagent', 'instruction', 'stage'],
-  },
-  {
-    key: 'process-restart',
-    tier: 3,
-    dimension: 'estate_hazard',
-    value: 'process_restart',
-    title: 'a process restart',
-    kinds: ['stage', 'subagent', 'instruction', 'gate'],
-  },
-  {
-    key: 'compaction',
-    tier: 3,
-    dimension: 'estate_hazard',
-    value: 'compaction_mid_task',
-    title: 'a compaction mid-task',
-    kinds: ['instruction', 'gate', 'register', 'stage', 'skill', 'route'],
-  },
-  {
-    key: 'after-compaction',
-    tier: 3,
-    dimension: 'session_state',
-    value: 'after_compaction',
-    title: 'a session after a compaction',
-    kinds: ['instruction', 'gate', 'register', 'stage', 'skill', 'route'],
-  },
-  {
-    key: 'after-restart',
-    tier: 3,
-    dimension: 'session_state',
-    value: 'after_restart',
-    title: 'a session after a restart',
-    kinds: ['stage', 'subagent', 'instruction', 'gate'],
-  },
-  {
-    key: 'resumed',
-    tier: 3,
-    dimension: 'session_state',
-    value: 'resumed',
-    title: 'a resumed session',
-    kinds: ['stage', 'instruction', 'gate', 'skill', 'route'],
-  },
-  {
-    key: 'stop-signal',
-    tier: 3,
-    dimension: 'owner_signal',
-    value: 'stop',
-    title: 'the owner saying stop',
-    kinds: ['instruction', 'stage', 'subagent', 'guard'],
-  },
-  {
-    key: 'no-questions',
-    tier: 3,
-    dimension: 'owner_signal',
-    value: 'no_questions',
-    title: 'the owner asking for no questions',
-    kinds: ['instruction', 'gate', 'register'],
-  },
-  {
-    key: 'goal-shift',
-    tier: 3,
-    dimension: 'deviation',
-    value: 'D2_goal_shift',
-    title: 'a goal shift',
-    kinds: ['route', 'skill', 'stage', 'instruction'],
-  },
-  {
-    key: 'off-topic',
-    tier: 3,
-    dimension: 'deviation',
-    value: 'D1_off_topic',
-    title: 'an off-topic turn',
-    kinds: ['route', 'skill', 'instruction', 'register', 'stage'],
-  },
-  {
-    key: 'out-of-scope',
-    tier: 3,
-    dimension: 'deviation',
-    value: 'D9_out_of_scope',
-    title: 'an out-of-scope ask',
-    kinds: ['route', 'skill', 'subagent', 'instruction'],
-  },
-  {
-    key: 'silence-burst',
-    tier: 3,
-    dimension: 'deviation',
-    value: 'D7_silence_or_burst',
-    title: 'silence or a burst',
-    kinds: ['instruction', 'register', 'guard', 'subagent'],
-  },
-];
-
 export function planRelevanceFamily(): Family {
   const family = 'plan.relevance';
   const items = itemsOf(
     family,
     3,
     PAIRWISE,
-    RELEVANCE.map(({ key, tier, title, kinds }) => ({
+    RELEVANCE.map(({ key, tier, title, relation }) => ({
       key,
       tier,
-      title: `${title} is crossed only with ${kinds.join(', ')} atoms`,
+      title: `${title} is crossed only with atoms that hold ${RELATION_TITLE[relation]}; with none, it is crossed with no atom`,
     })),
   );
   return {
@@ -865,25 +696,14 @@ export function planRelevanceFamily(): Family {
     items,
     async evaluate(seed) {
       const run = await estateRun(seed);
-      const kindOf = new Map(run.scanned.map.atoms.map((atom) => [atom.id, atom]));
+      const planted = plantedOf(run);
+      const rows = run.plan.plan.rows.filter((candidate) => candidate.id.startsWith('pairwise.'));
       const out = new Map<string, ItemResult>();
       for (const rule of RELEVANCE) {
-        const wrong: string[] = [];
-        for (const row of run.plan.plan.rows.filter((candidate) => candidate.id.startsWith('pairwise.'))) {
-          if (row.cell[rule.dimension] !== rule.value) continue;
-          const atom = kindOf.get(row.atomIds[0] as string);
-          if (!atom) continue;
-          const helperRoute =
-            rule.helperRoutes && atom.kind === 'route' && atom.fields?.targetKind === 'subagent';
-          if (!rule.kinds.includes(atom.kind) && !helperRoute) wrong.push(`${row.id} (${atom.kind})`);
-        }
-        out.set(`${family}.${rule.key}`, {
-          pass: wrong.length === 0,
-          detail:
-            wrong.length === 0
-              ? 'holds'
-              : `${wrong.length} rows cross it with atoms it cannot act on: ${wrong.slice(0, 3).join(', ')}`,
-        });
+        const crossings = rows
+          .filter((row) => row.cell[rule.dimension] === rule.value)
+          .map((row) => ({ row: row.id, atom: row.atomIds[0] as string }));
+        out.set(`${family}.${rule.key}`, judgeRelevance(rule.relation, run.scanned.map, crossings, planted));
       }
       return out;
     },

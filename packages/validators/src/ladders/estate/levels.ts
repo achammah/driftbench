@@ -9,6 +9,7 @@ import {
   toEstateSpaceMap,
 } from '@agent-nexus/driftbench-estate';
 import type { Item, Measure } from '../../ladder';
+import { type Planted, plantedOf, RELEVANCE, type Relation, targetsOf } from './bank/relevance-typed';
 import { componentOfKind, componentOfMarker, ESTATE_COMPONENTS } from './components';
 import { follow } from './follower';
 import type { HiddenEstate } from './hidden';
@@ -208,17 +209,29 @@ export function allowedPairs(
   dimensions: readonly Dimension[],
   constraints: ReadonlyArray<Record<string, string>>,
 ): Array<[string, string, string, string]> {
+  // A constraint is looked up under its first dimension and value: a cell is checked against the constraints of
+  // the values it holds, not against every constraint (the plan proposes hundreds).
+  const byEntry = new Map<string, Array<Array<[string, string]>>>();
+  for (const forbid of constraints) {
+    const entries = Object.entries(forbid);
+    const first = entries[0];
+    if (!first) continue;
+    const key = `${first[0]}=${first[1]}`;
+    byEntry.set(key, [...(byEntry.get(key) ?? []), entries]);
+  }
   const forbids = (cell: Record<string, string>) =>
-    constraints.some((forbid) =>
-      Object.entries(forbid).every(([dimension, value]) => cell[dimension] === value),
+    Object.entries(cell).some(([dimension, value]) =>
+      (byEntry.get(`${dimension}=${value}`) ?? []).some((entries) =>
+        entries.every(([name, wanted]) => cell[name] === wanted),
+      ),
     );
+  // The dimension with the most values is chosen first: a cell that no target can complete fails at once.
+  const order = [...dimensions].sort((a, b) => b.values.length - a.values.length);
   const extends_ = (cell: Record<string, string>, from: number): boolean => {
     if (forbids(cell)) return false;
-    const next = dimensions.findIndex(
-      (dimension, index) => index >= from && cell[dimension.id] === undefined,
-    );
+    const next = order.findIndex((dimension, index) => index >= from && cell[dimension.id] === undefined);
     if (next < 0) return true;
-    const dimension = dimensions[next] as Dimension;
+    const dimension = order[next] as Dimension;
     return dimension.values.some((value) => extends_({ ...cell, [dimension.id]: value }, next + 1));
   };
   const out: Array<[string, string, string, string]> = [];
@@ -236,6 +249,41 @@ export function allowedPairs(
   return out;
 }
 
+/**
+ * Whether the validator's relevance table justifies a declared exclusion. The table (bank/relevance-typed.ts) gives
+ * each situation value one relation to the atoms it can act on, judged from the kind, typed evidence and typed fields
+ * of an atom and from what the hidden estate planted: it is the one source of truth for plan.relevance and for this
+ * level. An exclusion is justified only when it forbids one situation value with one target atom that does not hold
+ * the value's relation. Any other declared exclusion (a situation against a situation, a value the table holds no row
+ * for, a target the table makes relevant) leaves its pairs owed.
+ */
+export function exclusionJustifier(
+  map: Pick<EstateMap, 'atoms' | 'edges'>,
+  planted: ReadonlyMap<string, Planted> = new Map(),
+): (forbid: Readonly<Record<string, string>>) => boolean {
+  const known = new Set(map.atoms.map((atom) => atom.id));
+  const targets = new Map<Relation, Set<string>>();
+  const of = (relation: Relation) => {
+    let found = targets.get(relation);
+    if (!found) {
+      found = targetsOf(relation, map, planted);
+      targets.set(relation, found);
+    }
+    return found;
+  };
+  return (forbid) => {
+    const entries = Object.entries(forbid);
+    const situation = entries.filter(([dimension]) => !dimension.startsWith('atoms.'));
+    const target = entries.filter(([dimension]) => dimension.startsWith('atoms.'));
+    if (situation.length !== 1 || target.length !== 1) return false;
+    const [dimension, value] = situation[0] as [string, string];
+    const atom = (target[0] as [string, string])[1];
+    const rule = RELEVANCE.find((row) => row.dimension === dimension && row.value === value);
+    if (!rule || !known.has(atom)) return false;
+    return !of(rule.relation).has(atom);
+  };
+}
+
 /** Level 3: every allowed pair is in a row of the plan, and every approved atom has its mandatory rows. */
 export function planLevel(run: EstateRun): Measure {
   const map = run.scanned.map;
@@ -249,7 +297,16 @@ export function planLevel(run: EstateRun): Measure {
     })),
     { id: 'target', values: targets.flatMap((dimension) => dimension.values.map((value) => value.id)) },
   ];
-  const constraints = space.constraints.map((constraint) => {
+  // The plan proposes its own exclusions from the estate's text (docs/estate.md, "Situation relevance in a proposed
+  // plan"), and coverage counts the tuples feasible under them. A declared exclusion lowers what the plan owes only
+  // when the validator's own table of what a situation value can act on justifies it: one situation value against
+  // one target atom whose kind the table says the value cannot act on. Any other declared exclusion (a situation
+  // against a situation, a value the table holds no row for, a target the table makes relevant) leaves its pairs owed.
+  const justified = exclusionJustifier(map, plantedOf(run));
+  const proposed = (run.plan.details.relevanceConstraints ?? []).filter((constraint) =>
+    justified(constraint.forbid),
+  );
+  const constraints = [...space.constraints, ...proposed].map((constraint) => {
     const forbid: Record<string, string> = {};
     for (const [dimension, value] of Object.entries(constraint.forbid)) {
       forbid[dimension.startsWith('atoms.') ? 'target' : dimension] = value;
