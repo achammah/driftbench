@@ -63,7 +63,7 @@ items:
   # 2. Validity: is the test or the environment at fault?
   - id: R5
     title: The result works, and the check demanded a form nobody states
-    when: { outcome: accepted_as_gold, contract: none, verdict_kind: machine }
+    when: { outcome: accepted_as_gold, contract: none, downstream_need: { not: declared }, verdict_kind: machine }
     effect: { verdict: pass, disposition: credited, fault: [test], fix_location: test, fix_action: fix_check, place: fixed }
     impl: builtin:blame/accepted-no-need
     cites: value_equivalence.md 3c R5; config_framework.md 3.2

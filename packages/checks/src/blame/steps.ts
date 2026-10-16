@@ -9,7 +9,7 @@ import {
 } from '@agent-nexus/driftbench-core';
 import { z } from 'zod';
 import type { PlacedBefore, PolicyView } from '../placement/apply';
-import { policyOf as valuePolicyOf } from '../value-check/ladder';
+import { DEFAULT_VALUE_POLICY, policyOf as valuePolicyOf } from '../value-check/ladder';
 import { diagnoseBlock } from './attribute';
 import { campaignDiagnoses } from './campaign';
 import {
@@ -21,9 +21,11 @@ import {
 } from './confirm';
 import { fixPlan } from './fixplan';
 import { flakyBlocks } from './flaky';
-import { checkEvidenceInputs } from './inputs';
+import { checkEvidenceInputs, sentUser } from './inputs';
 import { shippedPolicy } from './objects';
+import { blameServices } from './services';
 import type { BlameDiagnosis } from './types';
+import { replayedValueFacts } from './values';
 
 /**
  * The steps the shipped diagnostics name (`packages/checks/objects/diagnostic/*.yaml`), in the shape of the
@@ -35,7 +37,8 @@ import type { BlameDiagnosis } from './types';
 
 /** What a block step reads: the context the checks ran with, the block's verdicts, its objects, its params. */
 export type BlockStepContext = {
-  readonly check: Pick<CheckContext, 'observed' | 'expect' | 'spec' | 'block' | 'stimulus'>;
+  readonly check: Pick<CheckContext, 'observed' | 'expect' | 'spec' | 'block' | 'stimulus'> &
+    Partial<Pick<CheckContext, 'given' | 'blockIndex'>>;
   readonly verdicts: readonly Verdict[];
   readonly objects: ReadonlyArray<{ object: ResolvedObject }>;
   readonly params: Readonly<Record<string, unknown>>;
@@ -143,41 +146,62 @@ function blockStep(
     params: Emit,
     cost: 'static',
     summary,
-    run: (ctx) => {
+    run: async (ctx) => {
       const state = stateOf(ctx.earlier);
       state.stages.add(stage);
       if (ctx.params.emit !== true) return undefined;
       if (!state.stages.has('attribute')) return [];
-      // TODO after PR 459 merges: the value-evidence step calls
-      // runLadder(valueCase, policy, services) per call and maps its per-value record
-      // to EvidenceInput.values. No Verdict field; do not infer a rung from a failed check.
-      if (state.stages.has('value-evidence')) {
-        return ctx.verdicts
-          .filter(
-            (verdict) =>
-              verdict.gating &&
-              verdict.outcome === 'fail' &&
-              evidence.verdictSubject(verdict.id).part === 'input',
-          )
-          .map((verdict) => ({
-            summary: `${verdict.id}: value outcome unknown; value ladder integration pending`,
-            verdictRef: verdict.id,
-            disposition: 'unassigned',
-            fixLocation: 'unassigned',
-            confidence: 'undecided',
-            evidence: { outcome: 'unknown' },
-            flags: ['lint:value_ladder_unavailable'],
-          }));
-      }
+      const valueMode = state.stages.has('value-evidence');
       const placement = policyOf(ctx.objects, 'policy/placement');
       const valueObject = ctx.objects.find((one) => one.object.kind === 'policy/value-check')?.object;
+      const valuePolicy = valueObject === undefined ? undefined : valuePolicyOf(valueObject);
+      const services = blameServices();
+      // The services belong to the block, not to a diagnostic: every diagnostic that attributes a verdict
+      // decides it the same way, so the result does not depend on which one runs first. A value the check
+      // compared exactly (no decider was configured) is decided again with the value services; the other
+      // values keep the decisions the check stored. A service that throws is reported and read as unknown.
+      const errors: string[] = [];
+      const values: Record<string, readonly evidence.ValueFact[]> = {};
+      if (services.value !== undefined) {
+        for (const verdict of ctx.verdicts) {
+          if (!verdict.gating || verdict.outcome !== 'fail') continue;
+          if (evidence.verdictSubject(verdict.id).part !== 'input') continue;
+          try {
+            const replayed = await replayedValueFacts(
+              ctx.check,
+              verdict,
+              valuePolicy ?? DEFAULT_VALUE_POLICY,
+              services.value,
+            );
+            values[verdict.id] = replayed.facts;
+            // A judge that threw is swallowed by the ladder (the value stays inconclusive); report it.
+            for (const failure of replayed.errors) errors.push(`error:value_service_failed:${failure}`);
+          } catch (cause) {
+            errors.push(`error:value_service_failed:${describe(cause)}`);
+          }
+        }
+      }
+      let reply: evidence.ReplyReading | undefined;
+      if (services.reply !== undefined) {
+        try {
+          const user = sentUser(ctx.check);
+          reply = await services.reply({
+            ...(user === undefined ? {} : { user }),
+            reply: ctx.check.observed.text,
+          });
+        } catch (cause) {
+          errors.push(`error:reply_reader_failed:${describe(cause)}`);
+        }
+      }
       const tools = (ctx.check.expect?.tools ?? [])
         .filter((tool) => tool.count !== 0)
         .map((tool) => tool.label);
       const result = diagnoseBlock({
         verdicts: ctx.verdicts,
         evidenceFor: checkEvidenceInputs(ctx.check, ctx.verdicts, {
-          ...(valueObject === undefined ? {} : { valuePolicy: valuePolicyOf(valueObject) }),
+          ...(valuePolicy === undefined ? {} : { valuePolicy }),
+          ...(Object.keys(values).length === 0 ? {} : { values }),
+          ...(reply === undefined ? {} : { extra: { reply } }),
         }),
         tools,
         blame: policyOf(ctx.objects, 'policy/blame'),
@@ -185,8 +209,27 @@ function blockStep(
         chain: state.stages.has('chain'),
         ...(ctx.history === undefined ? {} : { history: ctx.history }),
       });
-      return result.diagnoses.map(toStepOutput);
+      // The value-mismatch diagnostic explains the values the agent sent: the other roots are not its subject.
+      const diagnoses = valueMode
+        ? result.diagnoses.filter((one) => evidence.verdictSubject(one.verdict_ref).part === 'input')
+        : result.diagnoses;
+      return [...diagnoses.map(toStepOutput), ...errors.map(errorOutput)];
     },
+  };
+}
+
+function describe(cause: unknown): string {
+  return cause instanceof Error ? `${cause.name}: ${cause.message}` : String(cause);
+}
+
+/** A failed service as a diagnosis without a verdict: the block keeps every other diagnosis. */
+function errorOutput(flag: string): StepOutput {
+  const [, kind = 'service_failed', ...rest] = flag.split(':');
+  const what = kind === 'reply_reader_failed' ? 'the reply reader' : 'the value service';
+  return {
+    summary: `${what} threw ${rest.join(':')}; the reading is unknown and the rules that need it did not match`,
+    flags: [`error:${kind}`],
+    confidence: 'undecided',
   };
 }
 
@@ -210,7 +253,7 @@ export const BLOCK_STEPS: Readonly<Record<string, BlameStep<BlockStepContext>>> 
   ),
   'builtin:blame/value-evidence': blockStep(
     'value-evidence',
-    'Value outcome unknown with a lint until the value ladder integration is available.',
+    "The value check's record of each failing value; a value the check compared exactly is decided again with the services given.",
   ),
   'builtin:blame/attribute': blockStep('attribute', 'policy/blame, first match in order.'),
   'builtin:placement/apply': blockStep('place', 'policy/placement, with recurrence from the history given.'),

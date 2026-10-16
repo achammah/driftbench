@@ -315,9 +315,12 @@ describe('block evidence handoff', () => {
 });
 
 describe('value-mismatch', () => {
-  it('leaves the value outcome unknown with a lint until the ladder integration is available', async () => {
+  it('attributes a failing tool input from the value check record, with no pending lint', async () => {
     const object = new ObjectStore(registry()).resolve('diagnostic', 'value-mismatch');
-    const v = verdict('tools.coverage.check.input.address', { name: 'tools' });
+    const v = {
+      ...verdict('tools.coverage.check.input.address', { name: 'tools' }),
+      valueCheck: [{ call: 1, path: 'address', rung: 'rung2b_as_given', outcome: 'fail' as const }],
+    };
     const ctx = {
       check: {
         observed: {
@@ -333,9 +336,9 @@ describe('value-mismatch', () => {
           cost: {},
           latencyMs: 0,
         },
-        expect: { tools: [{ label: 'coverage.check' }] },
+        expect: { tools: [{ label: 'coverage.check', input: { address: '88 Summit Avenue, Acmeville' } }] },
         spec: { metadata: {} },
-        block: { when: { user: 'Please check 88 Summit Ave, Acmeville' } },
+        block: { when: { user: 'Please check 88 Summit Avenue, Acmeville' } },
       },
       verdicts: [v],
       objects: [],
@@ -348,14 +351,9 @@ describe('value-mismatch', () => {
       for (const one of (await step.run({ ...ctx, params: item.params, earlier })) ?? []) earlier.push(one);
     }
     expect(earlier).toHaveLength(1);
-    expect(earlier[0]).toMatchObject({
-      verdictRef: v.id,
-      disposition: 'unassigned',
-      confidence: 'undecided',
-      evidence: { outcome: 'unknown' },
-      flags: ['lint:value_ladder_unavailable'],
-    });
-    expect(earlier[0]?.rule).toBeUndefined();
+    expect(earlier[0]).toMatchObject({ verdictRef: v.id, disposition: 'agent', fault: ['agent'] });
+    expect(earlier[0]?.rule).toMatch(/#R2b$/);
+    expect(earlier[0]?.flags).not.toContain('lint:value_ladder_unavailable');
   });
 });
 

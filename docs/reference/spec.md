@@ -43,6 +43,7 @@ The loader rewrites these forms before it validates a spec.
 * [Count](#count)
 * [Assertion](#assertion)
 * [CompareMode](#comparemode)
+* [ToolExpect recompute value](#toolexpect-recompute-value)
 * [ToolsOfferedExpect](#toolsofferedexpect)
 * [Expect rouge_l](#expect-rouge_l)
 * [Expect bleu](#expect-bleu)
@@ -63,6 +64,7 @@ The loader rewrites these forms before it validates a spec.
 * [ExecutionExpect](#executionexpect)
 * [ArtifactExpect](#artifactexpect)
 * [WorkspaceExpect](#workspaceexpect)
+* [Expect downstream](#expect-downstream)
 * [SafetyExpect](#safetyexpect)
 * [Budget](#budget)
 * [Uses](#uses)
@@ -371,6 +373,8 @@ The expected output and state delta of a block. Every field is optional.
 | `execution` | [ExecutionExpect](#executionexpect) | no |  | What the agent runs. |
 | `artifacts` | list of [ArtifactExpect](#artifactexpect) | no |  | The files the block must produce. |
 | `workspace` | [WorkspaceExpect](#workspaceexpect) | no |  | The workspace diff expected. |
+| `task_impossible` | boolean | no |  | True when the task, or the tests it was given, cannot be met honestly. The checks do not read it. Blame credits an agent that stopped and said so, and attributes a pass reached anyway to the agent as an integrity fault. |
+| `downstream` | list of [Expect downstream](#expect-downstream) | no |  | Consumers of the block output that need a form nobody states to the agent. The checks do not read it. When a value that works fails its check, blame names the missing rule as a setup fault instead of flagging the test. |
 | `protected` | list of strings, each not empty | no |  | Paths or globs the agent must not change or delete, whoever wrote them: the tests, checkers and source-of-truth files it was given. The checks do not read it. When a gating verdict fails and the net workspace diff holds one, blame attributes the failure to the agent as an integrity fault. |
 | `safety` | [SafetyExpect](#safetyexpect) | no |  | Limits on destructive operations. |
 
@@ -385,6 +389,7 @@ One expected tool call.
 | `input` | map of string to [Assertion](#assertion) | no |  | Assertions on the arguments, by argument name. |
 | `input_closed` | boolean | no |  | True requires every call input to be an object with only the top-level keys named in input. An absent input allows no keys. False or absent leaves other keys allowed. |
 | `compare` | [CompareMode](#comparemode) or map of string to [CompareMode](#comparemode) | no |  | How the input values are compared: one mode for every argument, or a mode by argument name. Absent means auto: the value-check rungs decide whether a value that differs from the gold names the same thing. |
+| `recompute` | map of string to [ToolExpect recompute value](#toolexpect-recompute-value) | no |  | Arguments the agent computes, by argument name. The agent writes a formula (a text that starts with =) or a number; the recompute rung runs it and the gold formula on the given inputs and on changed inputs, and fails a value that is right only on the given ones. An argument named here is not also named in input. |
 
 ## Count
 
@@ -434,6 +439,16 @@ Write one of these forms.
 | Key | Type | Description |
 |---|---|---|
 | `exact` | string, not empty | Why the writing itself is the requirement, in one line. |
+
+## ToolExpect recompute value
+
+The gold computation of an argument the agent computes, and the inputs it runs on.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `formula` | string, not empty | yes |  | The gold computation, a spreadsheet formula over the named inputs, such as =SUM(C2:C5). Numbers, names, + - * / ^, parentheses and SUM, MIN, MAX, AVERAGE, ROUND, ABS are supported. |
+| `inputs` | map of string to number | yes |  | The inputs the agent was given, by name: C2: 10. The formulas are first run on these. |
+| `ranges` | map of string to list of any value, at least 2 items, at most 2 items | no |  | The range [low, high] each input is drawn from on changed inputs. An input without one varies around its given value. |
 
 ## ToolsOfferedExpect
 
@@ -620,6 +635,17 @@ The workspace diff of the block.
 | `changed` | list of strings | no |  | Paths the block changes. |
 | `deleted` | list of strings | no |  | Paths the block deletes. |
 | `others_untouched` | boolean | no |  | True when no other path may change. |
+
+## Expect downstream
+
+A consumer that needs a form of a value.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `tool` | string, not empty | no |  | The tool whose input the consumer reads. Absent means any tool. |
+| `field` | string, not empty | no |  | The argument the consumer reads. Absent means every argument. |
+| `needs` | string, not empty | yes |  | The form the consumer needs, such as e164 or iso8601. |
+| `declared_in` | string, not empty | no |  | Where the consumer states the need, such as a file or a system name. |
 
 ## SafetyExpect
 

@@ -259,6 +259,8 @@ export const sameReferent: Rung = async (value, ctx) => {
     return {
       settles: 'inconclusive',
       evidence: `the judge ${judge.model} could not answer: ${cause instanceof Error ? cause.message : String(cause)}`,
+      // The failure is data, not only prose: a diagnostic reports it instead of reading a silent unknown.
+      emits: { judge_error: cause instanceof Error ? `${cause.name}: ${cause.message}` : String(cause) },
     };
   }
   const same = votes.filter(Boolean).length;

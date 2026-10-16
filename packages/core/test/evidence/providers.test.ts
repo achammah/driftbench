@@ -244,6 +244,39 @@ const cases: Array<{ name: string; given: evidence.EvidenceInput; want: unknown;
     want: 'none',
   },
   {
+    name: 'downstream_need',
+    why: 'the block declares a consumer of this tool and argument',
+    given: input({
+      values: [address('88 Summit Ave')],
+      expect: { downstream: [{ tool: 'coverage.check', field: 'address', needs: 'full street type' }] },
+    }),
+    want: 'declared',
+  },
+  {
+    name: 'downstream_need',
+    why: 'the declared consumer reads another argument',
+    given: input({
+      values: [address('88 Summit Ave')],
+      expect: { downstream: [{ tool: 'coverage.check', field: 'phone', needs: 'e164' }] },
+    }),
+    want: 'none',
+  },
+  {
+    name: 'downstream_need',
+    why: 'a project declares a consumer of every argument of the tool',
+    given: input({
+      values: [address('88 Summit Ave')],
+      downstreamConsumers: [{ tool: 'coverage.check', needs: 'full street type' }],
+    }),
+    want: 'declared',
+  },
+  {
+    name: 'task_impossible',
+    why: 'the block declares the task impossible',
+    given: input({ expect: { taskImpossible: true } }),
+    want: true,
+  },
+  {
     name: 'rule_home',
     why: 'the rule lives in a reference file',
     given: input({

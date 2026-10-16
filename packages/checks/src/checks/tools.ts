@@ -18,7 +18,7 @@ import {
   type Verdict,
 } from '@agent-nexus/driftbench-core';
 import { initializeShippedObjects } from '../initialize';
-import { checkAssertion } from '../support/assert';
+import { type AssertionResult, checkAssertion } from '../support/assert';
 import { countAllows, describeCount, minimumOf } from '../support/count';
 import { entryKeys, isRecord, listed, plural, show, times } from '../support/values';
 import {
@@ -32,6 +32,7 @@ import {
   type ValueServices,
   valuePolicyProblems,
 } from '../value-check/ladder';
+import { type Computation, evaluateFormula, type RecomputeCase } from '../value-check/recompute';
 
 const NAME = 'tools';
 
@@ -182,10 +183,11 @@ async function evaluate(ctx: CheckContext, policy: ValuePolicy, services: ValueS
     const own = calls.filter((call) => call.label === tool.label);
     verdicts.push(countVerdict(key, tool, own, calls));
     if (tool.input_closed === true) verdicts.push(closedInputVerdict(key, tool, own));
-    for (const [field, assertion] of Object.entries(tool.input ?? {})) {
+    const fields = new Set([...Object.keys(tool.input ?? {}), ...Object.keys(tool.recompute ?? {})]);
+    for (const field of fields) {
       argumentsExpected += 1;
       const values: ValueContext = { ctx, tool, field, policy, services, sources };
-      const [verdict, lint] = await inputVerdict(key, values, own, assertion);
+      const [verdict, lint] = await inputVerdict(key, values, own, tool.input?.[field]);
       if (verdict.outcome !== 'pass') missed.push(`${tool.label} input.${field}`);
       verdicts.push(verdict);
       verdicts.push(...lint);
@@ -212,6 +214,58 @@ async function evaluate(ctx: CheckContext, policy: ValuePolicy, services: ValueS
   return verdicts;
 }
 
+/** The expected tool and argument a tools-check input verdict id (`tools.<key>.input.<field>`) is about. */
+export function inputSubject(
+  expect: CheckContext['expect'] | undefined,
+  verdictId: string,
+): { tool: ToolExpect; field: string; assertion: Assertion | undefined } | undefined {
+  const tools = (expect?.tools ?? []).filter((tool) => !isZero(tool.count));
+  const keys = entryKeys(tools.map((tool) => tool.label));
+  for (const [index, tool] of tools.entries()) {
+    const prefix = `tools.${keys[index]}.input.`;
+    if (!verdictId.startsWith(prefix)) continue;
+    const field = verdictId.slice(prefix.length);
+    if (field === '' || field.includes('.')) continue;
+    return { tool, field, assertion: tool.input?.[field] };
+  }
+  return undefined;
+}
+
+/**
+ * The value-check ladder run again on the values of one input verdict, call by call, with the policy and the
+ * services given. The values are read from the observed calls, so a service the check had no access to (a judge
+ * configured later) can settle a value the check compared exactly.
+ */
+export async function replayInputValues(
+  ctx: ValueCheckContext,
+  verdictId: string,
+  policy: ValuePolicy,
+  services: ValueServices,
+): Promise<{ call: number; leaves: LeafResult[] }[]> {
+  const subject = inputSubject(ctx.expect, verdictId);
+  if (subject === undefined) return [];
+  const values: ValueContext = {
+    ctx,
+    tool: subject.tool,
+    field: subject.field,
+    policy,
+    services,
+    sources: userTexts(ctx),
+  };
+  const own = ctx.observed.toolCalls.filter((call) => call.label === subject.tool.label);
+  const out: { call: number; leaves: LeafResult[] }[] = [];
+  for (const [index, call] of own.entries()) {
+    const value = isRecord(call.input) ? call.input[subject.field] : undefined;
+    const answered =
+      subject.tool.recompute?.[subject.field] === undefined &&
+      !(subject.assertion === undefined || named(subject.assertion))
+        ? undefined
+        : await leafResults(values, call, value, subject.assertion);
+    if (answered !== undefined) out.push({ call: index + 1, leaves: answered });
+  }
+  return out;
+}
+
 /** The block's expected tools, without the ones expected 0 times. */
 function expectedTools(ctx: CheckContext): ToolExpect[] {
   return (ctx.expect.tools ?? []).filter((tool) => !isZero(tool.count));
@@ -228,9 +282,13 @@ function countVerdict(key: string, tool: ToolExpect, own: ToolCall[], calls: Too
   );
 }
 
+/** The part of the check context the value ladder reads; a hand-built context may lack the Given and the index. */
+export type ValueCheckContext = Pick<CheckContext, 'spec' | 'expect' | 'observed' | 'block' | 'stimulus'> &
+  Partial<Pick<CheckContext, 'given' | 'blockIndex'>>;
+
 /** Everything the ladder needs about one expected argument. */
 type ValueContext = {
-  ctx: CheckContext;
+  ctx: ValueCheckContext;
   tool: ToolExpect;
   field: string;
   policy: ValuePolicy;
@@ -244,7 +302,7 @@ type CallAnswer = {
   note?: string;
   lints?: NonNullable<LadderResult['lint']>[];
   /** The values a rung decided: their path, the rung and its outcome. */
-  decided?: { path: string; rung: string; outcome: Settles }[];
+  decided?: { path: string; rung: string; outcome: Settles; changedInputsFail?: boolean }[];
 };
 
 /** One entry of `Verdict.valueCheck`. */
@@ -259,13 +317,15 @@ async function inputVerdict(
   key: string,
   values: ValueContext,
   own: ToolCall[],
-  assertion: Assertion,
+  assertion: Assertion | undefined,
 ): Promise<[Verdict, Verdict[]]> {
   const { tool, field } = values;
+  const recompute = tool.recompute?.[field];
   const label = tool.label;
   const id = `${key}.input.${field}`;
   if (own.length === 0) {
-    const { expected } = checkAssertion(undefined, assertion);
+    const { expected } =
+      recompute === undefined ? checkAssertion(undefined, assertion as Assertion) : computed(recompute);
     return [
       machineVerdict(NAME, id, 'fail', `${label} was not called, so input.${field} could not be ${expected}`),
       [],
@@ -280,15 +340,19 @@ async function inputVerdict(
   let problem: string | undefined;
   for (const [index, call] of own.entries()) {
     const value = isRecord(call.input) ? call.input[field] : undefined;
-    const result = checkAssertion(value, assertion);
+    const result =
+      recompute === undefined ? checkAssertion(value, assertion as Assertion) : computed(recompute);
     expected = result.expected;
     problem = result.problem ?? problem;
     const at = `call ${index + 1}${callId(call)}`;
-    const answer = result.ok
-      ? ({ outcome: 'pass' } as CallAnswer)
-      : named(assertion)
-        ? await ladderAnswer(values, call, value, assertion)
-        : ({ outcome: 'fail' } as CallAnswer);
+    const answer =
+      recompute !== undefined
+        ? await ladderAnswer(values, call, value, undefined)
+        : result.ok
+          ? ({ outcome: 'pass' } as CallAnswer)
+          : named(assertion as Assertion)
+            ? await ladderAnswer(values, call, value, assertion)
+            : ({ outcome: 'fail' } as CallAnswer);
     if (answer.note !== undefined) notes.push(`${at}: ${answer.note}`);
     for (const entry of answer.decided ?? []) decisions.push({ call: index + 1, ...entry });
     for (const lint of answer.lints ?? [])
@@ -339,20 +403,38 @@ function named(assertion: Assertion): boolean {
   return 'exact' in assertion || 'subset' in assertion;
 }
 
+/** What the ladder decided for one value of a call: its path, the gold, the value and the ladder's answer. */
+export type LeafResult = { path: string; gold: unknown; value: unknown; result: LadderResult };
+
 /**
- * The ladder's answer for one call: on the value itself, or on each leaf of a `subset`. A leaf that fails fails
- * the call; one that is inconclusive leaves it inconclusive.
+ * The ladder on each value of one call: the value itself, each leaf of a `subset`, or the computed value of a
+ * `recompute` argument. `undefined` when a `subset` was expected and the value is not an object.
  */
-async function ladderAnswer(
+async function leafResults(
   values: ValueContext,
   call: ToolCall,
   value: unknown,
-  assertion: Assertion,
-): Promise<CallAnswer> {
-  const results: { path: string; result: LadderResult }[] = [];
+  assertion: Assertion | undefined,
+): Promise<LeafResult[] | undefined> {
+  const leaves: LeafResult[] = [];
+  const recompute = values.tool.recompute?.[values.field];
+  if (recompute !== undefined) {
+    const result =
+      value === undefined
+        ? absentComputed(values.field)
+        : await runLadder(
+            valueCase(values, call, values.field, goldOf(recompute), value, recomputeCase(recompute, value)),
+            values.policy,
+            values.services,
+          );
+    leaves.push({ path: values.field, gold: goldOf(recompute), value, result });
+    return leaves;
+  }
   const decide = async (path: string, gold: unknown, agent: unknown) => {
-    results.push({
+    leaves.push({
       path,
+      gold,
+      value: agent,
       result: await runLadder(valueCase(values, call, path, gold, agent), values.policy, values.services),
     });
   };
@@ -367,7 +449,7 @@ async function ladderAnswer(
         const at = `${path}.${key}`;
         if (isRecord(part)) {
           if (!(await walk(at, part, observed[key]))) {
-            results.push({ path: at, result: notAnObject(observed[key]) });
+            leaves.push({ path: at, gold: part, value: observed[key], result: notAnObject(observed[key]) });
           }
         } else {
           await decide(at, part, observed[key]);
@@ -375,9 +457,7 @@ async function ladderAnswer(
       }
       return true;
     };
-    if (!(await walk(values.field, assertion.subset, value))) {
-      return { outcome: 'fail', note: `${show(value)} is not an object` };
-    }
+    if (!(await walk(values.field, assertion.subset, value))) return undefined;
   } else {
     const gold =
       assertion !== null && typeof assertion === 'object' && 'exact' in assertion
@@ -385,6 +465,21 @@ async function ladderAnswer(
         : assertion;
     await decide(values.field, gold, value);
   }
+  return leaves;
+}
+
+/**
+ * The ladder's answer for one call: on the value itself, on each leaf of a `subset`, or on a computed value.
+ * A leaf that fails fails the call; one that is inconclusive leaves it inconclusive.
+ */
+async function ladderAnswer(
+  values: ValueContext,
+  call: ToolCall,
+  value: unknown,
+  assertion: Assertion | undefined,
+): Promise<CallAnswer> {
+  const results = await leafResults(values, call, value, assertion);
+  if (results === undefined) return { outcome: 'fail', note: `${show(value)} is not an object` };
   const settled = results.filter(
     (entry) => entry.result.rung !== 'identity' || entry.result.outcome !== 'pass',
   );
@@ -401,16 +496,66 @@ async function ladderAnswer(
   const lints = results
     .map((entry) => entry.result.lint)
     .filter((lint): lint is NonNullable<LadderResult['lint']> => lint !== undefined);
-  const decided = settled.map((entry) => ({
-    path: entry.path,
-    rung: entry.result.rung,
-    outcome: entry.result.outcome,
-  }));
+  const decided = settled.map((entry) => {
+    const changed = entry.result.emits?.changed_inputs_fail;
+    return {
+      path: entry.path,
+      rung: entry.result.rung,
+      outcome: entry.result.outcome,
+      ...(typeof changed === 'boolean' ? { changedInputsFail: changed } : {}),
+    };
+  });
   return {
     outcome,
     ...(decided.length === 0 ? {} : { decided }),
     ...(note === '' ? {} : { note }),
     ...(lints.length === 0 ? {} : { lints }),
+  };
+}
+
+/** What a computed argument is expected to be, for the evidence of a verdict. */
+function computed(spec: NonNullable<ToolExpect['recompute']>[string]): AssertionResult {
+  return { ok: false, expected: `a value that computes ${spec.formula}` };
+}
+
+/** The gold of a computed argument: the gold formula on the given inputs; absent when it cannot be computed. */
+function goldOf(spec: NonNullable<ToolExpect['recompute']>[string]): unknown {
+  try {
+    return evaluateFormula(spec.formula, spec.inputs);
+  } catch {
+    return undefined;
+  }
+}
+
+/** What the agent produced for a computed argument: a formula (text from `=`), a number, or text read as a formula. */
+function producedOf(value: unknown): Computation {
+  if (typeof value === 'number') return { value };
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed.startsWith('=') && trimmed !== '' && Number.isFinite(Number(trimmed))) {
+      return { value: Number(trimmed) };
+    }
+    return { formula: trimmed };
+  }
+  return { value };
+}
+
+function recomputeCase(spec: NonNullable<ToolExpect['recompute']>[string], value: unknown): RecomputeCase {
+  return {
+    produced: producedOf(value),
+    expected: { formula: spec.formula },
+    inputs: spec.inputs,
+    ...(spec.ranges === undefined ? {} : { ranges: spec.ranges as RecomputeCase['ranges'] }),
+  };
+}
+
+function absentComputed(field: string): LadderResult {
+  return {
+    outcome: 'fail',
+    rung: 'identity',
+    evidence: `${field} is absent, so nothing was computed`,
+    names: {},
+    tried: [],
   };
 }
 
@@ -431,6 +576,7 @@ function valueCase(
   path: string,
   gold: unknown,
   value: unknown,
+  recompute?: RecomputeCase,
 ): ValueCase {
   const { ctx, tool } = values;
   const schemas = ctx.spec.metadata?.tool_schemas;
@@ -446,6 +592,7 @@ function valueCase(
     ...(isRecord(call.input) ? { input: call.input } : {}),
     ...(compare === undefined ? {} : { compare }),
     ...(definition === undefined ? {} : { definition }),
+    ...(recompute === undefined ? {} : { recompute }),
     sources: { user: values.sources },
     ...(store === undefined ? {} : { world: store }),
   };
@@ -463,11 +610,11 @@ function compareFor(compare: ToolExpect['compare'], path: string): CompareMode |
 }
 
 /** What the user wrote before and in this block: the prefix, the earlier blocks' turns, and this block's turn. */
-function userTexts(ctx: CheckContext): string[] {
+function userTexts(ctx: ValueCheckContext): string[] {
   const texts = (ctx.given?.prefix ?? [])
     .filter((message) => message.role === 'user')
     .map((message) => message.content);
-  for (const block of ctx.spec.blocks.slice(0, ctx.blockIndex)) texts.push(...stimulusTexts(block.when));
+  for (const block of ctx.spec.blocks.slice(0, ctx.blockIndex ?? 0)) texts.push(...stimulusTexts(block.when));
   texts.push(...stimulusTexts(sentStimulus(ctx)));
   return texts;
 }
@@ -480,7 +627,7 @@ function stimulusTexts(stimulus: Stimulus): string[] {
 
 /** Closing the input restricts top-level argument names, without changing the value assertions. */
 function closedInputVerdict(key: string, tool: ToolExpect, own: ToolCall[]): Verdict {
-  const allowed = new Set(Object.keys(tool.input ?? {}));
+  const allowed = new Set([...Object.keys(tool.input ?? {}), ...Object.keys(tool.recompute ?? {})]);
   const failures: string[] = [];
   own.forEach((call, index) => {
     const at = `call ${index + 1}${callId(call)}`;

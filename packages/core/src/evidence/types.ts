@@ -138,6 +138,14 @@ export type PastDiagnosis = {
   run?: string;
 };
 
+/** A consumer of a value that needs a form: the tool and field it reads (absent: any), and what it needs. */
+export type DownstreamConsumer = {
+  tool?: string;
+  field?: string;
+  needs: string;
+  declared_in?: string;
+};
+
 /** The block-level expectations a provider reads, beside the run record. */
 export type BlockExpect = {
   /** Routed skills: `expect.skills`. */
@@ -148,8 +156,8 @@ export type BlockExpect = {
   protected?: readonly string[];
   /** The block declares the task impossible or its tests conflicting. */
   taskImpossible?: boolean;
-  /** A consumer the block or project declares for the value. */
-  downstream?: boolean;
+  /** The consumers the block declares for its values (`expect.downstream`). */
+  downstream?: readonly DownstreamConsumer[];
   /** The block's situation, for situational pointers. */
   situation?: string;
   /** The atoms the block's situation holds, when the plan or the phrase bank lists them. */
@@ -173,6 +181,8 @@ export type EvidenceInput = {
   edges?: readonly RuleEdge[];
   links?: readonly RuleLink[];
   stated?: readonly StatedRule[];
+  /** Consumers the project declares on the blame item that reads them (`downstream_consumers`). */
+  downstreamConsumers?: readonly DownstreamConsumer[];
   /** Tool input schemas by tool label, for a format the tool itself states. */
   toolSchemas?: Readonly<Record<string, unknown>>;
   promises?: readonly ToolPromise[];

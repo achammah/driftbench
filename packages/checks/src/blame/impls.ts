@@ -178,7 +178,22 @@ export const BLAME_IMPLS: Readonly<Record<string, BlameImpl>> = {
   },
   'builtin:blame/stated-step-skipped': standard('A stated step or gate was skipped: the agent.'),
   'builtin:blame/stated-format-broken': standard('A stated format or rule was broken: the agent.'),
-  'builtin:blame/downstream-need': standard('A declared consumer needs a form nobody states: setup.'),
+  'builtin:blame/downstream-need': {
+    ...standard('A declared consumer needs a form nobody states: setup.'),
+    // A project declares its consumers here; a block declares its own in `expect.downstream`.
+    params: z.strictObject({
+      downstream_consumers: z
+        .array(
+          z.strictObject({
+            tool: z.string().min(1).optional(),
+            field: z.string().min(1).optional(),
+            needs: z.string().min(1),
+            declared_in: z.string().min(1).optional(),
+          }),
+        )
+        .optional(),
+    }),
+  },
   'builtin:blame/wrong-derived': standard(
     'A value the agent built differs from gold: the agent, until a confirm run.',
   ),

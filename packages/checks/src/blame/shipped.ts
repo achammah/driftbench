@@ -141,6 +141,7 @@ export const SHIPPED_OBJECTS = {
         when: {
           outcome: 'accepted_as_gold',
           contract: 'none',
+          downstream_need: { not: 'declared' },
           verdict_kind: 'machine',
         },
         effect: {

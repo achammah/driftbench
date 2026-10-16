@@ -56,13 +56,23 @@ export function attribute(object: PolicyView, facts: Facts): Attribution {
 }
 
 /** The params the evidence step needs from the blame object: the bar and the retry limit. */
-function evidenceSettings(object: PolicyView): Pick<evidence.EvidenceInput, 'bar' | 'maxRetries'> {
+function evidenceSettings(
+  object: PolicyView,
+): Pick<evidence.EvidenceInput, 'bar' | 'maxRetries' | 'downstreamConsumers'> {
   const bar = object.params.bar;
   const r3 = object.items.find((item) => item.impl === 'builtin:blame/copied-value-tool-failed');
   const max = r3?.params.max_retries;
+  const consumers = object.items
+    .filter((item) => item.enabled && item.impl === 'builtin:blame/downstream-need')
+    .flatMap((item) =>
+      Array.isArray(item.params.downstream_consumers)
+        ? (item.params.downstream_consumers as evidence.DownstreamConsumer[])
+        : [],
+    );
   return {
     ...(typeof bar === 'number' ? { bar } : {}),
     ...(typeof max === 'number' ? { maxRetries: max } : {}),
+    ...(consumers.length > 0 ? { downstreamConsumers: consumers } : {}),
   };
 }
 

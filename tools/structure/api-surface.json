@@ -706,6 +706,7 @@
       "endStateCacheKey": "value",
       "enterBlock": "value",
       "error": "value",
+      "evaluateFormula": "value",
       "evidence": "value",
       "explainObject": "value",
       "explainRows": "value",

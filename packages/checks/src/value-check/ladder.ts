@@ -121,6 +121,8 @@ export type LadderResult = {
   evidence: string;
   /** The evidence names computed for the value and the ones the settling rung emitted. */
   names: Record<string, unknown>;
+  /** Only the names the settling rung emitted, such as `changed_inputs_fail` or `change`. */
+  emits?: Record<string, unknown>;
   /**
    * A lint on the test, never a fail of the agent: `unstated_format` when the block demands a writing nobody
    * states, `no_decider` when nothing could decide the value and it was compared exactly.
@@ -471,6 +473,7 @@ export async function runLadder(
       rung: item.id,
       evidence: result.evidence,
       names: { ...names, ...(result.emits ?? {}) },
+      ...(result.emits === undefined ? {} : { emits: { ...result.emits } }),
       tried,
     };
     const lint = unstatedFormat(value, policy, settled, item);

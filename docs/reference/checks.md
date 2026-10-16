@@ -66,6 +66,8 @@ Two kinds of verdict are inconclusive:
 | `custom` | `rules.custom` names a check | `custom.<name>`, `custom.<name>.<id>` |
 | `judge` | the check set holds a council and `expect.criteria` names a criterion | `judge.<name>` |
 
+Three `expect` keys are read by no check; they state facts that blame reads when a block fails: `protected` (paths or globs the agent must not change or delete), `task_impossible` (the task or its tests cannot be met honestly) and `downstream` (consumers that need a form of a value). The reference page of the spec lists their fields. `tools[].recompute` is read by the `tools` check, as `input` is: it declares an argument the agent computes.
+
 `tools.argument_accuracy` never gates: its `score` is the share of expected arguments that matched. `<n>` in `schema_strict` counts the calls of one tool in the block from 1. `<index>` counts from 0.
 
 ## Reading a verdict

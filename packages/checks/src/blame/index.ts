@@ -48,6 +48,7 @@ export {
   SHIPPED_OBJECTS,
   shippedPolicy,
 } from './objects';
+export { type BlameServices, blameServices, type ReplyReader, useBlameServices } from './services';
 export {
   BLOCK_STEPS,
   type BlameStep,

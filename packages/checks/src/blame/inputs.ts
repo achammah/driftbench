@@ -69,15 +69,18 @@ export function estateMetadata(spec: Pick<Spec, 'metadata'>): {
   };
 }
 
-/** The labels and names a block expects: tools in order, routed skills, and the paths it protects. */
+/** What a block expects that blame reads: tools in order, routed skills, protected paths, impossibility, consumers. */
 export function expectView(expect: Expect | undefined): evidence.BlockExpect {
   const tools = (expect?.tools ?? []).filter((tool) => tool.count !== 0).map((tool) => tool.label);
   const skills = (expect?.skills ?? []).map((skill) => skill.name);
   const protectedPaths = expect?.protected ?? [];
+  const downstream = expect?.downstream ?? [];
   return {
     ...(tools.length > 0 ? { tools } : {}),
     ...(skills.length > 0 ? { skills } : {}),
     ...(protectedPaths.length > 0 ? { protected: protectedPaths } : {}),
+    ...(expect?.task_impossible === true ? { taskImpossible: true } : {}),
+    ...(downstream.length > 0 ? { downstream } : {}),
   };
 }
 
@@ -96,6 +99,8 @@ export type BlockInputSource = {
   planRows?: evidence.EvidenceInput['planRows'];
   /** The `policy/value-check` object the block resolved, to read which implementation a stored rung id names. */
   valuePolicy?: ValuePolicy;
+  /** Value facts by verdict id, for a verdict whose values were decided again; else the stored record is read. */
+  values?: Readonly<Record<string, readonly evidence.ValueFact[]>>;
   extra?: Partial<evidence.EvidenceInput>;
 };
 
@@ -113,14 +118,16 @@ export function blockEvidenceInputs(source: BlockInputSource): (verdict: Verdict
   if (meta.situation !== undefined) expect.situation = meta.situation;
   const toolSchemas = toolSchemasOf(source.spec);
   return (verdict) => {
-    const values = valueFacts(
-      {
-        observed: source.observed,
-        ...(source.expect === undefined ? {} : { expect: source.expect }),
-        ...(source.valuePolicy === undefined ? {} : { policy: source.valuePolicy }),
-      },
-      verdict,
-    );
+    const values =
+      source.values?.[verdict.id] ??
+      valueFacts(
+        {
+          observed: source.observed,
+          ...(source.expect === undefined ? {} : { expect: source.expect }),
+          ...(source.valuePolicy === undefined ? {} : { policy: source.valuePolicy }),
+        },
+        verdict,
+      );
     return {
       block: { observed: source.observed, verdicts: [...source.verdicts] },
       verdict,
@@ -137,20 +144,26 @@ export function blockEvidenceInputs(source: BlockInputSource): (verdict: Verdict
   };
 }
 
-/** The same, from the context the checks ran with. */
+/** The user turn the agent received in a block: the driver's, else the authored one. */
+export function sentUser(ctx: Pick<CheckContext, 'block' | 'stimulus'>): string | undefined {
+  const stimulus = ctx.stimulus ?? ctx.block.when;
+  const user = typeof stimulus === 'string' ? stimulus : (stimulus as { user?: unknown } | undefined)?.user;
+  return typeof user === 'string' ? user : undefined;
+}
+
+/** The evidence inputs of a block's failing verdicts, from the context the checks ran with. */
 export function checkEvidenceInputs(
   ctx: Pick<CheckContext, 'observed' | 'expect' | 'spec' | 'block' | 'stimulus'>,
   verdicts: readonly Verdict[],
   extra: Omit<BlockInputSource, 'observed' | 'verdicts' | 'expect' | 'spec' | 'user'> = {},
 ): (verdict: Verdict) => evidence.EvidenceInput {
-  const stimulus = ctx.stimulus ?? ctx.block.when;
-  const user = typeof stimulus === 'string' ? stimulus : (stimulus as { user?: unknown } | undefined)?.user;
+  const user = sentUser(ctx);
   return blockEvidenceInputs({
     ...extra,
     observed: ctx.observed,
     verdicts,
     expect: ctx.expect,
     spec: ctx.spec,
-    ...(typeof user === 'string' ? { user } : {}),
+    ...(user === undefined ? {} : { user }),
   });
 }

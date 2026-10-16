@@ -67,6 +67,7 @@ import {
 export type {
   BlockExpect,
   ConfirmEvidence,
+  DownstreamConsumer,
   EvidenceCost,
   EvidenceInput,
   EvidenceProvider,

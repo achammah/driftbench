@@ -1,5 +1,6 @@
 import type { Assertion, Count } from '../schema/common';
 import type { Expect, Spec } from '../schema/spec';
+import { evaluateFormula } from './formula';
 import { error, type Issue } from './issues';
 
 const CRITERION_REF = /^([A-Za-z0-9][A-Za-z0-9_.-]*)(@gating)?$/;
@@ -164,6 +165,16 @@ export function checkSemantics(spec: Spec): Issue[] {
   return issues;
 }
 
+/** Why a gold formula gives no number on its inputs; undefined when it gives a finite one. */
+function formulaProblem(formula: string, inputs: Readonly<Record<string, number>>): string | undefined {
+  try {
+    const value = evaluateFormula(formula, inputs);
+    return Number.isFinite(value) ? undefined : `the result, ${String(value)}, is not a finite number`;
+  } catch (cause) {
+    return cause instanceof Error ? cause.message : String(cause);
+  }
+}
+
 function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]): void {
   for (const key of ['must', 'must_not'] as const) {
     expect[key]?.forEach((pattern, index) => {
@@ -183,6 +194,18 @@ function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]
   expect.tools?.forEach((tool, index) => {
     const toolPath = `${path}.tools.${index}`;
     checkCount(tool.count, `${toolPath}.count`, issues);
+    for (const [name, gold] of Object.entries(tool.recompute ?? {})) {
+      const problem = formulaProblem(gold.formula, gold.inputs);
+      if (problem) {
+        issues.push(
+          error(
+            'RECOMPUTE_GOLD_UNCOMPUTABLE',
+            `${toolPath}.recompute.${name}.formula`,
+            `the gold formula ${gold.formula} cannot be computed on its inputs: ${problem}. A test whose gold cannot be computed would blame the agent for it`,
+          ),
+        );
+      }
+    }
     const zero = isZero(tool.count);
     if (zero && tool.input) {
       issues.push(

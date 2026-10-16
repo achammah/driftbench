@@ -1,7 +1,7 @@
 # diagnostic/value-mismatch (config_framework.md 2.7). On a block whose tools check failed: the value check's
-# record of each failing value, then policy/blame over its evidence. The ladder rungs themselves belong to
-# policy/value-check. TODO after PR 459 merges: call runLadder per call in the evidence step; no Verdict field.
-# Until that API is stable this diagnostic reports unknown with a lint.
+# record of each failing value, then policy/blame over its evidence, for the verdicts on a tool input. A value
+# the check could not decide (it fell back to the exact compare) is decided again by the ladder with the
+# services given to the diagnostics (blame.useBlameServices); the others keep the decision the check stored.
 kind: diagnostic
 id: value-mismatch
 version: 1

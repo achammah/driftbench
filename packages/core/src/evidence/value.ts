@@ -251,8 +251,17 @@ export const downstream_need: EvidenceProvider = {
   name: 'downstream_need',
   cost: 'static',
   values: ['declared', 'none'],
-  from: 'a consumer the block or the project declares',
-  compute: (input) => (input.expect?.downstream === true ? 'declared' : 'none'),
+  from: 'a consumer of this tool and argument that the block (`expect.downstream`) or a blame item (`downstream_consumers`) declares',
+  compute: (input) => {
+    const tool = subjectTool(input);
+    const field = subjectField(input);
+    const consumers = [...(input.expect?.downstream ?? []), ...(input.downstreamConsumers ?? [])];
+    const reads = consumers.some(
+      (one) =>
+        (one.tool === undefined || one.tool === tool) && (one.field === undefined || one.field === field),
+    );
+    return reads ? 'declared' : 'none';
+  },
 };
 
 export const changed_inputs_fail: EvidenceProvider = {

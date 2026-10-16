@@ -238,6 +238,7 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `DUPLICATE_BLOCK_ID` | error | two blocks share an id |
 | `DUPLICATE_PERTURBATION_ID` | error | two perturbations share an id |
 | `TOOL_COUNT_CONTRADICTION` | error | a tool is expected 0 times but has input assertions |
+| `RECOMPUTE_GOLD_UNCOMPUTABLE` | error | the gold formula of an expected tool's `recompute` argument gives no finite number on its inputs: a syntax error, an unknown function or input, a division by zero |
 | `COUNT_RANGE_INVALID` | error | a count has a `min` greater than its `max` |
 | `MUST_CONFLICT` | error | the same pattern is in `must` and in `must_not` |
 | `STAGE_UNKNOWN` | error | the spec lists `stages`, and `expect.stage` or `recovery.stage_after` names a stage that is not there |

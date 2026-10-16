@@ -102,6 +102,31 @@ export const CompareMode = z
   .describe('How one value is compared: auto, a rung name, or exact with its reason.');
 export type CompareMode = z.infer<typeof CompareMode>;
 
+/**
+ * A computed argument: the agent writes a formula or a number, and the value-check ladder recomputes the gold
+ * formula and the agent's value on the given inputs and on changed inputs.
+ */
+export const RecomputeExpect = z
+  .strictObject({
+    formula: z
+      .string()
+      .min(1)
+      .describe(
+        'The gold computation, a spreadsheet formula over the named inputs, such as =SUM(C2:C5). Numbers, names, + - * / ^, parentheses and SUM, MIN, MAX, AVERAGE, ROUND, ABS are supported.',
+      ),
+    inputs: z
+      .record(z.string(), z.number())
+      .describe('The inputs the agent was given, by name: C2: 10. The formulas are first run on these.'),
+    ranges: z
+      .record(z.string(), z.tuple([z.number(), z.number()]))
+      .optional()
+      .describe(
+        'The range [low, high] each input is drawn from on changed inputs. An input without one varies around its given value.',
+      ),
+  })
+  .describe('The gold computation of an argument the agent computes, and the inputs it runs on.');
+export type RecomputeExpect = z.infer<typeof RecomputeExpect>;
+
 export const ToolExpect = z
   .strictObject({
     label: z.string().min(1).describe('The tool name.'),
@@ -122,6 +147,16 @@ export const ToolExpect = z
       .describe(
         'How the input values are compared: one mode for every argument, or a mode by argument name. Absent means auto: the value-check rungs decide whether a value that differs from the gold names the same thing.',
       ),
+    recompute: z
+      .record(z.string(), RecomputeExpect)
+      .optional()
+      .describe(
+        'Arguments the agent computes, by argument name. The agent writes a formula (a text that starts with =) or a number; the recompute rung runs it and the gold formula on the given inputs and on changed inputs, and fails a value that is right only on the given ones. An argument named here is not also named in input.',
+      ),
+  })
+  .refine((tool) => Object.keys(tool.recompute ?? {}).every((name) => tool.input?.[name] === undefined), {
+    message: 'an argument is named in input or in recompute, not both',
+    path: ['recompute'],
   })
   .describe('One expected tool call.');
 export type ToolExpect = z.infer<typeof ToolExpect>;
@@ -311,6 +346,28 @@ export const ArtifactExpect = z
   .describe('A file the block must produce.');
 export type ArtifactExpect = z.infer<typeof ArtifactExpect>;
 
+export const DownstreamExpect = z
+  .strictObject({
+    tool: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('The tool whose input the consumer reads. Absent means any tool.'),
+    field: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('The argument the consumer reads. Absent means every argument.'),
+    needs: z.string().min(1).describe('The form the consumer needs, such as e164 or iso8601.'),
+    declared_in: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('Where the consumer states the need, such as a file or a system name.'),
+  })
+  .describe('A consumer that needs a form of a value.');
+export type DownstreamExpect = z.infer<typeof DownstreamExpect>;
+
 export const WorkspaceExpect = z
   .strictObject({
     created: z.array(z.string()).optional().describe('Paths the block creates.'),
@@ -496,6 +553,18 @@ export const Expect = z
     execution: ExecutionExpect.optional().describe('What the agent runs.'),
     artifacts: z.array(ArtifactExpect).optional().describe('The files the block must produce.'),
     workspace: WorkspaceExpect.optional().describe('The workspace diff expected.'),
+    task_impossible: z
+      .boolean()
+      .optional()
+      .describe(
+        'True when the task, or the tests it was given, cannot be met honestly. The checks do not read it. Blame credits an agent that stopped and said so, and attributes a pass reached anyway to the agent as an integrity fault.',
+      ),
+    downstream: z
+      .array(DownstreamExpect)
+      .optional()
+      .describe(
+        'Consumers of the block output that need a form nobody states to the agent. The checks do not read it. When a value that works fails its check, blame names the missing rule as a setup fault instead of flagging the test.',
+      ),
     protected: z
       .array(z.string().min(1))
       .optional()

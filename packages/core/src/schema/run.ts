@@ -281,6 +281,11 @@ export const Verdict = z.strictObject({
         path: z.string().min(1),
         rung: z.string().min(1),
         outcome: Outcome,
+        /**
+         * Set by the recompute rung: true when the computed value matched the gold on the given inputs and
+         * differed on changed ones, false when it matched on both.
+         */
+        changedInputsFail: z.boolean().optional(),
       }),
     )
     .optional(),
