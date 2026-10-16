@@ -62,6 +62,8 @@ export type PhrasedBlock = {
   value: string;
   /** The texts this block takes: the generated one first, then every other approved phrase. */
   options: string[];
+  /** The workspace file that carries the text, for a block whose turn says nothing (data carried in the world). */
+  file?: string;
 };
 
 export type PilotVariant = {
@@ -241,8 +243,8 @@ function conversationOf(
     const index = spec.blocks.findIndex((block) => block.id === meta.block);
     const block = spec.blocks[index];
     if (!block) return;
-    const text = stimulusText(block.when);
-    if (text === undefined) return;
+    const said = stimulusText(block.when);
+    if (said === undefined) return;
     const bank = map.phrasesOf.get(`${dimension}=${value}`) ?? [];
     if (bank.length === 0) {
       warnings.add(`${dimension}=${value} has no approved phrase in the map, so its block keeps one wording`);
@@ -254,6 +256,14 @@ function conversationOf(
       const result = fillText(phrase.text, { ...slots, ...(phrase.binds ?? {}) });
       return result.ok ? result.value : undefined;
     };
+    // A turn that says nothing carries its phrase as the content of a file the block supplies.
+    const supplied =
+      said === ''
+        ? Object.entries(block.given?.world?.workspace?.files ?? {}).find(([, content]) =>
+            bank.some((phrase) => filled(phrase) === content),
+          )
+        : undefined;
+    const text = supplied ? supplied[1] : said;
     // The phrase the generator chose: the one whose filled text is the block's text.
     const original = bank.find((phrase) => filled(phrase) === text);
     const options = [text];
@@ -280,7 +290,14 @@ function conversationOf(
       }
       for (const [slot, bound] of Object.entries(original.binds ?? {})) slots[slot] = bound;
     }
-    phrased.push({ index, blockId: meta.block, dimension, value, options: unique(options) });
+    phrased.push({
+      index,
+      blockId: meta.block,
+      dimension,
+      value,
+      options: unique(options),
+      ...(supplied ? { file: supplied[0] } : {}),
+    });
   });
   const available = phrased.reduce((product, block) => product * block.options.length, 1);
   const count = Math.min(wordings, available);
@@ -355,7 +372,10 @@ function variantOf(
   phrased.forEach((block, i) => {
     const target = raw.blocks[block.index];
     const text = block.options[choice[i] as number];
-    if (target && text !== undefined) target.when = withText(target.when, text);
+    if (!target || text === undefined) return;
+    const files = target.given?.world?.workspace?.files;
+    if (block.file !== undefined && files) files[block.file] = text;
+    else target.when = withText(target.when, text);
   });
   raw.id = `${entry.spec.id}.w${factors.wording}`;
   raw.metadata = { ...(raw.metadata ?? {}), pilot: factors };

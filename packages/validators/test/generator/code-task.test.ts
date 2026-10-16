@@ -9,7 +9,7 @@ import { renderMap } from '../../src/ladders/generator/render';
 
 describe('readable export task family', () => {
   it('plants physical file changes and does not resurrect deleted input on later turns', async () => {
-    expect(bankItems()).toHaveLength(2033);
+    expect(bankItems()).toHaveLength(2036);
     expect(BANK_LEVELS).toHaveLength(22);
     const hidden = hiddenSpec(1);
     const world = {
