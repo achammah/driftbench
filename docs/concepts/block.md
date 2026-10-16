@@ -142,6 +142,8 @@ blocks:
 
 The task starts in a workspace that holds two CSV files. The first step expects the `xlsx` skill once, code that runs and exits with 0, no denial from the `workspace_boundary` guard, a workbook with one sheet per region, and no other file touched. A judged criterion checks that the reply states the totals the file holds. The second step changes the same workbook and touches nothing else.
 
+A block may name a `parent`, by block id or by position counting from 0. A block with no parent is a root, so the blocks of a spec form a forest. The runner sends a child after its parent, in the order the spec writes them when every parent is written before its children, and parents first otherwise. A `parent` that names no block is `PARENT_MISSING`; links that loop are `PARENT_CYCLE`.
+
 A workspace seed has two kinds of file. `files` maps a path to text, written as UTF-8. `binary` maps a path to base64, written byte for byte: use it for a workbook, a PDF or a text file whose byte-order mark must reach the agent. A path is in one of them, never in both (`WORKSPACE_PATH_TWICE`).
 
 Both examples pass `driftbench spec lint --strict`. A test in `tools/docs` runs them through the loader on every change. Seven complete specs, six conversations and one task, run against a deterministic example agent in [`examples/acme`](../../examples/acme/README.md).

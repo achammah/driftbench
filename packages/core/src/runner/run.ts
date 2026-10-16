@@ -21,6 +21,7 @@ import {
 import type { BlockSpec, EndState, Expect, GivenOverride, Spec, Stimulus } from '../schema/spec';
 import { cloneJson, contentHash } from '../spec/hash';
 import { specHash as specHashOf, specIdentity } from '../spec/identity';
+import { runOrder } from '../spec/parents';
 import { compareEndState, type EndStateMatch } from './assertion';
 import { blockCacheKey, endStateCacheKey, type ObservedCache, unwrapEndState, wrapEndState } from './cache';
 import { capabilityGap } from './capability';
@@ -369,7 +370,11 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   let users: Message[] = [];
   /** The spec block whose user messages `users` ends with; NaN after an injected step. */
   let usersBlock = -1;
-  let nextBlock = 0;
+  /** The order the spec's blocks run in: every child after its parent, else the order they are written in. */
+  const order = runOrder(spec);
+  const lastBlock = order.at(-1) ?? spec.blocks.length - 1;
+  /** Where the next block sits in `order`. */
+  let cursor = 0;
   let lastKey: string | undefined;
   let endRead: { states: unknown[]; afterBlock: number } | undefined;
   /** The end-state values so far: in mode T composed over the blocks, else the last read. */
@@ -389,7 +394,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         error = `the driver ${run.driver.id} did not stop within ${run.maxSteps} steps`;
         break;
       }
-      const step = await nextStep(run, nextBlock, blocks);
+      const step = await nextStep(run, order[cursor] ?? cursor, blocks);
       if (step.kind === 'stop') {
         endVerdict = step.verdict;
         if (step.verdict === 'inconclusive') {
@@ -398,8 +403,11 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         }
         break;
       }
-      const planned = planStep(spec, step);
-      if (step.kind === 'block') nextBlock = step.blockIndex + 1;
+      const planned = planStep(spec, step, lastBlock);
+      if (step.kind === 'block') {
+        const at = order.indexOf(step.blockIndex);
+        cursor = at < 0 ? step.blockIndex + 1 : at + 1;
+      }
 
       if (run.selectedBlocks && step.kind === 'block' && !run.selectedBlocks.has(step.blockIndex)) {
         const kept = run.carriedBlocks?.get(step.blockIndex);
@@ -485,32 +493,36 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         // not run either, and the driver is not asked for more steps.
         // Each later block is stamped as a run reconstructs it (a re-judge checks the stamps): the blocks before
         // it with their user messages and an empty reply, and the facts their ledger_add establishes.
-        const from = step.kind === 'block' ? step.blockIndex + 1 : nextBlock;
+        const later = order.slice(cursor);
         let laterState: RunningGiven = { ...state, ledger };
         let laterHistory = copyHistory(history, [
           ...stimulusMessages(planned.stimulus),
           assistantMessage(NOT_SENT),
         ]);
-        for (let index = from; index < spec.blocks.length; index++) {
-          const later = planStep(spec, {
-            kind: 'block',
-            blockIndex: index,
-            stimulus: (spec.blocks[index] as BlockSpec).when,
-          });
-          laterState = enterBlock(laterState, later.given);
-          if (later.given?.prefix) laterHistory = copyHistory(later.given.prefix);
+        for (const index of later) {
+          const laterStep = planStep(
+            spec,
+            {
+              kind: 'block',
+              blockIndex: index,
+              stimulus: (spec.blocks[index] as BlockSpec).when,
+            },
+            lastBlock,
+          );
+          laterState = enterBlock(laterState, laterStep.given);
+          if (laterStep.given?.prefix) laterHistory = copyHistory(laterStep.given.prefix);
           const laterHash = resolveGiven(laterState, laterHistory, run.target).hash;
-          const laterLedger = addFacts(laterState.ledger, later.expect.ledger_add).ledger;
+          const laterLedger = addFacts(laterState.ledger, laterStep.expect.ledger_add).ledger;
           laterState = { ...laterState, ledger: laterLedger };
           laterHistory = copyHistory(laterHistory, [
-            ...stimulusMessages(later.stimulus),
+            ...stimulusMessages(laterStep.stimulus),
             assistantMessage(NOT_SENT),
           ]);
           blocks.push(
             notRunBlock(
               run,
               blocks.length,
-              later,
+              laterStep,
               { givenHash: laterHash, specIndex: index, ledger: laterLedger },
               {
                 ...notRun,
@@ -853,7 +865,11 @@ async function nextStep(run: RunContext, blockIndex: number, blocks: BlockResult
   }
 }
 
-function planStep(spec: Spec, step: Exclude<DriverStep, { kind: 'stop' }>): PlannedStep {
+function planStep(
+  spec: Spec,
+  step: Exclude<DriverStep, { kind: 'stop' }>,
+  lastBlock: number = spec.blocks.length - 1,
+): PlannedStep {
   if (step.kind === 'block') {
     const block = spec.blocks[step.blockIndex];
     if (!block) {
@@ -878,7 +894,7 @@ function planStep(spec: Spec, step: Exclude<DriverStep, { kind: 'stop' }>): Plan
             },
           }
         : {}),
-      lastSpecBlock: step.blockIndex === spec.blocks.length - 1,
+      lastSpecBlock: step.blockIndex === lastBlock,
     };
   }
   const perturbation = spec.perturbations?.find((entry) => entry.id === step.perturbationId);

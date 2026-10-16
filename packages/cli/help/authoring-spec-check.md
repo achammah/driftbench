@@ -119,6 +119,8 @@ The path in a spec is dotted, counting from 0: `blocks.2.expect.tools.0.label` i
 | `TOOL_FORBIDDEN_EXPECTED` | error | a block expects a tool that `rules.forbidden_tools` or `rules.max_calls: 0` forbids |
 | `GIVEN_ORIGIN_WITHOUT_PREFIX` | error | a block sets `given.origin` and writes no `given.prefix` |
 | `WORKSPACE_PATH_TWICE` | error | a workspace seed writes one path in both `files` (text) and `binary` (base64); write it once |
+| `PARENT_MISSING` | error | a block's `parent` names no block of the spec: not a block id, nor a position from 0 |
+| `PARENT_CYCLE` | error | the `parent` links of some blocks loop, a block being its own parent included |
 | `LINK_BLOCK_UNKNOWN` | error | a link in `metadata.links` names a block id the spec does not have, or an index past its last block |
 | `LINK_TARGET_UNKNOWN` | error or warning | `spec lint --sections` only: error when the registry of the prompt has no such section, warning when no registry was given for the prompt |
 | `LINK_STALE` | warning | `spec lint --sections` only: the link's status is `stale`, or its section could not be found again in the registry's version |

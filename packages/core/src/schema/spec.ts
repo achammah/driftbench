@@ -478,6 +478,12 @@ export type Expect = z.infer<typeof Expect>;
 export const BlockSpec = z
   .strictObject({
     id: z.string().min(1).optional().describe('An id, unique in the spec.'),
+    parent: z
+      .union([z.string().min(1), z.number().int().min(0)])
+      .optional()
+      .describe(
+        'The block this one depends on: its id, or its position counting from 0. Absent: the block is a root. A child runs after its parent. `PARENT_MISSING` when no block matches, `PARENT_CYCLE` when the links loop.',
+      ),
     when: Stimulus.describe('The stimulus.'),
     given: GivenOverride.optional().describe('Initial conditions for this block.'),
     expect: Expect.optional().describe('The expected output and state delta.'),

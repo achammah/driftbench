@@ -2,6 +2,7 @@ import type { Assertion, Count, WorldState } from '../schema/common';
 import type { Expect, Spec } from '../schema/spec';
 import { error, type Issue } from './issues';
 import { isPlainObject } from './normalize';
+import { parentCycles, parentIndexes } from './parents';
 
 const CRITERION_REF = /^([A-Za-z0-9][A-Za-z0-9_.-]*)(@gating)?$/;
 
@@ -91,6 +92,8 @@ export function checkSemantics(spec: Spec): Issue[] {
         issues,
       );
   });
+
+  checkParents(spec, issues);
 
   const perturbationIds = new Set<string>();
   spec.perturbations?.forEach((perturbation, index) => {
@@ -186,6 +189,32 @@ export function checkSemantics(spec: Spec): Issue[] {
   }
 
   return issues;
+}
+
+/** A parent names a block of the spec, and the parent links never loop. */
+function checkParents(spec: Spec, issues: Issue[]): void {
+  parentIndexes(spec).forEach((parent, index) => {
+    if (parent !== null) return;
+    const named = spec.blocks[index]?.parent;
+    issues.push(
+      error(
+        'PARENT_MISSING',
+        `blocks.${index}.parent`,
+        `the parent ${JSON.stringify(named)} is not a block of this spec: name a block id or a position from 0 to ${spec.blocks.length - 1}`,
+      ),
+    );
+  });
+  for (const cycle of parentCycles(spec)) {
+    const first = cycle[0] ?? 0;
+    const loop = [...cycle, first].map((index) => spec.blocks[index]?.id ?? index).join(' -> ');
+    issues.push(
+      error(
+        'PARENT_CYCLE',
+        `blocks.${first}.parent`,
+        `the parent links loop (${loop}): a block cannot depend on itself, even through other blocks`,
+      ),
+    );
+  }
 }
 
 /** A workspace path is written once: in `files` as text or in `binary` as base64, never in both. */

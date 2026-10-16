@@ -231,6 +231,7 @@ One block: a stimulus, its initial conditions and its expectations.
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `id` | string, not empty | no |  | An id, unique in the spec. |
+| `parent` | string, not empty or integer, at least 0 | no |  | The block this one depends on: its id, or its position counting from 0. Absent: the block is a root. A child runs after its parent. `PARENT_MISSING` when no block matches, `PARENT_CYCLE` when the links loop. |
 | `when` | [Stimulus](#stimulus) | yes |  | The stimulus. |
 | `given` | [Given](#given) | no |  | Initial conditions for this block. |
 | `expect` | [Expect](#expect) | no |  | The expected output and state delta. |
