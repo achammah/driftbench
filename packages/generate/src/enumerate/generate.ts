@@ -28,6 +28,7 @@ import {
 } from '../seed/assemble';
 import { DeviationBalance } from '../seed/deviation-balance';
 import type { PreparedMap } from '../seed/map';
+import { TerminalSubsumption } from '../seed/minimal';
 import { phraseDrafts, type UnsaidPhrase } from '../seed/phrase-seeder';
 import { restatedDrafts } from '../seed/restated-seeder';
 import { indexDimensions, indexPathValues } from '../seed/scenario';
@@ -87,6 +88,11 @@ export type GenerateOptions = {
   specCap?: number;
   /** Tuple-exact by default. Pairs mode explicitly permits triple losses, which remain reported. */
   specCapMode?: SpecCapMode;
+  /**
+   * Drop the repeated end of a walk another written spec already says (default true). Under `specCap` it runs
+   * after the cap, on the specs actually written, so no walk loses an end only a dropped spec said.
+   */
+  reduceEnds?: boolean;
   /** The map path as the specs and the report record it (relative to the output folder). */
   mapPath: string;
   /** Specs to measure on the same map for comparison, such as the hand-written suite. */
@@ -240,6 +246,12 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
     allocation,
   };
   const run: RunIdentity = { seed, mapPath: options.mapPath };
+  const reduceEnds = options.reduceEnds !== false;
+  // Without a cap, each draft is reduced as it is written. With one, the cap decides what is written first and
+  // the pass below reduces the specs that stay, in the order they were written.
+  if (reduceEnds && options.specCap === undefined)
+    context.minimal = new TerminalSubsumption(prepared, run, t, allocation);
+  const draftOf = new Map<string, SpecDraft>();
 
   const graph = graphSeeder(prepared, context);
   const budgeted =
@@ -301,8 +313,10 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
       cut: cut[seeder],
     };
     for (const draft of list) {
+      context.minimal?.reduce(draft);
       context.allocation?.observeDraft(draft);
       const rendered: Rendered = renderDraft(prepared, draft, run);
+      if (options.specCap !== undefined && reduceEnds) draftOf.set(rendered.id, draft);
       const renderText = () => generatedSpecText(rendered, run, prepared.hash);
       const text = options.specCap === undefined ? renderText() : '';
       const loaded = checkSpec(rendered.spec, rendered.id);
@@ -377,6 +391,7 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
     complete.push(loaded.spec);
     keep('task', loaded.spec);
     context.allocation?.observeSpec(loaded.spec);
+    context.minimal?.observeSpec(loaded.spec);
     const path = `${COMPLETE_DIR}/task/${id}.yaml`;
     if (options.specCap !== undefined) cappedText.set(path, renderText);
     addFile(id, { path, text });
@@ -495,6 +510,30 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
     };
     retain(all);
     retain(complete);
+    if (reduceEnds) {
+      const written = new Allocation(prepared);
+      const minimal = new TerminalSubsumption(prepared, run, t, written);
+      for (const [index, spec] of all.entries()) {
+        const draft = draftOf.get(spec.id);
+        if (!draft) {
+          minimal.observeSpec(spec);
+          written.observeSpec(spec);
+          continue;
+        }
+        const before = draft.blocks.length;
+        minimal.reduce(draft);
+        written.observeDraft(draft);
+        if (draft.blocks.length === before) continue;
+        const rendered: Rendered = renderDraft(prepared, draft, run);
+        const loaded = checkSpec(rendered.spec, rendered.id);
+        if (!loaded.ok) continue;
+        const wasComplete = complete.indexOf(spec);
+        all[index] = loaded.spec;
+        if (wasComplete >= 0) complete[wasComplete] = loaded.spec;
+        const path = [...cappedText.keys()].find((entry) => entry.endsWith(`/${rendered.id}.yaml`));
+        if (path !== undefined) cappedText.set(path, () => generatedSpecText(rendered, run, prepared.hash));
+      }
+    }
     for (const seeder of SEEDERS) {
       const own = all.filter((spec) => seederOf(spec) === seeder);
       const ready = complete.filter((spec) => seederOf(spec) === seeder);

@@ -4,6 +4,7 @@ import { checkSpec, type Spec } from '@agent-nexus/driftbench-core';
 import { stringify } from 'yaml';
 import { seedFolderName } from '../families/instances';
 import { Allocation } from '../seed/allocation';
+import { TerminalSubsumption } from '../seed/minimal';
 import {
   generatedSpecText,
   NO_THEN_CRITERION,
@@ -97,6 +98,12 @@ function writeSuite(
   context.pathValues = indexPathValues(prepared);
   context.dimensionIndex = indexDimensions(prepared);
   context.allocation = new Allocation(prepared);
+  context.minimal = new TerminalSubsumption(
+    prepared,
+    { seed, mapPath: options.mapPath },
+    t,
+    context.allocation,
+  );
   const run = { seed, mapPath: options.mapPath };
   const coverage = new StreamCoverage(prepared, t, scratch);
   const invalid = new DiskArray<GenerateReport['invalid'][number]>(scratch, 'invalid.jsonl');
@@ -147,6 +154,7 @@ function writeSuite(
   // The phrases the complete specs say so far: the phrase seeder adds only those no complete spec says yet.
   const saidPhrases = new Set<string>();
   const render = (draft: SpecDraft): Spec | undefined => {
+    context.minimal?.reduce(draft);
     context.allocation?.observeDraft(draft);
     const seeder = draft.seeder;
     drafted[seeder] += 1;
@@ -240,6 +248,7 @@ function writeSuite(
     seeders.task.blocks += loaded.spec.blocks.length;
     seeders.task.complete += 1;
     context.allocation?.observeSpec(loaded.spec);
+    context.minimal?.observeSpec(loaded.spec);
     balance.observe(loaded.spec);
     terminal.observe(loaded.spec);
     coverage.add(loaded.spec, 'task', true);
