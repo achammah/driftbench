@@ -15,7 +15,7 @@ export function matchAssertion(value: unknown, assertion: Assertion): boolean {
     return Array.isArray(value) && value.some((item) => deepEqual(item, assertion.contains));
   }
   if ('one_of' in assertion) return assertion.one_of.some((option) => deepEqual(value, option));
-  if ('nonempty' in assertion) return !isEmpty(value);
+  if ('nonempty' in assertion) return !isBlank(value);
   if ('absent' in assertion) return value === undefined;
   return isRecord(value) && Object.entries(assertion.subset).every(([key, part]) => holds(value[key], part));
 }
@@ -109,14 +109,25 @@ function holds(value: unknown, expected: unknown): boolean {
 }
 
 /**
- * Empty: nothing, a string with no visible character, an empty list, or a mapping none of whose keys
+ * Holds nothing, for `{ nonempty: true }` (docs/reference/checks.md "Assertions on values"): nothing, a string
+ * with no visible character, an empty list, or a mapping none of whose keys holds anything, at any depth. A key
+ * holds nothing when its own value does. `0` and `false` are values.
+ */
+function isBlank(value: unknown): boolean {
+  if (value === undefined || value === null) return true;
+  if (typeof value === 'string') return value.trim() === '';
+  if (Array.isArray(value)) return value.length === 0;
+  return isRecord(value) && Object.values(value).every(isBlank);
+}
+
+/**
+ * Empty, for `end_state: none` (nothing was recorded): nothing, a string with no visible character, an empty list, or a mapping none of whose keys
  * holds a value. A blank summary is as empty as a missing one, so `{ nonempty: true }` refuses it.
  */
 function isEmpty(value: unknown): boolean {
   if (value === undefined || value === null) return true;
   if (typeof value === 'string') return value.trim() === '';
   if (Array.isArray(value)) return value.length === 0;
-  // docs/reference/checks.md "Assertions on values": a mapping whose keys hold nothing is empty; in JSON a
-  // key holds nothing when it is null.
+  // A mapping whose keys all hold null is empty. `{ nonempty: true }` reads deeper: see isBlank.
   return isRecord(value) && Object.values(value).every((part) => part === undefined || part === null);
 }
