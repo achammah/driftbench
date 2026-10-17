@@ -246,6 +246,23 @@ describe('a Read of a file the estate does not hold (docs/estate.md section 5, n
         pass: false,
         detail: expect.stringContaining(missing),
       });
+    // Marked, and a complete spec reads it by its bare name, an absolute path, a pattern or a glob of its name: fails.
+    const basename = path.slice(path.lastIndexOf('/') + 1);
+    for (const complete of [
+      withChecks({}, { tools: [{ label: 'Read', input: { file_path: { contains: basename } } }] }),
+      withChecks({}, { tools: [{ label: 'Read', input: { file_path: `/work/northwind/${path}` } }] }),
+      withChecks(
+        {},
+        {
+          tools: [{ label: 'Read', input: { file_path: { regex: `${basename.split('.').join('\\.')}$` } } }],
+        },
+      ),
+      withChecks({}, { references: [{ path: `**/${basename}` }] }),
+    ])
+      expect(await one({ ...suite, specs: [...suite.specs, complete] })).toMatchObject({
+        pass: false,
+        detail: expect.stringContaining(missing),
+      });
     // Marked, and the specs that name it only name it (or read another file): no complaint about the missing reference.
     for (const harmless of [
       withChecks({}, { must: [path] }),
@@ -319,6 +336,37 @@ describe('a Read of a file the estate does not hold (docs/estate.md section 5, n
       expect(checksReadOf(spec({}, { references: [{ path: 'archive/logbook.md' }] }), 'logbook.md')).toBe(
         false,
       );
+    });
+
+    it.each([
+      ['by its bare name, as a contains', read({ file_path: { contains: 'logbook.md' } })],
+      ['by its tail, as a contains', read({ file_path: { contains: 'lighthouse/logbook.md' } })],
+      ['by an absolute path, bare', read({ file_path: `/work/northwind/${REF}` })],
+      ['by an absolute path, as exact', read({ file_path: { exact: `/work/northwind/${REF}` } })],
+      ['by an absolute path in a some_call', some({ file_path: `/work/northwind/${REF}` })],
+      ['by a pattern that names the file', read({ file_path: { regex: 'logbook\\.md$' } })],
+      ['by an anchored pattern with the folder', read({ file_path: { regex: '^lighthouse/logbook\\.md$' } })],
+      ['by a pattern in a some_call', some({ file_path: { regex: 'lighthouse/logbook\\.md' } })],
+      ['by a double-star glob of its name', spec({}, { references: [{ path: '**/logbook.md' }] })],
+      ['by a double-star glob of its tail', spec({}, { references: [{ path: `**/${REF}` }] })],
+      ['by one_of that lists it', read({ file_path: { one_of: ['other.md', REF] } })],
+    ])('counts a Read of the file %s', (_name, candidate) => {
+      expect(checksReadOf(candidate, REF)).toBe(true);
+    });
+
+    it.each([
+      ['a bare name of another file', read({ file_path: { contains: 'notebook.md' } })],
+      ['a contains that is no file name', read({ file_path: { contains: '.md' } })],
+      ['a relative path with a folder in front', read({ file_path: `archive/${REF}` })],
+      ['an absolute path of another file', read({ file_path: '/work/northwind/lighthouse/other.md' })],
+      ['a pattern that names another file', read({ file_path: { regex: 'other\\.md$' } })],
+      ['a pattern that names no file', read({ file_path: { regex: '.*' } })],
+      ['a pattern that is no regular expression', read({ file_path: { regex: '(logbook.md' } })],
+      ['a glob of another name', spec({}, { references: [{ path: '**/notebook.md' }] })],
+      ['a glob of all markdown', spec({}, { references: [{ path: '**/*.md' }] })],
+      ['one_of that lists other files', read({ file_path: { one_of: ['a.md', 'b.md'] } })],
+    ])('does not count %s', (_name, candidate) => {
+      expect(checksReadOf(candidate, REF)).toBe(false);
     });
 
     it('counts nothing else: another tool, a pattern, a name only', () => {

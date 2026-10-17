@@ -595,24 +595,52 @@ const wantsOne = (count: unknown): boolean => {
  * Whether a complete spec checks a Read of exactly this path: a Read tool expectation, a references expectation (a glob
  * ending in the path) or a some_call entry for Read, each asking for at least one read (a minimum of 1 or more). A spec
  * that only names the atom, reads another file, or allows zero reads checks nothing of it. An `equals` or a bare path
- * must be the path itself; only a `contains` and a glob that starts with two stars and a slash may carry a prefix.
+ * must be the path itself, or an absolute path that ends in it; a `contains` and a `regex` must name the file; a glob that starts with two stars and a slash covers the paths that end in its tail.
  */
 export function checksReadOf(spec: FixtureSuite['specs'][number], path: string): boolean {
   const normal = (text: string) => text.replace(LEADING_DOT_SLASH, '');
   const target = normal(path);
   if (target === '') return false;
+  const name = target.slice(target.lastIndexOf('/') + 1);
+  /** An exact path: relative, it is the target; absolute, it ends in the target (the trace's absolute form). */
+  const exact = (text: string): boolean => {
+    const found = normal(text);
+    return text.startsWith('/') ? found === target || found.endsWith(`/${target}`) : found === target;
+  };
+  /** A text the path must contain: it names the file (the whole path, its tail, or its bare name) and the path holds it. */
+  const containing = (text: string): boolean => {
+    const found = normal(text);
+    return (
+      found.includes(name) && (target.includes(found) || found.endsWith(`/${target}`) || found === target)
+    );
+  };
+  /** A pattern the path must match: it names the file, and a read of the file matches it. */
+  const matching = (source: string): boolean => {
+    if (!source.split('\\').join('').includes(name)) return false;
+    try {
+      const pattern = new RegExp(source, 'm');
+      return pattern.test(target) || pattern.test(`/${target}`) || pattern.test(`/work/estate/${target}`);
+    } catch {
+      return false;
+    }
+  };
+  /** A glob of a references expectation: `**` then a tail, which is the end of the path; a plain path is exact. */
+  const globbing = (text: string): boolean => {
+    if (!LEADING_GLOB.test(text)) return exact(text);
+    const tail = normal(text.replace(LEADING_GLOB, ''));
+    return tail === target || target.endsWith(`/${tail}`) || tail.endsWith(`/${target}`);
+  };
   const same = (value: unknown, glob = false): boolean => {
-    if (typeof value === 'string') {
-      const globbed = glob && LEADING_GLOB.test(value);
-      const found = normal(globbed ? value.replace(LEADING_GLOB, '') : value);
-      return found === target || (globbed && found.endsWith(`/${target}`));
-    }
-    const asserted = value as { equals?: unknown; contains?: unknown } | undefined;
-    if (typeof asserted?.equals === 'string') return normal(asserted.equals) === target;
-    if (typeof asserted?.contains === 'string') {
-      const found = normal(asserted.contains);
-      return found === target || found.endsWith(`/${target}`);
-    }
+    if (typeof value === 'string') return glob ? globbing(value) : exact(value);
+    const asserted = value as
+      | { exact?: unknown; equals?: unknown; contains?: unknown; regex?: unknown; one_of?: unknown }
+      | undefined;
+    if (typeof asserted?.exact === 'string') return exact(asserted.exact);
+    if (typeof asserted?.equals === 'string') return exact(asserted.equals);
+    if (typeof asserted?.contains === 'string') return containing(asserted.contains);
+    if (typeof asserted?.regex === 'string') return matching(asserted.regex);
+    if (Array.isArray(asserted?.one_of))
+      return asserted.one_of.some((item) => typeof item === 'string' && exact(item));
     return false;
   };
   const blocks = (spec.spec.blocks ?? []) as Array<{
