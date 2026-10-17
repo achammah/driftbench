@@ -474,6 +474,8 @@ export type MutantVerdict = {
    * its situations and on the asks of the tests that name the atom: no test of any product can tell the two apart. Not counted alive.
    */
   equivalent?: true;
+  /** How many complete tests were inconclusive on the mutant (not a pass, no measured failure): none of them is a kill. */
+  inconclusive?: number;
   /** Why it lived: no complete test, or the tests that ran and passed. */
   reason?: string;
 };
@@ -554,25 +556,34 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
       });
       continue;
     }
+    // A kill is a measured failure: a spec that is not a pass without one (the run did not complete, a check was
+    // inconclusive) is inconclusive, its own state, and kills nothing.
     let killed = false;
+    let inconclusive = 0;
     for (const verdict of green) {
       const loaded = verdict.spec.loaded;
       if (!loaded) continue;
       const outcome = await replayOnFollower(run, loaded, checks, hid);
-      if (!outcome.pass) {
+      if (outcome.pass) continue;
+      if (outcome.definite) {
         killed = true;
         break;
       }
+      inconclusive += 1;
     }
     out.push({
       atom: atom.id,
       kind: atom.kind,
       tests: green.map((verdict) => verdict.spec.record.id),
       killed,
+      ...(killed || inconclusive === 0 ? {} : { inconclusive }),
       ...(killed
         ? {}
         : {
-            reason: `${green.length} complete tests ran on the follower with the atom deleted and all passed; the evidence ${atom.evidence.map((item) => item.type).join(', ')} did not fire`,
+            reason:
+              inconclusive > 0
+                ? `${inconclusive} of ${green.length} complete tests were inconclusive on the follower with the atom deleted (no check failed, the run did not measure it) and the others passed`
+                : `${green.length} complete tests ran on the follower with the atom deleted and all passed; the evidence ${atom.evidence.map((item) => item.type).join(', ')} did not fire`,
           }),
     });
   }

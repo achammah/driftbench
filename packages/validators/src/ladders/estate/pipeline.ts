@@ -281,7 +281,18 @@ export function replayChecks(): CheckSet {
   return defaultChecks({ registry });
 }
 
-export type ReplayOutcome = { pass: boolean; failing: string[]; error?: string; run: RunResult };
+export type ReplayOutcome = {
+  pass: boolean;
+  failing: string[];
+  /**
+   * Whether the run holds a measured failure: a gating check that returned `fail`, or an end state that missed. A run
+   * that is not a pass without one is inconclusive (it did not complete, a check was inconclusive, a block was not
+   * run): it measures nothing, so it is never a kill.
+   */
+  definite: boolean;
+  error?: string;
+  run: RunResult;
+};
 
 /** The asks of a spec: the user message of each block, in order. */
 export function asksOf(spec: LoadedSpec): string[] {
@@ -368,5 +379,9 @@ export async function replayOnFollower(
     result.status === 'completed' &&
     result.blocks.every((block) => block.pass) &&
     result.endState?.match !== false;
-  return { pass, failing, ...(result.error ? { error: result.error } : {}), run: result };
+  const definite =
+    result.blocks.some((block) =>
+      block.verdicts.some((verdict) => verdict.gating && verdict.outcome === 'fail'),
+    ) || result.endState?.match === false;
+  return { pass, failing, definite, ...(result.error ? { error: result.error } : {}), run: result };
 }
