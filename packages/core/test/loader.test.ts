@@ -182,6 +182,18 @@ const INVALID: Array<{ name: string; text: string; code: string; path?: string }
     path: 'blocks.0.expect.must.0',
   },
   {
+    name: 'workspace path in files and in binary (spec Given)',
+    text: 'id: x\ngiven:\n  world:\n    workspace:\n      files: { data/a.csv: "x" }\n      binary: { data/a.csv: "eA==" }\nblocks:\n  - user: hi\n    expect: { must: ["a"] }\n',
+    code: 'WORKSPACE_PATH_TWICE',
+    path: 'given.world.workspace.binary.data/a.csv',
+  },
+  {
+    name: 'workspace path in files and in binary (block Given)',
+    text: 'id: x\nblocks:\n  - user: hi\n    given:\n      world:\n        workspace:\n          files: { a.csv: "x" }\n          binary: { ./a.csv: "eA==" }\n    expect: { must: ["a"] }\n',
+    code: 'WORKSPACE_PATH_TWICE',
+    path: 'blocks.0.given.world.workspace.binary../a.csv',
+  },
+  {
     name: 'malformed criterion reference',
     text: 'id: x\nblocks:\n  - user: hi\n    expect: { criteria: ["polite@gate"] }\n',
     code: 'CRITERION_REF_INVALID',

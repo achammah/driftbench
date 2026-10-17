@@ -1,3 +1,4 @@
+import { posix } from 'node:path';
 import type { Assertion, Count } from '../schema/common';
 import type { Expect, Spec } from '../schema/spec';
 import { error, type Issue } from './issues';
@@ -80,6 +81,7 @@ export function checkSemantics(spec: Spec): Issue[] {
         ),
       );
     }
+    checkWorkspacePaths(block.given?.world, `blocks.${index}.given.world`, issues);
     if (block.expect) checkExpect(block.expect, `blocks.${index}.expect`, ctx, issues);
     if (block.expect)
       checkRetention(
@@ -90,9 +92,12 @@ export function checkSemantics(spec: Spec): Issue[] {
       );
   });
 
+  checkWorkspacePaths(spec.given?.world, 'given.world', issues);
+
   const perturbationIds = new Set<string>();
   spec.perturbations?.forEach((perturbation, index) => {
     const path = `perturbations.${index}`;
+    checkWorkspacePaths(perturbation.world, `${path}.world`, issues);
     if (perturbationIds.has(perturbation.id)) {
       issues.push(
         error(
@@ -183,6 +188,33 @@ export function checkSemantics(spec: Spec): Issue[] {
   }
 
   return issues;
+}
+
+/** A workspace path is written in files or in binary, never in both: the seed would be resolved one way. */
+function checkWorkspacePaths(
+  world: { workspace?: { files?: Record<string, string>; binary?: Record<string, string> } } | undefined,
+  path: string,
+  issues: Issue[],
+): void {
+  const files = world?.workspace?.files;
+  const binary = world?.workspace?.binary;
+  if (files === undefined || binary === undefined) return;
+  const seeded = new Set(Object.keys(files).map(workspacePath));
+  for (const key of Object.keys(binary)) {
+    if (seeded.has(workspacePath(key))) {
+      issues.push(
+        error(
+          'WORKSPACE_PATH_TWICE',
+          `${path}.workspace.binary.${key}`,
+          `the workspace path "${key}" is in both files and binary: write it in one`,
+        ),
+      );
+    }
+  }
+}
+
+function workspacePath(path: string): string {
+  return posix.normalize(path.replaceAll('\\', '/'));
 }
 
 function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]): void {
