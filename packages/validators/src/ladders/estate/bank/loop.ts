@@ -982,12 +982,18 @@ export function mutantFamily(): Family {
         const every = byClass.get(cls) ?? [];
         // A mutant the follower's session cannot show is no kill target: it is named, not counted alive.
         const same = every.filter((mutant) => mutant.equivalent);
-        const list = every.filter((mutant) => !mutant.equivalent);
+        // A reference to a missing file has no complete test by contract: named too, judged by its marker.
+        const absent = every.filter((mutant) => mutant.untestable);
+        const list = every.filter((mutant) => !mutant.equivalent && !mutant.untestable);
         const alive = list.filter((mutant) => !mutant.killed);
         const noted =
           same.length === 0
             ? ''
             : ` (${same.length} of ${every.length} not judged, the follower's session is the same without it: ${same[0]?.atom})`;
+        const missing =
+          absent.length === 0
+            ? ''
+            : ` (${absent.length} of ${every.length} not judged, the estate holds no such file and its tests wait on needs-existing-file: ${absent[0]?.atom})`;
         out.set(`${family}.${keyOf(cls)}`, {
           pass: alive.length === 0,
           detail:
@@ -995,8 +1001,8 @@ export function mutantFamily(): Family {
               ? every.length === 0
                 ? 'no atom of the class on this seed'
                 : list.length === 0
-                  ? `no atom of the class changes the follower's session on this seed${noted}`
-                  : `holds${noted}`
+                  ? `no atom of the class changes the follower's session on this seed${noted}${missing}`
+                  : `holds${noted}${missing}`
               : `${alive.length} of ${list.length} live: ${alive[0]?.atom} ${alive[0]?.reason ?? ''}`,
         });
       }
