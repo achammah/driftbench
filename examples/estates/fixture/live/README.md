@@ -8,6 +8,24 @@ Everything here is fictional and written by hand. Nothing calls a model and noth
   helpers, settings and steps. It implements a limited instruction syntax, not a complete
   runtime or model. Its first lines carry the stand-in marker, so
   `driftbench estate run` lets it run without `--allow-billed`.
+- The default fake gives each rule kind of an estate a behaviour, so that deleting a rule or writing its
+  opposite changes what the fake does. An agent with no rule takes the shortest path; each rule rules out
+  one shortcut:
+  - a helper that sorts messages into named folders files each message by the folder name it holds, sends one
+    that fits none where its rule says (and nowhere without the rule), and clears the messages it has filed
+    unless the helper forbids deleting;
+  - a standing line that forbids going on before a check step has passed makes the fake run that check step;
+    without the line the fake skips a step that can send the flow back;
+  - "pass the <field> to <script>" makes the fake pass the field's value from the table row of the
+    identifier in the ask; a prohibition or no line leaves it out;
+  - an output rule ("End with one line per <entity>: ...", "Answer with one JSON object") shapes the reply,
+    a reversed rule does not;
+  - a unit that lists its tools offers no other: "use the <Tool> tool" is refused for a tool it does not list;
+  - an ordering clause whose later part names the unit's own work holds vacuously; one that names nothing the
+    unit does stops the fake as unresolved.
+  A tool that ran and failed leaves the actions that wait on it undone; the others go on. A refused action
+  ends the work. `fake/rule-judge.cjs` is the matching stand-in judge: it reads the rule of the criterion
+  and the actions of the run, and answers inconclusive for a rule it cannot read.
 - Set `FAKE_MANIFEST` to opt into recorded playback for protocol tests. `fake/manifest.json`
   maps asks to streams under `fake/streams/`; stream paths are relative to the manifest.
   Besides stream records, a stream holds directives the fake performs: a guard row, a step row,
