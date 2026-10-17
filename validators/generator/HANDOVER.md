@@ -291,6 +291,12 @@ The test now constructs its intended imbalance by adding approved off-topic phra
 
 Focused results: four disk parity cases and 42 ownership/pin tests pass. Disabling the balancing iterator through a temporary test spy makes all three explicit-imbalance cases fail. The spy is removed; product source is unchanged.
 
+## Behaviours no owner can exercise: maintainer ruling (2026-10-16)
+
+A behaviour is exercised by a conversation of a flow that owns it, so one owner must call its tool and recover its class. The hidden constructor now adds one owner where none can (`behaviour-exercise.ts`), before the capacity pass. See [the journal](SWEEP-JOURNAL.md).
+
+Resolved: a behaviour that names a tool is drawn only where the map stages that tool, so the five `behaviour.list.exercised` items no longer owe an impossible cell.
+
 ## Feasibility and impossible pairs: maintainer ruling (2026-10-15)
 
 `diff.feasible.<seeder>` read only the written constraints, and only five seeders. A block in a cell no path of the hidden map can reach (`possible.ts`) passed, and blocks from the `cover` and `task` seeders were read by no item. The item now reads the hidden space map, the same map the coverage items read. It checks every seeder: `cover` and `task` have their own items, and `diff.feasible.unlisted` reads any seeder no item names. The bank grows from 2033 to 2036 items.
