@@ -438,8 +438,8 @@ Treats the specs as a sample of conversations and prints how complete it is: the
 ```
 $ pnpm -s driftbench space complete examples/acme/specs --map packages/space/test/fixtures/acme-space.yaml --t 1
 Completeness at t = 1: 46 cells, 7 conversations
-  seen          35 cells; f1 15, f2 11
-  Hill numbers  q0 35 · q1 28.1 · q2 22.7
+  seen          35 cells; f1 15, f2 10
+  Hill numbers  q0 35 · q1 28.2 · q2 22.9
 
 No completeness line: the estimate needs at least as many conversations as cells, and there are 7 for 46.
 ```
@@ -508,7 +508,7 @@ examples/acme/map/proposal.yaml: 291 of 291 decisions are open (51 dimensions, 1
 Axes: 7 of 51 dimensions, a full grid of 113568 cells (the space commands accept 250000).
   dimension   behaviour  behaviour axis, by code, 14 values: The behaviours the inventory lists
   dimension   flow  behaviour detail, by code, 5 values: The flows the inventory lists
-  dimension   deviation  deviation axis, by code, 10 values: The deviation classes the flows must be perturbed with
+  dimension   deviation  deviation axis, by code, 12 values: The deviation classes the flows must be perturbed with
   dimension   channel  channel axis, by code, 2 values: The channels the inventory names
 ```
 
@@ -565,7 +565,7 @@ $ pnpm -s driftbench generate --map examples/acme/map/approved.yaml --out _captu
 Actual axis-map coverage (written complete specs): pairs 708 of 708 (100.0%); triples 2928 of 4064 (72.0%).
 Candidate t-wise array (before the total cap): covering array of 156 rows over 5 dimensions, 356 of 356 allowed 2-tuples (100.0%); 2 pairs no path reaches are left out.
 Uncovered on the axis map: 0 pairs, 1136 triples (see coverage.actual[].uncovered).
-Map acme (../../../../examples/acme/map/approved.yaml), hash 7c05b9cee9cc: 51 dimensions, 187 values, 463 constraints, 55 approved phrases.
+Map acme (../../../../examples/acme/map/approved.yaml), hash 7a022d4e1380: 51 dimensions, 187 values, 463 constraints, 55 approved phrases.
 Seed 1, t = 2.
 
 Seeder        specs  blocks  complete  incomplete
@@ -575,7 +575,7 @@ boundary         85     183        13          72
 deviation        21     111        21           0
 metamorphic      42     192        42           0
 task             67      71        67           0
-cover            24     135        24           0
+cover            27     142        27           0
 
 Stage graph: 18 of 23 edges covered in 12 paths from needs.
 Constraints applied: 463.
@@ -600,6 +600,9 @@ Values with no approved phrase (72): their blocks are placeholders in incomplete
   coverage.check.in.address=coverage.check.in.address.below-min-length  1 block(s)
   ... 57 more in generate-report.json
 
+Approved phrases no walk could say (1), listed under no_phrase:
+  flow=price-sheet  "Build the price sheet from catalog.csv, one sheet per category.": no approved path walks the flow price-sheet
+
 Specs with a block the map supports no machine Then for (18), in incomplete/: gen-twise-108, gen-twise-109, gen-twise-114, gen-boundary-008, gen-boundary-017, gen-boundary-031, gen-boundary-046, gen-boundary-060, gen-boundary-067, gen-boundary-068, ....
   Most frequent reasons:
      3  it needs user_type in existing-customer; the cell holds new-customer
@@ -610,7 +613,7 @@ Specs with a block the map supports no machine Then for (18), in incomplete/: ge
      1  no approved path needs callback_phone=not-given
      1  no approved path needs catalog.search.in.unknown-key=catalog.search.in.unknown-key.sent
      1  no approved path needs coverage.check.in.unknown-key=coverage.check.in.unknown-key.sent
-Wrote 504 files to _captures/docs3/cli/generated.
+Wrote 507 files to _captures/docs3/cli/generated.
 exit 1
 ```
 
@@ -685,7 +688,7 @@ Mutation score per fault class (gated suite):
   X5_tool: 2/2 killed (100%, 95% CI 34% to 100%)
   D2_goal_shift: no scored fault, 1 equivalent excluded
   D4_loose_confirmation: 1/1 killed (100%, 95% CI 21% to 100%)
-  D6_instruction_in_data: 1/1 killed (100%, 95% CI 21% to 100%), 1 equivalent excluded
+  D6_instruction_in_data: no scored fault, 2 equivalent excluded
   D8_tool_failure: 1/1 killed (100%, 95% CI 21% to 100%)
   D9_out_of_scope: no scored fault, 1 equivalent excluded
   control: 2 negative control(s), green
@@ -847,21 +850,23 @@ $ pnpm -s driftbench pilot plan --map examples/acme/map/approved.yaml --suite ex
 Pilot plan: 13 cells by behaviour; per cell up to 10 conversations x 3 approved wordings x 5 repeats.
   cell             conversations  wordings  runs  blocks  cost
   behaviour=-      10             23        115   425     $0.00
-  behaviour=B-001  10             27        135   695     $0.00
-  behaviour=B-002  10             25        125   580     $0.00
-  behaviour=B-003  9              23        115   605     $0.00
-  behaviour=B-004  10             24        120   575     $0.00
-  behaviour=B-005  9              19        95    410     $0.00
-  behaviour=B-006  10             30        150   975     $0.00
+  behaviour=B-001  10             26        130   635     $0.00
+  behaviour=B-002  10             25        125   575     $0.00
+  behaviour=B-003  10             26        130   675     $0.00
+  behaviour=B-004  10             23        115   535     $0.00
+  behaviour=B-005  10             22        110   530     $0.00
+  behaviour=B-006  10             28        140   865     $0.00
   behaviour=B-007  10             28        140   940     $0.00
-  behaviour=B-008  10             29        145   845     $0.00
-  behaviour=B-009  10             26        130   665     $0.00
-  behaviour=B-010  9              24        120   685     $0.00
-  behaviour=B-011  10             23        115   550     $0.00
-  behaviour=B-012  10             23        115   460     $0.00
-  total            127            324       1620  8410    $0.00
+  behaviour=B-008  10             29        145   860     $0.00
+  behaviour=B-009  10             30        150   900     $0.00
+  behaviour=B-010  10             26        130   705     $0.00
+  behaviour=B-011  10             24        120   580     $0.00
+  behaviour=B-012  10             24        120   500     $0.00
+  total            130            334       1670  8725    $0.00
 Cost: the agent runs in process: no model call, nothing billed.
-Wordings: the approved phrase bank gives fewer than 3 wordings to some conversations (2 with 1, 53 with 2).
+Wordings: the approved phrase bank gives fewer than 3 wordings to some conversations (3 with 1, 50 with 2).
+Skipped acme-price-sheet-i01-base: a code-agent task: the pilot measures conversations.
+(66 more Skipped lines)
 ```
 
 | Exit code | `plan` | `run` | `analyse` |
@@ -1102,7 +1107,24 @@ Wrote _captures/docs3/cli/estate-map.yaml: 68 atoms (68 read by code and approve
     hazard       2
     invariant    4
   No model call: structured atoms only (--no-model).
+  Prose: 14 chunks, 6775 characters (standing 1, memory 2, skill bodies 4, skill files 4, helper bodies 3).
+  Unanswered prose chunks (no model call): 14, 6775 characters.
+    CLAUDE.md  2782 characters
+    .claude/agents/inbox-triager.md  169 characters
+    .claude/agents/ledger-auditor.md  519 characters
+    .claude/agents/route-planner.md  301 characters
+    .claude/memory/MEMORY.md  236 characters
+    .claude/memory/supplier-languages.md  271 characters
+    .claude/skills/invoice-reconcile/SKILL.md  547 characters
+    .claude/skills/invoice-reconcile/references/currency-table.md  143 characters
+    .claude/skills/invoice-reconcile/references/matching-rules.md  261 characters
+    .claude/skills/invoice-reconcile/references/old-tolerances.md  144 characters
+    .claude/skills/shipment-tracker/SKILL.md  350 characters
+    .claude/skills/supplier-email/SKILL.md  507 characters
+    .claude/skills/weekly-report/SKILL.md  419 characters
+    .claude/skills/weekly-report/templates/report.md  126 characters
   Refused: none.
+  Ignored: none.
   Orphans: .claude/skills/invoice-reconcile/references/old-tolerances.md.
   Unreachable from the standing instructions: .claude/agents/inbox-triager.md.
   Unenforced: 3 of 4 rules have no guard.
@@ -1114,20 +1136,21 @@ Next: driftbench estate lint _captures/docs3/cli/estate-map.yaml; driftbench est
 
 ```
 $ pnpm -s driftbench estate lint examples/estates/fixture/approved.yaml
-examples/estates/fixture/approved.yaml: estate at examples/estates/fixture, 122 atoms.
+examples/estates/fixture/approved.yaml: estate at examples/estates/fixture, 125 atoms.
   ORPHAN             .claude/skills/invoice-reconcile/references/old-tolerances.md: nothing in the estate names this file
   UNREACHABLE        .claude/agents/inbox-triager.md: no route, reference or dispatch from the standing instructions leads here
   MISSING_REFERENCE  .claude/skills/weekly-report/SKILL.md:13 names .claude/skills/weekly-report/references/kpi-definitions.md, which does not exist
   UNANCHORED_GUARD   the guard command "python3 .claude/guards/ledger-guard.py" finds its script from the working folder; anchor it on the project folder
   REGISTRY_ROW       the guard reply-length.py has no row in the check registry
   REGISTRY_GUARD     registry row G6 names supplier-send-guard.py, which no guard of the estate runs
-  UNENFORCED  51 rules no guard enforces (trusted; listed by estate scan).
+  UNENFORCED  54 rules no guard enforces (trusted; listed by estate scan).
+  EXTERNAL    0 named paths outside the estate (information).
 6 findings.
 ```
 
 ```
 $ pnpm -s driftbench estate plan approve examples/estates/fixture/plan.yaml
-examples/estates/fixture/plan.yaml: 1338 rows, 1338 proposed, 0 approved, 0 struck.
+examples/estates/fixture/plan.yaml: 1568 rows, 1568 proposed, 0 approved, 0 struck.
 Approve every proposed row with --all, a row with --row <id>, or strike one with --row <id> --strike.
 ```
 
@@ -1135,7 +1158,7 @@ Approve every proposed row with --all, a row with --row <id>, or strike one with
 
 | Exit code | When |
 |---|---|
-| 0 | `scan`: the map is written and every chunk answered. `lint`: clean (unenforced atoms alone are reported, not failed). `approve`, `plan approve`: listed or changed. `map`, `plan`: written. `diff`: the diff is computed, with or without changes. `impact`: nothing needs a person. `generate`: every approved row gave complete specs |
+| 0 | `scan`: the map is written and every chunk answered. `lint`: clean (unenforced atoms and paths outside the estate alone are reported, not failed). `approve`, `plan approve`: listed or changed. `map`, `plan`: written. `diff`: the diff is computed, with or without changes. `impact`: nothing needs a person. `generate`: every approved row gave complete specs |
 | 1 | `scan`: written, but a chunk failed or an atom was refused, both listed. `lint`: a finding, or an invalid map. `approve`: the map is invalid, or names an unknown kind or atom. `map`: the map or its space map is invalid. `plan`: the map or the space map is invalid, or they do not match. `plan approve`: the plan is invalid, or names no such row. `impact`: an atom waits for re-approval, a new atom has no test, a replay that passed before fails now, or a retirement could not be written. `generate`: the suite is written with incomplete specs, rows waiting for approval, or a generator defect |
 | 2 | usage or input error, nothing written: a missing file or option, an unknown runtime, `--no-model` with `--replay`, a target that exists without `--force`. `run` and `mutate` always |
 
@@ -1153,6 +1176,8 @@ Approve every proposed row with --all, a row with --row <id>, or strike one with
 | `REGISTRY_GUARD` | a registry row names a guard no part of the estate runs |
 | `QUOTE_DRIFT` | an atom's quote no longer matches its file |
 | `UNENFORCED` | a rule no guard enforces; reported, never failed |
+| `AMBIGUOUS_REFERENCE` | a bare file name fits several files, none in the naming file's own folder |
+| `EXTERNAL` | a body names a path outside the estate: information, reported as a count, never failing alone |
 
 A map that does not load reports `MAP_PARSE`, `MAP_NOT_OBJECT`, `MAP_DUPLICATE_ATOM`, `MAP_UNKNOWN_ATOM`, `MAP_HASH`, `MAP_QUOTE_DRIFT`, `MAP_UNKNOWN_KIND` or `SCHEMA_*`; a plan that does not load reports `PLAN_PARSE`, `PLAN_NOT_OBJECT`, `PLAN_DUPLICATE_ROW`, `PLAN_UNKNOWN_ROW` or `SCHEMA_*`.
 
@@ -1175,10 +1200,10 @@ Runs a spec suite over recorded sessions, with no model call unless judging is e
 | `--owner-file <file>` | owner values, one per line; blank lines and lines starting with `#` are skipped |
 | `--json` | print one JSON document |
 
-On the recorded sessions of [`examples/estates/sessions`](../../examples/estates/sessions/specs):
+On the seven recorded sessions of [`examples/estates/sessions`](../../examples/estates/sessions/specs), which hold eight replay specs (the campaign id differs on every run):
 
 ```
-$ pnpm -s driftbench replay examples/estates/sessions/clean-build.jsonl examples/estates/sessions/compaction-mid-task.jsonl examples/estates/sessions/forbidden-act.jsonl examples/estates/sessions/gate-violated.jsonl examples/estates/sessions/skill-skipped.jsonl examples/estates/sessions/subagent-dispatch.jsonl --suite examples/estates/sessions/specs --decisions examples/estates/sessions/*.decisions.jsonl --steps examples/estates/sessions/*.steps.jsonl
+$ pnpm -s driftbench replay examples/estates/sessions/clean-build.jsonl examples/estates/sessions/compaction-mid-task.jsonl examples/estates/sessions/forbidden-act.jsonl examples/estates/sessions/gate-violated.jsonl examples/estates/sessions/skill-skipped.jsonl examples/estates/sessions/subagent-dispatch.jsonl examples/estates/sessions/price-sheet-build.jsonl --suite examples/estates/sessions/specs --decisions examples/estates/sessions/*.decisions.jsonl --steps examples/estates/sessions/*.steps.jsonl
 ✓ replay-clean-build  session clean-build from block 0 (metadata)
 ✗ replay-compaction-mid-task  session compaction-mid-task from block 0 (metadata)
     failing: block 1: custom.ordered.Read.Edit
@@ -1187,10 +1212,11 @@ $ pnpm -s driftbench replay examples/estates/sessions/clean-build.jsonl examples
 ✗ replay-gate-violated  session gate-violated from block 0 (metadata)
     failing: block 0: guards.read-before-write.deny, block 0: execution.exit_code, block 0: custom.ordered.Read.Edit
 ✓ replay-negative-control  session gate-violated from block 0 (metadata)
+✓ replay-price-sheet-build  session price-sheet-build from block 0 (metadata)
 ✗ replay-skill-skipped  session skill-skipped from block 0 (metadata)
     failing: block 0: skills.shop-build, block 0: custom.ordered.skill_shop-build.Edit
 ✓ replay-subagent-dispatch  session subagent-dispatch from block 0 (metadata)
-7 specs replayed: 3 pass, 4 fail. Campaign replay-6d022943725c (in memory).
+8 specs replayed: 4 pass, 4 fail. Judge none, 0.0000 USD. Campaign replay-e1a167ba2cf2 (in memory).
 ```
 
 | Exit code | When |
@@ -1302,13 +1328,14 @@ With `--progress <file>`, each finished spec appends one compact JSON run line t
 On the Northwind fixture, with the stand-in command of `examples/estates/fixture/live/fake` (no model call):
 
 ```
-$ pnpm driftbench estate run <route_positive and tool_denied specs> --estate examples/estates/fixture --runtime claude-code --command examples/estates/fixture/live/fake/claude.mjs --store <db> --map examples/estates/fixture/approved.yaml
+$ pnpm driftbench estate run <route_positive and tool_denied specs> --estate examples/estates/fixture --runtime claude-code --command examples/estates/fixture/live/fake/claude.mjs --set-env FAKE_MANIFEST=<absolute path of examples/estates/fixture/live/fake/manifest.json> --store <db> --map examples/estates/fixture/approved.yaml
 ✓ estate.route_positive.route.invoice-reconcile.an-ask-that-fits-invoice-reconcile.1  (0.0000 USD)
 ✗ estate.tool_denied.tool.settings.deny-webfetch  (0.0000 USD)
     failing: block 0: forbidden.WebFetch
-2 specs run live on a stand-in: 1 pass, 1 fail. Cost 0.0000 USD over 2 runs that report one. Campaign estate-run-76badd446d95.
+2 specs run live on a stand-in: 1 pass, 1 fail. Cost 0.0000 USD over 2 runs that report one, judge none 0.0000 USD of it. Campaign estate-run-682f4f2e572e.
 (exit 1)
 $ pnpm driftbench estate mutate examples/estates/fixture/approved.yaml --atom gate.standing.read-a-file-before-editing-it --delete --to <dir>
+Mutant: delete gate.standing.read-a-file-before-editing-it in CLAUDE.md.
   before: - **R3.** Read a file before you edit it.
   after:  (the line is gone)
   map be2e7a0919cb -> 046d83f242ed
@@ -1316,7 +1343,7 @@ Wrote <dir>: the estate copy, map.yaml and mutant.json.
 (exit 0)
 ```
 
-The `tool_denied` spec fails by design: the stand-in plays a planted fault, a `WebFetch` call the settings deny. The fixture's [README](../../examples/estates/fixture/live/README.md) lists the 14 proof specs.
+The `tool_denied` spec fails by design: the stand-in plays a planted fault, a `WebFetch` call the settings deny. The stand-in plays the recorded streams of the fixture only when `FAKE_MANIFEST` names their manifest, as the command above does; without it the stand-in derives its actions from the estate and both specs pass. The campaign id differs on every run. The fixture's [README](../../examples/estates/fixture/live/README.md) lists the 14 proof specs.
 
 ## `driftbench estate unit`
 
@@ -1537,7 +1564,7 @@ Wrote <dir>/sealed.json. The sealed specs run only through driftbench holdout sc
 (exit 0)
 $ pnpm driftbench holdout score --sealed <dir> --target function:acme-sales --budget 3
   conversations  passed  pass rate  95% Wilson interval
-  49             49      100.0%     92.7% to 100.0%
+  47             47      100.0%     92.4% to 100.0%
 Not run, not counted: acme-price-sheet (names process:acme-ops), acme-price-sheet-i01-base (names process:acme-ops), (the other 9 price-sheet task specs).
 Budget: 1 of 3 queries used, 2 left. Which conversation passed is not shown: the holdout stays sealed.
 (exit 0)
