@@ -8,7 +8,7 @@
 version: 1
 runtime: claude-code
 root: .
-readAt: 2026-10-17T06:45:26.109Z
+readAt: 2026-10-17T08:36:04.444Z
 atoms:
   - id: skill.invoice-reconcile.skill-invoice-reconcile
     kind: skill
@@ -687,26 +687,26 @@ atoms:
       effect: allow
       rule: Bash(git status)
       pattern: git status
-  - id: tool.settings.allow-bash-python3
+  - id: tool.settings.allow-bash-python3-tools
     kind: tool
-    title: Allow Bash(python3 *)
+    title: Allow Bash(python3 tools/*)
     provenance:
       file: .claude/settings.json
       startLine: 5
       endLine: 5
-      quote: '"Bash(python3 *)"'
-      hash: c3a5cc6f4c234c9fc296e8a323339aabd46eeb949ed4e8bc5c9d63d767077985
+      quote: '"Bash(python3 tools/*)"'
+      hash: 0b91f40e2e1d3bad6eae3e13e9be8f2ccae0a4f1cdff06a161c4af43ec053d00
     producedBy: code
     role: detail
     approved: true
     evidence:
-      - { type: custom, name: permission, options: { effect: allow, rule: Bash(python3 *) } }
+      - { type: custom, name: permission, options: { effect: allow, rule: Bash(python3 tools/*) } }
     enforcement: []
     fields:
       tool: Bash
       effect: allow
-      rule: Bash(python3 *)
-      pattern: python3 *
+      rule: Bash(python3 tools/*)
+      pattern: python3 tools/*
   - id: tool.settings.deny-bash-git-push-force
     kind: tool
     title: Deny Bash(git push --force:*)
@@ -2657,5 +2657,5 @@ edges:
 producedBy:
   family: lane
   model: claude-opus-5-5 as the estate lane, by hand
-  at: 2026-10-17T06:45:26.109Z
-hash: c3b526d2ae0cb801a71fa4dc7f74fa51c8cbd2213f28793aaf56660f532e28ad
+  at: 2026-10-17T08:36:04.444Z
+hash: a382535fe5f2fe3428518bf6afeef6c373b124c03bfbb4aafb352d81671af9d6
