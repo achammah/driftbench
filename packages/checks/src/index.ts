@@ -93,3 +93,4 @@ export { type PiiFinding, type PiiKind, redact, scanPii } from './support/pii';
 export { type SchemaIssue, validateStrict } from './support/schema';
 
 export const packageName = '@agent-nexus/driftbench-checks';
+export { DEFAULT_CHECK_SET, runLadder } from './cheat';
