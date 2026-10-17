@@ -255,6 +255,7 @@ export const Verdict = z.strictObject({
   evidence: z.string(),
   reasoning: z.string().optional(),
   judge: z.strictObject({ cls: z.enum(['system1', 'system2']), votes: z.array(Vote) }).optional(),
+  by: z.record(z.string(), z.string()).optional(),
 });
 export type Verdict = z.infer<typeof Verdict>;
 
