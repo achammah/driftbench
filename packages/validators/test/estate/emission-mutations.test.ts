@@ -15,12 +15,18 @@ import { genCompleteFamily } from '../../src/ladders/estate/bank/loop';
 import { completionComponents } from '../../src/ladders/estate/completion';
 import { completionContract } from '../../src/ladders/estate/completion-contract';
 import * as pipeline from '../../src/ladders/estate/pipeline';
+import { type FieldReads, fieldReadCensus } from './field-reads';
 import { referenceChecks, referenceRun, required, SUFFIXES, suffix } from './ruling-reference';
 
 type Path = Array<string | number>;
 const REASON_CLASSES = ['default-equivalent', 'empty-demand', 'single-block-scope'] as const;
 /** Entry kinds whose omitted count the evaluators read as at least one (census below). */
 const DEFAULT_COUNT_KINDS = ['guards', 'references', 'skills', 'subagents'];
+/** The reads of the default-equivalent class: an entry list off `expect`, and the count of an entry. */
+const DEFAULT_COUNT_READS: FieldReads[] = [
+  { receivers: ['expect'], fields: DEFAULT_COUNT_KINDS },
+  { receivers: ['guard', 'reference', 'skill', 'helper', 'subagent'], fields: ['count'] },
+];
 type ReasonClass = (typeof REASON_CLASSES)[number];
 type EmissionSite = {
   path: Path;
@@ -150,7 +156,8 @@ const READER_ROOTS = [
 ];
 
 /** Every non-comment source line under the evaluator roots that matches `pattern`, as
- * `file: line`. A new reader changes this census and reopens the equivalence class. */
+ * `file: line`. A new reader changes this census and reopens the equivalence class. Reads of a field of
+ * `expect` are found in the syntax tree instead (field-reads.ts), where `?.` and literal text cannot hide one. */
 function readerCensus(pattern: RegExp): string[] {
   const files: string[] = [];
   const visit = (path: string) => {
@@ -177,7 +184,7 @@ const GUARDED_BLOCK = "if (typeof options.block === 'number' && options.block !=
 const CLASS_PROOFS: Record<
   ReasonClass,
   {
-    pattern: RegExp;
+    census: () => string[];
     readers: string[];
     cases: () => void;
     premise: (spec: Spec, site: EmissionSite) => boolean;
@@ -185,8 +192,7 @@ const CLASS_PROOFS: Record<
 > = {
   'default-equivalent': {
     // The deleted value is `count: { min: 1 }` on a guards, references, skills or subagents entry.
-    pattern:
-      /expect\.(guards|references|skills|subagents)\b|\b(guard|reference|skill|helper|subagent)\.count\b/,
+    census: () => fieldReadCensus(ROOT, READER_ROOTS, DEFAULT_COUNT_READS),
     readers: [
       'packages/checks/src/checks/guards.ts: applies: (ctx) => (ctx.expect.guards?.length ?? 0) > 0,',
       'packages/checks/src/checks/guards.ts: const expected = ctx.expect.guards ?? [];',
@@ -214,6 +220,8 @@ const CLASS_PROOFS: Record<
       'packages/core/src/spec/semantics.ts: checkCount(reference.count, `${path}.references.${index}.count`, issues);',
       'packages/core/src/spec/semantics.ts: for (const [index, subagent] of (expect.subagents ?? []).entries()) {',
       'packages/core/src/spec/semantics.ts: checkCount(subagent.count, `${path}.subagents.${index}.count`, issues);',
+      // The reference spec marks each guard entry as a warning. It sets `verdict` and never reads `count`.
+      "packages/validators/test/estate/ruling-reference.ts: for (const guard of block.expect?.guards ?? []) guard.verdict = 'warn';",
     ],
     cases() {
       // Entry ids come from name, path or verdict, never count; array lengths are unchanged.
@@ -228,7 +236,7 @@ const CLASS_PROOFS: Record<
   },
   'empty-demand': {
     // The deleted value is `expect.criteria: []`.
-    pattern: /expect\.criteria\b/,
+    census: () => fieldReadCensus(ROOT, READER_ROOTS, [{ receivers: ['expect'], fields: ['criteria'] }]),
     readers: [
       'packages/checks/src/checks/knowledge_retention.ts: const judged = (ctx.expect.criteria ?? []).some(',
       'packages/checks/src/checks/relevancy.ts: if (judged(ctx.expect.criteria)) {',
@@ -239,15 +247,24 @@ const CLASS_PROOFS: Record<
       'packages/judges/src/single.ts: applies: (ctx) => (ctx.expect.criteria?.length ?? 0) > 0,',
       'packages/judges/src/single.ts: return (ctx.expect.criteria ?? []).map((ref): Verdict => {',
       'packages/core/src/radius/depends.ts: criteria: unique((expect.criteria ?? []).map((ref) => parseCriterionRef(ref)?.name ?? ref)),',
+      'packages/core/src/radius/rejudge.ts: const refs = (block.expect?.criteria ?? []).filter((ref) =>',
       'packages/core/src/radius/rejudge.ts: const selected = (ctx.expect.criteria ?? []).map((ref) => parseCriterionRef(ref)?.name ?? ref);',
+      'packages/core/src/spec/lint.ts: for (const ref of expect?.criteria ?? []) {',
       'packages/core/src/spec/semantics.ts: expect.criteria?.forEach((ref, index) => {',
+      'packages/validators/test/estate/ruling-reference.ts: if (block.expect?.criteria)',
       "packages/validators/test/estate/ruling-reference.ts: block.expect.criteria = block.expect.criteria.filter((c) => c !== 'needs-registered-check');",
     ],
     cases() {
-      // Every reader takes `?? []`, `?.length ?? 0`, `?.forEach` or relevancy's own `?? []`.
+      // Every reader takes `?? []` (also behind `?.`, as rejudge and lint do), `?.length ?? 0`, `?.forEach` or
+      // relevancy's own `?? []`. The reference spec's own reader tests the value for truth and filters it, then
+      // hands it on to those readers: an empty list stays an empty list, an absent one stays absent.
       const forms = [
         (criteria?: string[]) => (criteria?.length ?? 0) > 0,
         (criteria?: string[]) => JSON.stringify(criteria ?? []),
+        (criteria?: string[]) =>
+          JSON.stringify(
+            ((criteria ? criteria.filter((ref) => ref !== 'x') : criteria) ?? []).map((ref) => ref),
+          ),
         (criteria?: string[]) => {
           const seen: string[] = [];
           criteria?.forEach((ref) => {
@@ -275,7 +292,7 @@ const CLASS_PROOFS: Record<
   },
   'single-block-scope': {
     // The deleted value is a custom check's `block: 0` on a one-block spec.
-    pattern: /\b(options|opts|entry)\.block\b/,
+    census: () => readerCensus(/\b(options|opts|entry)\.block\b/),
     readers: [
       'packages/checks/src/checks/estate.ts: if (entry.block !== undefined && entry.block !== ctx.blockIndex) return;',
       "packages/checks/src/checks/estate.ts: ...(typeof entry.block === 'number' ? { block: entry.block } : {}),",
@@ -657,7 +674,7 @@ describe('estate completion emitted assertion structure', { timeout: 1_200_000 }
     'proves %s for every input from its pinned reader census and case analysis',
     async (reasonClass) => {
       const proof = CLASS_PROOFS[reasonClass];
-      expect(readerCensus(proof.pattern), `${reasonClass} reader census`).toEqual(proof.readers);
+      expect(proof.census(), `${reasonClass} reader census`).toEqual(proof.readers);
       proof.cases();
       // Every site of this class meets the class premise on every pinned seed.
       for (const seed of PINNED_SEEDS) {
