@@ -69,6 +69,78 @@ jobs:
           fi
           test "$status" -eq 11
 
+  estate-test-608:
+    # Measurement only, on train/estate-608-test. Never merged to main.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',estate-test-608,')
+    name: mutants.test.ts on main plus ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: nothing
+            merges: ''
+          - name: 53b294fd5
+            merges: 53b294fd5
+          - name: 1f73e772f
+            merges: 1f73e772f
+          - name: 9de22ec8c
+            merges: 9de22ec8c
+          - name: 94d59744d
+            merges: 94d59744d
+          - name: 7d86072da
+            merges: 7d86072da
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Merge the commit onto main
+        shell: bash
+        env:
+          MERGES: ${{ matrix.merges }}
+        run: |
+          git config user.name ci
+          git config user.email ci@users.noreply.github.com
+          echo "main $(git rev-parse HEAD)"
+          for c in $MERGES; do
+            if git merge --no-edit "$c"; then
+              echo "merged $c"
+              continue
+            fi
+            files=$(git diff --name-only --diff-filter=U)
+            echo "conflicts in: $files"
+            for f in $files; do
+              case "$f" in
+                docs/*.md|CHANGELOG.md) git checkout --ours -- "$f"; git add -- "$f" ;;
+                *) echo "::error::code conflict in $f"; exit 1 ;;
+              esac
+            done
+            git commit --no-edit
+            echo "merged $c (docs rows kept on the main side)"
+          done
+          echo "tested $(git rev-parse HEAD)"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - run: pnpm build
+      - name: The failing test file
+        shell: bash
+        run: |
+          status=0
+          pnpm exec vitest run packages/validators/test/estate/mutants.test.ts 2>&1 | tee "mutants-${{ matrix.name }}.log" || status=$?
+          echo "exit $status" >> "mutants-${{ matrix.name }}.log"
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutants-${{ matrix.name }}
+          path: mutants-${{ matrix.name }}.log
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
