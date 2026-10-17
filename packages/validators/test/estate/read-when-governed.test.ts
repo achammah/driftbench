@@ -75,9 +75,23 @@ describe('gen.task.read_when judges the governed act', { timeout: 120_000 }, () 
     const suite = await fixture.fixtureSuite();
     const specs = structuredClone(suite.specs);
     if (ask !== undefined) {
-      const target = specs.find((spec) => spec.testType === 'read_when' && spec.complete);
+      // Only a spec whose rule names an act and an object can be held to it: the first complete read_when spec may
+      // test a rule that governs no act (a plain "when X, read Y"), and a planted wrong ask could never fail there.
+      const map = await loadEstateMap(suite.map);
+      if (!map.ok) throw new Error('the fixture map does not load');
+      const quoteOf = (id: string | undefined) =>
+        map.map.atoms.find((atom) => atom.id === id)?.provenance.quote;
+      const target = specs.find((spec) => {
+        const quote = quoteOf(spec.atoms[0]);
+        return (
+          spec.testType === 'read_when' &&
+          spec.complete &&
+          quote !== undefined &&
+          !performsGoverned('Anything at all.', quote)
+        );
+      });
       const block = (target?.spec.blocks as Array<{ when: { user: string } }> | undefined)?.[0];
-      if (!block) throw new Error('no complete read_when spec');
+      if (!block) throw new Error('no complete read_when spec whose rule governs an act and an object');
       block.when.user = ask;
     }
     const mock = vi.spyOn(fixture, 'fixtureSuite').mockResolvedValue({ ...suite, specs });
