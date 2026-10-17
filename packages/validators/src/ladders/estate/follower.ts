@@ -310,12 +310,12 @@ function chatReply(estate: HiddenEstate, cut: Cut): string {
   return words(estate, cut, ['That is outside the work I do here; please ask the front desk.']);
 }
 
-function read(cwd: string, path: string, exists = true): Call {
+function read(cwd: string, path: string, exists = true, content?: string): Call {
   return exists
     ? {
         label: 'Read',
         input: { file_path: `${cwd}/${path}` },
-        result: `# ${path}\nThe file reads as expected.\n`,
+        result: content ?? `# ${path}\nThe file reads as expected.\n`,
       }
     : { label: 'Read', input: { file_path: `${cwd}/${path}` }, result: 'File does not exist.', error: true };
 }
@@ -545,7 +545,8 @@ function taskSteps(
     }
   }
   doing.push(...forbidden());
-  const readTarget: Step = { call: read(cwd, topic.target) };
+  // The follower states only what it read: the file it edits shows the figures its reply repeats.
+  const readTarget: Step = { call: read(cwd, topic.target, true, topic.targetText) };
   const readFirst = !cut('rule:read-before-edit');
   if (readFirst) doing.push(readTarget);
   doing.push({ call: edit(cwd, topic.target) });
