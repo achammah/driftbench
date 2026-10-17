@@ -26,3 +26,11 @@ describe('the event log keeps every event written before an interruption', () =>
     expect(await readFile(path, 'utf8')).toContain('block_end');
   });
 });
+
+describe('the event log is part of the package surface', () => {
+  it('core exports eventLogSink and readEventLog', async () => {
+    const core = await import('../../src/index');
+    expect(typeof core.eventLogSink).toBe('function');
+    expect(typeof core.readEventLog).toBe('function');
+  });
+});
