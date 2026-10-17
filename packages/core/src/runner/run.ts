@@ -388,7 +388,14 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   /** What a block left behind when it ended, by spec index: the start of each of its children. */
   const ended = new Map<
     number,
-    { state: RunningGiven; history: Message[]; users: Message[]; stage: string | undefined }
+    {
+      state: RunningGiven;
+      history: Message[];
+      users: Message[];
+      stage: string | undefined;
+      /** Set when the block did not pass: the first block of its line that failed, and for a blocked block the one it hangs from. */
+      broken?: { by: string; root: string };
+    }
   >();
 
   try {
@@ -439,6 +446,31 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
           );
         }
         continue;
+      }
+      if (forest && step.kind === 'block') {
+        // A parent that did not pass blocks its child: no agent call, no failure, named by its direct parent and its root.
+        const parent = forest.parents.get(step.blockIndex);
+        const from = parent === undefined ? undefined : ended.get(parent);
+        if (from?.broken) {
+          const by = spec.blocks[parent as number]?.id ?? String(parent);
+          const root = from.broken.root;
+          const entered = enterBlock(from.state, planned.given, planned.world);
+          blocks.push(
+            blockedBlock(
+              run,
+              position,
+              planned,
+              {
+                givenHash: resolveGiven(entered, from.history, run.target).hash,
+                specIndex: step.blockIndex,
+                ledger: entered.ledger,
+              },
+              { by, root },
+            ),
+          );
+          ended.set(step.blockIndex, { ...from, broken: { by, root } });
+          continue;
+        }
       }
       if (run.mode === 'T' && !forest) {
         if (step.kind !== 'block') {
@@ -696,7 +728,20 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       };
       blocks.push(block);
       if (forest && step.kind === 'block') {
-        ended.set(step.blockIndex, { state, history, users: [...users], stage: reading?.stage });
+        ended.set(step.blockIndex, {
+          state,
+          history,
+          users: [...users],
+          stage: reading?.stage,
+          ...(block.pass
+            ? {}
+            : {
+                broken: {
+                  by: planned.blockId ?? String(step.blockIndex),
+                  root: planned.blockId ?? String(step.blockIndex),
+                },
+              }),
+        });
       }
       run.onEvent?.({
         type: 'block_end',
@@ -859,6 +904,46 @@ function notRunBlock(
     pass: false,
     status: 'not_run',
     notRun,
+  };
+}
+
+/** A block that was never sent because its parent did not pass: no observation, no verdict, never a pass. */
+function blockedBlock(
+  run: RunContext,
+  position: number,
+  planned: PlannedStep,
+  stamp: { givenHash: string; specIndex: number; ledger: Record<string, unknown> },
+  blocked: { by: string; root: string },
+): BlockResult {
+  run.onEvent?.({ type: 'block_start', index: position, at: new Date().toISOString() });
+  run.onEvent?.({
+    type: 'block_end',
+    index: position,
+    pass: false,
+    status: 'blocked',
+    at: new Date().toISOString(),
+  });
+  return {
+    index: position,
+    ...(planned.blockId !== undefined ? { blockId: planned.blockId } : {}),
+    ...(run.provenance
+      ? {
+          provenance: {
+            specIndex: stamp.specIndex,
+            stimulusHash: provenanceHash(planned.stimulus),
+            ledgerHash: provenanceHash(stamp.ledger),
+            artifacts: [],
+          },
+        }
+      : {}),
+    givenHash: stamp.givenHash,
+    observed: { ...NOT_SENT, segments: [], toolCalls: [], cost: {} },
+    verdicts: [],
+    ledgerCheck: { ok: true, contradictions: [] },
+    drift: [],
+    pass: false,
+    status: 'blocked',
+    blocked,
   };
 }
 

@@ -1,4 +1,10 @@
-import { type Message, type Observed, runSpec } from '@agent-nexus/driftbench-core';
+import {
+  type Check,
+  type Message,
+  machineVerdict,
+  type Observed,
+  runSpec,
+} from '@agent-nexus/driftbench-core';
 import { createScriptedDriver } from '@agent-nexus/driftbench-users';
 import { describe, expect, it } from 'vitest';
 import { specOf } from '../../core/test/runner/support';
@@ -53,6 +59,43 @@ describe.each(['F', 'T'] as const)('a spec with parent links, mode %s', (mode) =
     expect(of('say walkin')).toEqual([]);
     expect(of('say lookup')).toEqual(['say find']);
     expect(of('say receipt')).toEqual(['say find', 'say lookup', 'say book']);
+    expect(result.blocks).toHaveLength(5);
+  });
+});
+
+describe.each(['F', 'T'] as const)('a failed parent, mode %s', (mode) => {
+  it('blocks its descendants, each by its own parent and rooted at the first failure; other trees run', async () => {
+    const sent: string[] = [];
+    // The block "lookup" fails; "book" and "receipt" hang from it; "walkin" is another root.
+    const failLookup: Check = {
+      name: 'fail-lookup',
+      applies: () => true,
+      evaluate: (ctx) => [
+        machineVerdict('fail-lookup', 'x', ctx.block.id === 'lookup' ? 'fail' : 'pass', 'planted'),
+      ],
+    };
+    const result = await runSpec(spec(), {
+      adapter: functionAdapter({
+        respond: (messages: Message[]) => {
+          sent.push(String(messages.filter((m) => m.role === 'user').at(-1)?.content));
+          return reply('ok');
+        },
+      }),
+      driver: createScriptedDriver(),
+      checks: [failLookup],
+      mode,
+      repeat: 0,
+    });
+    const by = (id: string) => result.blocks.find((b) => b.blockId === id);
+    expect(by('find')?.status ?? 'pass').toBe('pass');
+    expect(by('lookup')?.status ?? 'fail').toBe('fail');
+    expect(by('book')?.status).toBe('blocked');
+    expect(by('book')?.blocked).toEqual({ by: 'lookup', root: 'lookup' });
+    expect(by('receipt')?.blocked).toEqual({ by: 'book', root: 'lookup' });
+    expect(by('walkin')?.status ?? 'pass').toBe('pass');
+    expect(sent).not.toContain('say book');
+    expect(sent).not.toContain('say receipt');
+    expect(sent).toContain('say walkin');
     expect(result.blocks).toHaveLength(5);
   });
 });
