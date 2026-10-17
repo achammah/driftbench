@@ -207,6 +207,45 @@ describe('counter-examples and fill-in values are not live references', () => {
   });
 });
 
+describe('a path the sentence says to write is not a prerequisite', () => {
+  it('skips an absent path after a write verb and keeps one after a read verb', async () => {
+    const { result } = await lint({
+      'CLAUDE.md':
+        '# Rules\nSave the summary to `workspace/clients/summary.md` after the call.\nWrite a note into `workspace/notes/today.html`.\nRead `.claude/missing-one.md` first, then write `out/report.md`.\nSee `.claude/missing-two.md` and generate `out/other.md` from `.claude/missing-three.md`.\n',
+    });
+    const missing = result.findings.filter((finding) => finding.code === 'MISSING_REFERENCE');
+    expect(
+      missing.map((finding) => finding.message.replace(/^CLAUDE\.md:\d+ names /, '').split(',')[0]),
+    ).toEqual(['.claude/missing-one.md', '.claude/missing-two.md', '.claude/missing-three.md']);
+  });
+});
+
+describe('a relative path in a single-file unit that starts outside the estate points out', () => {
+  const files = {
+    'CLAUDE.md': '# Rules\nDispatch the `filer` agent.\n',
+    '.claude/agents/filer.md':
+      '---\nname: filer\ndescription: Files notes.\n---\n# Filer\nFile the note under `workspace-root/clients/summary.md` and render `workspace-root/clients/card.html`.\n',
+  };
+
+  it('reports an EXTERNAL path for a helper, not a missing file', async () => {
+    const { result } = await lint(files);
+    expect(result.counts.MISSING_REFERENCE).toBe(0);
+    expect(result.counts.EXTERNAL).toBe(2);
+  });
+
+  it('keeps a first folder the estate holds, a dotted path and a skill citation as missing files', async () => {
+    const { result } = await lint({
+      ...files,
+      '.claude/agents/filer.md':
+        '---\nname: filer\ndescription: Files notes.\n---\n# Filer\nRead `.claude/refs/gone.md` and `.claude/skills/pack/references/gone.md`.\n',
+      '.claude/skills/pack/SKILL.md':
+        '---\nname: pack\ndescription: Packs.\n---\n# Pack\nRead `references/gone.md` first.\n',
+    });
+    expect(result.counts.MISSING_REFERENCE).toBe(3);
+    expect(result.counts.EXTERNAL).toBe(0);
+  });
+});
+
 describe('reach by dispatch', () => {
   it('reaches a helper dispatched from a live skill', async () => {
     const { result } = await lint({
@@ -236,5 +275,78 @@ describe('a sentence is not a path', () => {
     });
     const hazard = map.atoms.find((atom) => atom.kind === 'hazard');
     expect(hazard?.provenance.quote).toContain('✗ ignore the repeated guard nudges');
+  });
+});
+
+describe('a path is an output only when it is the destination of a write', () => {
+  const prerequisites = [
+    'Create the order using `@@`.',
+    'Write the report, following `@@`.',
+    'Export the photos after reviewing `@@`.',
+    'Generate the label with `@@`.',
+    'Produce the invoice based on `@@`.',
+    'Save the glaze notes in the format of `@@`.',
+    'Write the summary according to `@@`.',
+    'Emit the table matching `@@`.',
+    'Generate the report by parsing `@@`.',
+    'Generate the report by analyzing `@@`.',
+    'Generate the report after you ingest `@@`.',
+    'Write a summary of `@@`.',
+    'Write tests for `@@`.',
+    'Store notes as described in `@@`.',
+    'Produce output that conforms to `@@`.',
+    'Create the file in the layout defined by `@@`.',
+    'Export the rows listed in `@@`.',
+    'Generate the invoice, looking at `@@` for prices.',
+    'Write the email, and look at `@@`.',
+    'Summarize and save the result of `@@`.',
+    'Use the export script `@@`.',
+    'Run the export script `@@`.',
+    'Call the upload helper `@@`.',
+    'The store config is at `@@`.',
+    'The save step reads `@@`.',
+    'Follow the create template `@@`.',
+    'Keep the write policy `@@` in mind.',
+    'Write the report, then read `@@`.',
+    'Save the card after checking `@@`.',
+  ];
+  it.each(prerequisites)('keeps a missing file a finding: %s', async (line) => {
+    const { result } = await lint({
+      'CLAUDE.md': `# Rules\n${line.replace('@@', '.claude/data/prices.csv')}\n`,
+    });
+    expect(result.counts.MISSING_REFERENCE).toBe(1);
+  });
+
+  const outputs = [
+    'Write the report to `@@`.',
+    'Save the card in `@@`.',
+    'Write `@@` when a run ends.',
+    'Create the summary file called `@@`.',
+    'Export the rows into `@@`.',
+    'When a run ends, write the log `@@`.',
+    'Read and then write `@@`.',
+    'Save the result as `@@`.',
+    'Store the notes under `@@`.',
+  ];
+  it.each(outputs)('skips a destination: %s', async (line) => {
+    const { result } = await lint({
+      'CLAUDE.md': `# Rules\n${line.replace('@@', '.claude/data/made.csv')}\n`,
+    });
+    expect(result.counts.MISSING_REFERENCE).toBe(0);
+  });
+});
+
+describe('a verb inside a file name is not a verb', () => {
+  it('keeps an absent path a reference when a write-verb word only appears in another file name', async () => {
+    const { result } = await lint({
+      'CLAUDE.md':
+        '# Rules\nThe index `.claude/create-notes.md` lists `.claude/missing-one.md` for the team.\n',
+    });
+    expect(
+      result.findings
+        .filter((finding) => finding.code === 'MISSING_REFERENCE')
+        .map((f) => f.message)
+        .join(' '),
+    ).toContain('missing-one.md');
   });
 });

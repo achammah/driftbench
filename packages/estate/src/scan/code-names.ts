@@ -149,3 +149,67 @@ export function runtimeProduct(raw: RawEstate, path: string): boolean {
   for (const literal of literals) if (literal.endsWith(`/${sentence}`)) return true;
   return false;
 }
+
+/** The bodies of the unbounded loops (`while True`, `for (;;)`, `loop {`, `while true; do`) of a script. */
+function unboundedLoops(text: string): string[] {
+  const lines = text.split('\n');
+  const bodies: string[] = [];
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index] ?? '';
+    const indent = /^\s*/.exec(line)?.[0].length ?? 0;
+    if (/^\s*while\s+(?:True|1)\s*:/.test(line)) {
+      const body: string[] = [];
+      for (let next = index + 1; next < lines.length; next++) {
+        const row = lines[next] ?? '';
+        if (row.trim() !== '' && (/^\s*/.exec(row)?.[0].length ?? 0) <= indent) break;
+        body.push(row);
+      }
+      bodies.push(body.join('\n'));
+    } else if (/\b(?:while\s*\(\s*(?:true|1)\s*\)|for\s*\(\s*;\s*;\s*\)|loop)\s*\{/.test(line)) {
+      let depth = 0;
+      const body: string[] = [];
+      for (let next = index; next < lines.length; next++) {
+        const row = lines[next] ?? '';
+        depth += (row.match(/\{/g) ?? []).length - (row.match(/\}/g) ?? []).length;
+        body.push(row);
+        if (depth <= 0) break;
+      }
+      bodies.push(body.join('\n'));
+    } else if (/^\s*while\s+(?:true|:)\s*;?\s*do\b/.test(line)) {
+      const body: string[] = [line];
+      for (let next = index + 1; next < lines.length; next++) {
+        body.push(lines[next] ?? '');
+        if (/^\s*done\b/.test(lines[next] ?? '')) break;
+      }
+      bodies.push(body.join('\n'));
+    }
+  }
+  return bodies;
+}
+
+/** Whether a script serves: one receiver both binds (or accepts) and listens, or a server is created and listens. */
+function serves(text: string): boolean {
+  const receivers = (name: string) =>
+    new Set([...text.matchAll(new RegExp(String.raw`\b(\w+)\.${name}\(`, 'g'))].map((m) => m[1]));
+  const listening = receivers('listen');
+  for (const receiver of [...receivers('bind'), ...receivers('accept')])
+    if (listening.has(receiver)) return true;
+  return (
+    (/\bcreateServer\(/.test(text) && listening.size > 0) ||
+    /\bstart_server\(|\bserve_forever\b|\brun_forever\b/.test(text)
+  );
+}
+
+/**
+ * Whether a script source is a long-lived process rather than a check that answers and exits: it serves (one
+ * receiver binds or accepts and listens, or it runs a server loop), or it runs an unbounded loop that nothing
+ * inside it can leave (no break, return, exit or raise), together with sleeping, signal handling or detaching.
+ */
+export function longLived(text: string): boolean {
+  const staying =
+    /\b(?:sleep|signal\.(?:signal|pause)|setsid|start_new_session|os\.fork|daemon(?:ize)?)\b/.test(text);
+  const endless = unboundedLoops(text).some(
+    (body) => !/\b(?:break|return|exit|raise)\b|sys\.exit|process\.exit/.test(body),
+  );
+  return serves(text) || (endless && staying);
+}

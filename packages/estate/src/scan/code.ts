@@ -1060,6 +1060,76 @@ function skippedOf(raw: RawEstate): Set<string> {
   return built;
 }
 
+const FOLDERS = new WeakMap<RawEstate, Set<string>>();
+/** Whether a relative path with a folder starts in a folder the estate does not hold at its root or in `.claude`. */
+function outsideEstate(raw: RawEstate, files: ReadonlyMap<string, EstateFile>, written: string): boolean {
+  const clean = posix.normalize(written.replace(/^\.\//, ''));
+  const parts = clean.split('/');
+  if (parts.length < 2 || clean.startsWith('.') || clean.startsWith('/') || clean.startsWith('~'))
+    return false;
+  let folders = FOLDERS.get(raw);
+  if (!folders) {
+    folders = new Set<string>();
+    for (const path of files.keys()) {
+      const segments = path.split('/');
+      if (segments.length > 1) folders.add(segments[0] as string);
+      if (segments[0] === '.claude' && segments.length > 2) folders.add(segments[1] as string);
+    }
+    for (const base of raw.bases ?? []) for (const part of base.split('/')) folders.add(part);
+    FOLDERS.set(raw, folders);
+  }
+  return !folders.has(parts[0] as string);
+}
+
+const WRITE_VERB =
+  /^(?:writ(?:e|es|ing)|sav(?:e|es|ing)|creat(?:e|es|ing)|generat(?:e|es|ing)|produc(?:e|es|ing)|export(?:s|ing)?|upload(?:s|ing)?|stor(?:e|es|ing)|emit(?:s|ting)?)$/;
+/** A destination word: what a path follows when it is the place something is put. */
+const DESTINATION = /^(?:to|into|onto|in|at|as|under|called|named)$/;
+/** Words that start a noun phrase, then words a verb phrase cannot hold between the verb and its destination. */
+const DETERMINER =
+  /^(?:the|a|an|this|that|these|those|your|our|its|their|his|her|my|each|every|any|all|new|final)$/;
+/** A write word before one of these is a noun or a modifier, not a verb. */
+const MODIFIED =
+  /^(?:script|scripts|helper|helpers|step|steps|config|configuration|template|templates|policy|policies|up|command|commands|tool|tools|module|modules|routine|job|function|hook|plugin)$/;
+/** Words between a write verb and its object that make the object something read, or a different phrase. */
+const NOT_A_DESTINATION =
+  /^(?:of|for|by|from|with|via|per|about|on|over|across|between|against|through|using|following|according|matching|based|like|than|that|which|who|where|when|while|if|after|before|until|looking|look|parsing|parse|analyz\w*|ingest\w*|read\w*|open\w*|load\w*|see|seen|check\w*|review\w*|consult\w*|follow\w*|us(?:e|es|ed|ing)|described|defined|listed|specified|documented|given|stated|outlined|shown|conform\w*|refer\w*|adher\w*|correspond\w*|similar|equal)$/;
+
+/**
+ * Whether a path is the destination of a write: it follows a write verb directly (determiners and a short
+ * noun phrase only), or follows to, into, in, at, as, under, called or named after one. A write word that is a
+ * noun or a modifier (after a determiner, or before script, helper, step, config, template, policy, up) is
+ * not a verb. Every other path keeps its finding: it is a prerequisite the work reads.
+ */
+export function writeDestination(line: string, start: number): boolean {
+  // File names and quoted text are not words: only the words around them decide.
+  const clause =
+    (
+      line
+        .slice(0, start)
+        .replace(/`[^`]*`|"[^"]*"|'[^']*'|\S*[./\\]\S*/g, ' ')
+        .split(/[;:!?]|\.(?=\s|$)|,|\b(?:and|then|but|while|when)\b/i)
+        .pop() ?? ''
+    )
+      .toLowerCase()
+      .match(/[a-z']+/g) ?? [];
+  let verb = -1;
+  for (let index = 0; index < clause.length; index++) {
+    const word = clause[index] as string;
+    if (!WRITE_VERB.test(word)) continue;
+    if (DETERMINER.test(clause[index - 1] ?? '') || MODIFIED.test(clause[index + 1] ?? '')) continue;
+    verb = index;
+  }
+  if (verb < 0) return false;
+  const between = clause.slice(verb + 1);
+  const destination = DESTINATION.test(between.at(-1) ?? '');
+  const object = destination ? between.slice(0, -1) : between;
+  if (object.some((word) => NOT_A_DESTINATION.test(word) || MODIFIED.test(word))) return false;
+  if (destination) return true;
+  // Directly after the verb: determiners and at most two words of noun phrase.
+  return object.length <= 3;
+}
+
 function referenceAtoms(
   chunk: ProseChunk,
   files: ReadonlyMap<string, EstateFile>,
@@ -1107,16 +1177,26 @@ function referenceAtoms(
       const identifier = !pathReference(named);
       // Declared unit identifiers resolve without naming an absent file.
       if (identifier && (routeNames(raw).skills.has(named) || routeNames(raw).helpers.has(named))) continue;
-      const located = locateNamed(named, chunk.file, files, {
+      let located = locateNamed(named, chunk.file, files, {
         bases: raw.bases ?? [],
         skipped,
         aliases: raw.aliases ?? {},
         byName: names(raw, files),
         externals: raw.externals ?? [],
       });
+      const source = files.get(chunk.file);
+      // A helper is one file in no folder of its own, and its work runs in a project or a mounted workspace, so
+      // its relative path names that, not a sibling. A first folder the estate does not hold points out.
+      if (
+        located.via === 'none' &&
+        !located.candidates &&
+        source &&
+        source.kind === 'subagent' &&
+        outsideEstate(raw, files, named)
+      )
+        located = { path: posix.normalize(named.replace(/^\.\//, '')), via: 'external' };
       const path = located.path;
       const target = files.get(path);
-      const source = files.get(chunk.file);
       // A routing link loads the declared skill; it does not separately order a read of its definition.
       if (
         source &&
@@ -1127,6 +1207,8 @@ function referenceAtoms(
       )
         continue;
       const isSkipped = target === undefined && (skipped.has(path) || ignoredReference(raw, path));
+      // A path the sentence says to write, save or create is made by the work, not a prerequisite to find.
+      if (target === undefined && !isSkipped && writeDestination(line.text, reference.start)) continue;
       // A name without a separator that resolves nowhere has no place. Quoted, backticked or linked with an
       // extension, it designates a file beside its source and is concrete; a loose word, or a name with no
       // extension, is information only.
