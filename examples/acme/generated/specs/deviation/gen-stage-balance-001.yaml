@@ -143,7 +143,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: needs-to-address
-          stage: needs
+          stage: address
         phrase:
           dimension: stage_transition
           value: needs-to-address
@@ -153,7 +153,7 @@ metadata:
           spec: metadata.generated.cell
           stage_transition: address-to-callback
           coverage_result: no-service
-          stage: address
+          stage: callback
         phrase:
           dimension: stage_transition
           value: address-to-callback
@@ -164,7 +164,7 @@ metadata:
           stage_transition: callback-to-handover
           coverage_result: no-service
           callback_phone: given
-          stage: callback
+          stage: handover
         phrase:
           dimension: stage_transition
           value: callback-to-handover

@@ -121,7 +121,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: needs-to-identify
-          stage: needs
+          stage: identify
         phrase:
           dimension: stage_transition
           value: needs-to-identify
@@ -131,7 +131,7 @@ metadata:
           spec: metadata.generated.cell
           stage_transition: identify-to-offer
           account_lookup: plan-not-in-catalog
-          stage: identify
+          stage: offer
         phrase:
           dimension: stage_transition
           value: identify-to-offer
