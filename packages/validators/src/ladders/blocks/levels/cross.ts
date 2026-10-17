@@ -1,374 +1,327 @@
-import { between, list, load, pick, type RawSpec, type Rng, rngFor, SHOP, shuffled } from '../harness';
-import { plantedAgent, token } from '../kinds';
+import {
+  between,
+  list,
+  observed,
+  pick,
+  type RawSpec,
+  type Rng,
+  rngFor,
+  run,
+  SHOP,
+  scriptedAdapter,
+  shuffled,
+} from '../harness';
+import { token } from '../kinds';
 import { type BlocksProduct, need } from '../product';
-import { type BlockPlan, recipe } from '../recipe';
-import { type BankItem, expectAll, fail, type Tier } from '../types';
+import { type BankItem, expectAll, fail, type ItemResult, PASS, type Tier } from '../types';
 
 /**
- * Cross-capability combinations (family F7 of the v3 partition): each item holds two documented behaviours
- * at once, so a product that builds each capability alone and never their meeting point fails it.
+ * Cross-capability combinations (family F7 of the v3 partition): each item holds two documented behaviours at
+ * once, so a product that builds each capability alone and never their meeting point fails it.
  *
- * Parents x blast radius. docs/concepts/blast-radius.md, "Parent blocks" (feat/block-parents): "A change that
- * reaches a parent also reaches every descendant, in F, T and P, regardless of authored order. Explicit forest
- * roots remain independent." docs/concepts/blast-radius.md, forward closure: "In mode F and P ... every block
- * after a direct block of the same run is in. In mode T ... nothing follows." docs/concepts/given-when-then.md,
- * "Parent blocks": "Once a spec declares a parent link, its blocks form a forest in every mode: each root starts
- * at the spec defaults"; "Child-only mode T selection automatically replays its ancestors when no in-run
- * recording exists. A replayed ancestor gives its end state and its cost, but it is not a measurement of that
- * run: it adds no block, verdict or count, and `blockRerun.reason` names it"; "A passed parent runs once per
- * run, however many children share it"; "If a parent fails, is `not_run`, or is already blocked, the child is
- * `blocked`: it receives no agent call ... `blocked.by` names its direct parent and `blocked.root` names the
- * original failed or unrun cause."
+ * Personas x parents: a simulated user playing a persona drives a spec with parent links.
+ * - docs/simulated-user.md (main): "A simulated user plays a person with a persona and a goal, block by block";
+ *   "It reveals a fact ... only once the agent has asked for it ... a fact reaches the model only after an agent
+ *   reply matches one of the fact's ask patterns ... and an answer that holds such a fact fails the run."
+ * - docs/concepts/given-when-then.md, "Parent blocks" (feat/block-parents): "Once a spec declares a parent
+ *   link, its blocks form a forest in every mode: each root starts at the spec defaults, and a child inherits
+ *   only its ancestors"; "World and variables are copied, so siblings cannot change each other's start."
+ * Together: the user a block's turn is written by sees the conversation of that block's own branch (its
+ * ancestors' turns and the agent's replies to them), a fact the agent asked for in another branch is not yet
+ * asked in this one, and giving it there fails the run.
  *
- * Every id, marker, tool fixture and spec id is a token; the truth (which block is direct, replayed, blocked)
- * stays in the item.
+ * The persona's model is a fixture port: it records what it is shown and answers with the block's marker,
+ * which it reads from the hint the driver gives it. Every id, marker and spec id is a token; which block asks
+ * for the fact, and what each block should see, stays in the item.
  */
 
-const RADIUS = 'packages/core/src/radius/radius.ts';
 const RUNNER = 'packages/core/src/runner/run.ts';
+const SIMULATED = 'packages/users/src/simulated.ts';
 
-/** A random tree of `n` nodes, by parent index (-1 for its root). */
-function tree(rng: Rng, n: number): number[] {
-  return Array.from({ length: n }, (_, i) => (i === 0 ? -1 : between(rng, 0, i - 1)));
-}
-
-/** The indices below `at` in a forest given by parent index. */
-function descendants(parents: readonly number[], at: number): Set<number> {
-  const out = new Set<number>();
-  for (let i = 0; i < parents.length; i += 1)
-    for (let p = parents[i] ?? -1; p >= 0; p = parents[p] ?? -1) if (p === at) out.add(i);
-  return out;
-}
-
-/** The indices above `at`, its parent first. */
-function ancestors(parents: readonly number[], at: number): number[] {
+/** The indices above `at`, oldest first. */
+function lineage(parents: readonly number[], at: number): number[] {
   const out: number[] = [];
-  for (let p = parents[at] ?? -1; p >= 0; p = parents[p] ?? -1) out.push(p);
+  for (let p = parents[at] ?? -1; p >= 0; p = parents[p] ?? -1) out.unshift(p);
   return out;
 }
 
-type Order = 'grouped' | 'interleaved' | 'reversed';
+type Order = 'in-order' | 'interleaved' | 'reversed' | 'shuffled';
 
-/** The written order of two trees: A then B, A and B alternating, or every block after its children. */
-function written(a: number, b: number, order: Order): number[] {
-  const left = [...Array(a).keys()];
-  const right = Array.from({ length: b }, (_, i) => a + i);
-  if (order === 'grouped') return [...left, ...right];
-  if (order === 'reversed') return [...right, ...left].reverse();
-  const out: number[] = [];
-  for (let i = 0; i < Math.max(a, b); i += 1) {
-    if (i < a) out.push(left[i] as number);
-    if (i < b) out.push(right[i] as number);
-  }
-  return out;
-}
-
-type ForestRadius = {
-  depth: 'root' | 'inner';
-  mode: 'F' | 'T';
-  order: Order;
-};
-
-/**
- * Two trees in one spec. One block of tree A lists the changed tool; every other block lists another tool, so
- * the direct set is that one block. The documented radius is that block and its descendants; every block of
- * tree B (another root), every ancestor and every sibling branch stays out, in mode F as in mode T.
- */
-function forestRadiusItems(): BankItem[] {
-  const items: BankItem[] = [];
-  const cases: ForestRadius[] = [];
-  for (const depth of ['root', 'inner'] as const)
-    for (const mode of ['F', 'T'] as const)
-      for (const order of ['grouped', 'interleaved', 'reversed'] as const) cases.push({ depth, mode, order });
-  for (const c of cases) {
-    const id = `cross/parents-radius/roots/${c.depth}/${c.mode}/${c.order}`;
-    items.push({
-      id,
-      family: 'cross-parents-radius',
-      tier: Math.min(5, 3 + (c.order === 'grouped' ? 0 : 1) + (c.depth === 'inner' ? 1 : 0)) as Tier,
-      level: 7,
-      component: RADIUS,
-      title: `in a spec of two parent-linked trees written ${c.order}, a change reaching the ${c.depth} of one tree selects that block and its descendants in mode ${c.mode}, and leaves the other root's tree, every ancestor and every sibling branch out`,
-      cause:
-        'In a parent-linked spec the radius closes forward along parent links only: a change reaching one tree leaves every other root, ancestor and sibling branch out, in every mode.',
-      check: async ({ seed, product }) => {
-        const rng = rngFor(seed, id);
-        const a = between(rng, 4, 6);
-        const b = between(rng, 2, 4);
-        const left = tree(rng, a);
-        const right = tree(rng, b).map((p) => (p === -1 ? -1 : p + a));
-        const parents = [...left, ...right];
-        const inner = left.flatMap((p, i) => (p !== -1 && descendants(parents, i).size > 0 ? [i] : []));
-        const leaves = left.flatMap((p, i) => (p !== -1 ? [i] : []));
-        const at = c.depth === 'root' ? 0 : pick(rng, inner.length > 0 ? inner : leaves);
-        const tools = shuffled(rng, SHOP.tools);
-        const changed = tools[0] as string;
-        const other = tools[1] as string;
-        const ids = parents.map((_, i) => token(seed, `${id}#id#${i}`));
-        const order = written(a, b, c.order);
-        const raw: RawSpec = {
-          id: `spec-${token(seed, `${id}#spec`)}`,
-          channel: 'chat',
-          metadata: { depends: { fixtures: [token(seed, `${id}#fixture`)] } },
-          blocks: order.map((i) => ({
-            id: ids[i],
-            ...((parents[i] ?? -1) >= 0 ? { parent: ids[parents[i] as number] } : {}),
-            user: `${token(seed, `${id}#m#${i}`, 8)} ${pick(rng, SHOP.customers)} asks about the ${pick(rng, SHOP.bikes)}.`,
-            expect: { tools: [{ label: i === at ? changed : other, count: 1 }] },
-          })),
-        };
-        const contentHash = need<(value: unknown) => string>(product.core, 'core', 'contentHash');
-        const radiusOf = need<
-          (
-            specs: unknown[],
-            manifest: unknown,
-            options: unknown,
-          ) => {
-            whole: { reason: string } | null;
-            specs: { blocks: { id: string; state: Record<string, string> }[] }[];
-          }
-        >(product.core, 'core', 'radiusOf');
-        const spec = load(product, raw);
-        const report = radiusOf(
-          [{ spec, hash: contentHash(spec) }],
-          {
-            from: token(seed, `${id}#from`),
-            to: token(seed, `${id}#to`),
-            changes: [{ kind: 'tool', id: changed }],
-          },
-          { modes: [c.mode] },
-        );
-        if (report.whole) return fail(`the radius is the whole suite: ${report.whole.reason}`);
-        const below = descendants(parents, at);
-        const state = new Map(report.specs[0]?.blocks.map((block) => [block.id, block.state[c.mode]]));
-        const misses: string[] = [];
-        const extras: string[] = [];
-        for (const [i, blockId] of ids.entries()) {
-          const want = i === at ? 'direct' : below.has(i) ? 'forward' : 'out';
-          const got = state.get(blockId) ?? 'missing';
-          if (got === want) continue;
-          const role =
-            i === at
-              ? 'the block the change reaches'
-              : below.has(i)
-                ? 'a descendant of it'
-                : i >= a
-                  ? 'a block of the other root'
-                  : ancestors(parents, at).includes(i)
-                    ? 'an ancestor of it'
-                    : 'a block of a sibling branch';
-          (want === 'out' ? extras : misses).push(`${blockId} (${role}) ${got}, should be ${want}`);
-        }
-        return expectAll([
-          [misses.length === 0, `mode ${c.mode} misses ${misses.length}: ${list(misses, 4)}`],
-          [extras.length === 0, `mode ${c.mode} selects ${extras.length} extra: ${list(extras, 4)}`],
-        ]);
-      },
-    });
-  }
-  return items;
-}
-
-type RunRecord = {
-  blocks: {
-    blockId?: string;
-    status?: string;
-    pass: boolean;
-    blocked?: { by: string; root: string };
-  }[];
-  blockRerun?: { selected: number[]; reason: string };
-  status: string;
-};
-
-/** One mode T run of a raw spec with a block subset, through the product's runner and scripted driver. */
-async function runSubset(
-  product: BlocksProduct,
-  raw: RawSpec,
-  adapter: Record<string, unknown>,
-  blocks: readonly number[],
-): Promise<RunRecord> {
-  const spec = load(product, raw);
-  const runSpec = need<(spec: unknown, options: Record<string, unknown>) => Promise<RunRecord>>(
-    product.core,
-    'core',
-    'runSpec',
-  );
-  const createScriptedDriver = need<() => unknown>(product.users, 'users', 'createScriptedDriver');
-  const defaultChecks = need<() => unknown>(product.checks, 'checks', 'defaultChecks');
-  const defaultReaders = need<() => unknown>(product.artifacts, 'artifacts', 'defaultReaders');
-  return runSpec(spec, {
-    adapter,
-    driver: createScriptedDriver(),
-    checks: defaultChecks(),
-    artifacts: defaultReaders(),
-    mode: 'T',
-    repeat: 0,
-    blocks: new Set(blocks),
-    retry: { retries: 0, baseDelayMs: 0, sleep: async () => {} },
-    now: () => new Date('2026-10-16T00:00:00.000Z'),
-  });
-}
-
-type Subset = {
+type Shape = {
   id: string;
   tier: number;
-  /** A chain of `depth` ancestors above the block asked for, plus a sibling branch. */
-  depth: number;
-  /** Two children of one parent asked for together. */
-  siblings?: boolean;
-  /** The ancestor, counted from the block asked for (1 its parent), whose agent action fails. */
-  failsAt?: number;
+  /** The forest by parent index, and the block whose reply asks for the fact. */
+  draw(rng: Rng): { parents: number[]; asker: number };
+  orders: readonly Order[];
 };
 
-const SUBSETS: Subset[] = [
-  { id: 'parent', tier: 3, depth: 1 },
-  { id: 'grandparent', tier: 3, depth: 2 },
-  { id: 'deep', tier: 4, depth: 3 },
-  { id: 'two-siblings', tier: 4, depth: 1, siblings: true },
-  { id: 'parent-fails', tier: 4, depth: 1, failsAt: 1 },
-  { id: 'grandparent-fails', tier: 4, depth: 2, failsAt: 2 },
+const SHAPES: Shape[] = [
+  {
+    // Tree A (0, 1) whose root asks; tree B (2, 3) never asks.
+    id: 'two-roots',
+    tier: 2,
+    draw: () => ({ parents: [-1, 0, -1, 2], asker: 0 }),
+    orders: ['in-order', 'interleaved', 'reversed'],
+  },
+  {
+    // One root and three children; the first child's reply asks, and it has a child of its own.
+    id: 'star',
+    tier: 3,
+    draw: () => ({ parents: [-1, 0, 0, 0, 1], asker: 1 }),
+    orders: ['in-order', 'shuffled'],
+  },
+  {
+    // A chain 0, 1, 2 and a sibling branch 3 off the root; the middle block asks.
+    id: 'chain-and-branch',
+    tier: 3,
+    draw: () => ({ parents: [-1, 0, 1, 0], asker: 1 }),
+    orders: ['in-order', 'reversed'],
+  },
+  {
+    id: 'random-forest',
+    tier: 4,
+    draw: (rng) => {
+      // A random tree, then a second root with a child; the asker is a block of the tree that has a child.
+      const n = between(rng, 4, 6);
+      const parents = Array.from({ length: n }, (_, i) => (i === 0 ? -1 : between(rng, 0, i - 1)));
+      const withChild = parents.flatMap((_, i) => (parents.includes(i) ? [i] : []));
+      parents.push(-1, n);
+      return { parents, asker: pick(rng, withChild) };
+    },
+    orders: ['in-order', 'shuffled'],
+  },
 ];
 
-/**
- * A chain root .. parent .. asked, a sibling branch off the root, and a second root. In mode T the block subset
- * names only the blocks asked for: the product replays their ancestors for their end state, measures only the
- * blocks asked for, names the replayed ancestors in `blockRerun.reason`, runs a shared parent once, and blocks
- * a child whose replayed ancestor fails, by its parent, rooted at that ancestor, never sent.
- */
-function subsetItems(): BankItem[] {
+type View = 'conversation' | 'facts' | 'leak';
+
+const BRANCH_HISTORY =
+  "In a parent-linked spec a user driver reads the history of the block's own ancestors only, so a fact the agent asked for in another branch is not given.";
+
+const VIEWS: { id: View; tier: number; cause: string; component: string }[] = [
+  {
+    id: 'conversation',
+    tier: 1,
+    cause:
+      "The simulated user shows its model the conversation of the block's own ancestors in a parent-linked spec: their turns and the agent's replies, nothing of another branch.",
+    component: SIMULATED,
+  },
+  { id: 'facts', tier: 1, cause: BRANCH_HISTORY, component: RUNNER },
+  { id: 'leak', tier: 2, cause: BRANCH_HISTORY, component: RUNNER },
+];
+
+type Scenario = {
+  parents: number[];
+  asker: number;
+  ids: string[];
+  markers: string[];
+  raw: RawSpec;
+  replies: string[];
+  fact: string;
+};
+
+function scenario(seed: number, tag: string, shape: Shape, order: Order): Scenario {
+  const rng = rngFor(seed, tag);
+  const { parents, asker } = shape.draw(rng);
+  const keys = [...parents.keys()];
+  const written =
+    order === 'in-order'
+      ? keys
+      : order === 'reversed'
+        ? [...keys].reverse()
+        : order === 'interleaved'
+          ? [0, 2, 1, 3]
+          : shuffled(rng, keys);
+  const ids = keys.map((i) => token(seed, `${tag}#id#${i}`));
+  const markers = keys.map((i) => token(seed, `${tag}#marker#${i}`, 8));
+  const codes = keys.map(
+    (i) => `${token(seed, `${tag}#code#${i}`, 4).toUpperCase()}-${between(rng, 10, 99)}`,
+  );
+  const [first = 'ilse', last = 'varga'] = pick(rng, SHOP.customers).toLowerCase().split(' ');
+  const fact = `${first}.${last}@example.com`;
+  // Only the asker's reply matches the fact's ask pattern; every other reply says nothing of it.
+  const replies = keys.map((i) =>
+    i === asker
+      ? `Larkspur Cycles, hold ${codes[i]}. What is your email address?`
+      : `Larkspur Cycles, hold ${codes[i]}. Which bike would you like?`,
+  );
+  const raw: RawSpec = {
+    id: `spec-${token(seed, `${tag}#spec`)}`,
+    channel: 'chat',
+    blocks: written.map((i) => ({
+      id: ids[i],
+      ...((parents[i] ?? -1) >= 0 ? { parent: ids[parents[i] as number] } : {}),
+      user: `${markers[i]} I would like the ${pick(rng, SHOP.bikes)} for day ${between(rng, 1, 28)}.`,
+      expect: { must: [codes[i] as string] },
+    })),
+  };
+  return { parents, asker, ids, markers, raw, replies, fact };
+}
+
+type Request = { user: string; system: string };
+
+/** The marker the driver's hint names: the block whose turn the user writes now. */
+function hintOf(user: string): string | undefined {
+  const line = user.split('\n').find((each) => each.includes('in your own words:'));
+  return line?.split('in your own words:')[1]?.trim().split(/\s+/)[0];
+}
+
+const ANSWER = 'Yes please, that one.';
+
+/** The persona's fixture port: records every request, answers with the marker of the block it is asked for. */
+function personaPort(markers: readonly string[], leakAt: number | undefined, fact: string) {
+  const requests: Request[] = [];
+  return {
+    requests,
+    port: {
+      family: 'fixture',
+      model: 'fixture-persona',
+      complete: async (request: Request) => {
+        requests.push({ user: request.user, system: request.system });
+        const at = markers.indexOf(hintOf(request.user) ?? '');
+        if (at < 0) throw new Error('the persona fixture was asked for no block of the spec');
+        return `${markers[at]} ${ANSWER}${at === leakAt ? ` My email is ${fact}.` : ''}`;
+      },
+    },
+  };
+}
+
+async function play(product: BlocksProduct, s: Scenario, leakAt?: number) {
+  const createSimulatedUser = need<(options: Record<string, unknown>) => unknown>(
+    product.users,
+    'users',
+    'createSimulatedUser',
+  );
+  const { requests, port } = personaPort(s.markers, leakAt, s.fact);
+  const driver = createSimulatedUser({
+    persona: 'A calm customer of Larkspur Cycles who writes short messages.',
+    goal: 'Rent a bike for one day.',
+    facts: { email: s.fact },
+    revealWhenAsked: { email: ['e-?mail'] },
+    stopToken: '###FINISHED###',
+    port,
+    agentFamily: 'none',
+    judgeFamilies: [],
+  });
+  const adapter = scriptedAdapter(product, (turn) => {
+    const at = s.markers.findIndex((marker) => turn.user.includes(marker));
+    if (at < 0) throw new Error('the scripted agent has no reply for this turn');
+    return observed(s.replies[at] as string);
+  });
+  const record = await run(product, s.raw, adapter, { driver });
+  return { record, requests };
+}
+
+/** What the driver showed its model when it wrote the block of `marker`: the conversation and the facts. */
+function shown(requests: readonly Request[], marker: string) {
+  const request = requests.find((each) => hintOf(each.user) === marker);
+  if (!request) return undefined;
+  const lines = (text: string | undefined) =>
+    (text ?? '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line !== '');
+  const conversation = lines(
+    (request.user.split('The conversation so far:')[1] ?? '').split('Facts you may give now')[0],
+  );
+  const facts = lines(
+    (request.user.split('because the assistant asked for them:')[1] ?? '').split('\n\n')[0],
+  );
+  return { conversation, facts };
+}
+
+function judgeViews(view: View, s: Scenario, played: Awaited<ReturnType<typeof play>>): ItemResult {
+  const { record, requests } = played;
+  if (record.status !== 'completed')
+    return fail(
+      `the run should complete: no fact is given early; it ${record.status}: ${String(record.error ?? '').slice(0, 160)}`,
+    );
+  for (const [i, marker] of s.markers.entries()) {
+    const seen = shown(requests, marker);
+    if (!seen) return fail(`${s.ids[i]} should be written by the simulated user; it never was`);
+    const above = lineage(s.parents, i);
+    if (view === 'conversation') {
+      const want =
+        above.length === 0
+          ? ['(nothing yet: you write first)']
+          : above.flatMap((a) => [`Customer: ${s.markers[a]} ${ANSWER}`, `Assistant: ${s.replies[a]}`]);
+      if (seen.conversation.join('\n') !== want.join('\n'))
+        return fail(
+          `the user writing ${s.ids[i]} should be shown ${above.length === 0 ? 'no earlier turn: the block is a root, which starts at the spec defaults' : `the turns of its ancestors ${list(above.map((a) => s.ids[a]))} only`}; it was shown ${seen.conversation.length} lines: ${list(
+            seen.conversation.map((line) => line.slice(0, 48)),
+            4,
+          )}`,
+        );
+      continue;
+    }
+    const asked = above.includes(s.asker);
+    const offered = seen.facts.some((line) => line.includes(s.fact));
+    if (offered !== asked)
+      return fail(
+        asked
+          ? `the user writing ${s.ids[i]} should be offered the email: its ancestor ${s.ids[s.asker]} asked for it; it was not`
+          : `the user writing ${s.ids[i]} should not be offered the email: only ${s.ids[s.asker]}, outside its branch (ancestors ${list(above.map((a) => s.ids[a])) || 'none'}), asked for it; it was offered`,
+      );
+  }
+  return PASS;
+}
+
+async function judgeLeak(product: BlocksProduct, seed: number, id: string, s: Scenario): Promise<ItemResult> {
+  // A block outside the asker's branch, and its twin: a block under the asker.
+  const blocks = [...s.parents.keys()];
+  const outside = blocks.filter((i) => i !== s.asker && !lineage(s.parents, i).includes(s.asker));
+  const under = blocks.filter((i) => lineage(s.parents, i).includes(s.asker));
+  if (outside.length === 0 || under.length === 0)
+    return fail(
+      'the drawn forest should hold a block outside and a block under the asking block; it does not',
+    );
+  // The leak goes after the asker in the run, so a user that read the asker's reply could only know it from there.
+  const order = (await play(product, s)).record.blocks.map((block) => s.ids.indexOf(block.blockId ?? ''));
+  const later = outside.filter((i) => order.indexOf(i) > order.indexOf(s.asker));
+  const rng = rngFor(seed, `${id}#leak`);
+  const at = pick(rng, later.length > 0 ? later : outside);
+  const twin = pick(rng, under);
+  const leaked = await play(product, s, at);
+  const allowed = await play(product, s, twin);
+  return expectAll([
+    [
+      leaked.record.status === 'failed' && /before the agent asked/.test(String(leaked.record.error ?? '')),
+      `the run should fail when the user gives the email at ${s.ids[at]}: no reply of its branch (ancestors ${list(lineage(s.parents, at).map((a) => s.ids[a])) || 'none'}) asked for it, only ${s.ids[s.asker]} in another branch; the run ${leaked.record.status}${leaked.record.error ? `: ${String(leaked.record.error).slice(0, 120)}` : ''}`,
+    ],
+    [
+      allowed.record.status === 'completed',
+      `the run should complete when the user gives the email at ${s.ids[twin]}, under ${s.ids[s.asker]} that asked for it; it ${allowed.record.status}: ${String(allowed.record.error ?? '').slice(0, 120)}`,
+    ],
+  ]);
+}
+
+function personaParentItems(): BankItem[] {
   const items: BankItem[] = [];
-  for (const s of SUBSETS) {
-    for (const order of ['in-order', 'reversed'] as const) {
-      const id = `cross/parents-radius/subset-T/${s.id}/${order}`;
-      items.push({
-        id,
-        family: 'cross-parents-radius',
-        tier: Math.min(5, s.tier + (order === 'reversed' ? 1 : 0)) as Tier,
-        level: 7,
-        component: RUNNER,
-        title: `a mode T block subset that names only ${s.siblings ? 'two children of one parent' : `a block ${s.depth} below its root`} (written ${order})${s.failsAt ? ', whose replayed ancestor fails,' : ''} replays the ancestors for their end state, ${s.failsAt ? 'leaves the block blocked, by its parent, rooted at that ancestor, never sent' : 'sends each block asked for once, after its ancestors'}, measures only the blocks asked for and names every replayed ancestor`,
-        cause: s.failsAt
-          ? 'A mode T block subset whose replayed ancestor fails leaves the block asked for blocked, by its parent, rooted at that ancestor, never sent.'
-          : s.siblings
-            ? 'A mode T block subset replays a parent its selected children share once.'
-            : 'A mode T block subset replays the ancestors of the blocks asked for, measures only those blocks and names every replayed ancestor.',
-        check: async ({ seed, scratch, product }) => {
-          // Chain 0 .. depth, a sibling branch off the root, a second root with a child.
-          const parents: number[] = [-1];
-          for (let i = 1; i <= s.depth; i += 1) parents.push(i - 1);
-          const asked = [s.depth];
-          if (s.siblings) {
-            parents.push(s.depth - 1);
-            asked.push(parents.length - 1);
-          }
-          parents.push(0);
-          const branch = parents.length - 1;
-          parents.push(-1, parents.length);
-          const plans: BlockPlan[] = parents.map((parent, i) => ({
-            fate: s.failsAt !== undefined && i === s.depth - s.failsAt ? 'fail' : 'pass',
-            ...(parent === -1 ? {} : { parent }),
-          }));
-          const r = recipe(seed, id, 'normal', plans, { parents: true });
-          const order0 = [...plans.keys()];
-          const writtenOrder = order === 'in-order' ? order0 : [...order0].reverse();
-          r.raw.blocks = writtenOrder.map((i) => r.raw.blocks[i] as Record<string, unknown>);
-          const position = (i: number) => writtenOrder.indexOf(i);
-          const agent = plantedAgent(product, 'normal', r.actions, { scratch });
-          const record = await runSubset(
-            product,
-            r.raw,
-            agent.adapter,
-            asked.map(position).sort((x, y) => x - y),
-          );
-          const deliveries = agent.delivered();
-          const sent = (i: number) => deliveries.filter((each) => each.marker === r.blocks[i]?.marker).length;
-          const replayed = [...new Set(asked.flatMap((i) => ancestors(parents, i)))].sort((x, y) => x - y);
-          const idOf = (i: number) => r.blocks[i]?.id as string;
-          const measured = record.blocks.map((block) => block.blockId).sort();
-          const wanted = asked.map(idOf).sort();
-          if (measured.join(',') !== wanted.join(','))
-            return fail(
-              `the run should measure only the blocks asked for, ${list(wanted)}; it holds ${list(measured)}`,
-            );
-          const reason = record.blockRerun?.reason ?? '';
-          const outside = parents
-            .map((_, i) => i)
-            .filter((i) => !replayed.includes(i) && !asked.includes(i) && reason.includes(idOf(i)));
-          const conditions: [boolean, string][] = [
-            [
-              (record.blockRerun?.selected ?? []).join(',') ===
-                asked
-                  .map(position)
-                  .sort((x, y) => x - y)
-                  .join(','),
-              `blockRerun.selected should be ${list(asked.map(position))}, the blocks asked for; got ${list(record.blockRerun?.selected ?? ['none'])}`,
-            ],
-            ...replayed.map(
-              (i) =>
-                [
-                  reason.includes(idOf(i)),
-                  `blockRerun.reason should name the replayed ancestor ${idOf(i)}; it reads "${reason.slice(0, 160)}"`,
-                ] as [boolean, string],
-            ),
-            [
-              outside.length === 0,
-              `blockRerun.reason names blocks that were not replayed: ${list(outside.map(idOf))}`,
-            ],
-            [
-              sent(branch) === 0 && sent(parents.length - 2) === 0,
-              `a block outside the ancestors of the blocks asked for should never be sent; the sibling branch reached the agent ${sent(branch)} times, the other root ${sent(parents.length - 2)}`,
-            ],
-          ];
-          const failing = s.failsAt === undefined ? undefined : s.depth - s.failsAt;
-          for (const i of replayed) {
-            // An ancestor below the failing one is blocked, never sent; the failing one and those above it run once.
-            const expected = failing !== undefined && ancestors(parents, i).includes(failing) ? 0 : 1;
-            conditions.push([
-              sent(i) === expected,
-              `the replayed ancestor ${idOf(i)} should reach the agent ${expected} time${expected === 1 ? '' : 's'}; it reached it ${sent(i)} times`,
-            ]);
-          }
-          for (const i of asked) {
-            const block = record.blocks.find((each) => each.blockId === idOf(i));
-            if (failing === undefined) {
-              conditions.push(
-                [sent(i) === 1, `${idOf(i)} should reach the agent once; it reached it ${sent(i)} times`],
-                [
-                  block?.pass === true,
-                  `${idOf(i)} should pass; got ${block?.status ?? (block?.pass ? 'pass' : 'fail')}`,
-                ],
-              );
-              const history = deliveries.find((each) => each.marker === r.blocks[i]?.marker)?.history ?? [];
-              const markers = r.blocks.map((each) => each.marker);
-              const users = history
-                .filter((m) => m.role === 'user')
-                .map((m) => markers.findIndex((marker) => m.content.includes(marker)))
-                .slice(0, -1);
-              const lineage = ancestors(parents, i).reverse();
-              conditions.push([
-                users.join(',') === lineage.join(','),
-                `${idOf(i)} should start from its replayed ancestors' turns ${list(lineage.map(idOf))}; it saw ${list(users.map((u) => (u < 0 ? 'other' : idOf(u))))}`,
-              ]);
-            } else {
-              conditions.push(
-                [
-                  block?.status === 'blocked',
-                  `${idOf(i)} should be blocked: its replayed ancestor ${idOf(failing)} failed; got ${block?.status ?? (block?.pass ? 'pass' : 'fail')}`,
-                ],
-                [
-                  block?.blocked?.by === idOf(parents[i] as number) && block?.blocked?.root === idOf(failing),
-                  `${idOf(i)} should be blocked by ${idOf(parents[i] as number)}, root ${idOf(failing)}; got by ${block?.blocked?.by ?? 'none'}, root ${block?.blocked?.root ?? 'none'}`,
-                ],
-                [
-                  sent(i) === 0,
-                  `${idOf(i)} is blocked and should never be sent; it reached the agent ${sent(i)} times`,
-                ],
-              );
-            }
-          }
-          return expectAll(conditions);
-        },
-      });
+  for (const shape of SHAPES) {
+    for (const order of shape.orders) {
+      for (const view of VIEWS) {
+        const id = `cross/personas-parents/${shape.id}/${order}/${view.id}`;
+        const forest = `a ${shape.id.replace(/-/g, ' ')} forest written ${order}`;
+        items.push({
+          id,
+          family: 'cross-personas-parents',
+          tier: Math.min(5, shape.tier + view.tier + (order === 'in-order' ? 0 : 1) - 1) as Tier,
+          level: 2,
+          component: view.component,
+          title:
+            view.id === 'conversation'
+              ? `a simulated user driving ${forest} writes each block from that block's own branch: a root from no earlier turn, a child from its ancestors' turns and replies only`
+              : view.id === 'facts'
+                ? `a simulated user driving ${forest} is offered a fact for a block only when an ancestor's reply asked for it, never because another branch did`
+                : `a simulated user driving ${forest} that gives a fact in a branch where the agent never asked for it fails the run; giving it under the branch that asked does not`,
+          cause: view.cause,
+          check: async ({ seed, product }) => {
+            const s = scenario(seed, id, shape, order);
+            return view.id === 'leak'
+              ? judgeLeak(product, seed, id, s)
+              : judgeViews(view.id, s, await play(product, s));
+          },
+        });
+      }
     }
   }
   return items;
@@ -376,5 +329,5 @@ function subsetItems(): BankItem[] {
 
 /** Family F7 of the blocks bank: cross-capability combinations. */
 export function crossItems(): BankItem[] {
-  return [...forestRadiusItems(), ...subsetItems()];
+  return personaParentItems();
 }
