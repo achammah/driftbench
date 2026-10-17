@@ -1,6 +1,6 @@
 ---
 title: Blast radius
-summary: 'Compute which blocks of a suite a change to the agent can affect, from a change manifest you write or one `radius auto` derives from a prompt diff, so you rerun only those blocks.'
+summary: 'Compute which blocks of a suite a change to the agent can affect. The input is a change manifest you write or one `radius auto` derives from a prompt diff. Then you rerun only those blocks.'
 commands:
   - radius
   - radius auto
@@ -21,15 +21,15 @@ next:
 
 ## What it is
 
-A change to one part of an agent has a blast radius: the blocks that part can affect. driftbench computes the radius from what each block already says it reads (its Then, its Given, the map cell the generator recorded, its estate atoms, or what its author declared). Nothing runs.
+A change to one part of an agent has a blast radius: the blocks that part can affect. driftbench computes the radius from what each block already says it reads. That is its Then, its Given, the map cell the generator recorded, its estate atoms, or what its author declared. Nothing runs.
 
 You describe the change in a change manifest: the agent version before (`from`), the version after (`to`), and a list of changes. Each change has a `kind` and, for most kinds, an `id`.
 
-`driftbench radius` reads the specs and the manifest and prints, per run mode, which blocks are in the radius and how much a rerun saves against the whole suite. It is read only: it writes nothing.
+`driftbench radius` reads the specs and the manifest. It prints, per run mode, which blocks are in the radius and how much a rerun saves against the whole suite. It is read only: it writes nothing.
 
 `driftbench radius auto` writes a change manifest for you from two versions of a prompt file and an approved map whose entries carry evidence quotes. A change inside exactly one approved quote becomes a narrow change. Any doubt becomes a whole-suite change.
 
-A prompt can also carry a section registry, which names its sections by stable ids, and blocks can link to the sections they test in `metadata.links`. The registry, re-anchoring and links are in authoring-prompt-sections. Links stay out of the spec hash, so adding them never invalidates a carry.
+A prompt can also carry a section registry, which names its sections by stable ids. Blocks can link to the sections they test in `metadata.links`. The registry, re-anchoring and links are in authoring-prompt-sections. Links stay out of the spec hash, so adding them never invalidates a carry. A `prompt_section` change is always the whole suite. Selection by section links is advisory until links are verified by mutation. `radius --sections` only prints what it would skip.
 
 Each block of each spec gets one state per mode:
 
@@ -44,7 +44,7 @@ The forward closure depends on the mode:
 | Mode | Forward rule |
 |---|---|
 | `F` free-running | every block after the first direct block of the spec is `forward` |
-| `P` perturbed | every block from the earliest point where the change enters (the block after the first direct block, or the `inject_at` of a perturbation the change reaches) is `forward` |
+| `P` perturbed | every block from the earliest point where the change enters is `forward`. That point is the block after the first direct block, or the `inject_at` of a perturbation the change reaches |
 | `T` teacher-forced | nothing follows: a block starts from its canonical Given. One exception: in a task spec (a sandbox), the blocks after a direct block are `forward` until a block that sets its own `given.world.workspace` |
 
 The unit that reruns is the cell (one spec, one target, one mode, one repeat). In modes F and P a cell in the radius reruns whole, from its first block. In mode T a block can run alone.
@@ -52,7 +52,7 @@ The unit that reruns is the cell (one spec, one target, one mode, one repeat). I
 Unknown means in. The radius is conservative:
 
 * A block with unknown dependencies is in every radius (reason `unknown-deps`). A block is unknown when its spec has no `metadata.generated`, no `metadata.estate.atoms` and no `metadata.depends`.
-* A change the radius cannot map makes the radius the whole suite: an unknown kind, `model`, `agent`, `global: true`, the rule `reply_language`, a change with no `id`, a `map` id without `=`.
+* A change the radius cannot map makes the radius the whole suite. These changes cannot be mapped: an unknown kind, `model`, `agent`, `global: true`, the rule `reply_language`, a change with no `id`, a `map` id without `=`.
 * A change no block declares makes the radius the whole suite (`no block declares a dependency on it`), for example a new tool. A `criterion` change is the exception: a criterion no block names selects nothing.
 * A manifest with no change between two different versions is the whole suite. With `from` equal to `to` and no change, the radius is empty.
 
@@ -78,7 +78,7 @@ Do not use it as proof that the new agent equals the old one outside the radius.
 ### driftbench radius
 
 ```
-driftbench radius <paths...> --change <manifest> [--mode <modes>] [--explain] [--json]
+driftbench radius <paths...> --change <manifest> [--mode <modes>] [--explain] [--json] [--sections <registries...>]
 ```
 
 | Option | Meaning | Default |
@@ -86,8 +86,9 @@ driftbench radius <paths...> --change <manifest> [--mode <modes>] [--explain] [-
 | `<paths...>` (argument, required) | spec files or folders. Folders are searched for spec files. Every spec must be valid | none |
 | `--change <manifest>` (required in practice) | the change manifest, YAML or JSON (`.json` extension reads JSON, any other extension reads YAML). Relative to the current folder. Commander does not mark it required; the command exits 2 without it | none |
 | `--mode <modes>` | the run modes to plan for: `T` teacher-forced, `F` free-running, `P` perturbed. Several separated by commas, for example `T,F`. Spaces around each are trimmed, repeats are dropped, the output follows your order | `F` |
-| `--explain` | after the normal output, print one line per manifest change (`<kind>:<id or global>: <note>`, or `declared in the manifest` when the change has no note), then one line per block of every spec: `<specId>/<blockId>: <state JSON>: <reasons>`. Ignored with `--json` | off |
+| `--explain` | after the normal output, print one line per manifest change (`<kind>:<id or global>: <note>`, or `declared in the manifest` when the change has no note). Then print one line per block of every spec: `<specId>/<blockId>: <state JSON>: <reasons>`. Ignored with `--json` | off |
 | `--json` | print one JSON document instead of the text | off |
+| `--sections <registries...>` | section registries (authoring-prompt-sections). When the manifest holds `prompt_section` changes, print the advisory section selection after the radius. It lists the blocks selection by section links would run and the ones it would skip. Nothing is skipped: the radius stays the whole suite. With `--explain`, one `<specId>/<blockId>: advisory <state>: <reasons>` line per block; with `--json`, the key `advisory` | off |
 
 Exit codes:
 
@@ -131,8 +132,8 @@ How the diff maps to changes:
 
 * Both texts are normalized first: CRLF and CR become LF, Unicode becomes NFC. Offsets count UTF-16 code units in the normalized text. Other whitespace is kept. A quote matches across any run of whitespace.
 * The diff is a character edit distance alignment. It admits at most 64 single-character edits and 8,000,000 band cells; beyond that the result is the whole suite.
-* Every changed region must lie strictly inside exactly one anchor in both the old and the new text. Each anchor quote must occur exactly once in the old text, be located in the new text through its unchanged first and last characters, and occur exactly once there too. Anchors must not overlap.
-* Otherwise the manifest holds one change `kind: prompt, global: true` (the whole suite), with a `note` that names each region and the rule that failed: `stale quote in old text`, `ambiguous quote in old text`, `ambiguous quote in new text`, `anchor cannot be located unambiguously in new text`, `overlapping anchors`, `empty quote`, `ambiguous optimal diff alignment`, `diff exceeds the exact alignment bound`, `no quote matched on both sides`, `unmapped anchor`.
+* Every changed region must lie strictly inside exactly one anchor in both the old and the new text. Each anchor quote must occur exactly once in the old text. It must be located in the new text through its unchanged first and last characters. It must occur exactly once there too. Anchors must not overlap.
+* Otherwise the manifest holds one change `kind: prompt, global: true` (the whole suite). Its `note` names each region and the rule that failed: `stale quote in old text`, `ambiguous quote in old text`, `ambiguous quote in new text`, `anchor cannot be located unambiguously in new text`, `overlapping anchors`, `empty quote`, `ambiguous optimal diff alignment`, `diff exceeds the exact alignment bound`, `no quote matched on both sides`, `unmapped anchor`.
 * Identical texts (after normalization) give `changes: []` when the versions are equal, and the whole suite when they differ (`region none: no normalized change explains the version transition`).
 
 Exit codes:
@@ -161,7 +162,7 @@ YAML or JSON. Strict: an unknown key is an error at every level.
 
 | Key | Type | Required | Meaning |
 |---|---|---|---|
-| `kind` | string, not empty | yes | what changed: `stage`, `tool`, `rule`, `deviation`, `prompt`, `map`, `fixture`, `criterion`, `model`, `agent`. Any other string is accepted and makes the radius the whole suite |
+| `kind` | string, not empty | yes | what changed: `stage`, `tool`, `rule`, `deviation`, `prompt`, `map`, `fixture`, `criterion`, `model`, `agent`, `prompt_section`. Any other string is accepted and makes the radius the whole suite |
 | `id` | string, not empty | no | which one (see the table below). Without it, every kind is the whole suite |
 | `part` | `input`, `result`, `description` or `presence` | no | for a tool: which part changed. Absent: any part, the widest reading |
 | `global` | boolean | no | `true` when the change applies to every block, such as a tone rule: the whole suite |
@@ -184,17 +185,18 @@ What each kind selects:
 | `deviation` | a class, `D2` or `D2_goal_shift` | blocks that carry the class (an injection's class, or the `deviation` of the cell). `D2` also matches `D2_<anything>` |
 | `prompt` | an estate atom id | blocks of specs whose `metadata.estate.atoms` or `metadata.depends.atoms` name it |
 | `map` | `dimension=value` | blocks whose cell holds that value, or whose When was phrased from it |
-| `fixture` | a name or a literal value | blocks whose Given (spec and blocks up to this one) names it as a world store key, a fixture name, a workspace file or `workspace.from`; specs of family `<id>` as `family:<id>` (from `metadata.family.id` or a `family:` tag); names in `metadata.depends.fixtures`; and blocks whose When, expected tool inputs, Given or end state hold the literal text |
+| `fixture` | a name or a literal value | blocks whose Given (spec and blocks up to this one) names it as a world store key, a fixture name, a workspace file or `workspace.from`. It also selects specs of family `<id>` as `family:<id>` (from `metadata.family.id` or a `family:` tag). It also selects names in `metadata.depends.fixtures`. It also selects blocks whose When, expected tool inputs, Given or end state hold the literal text |
 | `criterion` | a criterion name | blocks whose `expect.criteria` name it |
 | `model`, `agent` | none | the whole suite |
+| `prompt_section` | `<prompt-id>#<section-id>`, or a section id alone for any prompt | the whole suite, with the reason `section selection is advisory until links are verified by mutation`. `--sections` prints which blocks the section links would select (authoring-prompt-sections) |
 
 What a tool change selects, by `part`:
 
 | `part` | Blocks |
 |---|---|
 | `input` | blocks that expect the tool called (count not 0), or assert on its input; every block of a spec whose `rules.max_calls` caps it above 0 |
-| `result` | blocks that expect the tool called (count not 0); blocks whose Given forces its result or error (`given.world.tools`); the last block of a spec whose end state reads `tool:<label>` |
-| `description`, `presence` or absent | every block that lists the tool, count 0 included; specs that cap or forbid it; blocks whose `expect.tools_offered` includes or excludes it; blocks that force it; end states that read it |
+| `result` | blocks that expect the tool called (count not 0). Blocks whose Given forces its result or error (`given.world.tools`). The last block of a spec whose end state reads `tool:<label>` |
+| `description`, `presence` or absent | every block that lists the tool, count 0 included. Specs that cap or forbid it. Blocks whose `expect.tools_offered` includes or excludes it. Blocks that force it. End states that read it |
 
 Minimal valid manifest:
 
@@ -224,8 +226,8 @@ changes:
 
 A change selects a block only through what the block carries. You write nothing new in a generated spec:
 
-* Its Then: `expect.tools` (label, count, `input`, `input_closed`), `expect.tool_order`, `expect.tools_offered`, `expect.stage`, `expect.stage_reported`, `must`, `must_not`, `lang`, `cards`, `skills`, `guards`, `execution`, `artifacts`, `workspace`, `safety`, `expect.criteria`, and the spec `rules`. The spec `end_state` counts on the last block only.
-* Its Given: the spec `given` and every block `given` up to this block: `world.tools` (forced results), `world.store`, `world.fixtures`, `world.workspace.files`, `world.workspace.from`, and the literals in `world`, `ledger`, `vars` and `prefix`.
+* Its Then: `expect.tools` (label, count, `input`, `input_closed`), `expect.tool_order`, `expect.tools_offered`, `expect.stage`, `expect.stage_reported`, `must`, `must_not`, `lang`. Its Then also holds `cards`, `skills`, `guards`, `execution`, `artifacts`, `workspace`, `safety`, `expect.criteria`, and the spec `rules`. The spec `end_state` counts on the last block only.
+* Its Given: the spec `given` and every block `given` up to this block. That holds `world.tools` (forced results), `world.store`, `world.fixtures`, `world.workspace.files`, `world.workspace.from`, and the literals in `world`, `ledger`, `vars` and `prefix`.
 * The generator record `metadata.generated`: `cell` (spec level), `blocks[].block` with `blocks[].cell` and `blocks[].phrase` (`dimension`, `value`), and `path`. A `flow:<name>` tag gives the flow when the cell has none.
 * The estate atoms: `metadata.estate.atoms`.
 * The task family: `metadata.family.id` or a `family:<id>` tag.
@@ -251,7 +253,7 @@ metadata:
 | `atoms` | list of strings | `prompt` changes with these ids select every block; also marks the atoms known |
 | `fixtures` | list of strings | `fixture` changes with these names select every block |
 
-Any `metadata.depends` mapping, even an empty one, makes the spec's dependencies known. A `map` or `path:` change still marks a block with no recorded cell (`:unknown-cell`), and a `prompt` change still marks a block with no atoms (`:unknown-atoms`).
+Any `metadata.depends` mapping, even an empty one, makes the spec's dependencies known. A `map` or `path:` change still marks a block with no recorded cell (`:unknown-cell`). A `prompt` change still marks a block with no atoms (`:unknown-atoms`).
 
 ### The map for radius auto
 
@@ -275,7 +277,7 @@ A map with many repeated or overlapping quotes over one source makes most edits 
 | `In the radius, mode <M>:` then a table | one row per spec with a cell in the radius | none |
 | `Mode <M>: no cell in the radius.` | the change reaches no cell in that mode | none |
 
-Table columns: `spec` (spec id), `cells` (mode P only: P cells of the spec in the radius, one per perturbation), `blocks in` (scored blocks not `out`, of the scored blocks of the spec), `from` (the first direct block; in mode P with no direct block, the perturbation ids), `why` (the reasons of the cells, deduplicated).
+Table columns are `spec`, `cells`, `blocks in`, `from` and `why`. `spec` is the spec id. `cells` (mode P only) holds the P cells of the spec in the radius, one per perturbation. `blocks in` is the scored blocks not `out`, of the scored blocks of the spec. `from` is the first direct block; in mode P with no direct block, it is the perturbation ids. `why` holds the reasons of the cells, deduplicated.
 
 Reasons a block or cell carries:
 
@@ -292,7 +294,7 @@ A block with no id is shown as `block <index>` (0 based).
 
 ### --explain lines
 
-After the text output: one line per change, `<kind>:<id or global>: <note or "declared in the manifest">`. Then one line per block of every spec: `<specId>/<blockId>: {"<mode>":"<state>",...}: <reasons joined by ", ">`. The lines print even when the radius is the whole suite. For a manifest from `radius auto`, the note names the region (`region old:<a>-<b> new:<c>-<d>`), the anchor entry (`relations[0]`), the source, the quote offsets, the quote, and `covered on both sides` or the rule that failed.
+After the text output: one line per change, `<kind>:<id or global>: <note or "declared in the manifest">`. Then one line per block of every spec: `<specId>/<blockId>: {"<mode>":"<state>",...}: <reasons joined by ", ">`. The lines print even when the radius is the whole suite. For a manifest from `radius auto`, the note names the region (`region old:<a>-<b> new:<c>-<d>`), the anchor entry (`relations[0]`), the source, the quote offsets and the quote. It ends with `covered on both sides` or the rule that failed.
 
 ### JSON output of radius
 
@@ -305,13 +307,14 @@ After the text output: one line per change, `<kind>:<id or global>: <note or "de
 | `specs[].specId`, `specs[].hash`, `specs[].path` | the spec, its hash, its path relative to the current folder |
 | `specs[].blocks[]` | `id`, `index`, `scored` (false for a gate rejected block), `why` (reasons; empty when not direct), `state` (`{ "<mode>": "direct" | "forward" | "out" }`) |
 | `specs[].cells[]` | `mode`, `perturbationId` (mode P), `in`, `why` (the reasons of the first direct block, or of the perturbation) |
-| `totals.<mode>` | `in` (direct plus forward), `direct`, `forward`, `out`, `total` (scored blocks), `unknown` (scored blocks with unknown dependencies), `cells.in`, `cells.total`, `sent` (scored blocks of the cells in the radius) |
+| `totals.<mode>` | `in` (direct plus forward), `direct`, `forward`, `out`, `total` (scored blocks). `unknown` (scored blocks with unknown dependencies), `cells.in`, `cells.total`, `sent` (scored blocks of the cells in the radius) |
+| `advisory` | with `--sections` and `prompt_section` changes only: `{ advisory: true, changed, closure, all, specs[].blocks[] (id, index, state, why), counts (selected, direct, forward, skipped, total) }`. See authoring-prompt-sections |
 
 `radius` writes no file.
 
 ### Output of radius auto
 
-A change manifest in YAML, on stdout or in the `--out` file. Read `changes`: a narrow change (such as `rule` `states@offer`) means the edit lay inside one approved anchor; `kind: prompt` with `global: true` means the whole suite, and the `note` says which region and which rule. Pass the file to `radius --change`, `campaign run --change` or `ci --change`.
+A change manifest in YAML, on stdout or in the `--out` file. Read `changes`. A narrow change (such as `rule` `states@offer`) means the edit lay inside one approved anchor. `kind: prompt` with `global: true` means the whole suite, and the `note` says which region and which rule. Pass the file to `radius --change`, `campaign run --change` or `ci --change`.
 
 ## Worked example
 

@@ -1,0 +1,23 @@
+# Fictional data only: Acme Telecom, Acmeville, people at example.com.
+# A block-linked spec for the section registry of ../acme-sales.md.
+id: acme-linked-porting
+title: Keeping a number checks eligibility first
+channel: chat
+lang: EN
+target: { adapter: function, agent: acme-sales }
+blocks:
+  - id: keep-number
+    user: I want to move my number +1 202 555 0131 to Acme.
+    expect:
+      tools:
+        - { label: port.check, count: 1 }
+        - { label: order.create, count: 0 }
+  - id: when
+    user: How long does the move take?
+    expect:
+      tools:
+        - { label: order.create, count: 0 }
+metadata:
+  links:
+    - { block: keep-number, to: { kind: prompt_section, prompt: acme-sales, section: porting_check_first }, status: declared, created_by: author }
+    - { block: when, to: { kind: prompt_section, prompt: acme-sales, section: porting_timing }, status: declared, created_by: author }

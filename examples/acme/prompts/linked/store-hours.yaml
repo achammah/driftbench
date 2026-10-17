@@ -1,0 +1,16 @@
+# Fictional data only: Acme Telecom, Acmeville, people at example.com.
+# A block-linked spec for the section registry of ../acme-sales.md.
+id: acme-linked-store-hours
+title: Store hours come from the store hours rule
+channel: chat
+lang: EN
+target: { adapter: function, agent: acme-sales }
+blocks:
+  - id: hours
+    user: When is the Acmeville shop open?
+    expect:
+      tools:
+        - { label: order.create, count: 0 }
+metadata:
+  links:
+    - { block: hours, to: { kind: prompt_section, prompt: acme-sales, section: store_hours }, status: declared, created_by: author }

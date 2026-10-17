@@ -4,6 +4,7 @@ summary: Name a change in a manifest, print its blast radius, run only those cel
 commands:
   - radius
   - radius auto
+  - radius sections reanchor
   - campaign run
   - campaign status
   - ci
@@ -281,12 +282,47 @@ driftbench radius specs --change change.yaml --explain
 With the full Acme map, which holds repeated and overlapping quotes, an edit selects the whole suite;
 `docs/concepts/blast-radius.md` shows a focused one-anchor map that narrows a price edit to its offer blocks.
 
+### 10. See what selection by section links would skip
+
+A prompt with a section registry gives a finer manifest: `radius sections reanchor --change-out` names each
+edited section as a `prompt_section` change. Such a change is the whole suite, because declared links miss
+behaviour that crosses sections; `--sections` prints what selection by links would run, as advice only.
+Here the explicit confirmation rule of the Acme prompt is loosened, and three linked specs are read:
+
+```sh setup
+sed 's/A loose yes such as "sure", "ok" or "go ahead" is not enough/A loose yes such as "sure" or "ok" is enough/' examples/acme/prompts/acme-sales.md > acme-sales-v2.md
+```
+
+```sh
+driftbench radius sections reanchor examples/acme/prompts/acme-sales.sections.yaml \
+  --prompt examples/acme/prompts/acme-sales.md acme-sales-v2.md --to-version v2 --change-out sections.yaml  # exit 1
+driftbench radius examples/acme/prompts/linked --change sections.yaml \
+  --sections examples/acme/prompts/acme-sales.sections.yaml  # exit 1
+```
+
+```text
+acme-sales v1 to v2: 23 kept, 6 moved, 1 stale.
+  stale explicit_confirm: the anchor is found but the section text changed: edited inside
+Every link to a stale section reads as stale until its span is declared again.
+Blast radius of v1 to v2 (manifest c87414677dc4): prompt_section:acme-sales#explicit_confirm.
+3 specs, 7 blocks.
+The radius is the whole suite: prompt_section:acme-sales#explicit_confirm: section selection is advisory until links are verified by mutation: the whole suite runs. Nothing can be carried.
+Advisory section selection (acme-sales#explicit_confirm): nothing is skipped, the whole suite runs until links are verified by mutation.
+  With references, overrides and duplicates: acme-sales#upgrade_order, acme-sales#order_failure.
+  Would run 3 of 7 blocks (2 by links, 1 forward) and would skip 4: 57.1% of the suite.
+  spec                       blocks  from       links that drove it
+  acme-linked-order-confirm  3 of 4  loose-yes  link:acme-sales#explicit_confirm (declared)
+```
+
+`campaign run --change sections.yaml` runs every cell: nothing is carried while selection is advisory.
+
 ## What you have at the end
 
 * `acme.db`: the baseline `c-base` under `acme-v1`, and `c-v2` under `acme-v2`: 29 cells fresh, 142
   carried, the audit clean.
 * `modes.db`: the mode T baseline with end-state snapshots, and `t-next`, which sent 86 blocks.
 * `auto.yaml`: a manifest written from two prompt files.
+* `sections.yaml`: a `prompt_section` manifest, and the advisory list of what links alone would rerun.
 * A way to gate the same radius in CI: `driftbench ci --change <manifest> --agent-version <to>` runs the
   radius, carries the rest from the `--baseline` campaign of `--store`, and with `--audit <n>` gives the
   verdict `radius-miss` (exit 1) on a difference. See `driftbench help recipes-gate-in-ci`.
