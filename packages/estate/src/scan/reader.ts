@@ -1,3 +1,4 @@
+import type { DocumentInfo } from '../schema';
 import type { Located } from './text';
 
 /**
@@ -22,7 +23,13 @@ export const FILE_KINDS = [
 export type FileKind = (typeof FILE_KINDS)[number];
 
 /** One file of the estate. `owner` names the skill a skill file belongs to. */
-export type EstateFile = { path: string; kind: FileKind; text: string; owner?: string };
+export type EstateFile = {
+  path: string;
+  kind: FileKind;
+  text: string;
+  owner?: string;
+  document?: DocumentInfo;
+};
 
 /** A value read from a declaration, with the passage it was read from. */
 export type Read<T> = { value: T; at: Located };

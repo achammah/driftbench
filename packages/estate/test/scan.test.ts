@@ -138,8 +138,10 @@ describe('the Claude Code reader', () => {
       ['.claude/skills/shipment-tracker/SKILL.md', 12],
       ['.claude/skills/supplier-email/SKILL.md', 5],
       ['.claude/skills/weekly-report/SKILL.md', 6],
-      ['.claude/skills/weekly-report/templates/report.md', 1],
     ]);
+    expect(raw.files.find((file) => file.path.endsWith('templates/report.md'))?.document?.role).toBe(
+      'template',
+    );
     for (const chunk of raw.prose) expect(chunk.text).not.toMatch(/^name:/m);
   });
 

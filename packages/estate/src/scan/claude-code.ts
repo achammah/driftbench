@@ -3,6 +3,12 @@ import { basename, isAbsolute, join, posix, relative, sep } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import { EstatePathError, estatePath } from '../paths';
 import { chunkLines, fileNames, guardName, locateNamed, namedPaths, positiveMention } from './code';
+import { classifyDocument, isNormative, normativeRanges } from './document-roles';
+import { type IgnoreRule, ignoreRule } from './ignore';
+import { pathReference } from './reference-role';
+
+export { ignoreRule } from './ignore';
+
 import type {
   CheckDecl,
   EstateFile,
@@ -115,9 +121,6 @@ export type ClaudeCodeReaderOptions = {
   ignore?: readonly string[];
 };
 
-/** A glob of the ignore list and its test on a path relative to the root. */
-type IgnoreRule = { pattern: string; test: (path: string) => boolean };
-
 type Ignored = { rules: IgnoreRule[]; counts: Map<string, number>; paths: string[] };
 
 /** The estate configuration: more globs to skip, and path aliases (`REF` to one or more folders). */
@@ -128,27 +131,6 @@ type EstateConfig = { ignore: string[]; aliases: Record<string, string[]>; exter
  * workspace. A path under one of them that the estate does not hold is external, not missing.
  */
 export const DEFAULT_EXTERNALS = ['docs/', '_meta/'] as const;
-
-/** A `.gitignore`-like glob as a test on a relative path: the path or one of its folders matches. */
-export function ignoreRule(pattern: string): IgnoreRule {
-  const anchored = pattern.startsWith('/');
-  const body = pattern.replace(/^\/+/, '').replace(/\/+$/, '');
-  let source = '';
-  for (let index = 0; index < body.length; index++) {
-    const char = body[index] ?? '';
-    if (body.startsWith('**/', index)) {
-      source += '(?:[^/]+/)*';
-      index += 2;
-    } else if (body.startsWith('**', index)) {
-      source += '.*';
-      index += 1;
-    } else if (char === '*') source += '[^/]*';
-    else if (char === '?') source += '[^/]';
-    else source += char.replace(/[.+^${}()|[\]\\]/g, '\\$&');
-  }
-  const regex = new RegExp(`${anchored ? '^' : '(?:^|/)'}${source}(?:/|$)`);
-  return { pattern, test: (path) => regex.test(path) };
-}
 
 export class ClaudeCodeReader implements EstateReader {
   readonly runtime = 'claude-code';
@@ -228,6 +210,12 @@ export class ClaudeCodeReader implements EstateReader {
       } else files.push({ path, text, ...classify(path, text) });
     }
 
+    for (const file of files)
+      file.document = classifyDocument(
+        file,
+        ['skill', 'skill_file'].includes(file.kind) ? file.path.split('/').slice(0, 3).join('/') : undefined,
+      );
+
     const estate: RawEstate = {
       runtime: this.runtime,
       labels: { read: 'Read', edit: 'Edit', write: 'Write', shell: 'Bash', dispatch: 'Agent' },
@@ -251,13 +239,18 @@ export class ClaudeCodeReader implements EstateReader {
         paths: ignored.paths,
         chosen,
       },
-      aliases: { ...inlineAliases(files), ...aliasTables(files, notes), ...config.aliases },
+      aliases: {
+        ...inlineAliases(files.filter(isNormative)),
+        ...aliasTables(files.filter(isNormative), notes),
+        ...config.aliases,
+      },
       externals: [
         ...(config.externals ?? DEFAULT_EXTERNALS),
         ...notes.filter((note) => note.message === EXTERNAL_NOTE).map((note) => note.file),
       ],
     };
     for (const file of files) {
+      if (!isNormative(file)) continue;
       if (file.kind === 'settings') readSettings(file, estate);
       if (file.kind === 'skill') readSkill(file, estate, budget);
       if (file.kind === 'subagent') readSubagent(file, estate, budget);
@@ -298,7 +291,7 @@ export class ClaudeCodeReader implements EstateReader {
     // The registry comes last: a row names its guard by a script, a check id or an id the script holds,
     // so every guard is known before a row is matched to one.
     const registries = files.filter(
-      (file) => file.kind === 'registry' || structuredRegistry(file.text, file.path),
+      (file) => isNormative(file) && (file.kind === 'registry' || structuredRegistry(file.text, file.path)),
     );
     const catalogues = registries.filter((file) => catalogueEntries(file.text));
     for (const file of catalogues) readCatalogue(file, estate);
@@ -325,6 +318,7 @@ async function readRootReferences(
   const tried = new Set<string>();
   const proseFiles = new Set(estate.prose.map((chunk) => chunk.file));
   const expanded = new Set<string>();
+  const unitNames = new Set([...estate.skills, ...estate.subagents].map((unit) => unit.name));
   // Many lines name the same file: each path is looked up on disk once.
   const isFile = new Map<string, Promise<boolean>>();
   const fileAt = (path: string) => {
@@ -349,9 +343,9 @@ async function readRootReferences(
     for (const line of chunkLines(chunk, source)) {
       // A standing file's line `@path` imports that file into the standing instructions.
       const imported = source?.kind === 'standing' ? /^@([^\s]+)\s*$/.exec(line.text.trim())?.[1] : undefined;
-      const names = imported ? [imported] : namedPaths(line.text);
+      const names = imported ? [imported] : namedPaths(line.text, true);
       for (const name of names) {
-        if (!/\.(md|markdown|txt)$/i.test(name) || /^(?:\/|~\/|[a-z]+:)/i.test(name)) continue;
+        if (/^(?:\/|~\/|[a-z]+:)/i.test(name) || (!pathReference(name) && unitNames.has(name))) continue;
         if (!imported && !positiveMention(line.text, name, ['read', 'open', 'load'])) continue;
         // An unindexed root guide is a candidate only after the naming file's own subtree.
         const local = posix.normalize(posix.join(posix.dirname(chunk.file), name));
@@ -409,7 +403,7 @@ async function readRootReferences(
             continue;
           }
           const text = (await readFile(safe, 'utf8')).replace(/^\uFEFF/, '');
-          candidate = { path, text, kind: 'other' };
+          candidate = { path, text, kind: 'other', document: classifyDocument({ path, text }) };
           estate.files.push(candidate);
           files.set(path, candidate);
           // The name gets a new list: a list of names is never changed in place once built.
@@ -419,7 +413,9 @@ async function readRootReferences(
         // a guard, an alias table) is not sent again as prose.
         if (imported) candidate.kind = 'standing';
         else if (STRUCTURED_KINDS.has(candidate.kind) || definesAliases(candidate)) continue;
-        if (proseFiles.has(path)) continue;
+        // Index every explicitly named existing file, but only prose documents supply rule text.
+        if (!imported && !/\.(md|markdown|txt)$/i.test(path)) continue;
+        if (!isNormative(candidate) || proseFiles.has(path)) continue;
         const real = await realpath(join(root, path)).catch(() => undefined);
         // Two spellings of one file (a link, a relative path) may form a cycle; canonical identity bounds it.
         if (real && expanded.has(real)) continue;
@@ -1890,20 +1886,26 @@ function addProse(
   endLine: number,
   budget: number,
 ): void {
-  const lines = file.text.split('\n').slice(startLine - 1, endLine);
-  if (lines.every((line) => line.trim() === '')) return;
-  const parts = cutLines(lines, budget).filter(({ from, to }) =>
-    lines.slice(from, to).some((line) => line.trim() !== ''),
-  );
-  parts.forEach(({ from, to }, index) => {
-    const chunk: ProseChunk = {
-      id: parts.length === 1 ? file.path : `${file.path}#${index + 1}`,
-      file: file.path,
-      startLine: startLine + from,
-      endLine: startLine + to - 1,
-      text: lines.slice(from, to).join('\n'),
-    };
-    estate.prose.push(chunk);
+  const ranges = normativeRanges(file, startLine, endLine);
+  const chunks: Array<Omit<ProseChunk, 'id'>> = [];
+  for (const range of ranges) {
+    const lines = file.text.split('\n').slice(range.startLine - 1, range.endLine);
+    if (lines.every((line) => line.trim() === '')) continue;
+    for (const { from, to } of cutLines(lines, budget)) {
+      if (lines.slice(from, to).every((line) => line.trim() === '')) continue;
+      chunks.push({
+        file: file.path,
+        startLine: range.startLine + from,
+        endLine: range.startLine + to - 1,
+        text: lines.slice(from, to).join('\n'),
+      });
+    }
+  }
+  chunks.forEach((chunk, index) => {
+    estate.prose.push({
+      ...chunk,
+      id: chunks.length === 1 ? file.path : `${file.path}#${index + 1}`,
+    });
   });
 }
 
@@ -2030,6 +2032,8 @@ async function localPath(root: string, file: string, notes: ReadNote[]): Promise
   try {
     return await estatePath(root, file);
   } catch (cause) {
+    // A name no file system can hold (a sentence read as a path) names no file.
+    if ((cause as NodeJS.ErrnoException)?.code === 'ENAMETOOLONG') return undefined;
     if (!(cause instanceof EstatePathError)) throw cause;
     if (!notes.some((note) => note.file === file && note.message === EXTERNAL_NOTE))
       notes.push({ file, message: EXTERNAL_NOTE });

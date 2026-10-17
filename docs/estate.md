@@ -213,6 +213,14 @@ Next: driftbench estate lint _captures/docs3/estate/map-nomodel.yaml; driftbench
 
 The map is YAML with a header on how to approve it, `producedBy` per atom and, for the map, the model family and model that split the prose. The loader recomputes every provenance hash and the map hash, so a map whose quote or span was edited is refused; `approved` and `role` may be edited by hand.
 
+### Document roles and navigation
+
+The reader classifies document authority before reading declarations or passing prose to the scanner. The map records each document's role and structural reasons under `documents`: normative, changelog, history, template, example, journal, fixture or archive. A mixed document retains its live sections and records the non-normative line spans separately. Repeated dated entries and append-only log structure identify historical records. Placeholder value slots identify fill-in templates. Example headings, illustrative blocks and navigation folders identify non-normative material. One incidental date or a variable path in a live procedure does not change its authority.
+
+Non-normative documents remain navigation targets. Their bodies yield no rules, gates or hazards, and their outgoing references are not linted as broken dependencies. A live prerequisite that names a template still requires that read. A record or store (changelog, history, journal, archive, fixture) outside every live skill is not an orphan or unreachable defect; a template, an example, or any file inside a live skill's folder that nothing names still is. Placeholders and examples never establish a missing file. A path whose extension names a document or script type, and which does not exist, is `MISSING_REFERENCE`; a pair, a ratio, a version or a dotted name is no reference at all. A quoted or linked filename with an extension that is absent is also `MISSING_REFERENCE`. A name with no extension or separator that resolves nowhere is informational `UNRESOLVED_REFERENCE`; ambiguous names retain their existing findings.
+
+See [document roles and precision](estate-document-roles.md) for the role evidence, authority boundaries and independent synthetic measurement.
+
 ### The estate configuration file
 
 An estate may hold `driftbench.estate.yaml` at its root, or at `.claude/driftbench.estate.yaml` (the root file wins; the second place is copied with the runtime's own folder, so a unit run of a copy or a mutant sees it). The scan and the unit runner read it; every key is optional. Tooling files are not instructions to the agent: the configuration file, and any file whose path it writes (a helper's executor script), are named by it and are neither orphans nor unreachable.
@@ -317,7 +325,8 @@ The graph answers what code can walk:
 | `UNENFORCED` | an instruction, gate or register atom no guard enforces: trusted, reported as a count, never failing alone |
 | `OVERSIZE` | the standing instructions are over the ceiling, counted in Unicode characters (code points): an emoji is one character, never its bytes or UTF-16 units |
 | `UNANCHORED_GUARD` | a guard command finds its script from the working folder, not from an anchor |
-| `MISSING_REFERENCE` | a file a body names does not exist |
+| `MISSING_REFERENCE` | a concrete path a live body names does not exist |
+| `UNRESOLVED_REFERENCE` | a name with no separator and no extension resolves nowhere; informational, never failing alone |
 | `MISSING_SCRIPT` | a guard command runs a script that does not exist; a dispatcher whose source passes a positional or parsed-option value to an executed or imported file path, or whose usage documents that file role, also names a missing target. A folder or filename never establishes dispatch; ordinary subcommands remain arguments. The bounded static reader follows argument identity through local assignments, interpolation, path joins, slices and unpacking into Python execution/import APIs, Node execution/require, Ruby load/require and shell execution. Data passed to a fixed program stays data; unknown code remains the outer script |
 | `REGISTRY_ROW` | a guard has no row in the check registry |
 | `REGISTRY_GUARD` | a registry row names a guard the estate does not run |

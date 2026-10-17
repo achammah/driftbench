@@ -1,8 +1,10 @@
 import { basename, posix } from 'node:path';
 import nlp from 'compromise';
 import type { Atom, AtomKind, EvidencePredicate } from '../schema';
+import { isNormative, maskIllustrativePrefixes, normativeEstate } from './document-roles';
 import { guardRuleSources } from './guard-rules';
 import type { EstateFile, GuardDecl, ProseChunk, RawEstate, RegistryRow } from './reader';
+import { documentFileType, ignoredReference, pathReference } from './reference-role';
 import {
   blankFences,
   type Located,
@@ -71,8 +73,6 @@ export const HAZARDS = [
   { id: 'nudge_storm', title: 'Repeated guard nudges', pattern: /\bnudges?\b/i },
 ] as const;
 
-/** Extensions a named file needs to count as a reference when it does not exist. */
-const DOCUMENT = /\.(md|markdown|txt|json|ya?ml|csv|tsv|html|py|sh|js|mjs|ts)$/i;
 const SCRIPT = /\.(sh|bash|py|js|mjs|cjs|ts|rb|pl)$/i;
 
 /** Builds atoms with stable, unique ids: kind, scope and a slug of the title, then -2, -3 on a repeat. */
@@ -186,6 +186,7 @@ export function registryRowOf(guard: GuardDecl, registry: readonly RegistryRow[]
 
 /** Every atom code reads, in a fixed order, so ids are the same on every run. */
 export function codeAtoms(raw: RawEstate, builder: AtomBuilder): void {
+  raw = normativeEstate(raw);
   const files = new Map(raw.files.map((file) => [file.path, file]));
   const { labels } = raw;
   const dispatch = (name: string): EvidencePredicate => ({
@@ -384,6 +385,7 @@ export function codeAtoms(raw: RawEstate, builder: AtomBuilder): void {
   const skillRoots = new Set(raw.skills.map((skill) => posix.normalize(skill.folder)));
   const folderFiles = new Map<string, EstateFile[]>();
   for (const file of raw.files) {
+    // Ownership comes from the folder, not from a document's role: a role limits what prose may declare.
     if (file.kind !== 'skill_file') continue;
     let folder = posix.dirname(posix.normalize(file.path));
     while (!skillRoots.has(folder)) {
@@ -528,14 +530,21 @@ function scriptAtoms(
 }
 
 /** A path and its spelling in the source, before notation is normalized. */
-type NamedReference = { path: string; spelling: string; start: number; end: number };
+type NamedReference = {
+  path: string;
+  spelling: string;
+  start: number;
+  end: number;
+  /** Found as a loose word after a directive, not quoted, linked or backticked. */
+  bare: boolean;
+};
 
 /** Paths a line names, sharing one tokenizer with reference provenance and negation checks. */
-export function namedPaths(line: string): string[] {
-  return namedReferences(line).map(({ path }) => path);
+export function namedPaths(line: string, identifiers = false): string[] {
+  return namedReferences(line, identifiers).map(({ path }) => path);
 }
 
-function namedReferences(line: string): NamedReference[] {
+function namedReferences(line: string, identifiers = false): NamedReference[] {
   const found: NamedReference[] = [];
   const claimed: Array<[number, number]> = [];
   const take = (
@@ -543,6 +552,8 @@ function namedReferences(line: string): NamedReference[] {
     token: string | undefined,
     wiki = false,
     length = match[0].length,
+    identifierContext = false,
+    bare = false,
   ) => {
     const start = match.index ?? 0;
     if (claimed.some(([from, to]) => start >= from && start < to)) return;
@@ -557,15 +568,30 @@ function namedReferences(line: string): NamedReference[] {
       .replace(/:\d+(?::\d+)?$/, '');
     if (wiki && !/\.[A-Za-z0-9]+$/.test(path)) path += '.md';
     const execution = /\b(?:run|execute)(?: the command)?\s*$|\bexample:\s*$/i.test(line.slice(0, start));
+    const identifier =
+      identifiers &&
+      (identifierContext || /^['"*\x60]/.test(match[0])) &&
+      /^[\p{L}_][\p{L}\p{N}_-]*$/u.test(path) &&
+      /\b(?:read|open|load)\s+(?:the\s+)?(?:(?:skill|helper|agent|identifier)\s+)?$/i.test(
+        line.slice(0, start),
+      );
+    // A sentence is not a file name: a name with spaces needs an extension, and no segment exceeds a file name.
+    const sentence =
+      (/\s/.test(path) && !/\.[A-Za-z0-9]+$/.test(path)) || path.split('/').some((part) => part.length > 255);
+    const concrete =
+      !sentence &&
+      pathReference(path) &&
+      !path.endsWith('/') &&
+      (!/\s/.test(posix.basename(path)) || /\.[^./\s]+$/.test(path));
     if (
       /^[a-z]+:/i.test(path) ||
       /[<>*?{}$|;&]/.test(path) ||
       /\s--?\w/.test(path) ||
       (execution && /\s/.test(path)) ||
-      !/\.[A-Za-z0-9]+$/.test(path)
+      (identifiers ? !concrete && !identifier : !/\.[A-Za-z0-9]+$/.test(path))
     )
       return;
-    found.push({ path, spelling, start, end: start + length });
+    found.push({ path, spelling, start, end: start + length, bare });
   };
   for (const match of line.matchAll(/`([^`\n]+)`/g)) take(match, match[1]);
   for (const match of line.matchAll(/\[[^\]\n]*\]\((?:<([^>\n]+)>|([^\s)]+))(?:\s+"[^"]*")?\)/g))
@@ -573,15 +599,26 @@ function namedReferences(line: string): NamedReference[] {
   for (const match of line.matchAll(/"([^"\n]+)"|'([^'\n]+)'/g)) take(match, match[1] ?? match[2]);
   for (const match of line.matchAll(/\[\[([^\]\n|]+)(?:\|[^\]\n]*)?\]\]/g)) take(match, match[1], true);
   for (const match of line.matchAll(/<([^<>\s]+)>|\*\*([^*\n]+)\*\*/g)) take(match, match[1] ?? match[2]);
+  if (identifiers) {
+    for (const match of line.matchAll(
+      /\b(?:read|open|load)\s+(?:the\s+)?(?:skill|helper|agent|identifier)\s+([\p{L}_][\p{L}\p{N}_-]*)(?![\p{L}\p{N}_/\\-]|\.[\p{L}\p{N}_])/giu,
+    )) {
+      const name = match[1];
+      if (!name) continue;
+      const token = [name] as RegExpMatchArray;
+      token.index = (match.index ?? 0) + match[0].length - name.length;
+      take(token, name, false, name.length, true);
+    }
+  }
   // Whole tokens, never a filename extracted from inside a URL, glob, example or link title.
   // Find the directive once: rescanning each token's prefix makes long prose quadratic.
   const directive = /\b(?:read|open|load|consult|include|import|see|use)\b/i.exec(line);
   const directiveEnd = directive ? directive.index + directive[0].length : Number.POSITIVE_INFINITY;
   for (const match of line.matchAll(/[^\s`"'<>()[\],;!]+/g)) {
-    if (!match[0].includes('.')) continue;
+    if (!match[0].includes('.') && !(identifiers && /[/\\]/.test(match[0]))) continue;
     if (!match[0].startsWith('@') && (match.index ?? 0) < directiveEnd) continue;
     const token = match[0].replace(/[.:]+$/, '');
-    take(match, token, false, token.length);
+    take(match, token, false, token.length, false, true);
   }
   return found;
 }
@@ -1034,7 +1071,7 @@ function referenceAtoms(
   for (const line of chunkLines(chunk, files.get(chunk.file))) {
     // A standing line `@path` is an import: the runtime loads that file, so the agent reads nothing.
     if (standing && /^@\S+$/.test(line.text.trim())) continue;
-    const references = namedReferences(line.text);
+    const references = namedReferences(line.text, true);
     if (!references.length) continue;
     const clauses = referenceClauses(line.text, references);
     const past = pastFile(clauses);
@@ -1067,6 +1104,9 @@ function referenceAtoms(
           : !positiveMention(line.text, spelling, ['read', 'open', 'load'])
       )
         continue;
+      const identifier = !pathReference(named);
+      // Declared unit identifiers resolve without naming an absent file.
+      if (identifier && (routeNames(raw).skills.has(named) || routeNames(raw).helpers.has(named))) continue;
       const located = locateNamed(named, chunk.file, files, {
         bases: raw.bases ?? [],
         skipped,
@@ -1086,8 +1126,16 @@ function referenceAtoms(
           ?.some((route) => route.definition === path)
       )
         continue;
-      const isSkipped = target === undefined && skipped.has(path);
-      if (!target && !isSkipped && !DOCUMENT.test(path)) continue;
+      const isSkipped = target === undefined && (skipped.has(path) || ignoredReference(raw, path));
+      // A name without a separator that resolves nowhere has no place. Quoted, backticked or linked with an
+      // extension, it designates a file beside its source and is concrete; a loose word, or a name with no
+      // extension, is information only.
+      const lacksPlace = located.via === 'none' && !located.candidates && !/[/\\]/.test(named);
+      const unresolvedName = lacksPlace && (reference.bare || !pathReference(named));
+      const concreteName = lacksPlace && !unresolvedName;
+      // An absent target is a claim only with evidence of a file: a document or script type, or an
+      // explicitly designated identifier (kept as information). Pairs, versions and dotted names are not.
+      if (!target && !isSkipped && !identifier && !documentFileType(path)) continue;
       if (target && (target.kind === 'guard_script' || SCRIPT.test(path))) continue;
       builder.add({
         kind: 'reference',
@@ -1097,7 +1145,9 @@ function referenceAtoms(
         situation: line.text,
         fields: {
           path,
-          exists: target !== undefined || isSkipped,
+          ...(unresolvedName ? { written: named, unresolved: true } : {}),
+          ...(concreteName ? { concrete: true } : {}),
+          exists: target !== undefined || skipped.has(path),
           readWhen: line.text,
           from: chunk.file,
           ...(isSkipped ? { ignored: true } : {}),
@@ -1108,6 +1158,44 @@ function referenceAtoms(
       });
     }
   }
+}
+
+/**
+ * Existing files that non-normative documents (a changelog, a history, a template, an example) point at.
+ * Such a document is navigation: its links still say that a file is documented, so the file is named, but
+ * it supplies no atom, rule, gate or missing-file finding, and a link from it never makes a file reachable.
+ */
+export function navigationNames(raw: RawEstate): Set<string> {
+  const files = new Map(raw.files.map((file) => [file.path, file]));
+  const named = new Set<string>();
+  const skipped = skippedOf(raw);
+  const options = {
+    bases: raw.bases ?? [],
+    skipped,
+    aliases: raw.aliases ?? {},
+    byName: names(raw, files),
+    externals: raw.externals ?? [],
+  };
+  for (const file of raw.files) {
+    if (isNormative(file) || !/\.(?:md|markdown|txt)$/i.test(file.path)) continue;
+    const lineCount = file.text.split('\n').length;
+    const chunk: ProseChunk = {
+      id: file.path,
+      file: file.path,
+      startLine: 1,
+      endLine: lineCount,
+      text: file.text,
+    };
+    for (const line of chunkLines(chunk, file)) {
+      for (const name of namedPaths(line.text, true)) {
+        if (!positiveMention(line.text, name, ['read', 'open', 'load'])) continue;
+        const located = locateNamed(name, file.path, files, options);
+        if (located.via === 'none' || located.via === 'external' || located.candidates) continue;
+        if (files.has(located.path) && located.path !== file.path) named.add(located.path);
+      }
+    }
+  }
+  return named;
 }
 
 type RouteSource = {
@@ -2320,14 +2408,17 @@ function maskedChunkLines(
         ? readFrontmatter(source.text).bodyLine
         : 1;
       const original = source.text.split('\n');
-      lines = blankFences(original.map((line, index) => (index < body - 1 ? '' : line)).join('\n')).split(
-        '\n',
-      );
+      lines = maskIllustrativePrefixes(
+        blankFences(original.map((line, index) => (index < body - 1 ? '' : line)).join('\n')),
+      ).split('\n');
       MASKED_PROSE.set(source, lines);
     }
     masked = lines.slice(chunk.startLine - 1, chunk.endLine).join('\n');
   } else masked = blankFences(chunk.text);
-  const original = chunk.text.split('\n');
+  // The quote is the line as written in the file: masking a counter-example or an illustration never edits it.
+  const original = source
+    ? source.text.split('\n').slice(chunk.startLine - 1, chunk.endLine)
+    : chunk.text.split('\n');
   return linesOf(masked)
     .filter((line) => line.text !== '')
     .map((line) => ({

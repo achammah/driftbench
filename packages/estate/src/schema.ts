@@ -221,6 +221,34 @@ export const Edge = z.strictObject({
 });
 export type Edge = z.infer<typeof Edge>;
 
+/** Authority is independent of runtime file kind and atom axis/detail role. */
+export const DocumentRole = z.enum([
+  'normative',
+  'changelog',
+  'history',
+  'template',
+  'example',
+  'journal',
+  'fixture',
+  'archive',
+]);
+export type DocumentRole = z.infer<typeof DocumentRole>;
+export const DocumentInfo = z.strictObject({
+  path: z.string().min(1),
+  role: DocumentRole,
+  reasons: z.array(z.string().min(1)).min(1),
+  sections: z
+    .array(
+      z.strictObject({
+        startLine: z.number().int().min(1),
+        endLine: z.number().int().min(1),
+        role: DocumentRole,
+      }),
+    )
+    .optional(),
+});
+export type DocumentInfo = z.infer<typeof DocumentInfo>;
+
 export const EstateMap = z.strictObject({
   version: z.literal(1).describe('Map format version, always 1.'),
   runtime: z.string().min(1).describe('The adapter that read the estate: claude-code, nexus, ...'),
@@ -229,6 +257,10 @@ export const EstateMap = z.strictObject({
     .min(1)
     .describe('The estate root, as given; never an absolute private path in a committed file'),
   readAt: z.string().min(1).describe('ISO time the scan read the estate.'),
+  documents: z
+    .array(DocumentInfo)
+    .optional()
+    .describe('Document authority and non-normative line spans; absent in older maps.'),
   atoms: z.array(Atom).describe('Every atom the scan read from the estate.'),
   edges: z.array(Edge).describe('The edges of the estate graph, decided by code.'),
   space: z.string().optional().describe('Path of the exported space map of the situation axes'),
