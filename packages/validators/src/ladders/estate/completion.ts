@@ -374,9 +374,25 @@ export function completionComponents(spec: Spec): ComponentInventory {
                 witness: text,
                 text,
               });
+            } else if (Array.isArray(a.one_of) && typeof a.one_of[0] === 'string') {
+              const choices = a.one_of;
+              fields.push({
+                name,
+                holds: (value) => choices.includes(value),
+                witness: choices[0],
+                text: choices[0],
+              });
+            } else if (a.nonempty === true) {
+              fields.push({
+                name,
+                holds: (value) => typeof value === 'string' && value !== '',
+                witness: 'fixture',
+              });
             } else if (typeof a.regex === 'string') {
               const pattern = a.regex;
               const witness = patternSample(pattern);
+              // A pattern with no sample (a group, an alternation) leaves the entry unwitnessed: a named gap, not a crash.
+              if (witness === undefined) gap(`${at}.input.${name}.assertion-witness`);
               fields.push({
                 name,
                 holds: (value) => typeof value === 'string' && new RegExp(pattern).test(value),
@@ -465,13 +481,16 @@ export function completionComponents(spec: Spec): ComponentInventory {
                       },
                     }))
                 : [
-                    {
-                      name: `input.${f.name}.foreign`,
+                    { name: 'foreign', value: foreign },
+                    { name: 'empty', value: '' },
+                  ]
+                    .filter((v) => !f.holds(v.value))
+                    .map((v) => ({
+                      name: `input.${f.name}.${v.name}`,
                       edit: (c: ToolCall) => {
-                        c.input = { ...record(c.input), [f.name]: foreign };
+                        c.input = { ...record(c.input), [f.name]: v.value };
                       },
-                    },
-                  ]),
+                    }))),
             ]),
           ];
           for (const variant of variants) {
