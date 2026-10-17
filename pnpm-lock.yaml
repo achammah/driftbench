@@ -361,6 +361,9 @@ importers:
       '@agent-nexus/driftbench-users':
         specifier: workspace:*
         version: link:../users
+      compromise:
+        specifier: 14.18.0
+        version: 14.18.0
       yaml:
         specifier: ^2.9.1
         version: 2.9.1
