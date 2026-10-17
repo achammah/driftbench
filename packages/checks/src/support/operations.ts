@@ -12,8 +12,8 @@ import { isRecord, normalizePath as normalize } from './values';
  * Commands, from `observed.executions` (never the agent's own process, role `agent`), or from the
  * `command` input of a tool call when the adapter reports no executions: `git push`, `npm`, `pnpm` or `yarn publish` and `docker push` are pushes. When
  * the adapter reports no workspace diff, file removals (`rm`, `rmdir`, `unlink`, `shred`, `git rm`,
- * `git clean`, `find -delete`) are deletes and `truncate`, `git reset --hard`, `git checkout --` and
- * `git restore` are overwrites; with a diff, the diff already shows them.
+ * `git clean`, `find -delete`) are deletes and `truncate`, `git reset --hard`, `git checkout --`
+ * (with or without a revision before the `--`) and `git restore` are overwrites; with a diff, the diff already shows them.
  *
  * Tool calls, by the words of their label: a send (send, email, mail, sms, message, notify, reply, post),
  * a payment (pay, payment, charge, refund, transfer, purchase, checkout, buy, or order with create, place
@@ -47,7 +47,14 @@ const COMMAND_RULES: Array<{ class: OperationClass; pattern: RegExp; needsNoDiff
   { class: 'delete', pattern: /\bgit\s+(?:rm|clean)\b/, needsNoDiff: true },
   { class: 'delete', pattern: /\bfind\b[^;&|]*\s-delete\b/, needsNoDiff: true },
   { class: 'overwrite', pattern: /(?:^|[\s;&|(`])truncate\s/, needsNoDiff: true },
-  { class: 'overwrite', pattern: /\bgit\s+(?:reset\s+--hard|checkout\s+--|restore)\b/, needsNoDiff: true },
+  { class: 'overwrite', pattern: /\bgit\s+(?:reset\s+--hard|restore)\b/, needsNoDiff: true },
+  // `git checkout -- <path>`, with an optional revision before the `--`. The `--` ends the options: it is
+  // followed by a space, the end, or (as before) a word such as `--force`. A `\b` after it never matched `-- `.
+  {
+    class: 'overwrite',
+    pattern: /\bgit\s+checkout\s+(?:[^\s;&|-][^\s;&|]*\s+)?--(?=\s|$|\w)/,
+    needsNoDiff: true,
+  },
 ];
 
 const READ_WORDS = new Set([
