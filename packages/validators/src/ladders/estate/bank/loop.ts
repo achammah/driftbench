@@ -19,6 +19,7 @@ import {
   scanRendered,
 } from '../pipeline';
 import { renderEstate } from '../render';
+import { inventedWord } from './askfrom';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
 
 /**
@@ -304,6 +305,50 @@ type AskCheck = {
   check(run: EstateRun, all: SpecVerdict[]): Promise<string | undefined> | string | undefined;
 };
 
+/** The situation each test type is asked in (docs/estate.md section 5); a live guard_positive is instructed. */
+const USE_OF_TEST: Readonly<Record<string, string>> = {
+  outside_trigger: 'outside',
+  guard_negative: 'outside',
+  route_near_miss: 'near_miss',
+  misroute: 'misroute',
+  skip_pressure: 'pressure',
+  stage_skip: 'pressure',
+};
+const NO_ASK = new Set(['invariant', 'setting']);
+
+/**
+ * Whether the bank holds too few approved phrases for a plan row, from the row's atoms alone: the situations of
+ * the row's use that hold its first atom (pins of the cell respected) and the approved phrases of the best one.
+ * A row needs one approved phrase; a twin needs two. No such situation means the bank is short. A live
+ * guard_positive row is asked in a `forced` situation, looked up the same way.
+ */
+function bankIsShort(
+  run: EstateRun,
+  row: { atomIds: string[]; cell: Record<string, string>; testType: string; mode: string },
+): boolean {
+  if (NO_ASK.has(row.testType)) return false;
+  // A live guard test is asked in a `forced` situation, found like any other: no early allowance.
+  const use =
+    row.testType === 'guard_positive' && row.mode === 'live'
+      ? 'forced'
+      : (USE_OF_TEST[row.testType] ?? 'trigger');
+  const head = row.atomIds[0];
+  let best: { atoms: string[]; approved: number } | undefined;
+  let score = -1;
+  for (const situation of run.bank.situations) {
+    if (situation.use !== use || head === undefined || !situation.atoms.includes(head)) continue;
+    const pins = Object.entries(situation.cell ?? {});
+    if (pins.some(([key, value]) => row.cell[key] !== undefined && row.cell[key] !== value)) continue;
+    const held = row.atomIds.filter((id) => situation.atoms.includes(id)).length;
+    if (held > score) {
+      best = { atoms: situation.atoms, approved: situation.phrases.filter((p) => p.approved).length };
+      score = held;
+    }
+  }
+  const need = row.testType === 'twin' ? 2 : 1;
+  return best === undefined || best.approved < need;
+}
+
 function asksOfSpec(verdict: SpecVerdict): string[] {
   return (verdict.spec.loaded?.spec.blocks ?? []).map((block) =>
     String((block.when as { user?: unknown } | undefined)?.user ?? ''),
@@ -585,7 +630,38 @@ const ASKS: AskCheck[] = [
     title: 'every approved plan row gives at least one spec',
     check: (run, all) => {
       const rows = new Set(all.map((v) => v.spec.record.row));
-      const missing = run.plan.plan.rows.filter((row) => row.status === 'approved' && !rows.has(row.id));
+      // docs/estate.md: complete tests with equal semantics share one representative, which lists the rows it stands
+      // for in `metadata.estate.equivalence.planRows`. A row is given a spec that way only when the representative
+      // really covers it: a complete spec of the row's test type and mode that names all the row's atoms and holds
+      // the same situation values, whatever the spec says about itself.
+      const represented = new Map<string, SpecVerdict[]>();
+      for (const v of all) {
+        if (!v.complete) continue;
+        const listed = (estateMeta(v.spec) as { equivalence?: { planRows?: unknown } }).equivalence?.planRows;
+        if (!Array.isArray(listed)) continue;
+        for (const id of listed)
+          if (typeof id === 'string') represented.set(id, [...(represented.get(id) ?? []), v]);
+      }
+      const covers = (v: SpecVerdict, row: (typeof run.plan.plan.rows)[number]): boolean => {
+        const meta = estateMeta(v.spec) as { atoms?: unknown; testType?: unknown; cell?: unknown };
+        const atoms = Array.isArray(meta.atoms) ? (meta.atoms as unknown[]) : [];
+        const own =
+          meta.cell !== null && typeof meta.cell === 'object' ? (meta.cell as Record<string, unknown>) : {};
+        const situation = Object.entries(row.cell).filter(([key]) => !key.startsWith('atoms.'));
+        return (
+          v.spec.record.testType === row.testType &&
+          v.spec.record.mode === row.mode &&
+          meta.testType === row.testType &&
+          row.atomIds.every((id) => atoms.includes(id)) &&
+          situation.every(([key, value]) => own[key] === value)
+        );
+      };
+      const missing = run.plan.plan.rows.filter(
+        (row) =>
+          row.status === 'approved' &&
+          !rows.has(row.id) &&
+          !(represented.get(row.id) ?? []).some((v) => covers(v, row)),
+      );
       return missing.length === 0 ? undefined : `${missing.length} rows give no spec`;
     },
   },
@@ -641,15 +717,51 @@ const ASKS: AskCheck[] = [
   {
     key: 'asks-approved',
     tier: 1,
-    title: 'a complete spec asks only approved phrases',
+    title: 'a complete spec asks an approved phrase, or a disclosed code-written ask where none is approved',
+    // docs/estate.md section 5: an approved phrase always wins; when the bank holds none for the row, code writes
+    // the ask from the atoms, and the spec says so (tag `ask:code`, `metadata.estate.ask: code`, the field the
+    // words came from in `askFrom`). Whether the bank holds one is derived here, from the plan row and its atoms
+    // and the bank: never from the situation the generated spec reports about itself.
     check: (run, all) => {
       const approved = new Set(
         run.bank.situations.flatMap((s) => s.phrases.filter((p) => p.approved).map((p) => p.text)),
       );
+      const rows = new Map(run.plan.plan.rows.map((row) => [row.id, row]));
+      const disclosed = (v: SpecVerdict): boolean => {
+        const spec = v.spec.loaded?.spec as { tags?: unknown } | undefined;
+        const meta = estateMeta(v.spec) as { ask?: unknown; askFrom?: unknown };
+        const tagged = Array.isArray(spec?.tags) && spec.tags.includes('ask:code');
+        if (!tagged || meta.ask !== 'code' || typeof meta.askFrom !== 'string' || meta.askFrom === '')
+          return false;
+        const row = rows.get(v.spec.record.row) ?? rows.get(v.spec.record.row.replace(/\.\d+$/, ''));
+        if (!row) return false;
+        // The row the generator reports is bookkeeping it writes itself: the spec must say the same about itself
+        // (its plan row, its atoms, its test type and the test tag), else the allowance does not apply.
+        const own = estateMeta(v.spec) as { planRow?: unknown; atoms?: unknown; testType?: unknown };
+        const atoms = Array.isArray(own.atoms) ? (own.atoms as unknown[]) : [];
+        if (
+          own.planRow !== row.id ||
+          own.testType !== row.testType ||
+          atoms.length !== row.atomIds.length ||
+          !row.atomIds.every((id) => atoms.includes(id)) ||
+          !(Array.isArray(spec?.tags) && spec.tags.includes(`test:${row.testType}`))
+        )
+          return false;
+        if (!bankIsShort(run, row)) return false;
+        // The words of a code-written ask come from the source it names: an invented phrase has words no source holds.
+        return asksOfSpec(v).every(
+          (ask) =>
+            ask === '' ||
+            approved.has(ask) ||
+            inventedWord(ask, meta.askFrom as string, row.atomIds, run.scanned.map) === undefined,
+        );
+      };
       const bad = all.filter(
-        (v) => v.complete && asksOfSpec(v).some((ask) => ask !== '' && !approved.has(ask)),
+        (v) => v.complete && asksOfSpec(v).some((ask) => ask !== '' && !approved.has(ask)) && !disclosed(v),
       );
-      return bad.length === 0 ? undefined : `${bad.length} complete specs ask an unapproved phrase`;
+      return bad.length === 0
+        ? undefined
+        : `${bad.length} complete specs ask an unapproved phrase that is not a disclosed code-written ask`;
     },
   },
   {
@@ -909,12 +1021,18 @@ export function mutantFamily(): Family {
         const every = byClass.get(cls) ?? [];
         // A mutant the follower's session cannot show is no kill target: it is named, not counted alive.
         const same = every.filter((mutant) => mutant.equivalent);
-        const list = every.filter((mutant) => !mutant.equivalent);
+        // A reference to a missing file has no complete test by contract: named too, judged by its marker.
+        const absent = every.filter((mutant) => mutant.untestable);
+        const list = every.filter((mutant) => !mutant.equivalent && !mutant.untestable);
         const alive = list.filter((mutant) => !mutant.killed);
         const noted =
           same.length === 0
             ? ''
             : ` (${same.length} of ${every.length} not judged, the follower's session is the same without it: ${same[0]?.atom})`;
+        const missing =
+          absent.length === 0
+            ? ''
+            : ` (${absent.length} of ${every.length} not judged, the estate holds no such file and its tests wait on needs-existing-file: ${absent[0]?.atom})`;
         out.set(`${family}.${keyOf(cls)}`, {
           pass: alive.length === 0,
           detail:
@@ -922,8 +1040,8 @@ export function mutantFamily(): Family {
               ? every.length === 0
                 ? 'no atom of the class on this seed'
                 : list.length === 0
-                  ? `no atom of the class changes the follower's session on this seed${noted}`
-                  : `holds${noted}`
+                  ? `no atom of the class changes the follower's session on this seed${noted}${missing}`
+                  : `holds${noted}${missing}`
               : `${alive.length} of ${list.length} live: ${alive[0]?.atom} ${alive[0]?.reason ?? ''}`,
         });
       }

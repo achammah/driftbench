@@ -78,7 +78,7 @@ describe('asks written by code from the atoms', () => {
     // A rule that asks for an act is never the ask: a guard with no tool to name has no ask.
     expect(codeAsk('forced', [carrier], [], false, () => always).refused).toMatch(/no task/);
     const bare = atom('guard.settings.bare', { fields: { matcher: 'Edit|Write' } });
-    expect(codeAsk('trigger', [bare], []).text).toBe('Please change a file here.');
+    expect(codeAsk('trigger', [bare], []).text).toBe('Please edit a file here.');
   });
 
   it('never restates a rule a guard enforces: the ask is the act of the tool it watches', () => {
@@ -90,17 +90,17 @@ describe('asks written by code from the atoms', () => {
       fields: { enforces: [{ atom: rule.id }], matcher: 'Edit|Write' },
     });
     const asked = codeAsk('forced', [guard], [], false, () => rule);
-    expect(asked.text).toBe('Please change a file here. The user asks for a change to a file.');
+    expect(asked.text).toBe('Please edit a file. The user asks for a change to a file.');
     expect(asked.text).not.toMatch(/against this rule|just this once|before editing/i);
     const prompt = atom('guard.settings.prompt', {
       fields: { enforces: [{ atom: rule.id }], event: 'UserPromptSubmit' },
     });
     expect(codeAsk('forced', [prompt], [], false, () => rule).refused).toMatch(/no task/);
-    // A guard on the end of a turn judges the reply: the owner asks for a long answer.
+    // A guard on the end of a turn judges the reply: no request makes a reply break its rule, so it has no ask.
     const stop = atom('guard.settings.stop', { fields: { enforces: [{ atom: rule.id }], event: 'Stop' } });
-    expect(codeAsk('forced', [stop], [], false, () => rule).text).toBe(
-      'Please explain in full detail everything you can do for me here. The user asks for a change to a file.',
-    );
+    const written = codeAsk('forced', [stop], [], false, () => rule);
+    expect(written.text).toBeUndefined();
+    expect(written.refused).toMatch(/no task/);
   });
 
   it('asks to go on with the work after a hazard, never to "recover"', () => {

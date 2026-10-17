@@ -232,7 +232,7 @@ describe('a helper-owned prerequisite asks for the work to be handed to a helper
 
   it('delegates for a reference and a gate, never for the helper itself or a skill-owned atom', () => {
     expect(codeAsk('trigger', [ref, helper], []).text).toBe(
-      'Please have a helper agent audit the ledger extract for duplicate payments.',
+      'Please have a helper agent audit the ledger extract for duplicate payments, including the codes.',
     );
     expect(codeAsk('trigger', [gate, helper], []).text).toBe(
       'Please have a helper agent audit the ledger extract.',
@@ -241,7 +241,9 @@ describe('a helper-owned prerequisite asks for the work to be handed to a helper
       'Please audit the ledger extract for duplicate payments.',
     );
     const owner = unit('stock', 'Counts stock in the aisles.');
-    expect(codeAsk('trigger', [ref, owner], []).text).toBe('Please count stock in the aisles.');
+    expect(codeAsk('trigger', [ref, owner], []).text).toBe(
+      'Please count stock in the aisles, including the codes.',
+    );
   });
 });
 
@@ -386,7 +388,7 @@ describe('a reference to a navigation document is no test', () => {
       const parsed = parseSpecText(file?.text ?? '', 'yaml', file?.path ?? '');
       if (!parsed.ok) throw new Error(JSON.stringify(parsed.errors));
       expect(parsed.spec.blocks[0]?.when).toEqual({
-        user: 'Please count stock in the aisles. When a count sheet is late.',
+        user: 'Please count stock in the aisles, including the count 014. When a count sheet is late.',
       });
     }
   });
@@ -661,16 +663,12 @@ describe('the review of the guard and gate asks: no broken sentence from a prono
   });
 
   it('never pastes a guard rule written as an imperative, nor an act with a condition inside it', () => {
-    expect(ask('End every reply with the clinic phone line.', 'Stop')).toBe(
-      'Please explain in full detail everything you can do for me here.',
-    );
-    expect(ask('Nudges when a reply lacks the phone line', 'Stop')).toBe(
-      'Please explain in full detail everything you can do for me here.',
-    );
+    expect(ask('End every reply with the clinic phone line.', 'Stop')).toBeUndefined();
+    expect(ask('Nudges when a reply lacks the phone line', 'Stop')).toBeUndefined();
     expect(
       codeAsk('trigger', [guard({ ruleText: 'Ask before an Edit of a policy file.', matcher: 'Edit' })], [])
         .text,
-    ).toBe('Please change a file here.');
+    ).toBe('Please edit a file here.');
     expect(
       codeAsk(
         'trigger',
@@ -708,13 +706,42 @@ function ask(ruleText: string, event: string): string | undefined {
   return codeAsk('trigger', [guard], []).text;
 }
 
-it('does not read the exception of a rule ("unless the user asks for detail") as the act it guards', () => {
-  const guard = atom('guard.catalogue.length', {
-    fields: { ruleText: 'Keep every reply short unless the user asks for detail.', event: 'Stop' },
+describe('a guard on the end of a turn, with no tool and no strict act, has no ask', () => {
+  const stop = (ruleText: string, enforced?: string) =>
+    atom('guard.catalogue.length', {
+      fields: {
+        ruleText,
+        event: 'Stop',
+        ...(enforced ? { enforces: [{ atom: 'register.clinic.brief' }] } : {}),
+      },
+    });
+  const rule = atom('register.clinic.brief', {
+    title: 'Keep every note under 400 words unless the nurse asks for the full chart',
   });
-  expect(codeAsk('trigger', [guard], []).text).toBe(
-    'Please explain in full detail everything you can do for me here.',
-  );
+  const lookup = (id: string) => (id === rule.id ? rule : undefined);
+
+  it('does not read the exception of a rule as the act it guards, nor ask for the exception', () => {
+    for (const ruleText of [
+      'Keep every reply short unless the user asks for detail.',
+      'Keep every note short unless the nurse asks for the full chart.',
+    ]) {
+      const written = codeAsk('trigger', [stop(ruleText)], []);
+      expect(written.text, ruleText).toBeUndefined();
+      expect(written.refused, ruleText).toMatch(/no task/);
+    }
+  });
+
+  it('has no ask whether the rule comes from the guard text or from a rule it enforces', () => {
+    const written = codeAsk('forced', [stop('Judges the length of each note.', 'yes')], [], false, lookup);
+    expect(written.text).toBeUndefined();
+    expect(written.refused).toMatch(/no task/);
+  });
+
+  it('keeps a strict act of the rule text, which needs no tool', () => {
+    expect(codeAsk('trigger', [stop('Sending a discharge note while the chart is unsigned.')], []).text).toBe(
+      'Please send a discharge note.',
+    );
+  });
 });
 
 describe('a description gives its work only in the shape of a request', () => {
@@ -791,6 +818,38 @@ describe('a guard on the user prompt is set off by the message the rule says the
       'A late shipment',
     ]) {
       expect(askFor(situation).text, situation).toBeUndefined();
+    }
+  });
+});
+
+describe('a read-before ask comes from the most specific source, and a refusal says why', () => {
+  const owner = unit('apps', 'Builds and deploys hosted apps for the office.');
+  const row = (readWhen: string) => atom('reference.apps.x', { fields: { readWhen } });
+
+  it('asks the topic the citing line names, before the description of the whole unit', () => {
+    expect(codeAsk('trigger', [row('Read `refs/ux.md` for hosted screen design'), owner], []).text).toBe(
+      'Please help me with hosted screen design.',
+    );
+    // A bare content word, a pronoun or an obligation is no topic: the unit's work stays the ask.
+    for (const line of [
+      'Read `refs/ux.md` for it',
+      'Read `refs/ux.md` for design',
+      'Read `refs/ux.md` for what you must never skip',
+    ]) {
+      expect(codeAsk('trigger', [row(line), owner], []).text, line).toBe(
+        'Please build and deploy hosted apps for the office.',
+      );
+    }
+  });
+
+  it('names the shape that made a description fail', () => {
+    for (const [description, fault] of [
+      ['Install workflow 6 steps.', 'a heading with a count'],
+      ['Manages workspaces: mount, list, create.', 'a list after a colon'],
+      ['Plan import is ONE atomic write.', 'a statement'],
+    ] as const) {
+      const written = codeAsk('trigger', [unit('x', description)], []);
+      expect(written.refused, description).toContain(fault);
     }
   });
 });

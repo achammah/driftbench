@@ -160,6 +160,10 @@ export class ClaudeCodeReader implements EstateReader {
   constructor(options: ClaudeCodeReaderOptions = {}) {
     this.budget = Math.max(1, options.chunkCharacters ?? DEFAULT_CHUNK_CHARACTERS);
     this.ignore = options.ignore ?? [];
+    if (options.userSkills !== undefined && options.userSkills.trim() === '')
+      throw new RangeError(
+        'userSkills must name a folder: an empty value would read the working folder as the layer',
+      );
     this.userSkills = options.userSkills;
   }
 
@@ -604,8 +608,10 @@ function userFolderOf(option: string | undefined, config: EstateConfig, root: st
   return resolve(option !== undefined ? process.cwd() : root, home);
 }
 
-/** A name a folder listing skips: hidden (a trash folder, a repository) or a dependency folder. */
+/** A name a folder listing skips: hidden (a repository, an archive) or a dependency folder. */
 const hiddenInLayer = (name: string) => name.startsWith('.') || name === 'node_modules';
+/** The folder a desktop keeps what a user threw away. It is never a container of skills, whatever its case. */
+const trashFolder = (name: string) => name.toLowerCase() === 'trash';
 
 /**
  * The files of the user-level skill layer. A folder of the layer that holds a `SKILL.md` is a skill; one that
@@ -643,6 +649,7 @@ async function readUserLayer(
       skills.push(entry.name);
       continue;
     }
+    if (trashFolder(entry.name)) continue;
     const inside = await readdir(join(folder, entry.name), { withFileTypes: true }).catch(() => []);
     for (const child of [...inside].sort(byName)) {
       const path = join(folder, entry.name, child.name);
@@ -1270,12 +1277,15 @@ function scriptFrom(
       ? relative
       : { script: posix.normalize(posix.join(directory, relative.script)), anchored: anchoredDirectory };
     if (!paths) return first;
-    const target = paths.has(first.script)
+    const dispatched = paths.has(first.script)
       ? dispatchedName(segment, runs, dispatcherSource(first.script, sources))
       : undefined;
     // With source available, an argument is a file only when its data flows to an execution path.
-    if (target === undefined) return first;
+    if (dispatched === undefined) return first;
+    const target = dispatched.path;
     const last = scriptIn(`${JSON.stringify(runs)} ${JSON.stringify(target)}`, directory, paths, true);
+    // A name picked from a table is a script only if the estate holds that file.
+    if (dispatched.existing && (last === undefined || last === first.script)) return first;
     if (last === undefined || last === first.script) {
       // A dispatcher whose target name matches no file still names that target: the guard runs nothing.
       return target === undefined
@@ -1306,7 +1316,11 @@ function dispatcherSource(script: string, sources?: ReadonlyMap<string, string>)
 }
 
 /** The command arguments name files only when source or usage proves their execution role. */
-function dispatchedName(segment: readonly string[], runs: string, source?: string): string | undefined {
+function dispatchedName(
+  segment: readonly string[],
+  runs: string,
+  source?: string,
+): { path: string; existing: boolean } | undefined {
   if (source === undefined) return undefined;
   const words = segment.map((token) => token.replace(/["']/g, ''));
   const index = words.indexOf(runs);
@@ -1765,8 +1779,12 @@ function scriptIn(
     const token = stripAnchor(unquoted);
     if (token === '' || token.startsWith('-') || /^[A-Za-z_][A-Za-z0-9_]*=/.test(token)) continue;
     const named = token.includes('/') || SCRIPT_EXTENSION.test(token);
-    // After a dispatcher, a bare word may name its target script without the extension.
-    const bare = !named && found !== undefined && /^[\w.-]+$/.test(token);
+    // After a dispatcher, a bare word may name its target script without the extension; so may a path the
+    // runner builds from the argument (a module name, a folder and a name).
+    const bare =
+      found !== undefined &&
+      !SCRIPT_EXTENSION.test(token) &&
+      (workingDirectoryFirst ? /^[\w./-]+$/ : /^[\w.-]+$/).test(token);
     if (!named && !bare) continue;
     const names = bare ? [token, ...DISPATCH_EXTENSIONS.map((extension) => `${token}${extension}`)] : [token];
     const searchBases = workingDirectoryFirst && anchorOf(unquoted).anchored ? [''] : bases;

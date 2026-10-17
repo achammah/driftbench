@@ -13,7 +13,14 @@ export {
   RESUME_ASK,
   situationProblem,
 } from './asks';
-export { estateOwners, navigationFiles, navigationReference, taskAtoms } from './context';
+export {
+  estateOwners,
+  holdsRule,
+  navigationFiles,
+  navigationReference,
+  rowOwners,
+  taskAtoms,
+} from './context';
 export { type ReadYaml, readEstateYaml, type YamlSchema } from './files';
 export {
   type AskSource,

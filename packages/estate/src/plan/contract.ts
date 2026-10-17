@@ -1,4 +1,4 @@
-import { estateOwners, navigationFiles, navigationReference } from '@agent-nexus/driftbench-generate';
+import { navigationFiles, navigationReference, rowOwners } from '@agent-nexus/driftbench-generate';
 import type { Atom, AtomKind, Edge, EstateMap, PlanRow, TestType } from '../schema';
 
 /**
@@ -124,7 +124,7 @@ export function contractRows(
   const atoms = map.atoms.filter((atom) => atom.approved);
   const approved = new Set(atoms.map((atom) => atom.id));
   const edges = map.edges.filter((edge) => approved.has(edge.from) && approved.has(edge.to));
-  const ownerOf = estateOwners(atoms, edges);
+  const ownerOf = rowOwners(atoms, edges);
   const navigation = navigationFiles(map.documents);
   const routed = new Set(edges.filter((edge) => edge.kind === 'route').map((edge) => edge.to));
   const rows: DraftRow[] = [];

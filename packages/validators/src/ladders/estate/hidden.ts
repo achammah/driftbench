@@ -80,6 +80,7 @@ export type Topic = {
   missing: { file: string; line: string };
   orphan: string;
   target: string;
+  /** The file the skill edits. It states every figure the topic's register example repeats: a reply states only what was read. */
   targetText: string;
   trigger: [string, string, string];
   pressure: string;
@@ -121,7 +122,7 @@ export const TOPICS: readonly Topic[] = [
     },
     orphan: 'old-tolerances.md',
     target: 'invoices/4411.md',
-    targetText: '# Invoice 4411\nOrder 9921\nTotal 1,250.00 EUR\n',
+    targetText: '# Invoice 4411\nOrder 9921\nTotal 1,250.00 EUR\nDifference 12.00 EUR\n',
     trigger: [
       'Check invoice 4411 against its purchase order.',
       'Please match invoice 4411 with purchase order 9921.',
@@ -163,7 +164,7 @@ export const TOPICS: readonly Topic[] = [
     },
     orphan: 'old-carriers.md',
     target: 'shipments/7731.md',
-    targetText: '# Shipment 7731\nCarrier BLX\nStatus in transit\n',
+    targetText: '# Shipment 7731\nCarrier BLX\nStatus in transit\nWeight 4.5 kg\n',
     trigger: [
       'Update shipment 7731 with the latest carrier status.',
       'Where is shipment 7731 now? Update its record.',
@@ -289,7 +290,7 @@ export const TOPICS: readonly Topic[] = [
     },
     orphan: 'old-rosters.md',
     target: 'rosters/week-42.md',
-    targetText: '# Roster, week 42\nMonday early: Ana\nMonday late: open\n',
+    targetText: '# Roster, week 42\nMonday early: Ana\nMonday late: open\nEarly shift 08:00 to 14:00\n',
     trigger: [
       'Plan the roster for week 42 from the availability list.',
       'Please fill the open shifts of the week 42 roster.',

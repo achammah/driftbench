@@ -87,8 +87,43 @@ export function taskAtoms(
     ? atoms.filter((atom) => !['skill', 'subagent'].includes(atom.kind) || atom.id === owner)
     : [...atoms];
   const unit = owner ? lookup.get(owner) : undefined;
-  if (unit && !result.some((atom) => atom.id === unit.id)) result.push(unit);
+  // The unit joins the row only when it holds the rule: it supplies the task of any rule it owns, but its load is
+  // part of what the row tests only when the rule is written in its own files.
+  if (unit && holdsRule(unit, head) && !result.some((atom) => atom.id === unit.id)) result.push(unit);
   return result;
+}
+
+/** Atom kinds whose rule may be written outside the unit that owns the file they gate. */
+const PREREQUISITE_KINDS: ReadonlySet<string> = new Set(['gate', 'reference']);
+
+/**
+ * Whether a unit holds a rule: a gate or a reference is held by a skill whose folder holds the file it is written in
+ * (or by the helper whose file it is); a rule of any other kind is held by its owner. A prerequisite written in the
+ * standing instructions about a file in a skill's folder is owned by that skill for its task, and held by nobody.
+ */
+export function holdsRule(unit: EstateAtom, rule: EstateAtom): boolean {
+  if (!PREREQUISITE_KINDS.has(rule.kind)) return true;
+  const file = rule.provenance?.file;
+  const home = unit.provenance?.file;
+  if (file === undefined || home === undefined) return true;
+  if (unit.kind === 'subagent') return file === home;
+  const folder = home.slice(0, home.lastIndexOf('/') + 1);
+  return file === home || (folder !== '' && file.startsWith(folder));
+}
+
+/** The owners of the rules a unit holds: the task owner of every atom, kept where the unit holds the atom. */
+export function rowOwners(
+  atoms: readonly EstateAtom[],
+  edges: ReadonlyArray<Link> = [],
+): Map<string, string> {
+  const byId = new Map(atoms.map((atom) => [atom.id, atom]));
+  const held = new Map<string, string>();
+  for (const [atomId, unitId] of estateOwners(atoms, edges)) {
+    const atom = byId.get(atomId);
+    const unit = byId.get(unitId);
+    if (atom && unit && holdsRule(unit, atom)) held.set(atomId, unitId);
+  }
+  return held;
 }
 
 /** Resolve optional documented hook sources to existing rules; a generic matcher is not a situation. */

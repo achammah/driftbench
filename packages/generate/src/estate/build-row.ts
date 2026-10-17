@@ -54,12 +54,12 @@ export function useOf(row: Pick<EstatePlanRow, 'testType' | 'mode'>): SituationU
  * the tool).
  */
 export function situationOfRow(
-  ctx: Pick<Context, 'bank' | 'atoms'>,
+  ctx: Pick<Context, 'bank' | 'atoms'> & Partial<Pick<Context, 'owners'>>,
   use: SituationUse,
   row: EstatePlanRow,
   head: EstateAtom | undefined,
 ): Situation | undefined {
-  const own = findSituation(ctx.bank, use, row, ctx.atoms);
+  const own = findSituation(ctx.bank, use, row, ctx.atoms, ctx.owners?.get(row.atomIds[0] ?? ''));
   // An outside situation of one rule does not certify a control of every rule the guard enforces.
   if (own || (use !== 'trigger' && use !== 'forced')) return own;
   if (head?.kind === 'tool' && use === 'trigger') {
@@ -93,7 +93,7 @@ export function situationOfRow(
 
 /** The situation of the use that lists most atoms read from the file the head atom is read from. */
 function siblingSituation(
-  ctx: Pick<Context, 'bank' | 'atoms'>,
+  ctx: Pick<Context, 'bank' | 'atoms'> & Partial<Pick<Context, 'owners'>>,
   use: SituationUse,
   row: EstatePlanRow,
   head: EstateAtom,
@@ -115,16 +115,26 @@ function siblingSituation(
   return best;
 }
 
-/** Atom kinds whose rule may be written outside the unit that owns the file they gate. */
-const PREREQUISITE_HEADS: ReadonlySet<string> = new Set(['gate', 'reference']);
+/** The atoms a code-written ask reads: the row's, and the unit that owns the rule by folder when the row lacks it. */
+function askAtomsOf(atoms: readonly EstateAtom[], ctx: Context): readonly EstateAtom[] {
+  const first = atoms[0] as EstateAtom;
+  const ownerUnit = ctx.atoms.get(ctx.owners.get(first.id) ?? '');
+  return ownerUnit && !atoms.includes(ownerUnit) ? [...atoms, ownerUnit] : atoms;
+}
 
-/** Whether a rule written in `file` is part of the unit: a skill holds its folder, a helper its own file. */
-function unitHolds(unit: EstateAtom, file: string | undefined): boolean {
-  const home = unit.provenance?.file;
-  if (file === undefined || home === undefined) return true;
-  if (unit.kind === 'subagent') return file === home;
-  const folder = home.slice(0, home.lastIndexOf('/') + 1);
-  return file === home || (folder !== '' && file.startsWith(folder));
+/** The ask code writes for a row from the atoms, or the reason it writes none. */
+function codeAskOf(
+  row: EstatePlanRow,
+  use: SituationUse,
+  askAtoms: readonly EstateAtom[],
+  ctx: Context,
+  variant?: number,
+): ReturnType<typeof codeAsk> {
+  return codeAsk(use, askAtoms, ctx.units, row.testType === 'twin', (id) => ctx.atoms.get(id), variant, {
+    testType: row.testType,
+    routesOf: (id) => ctx.routes.get(id) ?? [],
+    estate: [...ctx.atoms.values()],
+  });
 }
 
 /** The specs of one row: one, or one per recorded session of its situation for a replay row. */
@@ -135,7 +145,18 @@ export function buildRow(row: EstatePlanRow, ctx: Context, used: Set<string>): B
     ctx.owners,
   );
   const use = useOf(row);
-  const situation = use === 'none' ? undefined : situationOfRow(ctx, use, row, atoms[0]);
+  let situation = use === 'none' ? undefined : situationOfRow(ctx, use, row, atoms[0]);
+  // A live guard_positive row with no forced situation, and no ask code can write from the atoms (a guard on the
+  // end of a turn, which no request makes fire without asking for the exception), takes the situation the bank
+  // names for the guard itself: an approved phrase that sets the guard off, else the row waits for one.
+  if (use === 'forced' && !situation && ctx.fallback) {
+    const trigger = situationOfRow(ctx, 'trigger', row, atoms[0]);
+    if (
+      trigger?.phrases.some((entry) => entry.approved) &&
+      codeAskOf(row, use, askAtomsOf(atoms, ctx), ctx).text === undefined
+    )
+      situation = trigger;
+  }
   // The k positive asks of a route (`route_positive.<route>.<n>`) each take their own phrasing.
   const nth = row.testType === 'route_positive' ? /\.(\d+)$/.exec(row.id)?.[1] : undefined;
   const variant = nth !== undefined && Number(nth) > 1 ? Number(nth) - 1 : undefined;
@@ -161,24 +182,14 @@ export function build(
   const polarity = NEGATIVE_TESTS.has(row.testType) ? 'negative' : 'positive';
   // A unit run uses no model, so it cannot observe the load of the skill or helper that owns the atom under
   // test: that owner supplies the task of a live row, never an expectation of a unit one.
-  const scoped =
+  const own =
     row.mode === 'unit' || row.testType === 'contract_alone'
       ? atoms.filter((atom) => atom.kind !== 'subagent' && (row.mode !== 'unit' || atom.kind !== 'skill'))
       : atoms;
-  // The unit that owns a prerequisite supplies the task of the ask. Its load is expected only when the rule is
-  // written in the unit's own files: a standing gate to read a file in a skill's folder does not require the skill.
-  const first0 = atoms[0];
-  const own =
-    first0 && PREREQUISITE_HEADS.has(first0.kind)
-      ? scoped.filter(
-          (atom) =>
-            atom === first0 ||
-            !['skill', 'subagent'].includes(atom.kind) ||
-            unitHolds(atom, first0.provenance?.file),
-        )
-      : scoped;
   const then = thenOf(own, polarity, { ...ctx, live: row.mode === 'live' });
   const first = atoms[0] as EstateAtom;
+  // The unit that owns the rule supplies the task of a code-written ask even when the rule is not part of it.
+  const askAtoms = askAtomsOf(atoms, ctx);
 
   // Test types that add to or change what the atoms say.
   if (row.testType === 'stage_order' || row.testType === 'stage_skip') {
@@ -253,19 +264,7 @@ export function build(
       } else phraseIndex = situation.phrases.indexOf(phrase);
     }
     if (missing && ctx.fallback) {
-      const written = codeAsk(
-        use,
-        atoms,
-        ctx.units,
-        row.testType === 'twin',
-        (id) => ctx.atoms.get(id),
-        variant,
-        {
-          testType: row.testType,
-          routesOf: (id) => ctx.routes.get(id) ?? [],
-          estate: [...ctx.atoms.values()],
-        },
-      );
+      const written = codeAskOf(row, use, askAtoms, ctx, variant);
       if (written.text === undefined) {
         // Never a nonsense ask: the row waits for an approved phrase, under its own gap.
         gap(then, MARKERS.askable, first, written.refused ?? 'the atom gives no task');
@@ -563,10 +562,14 @@ export function findSituation(
   use: SituationUse,
   row: Pick<EstatePlanRow, 'atomIds' | 'cell'>,
   atoms?: ReadonlyMap<string, EstateAtom>,
+  /** The unit that owns the rule by folder, when the row does not carry it (it does not hold the rule). */
+  taskOwner?: string,
 ): Situation | undefined {
   const head = row.atomIds[0];
   const homes = head !== undefined && atoms ? foldersNamedBy(atoms.get(head)) : [];
-  const owner = row.atomIds.slice(1).find((id) => ['skill', 'subagent'].includes(atoms?.get(id)?.kind ?? ''));
+  const owner =
+    row.atomIds.slice(1).find((id) => ['skill', 'subagent'].includes(atoms?.get(id)?.kind ?? '')) ??
+    taskOwner;
   let best: Situation | undefined;
   let score = -1;
   let near = -1;
@@ -578,7 +581,10 @@ export function findSituation(
       owner &&
       atoms?.get(head)?.kind !== 'guard' &&
       ['trigger', 'forced', 'pressure'].includes(use) &&
-      !situation.atoms.includes(owner)
+      !situation.atoms.includes(owner) &&
+      // A situation that names no unit at all is the rule's own, approved for it: only one that names another
+      // skill or helper belongs to that unit's task.
+      situation.atoms.some((id) => ['skill', 'subagent'].includes(atoms?.get(id)?.kind ?? ''))
     )
       continue;
     const pins = Object.entries(situation.cell ?? {});

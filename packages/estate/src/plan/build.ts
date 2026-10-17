@@ -1,9 +1,9 @@
 import { contentHash } from '@agent-nexus/driftbench-core';
 import {
-  estateOwners,
   Feasibility,
   navigationFiles,
   navigationReference,
+  rowOwners,
 } from '@agent-nexus/driftbench-generate';
 import { compileSpace, gridSize, type SpaceMap } from '@agent-nexus/driftbench-space';
 import { toEstateSpaceMap } from '../map/space';
@@ -254,7 +254,7 @@ function journeyRowsOf(result: JourneyResult): PlanRow[] {
 
 function pairwiseRowsOf(map: EstateMap, result: PairwiseResult): PlanRow[] {
   const kindOf = new Map(map.atoms.map((atom) => [atom.id, atom.kind]));
-  const owners = estateOwners(
+  const owners = rowOwners(
     map.atoms.filter((atom) => atom.approved),
     map.edges,
   );

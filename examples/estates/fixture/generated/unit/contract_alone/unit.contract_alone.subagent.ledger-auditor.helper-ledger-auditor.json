@@ -4,7 +4,7 @@
   "testType": "contract_alone",
   "atom": "subagent.ledger-auditor.helper-ledger-auditor",
   "title": "Helper ledger-auditor",
-  "mapHash": "be2e7a0919cb31aecf73102cd271e7611cb439be814983a47b9dc39e38775f10",
+  "mapHash": "fc6a29aea9f4fda876fa747d68a9753526c0cd5e7c0206970de46e853e5629d5",
   "target": {
     "kind": "subagent",
     "name": "ledger-auditor",

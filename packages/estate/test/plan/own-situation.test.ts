@@ -23,6 +23,9 @@ it('keeps the declared owner on both contract and target-only covering rows', as
     const rows = plan.rows.filter((row) => row.atomIds[0] === gate.id);
     expect(rows.some((row) => row.id.startsWith('ordered_pair.'))).toBe(true);
     expect(rows.some((row) => row.id.startsWith('pairwise.'))).toBe(true);
-    for (const row of rows) expect(row.atomIds).toEqual([gate.id, skill.id]);
+    // The standing gate is owned by the skill whose folder holds its file; the skill joins the row only when the gate
+    // is written in the skill's own files.
+    const held = gate.provenance.file.startsWith('.claude/skills/editorial/');
+    for (const row of rows) expect(row.atomIds).toEqual(held ? [gate.id, skill.id] : [gate.id]);
   }
 }, 30_000);

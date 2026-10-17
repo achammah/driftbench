@@ -273,6 +273,52 @@ export function actOf(
   routesOf: (unitId: string) => readonly EstateAtom[] = () => [],
   estate: readonly EstateAtom[] = [],
 ): { act: string; context?: string; source: string; describes?: boolean } {
+  const found = unitActOf(atoms, lookup, routesOf, estate);
+  const head = atoms[0];
+  // A file that states no moment of its own is read at the work of the unit that cites it, which every file of
+  // that unit shares. What tells them apart is what each file is about: its own name.
+  if (head?.kind !== 'reference' || found.act === '' || found.source.startsWith(`${head.id} (`)) return found;
+  const subject = fileSubject(head.fields?.path);
+  if (subject === undefined) return found;
+  // A subject whose words the task already holds is not repeated ("weave a panel" holds "weave panel").
+  const taskWords = new Set(lower(found.act).match(/\p{L}+|\d+/gu) ?? []);
+  if (subject.split(' ').every((word) => taskWords.has(word))) return found;
+  return {
+    ...found,
+    act: `${found.act}, including the ${subject}`,
+    source: `${found.source}, file ${subject}`,
+  };
+}
+
+/** Names that say nothing about what a file is about. */
+const GENERIC_FILE_NAMES = new Set(['skill', 'readme', 'index', 'agents', 'claude', 'memory', 'notes']);
+
+/**
+ * What a file is about, from its own name: "references/api-limits.md" gives "api limits", "data-3.json" gives
+ * "data 3". Undefined when the name is generic, has no letters, or is not a file name.
+ */
+function fileSubject(path: unknown): string | undefined {
+  if (typeof path !== 'string') return undefined;
+  const stem =
+    path
+      .replace(/\\/g, '/')
+      .split('/')
+      .pop()
+      ?.replace(/\.[A-Za-z0-9]+$/, '') ?? '';
+  if (stem === '' || GENERIC_FILE_NAMES.has(stem.toLowerCase())) return undefined;
+  const words = stem
+    .split(/[\s._-]+/)
+    .filter((word) => word !== '')
+    .map((word) => word.toLowerCase());
+  return words.some((word) => /\p{L}{2,}/u.test(word)) ? words.join(' ') : undefined;
+}
+
+function unitActOf(
+  atoms: readonly EstateAtom[],
+  lookup: (id: string) => EstateAtom | undefined,
+  routesOf: (unitId: string) => readonly EstateAtom[],
+  estate: readonly EstateAtom[],
+): { act: string; context?: string; source: string; describes?: boolean } {
   const head = atoms[0];
   if (head?.kind === 'guard') {
     const guarded = guardAct(head, lookup);
@@ -313,6 +359,10 @@ export function actOf(
       if (task) break;
     }
     if (task) return { act: task, source: `${head.id} (readWhen)` };
+    // The citing line says what the file is for ("Read refs/ux.md for hosted screen design"): that topic is
+    // more specific than the description of the whole unit.
+    const topic = readTopic(head.fields.readWhen);
+    if (topic) return { act: `help me with ${topic}`, source: `${head.id} (readWhen topic)` };
   }
   // A route's own situation is narrower than an attached unit's catch-all description.
   if (head?.kind === 'route' && head.situation) {
@@ -346,17 +396,17 @@ export function actOf(
   let described: string | undefined;
   for (const atom of atoms) {
     if (atom.kind === 'route' && atom.situation) {
-      const task = firstWork(atom.situation);
-      if (task) return withContext(task, `${atom.id} (situation)`);
-      described ??= `${atom.id} (situation)`;
+      const work = firstWork(atom.situation);
+      if (work.task) return withContext(work.task, `${atom.id} (situation)`);
+      described ??= `${atom.id} (situation${work.fault ? `: ${work.fault}` : ''})`;
     }
   }
   for (const atom of atoms) {
     const description = typeof atom.fields?.description === 'string' ? atom.fields.description : undefined;
     if ((atom.kind === 'skill' || atom.kind === 'subagent') && description) {
-      const task = firstWork(description);
-      if (task) return withContext(task, `${atom.id} (description)`);
-      described ??= `${atom.id} (description)`;
+      const work = firstWork(description);
+      if (work.task) return withContext(work.task, `${atom.id} (description)`);
+      described ??= `${atom.id} (description${work.fault ? `: ${work.fault}` : ''})`;
     }
   }
   // The owning unit's purpose is its description; when that names no task, the requests that route to it do.
@@ -585,25 +635,55 @@ function requestTask(text: string): string | undefined {
  * mark (a colon), no bare number ("install workflow 6 steps" is a heading with a count), no copula
  * ("plan import is one atomic write" is a sentence about the plan), no subject before the verb.
  */
-/** The first sentence of a description that is a request: a heading or a statement before it is passed over. */
-function firstWork(text: string): string | undefined {
-  const sentences = plain(text).split(/(?<!\b(?:e\.g|i\.e|vs|etc))[.;]\s+/i);
-  for (const sentence of sentences) {
-    const work = workOf(firstSentence(sentence));
-    if (!verbLed(work, true)) continue;
-    const task = taskOf(work, true);
-    if (workable(task)) return task;
+/**
+ * The topic a line that points at a file names: "Read `refs/ux.md` for hosted screen design" gives "hosted screen
+ * design". Two content words at least, no pronoun, no file, no code, and no obligation.
+ */
+function readTopic(line: string): string | undefined {
+  for (const cell of plain(line)
+    .replace(/\S+\.(?:md|markdown|json|ya?ml|txt|csv|html)\b/gi, 'FILE')
+    .split(/\s*\|\s*/)) {
+    const found = /\b(?:read|see|consult|load|open|use)\b[^.;]*?\b(?:for|about|on)\s+([^.;,]+)/i.exec(
+      cell,
+    )?.[1];
+    if (found === undefined) continue;
+    const topic = lower(found.trim());
+    const words = topic.split(/\s+/).filter((word) => /\p{L}{3,}/u.test(word) && !DETERMINERS.has(word));
+    if (words.length < 2 || words.length > 8) continue;
+    if (RULE_WORDS.test(topic) || situationProblem(topic) !== undefined) continue;
+    if (topic.split(/\s+/).some((word) => CLAUSE_WORDS.has(word) || SUBORDINATORS.has(word))) continue;
+    if (askable(`help me with ${topic}`) === undefined) return topic;
   }
   return undefined;
 }
 
+/** The first sentence of a description that is a request: a heading or a statement before it is passed over. */
+function firstWork(text: string): { task?: string; fault?: string } {
+  const sentences = plain(text).split(/(?<!\b(?:e\.g|i\.e|vs|etc))[.;]\s+/i);
+  let fault: string | undefined;
+  for (const sentence of sentences) {
+    const work = workOf(firstSentence(sentence));
+    if (!verbLed(work, true)) continue;
+    const task = taskOf(work, true);
+    const why = workFault(task);
+    if (why === undefined) return { task };
+    fault ??= why;
+  }
+  return fault === undefined ? {} : { fault };
+}
+
 export function workable(task: string): boolean {
+  return workFault(task) === undefined;
+}
+
+/** Why a task taken from a description is no request, in a few words; undefined when it is one. */
+export function workFault(task: string): string | undefined {
   const words = task.split(/\s+/).filter((word) => word !== '');
   const lowered = words.map((word) => word.toLowerCase().replace(/[^a-z0-9']/g, ''));
-  if (task.includes(':')) return false;
+  if (task.includes(':')) return 'a list after a colon';
   // "Use when building a workflow" is a usage note, not a request.
-  if (SUBORDINATORS.has(lowered[1] ?? '')) return false;
-  if (lowered.slice(1).some((word) => /^\d+$/.test(word))) return false;
+  if (SUBORDINATORS.has(lowered[1] ?? '')) return 'a usage note';
+  if (lowered.slice(1).some((word) => /^\d+$/.test(word))) return 'a heading with a count';
   // A copula right after the verb and its bare object makes a statement; one inside a phrase that a preposition
   // or a relative word opened ("notices for customers whose parcels are late") belongs to that phrase.
   const copula = lowered.findIndex((word, index) => index > 0 && COPULAS.has(word));
@@ -613,8 +693,8 @@ export function workable(task: string): boolean {
       .slice(0, copula)
       .some((word) => PREPOSITIONS.has(word) || CLAUSE_WORDS.has(word) || INTERROGATIVES.has(word))
   )
-    return false;
-  return !subjectVerb(task);
+    return 'a statement';
+  return subjectVerb(task) ? 'a statement with a subject' : undefined;
 }
 
 const INTERROGATIVES: ReadonlySet<string> = new Set(['how', 'what', 'where', 'when', 'why', 'whether']);
@@ -1070,11 +1150,29 @@ function referenceSituation(readWhen: string): string | undefined {
   return undefined;
 }
 
+/**
+ * The act a prerequisite clause governs, with a pronoun object resolved to the thing it asks to read: "Read a file
+ * before editing it" governs "edit a file"; "Check the quote before sending it to a carrier" governs "send the quote
+ * to a carrier".
+ */
+function governedOf(text: string): string | undefined {
+  const clean = plain(text);
+  const pronoun =
+    /\b(?:read|load|check|review|consult)\s+(.+?)\s+before\s+([a-z]+ing)\s+(?:it|them|this|that)\b(.*)$/i.exec(
+      clean,
+    );
+  if (pronoun) {
+    const task = actionTask(`${pronoun[2]} ${pronoun[1]}${pronoun[3] ?? ''}`, true);
+    if (task) return task;
+  }
+  return governedAction(clean);
+}
+
 /** What a user asks for to make a tool of Claude Code run: the act the tool performs, in a user's words. */
 const TOOL_ACTS: Readonly<Record<string, string>> = {
-  Edit: 'change a file here',
-  MultiEdit: 'change a file here',
-  Write: 'change a file here',
+  Edit: 'edit a file here',
+  MultiEdit: 'edit a file here',
+  Write: 'edit a file here',
   NotebookEdit: 'change a notebook here',
   Bash: 'run a command in the shell here',
   Read: 'open a file here',
@@ -1108,11 +1206,8 @@ function forcedAct(
       act: TOOL_ACTS[matcher] ?? `use the ${matcher} tool on the files here`,
       ...(context ? { context } : {}),
     };
-  if (event === 'Stop' || event === 'SubagentStop')
-    return {
-      act: 'explain in full detail everything you can do for me here',
-      ...(context ? { context } : {}),
-    };
+  // A guard on the end of a turn judges the reply, and no owner request makes a reply break its rule without
+  // asking for the very exception the rule allows: with no tool and no strict act in its rule it has no ask.
   return null;
 }
 
@@ -1247,8 +1342,36 @@ function guardAct(
     if (forbade) return { act: forbade, source };
     const governed = typeof rule.fields?.trigger === 'string' ? actionTask(rule.fields.trigger) : undefined;
     if (governed) return { act: governed, source, breach: `${governed} without the required prerequisite` };
-    // A rule that asks for an act: the guarded act is the use of the tool the guard watches.
+    // The act the rule's own clause governs ("Read a file before editing it" governs editing a file): the ask names
+    // it, never the rule itself.
+    const watchesTool = typeof guard.fields?.matcher === 'string' && guard.fields.matcher !== '';
+    const clause = watchesTool
+      ? strictAct(governedOf(rule.provenance?.quote ?? rule.title) ?? governedOf(rule.title))
+      : undefined;
+    if (clause) {
+      const context = contextOf(rule);
+      return { act: clause, source, forced: { act: clause, ...(context ? { context } : {}) } };
+    }
+    // A rule that asks for an act: the guarded act is the use of the tool the guard watches, for the work the
+    // rule is about ("Always pass the carrier code to the tracking script" is met or missed while running a
+    // command to pass the carrier code to the tracking script).
     const forced = forcedAct(guard, rule);
+    const obligation = /^(?:always|must|should)\s+(.+)$/i.exec(plain(rule.title))?.[1];
+    // The obligation is an imperative to the agent whose verb the list may not hold ("pass"): it is kept when it has
+    // the other marks of a strict act.
+    const candidate = obligation !== undefined ? lower(firstClause(obligation)) : undefined;
+    const purpose =
+      candidate !== undefined &&
+      candidate.split(/\s+/).length <= 10 &&
+      askable(candidate) === undefined &&
+      !/[:()[\]{}"]/.test(candidate) &&
+      !candidate.split(/\s+/).some((word) => CLAUSE_WORDS.has(word.toLowerCase()))
+        ? candidate
+        : undefined;
+    if (forced && purpose && !forced.message) {
+      const fused = `${forced.act} to ${purpose}`;
+      if (askable(fused) === undefined) return { act: fused, source, forced: { ...forced, act: fused } };
+    }
     return { act: imperative(plain(rule.title)), source, forced };
   }
   const situation = ruleText ? strictSituation(ruleText) : undefined;
@@ -1256,7 +1379,7 @@ function guardAct(
   if (tool) {
     // The object the rule names (from its strict situation) joins the act: "run a command in the shell here for
     // a force push to the shared branch".
-    const object = situation && !tool.act.startsWith('explain') ? `${tool.act} for ${situation}` : tool.act;
+    const object = situation ? `${tool.act} for ${situation}` : tool.act;
     const fused = { act: askable(object) === undefined ? object : tool.act };
     return { act: fused.act, source: `${guard.id} (tool)`, forced: fused };
   }
