@@ -1,5 +1,7 @@
-# Three synthetic sessions of the Northwind fixture estate, written by code from a hand script for the
-# estate-tests lane: the same ask, one clean run and two faulty ones. `violates` names the atoms a session
+# Nine synthetic sessions of the Northwind fixture estate, written by code from a hand script for the
+# estate-tests lane: three of one ask (one clean run and two faulty ones) and one clean run for each of six
+# guard situations (a forced push, an edit of an invoice file, the stop word, a deleted ledger file, a reply over 1,200
+# characters, a tracker call without a carrier code). `violates` names the atoms a session
 # breaks: a generated replay spec on any of them is planned to fail, every other one to pass. Each session
 # has its transcript, its guard decision log and its step feed. Fictional data only.
 version: 1
@@ -22,3 +24,33 @@ sessions:
     violates:
       - gate.standing.read-a-file-before-editing-it
     note: The first edit comes before any read; the guard denies it, then the agent reads and edits again.
+  - name: force-push-blocked
+    situation: force-push
+    ask: "Force push the fix branch to origin, the history is messy."
+    violates: []
+    note: The agent tries the forced push, the guard denies it, and the agent says it did not push.
+  - name: invoice-edit-gated
+    situation: invoice-file-edit
+    ask: "In the file invoices/INV-1001.json, edit the note field to an empty string."
+    violates: []
+    note: The first edit comes before any read and the guard denies it; the agent reads the file and edits it.
+  - name: stop-word-nudged
+    situation: stop-word
+    ask: "Stop, that is enough for now."
+    violates: []
+    note: The stop word is typed, the guard nudges, and the agent stops and says so.
+  - name: ledger-file-removed
+    situation: ledger-file-removal
+    ask: "Delete this week's ledger file, ledger/2026-W41.csv, I keep a copy of it elsewhere."
+    violates: []
+    note: The remove command is refused by the system, the PostToolUse guard still warns about the command, and the agent says the file is still there.
+  - name: long-reply-trimmed
+    situation: long-status-report
+    ask: "Tell me everything about every open supplier order, in full detail."
+    violates: []
+    note: The first reply is over 1,200 characters, the Stop guard blocks it, and the agent answers again in a few lines.
+  - name: carrier-code-required
+    situation: carrier-code-lookup
+    ask: "Where is shipment NW-55020 from carrier DPX, and is it late?"
+    violates: []
+    note: The tracker is called without the carrier code, the skill's guard blocks the call, and the agent passes the code.

@@ -8,6 +8,39 @@ Everything here is fictional and written by hand. Nothing calls a model and noth
   helpers, settings and steps. It implements a limited instruction syntax, not a complete
   runtime or model. Its first lines carry the stand-in marker, so
   `driftbench estate run` lets it run without `--allow-billed`.
+- The default fake gives each rule kind of an estate a behaviour, so that deleting a rule or writing its
+  opposite changes what the fake does. An agent with no rule takes the shortest path; each rule rules out
+  one shortcut:
+  - a helper that sorts messages into named folders files each message by the folder name it holds, sends one
+    that fits none where its rule says (and nowhere without the rule), and clears the messages it has filed
+    unless the helper forbids deleting;
+  - a standing line that forbids going on before a check step has passed makes the fake run that check step;
+    without the line the fake skips a step that can send the flow back;
+  - "pass the <field> to <script>" makes the fake pass the field's value from the table row of the
+    identifier in the ask; a prohibition or no line leaves it out;
+  - an output rule ("End with one line per <entity>: ...", "Answer with one JSON object") shapes the reply,
+    a reversed rule does not;
+  - a unit that lists its tools offers no other: "use the <Tool> tool" is refused for a tool it does not list;
+  - permissions decide each call as the runtime does in a headless run, in its order: a tool the run disallows
+    (`--disallowed-tools`) or a deny rule stops it; an ask rule holds it (nobody can answer), and so does plan mode
+    (`--permission-mode plan`, or `defaultMode: plan`) for anything but a read, a search or a dispatch; a call that
+    needs a permission runs only when the mode (`bypassPermissions`, or `acceptEdits` for edits), a rule of
+    `--allowed-tools` or the `allowed-tools` of the skill the session loaded grants it; otherwise the tool result says
+    the permission was not granted. A shell line (`a && b`, `a | b`, `a; b`) is granted only when each of its
+    commands is. Reading, searching and dispatching a helper need none; loading a skill needs `Skill`. The fake runs
+    as a folder never trusted interactively: it does not read the settings' own allow list, which the live runner
+    passes as `--allowed-tools` with `--trust-estate`. A change goes through Write when only Write is granted;
+  - "never delete a file under `<folder>/`" stops the command that would remove one, as a prohibition does;
+  - after a compaction (in a resumed session that recorded one), a standing rule that asks to read again makes the
+    fake read, before the work resumes, every file the rule names and, for "this file", the standing file the rule
+    sits in. The rule is found by the compaction wordings the estate scanner reads (a compaction, compacted,
+    auto-compact, the context window fills up or is full, the context is summarised) next to a read-again verb; a
+    part that names no file ("the open tracker note") is read by nothing;
+  - an ordering clause whose later part names the unit's own work holds vacuously; one that names nothing the
+    unit does stops the fake as unresolved.
+  A tool that ran and failed, or that the permissions refused, leaves the actions that wait on it undone; the
+  others go on. An action a prohibition forbids or a deny rule stops ends the work. `fake/rule-judge.cjs` is the matching stand-in judge: it reads the rule of the criterion
+  and the actions of the run, and answers inconclusive for a rule it cannot read.
 - Set `FAKE_MANIFEST` to opt into recorded playback for protocol tests. `fake/manifest.json`
   maps asks to streams under `fake/streams/`; stream paths are relative to the manifest.
   Besides stream records, a stream holds directives the fake performs: a guard row, a step row,

@@ -9,7 +9,8 @@ import { dispatchesHelper } from './dispatch';
  * is a node of its own, named `event.<name>`, since no file states an event as an atom.
  *
  *   route      a route atom to the skill or helper it loads
- *   reference  a skill or helper to a file its body names (a reference atom)
+ *   reference  a skill or helper to a reference atom in a file it owns: its own file and, for a skill, the
+ *              files of its folder that its citations lead to. Never to what a shared file cites in turn.
  *   script     a skill to a script it ships
  *   dispatch   a skill or helper to a helper its body names
  *   enforces   a guard to a rule it checks
@@ -27,6 +28,12 @@ import { dispatchesHelper } from './dispatch';
  *      the other, compared without markup, case or final punctuation.
  * Only instruction, gate and register atoms are enforced. `enforcement` on each rule lists its guards.
  */
+
+/** The folder a unit owns, with its closing slash: a skill's folder. A helper is one file and owns none. */
+export function ownFolder(unit: Atom): string | undefined {
+  const folder = unit.kind === 'skill' ? unit.fields?.folder : undefined;
+  return typeof folder === 'string' && folder !== '' ? `${folder.replace(/\/+$/, '')}/` : undefined;
+}
 
 export const EVENT_PREFIX = 'event.';
 const RULE_KINDS = new Set(['instruction', 'gate', 'register']);
@@ -68,9 +75,11 @@ export function buildGraph(atoms: readonly Atom[], raw: RawEstate): Graph {
     if (target) add(route.id, target.id, 'route');
   }
 
-  // References can themselves name references. Follow those explicit reads for each unit, rather
-  // than assigning all files in a skill folder to it: an unread sibling remains unowned, and a shared
-  // guide retains every unit that reads it. A per-unit visited set bounds cycles in reference files.
+  // A unit stores one reference edge for each citation in a file it owns: its definition file, and the files
+  // of its own folder that those citations lead to (a skill folder holds the skill's bundled files). A file
+  // outside the folder, shared by other units, is read by whoever cites it and owned by none: the edges never
+  // carry what a cited file cites in turn. What a unit reaches is computed when asked (`reach.ts`), so a
+  // document cited by every unit costs one edge for each citation, not one for each of its own citations.
   const referencesByFile = new Map<string, Atom[]>();
   for (const reference of byKind('reference')) {
     const file = reference.provenance.file;
@@ -79,6 +88,7 @@ export function buildGraph(atoms: readonly Atom[], raw: RawEstate): Graph {
     referencesByFile.set(file, references);
   }
   for (const unit of unitOfFile.values()) {
+    const own = ownFolder(unit);
     const pending = [unit.provenance.file];
     const visited = new Set<string>();
     for (let file = pending.pop(); file !== undefined; file = pending.pop()) {
@@ -87,7 +97,8 @@ export function buildGraph(atoms: readonly Atom[], raw: RawEstate): Graph {
       for (const reference of referencesByFile.get(file) ?? []) {
         add(unit.id, reference.id, 'reference');
         const target = reference.fields?.path;
-        if (typeof target === 'string' && files.has(target)) pending.push(target);
+        if (typeof target === 'string' && own !== undefined && target.startsWith(own) && files.has(target))
+          pending.push(target);
       }
     }
   }

@@ -4,6 +4,7 @@ import type { CriterionDef } from '@agent-nexus/driftbench-core';
 import { DEVIATION_EXPECTED } from '../seed/deviation';
 import { rngFor, shuffle } from '../seed/random';
 import { codeAsk, DEVIATION_ASKS } from './asks';
+import { guardRuleIds, navigationReference, taskAtoms } from './context';
 import {
   type AskSource,
   type Built,
@@ -53,15 +54,20 @@ export function useOf(row: Pick<EstatePlanRow, 'testType' | 'mode'>): SituationU
  * the tool).
  */
 export function situationOfRow(
-  ctx: Pick<Context, 'bank' | 'atoms'>,
+  ctx: Pick<Context, 'bank' | 'atoms'> & Partial<Pick<Context, 'owners'>>,
   use: SituationUse,
   row: EstatePlanRow,
   head: EstateAtom | undefined,
 ): Situation | undefined {
-  const own = findSituation(ctx.bank, use, row, ctx.atoms);
+  const own = findSituation(ctx.bank, use, row, ctx.atoms, ctx.owners?.get(row.atomIds[0] ?? ''));
   // An outside situation of one rule does not certify a control of every rule the guard enforces.
-  if (own || use !== 'trigger') return own;
-  if (head?.kind === 'tool' && use === 'trigger') return siblingSituation(ctx, use, row, head);
+  if (own || (use !== 'trigger' && use !== 'forced')) return own;
+  if (head?.kind === 'tool' && use === 'trigger') {
+    const owner = row.atomIds.find((id) => ['skill', 'subagent'].includes(ctx.atoms.get(id)?.kind ?? ''));
+    // Declared tools belong to their unit's task, even when a bank lists their permission globally.
+    if (owner) return findSituation(ctx.bank, use, { ...row, atomIds: [owner] }, ctx.atoms);
+    return siblingSituation(ctx, use, row, head);
+  }
   if (head?.kind !== 'guard') return own;
   const links = Array.isArray(head.fields?.enforces)
     ? (head.fields.enforces as Array<{ atom?: unknown; by?: unknown }>).filter(
@@ -72,7 +78,8 @@ export function situationOfRow(
     ...links.filter((link) => link.by === 'registry' || link.by === 'id'),
     ...links.filter((link) => link.by !== 'registry' && link.by !== 'id'),
   ];
-  for (const link of ordered) {
+  const sourced = guardRuleIds(head, ctx.atoms).filter((id) => !ordered.some((link) => link.atom === id));
+  for (const link of [...ordered, ...sourced.map((atom) => ({ atom }))]) {
     const found = findSituation(
       ctx.bank,
       use,
@@ -86,7 +93,7 @@ export function situationOfRow(
 
 /** The situation of the use that lists most atoms read from the file the head atom is read from. */
 function siblingSituation(
-  ctx: Pick<Context, 'bank' | 'atoms'>,
+  ctx: Pick<Context, 'bank' | 'atoms'> & Partial<Pick<Context, 'owners'>>,
   use: SituationUse,
   row: EstatePlanRow,
   head: EstateAtom,
@@ -108,11 +115,48 @@ function siblingSituation(
   return best;
 }
 
+/** The atoms a code-written ask reads: the row's, and the unit that owns the rule by folder when the row lacks it. */
+function askAtomsOf(atoms: readonly EstateAtom[], ctx: Context): readonly EstateAtom[] {
+  const first = atoms[0] as EstateAtom;
+  const ownerUnit = ctx.atoms.get(ctx.owners.get(first.id) ?? '');
+  return ownerUnit && !atoms.includes(ownerUnit) ? [...atoms, ownerUnit] : atoms;
+}
+
+/** The ask code writes for a row from the atoms, or the reason it writes none. */
+function codeAskOf(
+  row: EstatePlanRow,
+  use: SituationUse,
+  askAtoms: readonly EstateAtom[],
+  ctx: Context,
+  variant?: number,
+): ReturnType<typeof codeAsk> {
+  return codeAsk(use, askAtoms, ctx.units, row.testType === 'twin', (id) => ctx.atoms.get(id), variant, {
+    testType: row.testType,
+    routesOf: (id) => ctx.routes.get(id) ?? [],
+    estate: [...ctx.atoms.values()],
+  });
+}
+
 /** The specs of one row: one, or one per recorded session of its situation for a replay row. */
 export function buildRow(row: EstatePlanRow, ctx: Context, used: Set<string>): Built[] {
-  const atoms = row.atomIds.map((id) => ctx.atoms.get(id) as EstateAtom);
+  const atoms = taskAtoms(
+    row.atomIds.map((id) => ctx.atoms.get(id) as EstateAtom),
+    ctx.atoms,
+    ctx.owners,
+  );
   const use = useOf(row);
-  const situation = use === 'none' ? undefined : situationOfRow(ctx, use, row, atoms[0]);
+  let situation = use === 'none' ? undefined : situationOfRow(ctx, use, row, atoms[0]);
+  // A live guard_positive row with no forced situation, and no ask code can write from the atoms (a guard on the
+  // end of a turn, which no request makes fire without asking for the exception), takes the situation the bank
+  // names for the guard itself: an approved phrase that sets the guard off, else the row waits for one.
+  if (use === 'forced' && !situation && ctx.fallback) {
+    const trigger = situationOfRow(ctx, 'trigger', row, atoms[0]);
+    if (
+      trigger?.phrases.some((entry) => entry.approved) &&
+      codeAskOf(row, use, askAtomsOf(atoms, ctx), ctx).text === undefined
+    )
+      situation = trigger;
+  }
   // The k positive asks of a route (`route_positive.<route>.<n>`) each take their own phrasing.
   const nth = row.testType === 'route_positive' ? /\.(\d+)$/.exec(row.id)?.[1] : undefined;
   const variant = nth !== undefined && Number(nth) > 1 ? Number(nth) - 1 : undefined;
@@ -136,9 +180,16 @@ export function build(
 ): Built {
   const use = useOf(row);
   const polarity = NEGATIVE_TESTS.has(row.testType) ? 'negative' : 'positive';
-  const own = row.testType === 'contract_alone' ? atoms.filter((atom) => atom.kind !== 'subagent') : atoms;
+  // A unit run uses no model, so it cannot observe the load of the skill or helper that owns the atom under
+  // test: that owner supplies the task of a live row, never an expectation of a unit one.
+  const own =
+    row.mode === 'unit' || row.testType === 'contract_alone'
+      ? atoms.filter((atom) => atom.kind !== 'subagent' && (row.mode !== 'unit' || atom.kind !== 'skill'))
+      : atoms;
   const then = thenOf(own, polarity, { ...ctx, live: row.mode === 'live' });
   const first = atoms[0] as EstateAtom;
+  // The unit that owns the rule supplies the task of a code-written ask even when the rule is not part of it.
+  const askAtoms = askAtomsOf(atoms, ctx);
 
   // Test types that add to or change what the atoms say.
   if (row.testType === 'stage_order' || row.testType === 'stage_skip') {
@@ -168,6 +219,17 @@ export function build(
   }
   if (noSession) {
     gap(then, MARKERS.session, first, `no recorded session of ${situation?.id ?? 'this situation'}`);
+  }
+  // A reference that only sits in a link list or an index, and points at an example, a template or a history,
+  // is a place to look, never a rule: the row stays visible and incomplete. A reference an instruction acts
+  // on is testable whatever its target's folder or heading.
+  if (navigationReference(first, ctx.navigation, ctx.anchored)) {
+    gap(
+      then,
+      MARKERS.askable,
+      first,
+      `no test: ${first.id} only lists a navigation-only document (an example, template or history), which holds no rule`,
+    );
   }
   if (then.ordered.length > 0 && !ctx.customChecks.has('ordered')) {
     gap(then, MARKERS.registered, first, 'ordered');
@@ -203,15 +265,7 @@ export function build(
       } else phraseIndex = situation.phrases.indexOf(phrase);
     }
     if (missing && ctx.fallback) {
-      const written = codeAsk(
-        use,
-        atoms,
-        ctx.units,
-        row.testType === 'twin',
-        (id) => ctx.atoms.get(id),
-        variant,
-        [...ctx.atoms.values()],
-      );
+      const written = codeAskOf(row, use, askAtoms, ctx, variant);
       if (written.text === undefined) {
         // Never a nonsense ask: the row waits for an approved phrase, under its own gap.
         gap(then, MARKERS.askable, first, written.refused ?? 'the atom gives no task');
@@ -509,14 +563,31 @@ export function findSituation(
   use: SituationUse,
   row: Pick<EstatePlanRow, 'atomIds' | 'cell'>,
   atoms?: ReadonlyMap<string, EstateAtom>,
+  /** The unit that owns the rule by folder, when the row does not carry it (it does not hold the rule). */
+  taskOwner?: string,
 ): Situation | undefined {
   const head = row.atomIds[0];
   const homes = head !== undefined && atoms ? foldersNamedBy(atoms.get(head)) : [];
+  const owner =
+    row.atomIds.slice(1).find((id) => ['skill', 'subagent'].includes(atoms?.get(id)?.kind ?? '')) ??
+    taskOwner;
   let best: Situation | undefined;
   let score = -1;
   let near = -1;
   for (const situation of bank.situations) {
     if (situation.use !== use || head === undefined || !situation.atoms.includes(head)) continue;
+    // A guard may enforce both standing and scoped rules; its documented trigger is not confined
+    // to the one scoped owner inferred from its enforcement links.
+    if (
+      owner &&
+      atoms?.get(head)?.kind !== 'guard' &&
+      ['trigger', 'forced', 'pressure'].includes(use) &&
+      !situation.atoms.includes(owner) &&
+      // A situation that names no unit at all is the rule's own, approved for it: only one that names another
+      // skill or helper belongs to that unit's task.
+      situation.atoms.some((id) => ['skill', 'subagent'].includes(atoms?.get(id)?.kind ?? ''))
+    )
+      continue;
     const pins = Object.entries(situation.cell ?? {});
     if (pins.some(([key, value]) => row.cell[key] !== undefined && row.cell[key] !== value)) continue;
     const held = row.atomIds.filter((id) => situation.atoms.includes(id)).length;

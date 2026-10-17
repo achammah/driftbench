@@ -3,6 +3,8 @@ import { checkSpec, type Issue, stringifyBlockYaml } from '@agent-nexus/driftben
 import type { GeneratedFile } from '../enumerate/generate';
 import { formatJson } from '../enumerate/json';
 import { build, buildRow, situationOfRow, specId, uniqueId, useOf } from './build-row';
+import { anchoredLines, estateOwners, navigationFiles, taskAtoms, unitRoutes } from './context';
+import { equivalenceKey } from './equivalence';
 import {
   type Built,
   type Context,
@@ -137,6 +139,22 @@ export function generateEstateSuite(
   options: EstateGenerateOptions,
 ): EstateGenerateResult {
   checkEstateInputs(input);
+  const lookup = new Map(input.map.atoms.map((atom) => [atom.id, atom]));
+  const owners = estateOwners(input.map.atoms, input.map.edges);
+  input = {
+    ...input,
+    plan: {
+      ...input.plan,
+      rows: input.plan.rows.map((row) => ({
+        ...row,
+        atomIds: taskAtoms(
+          row.atomIds.map((id) => lookup.get(id) as EstateAtom),
+          lookup,
+          owners,
+        ).map((atom) => atom.id),
+      })),
+    },
+  };
   const seed = options.seed ?? ESTATE_DEFAULT_SEED;
   const checks = [...(options.customChecks ?? REPLAY_CUSTOM_CHECKS)].sort();
   const ctx: Context = {
@@ -145,6 +163,10 @@ export function generateEstateSuite(
     bank: input.bank,
     ...(input.sessions ? { sessions: input.sessions } : {}),
     seed,
+    owners,
+    routes: unitRoutes(input.map.atoms, input.map.edges),
+    navigation: navigationFiles(input.map.documents),
+    anchored: anchoredLines(input.map.atoms),
     paths: options.paths,
     fallback: options.fallback ?? true,
     judge: options.judge ?? true,
@@ -184,6 +206,20 @@ export function generateEstateSuite(
   const unitWritten: UnitTest[] = [];
   const unitSkipped: string[] = [];
   const focusCases = new Map<string, Set<string>>();
+  const incomplete: EstateReport['incomplete'] = [];
+  const equivalents = new Map<
+    string,
+    {
+      built: Built;
+      row: EstatePlanRow;
+      file: GeneratedFile;
+      record: EstateSpecRecord;
+      rows: string[];
+      count: number;
+    }
+  >();
+  const askTexts: string[] = [];
+  let collapsed = 0;
   let blocks = 0;
   let judged = 0;
   const focusCaseKey = (built: Built, row: EstatePlanRow): string =>
@@ -193,6 +229,26 @@ export function generateEstateSuite(
   const emit = (built: Built, row: EstatePlanRow, totalsType: Totals, totalsMode: Totals): void => {
     const markers = [...new Set(built.gaps.map((entry) => entry.marker))].sort() as Marker[];
     const complete = markers.length === 0;
+    const key = complete ? equivalenceKey(built, row, ctx.atoms.get(row.atomIds[0] ?? '')) : undefined;
+    const equivalent = key === undefined ? undefined : equivalents.get(key);
+    if (equivalent) {
+      equivalent.count += 1;
+      collapsed += 1;
+      equivalent.rows.push(row.variantOf ?? row.id);
+      equivalent.record.atoms = [...new Set([...equivalent.record.atoms, ...row.atomIds])];
+      const meta = (equivalent.built.spec.metadata as { estate: Record<string, unknown> }).estate;
+      meta.atoms = equivalent.record.atoms;
+      equivalent.record.judged = [...new Set([...equivalent.record.judged, ...built.judgedAtoms])];
+      if (equivalent.record.judged.length > 0) meta.judged = equivalent.record.judged;
+      meta.equivalence = { count: equivalent.count, planRows: equivalent.rows };
+      equivalent.file.text = specText(equivalent.built, equivalent.row, ctx, []);
+      for (const atom of row.atomIds) {
+        const cases = focusCases.get(atom) ?? new Set<string>();
+        cases.add(focusCaseKey(built, row));
+        focusCases.set(atom, cases);
+      }
+      return;
+    }
     const text = specText(built, row, ctx, markers);
     // The text is the writer's rendering of this object, so the object is what is checked (as enumerate does).
     const loaded = checkSpec(built.spec, built.id);
@@ -205,8 +261,9 @@ export function generateEstateSuite(
     const folder = complete ? ESTATE_COMPLETE_DIR : ESTATE_INCOMPLETE_DIR;
     // By mode first, so a replay run takes `specs/replay` and nothing else.
     const path = `${folder}/${row.mode}/${row.testType}/${built.id}.yaml`;
-    files.push({ path, text });
-    records.push({
+    const file = { path, text };
+    files.push(file);
+    const record: EstateSpecRecord = {
       id: built.id,
       path,
       row: row.variantOf ?? row.id,
@@ -220,8 +277,14 @@ export function generateEstateSuite(
       judged: built.judgedAtoms,
       ...(built.session ? { session: built.session.name } : {}),
       ...(built.expect ? { expect: built.expect } : {}),
-    });
+    };
+    records.push(record);
+    if (key !== undefined)
+      equivalents.set(key, { built, row, file, record, rows: [row.variantOf ?? row.id], count: 1 });
+    if (!complete) incomplete.push({ spec: built.id, path, row: row.id, reasons: built.gaps });
     if (complete) {
+      const ask = (built.spec.blocks as Array<{ when?: { user?: string } }>)[0]?.when?.user;
+      if (ask && built.ask !== 'none') askTexts.push(ask);
       const key = focusCaseKey(built, row);
       for (const atom of row.atomIds) {
         const cases = focusCases.get(atom) ?? new Set<string>();
@@ -413,6 +476,24 @@ export function generateEstateSuite(
         : null,
     options: { seed, checks, fallback: ctx.fallback, judge: ctx.judge === true },
     summary: { specs: records.length, blocks, complete, incomplete: records.length - complete, judged },
+    incomplete,
+    equivalence: {
+      collapsed,
+      groups: [...equivalents.values()]
+        .filter((group) => group.count > 1)
+        .map((group) => ({
+          spec: group.built.id,
+          count: group.count,
+          atoms: group.record.atoms,
+          rows: group.rows,
+        })),
+    },
+    quality: {
+      completeShare: records.length ? complete / records.length : 0,
+      askedTests: askTexts.length,
+      distinctAsks: new Set(askTexts).size,
+      distinctAsksPer100: askTexts.length ? (new Set(askTexts).size * 100) / askTexts.length : 0,
+    },
     unit: {
       tests: unitWritten.length,
       guards: new Set(unitWritten.filter((test) => test.target.kind === 'guard').map((test) => test.atom))

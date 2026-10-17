@@ -128,6 +128,11 @@ export function locateQuote(
   );
 }
 
+/** True when the quote is in the given passage (already cut to the span's lines): the extractor's own check. */
+export function quoteWithin(passage: string, quote: string): boolean {
+  return new QuoteIndex(new Map([['passage', passage]])).contains('passage', quote);
+}
+
 /**
  * True when the quote is in the file at the span it claims: the extractor's quote check, run on the lines of
  * the span only.

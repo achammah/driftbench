@@ -1,8 +1,10 @@
 import { basename, posix } from 'node:path';
 import nlp from 'compromise';
 import type { Atom, AtomKind, EvidencePredicate } from '../schema';
+import { isNormative, maskIllustrativePrefixes, normativeEstate } from './document-roles';
 import { guardRuleSources } from './guard-rules';
 import type { EstateFile, GuardDecl, ProseChunk, RawEstate, RegistryRow } from './reader';
+import { documentFileType, ignoredReference, pathReference } from './reference-role';
 import {
   blankFences,
   type Located,
@@ -71,8 +73,6 @@ export const HAZARDS = [
   { id: 'nudge_storm', title: 'Repeated guard nudges', pattern: /\bnudges?\b/i },
 ] as const;
 
-/** Extensions a named file needs to count as a reference when it does not exist. */
-const DOCUMENT = /\.(md|markdown|txt|json|ya?ml|csv|tsv|html|py|sh|js|mjs|ts)$/i;
 const SCRIPT = /\.(sh|bash|py|js|mjs|cjs|ts|rb|pl)$/i;
 
 /** Builds atoms with stable, unique ids: kind, scope and a slug of the title, then -2, -3 on a repeat. */
@@ -155,6 +155,22 @@ export class AtomBuilder {
   }
 }
 
+/**
+ * The verdict a guard source declares on a line of its own, in a comment or a docstring: `Verdict: deny`.
+ * It is read only for a guard the registry gives no verdict.
+ */
+export function declaredVerdict(text: string | undefined): string | undefined {
+  if (text === undefined) return undefined;
+  for (const line of text.split('\n')) {
+    const match =
+      /^\s*(?:[#*/]+\s*)?Verdict\s*:\s*(deny|block|warn|nudge|allow|ask)\s*\.?\s*(?:\*\/|""")?\s*$/i.exec(
+        line,
+      );
+    if (match?.[1]) return match[1].toLowerCase();
+  }
+  return undefined;
+}
+
 /** The name a trace gives a guard: a catalogue check's id, else its script's file name, else a slug of its command. */
 export function guardName(guard: Pick<GuardDecl, 'script' | 'command' | 'check'>): string {
   if (guard.check) return guard.check.id;
@@ -186,6 +202,7 @@ export function registryRowOf(guard: GuardDecl, registry: readonly RegistryRow[]
 
 /** Every atom code reads, in a fixed order, so ids are the same on every run. */
 export function codeAtoms(raw: RawEstate, builder: AtomBuilder): void {
+  raw = normativeEstate(raw);
   const files = new Map(raw.files.map((file) => [file.path, file]));
   const { labels } = raw;
   const dispatch = (name: string): EvidencePredicate => ({
@@ -250,6 +267,11 @@ export function codeAtoms(raw: RawEstate, builder: AtomBuilder): void {
     const name = guardName(guard);
     const row = registryRowOf(guard, raw.registry);
     const rows = registryRowsOf(guard, raw.registry).filter((entry) => entry.origin !== 'catalogue');
+    // With no registry verdict, the guard's own source may declare it on a line of its own: `Verdict: deny`.
+    const declared = row?.verdict
+      ? undefined
+      : declaredVerdict(guard.script ? files.get(guard.script)?.text : undefined);
+    const verdict = row?.verdict ?? declared;
     const script = guard.script ? files.get(guard.script) : undefined;
     const ruleSources = [
       ...(script ? guardRuleSources(script) : []),
@@ -263,13 +285,14 @@ export function codeAtoms(raw: RawEstate, builder: AtomBuilder): void {
       kind: 'guard',
       title: `${guard.event}${guard.matcher ? ` ${guard.matcher}` : ''} guard ${name}`,
       at: guard.at,
-      evidence: [{ type: 'guard', name, ...(row?.verdict ? { verdict: row.verdict } : {}) }],
+      evidence: [{ type: 'guard', name, ...(verdict ? { verdict } : {}) }],
       fields: {
         name,
         event: guard.event,
         command: guard.command,
         anchored: guard.anchored,
         scope: guard.scope,
+        ...(declared ? { verdictFrom: 'source' } : {}),
         ...(ruleSources.length > 0
           ? {
               ruleText: [...new Set(ruleSources.map((source) => source.text))].join('\n'),
@@ -384,6 +407,7 @@ export function codeAtoms(raw: RawEstate, builder: AtomBuilder): void {
   const skillRoots = new Set(raw.skills.map((skill) => posix.normalize(skill.folder)));
   const folderFiles = new Map<string, EstateFile[]>();
   for (const file of raw.files) {
+    // Ownership comes from the folder, not from a document's role: a role limits what prose may declare.
     if (file.kind !== 'skill_file') continue;
     let folder = posix.dirname(posix.normalize(file.path));
     while (!skillRoots.has(folder)) {
@@ -528,14 +552,21 @@ function scriptAtoms(
 }
 
 /** A path and its spelling in the source, before notation is normalized. */
-type NamedReference = { path: string; spelling: string; start: number; end: number };
+type NamedReference = {
+  path: string;
+  spelling: string;
+  start: number;
+  end: number;
+  /** Found as a loose word after a directive, not quoted, linked or backticked. */
+  bare: boolean;
+};
 
 /** Paths a line names, sharing one tokenizer with reference provenance and negation checks. */
-export function namedPaths(line: string): string[] {
-  return namedReferences(line).map(({ path }) => path);
+export function namedPaths(line: string, identifiers = false): string[] {
+  return namedReferences(line, identifiers).map(({ path }) => path);
 }
 
-function namedReferences(line: string): NamedReference[] {
+function namedReferences(line: string, identifiers = false): NamedReference[] {
   const found: NamedReference[] = [];
   const claimed: Array<[number, number]> = [];
   const take = (
@@ -543,6 +574,8 @@ function namedReferences(line: string): NamedReference[] {
     token: string | undefined,
     wiki = false,
     length = match[0].length,
+    identifierContext = false,
+    bare = false,
   ) => {
     const start = match.index ?? 0;
     if (claimed.some(([from, to]) => start >= from && start < to)) return;
@@ -557,15 +590,30 @@ function namedReferences(line: string): NamedReference[] {
       .replace(/:\d+(?::\d+)?$/, '');
     if (wiki && !/\.[A-Za-z0-9]+$/.test(path)) path += '.md';
     const execution = /\b(?:run|execute)(?: the command)?\s*$|\bexample:\s*$/i.test(line.slice(0, start));
+    const identifier =
+      identifiers &&
+      (identifierContext || /^['"*\x60]/.test(match[0])) &&
+      /^[\p{L}_][\p{L}\p{N}_-]*$/u.test(path) &&
+      /\b(?:read|open|load)\s+(?:the\s+)?(?:(?:skill|helper|agent|identifier)\s+)?$/i.test(
+        line.slice(0, start),
+      );
+    // A sentence is not a file name: a name with spaces needs an extension, and no segment exceeds a file name.
+    const sentence =
+      (/\s/.test(path) && !/\.[A-Za-z0-9]+$/.test(path)) || path.split('/').some((part) => part.length > 255);
+    const concrete =
+      !sentence &&
+      pathReference(path) &&
+      !path.endsWith('/') &&
+      (!/\s/.test(posix.basename(path)) || /\.[^./\s]+$/.test(path));
     if (
       /^[a-z]+:/i.test(path) ||
       /[<>*?{}$|;&]/.test(path) ||
       /\s--?\w/.test(path) ||
       (execution && /\s/.test(path)) ||
-      !/\.[A-Za-z0-9]+$/.test(path)
+      (identifiers ? !concrete && !identifier : !/\.[A-Za-z0-9]+$/.test(path))
     )
       return;
-    found.push({ path, spelling, start, end: start + length });
+    found.push({ path, spelling, start, end: start + length, bare });
   };
   for (const match of line.matchAll(/`([^`\n]+)`/g)) take(match, match[1]);
   for (const match of line.matchAll(/\[[^\]\n]*\]\((?:<([^>\n]+)>|([^\s)]+))(?:\s+"[^"]*")?\)/g))
@@ -573,15 +621,26 @@ function namedReferences(line: string): NamedReference[] {
   for (const match of line.matchAll(/"([^"\n]+)"|'([^'\n]+)'/g)) take(match, match[1] ?? match[2]);
   for (const match of line.matchAll(/\[\[([^\]\n|]+)(?:\|[^\]\n]*)?\]\]/g)) take(match, match[1], true);
   for (const match of line.matchAll(/<([^<>\s]+)>|\*\*([^*\n]+)\*\*/g)) take(match, match[1] ?? match[2]);
+  if (identifiers) {
+    for (const match of line.matchAll(
+      /\b(?:read|open|load)\s+(?:the\s+)?(?:skill|helper|agent|identifier)\s+([\p{L}_][\p{L}\p{N}_-]*)(?![\p{L}\p{N}_/\\-]|\.[\p{L}\p{N}_])/giu,
+    )) {
+      const name = match[1];
+      if (!name) continue;
+      const token = [name] as RegExpMatchArray;
+      token.index = (match.index ?? 0) + match[0].length - name.length;
+      take(token, name, false, name.length, true);
+    }
+  }
   // Whole tokens, never a filename extracted from inside a URL, glob, example or link title.
   // Find the directive once: rescanning each token's prefix makes long prose quadratic.
   const directive = /\b(?:read|open|load|consult|include|import|see|use)\b/i.exec(line);
   const directiveEnd = directive ? directive.index + directive[0].length : Number.POSITIVE_INFINITY;
   for (const match of line.matchAll(/[^\s`"'<>()[\],;!]+/g)) {
-    if (!match[0].includes('.')) continue;
+    if (!match[0].includes('.') && !(identifiers && /[/\\]/.test(match[0]))) continue;
     if (!match[0].startsWith('@') && (match.index ?? 0) < directiveEnd) continue;
     const token = match[0].replace(/[.:]+$/, '');
-    take(match, token, false, token.length);
+    take(match, token, false, token.length, false, true);
   }
   return found;
 }
@@ -815,6 +874,12 @@ const PROHIBITION_VERBS = new Set([
 const PROHIBITION_STATES = new Set(['unable', 'inaccessible', 'refrain']);
 const OMISSION_VERBS = new Set(['forget', 'fail', 'omit']);
 
+/** The verdicts of `requiresAct`, by the marked text and the verbs asked about. */
+const MENTION_VERDICTS = new Map<string, boolean>();
+const MENTION_VERDICT_LIMIT = 16_384;
+/** Stands for the mentioned path in a text the grammar reads: the verdict does not depend on how the path is spelled. */
+const MENTION_MARKER = 'estatefilemarker';
+
 /** Whether at least one mention requires the act, rather than forbidding it in its own clause. */
 export function positiveMention(
   text: string,
@@ -823,45 +888,58 @@ export function positiveMention(
   bareNever = false,
 ): boolean {
   if (name === '') return false;
-  const actions = new Set(
-    verbs.flatMap((verb) => [verb, `${verb}s`, `${verb}es`, `${verb}ing`, `${verb}ed`]),
-  );
   let offset = text.indexOf(name);
   while (offset >= 0) {
     // Substitute the path so dots and punctuation in filenames cannot create sentence boundaries.
-    const marker = 'estatefilemarker';
-    const marked = text.slice(0, offset) + marker + text.slice(offset + name.length);
-    const clause =
-      nlp(marked.replace(/[\n;]/g, '. '))
-        .clauses()
-        .splitBefore('(and|or) (#Verb|#Negative)')
-        .out('array')
-        .find((part: string) => part.includes(marker)) ?? marked;
-    // A negation does not reach across a word that reverses or restarts the clause: "never proceed without
-    // reading X" requires the read, "do not read X unless asked" forbids it.
-    const segment = clause
-      .split(/\b(?:without|unless|until|before|but|instead)\b/i)
-      .find((part: string) => part.includes(marker));
-    const parsed = nlp((segment ?? clause).replace(/[‘’]/g, "'"));
-    const terms = parsed.termList();
-    const hasAction = terms.some((term) => actions.has(term.normal));
-    if (!hasAction && !bareNever) return true;
-    // Polarity belongs to the governing clause, including auxiliaries, passive prohibitions and
-    // intervening adverbs. A semantic verb lexicon supplements the parser's grammatical negatives.
-    const predicates = parsed.verbs().json() as Array<{ verb?: { infinitive?: string; negative?: boolean } }>;
-    const prohibits =
-      predicates.some(
-        ({ verb }) =>
-          (verb?.infinitive ?? '').split(' ').some((word) => PROHIBITION_VERBS.has(word)) && !verb?.negative,
-      ) || terms.some((term) => PROHIBITION_STATES.has(term.normal));
-    const negatives = predicates.filter(({ verb }) => verb?.negative);
-    const reminder =
-      negatives.length > 0 && negatives.every(({ verb }) => OMISSION_VERBS.has(verb?.infinitive ?? ''));
-    const negative = terms.some((term) => term.tags?.has('Negative') || term.normal === 'no');
-    if (!prohibits && (!negative || reminder)) return true;
+    const marked = text.slice(0, offset) + MENTION_MARKER + text.slice(offset + name.length);
+    // The grammar reads the marked text alone: lines that differ only in the path they name (the entries of an
+    // index) share one verdict, so each distinct sentence shape is parsed once.
+    const key = `${verbs.join(',')}\u0000${bareNever}\u0000${marked}`;
+    let verdict = MENTION_VERDICTS.get(key);
+    if (verdict === undefined) {
+      verdict = requiresAct(marked, verbs, bareNever);
+      if (MENTION_VERDICTS.size >= MENTION_VERDICT_LIMIT) MENTION_VERDICTS.clear();
+      MENTION_VERDICTS.set(key, verdict);
+    }
+    if (verdict) return true;
     offset = text.indexOf(name, offset + name.length);
   }
   return false;
+}
+
+/** Whether the mention marked in `marked` requires the act in its own clause. */
+function requiresAct(marked: string, verbs: readonly string[], bareNever: boolean): boolean {
+  const actions = new Set(
+    verbs.flatMap((verb) => [verb, `${verb}s`, `${verb}es`, `${verb}ing`, `${verb}ed`]),
+  );
+  const clause =
+    nlp(marked.replace(/[\n;]/g, '. '))
+      .clauses()
+      .splitBefore('(and|or) (#Verb|#Negative)')
+      .out('array')
+      .find((part: string) => part.includes(MENTION_MARKER)) ?? marked;
+  // A negation does not reach across a word that reverses or restarts the clause: "never proceed without
+  // reading X" requires the read, "do not read X unless asked" forbids it.
+  const segment = clause
+    .split(/\b(?:without|unless|until|before|but|instead)\b/i)
+    .find((part: string) => part.includes(MENTION_MARKER));
+  const parsed = nlp((segment ?? clause).replace(/[‘’]/g, "'"));
+  const terms = parsed.termList();
+  const hasAction = terms.some((term) => actions.has(term.normal));
+  if (!hasAction && !bareNever) return true;
+  // Polarity belongs to the governing clause, including auxiliaries, passive prohibitions and
+  // intervening adverbs. A semantic verb lexicon supplements the parser's grammatical negatives.
+  const predicates = parsed.verbs().json() as Array<{ verb?: { infinitive?: string; negative?: boolean } }>;
+  const prohibits =
+    predicates.some(
+      ({ verb }) =>
+        (verb?.infinitive ?? '').split(' ').some((word) => PROHIBITION_VERBS.has(word)) && !verb?.negative,
+    ) || terms.some((term) => PROHIBITION_STATES.has(term.normal));
+  const negatives = predicates.filter(({ verb }) => verb?.negative);
+  const reminder =
+    negatives.length > 0 && negatives.every(({ verb }) => OMISSION_VERBS.has(verb?.infinitive ?? ''));
+  const negative = terms.some((term) => term.tags?.has('Negative') || term.normal === 'no');
+  return !prohibits && (!negative || reminder);
 }
 
 /**
@@ -1034,7 +1112,7 @@ function referenceAtoms(
   for (const line of chunkLines(chunk, files.get(chunk.file))) {
     // A standing line `@path` is an import: the runtime loads that file, so the agent reads nothing.
     if (standing && /^@\S+$/.test(line.text.trim())) continue;
-    const references = namedReferences(line.text);
+    const references = namedReferences(line.text, true);
     if (!references.length) continue;
     const clauses = referenceClauses(line.text, references);
     const past = pastFile(clauses);
@@ -1067,6 +1145,9 @@ function referenceAtoms(
           : !positiveMention(line.text, spelling, ['read', 'open', 'load'])
       )
         continue;
+      const identifier = !pathReference(named);
+      // Declared unit identifiers resolve without naming an absent file.
+      if (identifier && (routeNames(raw).skills.has(named) || routeNames(raw).helpers.has(named))) continue;
       const located = locateNamed(named, chunk.file, files, {
         bases: raw.bases ?? [],
         skipped,
@@ -1086,8 +1167,16 @@ function referenceAtoms(
           ?.some((route) => route.definition === path)
       )
         continue;
-      const isSkipped = target === undefined && skipped.has(path);
-      if (!target && !isSkipped && !DOCUMENT.test(path)) continue;
+      const isSkipped = target === undefined && (skipped.has(path) || ignoredReference(raw, path));
+      // A name without a separator that resolves nowhere has no place. Quoted, backticked or linked with an
+      // extension, it designates a file beside its source and is concrete; a loose word, or a name with no
+      // extension, is information only.
+      const lacksPlace = located.via === 'none' && !located.candidates && !/[/\\]/.test(named);
+      const unresolvedName = lacksPlace && (reference.bare || !pathReference(named));
+      const concreteName = lacksPlace && !unresolvedName;
+      // An absent target is a claim only with evidence of a file: a document or script type, or an
+      // explicitly designated identifier (kept as information). Pairs, versions and dotted names are not.
+      if (!target && !isSkipped && !identifier && !documentFileType(path)) continue;
       if (target && (target.kind === 'guard_script' || SCRIPT.test(path))) continue;
       builder.add({
         kind: 'reference',
@@ -1097,7 +1186,9 @@ function referenceAtoms(
         situation: line.text,
         fields: {
           path,
-          exists: target !== undefined || isSkipped,
+          ...(unresolvedName ? { written: named, unresolved: true } : {}),
+          ...(concreteName ? { concrete: true } : {}),
+          exists: target !== undefined || skipped.has(path),
           readWhen: line.text,
           from: chunk.file,
           ...(isSkipped ? { ignored: true } : {}),
@@ -1108,6 +1199,44 @@ function referenceAtoms(
       });
     }
   }
+}
+
+/**
+ * Existing files that non-normative documents (a changelog, a history, a template, an example) point at.
+ * Such a document is navigation: its links still say that a file is documented, so the file is named, but
+ * it supplies no atom, rule, gate or missing-file finding, and a link from it never makes a file reachable.
+ */
+export function navigationNames(raw: RawEstate): Set<string> {
+  const files = new Map(raw.files.map((file) => [file.path, file]));
+  const named = new Set<string>();
+  const skipped = skippedOf(raw);
+  const options = {
+    bases: raw.bases ?? [],
+    skipped,
+    aliases: raw.aliases ?? {},
+    byName: names(raw, files),
+    externals: raw.externals ?? [],
+  };
+  for (const file of raw.files) {
+    if (isNormative(file) || !/\.(?:md|markdown|txt)$/i.test(file.path)) continue;
+    const lineCount = file.text.split('\n').length;
+    const chunk: ProseChunk = {
+      id: file.path,
+      file: file.path,
+      startLine: 1,
+      endLine: lineCount,
+      text: file.text,
+    };
+    for (const line of chunkLines(chunk, file)) {
+      for (const name of namedPaths(line.text, true)) {
+        if (!positiveMention(line.text, name, ['read', 'open', 'load'])) continue;
+        const located = locateNamed(name, file.path, files, options);
+        if (located.via === 'none' || located.via === 'external' || located.candidates) continue;
+        if (files.has(located.path) && located.path !== file.path) named.add(located.path);
+      }
+    }
+  }
+  return named;
 }
 
 type RouteSource = {
@@ -1197,8 +1326,12 @@ function routeTargets(
   return [...targets.values()];
 }
 
-/** Cell roles are grammatical evidence, not a vocabulary of table headings. */
-type RouteCell = 'request' | 'attribute' | 'fragment';
+/**
+ * Cell roles are grammatical evidence, not a vocabulary of table headings. A `limit` states what a unit does
+ * not do ("Cannot book a berth", "Never use for payments"): it says when not to use the unit, so no route
+ * comes from it.
+ */
+type RouteCell = 'request' | 'attribute' | 'fragment' | 'limit';
 const ROUTE_CELL_CACHE = new Map<string, RouteCell>();
 
 function routeCell(value: string): RouteCell {
@@ -1210,6 +1343,19 @@ function routeCell(value: string): RouteCell {
   ROUTE_CELL_CACHE.set(value, role);
   return role;
 }
+
+/** The first words of a prohibition addressed to the reader, as opposed to a statement about the unit. */
+const IMPERATIVE_LEADS = new Set([
+  'do',
+  "don't",
+  'never',
+  'must',
+  "mustn't",
+  'should',
+  "shouldn't",
+  'shall',
+  'please',
+]);
 
 function readRouteCell(value: string): RouteCell {
   const text = value
@@ -1241,6 +1387,13 @@ function readRouteCell(value: string): RouteCell {
     return 'attribute';
   if (/[,;]\s*\S/.test(text) && text.split(/[,;]/).every((part) => !/\s/.test(part.trim())))
     return 'attribute';
+  // A declarative negation that opens the cell ("Cannot ...", "Does not ...", "Won't ...", "Not for ...") negates
+  // what the cell says about the unit. An imperative prohibition ("Do not ...", "Never ...") is a rule addressed to
+  // the agent, which a table may bind to a unit, and a negation further in ("a tide that has not come in")
+  // belongs to the situation described.
+  const lead = terms.slice(0, 2);
+  if (lead.some((term) => term.tags?.has('Negative')) && !IMPERATIVE_LEADS.has(lead[0]?.normal ?? ''))
+    return 'limit';
 
   // Grammar may strengthen a decision, but a language-specific tagger is never a gate.
   // Distinct free multi-word phrases also describe requests in languages it cannot parse.
@@ -1291,11 +1444,19 @@ function tableRouteTargets(
   return !predicate?.tags?.has('Verb') || predicate.tags.has('Infinitive') ? targets : [];
 }
 
-/** Repeated short values identify categories; distinct free phrases identify requests. */
-function routeColumn(values: string[]): RouteCell {
-  const nonempty = values.filter((value) => value.trim() !== '');
-  if (!nonempty.length) return 'fragment';
-  const roles = nonempty.map(routeCell);
+/**
+ * Repeated short values identify categories; distinct free phrases identify requests. A column whose header
+ * holds a negation ("It cannot do", "Does not handle"), or whose cells mostly open with one, states limits.
+ * A limit cell in another column is left out of its reading.
+ */
+function routeColumn(values: string[], header = ''): RouteCell {
+  const filled = values.filter((value) => value.trim() !== '');
+  if (!filled.length) return 'fragment';
+  const roles = filled.map(routeCell);
+  const limits = roles.filter((role) => role === 'limit').length;
+  if (limits * 2 > filled.length || statesNegation(header)) return 'limit';
+  const nonempty = filled.filter((_value, index) => roles[index] !== 'limit');
+  const kept = roles.filter((role) => role !== 'limit');
   const counts = new Map<string, number>();
   for (const value of nonempty) {
     const key = value.replace(/[`*]/g, '').trim().toLowerCase();
@@ -1312,9 +1473,20 @@ function routeColumn(values: string[]): RouteCell {
     )
   )
     return 'attribute';
-  if (roles.every((role) => role === 'attribute')) return 'attribute';
-  if (roles.every((role) => role === 'request')) return 'request';
+  if (kept.every((role) => role === 'attribute')) return 'attribute';
+  if (kept.every((role) => role === 'request')) return 'request';
   return 'fragment';
+}
+
+/** Whether a heading holds a negation anywhere: "It cannot do", "Does not handle", "Never use it for". */
+function statesNegation(heading: string): boolean {
+  const text = heading.replace(/[`*]/g, '').trim();
+  return (
+    text !== '' &&
+    nlp(text)
+      .termList()
+      .some((term) => term.tags?.has('Negative'))
+  );
 }
 
 function ambiguousRouteTable(
@@ -1376,8 +1548,11 @@ function routeSources(
       cells.some((row) => (row[column]?.length ?? 0) > 0) ? [column] : [],
     );
     if (!targetColumns.length) continue;
-    const roles = table.header.map((_header, column) =>
-      routeColumn(table.rows.map((row) => row.cells[column] ?? '')),
+    const roles = table.header.map((header, column) =>
+      routeColumn(
+        table.rows.map((row) => row.cells[column] ?? ''),
+        header,
+      ),
     );
     const pairs = targetColumns.flatMap((target) =>
       roles.flatMap((role, condition) =>
@@ -1390,13 +1565,13 @@ function routeSources(
       if (condition === undefined) continue;
       for (const [index, row] of table.rows.entries()) {
         const ask = clean(row.cells[condition] ?? '');
-        if (!ask) continue;
+        if (!ask || routeCell(row.cells[condition] ?? '') === 'limit') continue;
         for (const { target: column } of pairs)
           for (const target of cells[index]?.[column] ?? []) {
             add({ ...target, ask, line: row.line, quote: row.text, via: 'table' });
           }
       }
-    } else if (!roles.every((role) => role === 'attribute')) {
+    } else if (!roles.every((role) => role === 'attribute' || role === 'limit')) {
       ambiguousRouteTable(
         raw,
         file,
@@ -2320,14 +2495,17 @@ function maskedChunkLines(
         ? readFrontmatter(source.text).bodyLine
         : 1;
       const original = source.text.split('\n');
-      lines = blankFences(original.map((line, index) => (index < body - 1 ? '' : line)).join('\n')).split(
-        '\n',
-      );
+      lines = maskIllustrativePrefixes(
+        blankFences(original.map((line, index) => (index < body - 1 ? '' : line)).join('\n')),
+      ).split('\n');
       MASKED_PROSE.set(source, lines);
     }
     masked = lines.slice(chunk.startLine - 1, chunk.endLine).join('\n');
   } else masked = blankFences(chunk.text);
-  const original = chunk.text.split('\n');
+  // The quote is the line as written in the file: masking a counter-example or an illustration never edits it.
+  const original = source
+    ? source.text.split('\n').slice(chunk.startLine - 1, chunk.endLine)
+    : chunk.text.split('\n');
   return linesOf(masked)
     .filter((line) => line.text !== '')
     .map((line) => ({

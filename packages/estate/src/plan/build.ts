@@ -1,5 +1,11 @@
 import { contentHash } from '@agent-nexus/driftbench-core';
-import { Feasibility } from '@agent-nexus/driftbench-generate';
+import {
+  anchoredLines,
+  Feasibility,
+  navigationFiles,
+  navigationReference,
+  rowOwners,
+} from '@agent-nexus/driftbench-generate';
 import { compileSpace, gridSize, type SpaceMap } from '@agent-nexus/driftbench-space';
 import { toEstateSpaceMap } from '../map/space';
 import { AtomKind, type EstateMap, type Plan, type PlanRow, TestType } from '../schema';
@@ -120,6 +126,14 @@ export function buildPlan(map: EstateMap, options: PlanOptions = {}): PlanResult
     },
   };
   const notes = [PHRASE_NOTE, ...inferred.notes];
+  const navigation = navigationFiles(map.documents);
+  const anchored = anchoredLines(map.atoms);
+  const navigational = approved.filter((atom) => navigationReference(atom, navigation, anchored)).length;
+  if (navigational > 0) {
+    notes.push(
+      `${navigational} reference${navigational === 1 ? '' : 's'} to documents the map records as navigation only (examples, templates, histories) give no test.`,
+    );
+  }
   if (pairwise.covered < pairwise.allowed) {
     notes.push(
       `The covering array stopped at ${pairwise.cells.length} rows with ${pairwise.allowed - pairwise.covered} t-tuples uncovered: raise the row limit.`,
@@ -242,13 +256,18 @@ function journeyRowsOf(result: JourneyResult): PlanRow[] {
 
 function pairwiseRowsOf(map: EstateMap, result: PairwiseResult): PlanRow[] {
   const kindOf = new Map(map.atoms.map((atom) => [atom.id, atom.kind]));
+  const owners = rowOwners(
+    map.atoms.filter((atom) => atom.approved),
+    map.edges,
+  );
   const width = String(result.cells.length).length;
   return result.cells.map((cell, index) => {
     const kind = kindOf.get(cell.atom);
     const testType = (kind && PRIMARY_TYPE[kind]) ?? 'obligation';
+    const owner = owners.get(cell.atom);
     return {
       id: `pairwise.${String(index + 1).padStart(width, '0')}`,
-      atomIds: [cell.atom],
+      atomIds: owner ? [cell.atom, owner] : [cell.atom],
       cell: { ...cell.situation, [cell.dimension]: cell.atom },
       testType,
       mode: 'live',

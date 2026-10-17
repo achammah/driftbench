@@ -8,7 +8,7 @@
 version: 1
 runtime: claude-code
 root: .
-readAt: 2026-10-16T05:04:02.549Z
+readAt: 2026-10-17T10:09:39.743Z
 atoms:
   - id: skill.invoice-reconcile.skill-invoice-reconcile
     kind: skill
@@ -518,7 +518,7 @@ atoms:
     role: axis
     approved: true
     evidence:
-      - { type: guard, name: reply-length.py }
+      - { type: guard, name: reply-length.py, verdict: deny }
     enforcement: []
     fields:
       name: reply-length.py
@@ -526,21 +526,31 @@ atoms:
       command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/reply-length.py
       anchored: true
       scope: estate
+      verdictFrom: source
       ruleText: |-
         Nudges when the last reply is too long.
+
+        Verdict: deny
         Keep every reply under 1,200 characters unless the user asks for detail.
       ruleSources:
         - kind: documentation
-          text: Nudges when the last reply is too long.
+          text: |-
+            Nudges when the last reply is too long.
+
+            Verdict: deny
           file: .claude/guards/reply-length.py
           startLine: 2
-          endLine: 2
-          quote: '"""Nudges when the last reply is too long."""'
+          endLine: 5
+          quote: |-
+            """Nudges when the last reply is too long.
+
+            Verdict: deny
+            """
         - kind: message
           text: Keep every reply under 1,200 characters unless the user asks for detail.
           file: .claude/guards/reply-length.py
-          startLine: 9
-          endLine: 9
+          startLine: 12
+          endLine: 12
           quote: print("Keep every reply under 1,200 characters unless the user asks for detail.", file=sys.stderr)
       rules: []
       script: .claude/guards/reply-length.py
@@ -1399,6 +1409,27 @@ atoms:
       path: .claude/skills/invoice-reconcile/references/matching-rules.md
       spans:
         - references/matching-rules.md
+  - id: reference.shipment-tracker.read-data-shipments-txt
+    kind: reference
+    title: Read data/shipments.txt
+    provenance:
+      file: .claude/skills/shipment-tracker/SKILL.md
+      startLine: 20
+      endLine: 20
+      quote: The local carrier table is `data/shipments.txt`.
+      hash: 7c900bf4edbf9ac7c4f86c1e26b8e4e10ca0e13d2c055cb271061a187dbd091f
+    producedBy: code
+    role: detail
+    approved: true
+    situation: The local carrier table is `data/shipments.txt`.
+    evidence:
+      - { type: tool_called, label: Read, input: { file_path: { contains: .claude/skills/shipment-tracker/data/shipments.txt } } }
+    enforcement: []
+    fields:
+      path: .claude/skills/shipment-tracker/data/shipments.txt
+      exists: true
+      readWhen: The local carrier table is `data/shipments.txt`.
+      from: .claude/skills/shipment-tracker/SKILL.md
   - id: reference.supplier-email.read-claude-memory-supplier-languages-md
     kind: reference
     title: Read .claude/memory/supplier-languages.md
@@ -2547,6 +2578,111 @@ atoms:
       rowsWithoutGuard:
         - G6
       holds: false
+documents:
+  - path: CLAUDE.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/agents/inbox-triager.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/agents/ledger-auditor.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/agents/route-planner.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/guards/CHECK-REGISTRY.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/guards/block-force-push.sh
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/guards/ledger-guard.py
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/guards/read-before-edit.py
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/guards/reply-length.py
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/guards/stop-word.sh
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/memory/MEMORY.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/memory/supplier-languages.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/settings.json
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/skills/invoice-reconcile/SKILL.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/invoice-reconcile/references/currency-table.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/invoice-reconcile/references/matching-rules.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/invoice-reconcile/references/old-tolerances.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/invoice-reconcile/scripts/reconcile.py
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/skills/shipment-tracker/SKILL.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/shipment-tracker/data/shipments.txt
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/shipment-tracker/scripts/check-carrier.sh
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/skills/shipment-tracker/scripts/track.sh
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/skills/supplier-email/SKILL.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/weekly-report/SKILL.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/weekly-report/templates/report.md
+    role: template
+    reasons:
+      - "navigation folder: templates"
+  - path: .claude/steps.json
+    role: normative
+    reasons:
+      - runtime structure or executable
 edges:
   - { from: guard.settings.posttooluse-bash-guard-ledger-guard-py, to: instruction.standing.never-delete-a-ledger-file-archive, kind: enforces }
   - { from: guard.settings.posttooluse-bash-guard-ledger-guard-py, to: event.PostToolUse, kind: event }
@@ -2584,6 +2720,7 @@ edges:
   - { from: skill.invoice-reconcile.skill-invoice-reconcile, to: script.invoice-reconcile.script-scripts-reconcile-py, kind: script }
   - { from: skill.shipment-tracker.skill-shipment-tracker, to: tool.invoice-reconcile.declared-bash, kind: allows }
   - { from: skill.shipment-tracker.skill-shipment-tracker, to: tool.settings.allow-read, kind: allows }
+  - { from: skill.shipment-tracker.skill-shipment-tracker, to: reference.shipment-tracker.read-data-shipments-txt, kind: reference }
   - { from: skill.shipment-tracker.skill-shipment-tracker, to: script.shipment-tracker.script-scripts-track-sh, kind: script }
   - { from: skill.supplier-email.skill-supplier-email, to: reference.supplier-email.read-claude-memory-supplier-languages-md, kind: reference }
   - { from: skill.weekly-report.skill-weekly-report, to: tool.invoice-reconcile.declared-bash, kind: allows }
@@ -2605,5 +2742,5 @@ edges:
 producedBy:
   family: lane
   model: claude-opus-5-5 as the estate lane, by hand
-  at: 2026-10-16T05:04:02.549Z
-hash: be2e7a0919cb31aecf73102cd271e7611cb439be814983a47b9dc39e38775f10
+  at: 2026-10-17T10:09:39.743Z
+hash: e48ea73788c2fb36e8def0b10b39a3551139beb107f54959237f272c2aa7ba41
