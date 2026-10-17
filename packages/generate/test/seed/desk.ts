@@ -8,7 +8,13 @@ const by = {
   approved: true,
   evidence: { source: 'desk.md', quote: 'Keep the pending parcel step after an aside.' },
 };
-export type Flow = { id: string; stages: readonly string[]; classes: readonly DeviationClass[] };
+export type Flow = {
+  id: string;
+  stages: readonly string[];
+  classes: readonly DeviationClass[];
+  /** Other routes of the same flow: one more path each, with the same recoveries. */
+  alsoStages?: ReadonlyArray<readonly string[]>;
+};
 const PHRASES: Partial<Record<DeviationClass, { text: string; lang: string }>> = {
   D1_off_topic: { text: 'Do you sell postcards?', lang: 'en' },
   D3_contradiction: { text: 'Actually the address is Elm Street.', lang: 'en' },
@@ -29,10 +35,15 @@ export function desk(
     values: ids.map((id) => ({ id, title: id, ...by })),
     ...by,
   });
-  const stages = [...new Set(flows.flatMap((flow) => flow.stages))];
+  const routes = (flow: Flow) => [flow.stages, ...(flow.alsoStages ?? [])];
+  const stages = [...new Set(flows.flatMap((flow) => routes(flow).flat()))];
   const classes = [...new Set(flows.flatMap((flow) => flow.classes))];
   const moves = [
-    ...new Set(flows.flatMap((flow) => flow.stages.slice(1).map((to, i) => `${flow.stages[i]}-to-${to}`))),
+    ...new Set(
+      flows.flatMap((flow) =>
+        routes(flow).flatMap((route) => route.slice(1).map((to, i) => `${route[i]}-to-${to}`)),
+      ),
+    ),
   ];
   const proposal: Proposal = {
     version: 1,
@@ -69,23 +80,35 @@ export function desk(
       })),
     ],
     relations: [
-      ...flows.map((flow) => ({
-        kind: 'path' as const,
-        id: `${flow.id}-route`,
-        flow: flow.id,
-        stages: [...flow.stages],
-        ...by,
-      })),
       ...flows.flatMap((flow) =>
-        flow.stages.slice(0, -1).map((stage, index) => ({
-          kind: 'states' as const,
-          subject: { dimension: 'flow', value: flow.id },
-          stage,
-          to: flow.stages[index + 1],
-          must: ['Parcel step confirmed'],
+        routes(flow).map((route, index) => ({
+          kind: 'path' as const,
+          id: index === 0 ? `${flow.id}-route` : `${flow.id}-route-${index + 1}`,
+          flow: flow.id,
+          stages: [...route],
           ...by,
         })),
       ),
+      ...flows.flatMap((flow) => {
+        const seen = new Set<string>();
+        return routes(flow).flatMap((route) =>
+          route.slice(0, -1).flatMap((stage, index) => {
+            const key = `${stage}>${route[index + 1]}`;
+            if (seen.has(key)) return [];
+            seen.add(key);
+            return [
+              {
+                kind: 'states' as const,
+                subject: { dimension: 'flow', value: flow.id },
+                stage,
+                to: route[index + 1],
+                must: ['Parcel step confirmed'],
+                ...by,
+              },
+            ];
+          }),
+        );
+      }),
       ...classes.map((cls) => ({
         kind: 'recovery' as const,
         class: cls,
@@ -172,4 +195,27 @@ export function twoPersonas() {
     ['desk'],
     ['novice', 'expert'],
   );
+}
+
+/** One flow with two routes to the last stage: the same last move is said after different earlier moves. */
+export function twoRoutes() {
+  return desk([
+    {
+      id: 'parcel',
+      stages: ['welcome', 'address', 'packing', 'receipt'],
+      alsoStages: [['welcome', 'packing', 'receipt']],
+      classes: ['D1_off_topic'],
+    },
+  ]);
+}
+
+/** One flow whose route stays on one stage for several moves: that stage is placed far more often than the last. */
+export function lingering() {
+  return desk([
+    {
+      id: 'parcel',
+      stages: ['welcome', 'address', 'address', 'address', 'address', 'address', 'receipt'],
+      classes: ['D1_off_topic'],
+    },
+  ]);
 }

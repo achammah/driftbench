@@ -1,9 +1,11 @@
+import { validateSpec } from '@agent-nexus/driftbench-core';
 import { describe, expect, it } from 'vitest';
 import type { PathRelation } from '../../src/extract/proposal';
-import type { SpecDraft } from '../../src/seed/assemble';
+import { Allocation } from '../../src/seed/allocation';
+import { renderDraft, type SpecDraft } from '../../src/seed/assemble';
 import { TerminalSubsumption } from '../../src/seed/minimal';
 import { type SeedContext, scenarioDraft } from '../../src/seed/seed-drafts';
-import { fixture, split, twoChannels, twoPersonas } from './desk';
+import { fixture, lingering, split, twoChannels, twoPersonas, twoRoutes } from './desk';
 
 const run = { seed: 1031, mapPath: '../desk.yaml' };
 
@@ -360,5 +362,148 @@ describe('terminal subsumption and the persona a walk is written for', () => {
     const length = again.blocks.length;
     for (const draft of [written, holder, again]) minimal.reduce(draft);
     expect(again.blocks.length).toBeLessThan(length);
+  });
+});
+
+describe('the checks a cut has to pass before it is made', () => {
+  const clean = (draft: ReturnType<typeof walk>) => {
+    draft.perturbations = undefined;
+    return draft;
+  };
+
+  it('keeps the move pairs: a walk whose last move follows a move no written walk makes keeps its end', () => {
+    const prepared = twoRoutes();
+    const [long, short] = prepared.relations.paths;
+    if (!long || !short) throw new Error('missing parcel paths');
+    const minimal = new TerminalSubsumption(prepared, run, 2);
+    // The short route says the same last move from the same stage as the long one, but after another move.
+    // Every tuple of its end is held by the long walk: only the pair of consecutive moves is new.
+    const first = clean(walk(prepared, 'first', long));
+    const second = clean(walk(prepared, 'second', short));
+    const length = second.blocks.length;
+    minimal.reduce(first);
+    minimal.reduce(second);
+    expect(second.blocks).toHaveLength(length);
+  });
+
+  it('cuts that same end once a written walk makes the pair', () => {
+    const prepared = twoRoutes();
+    const [long, short] = prepared.relations.paths;
+    if (!long || !short) throw new Error('missing parcel paths');
+    const minimal = new TerminalSubsumption(prepared, run, 2);
+    const first = clean(walk(prepared, 'first', long));
+    const second = clean(walk(prepared, 'second', short));
+    const third = clean(walk(prepared, 'third', short));
+    const length = third.blocks.length;
+    for (const draft of [first, second, third]) minimal.reduce(draft);
+    expect(third.blocks.length).toBeLessThan(length);
+  });
+
+  it('keeps the allocation: a cut that leaves the rarest stage further under its floor is not made', () => {
+    const prepared = lingering();
+    const path = prepared.relations.paths[0];
+    if (!path) throw new Error('missing parcel path');
+    const allocation = new Allocation(prepared);
+    const minimal = new TerminalSubsumption(prepared, run, 2, allocation);
+    // The route stays on one stage for five moves and reaches the last stage once. Two walks of it say the last
+    // move twice; cutting the second walk's end would leave the last stage placed once against ten times for the
+    // stage it lingers on, further from the floor than before.
+    const first = clean(walk(prepared, 'first', path));
+    const second = clean(walk(prepared, 'second', path));
+    const length = second.blocks.length;
+    for (const draft of [first, second]) {
+      minimal.reduce(draft);
+      allocation.observeDraft(draft);
+    }
+    expect(second.blocks).toHaveLength(length);
+  });
+
+  it('cuts that end when no allocation is kept', () => {
+    const prepared = lingering();
+    const path = prepared.relations.paths[0];
+    if (!path) throw new Error('missing parcel path');
+    const minimal = new TerminalSubsumption(prepared, run, 2);
+    const first = clean(walk(prepared, 'first', path));
+    const second = clean(walk(prepared, 'second', path));
+    const length = second.blocks.length;
+    for (const draft of [first, second]) minimal.reduce(draft);
+    expect(second.blocks.length).toBeLessThan(length);
+  });
+
+  it('never leaves a walk ending on a tool failure: the retry that follows it is part of the test', () => {
+    const prepared = fixture();
+    const path = prepared.relations.paths[0];
+    if (!path) throw new Error('missing parcel path');
+    const answer = (found: boolean) => ({ world: { tools: { lookup: { result: { found } } } } });
+    const failing = { world: { tools: { lookup: { error: 'service unavailable' } } } };
+    const minimal = new TerminalSubsumption(prepared, run, 2);
+    // Both walks end on a block that sees the same answer; the second has a failure on the block before it.
+    const first = clean(walk(prepared, 'first', path));
+    const second = clean(walk(prepared, 'second', path));
+    const last = first.blocks.length - 1;
+    for (const draft of [first, second]) {
+      const block = draft.blocks[last];
+      if (block) block.given = answer(true);
+    }
+    const before = second.blocks[last - 1];
+    if (!before) throw new Error('missing block');
+    before.given = failing;
+    const length = second.blocks.length;
+    minimal.reduce(first);
+    minimal.reduce(second);
+    expect(second.blocks).toHaveLength(length);
+  });
+
+  describe('what a block is, beyond the Then', () => {
+    const specOf = (prepared: ReturnType<typeof fixture>, id: string) => {
+      const path = prepared.relations.paths[0];
+      if (!path) throw new Error('missing parcel path');
+      const parsed = validateSpec(renderDraft(prepared, clean(walk(prepared, id, path)), run).spec);
+      if (!parsed.ok) throw new Error('the walk is not a valid spec');
+      return parsed.spec;
+    };
+    const keyOf = (prepared: ReturnType<typeof fixture>, spec: ReturnType<typeof specOf>, index: number) =>
+      (
+        new TerminalSubsumption(prepared, run, 2) as unknown as {
+          key(spec: unknown, index: number): string;
+        }
+      ).key(spec, index);
+
+    it('is another block when it is said from another stage', () => {
+      const prepared = fixture();
+      const spec = specOf(prepared, 'a');
+      const other = structuredClone(spec);
+      const before = other.blocks[1];
+      if (!before?.expect) throw new Error('missing expect');
+      before.expect = { ...before.expect, stage: 'welcome' };
+      expect(keyOf(prepared, other, 2)).not.toBe(keyOf(prepared, spec, 2));
+    });
+
+    it('is another block in another language', () => {
+      const prepared = fixture();
+      const spec = specOf(prepared, 'a');
+      const other = { ...structuredClone(spec), lang: 'NL' };
+      expect(keyOf(prepared, other, 1)).not.toBe(keyOf(prepared, spec, 1));
+    });
+
+    it('is another block under other rules', () => {
+      const prepared = fixture();
+      const spec = specOf(prepared, 'a');
+      const other = {
+        ...structuredClone(spec),
+        rules: { ...spec.rules, forbidden_tools: ['export_everything'] },
+      };
+      expect(keyOf(prepared, other, 1)).not.toBe(keyOf(prepared, spec, 1));
+    });
+
+    it('is another block when an earlier block changed the world the tools answer in', () => {
+      const prepared = fixture();
+      const spec = specOf(prepared, 'a');
+      const other = structuredClone(spec);
+      const first = other.blocks[0];
+      if (!first) throw new Error('missing block');
+      first.given = { world: { tools: { lookup: { result: { found: false } } } } };
+      expect(keyOf(prepared, other, 2)).not.toBe(keyOf(prepared, spec, 2));
+    });
   });
 });
