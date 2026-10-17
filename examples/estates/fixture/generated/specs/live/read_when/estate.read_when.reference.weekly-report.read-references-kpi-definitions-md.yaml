@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please help me with the weekly report or a summary of last week.
+      user: Please help me with the weekly report or a summary of last week, including the kpi definitions.
     expect:
       skills:
         - name: weekly-report
@@ -60,5 +60,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: skill.weekly-report.skill-weekly-report (asks it names)
+    askFrom: skill.weekly-report.skill-weekly-report (asks it names), file kpi definitions
     outcome: no-delete
