@@ -2,6 +2,7 @@
 
 import type { PerturbationSpec } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
+import { failableBehaviourTurns, flowsHolding } from '../extract/behaviour-turns';
 import {
   FLOW_DIMENSION,
   type PathRelation,
@@ -29,7 +30,7 @@ import {
 import type { Edge, StageGraph } from './graph';
 import { behaviourSubject, dimensionId, type PreparedMap, phraseKey, valueId } from './map';
 import { pick, type Rng, rngFor, shuffle, streamSeed } from './random';
-import { failureTools, slotsOf } from './relations';
+import { slotsOf } from './relations';
 import { buildScenario, type ProbeRequest, type ScenarioRequest } from './scenario';
 import { worldFor } from './world';
 
@@ -70,11 +71,7 @@ export function hasPaths(prepared: PreparedMap): boolean {
 
 /** The flows a behaviour belongs to, by the inventory, by id. A flow value is its own flow. */
 export function flowsOfBehaviour(prepared: PreparedMap, behaviour: string): string[] {
-  const flows = (prepared.inventory?.flows ?? [])
-    .filter((flow) => flow.id === behaviour || (flow.behaviours ?? []).includes(behaviour as never))
-    .map((flow) => flow.id);
-  const own = prepared.relations.paths.some((path) => path.flow === behaviour);
-  return own && !flows.includes(behaviour) ? [behaviour, ...flows] : flows;
+  return flowsHolding(prepared.inventory, prepared.relations.paths, behaviour);
 }
 
 export type PathTry = { draft: SpecDraft; path: PathRelation } | { reasons: string[] };
@@ -367,22 +364,20 @@ export function behaviourFailureDraft(
   behaviour: string | undefined,
 ): PathTry {
   const reasons: string[] = [];
-  const sideEffecting = new Set(
-    prepared.relations.paths.flatMap((path) =>
-      path.end_state ? [path.end_state.source.replace(/^tool:/, '')] : [],
-    ),
-  );
+  // The same rule the derived map and the target use: which turns that ask a behaviour can fail a tool.
+  const turns = failableBehaviourTurns({
+    relations: prepared.relations,
+    phrases: prepared.phrases,
+    inventory: prepared.inventory,
+    isBehaviour: (dimension) => behaviourSubject(prepared, { dimension }),
+  });
   for (const path of paths) {
-    const recoverable = failureTools(prepared.relations, TOOL_FAILURE, path.flow);
     const reads = new Map<string, UsesToolRelation[]>();
-    for (const use of prepared.relations.usesTools) {
-      if (!behaviourSubject(prepared, use.subject) || !recoverable.includes(use.tool)) continue;
-      if (sideEffecting.has(use.tool) || (use.to !== undefined && use.to !== use.stage)) continue;
+    for (const { use, flows } of turns) {
+      if (!flows.includes(path.flow)) continue;
       reads.set(use.subject.value, [...(reads.get(use.subject.value) ?? []), use]);
     }
-    const askable = [...reads.keys()]
-      .filter((value) => flowsOfBehaviour(prepared, value).includes(path.flow))
-      .sort((a, b) => Number(b === behaviour) - Number(a === behaviour));
+    const askable = [...reads.keys()].sort((a, b) => Number(b === behaviour) - Number(a === behaviour));
     for (const value of askable) {
       const dimension = prepared.space.dimensions.findIndex(
         (entry) =>

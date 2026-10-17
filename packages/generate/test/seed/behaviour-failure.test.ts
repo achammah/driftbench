@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { Proposal } from '../../src/extract/proposal';
 import { renderDraft } from '../../src/seed/assemble';
 import { prepareMap } from '../../src/seed/map';
-import { behaviourFailureDraft, coverDraft } from '../../src/seed/seed-drafts';
+import { impossibleConstraints } from '../../src/seed/possible';
+import { behaviourFailureDraft, coverDraft, flowsOfBehaviour } from '../../src/seed/seed-drafts';
 import { ZED_TOOLS, zedProposal } from '../enumerate/support';
 
 const evidence = { source: 'prompt.md', quote: 'Check balance reads the account.' };
@@ -12,7 +13,7 @@ const context = { seed: 42, t: 2, max: 100 };
 // Hand-written input, independent of the validator's generated maps and item bank. The balance flow walks
 // greet, verify, help; its move to verify calls lookup. The behaviour CHECK-11 is a read of the account: its
 // own turn runs lookup at any stage. CHECK-22 asks for no tool.
-function map(change: (proposal: Proposal) => void = () => {}) {
+function map(change: (proposal: Proposal) => void = () => {}, tool = 'lookup') {
   const proposal = zedProposal({
     extra: [
       {
@@ -38,7 +39,7 @@ function map(change: (proposal: Proposal) => void = () => {}) {
     {
       kind: 'uses_tool',
       subject: { dimension: 'flow', value: 'balance' },
-      tool: 'lookup',
+      tool,
       stage: 'greet',
       to: 'verify',
       input: { account: '4' },
@@ -47,7 +48,7 @@ function map(change: (proposal: Proposal) => void = () => {}) {
     ...['greet', 'verify', 'help'].map((stage) => ({
       kind: 'uses_tool' as const,
       subject: { dimension: 'policy', value: 'CHECK-11' },
-      tool: 'lookup',
+      tool,
       stage,
       to: stage,
       input: { account: '4' },
@@ -57,15 +58,15 @@ function map(change: (proposal: Proposal) => void = () => {}) {
       kind: 'recovery',
       class: 'D8_tool_failure',
       flows: ['balance'],
-      tool: 'lookup',
+      tool,
       stage_after: 'pending',
-      tools: [{ tool: 'lookup', count: 2 }],
+      tools: [{ tool, count: 2 }],
       ...by,
     },
   ];
   change(proposal);
   return prepareMap(proposal, {
-    tools: ZED_TOOLS,
+    tools: ZED_TOOLS.map((entry) => ({ ...entry, name: tool, slug: tool })),
     inventory: {
       behaviours: [
         { id: 'CHECK-11', title: 'Check the account', kind: 'conversation' },
@@ -244,5 +245,85 @@ describe('a tool failure on a turn that asks a behaviour', () => {
     });
     const built = coverDraft(prepared, context, 'cover', { deviation: 'D8_tool_failure', stage: 'help' });
     expect('draft' in built).toBe(false);
+  });
+});
+
+// The map, the target and the builder answer one question: can a tool fail on a turn that asks a behaviour at
+// this stage? Invented tool and behaviour; each variant changes one condition of the rule.
+describe('one rule for the map, the target and the builder', () => {
+  const answers = (change: (proposal: Proposal) => void) => {
+    const prepared = map(change, 'read_tide');
+    const stage = prepared.stage as number;
+    const deviation = prepared.deviation as number;
+    const at = prepared.space.dimensions[stage]?.index.get('help') as number;
+    const failure = prepared.space.dimensions[deviation]?.index.get('D8_tool_failure') as number;
+    // The target is read without the constraints the map derived, which already rule the cell out by themselves.
+    const bare = { ...prepared, space: { ...prepared.space, constraints: [] } };
+    const ruledOut = impossibleConstraints(bare, flowsOfBehaviour).some(
+      (pair) =>
+        pair.some(([dimension, value]) => dimension === stage && value === at) &&
+        pair.some(([dimension, value]) => dimension === deviation && value === failure),
+    );
+    const built = coverDraft(prepared, context, 'cover', { deviation: 'D8_tool_failure', stage: 'help' });
+    return {
+      space: prepared.feasibility.allowed([
+        [stage, at],
+        [deviation, failure],
+      ]),
+      target: !ruledOut,
+      builder: 'draft' in built,
+    };
+  };
+
+  it('allows the cell in all three when the tool can be asked again and the phrase is plain', () => {
+    expect(answers(() => {})).toEqual({ space: true, target: true, builder: true });
+  });
+
+  it('rules the cell out in all three when the tool is the end state a path writes', () => {
+    const result = answers((proposal) => {
+      for (const relation of proposal.relations ?? [])
+        if (relation.kind === 'path')
+          relation.end_state = { source: 'tool:read_tide', mode: 'exact', expect: {} };
+    });
+    expect(result).toEqual({ space: false, target: false, builder: false });
+  });
+
+  it('rules the cell out in all three when the only phrase of the behaviour states a slot', () => {
+    const result = answers((proposal) => {
+      for (const phrase of proposal.phrases)
+        if (phrase.dimension === 'policy' && phrase.value === 'CHECK-11')
+          phrase.text = 'Read the tide for {account}.';
+    });
+    expect(result).toEqual({ space: false, target: false, builder: false });
+  });
+
+  it('rules the cell out in all three when the only phrase of the behaviour binds a slot value', () => {
+    const result = answers((proposal) => {
+      for (const phrase of proposal.phrases)
+        if (phrase.dimension === 'policy' && phrase.value === 'CHECK-11') phrase.binds = { account: '4' };
+    });
+    expect(result).toEqual({ space: false, target: false, builder: false });
+  });
+
+  it('keeps the cell when another phrase of the behaviour is plain', () => {
+    const result = answers((proposal) => {
+      proposal.phrases.push({
+        dimension: 'policy',
+        value: 'CHECK-11',
+        text: 'Read the tide for {account}.',
+        lang: 'en',
+        ...by,
+      });
+    });
+    expect(result).toEqual({ space: true, target: true, builder: true });
+  });
+
+  it('rules the cell out in all three when no flow that holds the behaviour recovers from the tool', () => {
+    const result = answers((proposal) => {
+      for (const relation of proposal.relations ?? [])
+        if (relation.kind === 'recovery' && relation.class === 'D8_tool_failure')
+          relation.tool = 'other_tool';
+    });
+    expect(result).toEqual({ space: false, target: false, builder: false });
   });
 });

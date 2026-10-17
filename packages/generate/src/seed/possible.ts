@@ -1,4 +1,5 @@
 import { NONE } from '@agent-nexus/driftbench-space';
+import { failableBehaviourTurns } from '../extract/behaviour-turns';
 import type { PathRelation } from '../extract/proposal';
 import { PENDING_STAGE } from '../extract/proposal';
 import { behaviourSubject, type PreparedMap } from './map';
@@ -59,9 +60,6 @@ export function impossibleConstraints(
   const deviationPhrases = new Set(
     prepared.phrases.filter((phrase) => phrase.dimension === deviationId).map((phrase) => phrase.value),
   );
-  const sideEffecting = new Set(
-    relations.paths.flatMap((path) => (path.end_state ? [path.end_state.source.replace(/^tool:/, '')] : [])),
-  );
   const flowDimension = space.dimensions.some((dimension) => dimension.id === 'flow');
 
   const recoveriesOf = (cls: string, flow: string) =>
@@ -77,22 +75,18 @@ export function impossibleConstraints(
           : flowsOfBehaviour(prepared, use.subject.value).includes(flow)) &&
         (tool === undefined || use.tool === tool),
     );
-  const asked = new Set(
-    prepared.phrases
-      .filter((phrase) => behaviourDimensions.has(phrase.dimension))
-      .map((phrase) => `${phrase.dimension}=${phrase.value}`),
-  );
+  // The turns that ask a behaviour whose tool can fail: one rule for the map, the target and the builder.
+  const askedTurns = failableBehaviourTurns({
+    relations,
+    phrases: prepared.phrases,
+    inventory: prepared.inventory,
+    isBehaviour: (dimension) => behaviourSubject(prepared, { dimension }),
+  });
   /** A staying turn that asks a behaviour whose own read tool fails: it holds at any stage after the start. */
   const asks = (flow: string, stage: string, tool: string | undefined) =>
-    relations.usesTools.some(
-      (use) =>
-        behaviourSubject(prepared, use.subject) &&
-        use.stage === stage &&
-        (use.to === undefined || use.to === stage) &&
-        !sideEffecting.has(use.tool) &&
-        (tool === undefined || use.tool === tool) &&
-        asked.has(`${use.subject.dimension}=${use.subject.value}`) &&
-        flowsOfBehaviour(prepared, use.subject.value).includes(flow),
+    askedTurns.some(
+      ({ use, flows }) =>
+        use.stage === stage && (tool === undefined || use.tool === tool) && flows.includes(flow),
     );
   const said = (path: PathRelation, index: number, cls: string): boolean => {
     const stage = path.stages[index] as string;

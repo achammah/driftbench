@@ -2,6 +2,7 @@ import type { Inventory } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
 import { OPENING_CLASSES, TOOL_FAILURE } from '../seed/deviation';
 import { type Relations, readRelations, recoveryFor, stageAfter } from '../seed/relations';
+import { failableBehaviourTurns } from './behaviour-turns';
 import {
   FLOW_DIMENSION,
   type PathRelation,
@@ -121,21 +122,8 @@ export function derivedConstraints(
             call.stage === stage &&
             recoveryFor(relationsOf, TOOL_FAILURE, path.flow, call.tool) !== undefined,
         );
-      const flowBehaviours = inventory?.flows?.find((entry) => entry.id === path.flow)?.behaviours;
       const asks =
-        index >= 1 &&
-        relationsOf.usesTools.some(
-          (call) =>
-            call.subject.dimension !== FLOW_DIMENSION &&
-            kindOf.get(call.subject.dimension) === 'behaviour' &&
-            call.stage === stage &&
-            (call.to === undefined || call.to === stage) &&
-            (flowBehaviours === undefined || flowBehaviours.includes(call.subject.value as never)) &&
-            phrases.some(
-              (phrase) => phrase.dimension === call.subject.dimension && phrase.value === call.subject.value,
-            ) &&
-            recoveryFor(relationsOf, TOOL_FAILURE, path.flow, call.tool) !== undefined,
-        );
+        index >= 1 && askedTurns.some(({ use, flows }) => use.stage === stage && flows.includes(path.flow));
       return moves || asks ? [{}] : [];
     }
     const recovery = recoveryFor(relationsOf, deviation, path.flow);
@@ -162,6 +150,15 @@ export function derivedConstraints(
       });
   };
 
+  // The turns that ask a behaviour whose tool can fail: one rule for the map, the target and the builder.
+  const askedTurns = failableBehaviourTurns({
+    relations,
+    phrases,
+    inventory,
+    isBehaviour: (dimension) =>
+      dimension !== FLOW_DIMENSION &&
+      proposal.dimensions.find((entry) => entry.id === dimension)?.kind === 'behaviour',
+  });
   const classes = (deviationAxis?.values ?? []).filter((value) => value !== NONE);
   /** Every (path, position) where an event can place: a move reaches it, or a class is said there. */
   type Event = {
