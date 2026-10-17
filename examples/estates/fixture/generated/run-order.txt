@@ -424,7 +424,7 @@ specs/live/tool_boundary/estate.tool_boundary.tool.settings.allow-read.yaml
 specs/live/tool_boundary/estate.tool_boundary.tool.settings.allow-grep.yaml
 specs/live/tool_boundary/estate.tool_boundary.tool.settings.allow-glob.yaml
 specs/live/tool_boundary/estate.tool_boundary.tool.settings.allow-bash-git-status.yaml
-specs/live/tool_boundary/estate.tool_boundary.tool.settings.allow-bash-python3.yaml
+specs/live/tool_boundary/estate.tool_boundary.tool.settings.allow-bash-python3-tools.yaml
 specs/live/tool_denied/estate.tool_denied.tool.settings.deny-bash-git-push-force.yaml
 specs/live/tool_denied/estate.tool_denied.tool.settings.deny-bash-rm-rf.yaml
 specs/live/tool_denied/estate.tool_denied.tool.settings.deny-webfetch.yaml

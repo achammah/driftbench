@@ -1,4 +1,4 @@
-Impact of the estate diff e48ea73788c2 to c3b526d2ae0c on 8 live estate tests (0 retired before, 0 other specs).
+Impact of the estate diff fc6a29aea9f4 to a382535fe5f2 on 8 live estate tests (0 retired before, 0 other specs).
   Regenerate 4, re-approve 2, retire 1, new 2; 3 tests untouched, 24 atoms moved with the same quote.
 Regenerate:
   northwind-draft-pair (draft-pair.yaml): instruction.standing.keep-an-unconfirmed-draft-unsent removed
