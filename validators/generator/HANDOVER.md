@@ -307,3 +307,7 @@ The product lane fixes these in `packages/generate`. Per-seed counts: [evidence]
 A behaviour is exercised by a conversation of a flow that owns it, so one owner must call its tool and recover its class. The hidden constructor now adds one owner where none can (`behaviour-exercise.ts`), before the capacity pass. See [the journal](SWEEP-JOURNAL.md).
 
 Resolved: a behaviour that names a tool is drawn only where the map stages that tool, so the five `behaviour.list.exercised` items no longer owe an impossible cell.
+
+## Joint feasibility of a required cell: maintainer ruling (2026-10-16)
+
+A coverage target or an emitted cell must be carried by ONE event of the hidden map, not by one event per pair of its values. `possible.ts#jointWitness` is the single predicate; `impossiblePairs`, the triple coverage items and `diff.feasible.<seeder>` read it. Terminal behaviour calls of a read tool the flow recovers are positions; the cover seeder must place only cells an event carries. See [the journal](SWEEP-JOURNAL.md). No historical ladder level is updated by this scoped ruling.

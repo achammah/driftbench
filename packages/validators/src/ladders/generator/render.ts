@@ -5,7 +5,7 @@ import { codeTask } from './code-task';
 import { defaultValue } from './follower';
 import type { HiddenProperty, HiddenSpec } from './hidden';
 import { DEVIATION_RULES } from './hidden';
-import { impossiblePairs } from './possible';
+import { behaviourReadTool, impossiblePairs, renderedWhen } from './possible';
 
 /**
  * The hidden specification rendered as the artefacts a real agent has, and as the approved map the
@@ -315,24 +315,7 @@ export function hiddenProposal(spec: HiddenSpec): Proposal {
       kind: 'path' as const,
       id: path.id,
       flow: path.flow,
-      when: {
-        ...path.when,
-        ...Object.fromEntries(
-          spec.tools
-            .filter((tool) => tool.stage !== undefined && path.stages.slice(1).includes(tool.stage))
-            .flatMap((tool) =>
-              tool.output.map((property) => {
-                const dimension = `${tool.name}.out.${property.name}`;
-                return [
-                  dimension,
-                  spec.data
-                    .filter((value) => value.dimension === dimension && !value.invalid)
-                    .map((value) => value.id),
-                ];
-              }),
-            ),
-        ),
-      },
+      when: renderedWhen(spec, path),
       stages: [...path.stages],
       behaviours: [...(spec.flows.find((flow) => flow.id === path.flow)?.behaviours ?? [])],
       ...(path.endState
@@ -373,8 +356,8 @@ export function hiddenProposal(spec: HiddenSpec): Proposal {
     // without moving: a map built from that text states the call. A behaviour that never names its tool stays
     // unlinked, so the map holds nothing the generator could not read from the inventory.
     ...spec.behaviours.flatMap((behaviour) => {
-      const tool = spec.tools.find((entry) => entry.name === behaviour.tool);
-      if (!tool || tool.sideEffect || !behaviour.title.includes(tool.name)) return [];
+      const tool = behaviourReadTool(spec, behaviour);
+      if (!tool) return [];
       return spec.stages.map((stage) => ({
         kind: 'uses_tool' as const,
         subject: { dimension: 'behaviour', value: behaviour.id },
