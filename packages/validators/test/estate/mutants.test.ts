@@ -61,7 +61,7 @@ describe('agent mutants (level 5)', { timeout: 120_000 }, () => {
       if (mutant.killed) expect(mutant.reason, mutant.atom).toBeUndefined();
       else
         expect(mutant.reason, mutant.atom).toMatch(
-          /no generated test names the atom|wait for |complete tests ran on the follower|records the same session/,
+          /no generated test names the atom|wait for |complete tests ran on the follower|records the same session|holds no such file/,
         );
     }
     expect(of('script').length).toBeGreaterThan(0);
@@ -76,7 +76,11 @@ describe('agent mutants (level 5)', { timeout: 120_000 }, () => {
       // the read is a real difference, whichever of the atoms that name the file is deleted.
       const judged = mutants.filter(
         (mutant) =>
-          mutant.kind === 'reference' && !mutant.equivalent && !mutant.reason?.startsWith('no complete test'),
+          mutant.kind === 'reference' &&
+          !mutant.equivalent &&
+          // A reference to a file the estate lacks has no complete test by contract: it is judged by its marker.
+          !mutant.untestable &&
+          !mutant.reason?.startsWith('no complete test'),
       );
       expect(judged.length, `seed ${seed}`).toBeGreaterThan(0);
       expect(
