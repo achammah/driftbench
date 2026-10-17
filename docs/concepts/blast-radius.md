@@ -31,11 +31,11 @@ changes:
 | `rule` | `path:<id>` | every block of the specs that walk that path of the map |
 | `rule` | a spec rule: `lang_stable`, `max_calls`, `forbidden_tools`, `one_message_per_turn`, `match_case`, `custom.<name>` | every block of a spec whose `rules` carry it |
 | `rule` | `reply_language` | the whole suite: the rule holds on every block |
-| `deviation` | a deviation class, `D2` or `D2_goal_shift` | the blocks that carry the class |
+| `deviation` | a deviation class, `D2` or `D2_goal_shift` | the blocks that carry the class: a block's class is the id, or the id followed by `_` |
 | `prompt` | an estate atom id | the blocks of the specs whose `metadata.estate.atoms` name it, and every block that names no atoms |
 | `map` | `dimension=value` | blocks whose cell holds the value, or whose user turn was phrased from it |
 | `fixture` | a fixture name, a workspace file, `family:<id>`, or a literal value such as an email | blocks whose Given names it, task specs of that family, and blocks whose When, expected inputs or end state hold the value |
-| `criterion` | a judged criterion | blocks whose `expect.criteria` name it |
+| `criterion` | a judged criterion | blocks whose `expect.criteria` name it; the `@gating` suffix is not part of the name |
 | `model`, `agent` | none | the whole suite |
 
 A tool change says which part of the tool changed, because a block that must not call a tool still reads the tool: a new description can make the agent start calling it.
@@ -75,18 +75,23 @@ metadata:
 1. Direct: every block whose dependencies name a change of the manifest.
 2. Forward closure: a block whose Given was produced by a block in the radius is in the radius too. In mode F and P a block inherits the agent's own earlier replies, so every block after a direct block of the same run is in. In mode T a block starts from its canonical Given, written by the spec, so nothing follows. One exception: a task step in a sandbox keeps the workspace the step before left, until a step writes its own `given.world.workspace`. See [run modes](run-modes.md).
 
+A deviation id selects a class by its whole id or by the id followed by an underscore. `D1` selects the class `D1` and the class `D1_off_topic`. It never selects `D10`, `D11` or `D12`.
+
+In mode P the forward blocks start after the first direct block. They start at the `inject_at` of a perturbation the change reaches when that block comes first.
+
 The unit that reruns is the cell: one spec on one target in one mode for one repeat. A cell is in the radius when one of its blocks is, and it reruns whole, from its first block. The blocks of that run before the first direct block are run again and are not counted in the radius.
 
 ## Unknown means in
 
 The radius is conservative by default.
 
-* A block whose dependencies are unknown is in every radius: a hand-written spec with no generator record, no estate atoms and no `metadata.depends`.
+* A block whose dependencies are unknown is in every radius: a hand-written spec with no generator record, no estate atoms and no `metadata.depends`. Its reason in the output is `unknown-deps`.
 * A change the radius cannot map is the whole suite: a kind it does not know, `model`, `agent`, `global: true`, the reply language rule, a change with no id.
-* A change no block declares is the whole suite: a new tool or a stage no spec names can reach any block, and nothing says which.
+* A change no block declares is the whole suite: a new tool or a stage no spec names can reach any block, and nothing says which. This holds for every kind that names something, a `criterion` included.
 * A `map` or `path` change puts in every block that records no cell; a `prompt` change puts in every block that names no atoms.
 * A tool change with no `part` counts every block that lists the tool, count 0 included.
 * A manifest with no change between two different versions is the whole suite.
+* A manifest with no change and the same `from` and `to` gives an empty radius: no block is in.
 
 ## The agent version
 
@@ -95,6 +100,32 @@ A carried result must say which agent produced it. `agentVersionOf(run)` reads t
 ## The command
 
 `driftbench radius <specs> --change <manifest>` runs nothing and writes nothing. It exits 0 when the radius is smaller than the suite, 1 when it is the whole suite, 2 on bad input. `--mode` takes the modes to plan for, `--json` prints every block with its state and its reasons.
+
+The change manifest is strict. These give exit 2 and compute no radius:
+
+* an unknown key at any level;
+* a `part` that is not `input`, `result`, `description` or `presence`;
+* a missing `from`, `to` or `changes`.
+
+The `--json` document holds `manifest`, `modes`, `whole`, `specs` and `totals`:
+
+* `whole` is `null` when the radius is smaller than the suite. For the whole suite it is `{ change, reason }`, and the exit is 1.
+* Each block of `specs` holds `id`, `index`, `scored`, `why` and `state`. A block with no `id` is shown as `block <index>`, where the index counts from 0.
+* `state` has one key per mode asked: `direct`, `forward` or `out`.
+* `totals.<mode>` counts the scored blocks of that mode, with these keys:
+
+| Key | Counts |
+|---|---|
+| `in` | blocks in the radius, `direct` plus `forward` |
+| `direct` | blocks whose dependencies name a change |
+| `forward` | blocks in only because they follow a direct block |
+| `out` | blocks outside the radius |
+| `total` | scored blocks, `in` plus `out` |
+| `unknown` | scored blocks whose dependencies are unknown |
+| `cells` | `{ in, total }`: the cells in the radius and all cells |
+| `sent` | blocks a rerun of the radius sends: for each spec, its cells in the radius times its scored blocks, added over the specs |
+
+A block is scored unless a gate rejected it. A rejected block runs with its spec, but `total`, `in`, `out` and `sent` leave it out, so `sent` never counts it.
 
 ```
 $ pnpm -s driftbench radius examples/acme/gated/specs --change examples/acme/radius/stage-recap.yaml --mode F,T
@@ -293,7 +324,24 @@ Always use the agent versions your campaigns record. Without explicit version fl
 
 A prompt can carry a section registry, `prompts/<prompt-id>.sections.yaml`, that names each of its sections by a stable id with its span (UTF-16 code units, the unit of the quotes above), the SHA-256 of its text, an anchor quote, a scope (`global` or `local`) and its `references`, `overrides` and `duplicates`. The Acme example keeps one for its 30-section prompt in `examples/acme/prompts/`. `radius sections init` writes a first registry from the headings, `radius sections check` checks it against the prompt, and `radius sections reanchor` finds every section again in the next version: same text, then the unique quote, then the prefix and suffix window, else `stale`. A section is only placed where its text hashes as before, so an edit inside it makes it stale and it is never anchored to the wrong text; text that changed outside every section is reported.
 
+* The spans are compared in the new text.
+* A section found at the same start offset is `kept`. A section found at another start offset is `moved`.
+* A section that is not found again is `stale`.
+* An edit that keeps the prompt length and changes one section leaves that section `stale`. Every other section stays `kept` at its span.
+* An edit that changes the length of one section moves every later section by the difference. The earlier sections stay `kept` and the later sections are `moved`.
+* A section whose old text occurs once in the new text is found again, wherever it sits, and keeps its id.
+
 A block names the sections it tests in the spec's `metadata.links`, each link with a status: `declared`, `attributed`, `verified`, `refuted` or `stale`. `metadata.links` and `metadata.provenance` stay out of the spec hash, so a link added or promoted never changes a run id or a cache key and never invalidates a carry or a rejudge. `spec lint --sections <registries>` checks that every link names a section its registry holds.
+
+`spec validate` checks `metadata.links`. A value outside the lists below is refused with a path under `metadata.links`.
+
+* A link holds `to` and `status`, and optionally `block`, `relation`, `created_by`, `at_version` and `evidence`.
+* `to.kind` is `prompt_section`, `spec_clause` or `source_turn`.
+* `relation` is `verifies`, `exercises`, `derived_from` or `observed_in`. The default is `verifies`.
+* `status` is required.
+* `created_by` is `generator`, `author`, `attribution`, `citation`, `ir` or `mutation`.
+* `block` is a block id, or a block index when blocks have no id. An absent `block` means every block of the spec.
+* A `block` that names no block of the spec is an error with the code `LINK_BLOCK_UNKNOWN` at `metadata.links.<i>.block`.
 
 ### Advisory section selection
 
@@ -308,7 +356,7 @@ Why it does not skip tests yet: on the H7 suite (the Acme stand-in prompt of 30 
 
 ### Localisation over sections
 
-`radius localize <specs> --store <file> --campaign <id> --sections <registries>` ranks the local sections of a prompt by Ochiai suspiciousness from a stored campaign: a block covers the sections it links to, `failed` and `passed` sum the failure and pass rates of the linked blocks over the suite runs, and the score is `failed / sqrt(total failure weight x (failed + passed))`. A failure is dropped when an earlier block of the same conversation (or a parent block) failed in the same run; a block that passes after a failing one stays a row. Global sections are not ranked; ties print as a rank range. On the stored H7 runs (`packages/core/test/radius/localize.test.ts`) this rule ranks the planted section worse than flat counting on 3 of 98 faults; dropping every block after a failing one ranks worse on 18 of 98, the registered H5 result. Ranking against each block's own baseline verdict comes with the mutation runner.
+`radius localize <specs> --store <file> --campaign <id> --sections <registries>` ranks the local sections of a prompt by Ochiai suspiciousness from a stored campaign: a block covers the sections it links to, `failed` and `passed` sum the failure and pass rates of the linked blocks over the suite runs, and the score is `failed / sqrt(total failure weight x (failed + passed))`. A failure is dropped when an earlier block of the same conversation (or a parent block) failed in the same run; a block that passes after a failing one stays a row. A link whose status is `refuted` adds nothing to the counts of its section. It adds to neither `failed` nor `passed`, and it adds no linked block. Global sections are not ranked; ties print as a rank range. On the stored H7 runs (`packages/core/test/radius/localize.test.ts`) this rule ranks the planted section worse than flat counting on 3 of 98 faults; dropping every block after a failing one ranks worse on 18 of 98, the registered H5 result. Ranking against each block's own baseline verdict comes with the mutation runner.
 
 Anthropic Citations give `start_char_index` and `end_char_index` in code points. On a text with two emoji before the cited sentence the API gave 23 where UTF-16 gives 25, so an imported citation is converted (`codePointToUtf16`, `citationSpan`) before it is compared with a span.
 

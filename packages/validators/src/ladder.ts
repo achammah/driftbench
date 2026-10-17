@@ -29,6 +29,11 @@ export type BankEntry = {
   tier?: Tier;
   /** The one change that would make the item pass; items sharing a cause count once. */
   cause?: string;
+  /** `catch`: an item that passes on the product that owns its capability and guards against a planted bug, a
+   * shortcut or a cheat; it counts for no hardness (docs/validators.md section 13). Absent: a hardness item. */
+  role?: 'catch';
+  /** The doc section that defines the item's contract. */
+  contract?: string;
   pass: boolean;
   detail?: string;
 };

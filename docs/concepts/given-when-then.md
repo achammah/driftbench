@@ -33,6 +33,13 @@ An adapter applies `world.tools` only when it has the `toolStubs` capability; on
 
 A fact the agent learnt from a tool belongs in the prefix as a tool call with its `output`, never only in the assistant's text. The two are different tests. In an experiment on a sales agent (15 blocks, each run 30 times per arm), the agent that read an earlier result only in its own prose called the tool again in 332 of 450 runs, and the one that read the recorded call in 0 of 450; on the three lead blocks it filed the same callback request a second time in all 90 prose runs. `spec lint` warns with `PREFIX_PROSE_HISTORY` when an assistant message of a prefix states a ledger fact that no recorded call of the prefix holds and the user never said.
 
+The lint reads the ledger values of the spec's `given` and of each block's `given` up to the block. It also reads the `ledger_add` of the blocks before it. It matches a value as a whole word, without case. The value must not touch a letter or a digit on either side: `EN` is not found in `OPEN`. The lint leaves out a fact when:
+
+* an assistant message states the value only inside a longer word;
+* a tool call in an earlier message of the prefix holds the value in its input, output or error;
+* a tool call in the same message holds the value;
+* a user message before the assistant message holds the value.
+
 `origin` says where a prefix comes from:
 
 | Value | Meaning |
