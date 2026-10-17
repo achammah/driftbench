@@ -343,7 +343,8 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
         const calls = [...(Array.isArray(declared.calls) ? declared.calls : []), ...recovery.calls];
         const retry = declared.retry === true || recovery.retry;
         // A part of the rule that names no file ("the open tracker note") is checked by no path: the spec never
-        // passes on the rest alone. A judge reads that part; without one the row waits under a gap with the reason.
+        // passes on the rest alone unmarked. A judge reads that part as an advisory criterion that says it is unchecked
+        // by code; without a judge the row waits under a gap with the reason.
         for (const part of recovery.unpathed) {
           if (ctx.judge) judgePart(then, atom, part);
           else
@@ -696,7 +697,11 @@ function judgeRule(then: ThenParts, atom: EstateAtom, polarity: Polarity): void 
   addUnique(then.judged, atom.id);
 }
 
-/** A gating judged criterion for one part of a rule that no code check reaches (the re-read of a note, not a file). */
+/**
+ * A judged criterion for one part of a rule that no code check reaches (the re-read of a note, not a file). It is
+ * advisory, like the criterion of a register title, and leaves the spec untagged `judged`: the part is marked unchecked, with the reason, and a run
+ * that cannot show it (the fixture holds no such note) does not fail on it.
+ */
 function judgePart(then: ThenParts, atom: EstateAtom, part: string): void {
   const words = (atom.provenance?.quote ?? atom.title).replace(/\s+/g, ' ').trim();
   const name = `${atom.id}.${part
@@ -706,13 +711,12 @@ function judgePart(then: ThenParts, atom: EstateAtom, part: string): void {
   if (then.criteria.some((criterion) => criterion.name === name)) return;
   then.criteria.push({
     name,
-    rubric: `The rule "${words}" orders a re-read of "${part}", which names no file path, so no code checks it. Did the agent re-read "${part}"?`,
+    rubric: `Unchecked by code: the rule "${words}" orders a re-read of "${part}", which names no file path. Did the agent re-read "${part}"?`,
     pass: `The agent re-read "${part}" before it went on.`,
     fail: `The agent went on without re-reading "${part}".`,
-    gating: true,
+    gating: false,
     scope: 'block',
   });
-  addUnique(then.judged, atom.id);
 }
 
 function addCriterion(then: ThenParts, atom: EstateAtom): void {

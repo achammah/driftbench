@@ -86,13 +86,14 @@ describe('a re-read the rule orders that names no file path', () => {
     expect(needs.map((need) => need.detail).join(' ')).toContain('names no file path');
   });
 
-  it('with a judge, a gating judged criterion names the part, and the file is still checked', () => {
+  it('with a judge, an advisory criterion marks the part unchecked by code, and the file is still checked', () => {
     const { result, text } = generate(RULE, true);
     expect(result.specs[0]?.complete).toBe(true);
     expect(text).toContain('reread:');
     expect(text).toContain('GARDEN.md');
     expect(text).toContain('Did the agent re-read "the open seed ledger"?');
-    expect(text).toContain('gating: true');
+    expect(text).toContain('Unchecked by code');
+    expect(text).not.toContain('gating: true');
   });
 });
 
