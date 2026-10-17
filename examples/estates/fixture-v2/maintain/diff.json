@@ -3,16 +3,16 @@
   "old": {
     "path": "examples/estates/fixture/approved.yaml",
     "runtime": "claude-code",
-    "readAt": "2026-10-17T10:09:39.743Z",
-    "hash": "e48ea73788c2fb36e8def0b10b39a3551139beb107f54959237f272c2aa7ba41",
+    "readAt": "2026-10-17T14:50:55.123Z",
+    "hash": "fc6a29aea9f4fda876fa747d68a9753526c0cd5e7c0206970de46e853e5629d5",
     "atoms": 126,
     "edges": 55
   },
   "new": {
     "path": "examples/estates/fixture-v2/map.yaml",
     "runtime": "claude-code",
-    "readAt": "2026-10-17T10:09:56.160Z",
-    "hash": "c3b526d2ae0cb801a71fa4dc7f74fa51c8cbd2213f28793aaf56660f532e28ad",
+    "readAt": "2026-10-17T14:52:08.610Z",
+    "hash": "a382535fe5f2fe3428518bf6afeef6c373b124c03bfbb4aafb352d81671af9d6",
     "atoms": 127,
     "edges": 55
   },

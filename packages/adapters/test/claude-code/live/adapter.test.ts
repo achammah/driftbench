@@ -322,7 +322,7 @@ describe('claudeCodeLiveAdapter', () => {
       'Grep',
       'Glob',
       'Bash(git status)',
-      'Bash(python3 *)',
+      'Bash(python3 tools/*)',
       'Skill',
     ]);
     expect(argv.indexOf('-p')).toBeGreaterThan(at);
