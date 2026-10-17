@@ -178,6 +178,10 @@ export class ClaudeCodeReader implements EstateReader {
   constructor(options: ClaudeCodeReaderOptions = {}) {
     this.budget = Math.max(1, options.chunkCharacters ?? DEFAULT_CHUNK_CHARACTERS);
     this.ignore = options.ignore ?? [];
+    if (options.userSkills !== undefined && options.userSkills.trim() === '')
+      throw new RangeError(
+        'userSkills must name a folder: an empty value would read the working folder as the layer',
+      );
     this.userSkills = options.userSkills;
   }
 
@@ -608,8 +612,10 @@ function userFolderOf(option: string | undefined, config: EstateConfig, root: st
   return resolve(option !== undefined ? process.cwd() : root, home);
 }
 
-/** A name a folder listing skips: hidden (a trash folder, a repository) or a dependency folder. */
+/** A name a folder listing skips: hidden (a repository, an archive) or a dependency folder. */
 const hiddenInLayer = (name: string) => name.startsWith('.') || name === 'node_modules';
+/** The folder a desktop keeps what a user threw away. It is never a container of skills, whatever its case. */
+const trashFolder = (name: string) => name.toLowerCase() === 'trash';
 
 /**
  * The files of the user-level skill layer. A folder of the layer that holds a `SKILL.md` is a skill; one that
@@ -647,6 +653,7 @@ async function readUserLayer(
       skills.push(entry.name);
       continue;
     }
+    if (trashFolder(entry.name)) continue;
     const inside = await readdir(join(folder, entry.name), { withFileTypes: true }).catch(() => []);
     for (const child of [...inside].sort(byName)) {
       const path = join(folder, entry.name, child.name);
