@@ -56,7 +56,8 @@ it('gives no test to a reference whose target the map records as an example or a
 }, 30_000);
 
 it('keeps every reference test when the map records no document roles, guessing nothing from names', async () => {
-  const map = await scanned();
+  // A fresh scan records the roles it finds, so the map is given none, as an older map would have it.
+  const map = await scanned([]);
   const { plan, details } = buildPlan(map);
   expect(plan.rows.filter((row) => row.testType === 'read_when')).toHaveLength(3);
   expect(details.notes.some((note) => /navigation only/.test(note))).toBe(false);

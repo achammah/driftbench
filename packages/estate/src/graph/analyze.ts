@@ -75,6 +75,10 @@ export function analyzeGraph(
   atoms: readonly Atom[],
   edges: readonly Edge[],
   files: readonly EstateFile[],
+  /** Files documented by navigation-only documents: named, though they never make a file reachable. */
+  navigation: ReadonlySet<string> = new Set(),
+  /** Files that code names: a code file that is reached reaches the files it names. */
+  codeLinks: ReadonlyMap<string, readonly string[]> = new Map(),
 ): GraphAnalysis {
   const kinds = new Map(files.map((file) => [file.path, file.kind]));
   const byId = new Map(atoms.map((atom) => [atom.id, atom]));
@@ -101,6 +105,7 @@ export function analyzeGraph(
     if (reachableFiles.has(path) || !kinds.has(path)) return;
     reachableFiles.add(path);
     for (const atom of inFile.get(path) ?? []) queue.push(atom.id);
+    for (const named of codeLinks.get(path) ?? []) reachFile(named);
   };
   for (const file of files) if (ROOT_FILES.has(file.kind)) reachFile(file.path);
   while (head < queue.length) {
@@ -133,6 +138,18 @@ export function analyzeGraph(
         namedFiles.add(file.path);
         if (!reachableFiles.has(file.path)) tooling.add(file.path);
       }
+  }
+  for (const path of navigation) if (kinds.has(path)) namedFiles.add(path);
+  // A script that is itself named names the files it holds as literals; a stray script legitimises nothing.
+  for (let grew = true; grew; ) {
+    grew = false;
+    for (const [from, named] of codeLinks)
+      if (namedFiles.has(from))
+        for (const path of named)
+          if (kinds.has(path) && !namedFiles.has(path)) {
+            namedFiles.add(path);
+            grew = true;
+          }
   }
 
   const orphans = files

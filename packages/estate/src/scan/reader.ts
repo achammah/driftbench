@@ -1,3 +1,4 @@
+import type { DocumentInfo } from '../schema';
 import type { Located } from './text';
 
 /**
@@ -34,6 +35,7 @@ export type EstateFile = {
   kind: FileKind;
   text: string;
   owner?: string;
+  document?: DocumentInfo;
   layer?: 'user';
 };
 

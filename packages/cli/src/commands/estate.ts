@@ -5,12 +5,14 @@ import {
   AtomKind,
   approveAtoms,
   estateRecordingPort,
+  FileProseCache,
   INFORMATION,
   lintEstate,
   loadEstateMap,
   loadEstateRecording,
   type MapIssue,
   parseEstateMapText,
+  proseEstimateLine,
   proseInventory,
   proseInventoryLines,
   RUNTIMES,
@@ -88,7 +90,7 @@ export function registerEstateCommand(program: Command, io: Io, setExit: (code: 
     .option('--runtime <name>', `the runtime that reads the estate: ${RUNTIMES.join(', ')}`, 'claude-code')
     .option('--out <file>', 'where to write the map (YAML)')
     .option('--replay <file>', 'replay recorded answers instead of calling a model')
-    .option('--no-model', 'read the structured atoms only; no prose atom')
+    .option('--no-model', 'read structure and unapproved code-found prose candidates; no model call')
     .option('--provider <name>', 'anthropic or openai (default: the first whose key is set)')
     .option('--ceiling <characters>', 'the size ceiling of the standing instructions', '40000')
     .option('--ignore <glob>', 'skip the paths this glob matches, beside the defaults; repeat it', collect)
@@ -212,7 +214,17 @@ export async function estateScanCommand(
     reader,
     rootLabel: label(out, root),
     ceiling,
-    ...(port ? { port } : {}),
+    ...(port
+      ? {
+          port,
+          ...(!options.replay
+            ? { cache: new FileProseCache(resolve(dirname(out), '.cache', 'estate-prose')) }
+            : {}),
+          beforeModel: (estimate) => {
+            io.out(proseEstimateLine(estimate));
+          },
+        }
+      : {}),
     ...(deps.now ? { now: deps.now } : {}),
   });
   if (!(await writeOut(out, renderEstateMap(result.map), io))) return 2;
@@ -236,9 +248,11 @@ function ignoredLines(result: ScanEstateResult): string[] {
 
 function scanReport(result: ScanEstateResult, out: string, io: Io): string {
   const { map, analysis } = result;
+  const candidates = map.atoms.filter((atom) => atom.fields?.candidate === true).length;
+  const candidateText = candidates > 0 ? `, ${candidates} code-found candidates waiting for approval` : '';
   const byModel = map.atoms.filter((atom) => atom.producedBy === 'model').length;
   const lines = [
-    `Wrote ${show(out, io)}: ${map.atoms.length} atoms (${map.atoms.length - byModel} read by code and approved, ${byModel} split from prose by the model and waiting for approval), ${map.edges.length} edges.`,
+    `Wrote ${show(out, io)}: ${map.atoms.length} atoms (${map.atoms.length - byModel - candidates} read by code and approved${candidateText}, ${byModel} split from prose by the model and waiting for approval), ${map.edges.length} edges.`,
     '  Atoms per kind:',
   ];
   const kinds = AtomKind.options.filter((kind) => map.atoms.some((atom) => atom.kind === kind));
@@ -252,7 +266,7 @@ function scanReport(result: ScanEstateResult, out: string, io: Io): string {
   }
   const prose = proseInventoryLines(proseInventory(result.raw), result.chunks.length > 0);
   if (result.chunks.length === 0)
-    lines.push('  No model call: structured atoms only (--no-model).', ...prose);
+    lines.push('  No model call: structured atoms and code-found prose candidates (--no-model).', ...prose);
   else {
     lines.push(...prose);
     const calls = result.calls;
@@ -262,6 +276,13 @@ function scanReport(result: ScanEstateResult, out: string, io: Io): string {
     for (const run of result.chunks.filter((chunk) => chunk.status === 'failed')) {
       lines.push(`    ${run.chunk}  failed: ${run.error}${run.excerpt ? ` (answer: "${run.excerpt}")` : ''}`);
     }
+  }
+  const candidateSkips = result.raw.notes.filter((note) =>
+    note.message.startsWith('Prose candidate skipped'),
+  );
+  if (candidateSkips.length > 0) {
+    lines.push(`  Code-found prose candidates skipped: ${candidateSkips.length}.`);
+    for (const note of candidateSkips) lines.push(`    ${note.file}: ${note.message}`);
   }
   lines.push(result.refusals.length === 0 ? '  Refused: none.' : '  Refused, not in the map:');
   for (const refusal of result.refusals)

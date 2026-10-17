@@ -108,3 +108,12 @@ export function readerFor(
 ): EstateReader | undefined {
   return runtime === 'claude-code' ? new ClaudeCodeReader(options) : undefined;
 }
+
+export { proseCandidates } from './candidates';
+export {
+  FileProseCache,
+  type ProseCache,
+  type ProseEstimate,
+  proseCacheKey,
+  proseEstimateLine,
+} from './prose-cache';

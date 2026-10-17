@@ -122,7 +122,10 @@ describe('a file named in a change note', () => {
       '.claude/skills/pricing/references/current.md': '# Current\n',
     });
     const paths = map.atoms.filter((atom) => atom.kind === 'reference').map((atom) => atom.fields?.path);
-    expect(paths).toEqual(['.claude/skills/pricing/references/current.md']);
+    expect(paths).toEqual([]);
+    expect(map.documents?.find((document) => document.path.endsWith('pricing/SKILL.md'))?.sections).toEqual([
+      { startLine: 8, endLine: 14, role: 'changelog' },
+    ]);
   });
 
   it('keeps references the agent is told to read, to remove now, or that a file moved to', async () => {

@@ -77,7 +77,8 @@ describe('driftbench estate scan', () => {
     );
     expect(result.out).toMatch(/instruction\s+43 {2}\(43 by the model\)/);
     expect(result.out).toContain(
-      'Prose: 15 chunks, 6961 characters (standing 1, memory 2, skill bodies 4, skill files 5, helper bodies 3).',
+      // The fixture's weekly-report template is a template document, so no chunk of it is sent to the model.
+      'Prose: 14 chunks, 6835 characters (standing 1, memory 2, skill bodies 4, skill files 4, helper bodies 3).',
     );
     expect(result.out).not.toContain('Unanswered prose chunks');
     expect(result.out).toContain('Refused: none.');
@@ -98,8 +99,10 @@ describe('driftbench estate scan', () => {
       elsewhere,
     );
     expect(result.code).toBe(0);
-    expect(result.out).toContain('No model call: structured atoms only (--no-model).');
-    expect(result.out).toContain('Unanswered prose chunks (no model call): 15, 6961 characters.');
+    expect(result.out).toContain(
+      'No model call: structured atoms and code-found prose candidates (--no-model).',
+    );
+    expect(result.out).toContain('Unanswered prose chunks (no model call): 14, 6835 characters.');
     expect(result.out).toContain(
       '    .claude/skills/invoice-reconcile/references/matching-rules.md  261 characters\n',
     );
@@ -133,7 +136,7 @@ describe('driftbench estate scan', () => {
     const root = await fixtureCopy();
     const { io, output } = capture(root);
     const port = new FakeModelPort(
-      Array.from({ length: 15 }, () => (request) => {
+      Array.from({ length: 14 }, () => (request) => {
         const chunk = /^CHUNK: (.+)$/m.exec(request.user)?.[1] ?? '';
         return JSON.stringify({ chunk, atoms: [] });
       }),
@@ -144,8 +147,8 @@ describe('driftbench estate scan', () => {
       now: () => new Date('2026-10-11T00:00:00.000Z'),
     });
     expect(code).toBe(0);
-    expect(port.requests).toHaveLength(15);
-    expect(output.out).toContain('Model fake fake-model: 15 prose chunks, 15 calls.');
+    expect(port.requests).toHaveLength(14);
+    expect(output.out).toContain('Model fake fake-model: 14 prose chunks, 14 calls.');
     const loaded = await loadEstateMap(join(root, 'map.yaml'));
     expect(loaded.ok && loaded.map.producedBy).toEqual({
       family: 'fake',
