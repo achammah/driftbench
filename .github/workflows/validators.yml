@@ -69,6 +69,54 @@ jobs:
           fi
           test "$status" -eq 11
 
+  estate-full:
+    # Measurement only, on train/estate-union. Never merged to main.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',estate-full,')
+    name: estate all levels (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: seed1-hidden
+            args: --seed 1 --hidden
+          - name: seed2
+            args: --seed 2
+          - name: seed3
+            args: --seed 3
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Estate ladder, every level
+        shell: bash
+        env:
+          RUN_ARGS: ${{ matrix.args }}
+          RUN_NAME: ${{ matrix.name }}
+        run: |
+          # The exit code is the level reached, not a pass or fail: keep it beside the json.
+          start=$(date +%s)
+          status=0
+          # shellcheck disable=SC2086
+          pnpm -s driftbench validate estate $RUN_ARGS --all-levels --json > "estate-$RUN_NAME.json" || status=$?
+          echo "{\"exit\": $status, \"seconds\": $(( $(date +%s) - start )), \"head\": \"$(git rev-parse HEAD)\"}" > "estate-$RUN_NAME.meta.json"
+          cat "estate-$RUN_NAME.meta.json"
+      - name: Keep the run as evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: estate-${{ matrix.name }}
+          path: |
+            estate-${{ matrix.name }}.json
+            estate-${{ matrix.name }}.meta.json
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
