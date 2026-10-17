@@ -892,6 +892,10 @@ export function truthOf(run: EstateRun): Truth {
         ...((entry?.evidence as Array<Record<string, unknown>> | undefined) ?? []).map((e) => ({
           type: String(e.type),
           ...(typeof e.label === 'string' ? { label: e.label } : {}),
+          ...(typeof e.name === 'string' ? { name: e.name } : {}),
+          ...(typeof e.options === 'object' && e.options !== null
+            ? { options: e.options as Record<string, unknown> }
+            : {}),
         })),
         // The renderer wrote a file to read on this line: the line asks for a Read of that file.
         ...(run.rendered.atoms.some(
