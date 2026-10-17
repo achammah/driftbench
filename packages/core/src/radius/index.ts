@@ -53,6 +53,16 @@ export {
   sectionLinkStatus,
   specLinks,
 } from './links';
+export {
+  type Localization,
+  type LocalizeCampaign,
+  type LocalizeRow,
+  type LocalizeRun,
+  localizeRows,
+  localizeRuns,
+  ochiaiLocalize,
+  type SectionSuspicion,
+} from './localize';
 export { type PromptAnchor, promptChangeManifest } from './prompt';
 export {
   ALLOWED_VERSION_TRANSITION_FIELDS,
@@ -94,4 +104,16 @@ export {
   sectionsFromHeadings,
   sha256Hex,
 } from './sections';
+export {
+  defaultParentOf,
+  type ParentRef,
+  SECTION_SELECTION_ADVISORY,
+  type SectionBlockState,
+  type SectionSelection,
+  type SectionSelectionBlock,
+  type SectionSelectionSpec,
+  sectionChangeManifest,
+  sectionChanges,
+  sectionSelection,
+} from './select';
 export { agentVersionOf, withAgentVersion } from './version';

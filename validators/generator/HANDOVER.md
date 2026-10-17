@@ -7,8 +7,42 @@ Rewritten by the executor every iteration (docs/validators.md section 10). A str
 <!-- level-table:start -->
 | Seed | Level |
 |---|---|
-| 1 | 8 |
+| 1 | 14 |
+| 2 | 14 |
+| 3 | 14 |
+| hidden | 8 |
 <!-- level-table:end -->
+
+## Current climb: iteration 22
+
+D6 product change committed (`90832b3d5`), per the D6 maintainer ruling: an approved instruction of a class the users package carries in the world is the content of a supplied workspace file (`NOTES.txt`, first unused name), the injected turn says nothing, held files are kept, and a probe block's file lasts for its own turn. Measured with `validate generator --seeds 1..3 --hidden --json` at that commit (`.exec/d6-after.json`): seeds 1, 2, 3 at 14 (from 11, 12, 11); the hidden seed of that commit (425515389) at 8. A first version kept the file for later turns: seed 2 then failed `fault.D6.says-skipped` (r2 and r3 instances fired on later turns with no must_not), so the file now lasts one turn.
+
+* Level 15 on seeds 1, 2, 3 fails only `sequence.stages.D8_tool_failure`. It asks for D8 probes at stages the rendered map forbids: `render.ts:542` adds `possible.ts` impossible pairs, which forbid `{deviation: D8_tool_failure, stage: <stage>}` exactly at the stages the item lists, while the item reads `hidden.constraints` only (`bank2.ts:288-294`). Sent to the lead for a ruling (item 14 below); no product change.
+* Hidden 425515389 fails `phrases.behaviours` (3 of 6 behaviour phrases unsaid). PRs 475 and 507 say all 6 on that seed; not caused by the D6 change.
+* All levels on seed 2 at `90832b3d5` (`--all-levels`, `.exec/all-s2.json`): levels 1 to 14, 17, 20, 21 and 22 pass. The other failures are all on the rulings list below: 15 `sequence.stages.D8_tool_failure` (item 14); 16 `allocation.stage.present`, `ratio`, `evenness`, `hill1`, with opening at 0 placements (item 7); 18 `minimal.*`, 54 of 55 (item 4); 19 `contrast.read`/`list.integer.at-minimum-above-minimum` (item 2) and `contrast.write.integer.*` (item 1). No product-only change is left for seed 2 without a ruling.
+* The Acme reference agent passes the regenerated Acme suite only with PR 514 (file and tool-result guard); without it the 26 D6 blocks of `acme-generated.test.ts` fail. This branch depends on PR 514.
+
+## Earlier: iteration 21
+
+Follow-up coverage: branch rebased onto maintainer D8 contract `30e038ed5` (PR 511). No D8 production edit is needed: generation already preserves the rendered exact count. Independent Zed Bank tests now cover exact retry count, pending stage and failure text on ordinary and self-loop paths; the same non-bank map verifies perturbation placement after a restatement. Restoring the old restatement exclusion makes both placement tests fail. Focused tests pass 64/64, including real mode-P reference/fault runs on seeds 1 through 8. Evidence: `.exec/d8-modep-tests.log`, `.exec/nonbank-restated-red.log`.
+
+General product contract: an approved read-input correction must still use the latest value after a deviation; inserted turns must not shift a perturbation to the wrong stage (`docs/generating.md:287,289`, `docs/reference/spec.md:666`). Product code contains no validator seed, item id, fixture name or bank value. Before a level-lifting PR, add four-seed CI evidence, seeds 4-8 and a fresh hidden seed, plus these generality checks to its body. The owner routes the new minimum to the floors maintainer; never edit the protected floor on this branch.
+
+D6 attempt is parked, uncommitted, in `.exec/parked-d6/{assemble.ts,instruction-carrier.ts,instruction-carrier.test.ts}`. It passes real reference/fault checks but exposes conflicting validator contracts: `diff.phrases.filled` rejects the empty user text required by `perturbation.carrier.D6_instruction_in_data`; `bank3.ts` also counts only user-carried phrases. Seed 2 falls to level 1 with 24 rejected empty turns (`.exec/carrier-after.json`). Await the maintainer ruling before restoring or committing the carrier change. Generated Acme fixtures and categorical hashes would then need regeneration; the phrase provenance product test must check the actual carrier.
+
+Inherited work: the stopped author handed over PRs 475, 507, 508 and 510. Read `scratchpad/codex/HANDOVER-claude-generator-exec.md` in the owner's session directory. PR 508's before/after sweep jobs 38784363114 and 38784365861 are queued as last checked. Complete its table when they finish. Then investigate true invariance pairs on seeds 3/5/18, seed 18 behaviour coverage and the handed-over slot-phrase ruling. Do not modify protected validator code on this branch.
+
+This section supersedes the historical measurements and diagnoses below. Starting commit `14034c6ca`, measured with `validate generator --seeds 1..3 --hidden --json`: seed 1 = 11, seed 2 = 12, seed 3 = 11, hidden (336760492) = 9. Evidence: `.exec/baseline.json`. The prior handover's level 8 was stale.
+
+Iteration 21 measures seed 2 only: level 12 remains, but `mode.P.X2.slot-first` now passes. The sole level-13 failure is `perturbation.carrier.D6_instruction_in_data`. Evidence: `.exec/restated-after.json`. No levels above 13 are measured yet. Restated-slot scenarios now declare approved perturbations, indexed after the inserted earlier-value turn; their tool-failure stage comes from the actual block. The regression was red with zero restated perturbations and passes on seeds 1, 2 and 3.
+
+Active branch: `feat/generator-climb`, one worktree in the owner's `scratchpad/astra-gen-climb`. Only generator tests and validator runs are authorized. No paid calls. Keep the worktree and dependencies until the last push.
+
+Coordination: PR 475 and its author's follow-up own phrase handling in `scenario.ts` and `phrase-seeder.ts`. They cover hidden B-003 and seed 13 fact-flip. Do not change those sections. The owner permits tool-failure and world-carrier changes in `scenario.ts`. Persona/channel invariance on seeds 12/13/18 is a separate maintainer fix.
+
+`adequacy.D8.advance` is with the maintainer on `fix/generator-d8-retry-contract`. Seed 1 `gen-cover-021`, block 2: reference and mutant have identical check stage, text and input; reference calls lookup twice, mutant once; both satisfy `{max:2}`. Recovery level 13 also requires that exact count object. Evidence: `.exec/d8-evidence.jsonl`; sent to the owner. Await the product contract; never edit the validator item.
+
+World-carrier diagnosis: approved D6 text is emitted as user text. The canonical `world-instruction.test.ts` demonstrates file content plus an empty injected user turn; the follower reads that world. The earlier historical claim that D6 requires a fixture change is obsolete. The next product change will preserve the existing world and place approved D6 text in a collision-free workspace file for both explicit probes and mode P.
 
 V4 gate measurement: seed 1 reaches level 8. Counts by level 1 through 9: 25/25, 25/25, 26/26, 25/25, 25/25, 22/22, 30/30, 30/30, 17/20. Levels 10 through 22 were not run. The scoped measured bank is 225/228, not a replacement for the historical all-seed total. Gate-only checks on seeds 2 and 3 each pass 22/22; their full ladders were not rerun. Evidence: `.exec/gate-ladder-s1.json`, `.exec/gate-structured-s2.json`, `.exec/gate-structured-s3.json`. No full sweep is authorized on the loaded host.
 
@@ -117,6 +151,14 @@ Tried and rejected:
 
 ## Next actions
 
+Current actions (supersede the historical list below):
+
+1. Finish and commit iteration 21, with generator regression checks and the journal.
+2. Move D6 approved instruction text into the world, run seed 2, and push/open a draft PR at the first gained level.
+3. Continue each newly reached level; incorporate the maintainer's D8 contract and the author's phrase fixes when available. Recheck seeds 1/2/3 and the commit-derived hidden seed, using CI for the latter.
+
+Historical actions:
+
 1. Take the rulings on items 1 to 19 to the maintainer. Item 1 alone holds every seed at level 5.
 2. After pull request 306 merges, a maintainer sets the generator floor at 5 (`fix/generator-floor`).
 3. Fix `allocation.deviation.ratio` (above), then re-run the sweep.
@@ -220,3 +262,13 @@ Product obligation: keep shared preparation intact; on the actual request assert
 Ruling item 14 above. `sequence.stages.<class>` owed a probe at every middle stage of the flows listing the class, filtered only by written constraints. The hidden space map also forbids the pairs no path can reach (`possible.ts`), and the coverage items already read that map. For D8 the map allows a tool failure only on a move that calls a recovered tool, so the item demanded probes the map rules out (seed 2: check, choice, details, recap). No product could satisfy both.
 
 The item now reads the same map as the coverage items: a stage the map rules out for the class is owed no probe, and a probe placed at such a stage fails the item. A reachable stage left unprobed still fails it, and a class with no reachable stage never passes. Measured on main's product: the old logic fails D8 on 18 of the 21 visible and hidden seeds; the new item fails none, and no probe sits at a ruled-out stage. See [the journal](SWEEP-JOURNAL.md) and [evidence](evidence/sequence-impossible-pairs.json). No historical ladder level is updated by this scoped ruling.
+## Feasibility and impossible pairs: maintainer ruling (2026-10-15)
+
+`diff.feasible.<seeder>` read only the written constraints, and only five seeders. A block in a cell no path of the hidden map can reach (`possible.ts`) passed, and blocks from the `cover` and `task` seeders were read by no item. The item now reads the hidden space map, the same map the coverage items read. It checks every seeder: `cover` and `task` have their own items, and `diff.feasible.unlisted` reads any seeder no item names. The bank grows from 2033 to 2036 items.
+
+Measured on main's product, `diff.feasible.cover` fails on every measured seed (1 to 20, the hidden seed and 1001 to 1010). `diff.feasible.twise` also fails on seeds 10 and 15. Two product causes, both against the generator's own model in `packages/generate/src/seed/possible.ts`:
+
+1. A cover spec pairs a behaviour with a flow that does not list it (seed 2: `gen-cover-001`, flow change-request, behaviour B-001). Every block inherits the pair: 6787 blocks across 31 seeds.
+2. The first move's block records the start stage it is said at (`assemble.ts`, `saidAt`), while both models place a move at the stage it reaches. It is flagged only where the behaviour's flows carry no first-turn class: 25 blocks on seeds 10 and 15.
+
+The product lane fixes these in `packages/generate`. Per-seed counts: [evidence](evidence/feasible-impossible-pairs.json) and [the journal](SWEEP-JOURNAL.md). No historical ladder level is updated by this scoped ruling.

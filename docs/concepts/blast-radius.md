@@ -295,6 +295,21 @@ A prompt can carry a section registry, `prompts/<prompt-id>.sections.yaml`, that
 
 A block names the sections it tests in the spec's `metadata.links`, each link with a status: `declared`, `attributed`, `verified`, `refuted` or `stale`. `metadata.links` and `metadata.provenance` stay out of the spec hash, so a link added or promoted never changes a run id or a cache key and never invalidates a carry or a rejudge. `spec lint --sections <registries>` checks that every link names a section its registry holds.
 
+### Advisory section selection
+
+A change manifest can name a section: `kind: prompt_section`, `id: <prompt-id>#<section-id>`. `radius sections reanchor --change-out <file>` writes one per stale or reordered section, and a global `prompt` change when text changed outside every section. A `prompt_section` change makes the radius the whole suite, with the reason `section selection is advisory until links are verified by mutation`. `radius <specs> --change <manifest> --sections <registries>` adds what selection by links would run:
+
+* the blocks linked, by a link that is not `refuted`, to a changed section or to a section that references, overrides or duplicates one, transitively;
+* the blocks with no link to the changed prompt, and those with a stale link (as Ekstazi, a test with no record always runs);
+* every later block of the same conversation, and the blocks of a spec that starts from a selected parent block;
+* every block, when a changed section is global or unknown.
+
+Why it does not skip tests yet: on the H7 suite (the Acme stand-in prompt of 30 sections, 19 conversations, 37 blocks with declared links, 9,690 conversation runs on `claude-haiku-5-5`), declared links alone missed a block a mutant flipped in 3 of 90 single-section mutants, a share of 3.3% whose Wilson 95% interval reaches 9.3%, and in 9 of 110 mutants with the 20 two-section ones (8.2%). Two of the three misses were inherited failures in later blocks of a chain; the forward closure brings the share to 2 of 90 and 4 of 110 at a mean selection ratio of 0.23 (0.199 without it). The core test `packages/core/test/radius/select.test.ts` re-scores those stored runs with this rule and reproduces each number. The other miss is a link no author declared: negating the confirmation rule broke recap blocks linked only to `recap`. Selection may become a filter only when links verified by mutation keep the Wilson upper bound at or below 5%, two-section mutants included.
+
+### Localisation over sections
+
+`radius localize <specs> --store <file> --campaign <id> --sections <registries>` ranks the local sections of a prompt by Ochiai suspiciousness from a stored campaign: a block covers the sections it links to, `failed` and `passed` sum the failure and pass rates of the linked blocks over the suite runs, and the score is `failed / sqrt(total failure weight x (failed + passed))`. A failure is dropped when an earlier block of the same conversation (or a parent block) failed in the same run; a block that passes after a failing one stays a row. Global sections are not ranked; ties print as a rank range. On the stored H7 runs (`packages/core/test/radius/localize.test.ts`) this rule ranks the planted section worse than flat counting on 3 of 98 faults; dropping every block after a failing one ranks worse on 18 of 98, the registered H5 result. Ranking against each block's own baseline verdict comes with the mutation runner.
+
 Anthropic Citations give `start_char_index` and `end_char_index` in code points. On a text with two emoji before the cited sentence the API gave 23 where UTF-16 gives 25, so an imported citation is converted (`codePointToUtf16`, `citationSpan`) before it is compared with a span.
 
 ## Execution provenance
