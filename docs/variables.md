@@ -10,7 +10,7 @@ Three sources feed it:
 | Past conversations | the values they show, and how often | counts and a hash of the private set, never a line of text |
 | The owner | a value that is missing, a combination that cannot occur, a weight | the owner's words and the day they said them |
 
-Status. Built: the format, a loader that checks it, the conversion from a space map and from a map proposal, the conversion back to a space map, and the check of every quote against its file. Not built yet: the readers that fill a store from an estate, from past conversations and from an interview; the ledger that gives the ids (the store checks only their shape); the planner and the generator reading a store; a command for the store. The `space` commands read a space map, and `variablesToSpaceMap` makes one from a store.
+Status. Built: the format, a loader that checks it, the conversion from a space map and from a map proposal, the conversion back to a space map, the check of every quote against its file, and a planner that builds test rows from a store (`planV2`, opt-in). Not built yet: the readers that fill a store from an estate, from past conversations and from an interview; the ledger that gives the ids (the store checks only their shape); the generator reading a plan; a command for the store. The `space` commands read a space map, and `variablesToSpaceMap` makes one from a store.
 
 ## The file
 
@@ -219,6 +219,58 @@ Three conversions connect the store to the two files it replaces.
 * `spaceMapToVariables(map)` turns a space map into a store. Each dimension becomes an approved axis, each constraint an approved one, and no entry has provenance or an author, because a space map says neither. The weights of the prior move onto the values they weigh. The store keeps one weight per value, so the weight a value wrote itself, when the prior also weighs its dimension, is the one thing not kept; a space command never read it. Everything else a space command reads is kept: converting back gives the same map.
 * `proposalToVariables(proposal)` turns the dimensions and constraints of a map proposal into a store. It keeps every field: the role, the flags, who proposed each entry (`produced_by`), the rule fields and the weight of each value, and the evidence of each entry as a `quote` with the path as the proposal wrote it, so write the store beside the proposal. The phrases, the relations and the numeric settings stay in the proposal. Rebuilding the dimensions and constraints from the store gives the proposal's own, for the approved Acme proposal and for the one nobody approved.
 * `variablesToSpaceMap(store, options)` turns a store into a space map: its approved axes, their values, weights and required flags, and the constraints whose values are all in the map. It returns the result of `validateSpaceMap`, so a store with no approved axis gives the error `SCHEMA_TOO_SMALL` on `dimensions`. With `approvedOnly: false` it keeps what is not approved. It does not add the value `none` to a deviation axis; the generator adds it when it builds the cells, as it does for a proposal.
+
+## Planning rows from a store
+
+`planV2` builds the rows of a test plan from a store. A row gives one value to every approved variable, axes and details alike. It is opt-in: the planner of the seeders (`generate`) is unchanged, and nothing reads a plan yet.
+
+```ts
+import { planV2, renderPlanV2 } from '@agent-nexus/driftbench-generate';
+import { loadVariableStore } from '@agent-nexus/driftbench-space';
+
+const loaded = await loadVariableStore('examples/variables/tidewater.yaml');
+if (!loaded.ok) throw new Error('the store is not valid');
+const plan = planV2(loaded.store, { seed: 1, budget: 20, seeds: [{ id: 'monday', values: { channel: 'email' } }] });
+console.log(renderPlanV2(plan));
+```
+
+The plan uses what a person approved, as the space map does: a value counts when its own flag, else its variable's, is true, and a constraint counts when it is approved and every value it names is in the plan. `approvedOnly: false` plans everything.
+
+### What the rows cover
+
+The store never lists rules. The planner reads them from what the store keeps (`storeRules` lists them):
+
+* A passage is a rule. It is named by the ledger id of its quote, else by the file and the words of the quote with white space folded. The variables of every value, boundary and constraint that quotes it belong to the rule; a constraint brings every variable it forbids.
+* A value with `when` or `unless` brings the variables they name into the rule of the passages it quotes. With no quote it is a rule of its own. A value with only a `polarity`, `limit`, `within` or `priority` is a rule of its own variable.
+
+The strength of the cover follows the rules:
+
+| Layer | Strength | What the rows must hold |
+|---|---|---|
+| `own` | 3 | for each rule that names n variables, every combination of values of every `min(3, n)` of them |
+| `shared` | 2 | every combination of values of every pair of axes that two or more rules name; a rule that names one variable does not count, and a detail never makes a pair |
+| `single` | 1 | every value of the variables that no group above names |
+
+A combination that no valid row can hold is not a target. That includes a combination a constraint forbids, and one that constraints together make impossible: with `tide: slack` forbidden at both lamps, no row holds `slack`. A value that no valid row can hold gets the warning `value_unreachable`, and it is the store that may be wrong. Rows are built one at a time. Each starts from the most common target still waiting, then takes for every other variable the value that covers the most waiting targets, among the values that keep the row completable to one no constraint forbids. The array is not minimal.
+
+### Seeds, order and budget
+
+* A seed row is a real session: `{ id, values }`, with the values of the variables the session shows. Seeds come first, in the order given, and no budget cuts them. A seed counts as covering every combination all of whose variables it sets. A seed that names a variable or a value the store does not have is kept without that entry (`seed_unknown_value`). A seed that names a value the store has but nobody approved is kept whole, entry included, and each such entry is reported (`seed_unapproved_value`); it covers nothing and adds nothing to the weight. When nothing in the store is approved, the plan is the seeds alone (`no_variables`). A seed that holds a combination the store forbids is kept (`seed_forbidden`).
+* The weight of a row is the product of the shares of its values, written as a sum of logarithms (`logWeight`), so a row of hundreds of variables does not underflow. The share of a value is its weight over the weights of the approved values of its variable, or the same for all when the variable has no weights. A weight of 0 gives minus infinity, written `null` in the JSON.
+* The new rows come from the most common to the rarest. Rows of equal weight are ordered by a hash of the seed and the row, so the order is stable.
+* `budget` is the most rows the plan holds, seeds included. The plan keeps the first rows and cuts the rarest, and `layers` says what the cut leaves uncovered. A budget below the number of seeds keeps all the seeds and no new row.
+* The same store, options and `seed` give the same text, byte for byte. The log weight is written to nine places.
+
+### The plan
+
+| Field | Holds |
+|---|---|
+| `agent`, `version`, `seed`, `budget` | the store and the options |
+| `generated`, `cut` | new rows built, and new rows the budget cut |
+| `layers` | per layer: `strength`, `groups`, `targets`, `infeasible`, `seeded` (targets the seeds hold), `covered` (targets the kept rows hold), `uncovered` |
+| `rules` | the rules read from the store: `id`, `label`, `variables` |
+| `rows` | `id` (`seed.NAME`, `row.001` ...), `source` (`seed` or `planned`), `values`, `logWeight` |
+| `warnings` | `no_variables`, `value_unreachable`, `seed_unknown_value`, `seed_unapproved_value`, `seed_forbidden`, each with a message |
 
 ## Worked examples
 
