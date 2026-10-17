@@ -1,0 +1,10 @@
+id: refund-late-order
+uses: { value_check: acme }
+blocks:
+  - id: b1
+    user: My order W2378156 is late, I want a refund.
+    uses:
+      value_check: { extends: acme, items: [{ id: rung4_exact, params: { case_insensitive: true } }] }
+      check_set: no-accuracy
+  - id: b2
+    user: Thanks.

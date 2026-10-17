@@ -695,6 +695,18 @@ export const FILE_PAGES: readonly FilePage[] = [
     ],
   },
   {
+    file: 'objects.md',
+    title: 'Objects reference',
+    source: 'packages/core/src/schema/object.ts',
+    about: `An object is one rule set driftbench applies, written as data: a kind, an id and addressable items. A project tailors a shipped object by writing one that extends it, under \`driftbench/<kind>/<id>.yaml\` beside \`driftbench.yaml\` or in its \`objects:\` key; a spec or a block names the objects it uses under \`uses\`. The kinds: ${core.BUILTIN_KINDS.map((def) => `\`${def.kind}\` (${def.summary.replace(/\.$/, '').toLowerCase()})`).join(', ')}. \`driftbench object\` lists, explains, extends and validates them; see [the CLI](cli.md#driftbench-object) and \`driftbench help core-objects\`. The object file comes first, then the \`uses\` map.`,
+    keys: SNAKE,
+    names: core,
+    roots: [
+      ['ItemFile', core.ItemFile],
+      ['Uses', core.Uses],
+    ],
+  },
+  {
     file: 'change.md',
     title: 'Change manifest reference',
     source: 'packages/core/src/radius/change.ts',

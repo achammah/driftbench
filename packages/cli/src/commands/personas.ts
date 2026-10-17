@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { loadSpecFile, type TargetRef, type UserDriver } from '@agent-nexus/driftbench-core';
 import {
@@ -10,7 +11,9 @@ import {
   type UserModelPort,
   userRecordingPort,
 } from '@agent-nexus/driftbench-users';
+import { parse as parseYaml } from 'yaml';
 import type { Io } from '../io';
+import { isSituationalBlock, loadSituationalPersona } from './object-migrate';
 
 /**
  * Where a simulated user speaks from, and the persona files a run plays: shared by `driftbench simulate`
@@ -34,17 +37,32 @@ export function agentFamilyOf(target: TargetRef, given: string | undefined): str
   return NOT_A_MODEL.has(shown) ? 'none' : undefined;
 }
 
+/** True when the file parses as a situational block; an unreadable file is left to the persona loader. */
+async function situational(path: string): Promise<boolean> {
+  try {
+    return isSituationalBlock(parseYaml(await readFile(path, 'utf8')));
+  } catch {
+    return false;
+  }
+}
+
 /** A persona loaded from its file, with the spec it names resolved to the spec's id. */
 export type LoadedPersona = { persona: Persona; path: string; specId?: string };
 
-/** Loads persona files; a persona's `spec` is read relative to its file. Undefined (printed) on a bad file. */
+/**
+ * Loads persona files; a persona's `spec` is read relative to its file. A file may also be the situational
+ * block `object migrate persona` writes: its persona and scenario objects are composed back into the persona
+ * the old file gave. Undefined (printed) on a bad file.
+ */
 export async function loadPersonas(paths: readonly string[], io: Io): Promise<LoadedPersona[] | undefined> {
   const loaded: LoadedPersona[] = [];
   for (const path of paths) {
     const absolute = resolve(io.cwd, path);
     let persona: Persona;
     try {
-      persona = await loadPersona(absolute);
+      persona = (await situational(absolute))
+        ? await loadSituationalPersona(absolute)
+        : await loadPersona(absolute);
     } catch (cause) {
       io.err(`${cause instanceof Error ? cause.message : String(cause)}\n`);
       return undefined;

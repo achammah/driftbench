@@ -18,6 +18,8 @@ export { StoreError, type StoreErrorCode } from './errors';
 export {
   diffFiles,
   type FileChange,
+  isRegistryKind,
+  objectRegistryKind,
   parseVersionRef,
   REGISTRY_KINDS,
   type RegistryEntry,

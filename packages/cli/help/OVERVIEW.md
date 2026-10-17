@@ -34,6 +34,7 @@ Write and grow the tests
   driftbench family      code-agent task families built from a seed
   driftbench dataset     version spec sets in the store
   driftbench prompt      version prompts in the store
+  driftbench object      the rule sets driftbench applies: list, explain, extend, validate, migrate
 
 Run the agent
   driftbench campaign    plan, run, resume, inspect and export campaigns

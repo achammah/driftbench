@@ -1,0 +1,9 @@
+kind: policy/value-check
+id: acme
+extends: default
+description: Acme compares numbers by their digits, and reads the format its tools state.
+items:
+  - id: rung4_exact
+    params: { strip_punctuation: true }
+  - id: rung2_contract
+    enabled: true

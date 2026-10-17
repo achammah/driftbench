@@ -53,6 +53,10 @@ export async function readScaleConfig(path: string): Promise<ScaleLoad> {
   return { ok: true, scales };
 }
 
+/**
+ * The top-level keys of the project config. `objects` holds project-layer objects written inline (a list of
+ * object files); `driftbench object validate` reads it, and every reader here accepts it.
+ */
 const KEYS = new Set(['aggregates', 'scales', 'campaign', 'plugins', 'prices', 'objects']);
 
 function lineOf(text: string, offset: number): number {

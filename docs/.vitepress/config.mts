@@ -148,6 +148,7 @@ export default defineConfig({
           { text: 'Map reference', link: '/reference/map' },
           { text: 'Interview reference', link: '/reference/interview' },
           { text: 'Criteria and labels', link: '/reference/criteria' },
+          { text: 'Objects', link: '/reference/objects' },
           { text: 'Personas and red-team', link: '/reference/users' },
           { text: 'Change manifest', link: '/reference/change' },
           { text: 'Estate files', link: '/reference/estate-files' },

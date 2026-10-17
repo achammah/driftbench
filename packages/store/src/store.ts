@@ -21,6 +21,7 @@ import { describeCause, describeIssues, StoreError } from './errors';
 import {
   checkName,
   entriesOf,
+  isRegistryKind,
   isVersionPath,
   isVersionRecord,
   REGISTRY_KINDS,
@@ -832,8 +833,11 @@ function textOrder(a: string, b: string): number {
 }
 
 function checkKind(kind: string): asserts kind is RegistryKind {
-  if (!REGISTRY_KINDS.includes(kind as RegistryKind)) {
-    throw new StoreError('INVALID_RECORD', `the registry holds ${REGISTRY_KINDS.join(' and ')}, not ${kind}`);
+  if (!isRegistryKind(kind)) {
+    throw new StoreError(
+      'INVALID_RECORD',
+      `the registry holds ${REGISTRY_KINDS.join(', ')} and object.<kind>, not ${kind}`,
+    );
   }
 }
 

@@ -11,8 +11,37 @@ import { StoreError } from './errors';
  * list's canonical JSON. Pushing content a name already holds gives back that version.
  */
 
-export type RegistryKind = 'dataset' | 'prompt';
+/**
+ * What a version holds: a dataset, a prompt, or one object of the framework, `object.<kind>` with the object
+ * kind's `/` written as `.`, such as `object.policy.blame` or `object.persona`. Object kinds are open (a
+ * plugin adds kinds), so they are checked by their form, not listed.
+ */
+export type RegistryKind = 'dataset' | 'prompt' | `object.${string}`;
+/** The fixed kinds. Object kinds are `object.<kind>`: see `objectRegistryKind` and `isRegistryKind`. */
 export const REGISTRY_KINDS: readonly RegistryKind[] = ['dataset', 'prompt'];
+
+/** The object kind grammar of core's `ObjectKind`: lower case, one optional `/` group. */
+const OBJECT_KIND = /^[a-z][a-z0-9-]*(\/[a-z][a-z0-9-]*)?$/;
+const OBJECT_REGISTRY_KIND = /^object\.[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)?$/;
+
+/** True for `dataset`, `prompt` and `object.<kind>` with a well formed object kind. */
+export function isRegistryKind(kind: unknown): kind is RegistryKind {
+  return (
+    typeof kind === 'string' &&
+    (REGISTRY_KINDS.includes(kind as RegistryKind) || OBJECT_REGISTRY_KIND.test(kind))
+  );
+}
+
+/** The registry kind of an object kind: `policy/blame` gives `object.policy.blame`. */
+export function objectRegistryKind(kind: string): RegistryKind {
+  if (!OBJECT_KIND.test(kind)) {
+    throw new StoreError(
+      'INVALID_RECORD',
+      `"${kind}" is not an object kind, such as policy/blame or persona`,
+    );
+  }
+  return `object.${kind.replaceAll('/', '.')}`;
+}
 
 /** One file of a version: a path relative to the version's root, with `/` separators. */
 export type RegistryFile = { path: string; bytes: Uint8Array };
@@ -287,7 +316,7 @@ export function isVersionRecord(value: unknown): value is RegistryVersion {
   const record = value as Record<string, unknown>;
   const files = record.files;
   return (
-    REGISTRY_KINDS.includes(record.kind as RegistryKind) &&
+    isRegistryKind(record.kind) &&
     typeof record.name === 'string' &&
     Number.isInteger(record.version) &&
     (record.version as number) >= 1 &&

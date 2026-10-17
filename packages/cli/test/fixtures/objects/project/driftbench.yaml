@@ -1,0 +1,8 @@
+# The project config of the objects fixture: one inline object, the rest under driftbench/.
+objects:
+  - kind: check-set
+    id: no-accuracy
+    extends: default
+    items:
+      - id: tools.argument_accuracy
+        enabled: false
