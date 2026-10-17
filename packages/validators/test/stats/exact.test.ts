@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { describe, expect, it } from 'vitest';
+import { capabilityItems } from '../../src/ladders/stats/bank/exact-capabilities';
 import { runItem, statsBank } from '../../src/ladders/stats/bank/index';
 import type { BankItem } from '../../src/ladders/stats/bank/item';
 import type { StatsImpl } from '../../src/ladders/stats/reference';
@@ -16,7 +17,12 @@ import { ROOT, real } from './support';
  */
 /** The functions of the report package: not statistics functions to replace in the package object. */
 const REPORT_FUNCTIONS = ['suiteHeadline', 'clusterRate'];
-const items: BankItem[] = statsBank(ROOT).filter((item) => item.id.startsWith('exact.'));
+// Only the explicitly registered planned capabilities have a separate positive/missing-export suite.
+// Unknown or accidentally missing inherited exports must still fail the availability test below.
+const plannedIds = new Set(capabilityItems().map((item) => item.id));
+const items: BankItem[] = statsBank(ROOT).filter(
+  (item) => item.id.startsWith('exact.') && !plannedIds.has(item.id),
+);
 const byFunction = new Map<string, BankItem[]>();
 for (const item of items.filter((item) => !item.id.startsWith('exact.source.'))) {
   const name = item.id.split('.')[1] as string;

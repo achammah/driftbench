@@ -244,6 +244,17 @@ A set of specs, or of real conversations, is a sample of the situations an agent
 
 `f1` and `f2` are the classes seen once and twice, and `n` the observations. `abundances(labels)` turns a list of class labels into the counts these functions take. `driftbench space complete` prints the same quantities for a map of situations; see [CLI](../reference/cli.md#driftbench-space-complete).
 
+## Planned: four statistics the pages already lean on
+
+Each is written here before it is built. The statistics validator holds the package to these definitions with items whose answers come from Python (`validators/stats/NEEDS.md`, batch 11); until the functions exist those items fail.
+
+| Function | What it computes | Where a page leans on it |
+|---|---|---|
+| `holm(pvalues, alpha)` | Holm's step-down procedure: with the p-values sorted ascending, `adjusted` at rank i is the largest over j up to i of `min(1, (m - j + 1) p(j))`, in the input order; `rejected` is `adjusted <= alpha` (default 0.05). It controls the chance of any false rejection, where `benjaminiHochberg` controls the share of false rejections. Returns `adjusted`, `rejected` and `alpha`; no hypotheses give empty lists | a gate on several criteria that must not pass a regression by chance: [the campaign verdict](#the-campaign-verdict) names Benjamini-Hochberg for reporting, and a gating decision needs the family-wise rate |
+| `sampleSizeForEffect({ effect, baselineRate, power, alpha, repeats, rho })` | the smallest whole number of specs `n` per version whose `mde` is at most `effect`: the inverse of `mde`. The effective units are `n repeats / (1 + (repeats - 1) rho)`; `effect` is a drop from `baselineRate` (0 < effect <= baselineRate); `power` 0.8, `alpha` 0.05, `repeats` 1 and `rho` 0 by default. Returns `n`, `effectiveN` and `designEffect` | [before a campaign](#before-a-campaign) and the README: "the gate says how many test conversations your suite needs before it can show anything" |
+| `kappaInterval(a, b, { alpha })` | Cohen's kappa of two raters with its large-sample interval: `se = sqrt(po (1 - po) / (n (1 - pe)^2))` with `po` the observed and `pe` the chance agreement, the interval `kappa -/+ z(1 - alpha / 2) se` clipped to [-1, 1], `alpha` 0.05. Unweighted; when `pe` is 1 the interval is the point. Returns `kappa`, `se`, `lower`, `upper` | [judge calibration](judges.md#calibration-an-assignment-is-earned): the kappa of a judge against hand labels is printed with a Wilson interval on the agreement; the kappa itself has none |
+| `mcnemarMidP(b, c)` | the mid-p McNemar test on discordant counts: `2 P(X < k) + P(X = k)` capped at 1, with `X` binomial(b + c, 0.5) and `k = min(b, c)`; no discordant pair gives 1. It is less conservative than the exact test at small counts. Returns `pValue`, `b`, `c` | [comparing a baseline and a candidate](#comparing-a-baseline-and-a-candidate): `compare` prints the exact test, which at 5 discordant pairs cannot reach 0.05 even when all five go one way (p = 0.0625; mid-p gives 0.03125) |
+
 ## Helpers
 
 The package also exports the pieces the functions above are built on: `mean`, `quantile`, `quantileSorted` (type 7 quantiles), `sampleVariance`, `mulberry32` (the seeded generator), `zFor`, `Z95`, `normalCdf`, `normalSf`, `normalQuantile`, `chiSquareSf`, `binomialCdf`, `betaQuantile`, `incompleteBeta`, `logGamma`, `erfc` and `kolmogorovSf`.

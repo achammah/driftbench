@@ -386,3 +386,29 @@ Method. The package of the commit before any fix (`141a67d8`, 590 of 858 items p
 What stays open, and why it is not a flaw of the bank. A blanket throw on non-finite or empty arguments is, for most functions, the correct implementation of rule 1 of the degenerate level (a RangeError that names the function and the argument). The 71 to 79 items it gains are the items a real fix of those functions gains too: there the cheat and the fix are the same code. It is wrong only where an odd argument is valid, and it loses the valid-odd items there: `normalCdf(Infinity)`, `normalQuantile(0)`, `logGamma` at a pole, `kolmogorovSf` at the ends, `benjaminiHochberg([])`, `abundances([])`, `betaQuantile` at p = 0 and 1, `incompleteBeta` at 0 and 1, `binomialCdf` out of range, `hillNumber` at q < 0, `mde` at baseline 0 and 1, `wilson` at k = 0 and k = n. The 7 losses are the valid-odd items of the functions the blanket throw reaches. A function found later with a valid odd input gets an item the same day. The auditor's +44 on the old bank is this cheat.
 
 Found while writing the sibling items: `erfc(Infinity)`, `normalSf(Infinity)` and `normalCdf(1e300)` returned NaN, because the square of the argument overflowed. Fixed in its own pull request; the three sibling items fail without it.
+
+## Batch 10: the defects of the differential sweep, as items
+
+A random differential test of the 57 exports (about 12,000 cases against scipy, exact rationals and 80-digit decimals, seeds in `packages/validators/fixtures/stats/make_exact_defects.py`) found accuracy defects outside the ranges the earlier items reached. Fourteen items, each at arguments where the package at the commit of the sweep was off by more than 1e-9 relative, NaN, Infinity, or did not return in time. Items that one change fixes share a cause (7 causes):
+
+| Cause | Items | Example (call, package value, exact value) |
+|---|---|---|
+| `hillNumber` loses its digits at large q | `defect.hillNumber.large-q` | `hillNumber([100, 60, 30, 10, 5, 2, 1], 50)`: 2.11642982 against 2.11132176 |
+| a quantile taken at `1 - alpha / 2` | `defect.zFor.tiny-alpha`, `wilsonEffective.tiny-alpha`, `pairedRateDifference.tiny-alpha`, `mde.tiny-alpha` | `zFor(1e-10)`: 6.466951074732 against 6.466951087241; `zFor(1e-16)`: Infinity against 8.3048 |
+| `clopperPearson` and `betaQuantile` in the far tail | `defect.clopperPearson.tiny-alpha`, `defect.betaQuantile.far-tail` | `clopperPearson(5, 100, 1e-20).upper`: 1 against 0.4750; `betaQuantile(1e-10, 0.0195, 0.3239)`: 3.1e-61 against 2.2e-308 |
+| `normalQuantile` below 1e-308 | `defect.normalQuantile.subnormal-p` | `normalQuantile(2.9817e-320)`: NaN against -38.2406 |
+| the log-gamma prefactor at shapes of 1e4 and more | `defect.incompleteBeta.large-shape`, `chiSquareSf.large-df`, `binomialCdf.large-n` | relative error 1e-8 to 2.5e-8 |
+| `binomialCdf` takes time proportional to k | `defect.binomialCdf.huge-n-time` | `binomialCdf(5e8, 1e9, 0.5)` must return in 8 s |
+| exact `ksTest` p-value in the tail | `defect.ksTest.separated-samples`, `ksTest.tail-lattice` | separated samples of 38 and 76: p against 2 / C(114, 38) |
+
+Measured both ways. On the commit the sweep ran on, 14 of 14 fail. On that commit plus the six open pull requests of the lead's stats-fix lane (#699 hillNumber, #702 normalQuantile, #703 alpha complement, #707 log prefactor, #700 ksTest tail, #709 betaQuantile tails), 14 of 14 pass. #740 (erfc limits) is a separate fix whose items are the `sibling` and `valid-odd` items of batch 9.
+
+The floor of the ladder stays at the level of the pilot. These items are written to fail until the fixes land; until then the bank on `main` is 14 items short of 100 percent, which is the point: the fixes are the work.
+
+## Batch 11: four statistics the docs now define and the package lacks
+
+`docs/concepts/statistics.md` gains a section "Planned: four statistics the pages already lean on", written before any item: `holm` (family-wise control for a gate on several criteria), `sampleSizeForEffect` (the inverse of `mde`; the README promises that the gate says how many conversations a suite needs), `kappaInterval` (judge calibration prints a kappa with no interval on it) and `mcnemarMidP` (the exact test `compare` prints cannot reach 0.05 at five discordant pairs). Each has its definition on the page, an oracle in Python (`make_exact_capabilities.py`: exact rationals and scipy) and 32 items in all, in the family `exact-estimators`. The four functions do not exist, so the items fail with the signature to add and the page that defines them; there are four causes.
+
+The oracles were checked against an independent implementation written in TypeScript in a scratch file (not in the package): 32 of 32 pass, so an executor who writes the functions from the page gets green items.
+
+This is the honest size of capability growth. The statistics the pages lean on and the package lacks number four, not a hundred; the 155 quarantined methods have no page that needs them (batch 1 to 5), and adding them would be the padding section 12.1 rules out.

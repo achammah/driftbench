@@ -1,0 +1,1158 @@
+{
+  "provenance": {
+    "script": "packages/validators/fixtures/stats/make_exact_capabilities.py",
+    "numpy": "2.5.2",
+    "sources": {
+      "holm.textbook": "Holm 1979: adjusted = running maximum of min(1, (m - j + 1) p(j)) over the sorted p-values",
+      "holm.order": "the adjusted values come back in the input order, not the sorted order",
+      "holm.ties": "tied p-values get the same adjusted value",
+      "holm.monotone": "the running maximum keeps the adjusted values non-decreasing in rank",
+      "holm.cap-at-one": "an adjusted value above 1 is 1",
+      "holm.alpha": "alpha 0.01, 0.05, 0.2 and the boundary p(j) (m - j + 1) = alpha is rejected",
+      "holm.single-and-empty": "one hypothesis is its own p-value; none gives empty lists",
+      "holm.stricter-than-bh": "Holm never rejects more than Benjamini-Hochberg (scipy.stats.false_discovery_control gives the BH adjusted values to compare with)",
+      "sampleSizeForEffect.defaults": "the two-proportion power equation solved for n (scipy.stats.norm), defaults power 0.8 alpha 0.05",
+      "sampleSizeForEffect.power": "power 0.5, 0.9, 0.95",
+      "sampleSizeForEffect.alpha": "alpha 0.2, 0.01, 0.001",
+      "sampleSizeForEffect.repeats": "repeats without correlation: n shrinks in proportion",
+      "sampleSizeForEffect.rho": "repeats with a correlation: the design effect 1 + (repeats - 1) rho",
+      "sampleSizeForEffect.whole-number": "n is a whole number, the smallest whose effective units reach the need",
+      "sampleSizeForEffect.small-effect": "a small effect needs many specs",
+      "sampleSizeForEffect.inverse-of-mde": "mde(n) at the returned n is at most the effect, and at n - 1 it is above it",
+      "kappaInterval.binary": "kappa and its large-sample interval from the 2 x 2 table, exact rationals for po and pe",
+      "kappaInterval.multi-class": "three to five categories",
+      "kappaInterval.alpha": "alpha 0.2, 0.1, 0.01",
+      "kappaInterval.perfect": "perfect agreement with more than one category: kappa 1, se 0",
+      "kappaInterval.chance-level": "agreement at chance: kappa near 0",
+      "kappaInterval.constant-raters": "both raters give one label throughout: pe = 1, the interval is the point",
+      "kappaInterval.clipped": "the interval is clipped to [-1, 1]",
+      "kappaInterval.disagreement": "systematic disagreement gives a negative kappa",
+      "kappaInterval.labels": "labels may be strings or booleans",
+      "mcnemarMidP.small": "exact rationals: 2 P(X < k) + P(X = k), X binomial(b + c, 0.5)",
+      "mcnemarMidP.symmetric": "the test does not care which side is larger",
+      "mcnemarMidP.no-discordant": "no discordant pair: p = 1",
+      "mcnemarMidP.tied-sides": "b = c: the mid-p is capped at 1",
+      "mcnemarMidP.larger": "tens of discordant pairs",
+      "mcnemarMidP.large-count": "hundreds of discordant pairs: exact big-integer arithmetic keeps the value",
+      "mcnemarMidP.less-conservative": "the mid-p is below the exact two-sided p (scipy.stats.binomtest) whenever b != c"
+    }
+  },
+  "holm.textbook": [
+    {
+      "pvalues": [0.01, 0.04, 0.03, 0.005],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.03, 0.06, 0.06, 0.02],
+        "rejected": [true, false, false, true],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.001, 0.02, 0.2, 0.5, 0.04],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.005, 0.08, 0.4, 0.5, 0.12],
+        "rejected": [true, false, false, false, false],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.012, 0.011, 0.013],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.033, 0.033, 0.033],
+        "rejected": [true, true, true],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.9, 0.8, 0.7],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [1.0, 1.0, 1.0],
+        "rejected": [false, false, false],
+        "alpha": 0.05
+      }
+    }
+  ],
+  "holm.order": [
+    {
+      "pvalues": [0.04, 0.001, 0.03, 0.2],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.09, 0.004, 0.09, 0.2],
+        "rejected": [false, true, false, false],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.3, 0.2, 0.1, 0.001, 0.002],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.4, 0.4, 0.30000000000000004, 0.005, 0.008],
+        "rejected": [false, false, false, true, true],
+        "alpha": 0.05
+      }
+    }
+  ],
+  "holm.ties": [
+    {
+      "pvalues": [0.02, 0.02, 0.02, 0.5],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.08, 0.08, 0.08, 0.5],
+        "rejected": [false, false, false, false],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.01, 0.01, 0.04, 0.04],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.04, 0.04, 0.08, 0.08],
+        "rejected": [true, true, false, false],
+        "alpha": 0.05
+      }
+    }
+  ],
+  "holm.monotone": [
+    {
+      "pvalues": [0.001, 0.03, 0.0301, 0.9],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.004, 0.09, 0.09, 0.9],
+        "rejected": [true, false, false, false],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.2, 0.0004, 0.0006, 0.5, 0.0005],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.4, 0.002, 0.002, 0.5, 0.002],
+        "rejected": [false, true, true, false, true],
+        "alpha": 0.05
+      }
+    }
+  ],
+  "holm.cap-at-one": [
+    {
+      "pvalues": [0.6, 0.7, 0.8, 0.9],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [1.0, 1.0, 1.0, 1.0],
+        "rejected": [false, false, false, false],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.34, 0.5],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.68, 0.68],
+        "rejected": [false, false],
+        "alpha": 0.05
+      }
+    }
+  ],
+  "holm.alpha": [
+    {
+      "pvalues": [0.004, 0.012, 0.03],
+      "alpha": 0.01,
+      "expected": {
+        "adjusted": [0.012, 0.024, 0.03],
+        "rejected": [false, false, false],
+        "alpha": 0.01
+      }
+    },
+    {
+      "pvalues": [0.004, 0.012, 0.03],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.012, 0.024, 0.03],
+        "rejected": [true, true, true],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.004, 0.012, 0.03],
+      "alpha": 0.2,
+      "expected": {
+        "adjusted": [0.012, 0.024, 0.03],
+        "rejected": [true, true, true],
+        "alpha": 0.2
+      }
+    },
+    {
+      "pvalues": [0.0125, 0.5, 0.9, 0.6],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.05, 1.0, 1.0, 1.0],
+        "rejected": [true, false, false, false],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.025, 0.5],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.05, 0.5],
+        "rejected": [true, false],
+        "alpha": 0.05
+      }
+    }
+  ],
+  "holm.single-and-empty": [
+    {
+      "pvalues": [0.03],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.03],
+        "rejected": [true],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.7],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.7],
+        "rejected": [false],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [],
+        "rejected": [],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [0.0],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.0],
+        "rejected": [true],
+        "alpha": 0.05
+      }
+    },
+    {
+      "pvalues": [1.0],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [1.0],
+        "rejected": [false],
+        "alpha": 0.05
+      }
+    }
+  ],
+  "holm.stricter-than-bh": [
+    {
+      "pvalues": [0.01, 0.015, 0.02, 0.03, 0.04],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.05, 0.06, 0.06, 0.06, 0.06],
+        "rejected": [true, false, false, false, false],
+        "alpha": 0.05,
+        "bhAdjusted": [0.03333333333333333, 0.03333333333333333, 0.03333333333333333, 0.0375, 0.04]
+      }
+    },
+    {
+      "pvalues": [0.001, 0.008, 0.039, 0.041, 0.042, 0.06],
+      "alpha": 0.05,
+      "expected": {
+        "adjusted": [0.006, 0.04, 0.156, 0.156, 0.156, 0.156],
+        "rejected": [true, true, false, false, false, false],
+        "alpha": 0.05,
+        "bhAdjusted": [0.006, 0.024, 0.0504, 0.0504, 0.0504, 0.06]
+      }
+    }
+  ],
+  "sampleSizeForEffect.defaults": [
+    {
+      "effect": 0.1,
+      "baselineRate": 0.9,
+      "expected": {
+        "n": 199,
+        "effectiveN": 199.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.05,
+      "baselineRate": 0.8,
+      "expected": {
+        "n": 1094,
+        "effectiveN": 1094.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.2,
+      "baselineRate": 0.7,
+      "expected": {
+        "n": 93,
+        "effectiveN": 93.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.15,
+      "baselineRate": 0.5,
+      "expected": {
+        "n": 170,
+        "effectiveN": 170.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.3,
+      "baselineRate": 0.95,
+      "expected": {
+        "n": 27,
+        "effectiveN": 27.0,
+        "designEffect": 1.0
+      }
+    }
+  ],
+  "sampleSizeForEffect.power": [
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "power": 0.5,
+      "expected": {
+        "n": 145,
+        "effectiveN": 145.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "power": 0.9,
+      "expected": {
+        "n": 392,
+        "effectiveN": 392.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "power": 0.95,
+      "expected": {
+        "n": 485,
+        "effectiveN": 485.0,
+        "designEffect": 1.0
+      }
+    }
+  ],
+  "sampleSizeForEffect.alpha": [
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "alpha": 0.2,
+      "expected": {
+        "n": 169,
+        "effectiveN": 169.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "alpha": 0.01,
+      "expected": {
+        "n": 437,
+        "effectiveN": 437.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "alpha": 0.001,
+      "expected": {
+        "n": 639,
+        "effectiveN": 639.0,
+        "designEffect": 1.0
+      }
+    }
+  ],
+  "sampleSizeForEffect.repeats": [
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "repeats": 2,
+      "expected": {
+        "n": 147,
+        "effectiveN": 294.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "repeats": 5,
+      "expected": {
+        "n": 59,
+        "effectiveN": 295.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "repeats": 10,
+      "expected": {
+        "n": 30,
+        "effectiveN": 300.0,
+        "designEffect": 1.0
+      }
+    }
+  ],
+  "sampleSizeForEffect.rho": [
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "repeats": 5,
+      "rho": 0.3,
+      "expected": {
+        "n": 129,
+        "effectiveN": 293.18181818181813,
+        "designEffect": 2.2
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "repeats": 5,
+      "rho": 0.9,
+      "expected": {
+        "n": 270,
+        "effectiveN": 293.47826086956525,
+        "designEffect": 4.6
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "repeats": 10,
+      "rho": 0.5,
+      "expected": {
+        "n": 162,
+        "effectiveN": 294.54545454545456,
+        "designEffect": 5.5
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "repeats": 3,
+      "rho": 0.0,
+      "expected": {
+        "n": 98,
+        "effectiveN": 294.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "repeats": 4,
+      "rho": 1.0,
+      "expected": {
+        "n": 294,
+        "effectiveN": 294.0,
+        "designEffect": 4.0
+      }
+    }
+  ],
+  "sampleSizeForEffect.whole-number": [
+    {
+      "effect": 0.07,
+      "baselineRate": 0.83,
+      "expected": {
+        "n": 521,
+        "effectiveN": 521.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.12,
+      "baselineRate": 0.6,
+      "expected": {
+        "n": 270,
+        "effectiveN": 270.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.33,
+      "baselineRate": 0.9,
+      "expected": {
+        "n": 27,
+        "effectiveN": 27.0,
+        "designEffect": 1.0
+      }
+    }
+  ],
+  "sampleSizeForEffect.small-effect": [
+    {
+      "effect": 0.02,
+      "baselineRate": 0.5,
+      "expected": {
+        "n": 9806,
+        "effectiveN": 9806.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.01,
+      "baselineRate": 0.9,
+      "expected": {
+        "n": 14751,
+        "effectiveN": 14751.0,
+        "designEffect": 1.0
+      }
+    }
+  ],
+  "sampleSizeForEffect.inverse-of-mde": [
+    {
+      "effect": 0.1,
+      "baselineRate": 0.8,
+      "repeats": 1,
+      "rho": 0.0,
+      "expected": {
+        "n": 294,
+        "effectiveN": 294.0,
+        "designEffect": 1.0
+      }
+    },
+    {
+      "effect": 0.15,
+      "baselineRate": 0.7,
+      "repeats": 4,
+      "rho": 0.4,
+      "expected": {
+        "n": 90,
+        "effectiveN": 163.63636363636363,
+        "designEffect": 2.2
+      }
+    },
+    {
+      "effect": 0.08,
+      "baselineRate": 0.9,
+      "repeats": 6,
+      "rho": 0.2,
+      "expected": {
+        "n": 99,
+        "effectiveN": 297.0,
+        "designEffect": 2.0
+      }
+    }
+  ],
+  "kappaInterval.binary": [
+    {
+      "a": [
+        0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1,
+        0, 0, 1, 0, 0, 1
+      ],
+      "b": [
+        0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1,
+        0, 1, 1, 0, 0, 1
+      ],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.9,
+        "se": 0.06892024376045111,
+        "lower": 0.7649188044237945,
+        "upper": 1.0
+      }
+    },
+    {
+      "a": [
+        0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1,
+        1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+        0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0
+      ],
+      "b": [
+        1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1,
+        1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1,
+        0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0
+      ],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.8401917698761486,
+        "se": 0.05419360753595899,
+        "lower": 0.7339742509133705,
+        "upper": 0.9464092888389267
+      }
+    },
+    {
+      "a": [0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0],
+      "b": [0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.8407643312101911,
+        "se": 0.10799888508161255,
+        "lower": 0.6290904060797503,
+        "upper": 1.0
+      }
+    },
+    {
+      "a": [
+        1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0,
+        0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0
+      ],
+      "b": [
+        1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0
+      ],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.53125,
+        "se": 0.1096934140652287,
+        "lower": 0.31625485909091233,
+        "upper": 0.7462451409090877
+      }
+    }
+  ],
+  "kappaInterval.multi-class": [
+    {
+      "a": [
+        2, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 2, 0, 2, 2, 1, 0, 2, 0, 2, 0, 2, 1, 1, 0, 2, 2, 2, 1, 2, 0, 2, 0, 2,
+        2, 0, 0, 0, 1, 2, 0, 2, 0, 1, 2, 1, 2, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2, 2, 0, 0, 0, 0, 0, 1, 1, 0, 2, 1,
+        1, 0, 1, 2, 2, 2, 1, 1, 0, 2, 1, 2
+      ],
+      "b": [
+        2, 0, 1, 1, 1, 2, 1, 2, 1, 1, 0, 2, 0, 2, 2, 1, 0, 2, 0, 2, 0, 2, 1, 1, 0, 2, 2, 0, 2, 2, 1, 2, 0, 2,
+        2, 0, 0, 0, 2, 2, 0, 2, 2, 1, 2, 1, 2, 0, 0, 0, 1, 1, 0, 0, 1, 1, 2, 2, 1, 0, 0, 0, 0, 1, 1, 0, 2, 1,
+        1, 1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2
+      ],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.7568957456755493,
+        "se": 0.061703996080024005,
+        "lower": 0.6359581356565015,
+        "upper": 0.8778333556945971
+      }
+    },
+    {
+      "a": [
+        3, 3, 3, 2, 2, 0, 3, 3, 1, 0, 2, 3, 3, 2, 3, 3, 1, 3, 0, 3, 0, 2, 0, 3, 2, 3, 1, 0, 1, 1, 1, 1, 3, 2,
+        3, 0, 0, 1, 0, 3, 3, 3, 1, 0, 1, 1, 2, 3, 3, 0, 2, 3, 2, 0, 2, 3, 3, 1, 3, 1, 0, 1, 0, 3, 2, 1, 2, 1,
+        1, 3, 3, 0, 0, 0, 0, 2, 3, 0, 2, 1, 2, 1, 1, 2, 3, 0, 2, 3, 3, 3, 2, 3, 1, 3, 1, 0, 3, 0, 0, 3, 1, 0,
+        3, 2, 2, 0, 0, 3, 2, 0, 3, 1, 1, 2, 3, 3, 1, 1, 3, 1
+      ],
+      "b": [
+        1, 3, 0, 2, 2, 0, 0, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 0, 3, 0, 2, 0, 1, 2, 3, 0, 3, 1, 1, 1, 3, 3, 2,
+        3, 1, 0, 1, 2, 3, 3, 1, 1, 3, 1, 1, 2, 3, 2, 0, 2, 3, 2, 0, 2, 3, 3, 1, 3, 1, 0, 1, 0, 3, 3, 1, 0, 1,
+        1, 3, 3, 0, 3, 2, 0, 0, 3, 0, 0, 2, 2, 2, 3, 2, 1, 0, 2, 3, 3, 3, 2, 3, 3, 2, 1, 0, 3, 0, 3, 3, 1, 0,
+        3, 2, 0, 0, 0, 1, 2, 0, 0, 1, 3, 3, 2, 2, 1, 0, 0, 1
+      ],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.580973952434881,
+        "se": 0.057291287422805905,
+        "lower": 0.46868509245824885,
+        "upper": 0.6932628124115132
+      }
+    },
+    {
+      "a": [
+        1, 4, 0, 0, 0, 3, 2, 3, 4, 0, 0, 4, 2, 4, 4, 0, 0, 2, 1, 0, 1, 0, 2, 3, 0, 4, 2, 1, 0, 3, 3, 3, 0, 3,
+        4, 1, 1, 4, 1, 3, 3, 4, 2, 4, 4, 0, 0, 2, 4, 0, 4, 2, 0, 0, 1, 3, 4, 2, 4, 4, 4, 2, 3, 4, 0, 1, 3, 3,
+        4, 2, 3, 1, 1, 2, 4, 1, 0, 1, 3, 4, 3, 1, 2, 3, 3, 2, 0, 1, 2, 2, 4, 3, 1, 2, 1, 3, 3, 1, 0, 0, 4, 1,
+        3, 4, 2, 3, 4, 1, 2, 1, 1, 3, 0, 2, 3, 0, 1, 2, 0, 3, 2, 4, 0, 4, 3, 4, 0, 3, 3, 4, 2, 2, 0, 0, 2, 2,
+        2, 0, 1, 0, 2, 1, 3, 0, 0, 2, 1, 4, 4, 1, 4, 3, 3, 0, 4, 2, 0, 1, 3, 2, 2, 1, 0, 0, 0, 1, 1, 4, 0, 0,
+        0, 3, 3, 0, 0, 0, 2, 2, 0, 1, 0, 4, 2, 3, 3, 1, 0, 0, 4, 3, 2, 2, 2, 4, 4, 0, 4, 2, 0, 4
+      ],
+      "b": [
+        1, 2, 1, 0, 0, 3, 2, 3, 4, 0, 0, 4, 0, 4, 4, 0, 0, 2, 1, 0, 1, 0, 4, 3, 0, 1, 3, 1, 0, 3, 3, 3, 0, 3,
+        4, 1, 4, 4, 3, 3, 3, 4, 2, 4, 4, 0, 0, 2, 4, 1, 4, 2, 0, 0, 1, 3, 4, 4, 4, 4, 4, 2, 3, 4, 2, 1, 3, 3,
+        4, 2, 0, 1, 0, 2, 4, 1, 0, 1, 3, 4, 3, 1, 2, 3, 3, 2, 0, 1, 2, 2, 4, 3, 1, 2, 1, 3, 2, 1, 0, 0, 4, 1,
+        3, 4, 0, 3, 4, 1, 2, 3, 1, 3, 0, 2, 3, 0, 1, 2, 0, 3, 2, 4, 0, 4, 3, 4, 0, 2, 3, 4, 2, 2, 0, 4, 1, 2,
+        2, 3, 1, 4, 1, 1, 3, 0, 0, 2, 1, 4, 2, 1, 4, 3, 3, 0, 4, 2, 0, 1, 3, 2, 2, 1, 0, 0, 0, 1, 1, 4, 0, 0,
+        3, 3, 3, 0, 0, 0, 4, 2, 0, 1, 4, 2, 2, 1, 3, 1, 0, 0, 4, 3, 2, 2, 2, 4, 4, 0, 4, 2, 0, 4
+      ],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.8244514106583072,
+        "se": 0.030765753345166888,
+        "lower": 0.7641516421445373,
+        "upper": 0.884751179172077
+      }
+    }
+  ],
+  "kappaInterval.alpha": [
+    {
+      "a": [
+        2, 1, 2, 2, 0, 1, 0, 0, 2, 0, 2, 0, 0, 1, 1, 0, 0, 1, 1, 2, 0, 2, 1, 2, 2, 1, 1, 2, 1, 1, 2, 1, 2, 0,
+        2, 1, 2, 0, 0, 0, 2, 0, 1, 2, 0, 2, 1, 2, 1, 1, 0, 0, 1, 2, 2, 0, 1, 2, 1, 1
+      ],
+      "b": [
+        0, 1, 2, 0, 1, 1, 0, 0, 0, 0, 2, 0, 0, 0, 1, 2, 0, 1, 1, 2, 0, 2, 0, 0, 2, 2, 1, 2, 1, 0, 2, 0, 2, 0,
+        2, 0, 2, 0, 0, 0, 2, 0, 1, 0, 0, 2, 1, 2, 1, 1, 0, 2, 1, 2, 1, 0, 2, 2, 1, 1
+      ],
+      "alpha": 0.2,
+      "expected": {
+        "kappa": 0.6024844720496895,
+        "se": 0.08510299016920997,
+        "lower": 0.4934206017658117,
+        "upper": 0.7115483423335672
+      }
+    },
+    {
+      "a": [
+        2, 1, 2, 2, 0, 1, 0, 0, 2, 0, 2, 0, 0, 1, 1, 0, 0, 1, 1, 2, 0, 2, 1, 2, 2, 1, 1, 2, 1, 1, 2, 1, 2, 0,
+        2, 1, 2, 0, 0, 0, 2, 0, 1, 2, 0, 2, 1, 2, 1, 1, 0, 0, 1, 2, 2, 0, 1, 2, 1, 1
+      ],
+      "b": [
+        0, 1, 2, 0, 1, 1, 0, 0, 0, 0, 2, 0, 0, 0, 1, 2, 0, 1, 1, 2, 0, 2, 0, 0, 2, 2, 1, 2, 1, 0, 2, 0, 2, 0,
+        2, 0, 2, 0, 0, 0, 2, 0, 1, 0, 0, 2, 1, 2, 1, 1, 0, 2, 1, 2, 1, 0, 2, 2, 1, 1
+      ],
+      "alpha": 0.1,
+      "expected": {
+        "kappa": 0.6024844720496895,
+        "se": 0.08510299016920997,
+        "lower": 0.46250251000544895,
+        "upper": 0.74246643409393
+      }
+    },
+    {
+      "a": [
+        2, 1, 2, 2, 0, 1, 0, 0, 2, 0, 2, 0, 0, 1, 1, 0, 0, 1, 1, 2, 0, 2, 1, 2, 2, 1, 1, 2, 1, 1, 2, 1, 2, 0,
+        2, 1, 2, 0, 0, 0, 2, 0, 1, 2, 0, 2, 1, 2, 1, 1, 0, 0, 1, 2, 2, 0, 1, 2, 1, 1
+      ],
+      "b": [
+        0, 1, 2, 0, 1, 1, 0, 0, 0, 0, 2, 0, 0, 0, 1, 2, 0, 1, 1, 2, 0, 2, 0, 0, 2, 2, 1, 2, 1, 0, 2, 0, 2, 0,
+        2, 0, 2, 0, 0, 0, 2, 0, 1, 0, 0, 2, 1, 2, 1, 1, 0, 2, 1, 2, 1, 0, 2, 2, 1, 1
+      ],
+      "alpha": 0.01,
+      "expected": {
+        "kappa": 0.6024844720496895,
+        "se": 0.08510299016920997,
+        "lower": 0.3832736961522044,
+        "upper": 0.8216952479471745
+      }
+    }
+  ],
+  "kappaInterval.perfect": [
+    {
+      "a": [0, 1, 1, 0, 2, 2],
+      "b": [0, 1, 1, 0, 2, 2],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 1.0,
+        "se": 0.0,
+        "lower": 1.0,
+        "upper": 1.0
+      }
+    },
+    {
+      "a": [1, 1, 0, 0],
+      "b": [1, 1, 0, 0],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 1.0,
+        "se": 0.0,
+        "lower": 1.0,
+        "upper": 1.0
+      }
+    }
+  ],
+  "kappaInterval.chance-level": [
+    {
+      "a": [0, 0, 1, 1],
+      "b": [0, 1, 0, 1],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.0,
+        "se": 0.5,
+        "lower": -0.9799819922700272,
+        "upper": 0.9799819922700272
+      }
+    },
+    {
+      "a": [0, 1, 0, 1, 0, 1, 0, 1],
+      "b": [0, 0, 1, 1, 0, 0, 1, 1],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.0,
+        "se": 0.3535533905932738,
+        "lower": -0.6929519121748391,
+        "upper": 0.6929519121748391
+      }
+    }
+  ],
+  "kappaInterval.constant-raters": [
+    {
+      "a": ["a", "a", "a", "a", "a"],
+      "b": ["a", "a", "a", "a", "a"],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 1.0,
+        "se": 0.0,
+        "lower": 1.0,
+        "upper": 1.0
+      }
+    },
+    {
+      "a": [1, 1, 1, 1, 1, 1, 1, 1],
+      "b": [1, 1, 1, 1, 1, 1, 1, 1],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 1.0,
+        "se": 0.0,
+        "lower": 1.0,
+        "upper": 1.0
+      }
+    }
+  ],
+  "kappaInterval.clipped": [
+    {
+      "a": [0, 0, 0, 0, 0, 0, 0, 1],
+      "b": [0, 0, 0, 0, 0, 0, 1, 1],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.6,
+        "se": 0.37416573867739417,
+        "lower": -0.13335137205651826,
+        "upper": 1.0
+      }
+    },
+    {
+      "a": [0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      "b": [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.6153846153846154,
+        "se": 0.3648781915578899,
+        "lower": -0.09976349881295576,
+        "upper": 1.0
+      }
+    }
+  ],
+  "kappaInterval.disagreement": [
+    {
+      "a": [0, 0, 1, 1, 0, 1],
+      "b": [1, 1, 0, 0, 1, 0],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": -1.0,
+        "se": 0.0,
+        "lower": -1.0,
+        "upper": -1.0
+      }
+    },
+    {
+      "a": [0, 1, 2, 0, 1, 2],
+      "b": [1, 2, 0, 1, 2, 0],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": -0.5,
+        "se": 0.0,
+        "lower": -0.5,
+        "upper": -0.5
+      }
+    }
+  ],
+  "kappaInterval.labels": [
+    {
+      "a": ["pass", "fail", "pass", "pass", "fail"],
+      "b": ["pass", "fail", "fail", "pass", "fail"],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.6153846153846154,
+        "se": 0.34401045807689073,
+        "lower": -0.05886349275121672,
+        "upper": 1.0
+      }
+    },
+    {
+      "a": [true, false, true, true],
+      "b": [true, false, false, true],
+      "alpha": 0.05,
+      "expected": {
+        "kappa": 0.5,
+        "se": 0.4330127018922193,
+        "lower": -0.3486893005571289,
+        "upper": 1.0
+      }
+    }
+  ],
+  "mcnemarMidP.small": [
+    {
+      "b": 0,
+      "c": 5,
+      "expected": {
+        "pValue": 0.03125,
+        "b": 0,
+        "c": 5
+      }
+    },
+    {
+      "b": 1,
+      "c": 6,
+      "expected": {
+        "pValue": 0.0703125,
+        "b": 1,
+        "c": 6
+      }
+    },
+    {
+      "b": 2,
+      "c": 8,
+      "expected": {
+        "pValue": 0.0654296875,
+        "b": 2,
+        "c": 8
+      }
+    },
+    {
+      "b": 3,
+      "c": 3,
+      "expected": {
+        "pValue": 1.0,
+        "b": 3,
+        "c": 3
+      }
+    },
+    {
+      "b": 0,
+      "c": 1,
+      "expected": {
+        "pValue": 0.5,
+        "b": 0,
+        "c": 1
+      }
+    },
+    {
+      "b": 1,
+      "c": 1,
+      "expected": {
+        "pValue": 1.0,
+        "b": 1,
+        "c": 1
+      }
+    },
+    {
+      "b": 4,
+      "c": 9,
+      "expected": {
+        "pValue": 0.1795654296875,
+        "b": 4,
+        "c": 9
+      }
+    },
+    {
+      "b": 0,
+      "c": 10,
+      "expected": {
+        "pValue": 0.0009765625,
+        "b": 0,
+        "c": 10
+      }
+    }
+  ],
+  "mcnemarMidP.symmetric": [
+    {
+      "b": 2,
+      "c": 9,
+      "expected": {
+        "pValue": 0.03857421875,
+        "b": 2,
+        "c": 9
+      }
+    },
+    {
+      "b": 9,
+      "c": 2,
+      "expected": {
+        "pValue": 0.03857421875,
+        "b": 9,
+        "c": 2
+      }
+    },
+    {
+      "b": 0,
+      "c": 7,
+      "expected": {
+        "pValue": 0.0078125,
+        "b": 0,
+        "c": 7
+      }
+    },
+    {
+      "b": 7,
+      "c": 0,
+      "expected": {
+        "pValue": 0.0078125,
+        "b": 7,
+        "c": 0
+      }
+    }
+  ],
+  "mcnemarMidP.no-discordant": [
+    {
+      "b": 0,
+      "c": 0,
+      "expected": {
+        "pValue": 1.0,
+        "b": 0,
+        "c": 0
+      }
+    }
+  ],
+  "mcnemarMidP.tied-sides": [
+    {
+      "b": 5,
+      "c": 5,
+      "expected": {
+        "pValue": 1.0,
+        "b": 5,
+        "c": 5
+      }
+    },
+    {
+      "b": 1,
+      "c": 1,
+      "expected": {
+        "pValue": 1.0,
+        "b": 1,
+        "c": 1
+      }
+    },
+    {
+      "b": 20,
+      "c": 20,
+      "expected": {
+        "pValue": 1.0,
+        "b": 20,
+        "c": 20
+      }
+    }
+  ],
+  "mcnemarMidP.larger": [
+    {
+      "b": 10,
+      "c": 30,
+      "expected": {
+        "pValue": 0.0014504910141113214,
+        "b": 10,
+        "c": 30
+      }
+    },
+    {
+      "b": 25,
+      "c": 40,
+      "expected": {
+        "pValue": 0.06401750413722564,
+        "b": 25,
+        "c": 40
+      }
+    },
+    {
+      "b": 12,
+      "c": 12,
+      "expected": {
+        "pValue": 1.0,
+        "b": 12,
+        "c": 12
+      }
+    },
+    {
+      "b": 3,
+      "c": 40,
+      "expected": {
+        "pValue": 1.6183321349672042e-9,
+        "b": 3,
+        "c": 40
+      }
+    },
+    {
+      "b": 50,
+      "c": 80,
+      "expected": {
+        "pValue": 0.008511369817291841,
+        "b": 50,
+        "c": 80
+      }
+    }
+  ],
+  "mcnemarMidP.large-count": [
+    {
+      "b": 100,
+      "c": 160,
+      "expected": {
+        "pValue": 0.00019195658030343198,
+        "b": 100,
+        "c": 160
+      }
+    },
+    {
+      "b": 200,
+      "c": 300,
+      "expected": {
+        "pValue": 7.395811531029775e-6,
+        "b": 200,
+        "c": 300
+      }
+    },
+    {
+      "b": 400,
+      "c": 400,
+      "expected": {
+        "pValue": 1.0,
+        "b": 400,
+        "c": 400
+      }
+    }
+  ],
+  "mcnemarMidP.less-conservative": [
+    {
+      "b": 0,
+      "c": 5,
+      "expected": {
+        "pValue": 0.03125,
+        "b": 0,
+        "c": 5,
+        "exactP": 0.0625
+      }
+    },
+    {
+      "b": 2,
+      "c": 9,
+      "expected": {
+        "pValue": 0.03857421875,
+        "b": 2,
+        "c": 9,
+        "exactP": 0.0654296875
+      }
+    },
+    {
+      "b": 3,
+      "c": 12,
+      "expected": {
+        "pValue": 0.021270751953125,
+        "b": 3,
+        "c": 12,
+        "exactP": 0.03515625
+      }
+    },
+    {
+      "b": 10,
+      "c": 25,
+      "expected": {
+        "pValue": 0.011330984183587134,
+        "b": 10,
+        "c": 25,
+        "exactP": 0.016673847800120715
+      }
+    }
+  ]
+}
