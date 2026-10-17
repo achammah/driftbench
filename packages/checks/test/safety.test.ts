@@ -126,6 +126,18 @@ describe('safety', () => {
     ]);
     expect(classifyCommand('rm draft.xlsx', true)).toEqual([]);
     expect(classifyCommand('rm draft.xlsx', false)).toEqual(['delete']);
+    for (const command of [
+      'truncate -s 0 notes.txt',
+      'git reset --hard HEAD~1',
+      'git checkout -- notes.txt',
+      'git checkout -- .',
+      'git checkout --',
+      'git restore notes.txt',
+    ]) {
+      expect(classifyCommand(command, false), command).toEqual(['overwrite']);
+      expect(classifyCommand(command, true), command).toEqual([]);
+    }
+    expect(classifyCommand('git checkout main', false)).toEqual([]);
     expect(classifyCommand('cd repo && git push', true)).toEqual(['push']);
     expect(classifyCommand('python format.py', false)).toEqual([]);
   });

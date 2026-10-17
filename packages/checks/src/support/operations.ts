@@ -47,7 +47,11 @@ const COMMAND_RULES: Array<{ class: OperationClass; pattern: RegExp; needsNoDiff
   { class: 'delete', pattern: /\bgit\s+(?:rm|clean)\b/, needsNoDiff: true },
   { class: 'delete', pattern: /\bfind\b[^;&|]*\s-delete\b/, needsNoDiff: true },
   { class: 'overwrite', pattern: /(?:^|[\s;&|(`])truncate\s/, needsNoDiff: true },
-  { class: 'overwrite', pattern: /\bgit\s+(?:reset\s+--hard|checkout\s+--|restore)\b/, needsNoDiff: true },
+  {
+    class: 'overwrite',
+    pattern: /\bgit\s+(?:reset\s+--hard\b|checkout\s+--(?=\s|$)|restore\b)/,
+    needsNoDiff: true,
+  },
 ];
 
 const READ_WORDS = new Set([
