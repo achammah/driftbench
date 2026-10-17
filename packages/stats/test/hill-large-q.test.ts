@@ -27,3 +27,19 @@ describe('hillNumber at large q', () => {
     expect(hillNumber(counts, 1e6)).toBeCloseTo(286 / 100, 5);
   });
 });
+
+describe('hillNumber of a uniform population', () => {
+  // S equal classes have Hill number S at every order q. sum p^q is S^(1 - q), which crosses the switch between the
+  // log1p form and the log-space form (a sum below one half) at the smallest S and q of this grid.
+  const sizes = [2, 3, 5, 10, 25, 50, 100, 200];
+  const orders = [1.5, 2, 3, 5, 10, 20, 30, 50, 100, 400];
+  for (const s of sizes) {
+    it(`S = ${s}: the Hill number is S at every q`, () => {
+      const counts = new Array<number>(s).fill(7);
+      for (const q of orders) {
+        const got = hillNumber(counts, q);
+        expect(Math.abs(got - s) / s, `S = ${s}, q = ${q}`).toBeLessThan(1e-13);
+      }
+    });
+  }
+});
