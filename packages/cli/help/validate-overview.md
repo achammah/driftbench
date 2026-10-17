@@ -216,7 +216,7 @@ Unexpected argument "2": a level is only taken by floors --raise.
 ```
 
 A whole ladder, run from the repository root; the statistics ladder took 143 seconds on seed 1 on a busy
-machine. Shown as text, not run by the help test: a whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
+machine. Shown as text, not run by the help test. A whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
 
 ```bash
 pnpm -s driftbench validate stats

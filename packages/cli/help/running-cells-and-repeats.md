@@ -1,6 +1,6 @@
 ---
 title: Cells, repeats and concurrency
-summary: How a campaign expands specs x targets x modes x perturbations x repeats into cells, how a cell id is made, how --repeats, --target, --route and --concurrency shape the work, and in which order cells run and print.
+summary: How a campaign expands specs x targets x modes x perturbations x repeats into cells. How a cell id is made. How --repeats, --target, --route and --concurrency shape the work. In which order cells run and print.
 commands:
   - campaign plan
   - campaign run
@@ -18,11 +18,11 @@ next:
 
 ## What it is
 
-A campaign is a grid. Each cell of the grid is one spec, on one target, in one mode, at one repeat number, and in mode P with one perturbation the spec declares. Each cell gives one run. `--repeats` runs the same spec, target and mode several times, to measure how often the agent passes rather than whether it passed once. `--concurrency` sets how many cells run at the same time. A cell has a stable id: the first 16 hex characters of the SHA-256 of the canonical JSON of the spec's content hash, the target, the mode, the repeat and the perturbation. The campaign is not part of it, so the same cell has the same id in every campaign, and the run id of a cell's run is its cell id.
+A campaign is a grid. Each cell of the grid is one spec, on one target, in one mode, at one repeat number. In mode P, a cell also has one perturbation the spec declares. Each cell gives one run. `--repeats` runs the same spec, target and mode several times, to measure how often the agent passes rather than whether it passed once. `--concurrency` sets how many cells run at the same time. A cell has a stable id. The id is the first 16 hex characters of the SHA-256 of the canonical JSON. The JSON holds the spec's content hash, the target, the mode, the repeat and the perturbation. The campaign is not part of it. So the same cell has the same id in every campaign. The run id of a cell's run is its cell id.
 
 ## When to use it
 
-* To decide how many repeats to run: more repeats tighten the pass rate of each spec; more specs shrink the minimum detectable effect more (topic running-campaign-plan).
+* To decide how many repeats to run: more repeats tighten the pass rate of each spec. More specs shrink the minimum detectable effect more (topic running-campaign-plan).
 * To run one suite on several agents at once: give `--target` several times.
 * To keep part of a mixed suite on its own agent: `--route <tag=target>`.
 * To go faster on an agent that accepts parallel sessions, or slower on one that rate-limits: `--concurrency`.
@@ -37,7 +37,7 @@ A campaign is a grid. Each cell of the grid is one spec, on one target, in one m
 | `--route <tag=target>` | `campaign plan`, `campaign run` | none | needs `--target`: a spec whose `tags` hold the tag runs on this target alone, instead of the `--target` list. The first route whose tag the spec carries wins. |
 | `--mode <modes>` | `campaign plan`, `campaign run` | `F` | one or more of `T`, `F`, `P`, comma separated (topic running-modes). |
 | `--concurrency <n>` | `campaign run`, `campaign resume` | `4` | cells that run at the same time; a whole number of at least 1. Never more workers than cells. |
-| `--agent-version <label>` | `campaign run` | none | written as the `variant` of every target that names none, so it changes the target and therefore the cell id: runs of `v2` never reuse runs of `v1`. |
+| `--agent-version <label>` | `campaign run` | none | written as the `variant` of every target that names none. So it changes the target and therefore the cell id. Runs of `v2` never reuse runs of `v1`. |
 
 A campaign holds at most 1,000,000 cells.
 
@@ -54,21 +54,21 @@ A campaign holds at most 1,000,000 cells.
 
 ### Cell order
 
-Cells are listed, run and printed in this order: spec (in the sorted order of the files), then target, then mode (T, F, P), then perturbation, then repeat. `campaign plan` prints this order.
+Cells are listed, run and printed in this order. First the spec (in the sorted order of the files), then target, then mode (T, F, P), then perturbation, then repeat. `campaign plan` prints this order.
 
 ### The worker pool
 
 * The pool has `--concurrency` workers, never more than the cells. Each worker takes the next cell: first the T and F cells in cell order, then the P cells.
-* A P cell takes as the reference of its recovery the F run of the same spec, target and repeat (else repeat 0) in the campaign, and waits for it when that run is still in flight. A campaign without F cells gives P runs no reference.
+* A P cell takes the F run of the same spec, target and repeat in the campaign as the reference of its recovery. If no F run has the same repeat, it takes repeat 0. It waits for that run when the run is still in flight. A campaign without F cells gives P runs no reference.
 * A cell whose completed run is already in the store is reused without running (that is how `resume` works).
-* With a budget, a worker checks the spend when it takes a cell; once the budget is reached, the cell is stopped and never starts (topic running-budget-and-prices).
+* With a budget, a worker checks the spend when it takes a cell. Once the budget is reached, the cell is stopped and never starts (topic running-budget-and-prices).
 * Each run is filed in the store as soon as it finishes.
-* Lines print in cell order: a cell's line prints once it and every cell before it have an outcome, so a slow first cell holds back the lines after it, never the work.
+* Lines print in cell order. A cell's line prints once it and every cell before it have an outcome. So a slow first cell holds back the lines after it, never the work.
 * When running a cell throws an unexpected error, no new cell starts, and the error is raised once the cells in flight finish.
 
 ## Worked example
 
-One spec on two targets with three repeats and two workers; then the whole Acme suite on the sales agent, with the price-sheet task routed to the ops agent and an agent version. No model is called.
+One spec on two targets with three repeats and two workers. Then the whole Acme suite on the sales agent, with the price-sheet task routed to the ops agent and an agent version. No model is called.
 
 ```sh
 driftbench campaign run examples/acme/specs/conversations/plan-upgrade.yaml --target function:acme --target function:acme-sales --repeats 3 --concurrency 2 --campaign acme-grid
@@ -99,7 +99,7 @@ The runs are not kept: pass --store <file> to keep them.
 7 cells: 7 pass, 0 fail, 0 failed. Spent $0.00.
 ```
 
-`function:acme` and `function:acme-sales` reach the same agent but are two targets, so each gets its own cells. The price-sheet spec carries the tag `flow:price-sheet`, so the route runs it on `process:acme-ops` and prints no override note. The cell line shows the target without its variant; `--agent-version v2` is in the target the runs record, so these cells have other ids than unversioned ones.
+`function:acme` and `function:acme-sales` reach the same agent but are two targets, so each gets its own cells. The price-sheet spec carries the tag `flow:price-sheet`, so the route runs it on `process:acme-ops` and prints no override note. The cell line shows the target without its variant. `--agent-version v2` is in the target the runs record. So these cells have other ids than unversioned ones.
 
 ## Common errors
 
@@ -110,5 +110,5 @@ Each exits 2.
 * `--route goes with --target: without it each spec already runs on its own target.`
 * `--route takes tag=target, such as flow:price-sheet=process:acme-ops, not "bad".`
 * `--repeats 1000000 makes 6000000 cells; a campaign holds at most 1000000.`
-* `Note: <spec> names the <adapter> adapter; --target runs it on <target>.` is not an error: it warns that `--target` moved a spec off the adapter it was written for. Add a `--route` for it if that was not intended.
+* `Note: <spec> names the <adapter> adapter; --target runs it on <target>.` is not an error. It warns that `--target` moved a spec off the adapter it was written for. Add a `--route` for it if that was not intended.
 * Too much concurrency against a rate-limited agent shows as retries and `failed` cells with status 429: lower `--concurrency` (topic running-retries).

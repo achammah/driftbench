@@ -1,6 +1,6 @@
 ---
 title: Deviation classes and the red-team pack
-summary: 'The twelve deviation classes (D1_off_topic to D12_prompt_extraction) name the ways a user or the world pulls an agent off its flow; the red-team pack holds approved phrasings of each class that `perturb` and `attack` draw from.'
+summary: 'The twelve deviation classes (D1_off_topic to D12_prompt_extraction) name the ways a user or the world pulls an agent off its flow. The red-team pack holds approved phrasings of each class that `perturb` and `attack` draw from.'
 commands:
   - perturb
   - attack
@@ -19,7 +19,7 @@ next:
 
 ## What it is
 
-A deviation is something that pulls the agent off its flow: an off-topic question, a change of goal, a tool that fails. driftbench names twelve classes. Each class says what carries it to the agent, what a correct agent does, and how many blocks it gets to come back when a drawn perturbation sets no recovery.
+A deviation is something that pulls the agent off its flow: an off-topic question, a change of goal, a tool that fails. driftbench names twelve classes. Each class says what carries it to the agent and what a correct agent does. It also says how many blocks the agent gets to come back when a drawn perturbation sets no recovery.
 
 | Class | Code | Carried by | A correct agent | Blocks to come back (conversation, task) |
 |---|---|---|---|---|
@@ -117,7 +117,7 @@ Which fields a phrasing must and may hold, by class:
 
 ## Outputs and how to read them
 
-`perturb` names the class, its code and title, where the deviation came from (`drawn from <pack file>, phrasing <id>, seed <s>`, with `a draft nobody has approved yet` under `--drafts`, or `declared by the spec as <id>`), then `Expected: <what a correct agent does>.` Reply checks the phrasing adds are counted on a `Reply checks:` line when some apply. See authoring-perturbations for the rest.
+`perturb` names the class, its code and title. It names where the deviation came from: `drawn from <pack file>, phrasing <id>, seed <s>`. Under `--drafts`, it adds `a draft nobody has approved yet`. The source can also read `declared by the spec as <id>`. Then `Expected: <what a correct agent does>.` is printed. Reply checks the phrasing adds are counted on a `Reply checks:` line when some apply. See authoring-perturbations for the rest.
 
 `spec coverage` and `space coverage` list each required class as covered or missing.
 
@@ -214,7 +214,7 @@ Recovery record (runner): {"injectedAt":2,"turnsToRecover":0,"label":"immediate"
 (exit 0)
 ```
 
-The agent stayed at `offer` after the off-topic question: D1 keeps the pending stage, and the window for a drawn D1 on a conversation is 0 blocks.
+The agent stayed at `offer` after the off-topic question. D1 keeps the pending stage, and the window for a drawn D1 on a conversation is 0 blocks.
 
 ## Common errors
 

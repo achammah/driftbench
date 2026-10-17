@@ -126,7 +126,7 @@ the oracle's answer contradicts the documentation). The maintainer then rules:
 | Ruling | Meaning |
 |---|---|
 | valid as written (the default) | the item stands; the product must change |
-| fix the item | the item is wrong; the maintainer changes it on a branch that is not an executor branch, the changed item kills a planted mutant and passes a correct reference, and a reviewer who did not write the change checks it |
+| fix the item | the item is wrong. The maintainer changes it on a branch that is not an executor branch. The changed item kills a planted mutant and passes a correct reference. A reviewer who did not write the change checks it |
 | quarantine | no product need; the item moves to `NEEDS.md` and stops counting |
 
 ## Worked example
@@ -142,7 +142,7 @@ driftbench validate floors
 Floors (validators/floors.json): none.
 ```
 
-A real mutant of the statistics package, at the repository root (62 seconds). Shown as text, not run by the help test: a whole ladder runs for minutes, and the level it reaches changes as the product is fixed. The
+A real mutant of the statistics package, at the repository root (62 seconds). Shown as text, not run by the help test. A whole ladder runs for minutes, and the level it reaches changes as the product is fixed. The
 mutant also sets an environment variable, which a worked example line cannot.
 The planted bug changes the default power of `mde` from 0.8 to 0.9:
 

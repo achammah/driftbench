@@ -1,6 +1,6 @@
 ---
 title: Adapters for every agent framework
-summary: Every adapter driftbench ships (function, http, litellm, nexus, process, OpenAI Agents, Anthropic, Google, LangGraph, CrewAI, Vercel AI, Pydantic AI, Claude Code), which ones the command line reaches by itself, and how to bring any of them into the command line with a plugin.
+summary: Every adapter driftbench ships (function, http, litellm, nexus, process, OpenAI Agents, Anthropic, Google, LangGraph, CrewAI, Vercel AI, Pydantic AI, Claude Code). Which ones the command line reaches by itself. How to bring any of them into the command line with a plugin.
 commands:
   - campaign run
 see_also:
@@ -15,12 +15,12 @@ next:
 
 ## What it is
 
-An adapter connects the runner to one kind of agent: it opens a session, sends one block, and returns what the agent did (text, tool calls, stages, skills, guards, commands, files, cost) in driftbench's Observed record. All adapters live in the package `@agent-nexus/driftbench-adapters` and pass the same contract suite, so every spec, check, judge and statistic works on any of them. The command line reaches some adapters by itself; the others are built in code with your own client or SDK object, and reach the command line through a plugin.
+An adapter connects the runner to one kind of agent. It opens a session and sends one block. It returns what the agent did (text, tool calls, stages, skills, guards, commands, files, cost) in driftbench's Observed record. All adapters live in the package `@agent-nexus/driftbench-adapters` and pass the same contract suite, so every spec, check, judge and statistic works on any of them. The command line reaches some adapters by itself. You build the others in code with your own client or SDK object, and they reach the command line through a plugin.
 
 ## When to use it
 
 * Pick the adapter that matches how your agent is built. If the command line reaches it from settings, you need no code (topic running-targets-from-settings).
-* If your agent is an SDK object (an OpenAI Agents agent, a LangGraph graph, a CrewAI crew, a Vercel AI call, an Anthropic or Gemini client with tools, a Pydantic AI agent), write a ten-line plugin that builds the adapter and registers it under a target name (topic running-plugins).
+* If your agent is an SDK object, write a ten-line plugin that builds the adapter and registers it under a target name (topic running-plugins). An SDK object is an OpenAI Agents agent, a LangGraph graph, a CrewAI crew or a Vercel AI call. It can also be an Anthropic or Gemini client with tools, or a Pydantic AI agent.
 * If your agent is a Python function, the Python package runs it: `run_specs(..., agent=...)` in `python/driftbench` passes it to the CLI through a process target.
 * If you have a hand-made transport, write your own adapter and run the contract suite on it (`examples/adapter-contract`).
 
@@ -43,16 +43,16 @@ An adapter connects the runner to one kind of agent: it opens a session, sends o
 | claude-code (replay) | `replayAdapter({ session, fromBlock, files })` | a recorded Claude Code session (transcript, guard decision log, step feed), replayed with no model call | the `replay` command (validate area) |
 | claude-code (live) | `claudeCodeLiveAdapter(...)` | the runtime's headless command, in a sandbox holding a copy of the estate | `estate run` (validate area) |
 
-The options of each factory, and the status of each adapter, are in `docs/adapters/<adapter>.md` of the repository. Each adapter reports its capabilities (`deterministic`, `sandbox`, `readArtifact`, `variants`, `toolStubs`, `trace`, `endState`); a check that needs a capability the adapter lacks gives `inconclusive`, not a pass.
+The options of each factory, and the status of each adapter, are in `docs/adapters/<adapter>.md` of the repository. Each adapter reports its capabilities (`deterministic`, `sandbox`, `readArtifact`, `variants`, `toolStubs`, `trace`, `endState`). A check that needs a capability the adapter lacks gives `inconclusive`, not a pass.
 
 ## Inputs
 
 * For a plugin adapter: the SDK object or client you build in the plugin, with your own keys read from the environment. A key never goes in a spec.
-* The spec's `target:`: `adapter` is the name you register (such as `echo`), `agent` is passed to your factory, which may serve several agents or return nothing for a name it does not know.
+* The spec's `target:`: `adapter` is the name you register (such as `echo`). `agent` is passed to your factory. The factory may serve several agents or return nothing for a name it does not know.
 
 ## Outputs and how to read them
 
-Every adapter feeds the same run record, so the output is the same as for any target (topic running-outcomes). What differs is what the agent reports: a chat SDK gives text and tool calls; a code agent also gives commands, a workspace diff and artifacts; a runtime with hooks gives guards. Checks that read something the adapter does not report are inconclusive.
+Every adapter feeds the same run record, so the output is the same as for any target (topic running-outcomes). What differs is what the agent reports. A chat SDK gives text and tool calls. A code agent also gives commands, a workspace diff and artifacts. A runtime with hooks gives guards. Checks that read something the adapter does not report are inconclusive.
 
 ## Worked example
 
@@ -77,11 +77,11 @@ Smoke: plugins-hello on echo:demo, 3 runs, cache off.
 ✓ The transcripts are identical.
 ```
 
-The adapter part of the plugin file is two lines: an `echoAgent(messages)` function that returns an Observed record (`segments`, `text`, `toolCalls`, `cost`, `latencyMs`), and `api.adapter('echo', () => functionAdapter({ respond: echoAgent, deterministic: true }))` inside the default export `plugin(api)`. Read the whole file at `examples/plugins/plugin.mjs`.
+The adapter part of the plugin file is two lines. The first is an `echoAgent(messages)` function that returns an Observed record (`segments`, `text`, `toolCalls`, `cost`, `latencyMs`). The second is `api.adapter('echo', () => functionAdapter({ respond: echoAgent, deterministic: true }))` inside the default export `plugin(api)`. Read the whole file at `examples/plugins/plugin.mjs`.
 
 ## Common errors
 
 * `No adapter is set up for echo:demo, the target of plugins-hello. ...` (exit 2) The spec names a plugin adapter and no plugin is loaded. Add `--plugin <module>` or `plugins:` in `driftbench.yaml`.
-* `driftbench: Cannot load the plugin <module>: Cannot find module ...` (exit 2) The plugin path is wrong, or its SDK is not installed where the plugin file can import it.
+* `driftbench: Cannot load the plugin <module>: Cannot find module ...` (exit 2) The plugin path is wrong. Or its SDK is not installed where the plugin file can import it.
 * A check reads `inconclusive` on every block with an SDK adapter: the SDK does not report what the check needs (stages, skills, end state). Add it in your adapter, or make the expectation non-gating.
 * `smoke` reports differing transcripts on a model behind an adapter that claims `deterministic: true`: the claim is false for that model. Declare it only for a seeded or replayed agent.

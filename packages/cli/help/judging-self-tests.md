@@ -1,6 +1,6 @@
 ---
 title: Judge self-tests
-summary: "The four layers that test the judges themselves before their verdicts count: fixture pairs per criterion, calibration against hand labels, the benchmark floors of the shipped judge, and the judges validator ladder; all run offline."
+summary: "The four layers that test the judges themselves before their verdicts count. The layers are: fixture pairs per criterion, calibration against hand labels, the benchmark floors of the shipped judge, and the judges validator ladder. All run offline."
 commands:
   - judge check
   - judge run
@@ -26,7 +26,7 @@ A judge is a model, and a model can be wrong. driftbench trusts no judge before 
 | Fixture pairs | Each criterion carries a pass fixture and a fail fixture. A criterion folder is valid only when both exist and differ. A judge or council that does not separate the pair cannot be trusted on that criterion. | `driftbench judge check`, `driftbench judge run` |
 | Calibration | Each judge alone must separate the pair in every repeat and agree with hand labels at kappa 0.8 or more. Only then can it own a criterion; an unowned criterion never gates. | `driftbench judge calibrate` |
 | Benchmark floors | The shipped default judge, on three models, is scored on 14 fixed slices of fictional cases whose answer is known by construction. A score may never fall below its floor. | `pnpm bench replay --check-floor` |
-| The judges validator | A ladder of 20 levels of code tests on the judges package itself: the answer contract under hostile output, cassette replay, the client parsers, evidence quoting, the instruction screen, council majority, cascade, pairwise, calibration, scale. | `driftbench validate judges` |
+| The judges validator | A ladder of 20 levels of code tests on the judges package itself. They cover the answer contract under hostile output, cassette replay, the client parsers and evidence quoting. They also cover the instruction screen, council majority, cascade, pairwise, calibration and scale. | `driftbench validate judges` |
 
 All four run with no model call: the first three on committed cassettes, the validator on its own fixtures. CI runs the bench replay with `--check-floor`.
 
@@ -68,7 +68,7 @@ Without `--check-floor`, the exit code is the level reached.
 * `judge run`: `separated` or `NOT separated` per criterion.
 * `judge calibrate`: `at the bar` or `misses: <reason>` per judge and criterion, and the assignment table.
 * `pnpm bench replay --check-floor`: `floor HOLDS` or `floor FAILS` per slice and model.
-* `validate judges`: one row per level with its metric, threshold and result per seed; `Level of the run: <k> of 20`; then the failing items of the first failing level, each with its family, tier, source file, cause and a `Fix:` hint. The ladder stops counting at the first failing level.
+* `validate judges`: one row per level with its metric, threshold and result per seed. Then `Level of the run: <k> of 20`. Then the failing items of the first failing level, each with its family, tier, source file, cause and a `Fix:` hint. The ladder stops counting at the first failing level.
 
 ## Worked example
 
@@ -97,7 +97,7 @@ separated  sheet_matches_catalog [system1, gating]: pass fixture pass, fail fixt
 (exit 0)
 ```
 
-The validator ladder runs with `driftbench validate judges --seed 1`. It reads the repository's `validators/` folder and takes minutes, and its last level measures speed, so its exit code depends on the machine; its output and options are in the validators area of this help.
+The validator ladder runs with `driftbench validate judges --seed 1`. It reads the repository's `validators/` folder and takes minutes. Its last level measures speed, so its exit code depends on the machine. Its output and options are in the validators area of this help.
 
 Levels 1 to 19 pass. Level 20 measures speed on a 100000-entry prompt against a 6000 ms budget, so its result depends on the machine; here it took 6249 ms. The run took about five minutes.
 

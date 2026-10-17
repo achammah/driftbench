@@ -1,6 +1,6 @@
 ---
 title: Red-team an agent
-summary: Inject deviations into a spec one at a time with perturb, let the adaptive attacker pick them from the agent's replies, and run every perturbation of a suite in mode P, on the Acme sales assistant.
+summary: Inject deviations into a spec one at a time with perturb. Let the adaptive attacker pick them from the agent's replies. Run every perturbation of a suite in mode P, on the Acme sales assistant.
 commands:
   - perturb
   - attack

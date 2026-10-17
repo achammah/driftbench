@@ -69,7 +69,7 @@ Every option is the general one (`validate-overview`, `validate-reading-items`, 
 
 | Variable | Default | Effect |
 |---|---|---|
-| `DRIFTBENCH_STATS_IMPL` | unset | an absolute module path (or `file://` URL) whose exports replace `@agent-nexus/driftbench-stats` in the bank's child processes. It exists to plant a mutant: point it at a copy of the package with one bug and the bank must lose at least one item (`validate-mutants-and-rulings`) |
+| `DRIFTBENCH_STATS_IMPL` | unset | an absolute module path (or `file://` URL) whose exports replace `@agent-nexus/driftbench-stats` in the bank's child processes. It exists to plant a mutant. Point it at a copy of the package with one bug and the bank must lose at least one item (`validate-mutants-and-rulings`) |
 
 Every option of `driftbench validate`, for reference (the topic named in the last column explains it):
 
@@ -143,7 +143,7 @@ driftbench validate stats --hardness # exit 64
 validators/stats/journal.jsonl: the journal holds no iteration 0 row: run and record iteration 0 first.
 ```
 
-The ladder on seed 1, at the repository root (143 seconds on a busy machine). Shown as text, not run by the help test: a whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
+The ladder on seed 1, at the repository root (143 seconds on a busy machine). Shown as text, not run by the help test. A whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
 
 ```bash
 pnpm -s driftbench validate stats

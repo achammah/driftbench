@@ -1,6 +1,6 @@
 ---
 title: Covering arrays, strength and seeds
-summary: 'How `generate` chooses which combinations of the map to test: a t-wise covering array at strength `--t`, or `--budget` rows chosen for pair coverage and balance, trimmed by `--spec-cap`, with every choice fixed by `--seed` so a run is reproducible byte for byte.'
+summary: 'How `generate` chooses which combinations of the map to test. It uses a t-wise covering array at strength `--t`, or `--budget` rows chosen for pair coverage and balance. `--spec-cap` trims the result. `--seed` fixes every choice, so a run is reproducible byte for byte.'
 commands:
   - generate
   - space coverage
@@ -16,17 +16,17 @@ next:
 
 ## What it is
 
-The axes of an approved map make a grid with far too many cells to test one by one (the Acme map has 113568 on the proposal). A covering array is a short list of rows that still holds every combination of `t` values that the constraints allow:
+The axes of an approved map make a grid with far too many cells. You cannot test them one by one (the Acme map has 113568 on the proposal). A covering array is a short list of rows. It still holds every combination of `t` values that the constraints allow:
 
 - At t = 2 (pairwise), every allowed pair of values on two axes appears in at least one row.
 - At t = 3, every allowed triple.
 - Faults that need two or three things to go together are caught with far fewer conversations than the full grid.
 
-In `generate`, the `twise` seeder builds this array over the axes (the report names them in `twise.dimensions`) and turns each row into one conversation along an approved path of its flow. Combinations no approved path can reach are left out and reported (`twise.unreachable`). The `cover` seeder runs last and adds one scenario for each allowed pair the complete specs of the other seeders still miss.
+In `generate`, the `twise` seeder builds this array over the axes (the report names them in `twise.dimensions`). It turns each row into one conversation along an approved path of its flow. Combinations no approved path can reach are left out and reported (`twise.unreachable`). The `cover` seeder runs last and adds one scenario for each allowed pair the complete specs of the other seeders still miss.
 
 Two options change how many rows there are:
 
-- `--budget N` (budget mode) replaces the t-wise rows with N rows. Each pick takes the cell that adds the most uncovered allowed pairs; a tie goes to the cell that moves value counts toward their fair share (N divided by the allowed values of each dimension); a remaining tie goes to a seeded shuffle. Once every pair is covered, balance alone decides. The other seeders still run, so the suite can exceed N, and `cover` can add the pairs the budget rows miss. Approved `numeric_settings` of the map are sampled only in budget mode, into `given.vars`.
+- `--budget N` (budget mode) replaces the t-wise rows with N rows. Each pick takes the cell that adds the most uncovered allowed pairs. A tie goes to the cell that moves value counts toward their fair share (N divided by the allowed values of each dimension). A remaining tie goes to a seeded shuffle. Once every pair is covered, balance alone decides. The other seeders still run, so the suite can exceed N, and `cover` can add the pairs the budget rows miss. Approved `numeric_settings` of the map are sampled only in budget mode, into `given.vars`.
 - `--spec-cap N` limits the total written specs. It keeps every graph, boundary, deviation, metamorphic, task and incomplete spec (the protected specs) and selects complete t-wise and cover specs by their actual coverage. `--spec-cap-mode tuples` (default) tries to keep every pair and triple; `pairs` keeps pairs and allows reported triple losses.
 
 Seeds: every seeded choice (array construction, shuffles, phrase choice, task-family draws) comes from `--seed`, default 1. The same map and seed give the same files, byte for byte. Another seed gives another valid suite.
@@ -52,16 +52,16 @@ Seeds: every seeded choice (array construction, shuffles, phrase choice, task-fa
 | `--spec-cap-mode <mode>` | `tuples` or `pairs`. Needs `--spec-cap`. | `tuples` |
 | `--max <n>` | The most specs per seeder. A seeder cut by it makes the exit 1. With `--budget`, it still applies to the other seeders. | no cap |
 
-Every other option of `generate` is in authoring-generate. Exit codes: 0 when every block is complete; 1 when the suite is written with incomplete specs, a seeder cut by `--max`, or a spec cap that lost target tuples; 2 on bad input. Partial pair coverage in budget mode does not by itself change the exit code.
+Every other option of `generate` is in authoring-generate. Exit codes: 0 when every block is complete. 1 when the suite is written with incomplete specs, a seeder cut by `--max`, or a spec cap that lost target tuples. 2 on bad input. Partial pair coverage in budget mode does not by itself change the exit code.
 
 ### driftbench space coverage (to measure)
 
-`driftbench space coverage <paths...> --map <space map> --t <n>` counts covered cells on every subset of n dimensions and always prints the t = 2 and t = 3 lines (see authoring-space-coverage).
+`driftbench space coverage <paths...> --map <space map> --t <n>` counts covered cells on every subset of n dimensions. It always prints the t = 2 and t = 3 lines (see authoring-space-coverage).
 
 ## Inputs
 
 - An approved map with `role: axis` dimensions and their constraints. The more values on the axes, the more rows a covering array needs.
-- Optional approved `numeric_settings` in the map (`id`, `min`, `max`, `integer`, `unit`): sampled with sliced Latin hypercube sampling in budget mode only; `generate` without `--budget` refuses a map that has them approved.
+- Optional approved `numeric_settings` in the map (`id`, `min`, `max`, `integer`, `unit`) are sampled with sliced Latin hypercube sampling in budget mode only. `generate` without `--budget` refuses a map that has them approved.
 
 ## Outputs and how to read them
 
@@ -70,7 +70,7 @@ In the printed summary:
 - `Actual axis-map coverage (written complete specs): pairs <a> of <b>; triples <c> of <d>.` What the suite you got covers. This is the number to read first.
 - `Candidate t-wise array (before the total cap): covering array of <rows> rows over <k> dimensions, <x> of <y> allowed t-tuples (<share>); <n> pairs no path reaches are left out.` The array itself, before any cap.
 - `Candidate budget array (before the total cap), budget <n>: <n> cells of <pool> allowed, pairs covered <x> of <y> (<share>), max deviation from fair share <d>.` In budget mode instead.
-- `Spec cap <n>: <w> of <c> candidate specs written; <p> structural, fault and incomplete specs protected.` and `Coverage lost: see spec_cap.coverage[].lost.` when the cap cost tuples.
+- `Spec cap <n>: <w> of <c> candidate specs written; <p> structural, fault and incomplete specs protected.` When the cap cost tuples, `Coverage lost: see spec_cap.coverage[].lost.` follows.
 - `Seed <s>, t = <t>.`
 
 In `generate-report.json`:
@@ -79,7 +79,7 @@ In `generate-report.json`:
 |---|---|
 | `twise` | `t`, `dimensions`, `rows`, `allowed`, `covered`, `share`, `unreachable` |
 | `coverage.actual` | per strength, every allowed tuple the written complete specs miss (`uncovered`) |
-| `budget` | `budget`, `seed`, `dimensions`, `pool` (allowed cells), `picked`, `capped` (stopped at the pool size), `pairs` (`allowed`, `covered`, `share`), `values` (count, fair share and deviation per value), `maxDeviation`, and `numeric` with approved ranges |
+| `budget` | `budget`, `seed`, `dimensions`, `pool` (allowed cells), `picked`, `capped` (stopped at the pool size), `pairs` (`allowed`, `covered`, `share`). Also `values` (count, fair share and deviation per value), `maxDeviation`, and `numeric` with approved ranges |
 | `spec_cap` | `mode`, `limit`, `candidates`, `written`, `protected`, `preserving` (the greedy selection size), `preserved`, `trimmed` per seeder, `coverage` per strength with `uncovered` and the tuples lost |
 
 ## Worked example

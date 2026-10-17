@@ -1,6 +1,6 @@
 ---
 title: Importing specs from tables and traces
-summary: 'Get existing test cases and production conversations into driftbench: `import csv` and `import xlsx` turn table rows into specs through a mapping file; `import traces` drafts specs from OpenTelemetry, Nexus or Claude Code traces; `import approve` records a person''s review of the drafts.'
+summary: 'Get existing test cases and production conversations into driftbench. `import csv` and `import xlsx` turn table rows into specs through a mapping file. `import traces` drafts specs from OpenTelemetry, Nexus or Claude Code traces. `import approve` records a person''s review of the drafts.'
 commands:
   - import csv
   - import xlsx
@@ -21,9 +21,9 @@ next:
 Two ways to get data in without writing YAML by hand:
 
 - **Tables.** `import csv` reads a `.csv` or `.tsv` file; `import xlsx` reads one sheet of a `.xlsx` workbook. A mapping file says which columns fill which spec and block fields. Rows that share a `group_by` value become the blocks of one spec, in row order. Every spec is checked by the spec loader before anything is written: one invalid row and nothing is written.
-- **Traces.** `import traces` reads recorded production conversations: OpenTelemetry spans with the GenAI semantic conventions (`otel`), Nexus platform traces (`nexus`), or a recorded Claude Code session (`claude-code`). Each conversation becomes one draft spec. Each observed user turn is a block; what production observed before it (earlier messages, replies, tool calls and results) is the block's `given.prefix`. No block gets an `expect`: one copied from the observed reply would pass by construction. A person writes each `expect` from the agent's specification, then runs `import approve`.
+- **Traces.** `import traces` reads recorded production conversations. It reads OpenTelemetry spans with the GenAI semantic conventions (`otel`), Nexus platform traces (`nexus`), or a recorded Claude Code session (`claude-code`). Each conversation becomes one draft spec. Each observed user turn is a block; what production observed before it (earlier messages, replies, tool calls and results) is the block's `given.prefix`. No block gets an `expect`: one copied from the observed reply would pass by construction. A person writes each `expect` from the agent's specification, then runs `import approve`.
 
-Personal data in traces is redacted by default (emails, phones, IBANs, national ids, card numbers, addresses), one placeholder per value across a conversation, such as `[ADDRESS_1]`.
+Personal data in traces is redacted by default (emails, phones, IBANs, national ids, card numbers, addresses). Each value has one placeholder across a conversation, such as `[ADDRESS_1]`.
 
 ## When to use it
 
@@ -52,7 +52,7 @@ driftbench import xlsx <file> --mapping <yaml> --out <dir> [--force] [--json]
 |---|---|
 | 0 | every spec is written |
 | 1 | a row makes an invalid spec; each is printed with its rows and the loader's error; nothing is written |
-| 2 | bad input: the mapping, the file, a format that does not match the file, a column the table lacks, a spec file that exists with other content |
+| 2 | bad input. The mapping or the file is bad. Or the format does not match the file. Or a column is missing from the table. Or a spec file exists with other content |
 
 ### driftbench import traces
 
@@ -62,7 +62,7 @@ driftbench import traces <path> --from otel|nexus|claude-code --out <dir> [--sel
 
 | Option | Meaning | Default |
 |---|---|---|
-| `<path>` (required) | A trace file; a folder (its `.json` and `.jsonl` files, in name order; OpenTelemetry spans from all files are read together); or `-` for standard input (`otel` and `nexus` only). | none |
+| `<path>` (required) | A trace file, a folder or `-`. A folder means its `.json` and `.jsonl` files, in name order. OpenTelemetry spans from all files are read together. `-` means standard input (`otel` and `nexus` only). | none |
 | `--from <source>` (required) | `otel`, `nexus` or `claude-code`. | none |
 | `--out <dir>` (required) | The folder for the drafts, named `draft-<source>-<trace id>.yaml`. | none |
 | `--select <ids>` | Draft only these traces: comma-separated trace ids. An unknown id exits 2 and writes nothing. | every trace |
@@ -144,15 +144,24 @@ The fixtures in `packages/adapters/test/traces/fixtures/` show each shape: `otel
 
 ## Outputs and how to read them
 
-- `import csv|xlsx`: one `✓ <file>  <id> · <n> blocks · rows <r>` line per spec, then `Imported <s> specs from <n> rows of <file> into <dir>.` Each written spec starts with `# Imported from <file>, rows <r>.` An invalid row prints `✗ row <n>: spec <id>: <path> <code> <message>`.
-- `import traces`: `Read <t> traces from <f> files (<source>): <n> turns.`, `Wrote <d> draft specs to <dir>, none approved: <b> blocks, no expect yet.`, `Personal data redacted: <n> values.`, the next step, and with `--dataset` `Pushed dataset <name>@<version> (hash <h>): ...`. A draft keeps what production did (reply, tool counts, tokens, cost, latency) in `metadata.imported.observed`, for the review only: never copy it into an `expect`.
+- `import csv|xlsx` prints:
+  - one `✓ <file>  <id> · <n> blocks · rows <r>` line per spec, then `Imported <s> specs from <n> rows of <file> into <dir>.`
+  - Each written spec starts with `# Imported from <file>, rows <r>.`
+  - An invalid row prints `✗ row <n>: spec <id>: <path> <code> <message>`.
+- `import traces` prints:
+  - `Read <t> traces from <f> files (<source>): <n> turns.`
+  - `Wrote <d> draft specs to <dir>, none approved: <b> blocks, no expect yet.`
+  - `Personal data redacted: <n> values.`
+  - the next step
+  - with `--dataset`, `Pushed dataset <name>@<version> (hash <h>): ...`
+  - A draft keeps what production did (reply, tool counts, tokens, cost, latency) in `metadata.imported.observed`, for the review only. Never copy it into an `expect`.
 - `import approve`: the drafts not approved yet, or `Approved <n> drafts of <m>.`, or `all <n> drafts are approved.`
 
 `spec lint` warns `BLOCK_NO_EXPECTATION` on every block of a fresh draft: that is the work left for a person.
 
 ## Worked example
 
-Import the Acme table from CSV and from the workbook, check the specs, then draft specs from an OpenTelemetry and a Nexus fixture, list, approve, and push one import as a dataset version:
+Import the Acme table from CSV and from the workbook, and check the specs. Then draft specs from an OpenTelemetry and a Nexus fixture. List them, approve them, and push one import as a dataset version:
 
 ```sh
 driftbench import csv examples/acme/import/cases.csv --mapping examples/acme/import/mapping.yaml --out out/imp/csv
@@ -278,7 +287,7 @@ $ driftbench import approve examples/acme/specs/conversations/plan-upgrade.yaml
 (exit 1)
 ```
 
-The three mappings used above: `bad-map.yaml` holds `spec: {title: x}`, `block: {expect: {}}` and `owner: me`; `missing-col.yaml` names a column `nope`; `invalid.yaml` maps the number column `max_calls` into `expect.stage`, which takes text.
+The three mappings used above: `bad-map.yaml` holds `spec: {title: x}`, `block: {expect: {}}` and `owner: me`. `missing-col.yaml` names a column `nope`. `invalid.yaml` maps the number column `max_calls` into `expect.stage`, which takes text.
 
 | Symptom | Fix |
 |---|---|

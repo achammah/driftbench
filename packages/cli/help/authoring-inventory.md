@@ -1,6 +1,6 @@
 ---
 title: Behaviour inventory and spec coverage
-summary: 'The behaviour inventory lists what the agent must do, grouped into flows with the deviations each flow must survive; `spec coverage` shows which behaviours and deviations your specs cover, per channel.'
+summary: 'The behaviour inventory lists what the agent must do, grouped into flows with the deviations each flow must survive. `spec coverage` shows which behaviours and deviations your specs cover, per channel.'
 commands:
   - spec coverage
 see_also:
@@ -22,12 +22,12 @@ The behaviour inventory is one YAML or JSON file. It lists:
 - `flows`: groups of behaviours that run together, each with the deviation classes the flow must be perturbed with.
 - `channels`: optionally, the channel universe.
 
-Specs point at the inventory in two ways: `covers: [B-001, ...]` names the behaviours a spec covers, and the tag `flow:<id>` ties a spec to a flow.
+Specs point at the inventory in two ways. `covers: [B-001, ...]` names the behaviours a spec covers. The tag `flow:<id>` ties a spec to a flow.
 
 `driftbench spec coverage` reads the inventory and the specs and prints two matrices:
 
-- Behaviours by channel: one row per behaviour, one column per channel. A cell is `covered` when a valid spec on that channel, or on no channel, lists the behaviour in `covers`; `missing` when none does; `n/a` when the behaviour does not apply on that channel.
-- Flows by required deviation: one row per flow. A spec belongs to a flow when it carries the tag `flow:<id>`, or covers one of the flow's behaviours. A required deviation class is covered when a member spec has a perturbation of that class, or a block whose stimulus is an injection of that class.
+- Behaviours by channel: one row per behaviour, one column per channel. A cell is `covered` when a valid spec on that channel, or on no channel, lists the behaviour in `covers`. It is `missing` when none does. It is `n/a` when the behaviour does not apply on that channel.
+- Flows by required deviation: one row per flow. A spec belongs to a flow when it carries the tag `flow:<id>`, or covers one of the flow's behaviours. A required deviation class is covered when a member spec has a perturbation of that class. It is also covered when a block has a stimulus that is an injection of that class.
 
 Task behaviours (`kind: task`) and task specs are rows of the same matrices as conversations. Invalid specs are listed and never count.
 
@@ -124,8 +124,8 @@ perturbations:             # a perturbation of a required class covers it
 
 Text output, in this order:
 
-- `Behaviours by channel`: per row a mark (`✓` every applicable cell covered, `✗` a cell missing), the id, the kind, one cell per channel (`covered`, `missing`, `n/a`), the title. The `total` row gives covered of applicable cells per channel.
-- `Flows by required deviation`: per row a mark (`✓` all required deviations covered, `✗` one missing, `-` none required), the flow id, the member spec count, each required class with `covered` or `missing`, the title.
+- `Behaviours by channel`: per row a mark (`✓` every applicable cell covered, `✗` a cell missing), the id and the kind. Then come one cell per channel (`covered`, `missing`, `n/a`), and the title. The `total` row gives covered of applicable cells per channel.
+- `Flows by required deviation`: per row a mark (`✓` all required deviations covered, `✗` one missing, `-` none required). Then come the flow id and the member spec count. Then come each required class with `covered` or `missing`, and the title.
 - `Warnings` (only when there are some):
 
 | Code | Meaning | What to do |
@@ -138,7 +138,7 @@ Text output, in this order:
 - `Invalid specs, not counted`: each invalid spec with its first error. Fix them with `spec validate`.
 - Last line: `Coverage: <a> of <b> behaviours covered, <c> of <d> flow deviations covered.` A behaviour counts as covered when every applicable cell is.
 
-`--json` prints one document with the keys `inventory`, `channels`, `behaviours` (each with `id`, `title`, `kind`, `status` and its `cells`: channel, status and covering spec ids), `perChannel` (applicable, covered, missing per channel), `flows` (each with its member `specs` and, per required deviation, `status`, `specs` and `sources`: the spec, `perturbation` or `injection`, and the path in the spec), `warnings`, `invalidSpecs`, `summary` (`behaviours` and `deviations`, each `{ covered, total }`) and `ok`.
+`--json` prints one document with the keys `inventory`, `channels`, `behaviours`, `perChannel`, `flows`, `warnings`, `invalidSpecs`, `summary` and `ok`. `behaviours` has, for each: `id`, `title`, `kind`, `status` and its `cells`: channel, status and covering spec ids. `perChannel` has applicable, covered, missing per channel. `flows` has, for each, its member `specs` and, per required deviation, `status`, `specs` and `sources`. `sources` give the spec, `perturbation` or `injection`, and the path in the spec. `summary` has `behaviours` and `deviations`, each `{ covered, total }`.
 
 ## Worked example
 
@@ -179,7 +179,7 @@ Coverage: 4 of 14 behaviours covered, 7 of 10 flow deviations covered.
 (exit 1)
 ```
 
-How to read it: B-007 has no spec on any channel; most behaviours have no `whatsapp` spec; the `order` flow needs a `D2_goal_shift` and a `D3_contradiction` perturbation. The gaps are deliberate in this example.
+How to read it: B-007 has no spec on any channel. Most behaviours have no `whatsapp` spec. The `order` flow needs a `D2_goal_shift` and a `D3_contradiction` perturbation. The gaps are deliberate in this example.
 
 The test fixtures show the warning and invalid-spec sections:
 

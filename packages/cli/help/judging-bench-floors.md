@@ -1,6 +1,6 @@
 ---
 title: bench floors
-summary: Show the per slice and per model accuracy floors of the judge benchmark, or raise one floor from current replay evidence; the floors are what bench replay --check-floor enforces.
+summary: Show the per slice and per model accuracy floors of the judge benchmark, or raise one floor from current replay evidence. The floors are what bench replay --check-floor enforces.
 commands: []
 see_also:
   - judging-bench-replay
@@ -41,18 +41,18 @@ Exit codes:
 | Code | When |
 |---|---|
 | 0 | The floors are printed, or the floor is raised. |
-| 2 | Bad input, or the raise is refused (missing argument, evidence that names no matching slice and model, evidence that differs from the current replay, a count below the floor, a paired regression, or an unchanged count at an unchanged fingerprint). |
+| 2 | Bad input, or the raise is refused. Causes: a missing argument, or evidence that names no matching slice and model. Other causes: evidence that differs from the current replay, or a count below the floor. Other causes: a paired regression, or an unchanged count at an unchanged fingerprint. |
 
 ## Inputs
 
 * `benchmarks/floors.json`: `version: 1`, `floors` (a map from `<slice>@<version>/<model>` to a floor) and `history` (earlier floors). A missing file reads as empty.
-* With `--raise`: the evidence file, the manifest, the slice, and the committed cassette and evidence of that slice and model, which are replayed to check the evidence.
+* With `--raise`: the evidence file, the manifest, the slice, and the committed cassette and evidence of that slice and model. The cassette and evidence are replayed to check the evidence.
 
 The rules of a raise, from source:
 
 * The evidence report's results, dataset version and hash, model and client settings must equal the current replay. Its commit must equal the replay's commit or the recording's commit. A record evidence file must also carry the current cassette's SHA-256.
 * A dataset version can only rise.
-* Within one dataset version, the new result must pass the floor check (count at least the floor, no paired regression), and an equal count is refused unless the fingerprint changed.
+* Within one dataset version, the new result must pass the floor check (count at least the floor, no paired regression). An equal count is refused unless the fingerprint changed.
 * The previous floor moves to `history`.
 
 ## Outputs and how to read them
@@ -63,7 +63,7 @@ The rules of a raise, from source:
 
 ## Worked example
 
-The help test runs only `driftbench` commands, and the bench is a repository script, so the tested line here validates the criteria folder the judge prompt is built from; the bench runs themselves follow.
+The help test runs only `driftbench` commands. The bench is a repository script, so the tested line here validates the criteria folder the judge prompt is built from. The bench runs themselves follow.
 
 ```sh
 driftbench judge check examples/acme/criteria
@@ -90,7 +90,7 @@ ok  sheet_matches_catalog [system1, gating]: pass fixture 2 line(s), fail fixtur
 
 On a copy of `benchmarks/` under `out/`, with the haiku floor of `fresh-reference` removed, so no tracked file changes. The check fails without a floor, the replay evidence raises it, a second raise with the same evidence is refused, and the check then holds:
 
-Not run by the help test: the bench reads git (the commit each report records) and the repository's `benchmarks/` folder, which the help test's scratch folder does not link. From a repository checkout:
+Not run by the help test: the bench reads git (the commit each report records) and the repository's `benchmarks/` folder. The help test's scratch folder does not link that folder. From a repository checkout:
 
 ```text
 $ mkdir -p out/judging/benchroot && cp -R benchmarks out/judging/benchroot/

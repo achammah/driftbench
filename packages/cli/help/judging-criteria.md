@@ -1,6 +1,6 @@
 ---
 title: Judged criteria
-summary: How to define a criterion a model judges (name, rubric, FAIL and PASS pictures, gating, scope, judge class, inputs, repeat reducer), reference it from a block, and give it the fixture pair and hand labels it needs before a judge is trusted on it.
+summary: How to define a criterion a model judges (name, rubric, FAIL and PASS pictures, gating, scope, judge class, inputs, repeat reducer). It shows how to reference it from a block. It names the fixture pair and hand labels it needs before a judge is trusted on it.
 commands:
   - spec validate
   - judge check
@@ -17,16 +17,16 @@ next:
 
 ## What it is
 
-A judged criterion is a question about a block that code cannot answer, such as "does the reply ask at most one question" or "does every price come from a tool result". A model judge reads the block and answers pass, fail or inconclusive. A criterion lives in two places:
+A judged criterion is a question about a block that code cannot answer. Examples: "does the reply ask at most one question" or "does every price come from a tool result". A model judge reads the block and answers pass, fail or inconclusive. A criterion lives in two places:
 
 * In a spec, under `criteria`, where blocks reference it by name in `expect.criteria`.
-* In a criteria folder, one YAML file per criterion with a fixture pair (a slice it must pass and a slice it must fail), and in a labels folder, hand-labelled blocks. These are what calibration tests a judge on.
+* In a criteria folder, one YAML file per criterion with a fixture pair (a slice it must pass and a slice it must fail). In a labels folder, hand-labelled blocks. These are what calibration tests a judge on.
 
 ## When to use it
 
 * When the expectation is about meaning, not words: tone, honesty, staying on task, a paraphrased refusal. Prefer a machine check whenever code can decide (see `judging-machine-checks`).
 * Write the rubric as one binary question with an observable answer. `lintCriterion` lists common defects (see `judging-opt-in-settings`).
-* Give the criterion a fixture pair and labels before it gates anything: an uncalibrated criterion is judged by default seating, and calibration may leave it unassigned (never gating).
+* Give the criterion a fixture pair and labels before it gates anything. An uncalibrated criterion is judged by default seating, and calibration may leave it unassigned (never gating).
 
 ## Commands and every option
 
@@ -51,15 +51,15 @@ A criterion definition (the same shape in a spec's `criteria` list and in a crit
 | `pass` | text | no in a spec, yes in a criteria folder | The PASS picture. |
 | `gating` | boolean | no | `true` gates every reference: a fail fails the block. |
 | `scope` | `block` or `conversation` | no, default `block` | `block`: the judge reads the last 2 messages of the prefix as context, then the block. `conversation`: the whole prefix, then the block. |
-| `judge_class` | `system1`, `system2` or `auto` | no, default `auto` | System 1 for evidence inside the block (a tool used, a fact present, one question per turn); system 2 for reading across blocks (a contradiction with the ledger, drift, recovery). `auto` goes to system 1 until calibration assigns a class. A calibrated assignment overrides it. |
-| `inputs` | list of workspace paths | no | Files the judge reads beside the transcript, such as the source a produced file must match. In a run they are read from the Given workspace seed first (as the agent received them), then the workspace; a missing one is named as not available. They are part of the request key. |
-| `repeat_reducer` | `mode`, `median` or `at_least:<k>` | no | How the verdicts across repeats of one spec become one verdict: `mode` (the most common, when more than half are scored), `median` (pass above one half of the repeats, fail below), `at_least:<k>` (pass when at least k repeats pass; fail only when k can no longer be reached). Inconclusive repeats are left out. Without it, no reduced verdict. |
+| `judge_class` | `system1`, `system2` or `auto` | no, default `auto` | System 1 for evidence inside the block (a tool used, a fact present, one question per turn). System 2 for reading across blocks (a contradiction with the ledger, drift, recovery). `auto` goes to system 1 until calibration assigns a class. A calibrated assignment overrides it. |
+| `inputs` | list of workspace paths | no | Files the judge reads beside the transcript, such as the source a produced file must match. In a run they are read from the Given workspace seed first (as the agent received them), then the workspace. A missing one is named as not available. They are part of the request key. |
+| `repeat_reducer` | `mode`, `median` or `at_least:<k>` | no | How the verdicts across repeats of one spec become one verdict. `mode` is the most common, when more than half are scored. `median` is pass above one half of the repeats, fail below. `at_least:<k>` is pass when at least k repeats pass, and fail only when k can no longer be reached. Inconclusive repeats are left out. Without it, no reduced verdict. |
 
-Referencing from a block: `expect.criteria: [one_question_per_turn, no_invented_data@gating]`. `name@gating` gates that one reference. A reference to a name the spec does not define is an error; a spec with no `criteria` list may name criteria from a shared catalogue, and `spec lint` warns that they must come from there.
+Referencing from a block: `expect.criteria: [one_question_per_turn, no_invented_data@gating]`. `name@gating` gates that one reference. A reference to a name the spec does not define is an error. A spec with no `criteria` list may name criteria from a shared catalogue. In that case `spec lint` warns that they must come from there.
 
 The shared catalogue `examples/criteria` holds five criteria with fixture pairs: `conversation_completeness`, `knowledge_retention`, `relevancy`, `role`, `task_completion`. On a block that also sets the machine fields `relevancy` or `knowledge_retention`, the judged criterion of the same name makes the machine verdict advisory.
 
-A criteria folder file: `criterion` (the definition) and `fixtures` with `pass` and `fail`, each with `transcript` (entries with `role`, `text`, `tool`), optional `note`, `artifact`, `inputs` (path to text, required for every input the criterion names) and `given` (`stage`, `ledger`). See `judging-judge-check` for every key and issue.
+A criteria folder file: `criterion` (the definition) and `fixtures` with `pass` and `fail`. Each of `pass` and `fail` has `transcript` (entries with `role`, `text`, `tool`). The optional keys are `note`, `artifact`, `inputs` (path to text, required for every input the criterion names) and `given` (`stage`, `ledger`). See `judging-judge-check` for every key and issue.
 
 A labels file: `criterion`, optional `labelled_by`, `blocks` (each `id`, `label` pass or fail, the fixture keys, optional `anchor`). See `judging-calibration`.
 

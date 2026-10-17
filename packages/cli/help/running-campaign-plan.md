@@ -16,7 +16,7 @@ next:
 
 ## What it is
 
-`driftbench campaign plan` shows what `driftbench campaign run` would do with the same arguments, and calls no agent. It loads and validates the specs, resolves the target of every spec (a target with no adapter is refused, exactly as `run` refuses it), and expands the specs into cells: one cell per spec, target, mode, repeat and, in mode P, perturbation. It prints one row per cell, the projected cost, and one minimum detectable effect line per mode: the smallest drop in pass rate that a comparison of two campaigns of this size could detect.
+`driftbench campaign plan` shows what `driftbench campaign run` would do with the same arguments, and calls no agent. It loads and validates the specs. It resolves the target of every spec (a target with no adapter is refused, exactly as `run` refuses it). It expands the specs into cells: one cell per spec, target, mode, repeat and, in mode P, perturbation. It prints one row per cell, the projected cost, and one minimum detectable effect line per mode. That line gives the smallest drop in pass rate that a comparison of two campaigns of this size could detect.
 
 ## When to use it
 
@@ -63,17 +63,17 @@ Text output, on stdout, in this order:
 
 1. `Note: <spec id> names the <adapter> adapter; --target runs it on <target>.` once for each spec a `--target` overrides. Routed specs get no note.
 2. `Plan: <n> specs, <n> targets, mode(s) <list>, <n> repeats: <n> cells, <n> blocks.` Without `--target`, the targets part reads `each on its own target (<list>)`.
-3. A table with one row per cell: `cell` (the cell id, 16 hex characters), `spec`, `target`, `mode`, `repeat`, `perturbation` (only when some cell is in mode P), and `blocks`: the blocks the cell sends. A P cell sends the spec's blocks plus the injected block, except for a perturbation that only changes the world: that one adds no block.
+3. A table with one row per cell. Its columns are `cell` (the cell id, 16 hex characters), `spec`, `target`, `mode`, `repeat`, `perturbation` (only when some cell is in mode P), and `blocks`. `blocks` holds the blocks the cell sends. A P cell sends the spec's blocks plus the injected block, except for a perturbation that only changes the world: that one adds no block.
 4. `Projected cost: $<usd> (<adapter>: <n> blocks at $<usd per block>; ...).` An adapter with no measured unit reads `<adapter>: no unit measured` and counts $0. With `--budget-usd`, the budget sentence follows. Judge calls are not priced.
-5. One line per mode: `Minimum detectable effect, mode <M>: <effect> on a <rate>% pass rate, with <n> runs per arm over <n> specs (rho <rho>, design effect <d>; two-sided alpha 0.05, power 0.8).` The effect is in percentage points. It reads `none detectable` when the campaign is too small to detect any drop below the baseline, and `no runs` when the mode has no run. One arm is every spec on the first target. The specs are the independent units; the design effect is `1 + (repeats - 1) * rho`, and the effective units per arm are `specs * repeats / design effect`.
+5. One line per mode: `Minimum detectable effect, mode <M>: <effect> on a <rate>% pass rate, with <n> runs per arm over <n> specs (rho <rho>, design effect <d>; two-sided alpha 0.05, power 0.8).` The effect is in percentage points. It reads `none detectable` when the campaign is too small to detect any drop below the baseline. It reads `no runs` when the mode has no run. One arm is every spec on the first target. The specs are the independent units. The design effect is `1 + (repeats - 1) * rho`. The effective units per arm are `specs * repeats / design effect`.
 
 `--json` prints `{ "cells": [...], "blocks": <n>, "cost": { "usd", "unmeasured", "byAdapter" }, "budgetUsd"?, "withinBudget"?, "mde": [...] }`. Each cell holds `cellId`, `specId`, `specHash`, `target`, `mode`, `repeat`, `perturbationId` (mode P only) and `blocks`. Each `mde` entry holds `mode`, `runsPerArm`, `specs`, `baselineRate`, `rho`, `alpha`, `power`, `designEffect`, and `effect` as a proportion (absent when nothing is detectable).
 
-Exit codes: 0 when the plan printed; 2 on bad input. Bad input is an invalid spec or none found, an unknown mode, a bad number, a bad target or route, a target with no adapter, too many cells, a store that cannot be opened, or a bad config.
+Exit codes: 0 when the plan printed; 2 on bad input. Bad input is an invalid spec or none found, an unknown mode, or a bad number. It is also a bad target or route, or a target with no adapter. It is also too many cells, a store that cannot be opened, or a bad config.
 
 ## Worked example
 
-Six Acme conversation specs on the Acme sales agent, two repeats; then one spec in all three modes with a budget; then the same spec as JSON. The Acme agents run in process, so no model is called.
+Six Acme conversation specs on the Acme sales agent, two repeats. Then one spec in all three modes with a budget. Then the same spec as JSON. The Acme agents run in process, so no model is called.
 
 ```sh
 driftbench campaign plan examples/acme/specs/conversations --target function:acme --repeats 2
@@ -100,7 +100,7 @@ Projected cost: $0.00 (function: no unit measured).
 Minimum detectable effect, mode F: 47.8 points on a 50% pass rate, with 12 runs per arm over 6 specs (rho 0, design effect 1.00; two-sided alpha 0.05, power 0.8).
 ```
 
-Twelve cells would run. With six specs the design detects only a drop of about 48 points from a 50% pass rate: add specs, the independent units, to shrink it.
+Twelve cells would run. With six specs the design detects only a drop of about 48 points from a 50% pass rate. Add specs, the independent units, to shrink it.
 
 ```text
 Plan: 1 spec, 1 target, modes T, F, P, 1 repeat: 5 cells, 27 blocks.
@@ -181,5 +181,5 @@ Each exits 2 and prints on stderr.
 * `No adapter is set up for function:nope. ...` The target names an agent this install does not reach. The rest of the message lists the targets it does reach (topic running-targets).
 * `acme-x names no target. Give the spec a target, or run with --target <adapter[:agent]>, such as --target function:acme-sales.` A spec without `target:` and no `--target`.
 * `No spec files found.` The paths hold no `*.yaml`, `*.yml` or `*.spec.json` file.
-* A line `✗ <path>`, one line per issue such as `    (file)  SPEC_PARSE  cannot read the file: ...`, then `Fix the invalid specs first: nothing ran.` A path that does not exist, or an invalid spec. Check it with `driftbench spec validate <path>`.
+* A line `✗ <path>` is printed, then one line per issue such as `    (file)  SPEC_PARSE  cannot read the file: ...`. Then `Fix the invalid specs first: nothing ran.` is printed. A path that does not exist, or an invalid spec. Check it with `driftbench spec validate <path>`.
 * `--repeats 1000000 makes 6000000 cells; a campaign holds at most 1000000.` Lower the repeats, the specs, the targets or the modes.

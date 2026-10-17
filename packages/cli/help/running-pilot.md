@@ -1,6 +1,6 @@
 ---
 title: Pilot runs and the noise floor
-summary: driftbench pilot plans, runs and analyses a small designed experiment on a generated suite to split the variance of pass rates between cells, conversations, wordings and repeats, set the noise floor, and size the real campaign.
+summary: driftbench pilot plans, runs and analyses a small designed experiment on a generated suite. The experiment splits the variance of pass rates between cells, conversations, wordings and repeats. It also sets the noise floor and sizes the real campaign.
 commands:
   - pilot plan
   - pilot run
@@ -16,11 +16,11 @@ next:
 
 ## What it is
 
-Before a large campaign, you need to know how noisy the agent is and where the noise comes from: from one behaviour to another (cell), from one conversation to another inside a behaviour, from one approved wording of the same user turn to another, or from run to run of the same input (repeat). `driftbench pilot` answers that on a generated suite (specs with `metadata.generated`, made by `driftbench generate` from an approved map). `pilot plan` prints the design and its cost; `pilot run` runs it through the runner, keeps the factors on every run in a store, analyses, and writes `pilot-report.json`; `pilot analyse` analyses a stored pilot again with other settings, running nothing. The pilot runs only on in-process agents: the Acme sales assistant `function:acme` and its seeded random control `function:acme-random` (or `function:acme-random-<seed>`), which plants failures at known rates so you can check that the analysis recovers them.
+Before a large campaign, you need to know how noisy the agent is and where the noise comes from. The noise comes from one behaviour to another (cell). It comes from one conversation to another inside a behaviour. It comes from one approved wording of the same user turn to another. It also comes from run to run of the same input (repeat). `driftbench pilot` answers that on a generated suite (specs with `metadata.generated`, made by `driftbench generate` from an approved map). `pilot plan` prints the design and its cost. `pilot run` runs it through the runner, keeps the factors on every run in a store, analyses, and writes `pilot-report.json`. `pilot analyse` analyses a stored pilot again with other settings, running nothing. The pilot runs only on in-process agents. These are the Acme sales assistant `function:acme` and its seeded random control `function:acme-random` (or `function:acme-random-<seed>`). The control plants failures at known rates so you can check that the analysis recovers them.
 
 ## When to use it
 
-* Before sizing a real campaign: the pilot tells you how many repeats per block reach a noise floor, and how to spread conversations across cells (Neyman allocation).
+* Before sizing a real campaign: the pilot tells you how many repeats per block reach a noise floor. It also tells you how to spread conversations across cells (Neyman allocation).
 * To find wording-sensitive behaviours: cells whose pass rate swings across approved wordings of the same turn.
 * To validate the method on the control agent, whose planted variance shares must fall inside the estimated intervals.
 * Not on a billed agent: `pilot run` refuses any target that is not in process. Size a billed experiment with `pilot plan` and run it as an approved campaign.
@@ -84,7 +84,7 @@ Analysis options (`run` and `analyse`):
 
 ## Outputs and how to read them
 
-`pilot plan` prints one row per cell (conversations, wordings, runs, blocks, cost), a total, the cost source (`Cost: the agent runs in process: no model call, nothing billed.` for an in-process target), a note when the phrase bank gives fewer wordings than asked, and one `Skipped <spec>: <reason>` line per spec left out.
+`pilot plan` prints one row per cell (conversations, wordings, runs, blocks, cost) and a total. It prints the cost source (`Cost: the agent runs in process: no model call, nothing billed.` for an in-process target). It prints a note when the phrase bank gives fewer wordings than asked. It prints one `Skipped <spec>: <reason>` line per spec left out.
 
 `pilot run` and `pilot analyse` print the report:
 
@@ -102,7 +102,7 @@ Exit codes: `plan` 0, or 2 on bad input. `run` 0 when every run completed, 1 whe
 
 ## Worked example
 
-A small design (2 conversations, 2 wordings, 2 repeats per cell) planned, then run on the seeded random control, then analysed again with a wider noise floor. Everything runs in process: no model is called.
+A small design (2 conversations, 2 wordings, 2 repeats per cell) is planned. Then it runs on the seeded random control. Then it is analysed again with a wider noise floor. Everything runs in process: no model is called.
 
 ```sh
 driftbench pilot plan --map examples/acme/map/approved.yaml --suite examples/acme/generated/specs --conversations 2 --wordings 2 --repeats 2
@@ -138,7 +138,7 @@ Wording-sensitive cells (a conversation's pass rates span more than 20.0% across
 Report: pilot-out/pilot-report.json
 ```
 
-On the control agent, 91.4% of the variance is run to run (planted 85.9%), so repeats, not more conversations, are what this agent needs; every planted share is recovered. The `analyse` run reads the same 104 runs from the store and reports the floor at 10.0% (119 repeats per block).
+On the control agent, 91.4% of the variance is run to run (planted 85.9%), so repeats, not more conversations, are what this agent needs. Every planted share is recovered. The `analyse` run reads the same 104 runs from the store and reports the floor at 10.0% (119 repeats per block).
 
 ## Common errors
 
@@ -149,7 +149,7 @@ Each exits 2.
 * `examples/acme/specs holds no generated spec, so the pilot has nothing to run.` The suite must hold specs with `metadata.generated`.
 * `--by names at least one dimension.`
 * `--resample takes cells, conversations or both, not "all".`
-* `--floor takes a number between 0 and 1, not "1".` (the same for `--sensitivity`); `--repeats takes a whole number of at least 1, not "0".` (the same for the other whole numbers).
+* `--floor takes a number between 0 and 1, not "1".` (the same for `--sensitivity`). `--repeats takes a whole number of at least 1, not "0".` (the same for the other whole numbers).
 * `No store at nope.db: this command reads a store and does not make one.` (`analyse`)
 * `pilot.db holds no campaign x.` and `<store> holds no pilot campaign.` (`analyse`)
 * `<map>: <message>` with its issues: the map is not an approved map (authoring area).

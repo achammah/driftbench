@@ -1,6 +1,6 @@
 ---
 title: Stop and resume a campaign
-summary: Interrupt a campaign at any time and finish it later with campaign resume, which runs only the cells with no completed run and reuses the others.
+summary: Interrupt a campaign at any time and finish it later with campaign resume. It runs only the cells with no completed run and reuses the others.
 commands:
   - campaign resume
 see_also:
@@ -17,7 +17,7 @@ next:
 
 ## What it is
 
-A stored campaign can stop before every cell has run: you pressed Ctrl-C, the machine went down, the budget stopped the remaining cells, or some runs failed with an error. `driftbench campaign resume` finishes it. It reads the campaign from the store, with the specs at the content hashes the campaign pinned and the target the campaign pinned for each cell, and runs every cell that has no completed run. A cell whose completed run is already in the store (pass or fail) is reused and not run again. A cell whose run failed with an error or stopped runs again, and its new run replaces the old one under the same run id. `resume` never creates a new campaign.
+A stored campaign can stop before every cell has run. You pressed Ctrl-C, the machine went down, the budget stopped the remaining cells, or some runs failed with an error. `driftbench campaign resume` finishes it. It reads the campaign from the store. It uses the specs at the content hashes the campaign pinned and the target the campaign pinned for each cell. It runs every cell that has no completed run. A cell whose completed run is already in the store (pass or fail) is reused and not run again. A cell whose run failed with an error or stopped runs again, and its new run replaces the old one under the same run id. `resume` never creates a new campaign.
 
 ## When to use it
 
@@ -47,7 +47,7 @@ driftbench campaign resume [campaignId] --store <file> [--no-cache] [--concurren
 | `--retry-max-ms <ms>` | `30000` | the longest wait between two attempts. |
 | `--json` | off | print one JSON document (topic running-outcomes). |
 
-`resume` takes no `--target`, `--mode`, `--repeats`, `--cache-suite` or `--config`: the cells are those the campaign was created with, and the project config is not read for them.
+`resume` takes no `--target`, `--mode`, `--repeats`, `--cache-suite` or `--config`. The cells are those the campaign was created with. The project config is not read for them.
 
 ## Inputs
 
@@ -59,20 +59,20 @@ driftbench campaign resume [campaignId] --store <file> [--no-cache] [--concurren
 
 * Every run is filed in the store as it finishes, so a crash or Ctrl-C loses no finished run.
 * A cell that was in flight has no stored run: `status` shows it `pending`, and `resume` runs it.
-* Each block an adapter answered is written to the cache as soon as it is observed (for adapters without a sandbox). When `resume` runs that cell again, the blocks the cache holds are read back and the first block it does not hold goes to the adapter, which opens a session from the history so far. For an agent that keeps no state between blocks, the resumed run gives the same verdicts as an uninterrupted one. For an agent with state (a record it wrote), the state of the finished blocks is not recreated: the resumed run sees the agent as it is at the resume.
+* Each block an adapter answered is written to the cache as soon as it is observed (for adapters without a sandbox). When `resume` runs that cell again, the blocks the cache holds are read back. The first block it does not hold goes to the adapter, which opens a session from the history so far. For an agent that keeps no state between blocks, the resumed run gives the same verdicts as an uninterrupted one. For an agent with state (a record it wrote), the state of the finished blocks is not recreated. The resumed run sees the agent as it is at the resume.
 * A run in a sandbox (a `process` target) is never cached: an interrupted sandboxed cell runs again from its first block.
-* On Ctrl-C (SIGINT) or SIGTERM, the CLI kills the process groups of the commands it started and removes its open sandbox folders before it exits (topic running-cleanup). A SIGKILL skips that sweep.
-* Each stored run keeps its events (block start, model call, tool call, retry, block end, run end) on its record; the viewer reads them as a timeline. From code, `eventLogSink(path)` of `@agent-nexus/driftbench-core` appends each event to a JSON-lines file as it happens, and `readEventLog(path)` reads it back and skips a line cut short by a kill.
+* On Ctrl-C (SIGINT) or SIGTERM, the CLI kills the process groups of the commands it started. It also removes its open sandbox folders, then exits (topic running-cleanup). A SIGKILL skips that sweep.
+* Each stored run keeps its events (block start, model call, tool call, retry, block end, run end) on its record. The viewer reads them as a timeline. From code, `eventLogSink(path)` of `@agent-nexus/driftbench-core` appends each event to a JSON-lines file as it happens. `readEventLog(path)` reads it back and skips a line cut short by a kill.
 
 ## Outputs and how to read them
 
-The same lines as `campaign run` (topic running-outcomes): the `Campaign <id>: <n> cells, <c> at a time.` header, one line per cell in cell order, and the summary. A cell whose completed run was already stored reads `pass (reused)` or `fail (reused)`, and the summary adds `<n> reused`. The spend counts only the runs this command made. The new runs are filed in the same store under the same campaign.
+The lines are the same as in `campaign run` (topic running-outcomes). They are the `Campaign <id>: <n> cells, <c> at a time.` header, one line per cell in cell order, and the summary. A cell whose completed run was already stored reads `pass (reused)` or `fail (reused)`, and the summary adds `<n> reused`. The spend counts only the runs this command made. The new runs are filed in the same store under the same campaign.
 
 Exit codes: 0 when every cell passes; 1 when a cell fails, failed or was stopped; 3 when no cell failed but a cell was not run or blocked; 2 on bad input (no store file, an unknown campaign, a store with no campaign, a target with no adapter, a bad number).
 
 ## Worked example
 
-A campaign whose four cells are all stopped by a budget of $0, read back as pending, then finished by `resume`, then resumed again (nothing left to run, every cell reused). No model is called.
+A campaign has four cells that a budget of $0 stops. It is read back as pending, finished by `resume`, then resumed again (nothing left to run, every cell reused). No model is called.
 
 ```sh
 driftbench campaign run examples/acme/specs/conversations/plan-upgrade.yaml examples/acme/specs/conversations/tool-failure.yaml --target function:acme --repeats 2 --budget-usd 0 --store res.db --campaign acme-halted  # exit 1
@@ -114,7 +114,7 @@ Campaign acme-halted: 4 cells, 1 at a time. Checks: tools, tools_offered, forbid
 4 cells: 4 pass, 0 fail, 0 failed, 4 reused. Spent $0.00.
 ```
 
-A budget-stopped cell is not stored, so `status` shows it pending. The campaign was run with `--budget-usd 0`, which is stored as 0 and read by `resume` as no budget, so the first `resume` runs all four cells. The second finds a completed run for every cell and runs nothing. The same `resume` finishes a campaign you stopped with Ctrl-C.
+A budget-stopped cell is not stored, so `status` shows it pending. The campaign was run with `--budget-usd 0`, which is stored as 0 and read by `resume` as no budget. For that reason the first `resume` runs all four cells. The second finds a completed run for every cell and runs nothing. The same `resume` finishes a campaign you stopped with Ctrl-C.
 
 ## Common errors
 

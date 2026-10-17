@@ -30,7 +30,7 @@ The ladder (version 1), from `driftbench validate estate`:
 
 | Level | Id | Name | Items | What the items check |
 |---|---|---|---|---|
-| 1 | `reader` | reader and graph | 641 | planted forms of every reader gap (symlinks, registry tables, process maps, catalogues, dispatcher commands, compact frontmatter, long references), gates, hazards and paths with decoys, pairs of forms, the generated estates |
+| 1 | `reader` | reader and graph | 641 | planted forms of every reader gap (symlinks, registry tables, process maps, catalogues, dispatcher commands, compact frontmatter, long references). Also gates, hazards and paths with decoys, pairs of forms, the generated estates |
 | 2 | `lint` | lint | 46 | planted defects found exactly; clean estates give no finding |
 | 3 | `plan` | plan | 65 | the plan contract, pairwise and three-way coverage against brute force, relevance |
 | 4 | `generation` | generation | 270 | every class of test complete, valid, distinct and green on the rule follower |
@@ -135,7 +135,7 @@ driftbench validate estate --hardness # exit 64
 validators/estate/journal.jsonl: the journal holds no iteration 0 row: run and record iteration 0 first.
 ```
 
-The ladder on seed 1, at the repository root (1327 seconds on a busy machine). Shown as text, not run by the help test: a whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
+The ladder on seed 1, at the repository root (1327 seconds on a busy machine). Shown as text, not run by the help test. A whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
 It failed level 1 with 72 items and exited 0. The table and one family of the failing items, cut from
 107 lines:
 

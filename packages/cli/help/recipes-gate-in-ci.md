@@ -148,7 +148,7 @@ Each changed golden names the checks it failed, as `block <index> <verdict id>`.
 | Verdict | Exit | Means |
 |---|---|---|
 | `parity` | 0 | every gating criterion that is not underpowered and the all-pass flag have an upper bound below the margin, and no flag family is new |
-| `regression` | 1 | evidence of a drop: a new flag, a criterion the false discovery rate control keeps, or the all-pass McNemar test below 0.05 with more goldens regressed than improved |
+| `regression` | 1 | evidence of a drop. It is a new flag or a criterion the false discovery rate control keeps. It can also be the all-pass McNemar test below 0.05 with more goldens regressed than improved |
 | `not-shown-non-inferior` | 1 | no evidence of a drop, but an interval is wider than the margin: too few goldens, never a regression |
 | `incomplete` | 1 | a candidate cell did not run, such as one stopped by `--budget-usd` |
 | `aggregate-failed` | 1 | a campaign-level criterion failed (step 4) |

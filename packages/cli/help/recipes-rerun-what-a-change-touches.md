@@ -1,6 +1,6 @@
 ---
 title: Rerun only what a change touches
-summary: Name a change in a manifest, print its blast radius, run only those cells and carry the rest from a baseline, audit the carry, and rerun single blocks in mode T, on Acme.
+summary: Name a change in a manifest and print its blast radius. Run only those cells and carry the rest from a baseline. Audit the carry, and rerun single blocks in mode T, on Acme.
 commands:
   - radius
   - radius auto

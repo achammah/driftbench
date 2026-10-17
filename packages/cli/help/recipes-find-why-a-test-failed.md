@@ -1,6 +1,6 @@
 ---
 title: Find why a test failed
-summary: From a failing cell to its cause on Acme, through the failing verdicts, their evidence, the drift class, the drilldown, a determinism check and an offline replay.
+summary: From a failing cell to its cause on Acme. The path goes through the failing verdicts, their evidence, the drift class, the drilldown, a determinism check and an offline replay.
 commands:
   - campaign run
   - ci

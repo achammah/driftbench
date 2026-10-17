@@ -1,6 +1,6 @@
 ---
 title: Compare two versions of an agent
-summary: Run the same suite on two agent versions, decide with compare whether the new one is no worse, read the diff in a scorecard, and watch the versions over time with monitor.
+summary: Run the same suite on two agent versions. Decide with compare whether the new one is no worse. Read the diff in a scorecard, and watch the versions over time with monitor.
 commands:
   - campaign run
   - compare

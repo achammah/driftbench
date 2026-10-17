@@ -1,6 +1,6 @@
 ---
 title: Mixture of Judges
-summary: "Mixture of Judges (MoJ) routes each item to the judge that fits it: a cheap first judge settles what it is sure of and only uncertain items go to costlier judges of other families; on main it is a research harness built on the package's opt-in createEscalation, with no CLI command."
+summary: "Mixture of Judges (MoJ) routes each item to the judge that fits it. A cheap first judge settles what it is sure of. Only uncertain items go to costlier judges of other families. On main it is a research harness built on the package's opt-in createEscalation, with no CLI command."
 commands: []
 see_also:
   - judging-council
@@ -14,26 +14,26 @@ next:
 
 ## What it is
 
-Mixture of Judges (MoJ) is a routing design: a cheap, fast first judge answers every item, and only the items it leaves uncertain go to more costly judges, such as a reasoning model or a panel of models from other families, sometimes after a reference answer is solved once. The cost is spent where the cheap judge is unsure.
+Mixture of Judges (MoJ) is a routing design. A cheap, fast first judge answers every item. Only the items it leaves uncertain go to more costly judges, such as a reasoning model or a panel of models from other families. Sometimes this happens after a reference answer is solved once. The cost is spent where the cheap judge is unsure.
 
 MoJ is the umbrella name; on main it is made of four package functions, each opt-in and each a library call:
 
 * `createEscalation`: the router. A cheap first judge answers; only the signals you choose send the item to later judges of other families (details below).
-* `weightedPanel(votes, weights, margin)`: the panel vote of the later judges, weighted by calibrated agreement (such as kappa), with an abstain when the margin is thin (default margin 0.3). It is defined in `packages/judges/src/weighted-panel.ts` but not exported from the package index on main, so it cannot be imported yet; the council's own `weights` field is the public weighted vote (see `judging-council`).
-* `withReferenceConsensus(client, { solve, samples, route: 'auto' })`: the reference expert. With `route: 'auto'` it first asks whether the question has one checkable answer (a number, an option, a fact, a proof result, code behaviour); only then does a blind solver produce a reference the judge compares with. Creative and open questions skip the solve.
+* `weightedPanel(votes, weights, margin)`: the panel vote of the later judges, weighted by calibrated agreement (such as kappa). It abstains when the margin is thin (default margin 0.3). It is defined in `packages/judges/src/weighted-panel.ts` but not exported from the package index on main, so it cannot be imported yet. The council's own `weights` field is the public weighted vote (see `judging-council`).
+* `withReferenceConsensus(client, { solve, samples, route: 'auto' })`: the reference expert. With `route: 'auto'` it first asks whether the question has one checkable answer (a number, an option, a fact, a proof result, code behaviour). Only then does a blind solver produce a reference the judge compares with. Creative and open questions skip the solve.
 * `calibrateCascade`: the measurement. `{ judge, criteria, labels, repeats }` scores a deployable route on your labels; `{ first, escalateTo, ... }` is the label-aware form behind `judge calibrate --cascade`.
 
 The research write-up and its frozen results are on main too:
 
 * The research harness and its write-up. `research/moj/README.md`, `research/moj/RESULTS.md`, `research/moj/results/sealed/report.json` and `research/moj/sealed/freeze.json` are copies from the branch `research/system1-judge`, kept so that published numbers have a source in the repository. The harness code and its recordings are not copied.
 
-No CLI command runs MoJ routing on main. `judge run`, `judge calibrate`, `replay` and `estate run` do not route through an escalation client; `judge calibrate --cascade` measures a cheap-first cascade but is not a deployed router.
+No CLI command runs MoJ routing on main. `judge run`, `judge calibrate`, `replay` and `estate run` do not route through an escalation client. `judge calibrate --cascade` measures a cheap-first cascade but is not a deployed router.
 
 ## When to use it
 
 * When a council of three costly judges on every item is too expensive, and a cheap judge is right on most items.
 * When some items need a different kind of judge (a reference solve for a math or fact question, a reasoning model for a subtle rubric).
-* To measure whether a routing pays off, use `calibrateCascade({ judge, criteria, labels, repeats })` with the escalation client as `judge`: it scores the deployable route on your labels. For a plain cheap-then-costly cascade measured from the command line, use `judge calibrate --cascade` (see `judging-calibration`).
+* To measure whether a routing pays off, use `calibrateCascade({ judge, criteria, labels, repeats })` with the escalation client as `judge`. It scores the deployable route on your labels. For a plain cheap-then-costly cascade measured from the command line, use `judge calibrate --cascade` (see `judging-calibration`).
 
 ## Commands and every option
 
@@ -66,11 +66,11 @@ There is one escalation round. Each later judge answers at most once; the first 
 
 ## Outputs and how to read them
 
-The result carries `escalation`: `triggers` (the signals that fired), `escalated`, `first` (the first results), `then` (each later judge's result or error), `decision` (`first`, `majority`, `first-stands` or `inconclusive`) and `calls`. `costUsd` sums the reported provider costs. A transport error of the first judge is thrown; a later judge's error abstains.
+The result carries `escalation`. It holds `triggers` (the signals that fired), `escalated`, `first` (the first results) and `then` (each later judge's result or error). It also holds `decision` (`first`, `majority`, `first-stands` or `inconclusive`) and `calls`. `costUsd` sums the reported provider costs. A transport error of the first judge is thrown; a later judge's error abstains.
 
 Recording works as for any client: `recordingClient(judge, cassette)` and `playerClient(cassette, judge.id)` keep both-order comparisons and the routing record, and the key covers the escalation configuration. A missing entry fails; there is no live fallback.
 
-Construction errors: `agent family is required`, `a judge shares the agent family: refused`, `escalation needs a cross-family pool`, `escalation needs at least one then judge`, `every judge family is required`, `duplicate judge ids in escalation`, `unknown escalation trigger`, `unknown escalation decision`, and `confidence must be from 0 to 1`.
+Construction errors: `agent family is required`, `a judge shares the agent family: refused` and `escalation needs a cross-family pool`. More errors: `escalation needs at least one then judge`, `every judge family is required` and `duplicate judge ids in escalation`. Further errors: `unknown escalation trigger`, `unknown escalation decision` and `confidence must be from 0 to 1`.
 
 ## Worked example
 

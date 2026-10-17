@@ -1,6 +1,6 @@
 ---
 title: bench record
-summary: Record the shipped default judge on the benchmark slices with a live model, under a required USD spend cap, and write the cassettes and evidence that bench replay checks; a maintainer action that costs money.
+summary: Record the shipped default judge on the benchmark slices with a live model, under a required USD spend cap. Write the cassettes and evidence that bench replay checks. This is a maintainer action that costs money.
 commands: []
 see_also:
   - judging-bench-replay
@@ -13,13 +13,13 @@ next:
 
 ## What it is
 
-`pnpm bench record` is a repository script, not part of the published `driftbench` command. For one model, it sends every case of the selected benchmark slices to the shipped default judge on that live model, keeps the raw answers as a cassette, and writes evidence: the score report, the cassette's SHA-256, the resolved model names, and the measured and charged spend of every call. Before it accepts a recording, it replays the new cassette and checks that the replay gives exactly the recorded results.
+`pnpm bench record` is a repository script, not part of the published `driftbench` command. For one model, it sends every case of the selected benchmark slices to the shipped default judge on that live model. It keeps the raw answers as a cassette. It writes evidence: the score report, the cassette's SHA-256, the resolved model names, and the measured and charged spend of every call. Before it accepts a recording, it replays the new cassette and checks that the replay gives exactly the recorded results.
 
 Every call is billed by the provider. The spend cap is required and covers this invocation only, calls in flight included.
 
 ## When to use it
 
-* After a change that makes `pnpm bench replay` say `re-record needed` (a new prompt fingerprint, new client settings, or a new dataset version), and only with an approved budget.
+* After a change that makes `pnpm bench replay` say `re-record needed` (a new prompt fingerprint, new client settings, or a new dataset version). Do it only with an approved budget.
 * To add a model to the benchmark, after a maintainer adds it to `benchmarks/manifest.json` as `active`.
 * To finish an interrupted recording, with `--resume`.
 * To check a score without spending, use `pnpm bench replay`: it reads the committed recordings.
@@ -66,7 +66,7 @@ Files written, per slice and model:
 |---|---|
 | `benchmarks/cassettes/<slice>@<version>/<model>.json` | The raw answers and the client identity. |
 | `benchmarks/evidence/<slice>@<version>/<model>.json` | Format `driftbench-bench-record-v1`: `report`, `cassetteSha256`, `resolvedModels`, `costUsd`, `chargedUsd`, `calls`, `spend`. |
-| `benchmarks/evidence/spend.jsonl`, or `--spend-ledger` | One JSON line per call: `lane` (`bench-frame`), `slice`, `datasetVersion`, `fingerprint`, `at`, `model`, `resolvedModel`, `costUsd`, `chargedUsd`, `accounting` (`provider`, `tokens` or `reserved-on-error`), `status` (`ok` or `error`), and token counts when known. |
+| `benchmarks/evidence/spend.jsonl`, or `--spend-ledger` | One JSON line per call: `lane` (`bench-frame`), `slice`, `datasetVersion`, `fingerprint`, `at`, `model`, `resolvedModel`. Also `costUsd`, `chargedUsd`, `accounting` (`provider`, `tokens` or `reserved-on-error`), `status` (`ok` or `error`), and token counts when known. |
 | `benchmarks/cassettes/history/<sha256>.json` | Without `--resume`, the previous completed cassette, kept by content hash before it is replaced. |
 
 Partial files are written after each completed call and removed when the slice completes.
@@ -75,7 +75,7 @@ Text output per slice: the replay score line (see `judging-bench-replay`), then 
 
 ## Worked example
 
-The help test runs only `driftbench` commands, and the bench is a repository script, so the tested line here validates the criteria folder the judge prompt is built from; the bench run itself follows.
+The help test runs only `driftbench` commands. The bench is a repository script. The tested line here therefore validates the criteria folder the judge prompt is built from. The bench run itself follows.
 
 ```sh
 driftbench judge check examples/acme/criteria
@@ -100,9 +100,9 @@ ok  sheet_matches_catalog [system1, gating]: pass fixture 2 line(s), fail fixtur
 (exit 0)
 ```
 
-A spend-free run: with `--resume` on a slice whose recording is already complete, the command checks the recording by replay and reuses it without any model call. It runs here on a copy of `benchmarks/` under `out/`, so no tracked file changes (the command creates an empty spend ledger in the copy):
+A spend-free run: with `--resume` on a slice whose recording is already complete, the command checks the recording by replay. The command reuses it without any model call. It runs here on a copy of `benchmarks/` under `out/`, so no tracked file changes (the command creates an empty spend ledger in the copy):
 
-Not run by the help test: the bench reads git (the commit each report records) and the repository's `benchmarks/` folder, and a real recording calls a paid model. From a repository checkout:
+Not run by the help test. The bench reads git (the commit each report records) and the repository's `benchmarks/` folder. A real recording calls a paid model. From a repository checkout:
 
 ```text
 $ mkdir -p out/judging/benchroot && cp -R benchmarks out/judging/benchroot/

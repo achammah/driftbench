@@ -149,7 +149,7 @@ driftbench validate judges --hardness # exit 64
 validators/judges/journal.jsonl: the journal holds no iteration 0 row: run and record iteration 0 first.
 ```
 
-The ladder on seed 1, at the repository root (288 seconds while the machine was heavily loaded). Shown as text, not run by the help test: a whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
+The ladder on seed 1, at the repository root (288 seconds while the machine was heavily loaded). Shown as text, not run by the help test. A whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
 
 ```bash
 pnpm -s driftbench validate judges

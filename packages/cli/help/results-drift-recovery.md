@@ -1,6 +1,6 @@
 ---
 title: "Drift and recovery records"
-summary: "How each failing block gets a drift class, the succession metrics of every run, and the recovery record of every perturbed run, and where to read them."
+summary: "How each failing block gets a drift class. The topic also covers the succession metrics of every run, the recovery record of every perturbed run, and where to read them."
 commands:
   - report
 see_also:

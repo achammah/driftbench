@@ -1,6 +1,6 @@
 ---
 title: The validity gate
-summary: '`gate` passes every candidate block through nine stages (observed state, leakage, shortcut, contrast, red first, stability, difficulty, label audit, freshness) against reference agents and planted faults, and writes the gated suite, a sealed holdout, the report, and the files a person reviews; no model is called.'
+summary: '`gate` passes every candidate block through nine stages (observed state, leakage, shortcut, contrast, red first, stability, difficulty, label audit, freshness). The stages check blocks against reference agents and planted faults. `gate` writes the gated suite, a sealed holdout, the report, and the files a person reviews. No model is called.'
 commands:
   - gate
 see_also:
@@ -20,7 +20,7 @@ next:
 
 A test is only useful if it passes on a correct agent, fails on a broken one, and cannot be passed by a trivial agent. The gate checks exactly that, block by block, before a block may count.
 
-It runs the candidate specs on the reference agents (`--reference`, the correct build), on trivial agents, and on a set of planted faults (`--faults`: wrappers around the reference that each break one thing). Nine stages run in order. Each stage rejects or marks a block with a named reason; the funnel counts each block once, at the first stage that rejects it.
+It runs the candidate specs on the reference agents (`--reference`, the correct build). It runs them on trivial agents too. It runs them on a set of planted faults (`--faults`: wrappers around the reference that each break one thing). Nine stages run in order. Each stage rejects or marks a block with a named reason; the funnel counts each block once, at the first stage that rejects it.
 
 | # | Stage | Rejects or marks |
 |---|---|---|
@@ -37,10 +37,10 @@ It runs the candidate specs on the reference agents (`--reference`, the correct 
 Details that change how you read results:
 
 - A block's outcome reads only the gating verdicts of its Then. A block no verdict decided is `unjudged`, never a pass.
-- The trivial agents: `constant` sends the same reply to every message; `echo` sends the user's message back with every literal word of the spec's patterns; `first-tool` calls the first tool the spec names with no argument.
-- Leakage: an expected tool input the user states in the When is allowed (passing it on is the test); an end-state value found in the When or Given is a leak; enum words of 4 letters or fewer are ignored; numbers always count.
+- The trivial agents: `constant` sends the same reply to every message. `echo` sends the user's message back with every literal word of the spec's patterns. `first-tool` calls the first tool the spec names with no argument.
+- Leakage: an expected tool input the user states in the When is allowed (passing it on is the test). An end-state value found in the When or Given is a leak. Enum words of 4 letters or fewer are ignored. Numbers always count.
 - Stage 4 compares blocks through the cells `generate` records. A hand-written spec has none, so it passes stage 4.
-- Stage 5: a block targets a fault when the fault changed an observed field of its spec and the block reads a field the fault changes, or carries the class it plants. A fault that changes no observed field is an equivalent mutant and leaves the score. The mutation score per class is the share of scored faults the gated suite kills, with a 95% Wilson interval.
+- Stage 5: a block targets a fault when the fault changed an observed field of its spec. The block must also read a field the fault changes. A block targets a fault too when it carries the class the fault plants. A fault that changes no observed field is an equivalent mutant and leaves the score. The mutation score per class is the share of scored faults the gated suite kills, with a 95% Wilson interval.
 - The holdout: whole specs, drawn with `--seed` at the share `--holdout`, go to `holdout/` with `seal.json`. They are gated like the rest, never run as an evaluation by the gate; `holdout score` (another area) scores them once.
 - No model is called. The gate runs deterministic agents only.
 
@@ -83,7 +83,7 @@ driftbench gate <specs> --reference <adapter:agent>... --faults <path> --out <di
 |---|---|
 | 0 | the gated suite is written with at least one accepted block |
 | 1 | the gated suite is written with no accepted block |
-| 2 | usage or input error, nothing written: a bad option value, an invalid candidate, two candidates with one id, a spec whose target is not a `--reference`, a route to a target that is not a reference, a fault set that does not load, no adapter for a reference, an earlier output without `--force` |
+| 2 | usage or input error, nothing written. Causes: a bad option value, an invalid candidate, or two candidates with one id. A spec has a target that is not a `--reference`, or a route goes to a target that is not a reference. A fault set does not load. A reference has no adapter. An earlier output exists and `--force` is absent. |
 
 ## Inputs
 
@@ -94,14 +94,14 @@ A module that exports `faults`, a list. Each fault:
 | Field | Type | Meaning |
 |---|---|---|
 | `id` | string | Unique in the set. |
-| `kind` | `drift`, `deviation` or `control` | A drift fault plants one of X1 to X5; a deviation fault mishandles one deviation class; a control changes nothing and must leave every block green. |
+| `kind` | `drift`, `deviation` or `control` | A drift fault plants one of X1 to X5. A deviation fault mishandles one deviation class. A control changes nothing and must leave every block green. |
 | `class` | `X1_local` to `X5_tool`, a deviation class `D1_off_topic` to `D12_prompt_extraction`, or `control` | The class it plants. |
 | `target` | `adapter:agent` | The reference it wraps. A fault whose target is not a `--reference` does not run (the gate prints a note). |
 | `affects` | list of Then fields, such as `text`, `tools`, `stage`, `guards`, `end_state`, `lang`, `artifacts`, `workspace`, `safety`, `execution` | The fields it is meant to change. |
 | `description` | string | What it does wrong. |
 | `agent` | `{ kind: 'function', create() }` or `{ kind: 'process', script }` | A function fault returns a session with `respond(messages, world)` and `payloads()`; a process fault is `node <script>` in a local sandbox. |
 
-The drift classes: `X1_local` (a wrong answer or action in this block, while earlier facts hold), `X2_contradiction` (the block contradicts a fact established earlier), `X3_flow` (a stage skipped, repeated, or the flow going back), `X4_format` (a format or persona rule breaks, such as a reply in the wrong language), `X5_tool` (a tool call, skill or guard missing, extra, repeated, or with wrong parameters). The Acme set, `examples/acme/faults`, wraps both Acme agents and has one control each.
+The drift classes follow. `X1_local` is a wrong answer or action in this block, while earlier facts hold. `X2_contradiction` is a block that contradicts a fact established earlier. `X3_flow` is a stage skipped, repeated, or the flow going back. `X4_format` is a format or persona rule that breaks, such as a reply in the wrong language. `X5_tool` is a tool call, skill or guard missing, extra, repeated, or with wrong parameters. The Acme set, `examples/acme/faults`, wraps both Acme agents and has one control each.
 
 ## Outputs and how to read them
 
@@ -111,11 +111,11 @@ Files under `--out`:
 |---|---|
 | `specs/...` | the gated suite: specs with at least one accepted block, at their original relative paths. Rejected blocks are dropped |
 | `holdout/...` and `holdout/seal.json` | the sealed specs, and the seal: `sealed`, `note`, `seed`, `share`, and each spec's `id`, `path` and `hash` |
-| `gate-report.json` | `gate`, `source`, `references`, `fault_set`, `options`, `stages`, `summary`, `funnel`, `mutation`, and `blocks`: per block its `key` (`<spec id>#<block id or index>`), `path`, `family`, `target`, the Then `fields` it reads, `status`, the first `stage` and `reason` that refused it, every stage's status and detail, the reference outcomes per repeat, the trivial and fault outcomes, `pass_k`, `pass_probability` and `agents` |
+| `gate-report.json` | `gate`, `source`, `references`, `fault_set`, `options`, `stages`, `summary`, `funnel`, `mutation`, and `blocks`. Each block has its `key` (`<spec id>#<block id or index>`), `path`, `family`, `target`, the Then `fields` it reads, and `status`. It has the first `stage` and `reason` that refused it, and every stage's status and detail. It has the reference outcomes per repeat, and the trivial and fault outcomes. It has `pass_k`, `pass_probability` and `agents` |
 | `review.yaml` | blocks that flipped across repeats, for a person to decide: fix the Then, fix the check, or drop the block |
 | `label-audit.yaml` | the sampled blocks per family, each with its When and expected Then, and `label_correct: null` and `note: null` for a person to fill |
 
-The printed funnel: one line per stage with `in`, `rejected` or `marked`, `out`, and the reasons with counts. Then `Accepted <a> of <n> blocks.`, the mutation score per fault class (`<killed>/<scored> killed (<share>, 95% CI <lo> to <hi>)`, or `no scored fault, <n> equivalent excluded`), the controls (`<n> negative control(s), green`), and `Wrote <n> files to <dir>.`
+The printed funnel: one line per stage with `in`, `rejected` or `marked`, `out`, and the reasons with counts. Then `Accepted <a> of <n> blocks.` is printed. The mutation score per fault class follows (`<killed>/<scored> killed (<share>, 95% CI <lo> to <hi>)`, or `no scored fault, <n> equivalent excluded`). The controls follow (`<n> negative control(s), green`). Last comes `Wrote <n> files to <dir>.`
 
 What to do with a rejection: `expected-value-in-given` or `-in-when`: move the value out of where the agent reads it, or test something it must compute. `passed-by-echo`: the Then only checks words the user already said; add a machine check (tool, stage, end state). `targets-no-fault`: no planted fault touches what this block reads; add a fault or accept the gap. `flips`: read `review.yaml`.
 

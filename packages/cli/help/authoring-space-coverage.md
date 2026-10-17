@@ -1,6 +1,6 @@
 ---
 title: Space coverage and completeness
-summary: '`space coverage` counts which cells of a space map your specs cover (per dimension, over every subset of t dimensions, weighted by the user mix, and for each required cell); `space complete` estimates how much of the map a sample of conversations has shown.'
+summary: '`space coverage` counts which cells of a space map your specs cover. It counts per dimension, over every subset of t dimensions, weighted by the user mix, and for each required cell. `space complete` estimates how much of the map a sample of conversations has shown.'
 commands:
   - space coverage
   - space complete
@@ -18,8 +18,8 @@ next:
 
 Both commands read a space map (see authoring-map) and a set of specs, place each spec on the map's grid, and count.
 
-- `space coverage` answers: which situations do my specs test? It prints, per dimension, which values some spec reaches; on every subset of `t` dimensions, how many allowed cells are covered; the same share weighted by the prior (the user mix); and each required cell with the specs that cover it. It exits 1 while a required cell is empty.
-- `space complete` treats the specs as a random sample of conversations and answers: how much of the map has the sample shown, and how likely is the next conversation to show a new cell? It prints the sample coverage and the discovery probability with bootstrap intervals, and the Hill numbers of the cells seen. It prints that line only when there are at least as many conversations as allowed cells.
+- `space coverage` answers: which situations do my specs test? It prints, per dimension, which values some spec reaches. On every subset of `t` dimensions, it prints how many allowed cells are covered. It prints the same share weighted by the prior (the user mix). It also prints each required cell with the specs that cover it. It exits 1 while a required cell is empty.
+- `space complete` treats the specs as a random sample of conversations. It answers: how much of the map has the sample shown, and how likely is the next conversation to show a new cell? It prints the sample coverage and the discovery probability with bootstrap intervals, and the Hill numbers of the cells seen. It prints that line only when there are at least as many conversations as allowed cells.
 
 A t-wise count looks at cells on t dimensions at a time. At t = 2 a cell is a pair of values on two dimensions; a suite covers it when one spec places on both values. Without `--t`, the cells are the full grid: one value on every dimension.
 
@@ -50,7 +50,7 @@ The t-wise lines are always printed for t = 2 and t = 3 when the map has that ma
 |---|---|
 | 0 | every required cell is covered (also when there is none) |
 | 1 | a required cell has no spec |
-| 2 | an invalid map, an invalid inventory the map names, `t` out of range, a full grid over 250000 cells, a path that does not exist, no spec file, an option error |
+| 2 | an invalid map or an invalid inventory the map names. `t` out of range or a full grid over 250000 cells. A path that does not exist, no spec file or an option error |
 
 ### driftbench space complete
 
@@ -84,9 +84,9 @@ The bootstrap draws 2000 resamples of the conversations with seed 1, at the 95% 
 
 - Header: `Map <agent>, version <v>: <d> dimensions, <cells> cells, <k> constraints, prior <kind> (<source>)`. `prior uniform (no weight declared)` when the map gives no weight.
 - `Dimensions`: per dimension, the value count, how many some spec reaches, and the values none reaches. This is the first gap list to read.
-- `Grid at t = <t>` (or `Full grid`): `cells` allowed of total, the forbidden count; `covered` and its share; `weighted`: the covered share of the user mix, and the effective sample size (how many independent specs the weighted share rests on). `not computed` when the prior gives no weight to any allowed cell.
+- `Grid at t = <t>` (or `Full grid`): `cells` allowed of total, and the forbidden count. `covered` and its share. `weighted`: the covered share of the user mix, and the effective sample size (how many independent specs the weighted share rests on). `not computed` when the prior gives no weight to any allowed cell.
 - `t-wise coverage`: covered of allowed pairs (t = 2) and triples (t = 3).
-- `Required cells`: `✓` or `✗`, the cell (`stage=recap · deviation=D4_loose_confirmation` from required values, or `flow <id> · <class>` from the inventory), and the covering specs or `no spec`.
+- `Required cells`: `✓` or `✗`, then the cell. The cell is `stage=recap · deviation=D4_loose_confirmation` from required values, or `flow <id> · <class>` from the inventory. Then the covering specs or `no spec`.
 - `Warnings` (never change the exit code):
 
 | Code | Meaning | What to do |
@@ -98,18 +98,18 @@ The bootstrap draws 2000 resamples of the conversations with seed 1, at the 95% 
 
 - `Invalid specs, not counted`, then the summary line `Coverage: <a> of <b> required cells covered, <c> of <d> cells at t = <t> (<share>).`
 
-`--json` keys: `map`, `inventory` (when named), `agent`, `version`, `prior` (`kind`, `source`, `uniform`), `constraints` (count), `dimensions` (each `id`, `title`, `kind`, `values` with per-value counts, `allowed`, `covered`), `grid` (`t`, `projections`, `total`, `allowed`, `covered`, `share`, `full`, `weighted`, `effectiveSampleSize`, and `cells`: every allowed cell with its `values`, `count` and `specs`), `tway` (one entry per strength 2 and 3), `required` (each with `source`, its values or flow and deviation, `covered`, `specs`), `specs` (each `id`, `path`, `cells` covered, `weight`), `warnings`, `invalidSpecs`, `ok`.
+`--json` keys: `map`, `inventory` (when named), `agent`, `version`, `prior` (`kind`, `source`, `uniform`) and `constraints` (count). `dimensions` has, for each: `id`, `title`, `kind`, `values` with per-value counts, `allowed`, `covered`. `grid` has `t`, `projections`, `total`, `allowed`, `covered`, `share`, `full`, `weighted`, `effectiveSampleSize`, and `cells`: every allowed cell with its `values`, `count` and `specs`. `tway` has one entry per strength 2 and 3. `required` has, for each: `source`, its values or flow and deviation, `covered`, `specs`. `specs` has, for each: `id`, `path`, `cells` covered, `weight`. The last keys are `warnings`, `invalidSpecs`, `ok`.
 
 ### space complete
 
 - `Completeness at t = <t>: <cells> cells, <n> conversations` (or `over the full grid`).
 - `seen`: cells shown by at least one conversation; `f1` and `f2`: cells shown by exactly one, and exactly two.
-- `Hill numbers`: q0 is the number of cells seen; q1 (exponential of the Shannon entropy) and q2 (inverse Simpson) count the cells as if equally common; a q2 far under q0 means a few cells hold most conversations.
+- `Hill numbers`: q0 is the number of cells seen. q1 (exponential of the Shannon entropy) and q2 (inverse Simpson) count the cells as if equally common. A q2 far under q0 means a few cells hold most conversations.
 - `left out`: specs that fall in no allowed cell.
-- When printable: `sample coverage` (Chao form) and `discovery` (Good-Turing f1 / n), each with its 95% interval; `bootstrap` (resamples and seed); then a plain sentence and the assumption: the conversations are independent, from a generator that does not learn from results.
+- When printable: `sample coverage` (Chao form) and `discovery` (Good-Turing f1 / n), each with its 95% interval. Then `bootstrap` (resamples and seed). Then a plain sentence and the assumption: the conversations are independent, from a generator that does not learn from results.
 - When not printable: `No completeness line: <reason>.`
 
-`--json` keys: `map`, `t`, `full`, `cells`, `conversations`, `unplaced`, `seen`, `f1`, `f2`, `hill`, `printable`, `reason` (when not printable), `coverage`, `discovery` (each `estimate`, `lower`, `upper`), `sentence`, `bootstrap`, `assumption`, `invalidSpecs`.
+`--json` keys: `map`, `t`, `full`, `cells`, `conversations`, `unplaced`, `seen`, `f1`, `f2`, `hill`, `printable`, `reason` (when not printable). Also `coverage`, `discovery` (each `estimate`, `lower`, `upper`), `sentence`, `bootstrap`, `assumption`, `invalidSpecs`.
 
 ## Worked example
 
@@ -162,7 +162,7 @@ Coverage: 8 of 11 required cells covered, 199 of 818 cells at t = 2 (24.3%).
 (exit 1)
 ```
 
-Read it: no spec carries a persona tag, and five data values are never reached; three required flow deviations have no spec, so the command exits 1.
+Read it: no spec carries a persona tag, and five data values are never reached. Three required flow deviations have no spec, so the command exits 1.
 
 Completeness of the same seven specs is not estimable, while the 332 generated specs of the Acme example are enough at t = 1:
 
@@ -192,7 +192,7 @@ The figures assume independent conversations from a generator that does not lear
 (exit 0)
 ```
 
-A generated suite is steered toward unseen cells, so, as the last line says, its estimate is optimistic: 39 of 46 values are seen, not all.
+A generated suite is steered toward unseen cells, so its estimate is optimistic, as the last line says. Here 39 of 46 values are seen, not all.
 
 ## Common errors
 
@@ -208,7 +208,7 @@ error: required option '--map <file>' not specified
 (exit 2)
 ```
 
-Passing the extract proposal instead of a space map (the first lines of a long list; the command ends with `The map is invalid, so coverage was not computed.` and exit 2):
+Passing the extract proposal instead of a space map gives this output. It shows the first lines of a long list. The command ends with `The map is invalid, so coverage was not computed.` and exit 2:
 
 ```
 $ driftbench space coverage examples/acme/specs --map examples/acme/map/approved.yaml

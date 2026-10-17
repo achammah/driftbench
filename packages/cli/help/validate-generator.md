@@ -152,7 +152,7 @@ driftbench validate generator --hardness # exit 64
 validators/generator/journal.jsonl: the journal holds no iteration 0 row: run and record iteration 0 first.
 ```
 
-The ladder on seed 1, at the repository root (63 seconds, stopped at level 2). Shown as text, not run by the help test: a whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
+The ladder on seed 1, at the repository root (63 seconds, stopped at level 2). Shown as text, not run by the help test. A whole ladder runs for minutes, and the level it reaches changes as the product is fixed.
 
 ```bash
 pnpm -s driftbench validate generator

@@ -1,6 +1,6 @@
 ---
 title: Live estate runs and estate mutants
-summary: Run generated estate specs live through the runtime in a sandboxed copy of the estate, safely on a stand-in, and prove the tests can fail with estate mutants.
+summary: Run generated estate specs live through the runtime in a sandboxed copy of the estate, safely on a stand-in. Prove the tests can fail with estate mutants.
 commands:
   - estate run
   - estate mutate

@@ -1,6 +1,6 @@
 ---
 title: Estate coverage and drift
-summary: Report how much of an estate its generated tests cover, which atoms recorded sessions reach, block pass rates and guard deny rates, with no model call.
+summary: Report how much of an estate its generated tests cover, which atoms recorded sessions reach, block pass rates and guard deny rates. No model is called.
 commands:
   - estate stats
 see_also:

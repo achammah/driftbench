@@ -1,6 +1,6 @@
 ---
 title: Check that an agent is deterministic
-summary: driftbench smoke runs one spec several times with the cache off and no checks, and reports whether the transcripts of what the agent did are identical, and where they first differ.
+summary: driftbench smoke runs one spec several times with the cache off and no checks. It reports whether the transcripts of what the agent did are identical, and where they first differ.
 commands:
   - smoke
 see_also:
@@ -14,7 +14,7 @@ next:
 
 ## What it is
 
-`driftbench smoke` is the determinism check. It runs one spec several times (3 by default) in mode F, with the cache off and no checks, then compares the transcripts of the runs block by block against the first run. A transcript holds what the agent did in each block: the text segments, the tool calls with their inputs and outputs, the runtime report (skills, guard verdicts, stages, references, subagents), the commands with their exit codes, the artifacts and the workspace diff. It leaves out what may vary between two identical runs: cost, latency, timestamps and the raw trace. It also says whether the adapter claims to be deterministic, so a claim the runs contradict is visible.
+`driftbench smoke` is the determinism check. It runs one spec several times (3 by default) in mode F, with the cache off and no checks. It then compares the transcripts of the runs block by block against the first run. A transcript holds what the agent did in each block. It holds the text segments and the tool calls with their inputs and outputs. It holds the runtime report (skills, guard verdicts, stages, references, subagents) and the commands with their exit codes. It holds the artifacts and the workspace diff. It leaves out what may vary between two identical runs: cost, latency, timestamps and the raw trace. It also says whether the adapter claims to be deterministic, so a claim the runs contradict is visible.
 
 ## When to use it
 
@@ -53,11 +53,11 @@ Smoke: <spec id> on <target>, <n> runs, cache off.
 ✓ The transcripts are identical.
 ```
 
-The transcript hash is the first 12 hex characters of the SHA-256 of the transcript's canonical JSON: equal hashes mean equal transcripts. When they differ, the check line is `✗ The transcripts differ: run <i> first differs from run 1 at block <k>[ (<block id>)].`, followed by `  The adapter claims to be deterministic, so the difference at block <k> fails that claim.` or `  The adapter does not claim to be deterministic.` When a run did not complete: `✗ <n> of <runs> runs did not complete.`
+The transcript hash is the first 12 hex characters of the SHA-256 of the transcript's canonical JSON: equal hashes mean equal transcripts. `✗ The transcripts differ: run <i> first differs from run 1 at block <k>[ (<block id>)].` is the check line when they differ. Either `  The adapter claims to be deterministic, so the difference at block <k> fails that claim.` follows it as a second line. Or `  The adapter does not claim to be deterministic.` follows it. When a run did not complete: `✗ <n> of <runs> runs did not complete.`
 
 `--json` prints `{ "specId", "target", "runs": [ { "status", "blocks", "error"? } ], "deterministicClaim", "identical", "hashes": [...], "firstDifference"?: { "run", "block", "blockId"? } }`. In `firstDifference`, `run` and `block` count from 0.
 
-Exit codes: 0 when the transcripts are identical and every run completed; 1 when they differ or a run did not complete; 2 on bad input (nothing ran).
+Exit codes: 0 when the transcripts are identical and every run completed. 1 when they differ or a run did not complete. 2 on bad input (nothing ran).
 
 ## Worked example
 
@@ -102,7 +102,7 @@ Smoke: acme-plan-upgrade on function:acme, 3 runs, cache off.
 }
 ```
 
-Both Acme agents are deterministic and claim it. The task's transcript includes the workbook it wrote (hash and size) and the workspace diff, so even the produced file is the same byte for byte across runs.
+Both Acme agents are deterministic and claim it. The task's transcript includes the workbook it wrote (hash and size) and the workspace diff. For that reason even the produced file is the same byte for byte across runs.
 
 ## Common errors
 
@@ -115,5 +115,5 @@ Each exits 2.
 
 Results that look like errors:
 
-* `✗ The transcripts differ ... The adapter claims to be deterministic, so the difference at block <k> fails that claim.` (exit 1) Fix the agent (fixed seeds, fixed clock in what it writes), or drop the `deterministic` claim of the target.
+* `✗ The transcripts differ ... The adapter claims to be deterministic, so the difference at block <k> fails that claim.` (exit 1). Fix the agent (fixed seeds, fixed clock in what it writes), or drop the `deterministic` claim of the target.
 * A model target that differs at block 0: a model is not deterministic. Use repeats and statistics instead of a single run.

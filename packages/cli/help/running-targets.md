@@ -1,6 +1,6 @@
 ---
 title: Targets and adapters
-summary: How a target is written (adapter or adapter:agent), where it comes from (the spec, --target, --route), which targets the command line reaches and in what order it finds their adapter, and what to do when none is set up.
+summary: How a target is written (adapter or adapter:agent). Where it comes from (the spec, --target, --route). Which targets the command line reaches, and in what order it finds their adapter. What to do when none is set up.
 commands:
   - campaign plan
   - campaign run
@@ -20,7 +20,7 @@ next:
 
 ## What it is
 
-A target names the agent under test. It is written `<adapter>` or `<adapter>:<agent>`, such as `function:acme-sales`, `process:my-agent`, `http:my-bot` or `litellm:my-model`. The adapter is the piece of driftbench that knows how to send a block to that kind of agent and read back what it did; the agent part is a name the adapter interprets. In a spec, a target is a mapping with more fields:
+A target names the agent under test. It is written `<adapter>` or `<adapter>:<agent>`, such as `function:acme-sales`, `process:my-agent`, `http:my-bot` or `litellm:my-model`. The adapter is the piece of driftbench that knows how to send a block to that kind of agent and read back what it did. The agent part is a name the adapter interprets. In a spec, a target is a mapping with more fields:
 
 ```text
 target:
@@ -39,13 +39,13 @@ target:
 * Every run needs a target. Leave it to the spec (each spec runs on its own `target:`), or force one with `--target`.
 * Compare agents on one suite: give `--target` once per agent; each adds a full set of cells.
 * Keep a mixed suite on the right agents: `--route <tag=target>` sends the specs carrying a tag to their own target.
-* Reach your own agent: through a URL (`http`), an OpenAI-compatible endpoint (`litellm`), the Nexus platform (`nexus`), a command (`process` with `--process-command`), or any adapter a plugin registers.
+* Reach your own agent in one of these ways: through a URL (`http`), an OpenAI-compatible endpoint (`litellm`), or the Nexus platform (`nexus`). Or use a command (`process` with `--process-command`), or any adapter a plugin registers.
 
 ## Commands and every option
 
 | Option | Commands | Default | Effect |
 |---|---|---|---|
-| `--target <adapter[:agent]>` | `campaign plan`, `campaign run` (repeatable); `smoke`, `simulate`, `perturb`, `attack` (once) | each spec on its own target | run on this target instead of the spec's. Only the adapter and agent are given this way: the spec's `options`, `deployment` and `variant` are not carried over, so a target that needs settings reads them from the environment. A spec whose own target names another adapter gets `Note: <spec> names the <adapter> adapter; --target runs it on <target>.` |
+| `--target <adapter[:agent]>` | `campaign plan`, `campaign run` (repeatable); `smoke`, `simulate`, `perturb`, `attack` (once) | each spec on its own target | run on this target instead of the spec's. Only the adapter and agent are given this way. The spec's `options`, `deployment` and `variant` are not carried over, so a target that needs settings reads them from the environment. A spec whose own target names another adapter gets `Note: <spec> names the <adapter> adapter; --target runs it on <target>.` |
 | `--route <tag=target>` | `campaign plan`, `campaign run` (repeatable) | none | needs `--target`: a spec whose `tags` hold the tag runs on this target alone. |
 | `--process-command <command>` | `campaign run`, `campaign resume` | none | the command behind every `process:<name>` other than `process:acme-ops` (topic running-process-and-sandboxes). |
 | `--agent-version <label>` | `campaign run` | none | written as the `variant` of every target that names none. |
@@ -72,11 +72,11 @@ One adapter is made per distinct target in a campaign: two specs naming `http:my
 ## Outputs and how to read them
 
 * The target shows in each plan row and cell line as `<adapter>:<agent>` (the variant is not shown).
-* A refusal prints, on stderr, `No adapter is set up for <target>[, the target of <spec ids>].`, then the setting that is missing when the target is a built-in one, then the targets this install reaches, then `Plugins add the adapters <names>.` when plugins are loaded. The command exits 2 before anything runs: `campaign plan` refuses exactly what `campaign run` would.
+* A refusal prints, on stderr, `No adapter is set up for <target>[, the target of <spec ids>].`. Then it prints the setting that is missing when the target is a built-in one. Then it prints the targets this install reaches. Then it prints `Plugins add the adapters <names>.` when plugins are loaded. The command exits 2 before anything runs: `campaign plan` refuses exactly what `campaign run` would.
 
 ## Worked example
 
-One spec planned on three targets; then the price-sheet task on its own target and the conversation suite with a route; then a target with no settings. No model is called.
+One spec planned on three targets. Then the price-sheet task on its own target and the conversation suite with a route. Then a target with no settings. No model is called.
 
 ```sh
 driftbench campaign plan examples/acme/specs/conversations/plan-upgrade.yaml --target function:acme --target function:acme-sales --target process:acme-ops

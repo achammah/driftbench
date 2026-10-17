@@ -1,6 +1,6 @@
 ---
 title: Benchmark a judge
-summary: Measure judges against fixture pairs and hand labels on the Acme criteria, from recorded answers with no model call, write which judge owns each criterion, and grow the labels with the review queue.
+summary: Measure judges against fixture pairs and hand labels on the Acme criteria, from recorded answers with no model call. Write which judge owns each criterion. Grow the labels with the review queue.
 commands:
   - judge check
   - judge run

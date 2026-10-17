@@ -1,6 +1,6 @@
 ---
 title: The space map
-summary: 'The space map is the declared list of situations an agent can face (dimensions, their values, impossible combinations and the user mix); `space declare` writes a first one from the inventory and the specs, and the space and generation commands count and fill its cells.'
+summary: 'The space map is the declared list of situations an agent can face (dimensions, their values, impossible combinations and the user mix). `space declare` writes a first one from the inventory and the specs. The space and generation commands count and fill its cells.'
 commands:
   - space declare
   - space coverage
@@ -20,7 +20,7 @@ next:
 
 The space map is one YAML or JSON file, usually beside the agent's behaviour inventory. It declares the situations an agent can face as a grid:
 
-- A dimension is one axis an interaction varies on: the stage reached, the behaviour exercised, the deviation the user brings, the persona, the channel, the data, the task.
+- A dimension is one axis an interaction varies on. The axes are the stage reached, the behaviour exercised, the deviation the user brings, the persona, the channel, the data, the task.
 - Each dimension lists its values.
 - A cell is one value per dimension. The grid is every combination.
 - Constraints name the impossible combinations; a forbidden cell counts nowhere.
@@ -37,7 +37,7 @@ A spec is cut into events: one per block and one per perturbation. A spec covers
 
 | Kind | Placed from | Per |
 |---|---|---|
-| `stage` | a block's `expect.stage`. A deviation (an injection block or a perturbation) places on the stage the conversation has reached when it arrives: the `expect.stage` of the nearest earlier block that has one; else its own `expect.stage`; for a perturbation then its `recovery.stage_after` | event |
+| `stage` | a block's `expect.stage`. A deviation (an injection block or a perturbation) places on the stage the conversation has reached when it arrives. That stage is the `expect.stage` of the nearest earlier block that has one. If there is none, it is the deviation's own `expect.stage`. For a perturbation it is then its `recovery.stage_after` | event |
 | `deviation` | an injection block's or a perturbation's `class`; any other block carries no deviation | event |
 | `behaviour` | every id in the spec's `covers` | spec |
 | `channel` | the spec's `channel` | spec |
@@ -80,7 +80,7 @@ A dimension with nothing to list is left out. Persona, data and task dimensions 
 | Exit code | When |
 |---|---|
 | 0 | the map is written |
-| 2 | an invalid inventory, a missing spec path, no spec file, a seeded map that is invalid (rename the stages or channels the message names), the output file exists, an option error |
+| 2 | an invalid inventory, a missing spec path, no spec file, a seeded map that is invalid (rename the stages or channels the message names). Also when the output file exists or on an option error |
 
 ### driftbench space coverage and driftbench space complete
 
@@ -364,4 +364,4 @@ out/authoring-map/space.yaml already exists. The map is never overwritten: remov
 | `SPACE_GRID_EMPTY` | the constraints forbid every cell |
 | `SCHEMA_*` | a key or value the schema refuses: an unknown key, a bad id, an unknown kind, a missing `constraints` or `prior` |
 
-Common mistakes that load but mislead: a stage the specs use but the map does not list (`UNKNOWN_VALUE` warnings, and the spec places nowhere on that dimension); a map with no `none` deviation value (blocks without a deviation then place nowhere on it).
+Common mistakes that load but mislead: a stage the specs use but the map does not list. That gives `UNKNOWN_VALUE` warnings, and the spec places nowhere on that dimension. Another is a map with no `none` deviation value (blocks without a deviation then place nowhere on it).

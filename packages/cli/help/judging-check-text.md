@@ -1,6 +1,6 @@
 ---
 title: Checks on the reply text
-summary: "The machine checks that read what the customer sees: must, must_not, regex, exact, starts_with, length, lang, refusal, injection, json, markup, finish_reason, rouge_l, bleu, similarity, relevancy, knowledge_retention, pii and cards, with their spec fields, verdict ids and evidence."
+summary: "The machine checks that read what the customer sees. They are must, must_not, regex, exact, starts_with, length, lang, refusal, injection, json, markup, finish_reason, rouge_l, bleu, similarity, relevancy, knowledge_retention, pii and cards. This topic gives their spec fields, verdict ids and evidence."
 commands:
   - campaign run
   - replay
@@ -15,7 +15,7 @@ next:
 
 ## What it is
 
-These checks read the customer-visible text of a block: the adapter's `observed.text`, or the text segments joined by a line break when it is empty. Each one is turned on by a field of the block's `expect` (or of the spec's `rules`) and gives verdicts with ids that start with its name. All are deterministic and make no model call, except the opt-in `pii.personal_data`.
+These checks read the customer-visible text of a block: the adapter's `observed.text`, or the text segments joined by a line break when it is empty. A field of the block's `expect` (or of the spec's `rules`) turns each one on. Each gives verdicts with ids that start with its name. All are deterministic and make no model call, except the opt-in `pii.personal_data`.
 
 ## When to use it
 
@@ -29,7 +29,7 @@ These checks read the customer-visible text of a block: the adapter's `observed.
 
 ## Commands and every option
 
-Every run command applies these checks (see `judging-machine-checks`). One command option concerns them: `driftbench replay --owner <values...>` and `--owner-file <file>` list the owner's own email, phone, IBAN or national number, which the `pii` check leaves out (one value per line in the file, `#` starts a comment). The judge for `pii_judge` comes from `--judge` on `replay` and `estate run`.
+Every run command applies these checks (see `judging-machine-checks`). One command option concerns them: `driftbench replay --owner <values...>` and `--owner-file <file>`. They list the owner's own email, phone, IBAN or national number, which the `pii` check leaves out. The file has one value per line, and `#` starts a comment. The judge for `pii_judge` comes from `--judge` on `replay` and `estate run`.
 
 The spec fields:
 
@@ -39,21 +39,21 @@ The spec fields:
 | `must_not: [pattern...]` | `must_not` | No pattern matches. A pattern cannot sit in both lists. | `must_not.<i>` |
 | `rules.match_case` | `must`, `must_not` | Default `false`: case is ignored and a trailing punctuation mark of the reply does not count. `true`: both count. | |
 | `regex: [pattern...]` | `regex` | Each pattern matches; case-sensitive. | `regex.<i>` |
-| `exact: text` | `exact` | The reply equals the text after normalising (trimmed, only letters, digits and spaces, spaces collapsed, lower case; numbers compare as numbers; `true` equals `1`; a dot or comma between digits counts). `exact_strict: true` compares byte for byte after trimming. | `exact.0` |
+| `exact: text` | `exact` | The reply equals the text after normalising. Normalising trims the text, keeps only letters, digits and spaces, collapses spaces and makes it lower case. Numbers compare as numbers. `true` equals `1`. A dot or comma between digits counts. `exact_strict: true` compares byte for byte after trimming. | `exact.0` |
 | `starts_with: text` | `starts_with` | The whole reply, leading space removed, starts with the text. | `starts_with.0` |
 | `length: { words: { min, max }, chars: { min, max } }` | `length` | Word count (runs of non-space) and character count (code points) within bounds. | `length.words`, `length.chars` |
 | `lang: EN` (or a tag such as `fr-BE`) | `lang` | Every text segment reads as that language (detector franc-min; names and links are ignored; under 30 letters is skipped). | `lang.expected` |
 | `rules.lang_stable: true` | `lang` | Every segment stays in the language the run settled on. | `lang.stable` |
 | `refusal: refuses` or `answers` | `refusal` | The reply is, or is not, a refusal, by refusal phrases in English, French, Dutch, German, Spanish, Italian and Portuguese. | `refusal.verdict` |
-| `injection: true` | `injection` | The block's user message is an injection or jailbreak attempt (`injection.attack` passes when a rule recognises it, inconclusive otherwise) and the reply does not obey it (`injection.resist`). | `injection.attack`, `injection.resist` |
-| `json: { schema, paths, embedded }` | `json` | The reply is JSON (one Markdown fence of JSON is accepted; `embedded: true` reads the first JSON object or array in prose), matches a strict schema, and each `{ path, assert }` holds. | `json.valid`, `json.schema`, `json.path.<i>` |
+| `injection: true` | `injection` | The block's user message is an injection or jailbreak attempt. `injection.attack` passes when a rule recognises it, and is inconclusive otherwise. The reply does not obey it (`injection.resist`). | `injection.attack`, `injection.resist` |
+| `json: { schema, paths, embedded }` | `json` | The reply is JSON. One Markdown fence of JSON is accepted, and `embedded: true` reads the first JSON object or array in prose. The reply matches a strict schema, and each `{ path, assert }` holds. | `json.valid`, `json.schema`, `json.path.<i>` |
 | `markup: xml`, `html` or `sql` | `markup` | Well-formed tags, or SQL that SQLite's parser accepts. Structure only. | `markup.valid` |
 | `finish_reason: stop` (or another reason) | `finish_reason` | The runtime's reported stop reason equals it. No reason reported: inconclusive, not gating. | `finish_reason.reason` |
 | `rouge_l: { reference, min, profile }` | `rouge_l` | Word-level ROUGE-L F measure reaches `min` (0 to 1). `profile`: `driftbench` (default) or `ragas`. | `rouge_l.0` |
 | `bleu: { reference, min, profile }` | `bleu` | BLEU (1- to 4-grams, brevity penalty) reaches `min`. | `bleu.0` |
 | `similarity: [{ reference, min }]` | `similarity` | Embedding similarity reaches `min`. Default embedder `char-ngram-tfidf`, local, deterministic. | `similarity.<i>`, with the score |
 | `relevancy: { min, terms }` | `relevancy` | The share of key terms of the ask found in the reply (stemmed, in the ask's language) reaches `min` (default 0.5). No term found fails and gates; some but too few is inconclusive, not gating. With the judged criterion `relevancy` on the block, advisory only. | `relevancy.terms`, with the share as score |
-| `knowledge_retention: [{ fact, use, ask }]` | `knowledge_retention` | A fact in the ledger is not asked again (a question that matches `ask`, or names the key, fails unless it repeats the value); with `use: true`, its value appears in the reply or a tool input. | `knowledge_retention.<fact>.asked`, `knowledge_retention.<fact>.used` |
+| `knowledge_retention: [{ fact, use, ask }]` | `knowledge_retention` | A fact in the ledger is not asked again. A question that matches `ask`, or names the key, fails unless it repeats the value. With `use: true`, its value appears in the reply or a tool input. | `knowledge_retention.<fact>.asked`, `knowledge_retention.<fact>.used` |
 | (always on) | `pii` | No IBAN, Belgian national number, phone number or email address in the visible text. Fictional values (`example.com`, `.test`, the 555-0100 to 555-0199 range and others) pass. | `pii.iban`, `pii.national_number`, `pii.phone`, `pii.email` |
 | `pii_judge: true` | `pii` | A judge finds no real person's name or personal address. Without a judge: gating inconclusive. | `pii.personal_data` |
 | `cards: [{ name, count }]` | `cards` | Each card is sent the expected number of times (`count` exact or `{ min, max }`). | `cards.<name>` |
@@ -61,11 +61,11 @@ The spec fields:
 
 ## Inputs
 
-The block's visible text, its user message (for `injection`, `relevancy`), the ledger (for `knowledge_retention`), the cards and the runtime's finish reason, as the adapter reports them. Patterns compile as JavaScript regular expressions with the `m` flag; in YAML, escape `$` and `.` as `\$` and `\.` when they mean themselves.
+The inputs are the block's visible text and its user message (for `injection`, `relevancy`). They also include the ledger (for `knowledge_retention`), the cards and the runtime's finish reason. The adapter reports them. Patterns compile as JavaScript regular expressions with the `m` flag. In YAML, escape `$` and `.` as `\$` and `\.` when they mean themselves.
 
 ## Outputs and how to read them
 
-The evidence quotes what decided: the matched text with its offset (`/Acme Telecom/ matched "Acme Telecom" at offset 12: ...`), the counted words (`27 words, within 0 to 60`), the key terms found and missing, the detected language. A failing `must` on a literal names the closest span and how far it differs. The `pii` evidence masks each value. A failing `similarity` or `relevancy` gives drift class X1; a failing `knowledge_retention` gives X3.
+The evidence quotes what decided. It shows the matched text with its offset (`/Acme Telecom/ matched "Acme Telecom" at offset 12: ...`). It shows the counted words (`27 words, within 0 to 60`), the key terms found and missing, and the detected language. A failing `must` on a literal names the closest span and how far it differs. The `pii` evidence masks each value. A failing `similarity` or `relevancy` gives drift class X1; a failing `knowledge_retention` gives X3.
 
 ## Worked example
 
@@ -193,7 +193,7 @@ block 1 stage.reached pass: reached offer, expected offer (stages in this block:
 (exit 0)
 ```
 
-The campaign id changes on every run. The `relevancy` fail shows the limit of a word count: an ask that is an email address has no topic words, so that block should not ask for `relevancy`. `tsx packages/cli/src/bin.ts` is the CLI run from source, the same program as `driftbench`, so its `--json` can be piped.
+The campaign id changes on every run. The `relevancy` fail shows the limit of a word count. An ask that is an email address has no topic words. So that block should not ask for `relevancy`. `tsx packages/cli/src/bin.ts` is the CLI run from source. It is the same program as `driftbench`, so its `--json` can be piped.
 
 ## Common errors
 

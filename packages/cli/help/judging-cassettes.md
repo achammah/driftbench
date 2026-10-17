@@ -1,6 +1,6 @@
 ---
 title: Cassettes
-summary: A cassette is a JSON file of recorded judge answers that lets the council, calibration and the benchmarks run with no network and no key; a request it does not hold is a cassette miss, never a made-up answer.
+summary: A cassette is a JSON file of recorded judge answers. It lets the council, calibration and the benchmarks run with no network and no key. A request it does not hold is a cassette miss, never a made-up answer.
 commands:
   - judge run
   - judge calibrate
@@ -16,7 +16,7 @@ next:
 
 ## What it is
 
-A cassette records what judges answered. A recorder wraps a live judge client and appends every answer or failure to the cassette. A player replays the cassette as a judge client, with no network and no key. Each entry is matched by the judge id and the request key, a hash of what the judge reads, of the prompt texts, and of the client. A request with no matching entry throws a `cassette_miss` error: the cassette never invents an answer, and a changed question never replays an answer recorded for another one. No key and no header is ever recorded.
+A cassette records what judges answered. A recorder wraps a live judge client and appends every answer or failure to the cassette. A player replays the cassette as a judge client, with no network and no key. Each entry is matched by the judge id and the request key. The request key is a hash of what the judge reads, of the prompt texts, and of the client. A request with no matching entry throws a `cassette_miss` error. The cassette never invents an answer, and a changed question never replays an answer recorded for another one. No key and no header is ever recorded.
 
 ## When to use it
 
@@ -59,7 +59,7 @@ Replay rules:
 
 * An answer recorded as `raw` is parsed by the current parser at replay, so a parser change is tested by a replay. An answer that did not parse when recorded does not parse on replay either.
 * When several entries share a key, they are replayed in order, and the last one repeats.
-* A cassette with no `answerContract: ledger` entry for a judge replays that judge under the legacy contract, so cassettes made before the ledger contract keep working. A system 1 request is always keyed as legacy.
+* A cassette with no `answerContract: ledger` entry for a judge replays that judge under the legacy contract. This keeps cassettes made before the ledger contract working. A system 1 request is always keyed as legacy.
 * A cassette whose entries record decoder version 2 replays requests under version 2.
 * `cost_usd` comes back as the call's cost, so a replayed calibration prints the recorded spend; no money is spent.
 
@@ -89,7 +89,7 @@ Two entries of the council cassette, a system 1 `answer` and a system 2 `raw`:
 
 ## Worked example
 
-The council cassette replayed over the fixtures it was recorded for, where every call finds its recording; then a copy of the criteria with one rubric reworded, replayed on the same cassette. The rubric is part of the request key, so the changed criterion misses every recording and the other 11 still replay:
+The council cassette is replayed over the fixtures it was recorded for, where every call finds its recording. Then a copy of the criteria with one rubric reworded is replayed on the same cassette. The rubric is part of the request key, so the changed criterion misses every recording and the other 11 still replay:
 
 ```sh setup
 mkdir -p cassette-miss
@@ -150,6 +150,6 @@ The 18 calls of the changed criterion (three rounds of three judges, for each fi
 * `<k> judge call(s) gave no answer (a cassette miss or a recorded failure)` (exit 1 on `judge run`). Something the key covers changed since recording: a rubric, a fixture, an input, the prompt, the model, a client setting. Record again, or use the cassette made for these requests.
 * `judge run: ENOENT: no such file or directory, open '<path>'` (exit 2). The cassette path is wrong.
 * `<path> is not JSON: <error>` (exit 2). The file is not valid JSON.
-* `<path>: judge <id> is listed twice`, `<path>: an entry names judge <id>, which the cassette does not list`, `<path>: key <key> is not a 12-character hex request hash`, `<path>: an entry holds both an answer and an error`, `<path>: an entry is empty: it has no answer, raw text or error` (exit 2). The cassette is malformed; fix the entry or record again.
+* `<path>: judge <id> is listed twice` and `<path>: an entry names judge <id>, which the cassette does not list` (exit 2). `<path>: key <key> is not a 12-character hex request hash` and `<path>: an entry holds both an answer and an error` (exit 2). `<path>: an entry is empty: it has no answer, raw text or error` (exit 2). In each case the cassette is malformed. Fix the entry or record again.
 * `the cassette lists no judge "<id>"` (from code). A player was asked for a judge the file does not list.
 * `re-record needed: ...` (exit 1 on `pnpm bench replay`). A bench cassette no longer matches its evidence, client settings or dataset. See `judging-bench-replay`.

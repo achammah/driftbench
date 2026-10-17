@@ -1,6 +1,6 @@
 ---
 title: Read a stored campaign
-summary: Print the state of every cell of a campaign kept in a store, and with --detail the compounding index, the succession of every run and the recovery of every perturbed run. Calls no agent.
+summary: Print the state of every cell of a campaign kept in a store. With --detail it also prints the compounding index, the succession of every run and the recovery of every perturbed run. Calls no agent.
 commands:
   - campaign status
 see_also:
@@ -15,13 +15,13 @@ next:
 
 ## What it is
 
-`driftbench campaign status` reads a campaign from a store file and prints the state of each of its cells, from the runs filed there: pass, fail, failed, stopped, or pending when the cell has no run yet. It runs nothing and calls no agent. With `--detail` it adds three tables computed from the stored runs: the compounding index of every spec run in both modes T and F, the succession of every run (where it started to fail and how often), and the recovery of every perturbed (mode P) run.
+`driftbench campaign status` reads a campaign from a store file and prints the state of each of its cells, from the runs filed there. The states are pass, fail, failed, stopped, or pending when the cell has no run yet. It runs nothing and calls no agent. With `--detail` it adds three tables computed from the stored runs. The first is the compounding index of every spec run in both modes T and F. The second is the succession of every run (where it started to fail and how often). The third is the recovery of every perturbed (mode P) run.
 
 ## When to use it
 
 * After `campaign run --store <file>` or `campaign resume`, to read the results again without running anything.
 * To see which cells are still pending after an interrupted run, before `campaign resume`.
-* To measure compounding (how much worse the agent does when it carries its own earlier answers, F, than when every block starts from the canonical history, T) and recovery after a perturbation: `--detail`.
+* To measure compounding and recovery after a perturbation, use `--detail`. Compounding is how much worse the agent does when it carries its own earlier answers (F). The baseline is when every block starts from the canonical history (T).
 * Not for a scorecard file or a comparison of two campaigns: those are the `report` and `compare` commands (results area).
 
 ## Commands and every option
@@ -40,25 +40,25 @@ driftbench campaign status [campaignId] --store <file> [--detail] [--json]
 ## Inputs
 
 * A store file written by `campaign run --store`, `campaign resume`, `campaign import`, or another command that files campaigns.
-* The specs the campaign pins are read from the store at their content hash, not from disk: editing a spec file later does not change what `status` reports.
+* The specs the campaign pins are read from the store at their content hash, not from disk. Editing a spec file later does not change what `status` reports.
 
 ## Outputs and how to read them
 
 Text output:
 
 1. `Campaign <id>, created <ISO time>.`
-2. One line per cell, in cell order, in the same form as `campaign run` prints (topic running-outcomes): `<mark> <spec> · <target> · <mode> · repeat <n>[ · <perturbation>]  <state>[ (<notes>)]  <detail>`. A cell with no stored run reads `· ... pending`. A cell the budget stopped before it started has no stored run, so `status` shows it as pending.
+2. One line per cell, in cell order. The form is the same as `campaign run` prints (topic running-outcomes): `<mark> <spec> · <target> · <mode> · repeat <n>[ · <perturbation>]  <state>[ (<notes>)]  <detail>`. A cell with no stored run reads `· ... pending`. A cell the budget stopped before it started has no stored run, so `status` shows it as pending.
 3. The summary line: `<n> cells: <p> pass, <f> fail, <e> failed[, <q> pending][, <r> reused][, <c> carried]. Spent $<usd>.`
 
 With `--detail`, three tables follow:
 
-* Compounding index. One row per spec and target that ran in both T and F: the blocks both modes ran, the runs in T and in F, the T pass rate, the F pass rate, the index (T minus F, in percentage points; positive means the agent does worse when it carries its own history), and a 95% interval from a clustered bootstrap (blocks resampled within a spec, specs across the campaign). An `all specs` row closes the table. With no spec in both modes: `No spec ran in both T and F.`
-* Succession, one row per run: the index of the first failing block (`none` when every block passed), how many blocks fail, their share, the longest run of passing blocks, whether every block passed, and the drift classes the failing blocks carry with their counts.
-* Recovery, one row per perturbed run: the perturbation, its deviation class, the repeat, the block it was injected at, the blocks it took to pass at its stage again (`turns`), the label against the spec's `within_blocks`, the collateral (blocks failing that passed in the F reference run), whether no forbidden or unnamed consequential tool was called (`safe action`), and whether the agent asked a question before the first consequential act (`clarified`). With no P run: `No perturbed run.`
+* Compounding index. One row per spec and target that ran in both T and F. The columns are the blocks both modes ran, the runs in T and in F, the T pass rate and the F pass rate. They continue with the index and a 95% interval from a clustered bootstrap. The index is T minus F, in percentage points. Positive means the agent does worse when it carries its own history. The bootstrap resamples blocks within a spec and specs across the campaign. An `all specs` row closes the table. With no spec in both modes: `No spec ran in both T and F.`
+* Succession, one row per run. The columns are the index of the first failing block (`none` when every block passed), how many blocks fail and their share. They continue with the longest run of passing blocks and whether every block passed. They also show the drift classes the failing blocks carry with their counts.
+* Recovery, one row per perturbed run. The columns name the perturbation, its deviation class, the repeat and the block it was injected at. They show the blocks it took to pass at its stage again (`turns`) and the label against the spec's `within_blocks`. They show the collateral (blocks failing that passed in the F reference run). `safe action` says whether no forbidden or unnamed consequential tool was called. `clarified` says whether the agent asked a question before the first consequential act. With no P run: `No perturbed run.`
 
-`--json` prints the same document as `campaign run --json` (topic running-outcomes) with `stored: true` and an empty `checks` list, plus a `detail` object with `compounding`, `succession` and `recovery` when `--detail` is given.
+`--json` prints the same document as `campaign run --json` (topic running-outcomes) with `stored: true` and an empty `checks` list. When `--detail` is given, it adds a `detail` object with `compounding`, `succession` and `recovery`.
 
-Exit codes: 0 when every cell passes; 1 when any cell is in another state (pending included); 2 on bad input (no store file, an unknown campaign, a store with no campaign, a store whose pinned spec is missing).
+Exit codes: 0 when every cell passes. 1 when any cell is in another state (pending included). 2 on bad input (no store file, an unknown campaign, a store with no campaign, a store whose pinned spec is missing).
 
 ## Worked example
 
@@ -115,5 +115,5 @@ Each exits 2 and prints on stderr.
 * `No store at missing.db: this command reads a store and does not make one.` The `--store` path does not exist. Check the path, or run `campaign run --store <file>` first.
 * `No campaign nope in modes.db.` The id is not in that store. Omit the id to read the latest campaign.
 * `The store at e2.db holds no campaign. Run one with: driftbench campaign run <paths...>` The store exists but has no campaign yet.
-* `The store has no spec <id> at hash <hash>, which campaign <campaign> pins.` The store is damaged or partial; import the campaign again from its export bundle (topic running-campaign-export-import).
+* `The store has no spec <id> at hash <hash>, which campaign <campaign> pins.` The store is damaged or partial. Import the campaign again from its export bundle (topic running-campaign-export-import).
 * `Error: required option '--store <file>' not specified` The store flag is missing.
