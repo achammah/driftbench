@@ -151,14 +151,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 684
-            merges: fix/estate-level3-pruned-space
-          - name: 684+649
-            merges: fix/estate-level3-pruned-space fix/estate-fixture-phrases
           - name: 684+608+548fix
-            merges: fix/estate-level3-pruned-space fix/estate-fake-agent-grammar-2 7c81a4cd5
+            merges: fix/estate-level3-pruned-space fix/estate-fake-agent-grammar-2 fix/estate-missing-reference-contract
           - name: 684+608+548fix+649
-            merges: fix/estate-level3-pruned-space fix/estate-fake-agent-grammar-2 7c81a4cd5 fix/estate-fixture-phrases
+            merges: fix/estate-level3-pruned-space fix/estate-fake-agent-grammar-2 fix/estate-missing-reference-contract fix/estate-fixture-phrases
     steps:
       - uses: actions/checkout@v7
         with:
