@@ -10,7 +10,9 @@ const hidden = hiddenSpec(1);
 const source = await generateFrom(hidden, renderMap(hidden), 1, {}, { once: true });
 if (!source.prepared) throw new Error('the fictional map failed to load');
 const prepared = source.prepared;
-const options = { mapPath: '../map.yaml', t: 3, seed: 7 };
+// These tests are about the cap itself: the repeated ends are reduced after it, on the specs that stay, so
+// the structural specs compared here would differ from the uncapped suite. The reduction has its own tests.
+const options = { mapPath: '../map.yaml', t: 3, seed: 7, reduceEnds: false };
 const full = generateSuite(prepared, options);
 const capped = generateSuite(prepared, { ...options, specCap: full.all.length });
 const held = (specs: typeof full.complete, t: number) =>

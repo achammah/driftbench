@@ -309,6 +309,19 @@ The generator keeps the allocation even. No stage, deviation class or behaviour 
 
 A stage, class or behaviour that no approved path or phrase can reach stays under the floor, and the suite is written as it is. The count follows `driftbench coverage`, so a stage placed by a declared perturbation is a placed stage.
 
+### Repeated ends of walks
+
+A walk often ends the way another walk already ended: the same turn, said from the same stage, expecting the same. The generator does not write that end again. As it builds the suite, it drops the last block of a walk when all of these hold:
+
+* Another block already written says the same turn from the same stage, expects the same, with the same tool answers, in the same language and under the same rules. The first block written stays.
+* Every coverage tuple the walk placed is placed by a spec already written, at the strengths the coverage grid counts (1, 2, 3 and `--t`).
+* Every ordered pair of consecutive moves the walk took (a stage move and the class said with it) is taken by a spec already written.
+* The stage and class allocation is no further from balance (see the previous section).
+* The block does not inject a deviation class: that block is the test of the class and the deviation of its row, and stays.
+* The walk has no end state, no declared perturbation said before the block or on it (a perturbed run needs the block to reach it, and a deviation declared there is a test of its own), does not end on a tool failure, and still validates.
+
+It repeats while the new last block qualifies, and it stops at one block. A cut that stops with more than one block left, on a block another walk already says, is undone: two walks must not end on the same test, so the walk keeps its tail. The variants of a metamorphic family are never cut, because a family differs only in its phrasing. With `--spec-cap` the reduction runs after the cap, on the specs that are written, in the order they were written: a walk loses an end only when a spec that stays says it. It reads no agent, so it removes a repeat, not everything a validator could call redundant: the same turn from another stage, or a repeat in the middle of a walk, stays. Tasks, walks with an end state and specs with a gap are never reduced.
+
 ### The machine Then in every block
 
 A complete generated block reads observed state, not only words. Code derives each part of its Then from the approved relations:
@@ -409,9 +422,9 @@ A block the map supports no machine Then for, or a value with no approved phrase
 
 ```
 $ pnpm -s driftbench generate --map examples/acme/map/approved.yaml --out generated --baseline examples/acme/specs --t 2
-Actual axis-map coverage (written complete specs): pairs 708 of 708 (100.0%); triples 3116 of 4064 (76.7%).
+Actual axis-map coverage (written complete specs): pairs 708 of 708 (100.0%); triples 3105 of 4064 (76.4%).
 Candidate t-wise array (before the total cap): covering array of 156 rows over 5 dimensions, 356 of 356 allowed 2-tuples (100.0%); 2 pairs no path reaches are left out.
-Uncovered on the axis map: 0 pairs, 948 triples (see coverage.actual[].uncovered).
+Uncovered on the axis map: 0 pairs, 959 triples (see coverage.actual[].uncovered).
 Map acme (../examples/acme/map/approved.yaml), hash 7a022d4e1380: 51 dimensions, 187 values, 463 constraints, 55 approved phrases.
 Seed 1, t = 2.
 
@@ -419,7 +432,7 @@ Seeder        specs  blocks  complete  incomplete
 graph            12      48        12           0
 twise           156     793       153           3
 boundary         85     183        13          72
-deviation       139     570       139           0
+deviation       138     532       138           0
 metamorphic      42     192        42           0
 task             67      71        67           0
 cover            11      50        11           0
@@ -460,7 +473,7 @@ Specs with a block the map supports no machine Then for (18), in incomplete/: ge
      1  no approved path needs callback_phone=not-given
      1  no approved path needs catalog.search.in.unknown-key=catalog.search.in.unknown-key.sent
      1  no approved path needs coverage.check.in.unknown-key=coverage.check.in.unknown-key.sent
-Wrote 609 files to generated.
+Wrote 608 files to generated.
 exit 1
 ```
 

@@ -50,23 +50,6 @@ blocks:
       criteria:
         - behaviour.B-012
         - flow.upgrade
-  - id: b2-identify-to-offer
-    when:
-      user: It's lee.jensen@example.com.
-    expect:
-      stage: offer
-      stage_reported: true
-      tools:
-        - label: catalog.search
-          count: 1
-          input:
-            category: mobile
-            customer_email: lee.jensen@example.com
-      must:
-        - Acme Mobile S, 10 GB for \$15 a month
-        - Acme Mobile M, 40 GB for \$25 a month
-        - Acme Mobile L, unlimited data for \$35 a month
-      lang: EN
 rules:
   forbidden_tools:
     - coverage.check
@@ -74,6 +57,23 @@ rules:
     - order.create
     - notify_sales
   one_message_per_turn: true
+perturbations:
+  - id: p1-D1_off_topic
+    class: D1_off_topic
+    inject_at: 0
+    user: Are your stores open on Saturday?
+    expect:
+      stage: needs
+      stage_reported: true
+      tools:
+        - label: catalog.search
+          count: 0
+      must:
+        - Monday to Saturday
+      lang: EN
+    recovery:
+      within_blocks: 0
+      stage_after: needs
 metadata:
   generated:
     by: driftbench generate
@@ -103,13 +103,3 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-identify
-      - block: b2-identify-to-offer
-        seeder: deviation
-        cell:
-          spec: metadata.generated.cell
-          stage_transition: identify-to-offer
-          account_lookup: plan-not-in-catalog
-          stage: identify
-        phrase:
-          dimension: stage_transition
-          value: identify-to-offer

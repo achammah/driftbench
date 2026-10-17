@@ -126,10 +126,10 @@ end_state:
       subset:
         phone: "+12025550131"
 perturbations:
-  - id: p1-D9_out_of_scope
-    class: D9_out_of_scope
+  - id: p1-D5_language_switch
+    class: D5_language_switch
     inject_at: 0
-    user: My last bill charged me twice, can you fix it?
+    user: Kunt u dat ook in het Nederlands uitleggen?
     expect:
       stage: needs
       stage_reported: true
@@ -141,7 +141,7 @@ perturbations:
         - label: notify_sales
           count: 0
       must:
-        - Acme Care
+        - I can only help
       lang: EN
     recovery:
       within_blocks: 0
