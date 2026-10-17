@@ -210,6 +210,36 @@ const INVALID: Array<{ name: string; text: string; code: string; path?: string }
     code: 'PARENT_CYCLE',
   },
   {
+    name: 'invalid pattern in the regex list of expect',
+    text: 'id: x\nblocks:\n  - user: hi\n    expect: { regex: ["(unclosed"] }\n',
+    code: 'REGEX_INVALID',
+    path: 'blocks.0.expect.regex.0',
+  },
+  {
+    name: 'invalid regex assertion of a json path',
+    text: 'id: x\nblocks:\n  - user: hi\n    expect: { json: { paths: [{ path: a, assert: { regex: "(x" } }] } }\n',
+    code: 'REGEX_INVALID',
+    path: 'blocks.0.expect.json.paths.0.assert.regex',
+  },
+  {
+    name: 'invalid regex nested in a subset of a tool input',
+    text: 'id: x\nblocks:\n  - user: hi\n    expect: { tools: [{ label: t, input: { a: { subset: { b: { regex: "(x" } } } } }] }\n',
+    code: 'REGEX_INVALID',
+    path: 'blocks.0.expect.tools.0.input.a.subset.b.regex',
+  },
+  {
+    name: 'invalid regex nested in a subset of an end state',
+    text: 'id: x\nend_state: { source: s, expect: { a: { subset: { b: { regex: "(x" } } } } }\nblocks:\n  - user: hi\n',
+    code: 'REGEX_INVALID',
+    path: 'end_state.expect.a.subset.b.regex',
+  },
+  {
+    name: 'invalid pattern in the expectations of a perturbation',
+    text: 'id: x\nblocks:\n  - user: hi\n    expect: { must: [a] }\nperturbations:\n  - { id: p, class: D1_off_topic, inject_at: 0, user: hello, expect: { regex: ["(x"] } }\n',
+    code: 'REGEX_INVALID',
+    path: 'perturbations.0.expect.regex.0',
+  },
+  {
     name: 'malformed criterion reference',
     text: 'id: x\nblocks:\n  - user: hi\n    expect: { criteria: ["polite@gate"] }\n',
     code: 'CRITERION_REF_INVALID',

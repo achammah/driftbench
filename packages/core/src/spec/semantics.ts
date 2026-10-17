@@ -226,6 +226,13 @@ function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]
       if (problem) issues.push(error('REGEX_INVALID', `${path}.${key}.${index}`, problem));
     });
   }
+  expect.regex?.forEach((pattern, index) => {
+    const problem = patternError(pattern);
+    if (problem) issues.push(error('REGEX_INVALID', `${path}.regex.${index}`, problem));
+  });
+  expect.json?.paths?.forEach((entry, index) => {
+    checkAssertion(entry.assert, `${path}.json.paths.${index}.assert`, issues);
+  });
   const mustNot = new Set(expect.must_not ?? []);
   expect.must?.forEach((pattern, index) => {
     if (mustNot.has(pattern)) {
@@ -308,10 +315,30 @@ function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]
 }
 
 function checkAssertion(assertion: Assertion, path: string, issues: Issue[]): void {
-  if (assertion !== null && typeof assertion === 'object' && 'regex' in assertion) {
+  if (assertion === null || typeof assertion !== 'object') return;
+  if ('regex' in assertion) {
     const problem = patternError(assertion.regex);
     if (problem) issues.push(error('REGEX_INVALID', `${path}.regex`, problem));
   }
+  // A subset holds JSON values; a value written as { regex: <pattern> } is an assertion in its own right.
+  if ('subset' in assertion) checkNestedRegex(assertion.subset, `${path}.subset`, issues);
+}
+
+function checkNestedRegex(value: unknown, path: string, issues: Issue[]): void {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => {
+      checkNestedRegex(item, `${path}.${index}`, issues);
+    });
+    return;
+  }
+  if (!isPlainObject(value)) return;
+  const keys = Object.keys(value);
+  if (keys.length === 1 && keys[0] === 'regex' && typeof value.regex === 'string') {
+    const problem = patternError(value.regex);
+    if (problem) issues.push(error('REGEX_INVALID', `${path}.regex`, problem));
+    return;
+  }
+  for (const [key, inner] of Object.entries(value)) checkNestedRegex(inner, `${path}.${key}`, issues);
 }
 
 function checkCount(count: Count | undefined, path: string, issues: Issue[]): void {
