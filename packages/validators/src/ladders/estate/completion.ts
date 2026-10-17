@@ -1,4 +1,12 @@
-import { globMatches, type Observed, type Spec, type ToolCall } from '@agent-nexus/driftbench-core';
+import {
+  type Assertion,
+  type ExecutionRecord,
+  globMatches,
+  matchAssertion,
+  type Observed,
+  type Spec,
+  type ToolCall,
+} from '@agent-nexus/driftbench-core';
 import { operationWitnesses } from './operation-witnesses';
 
 export type Component = {
@@ -925,6 +933,199 @@ export function completionComponents(spec: Spec): ComponentInventory {
           });
           if (!after) gap(`${at}.after`);
         }
+      } else if (channel === 'expect' && check === 'execution') {
+        keys(['ran_code', 'exit_code', 'max_commands']);
+        const command = (exitCode = 0): ExecutionRecord => ({ command: 'fixture-command', exitCode });
+        const agentOnly: ExecutionRecord = { command: 'fixture-agent', role: 'agent', exitCode: 0 };
+        // The commands that satisfy every asked clause at once: the evidence clause is judged against them.
+        const satisfying = (): ExecutionRecord[] =>
+          opts.ran_code === false
+            ? []
+            : typeof opts.max_commands === 'number' && opts.max_commands < 1
+              ? []
+              : [command(typeof opts.exit_code === 'number' ? opts.exit_code : 0)];
+        add(
+          'evidence.executions',
+          (o) => {
+            delete o.executions;
+          },
+          (o) => {
+            o.executions = satisfying();
+          },
+        );
+        required(inventory.components.at(-1)).violationOutcome = 'inconclusive';
+        if (opts.ran_code === true) {
+          add(
+            'ran_code.none',
+            (o) => {
+              o.executions = [];
+            },
+            (o) => {
+              o.executions = [command()];
+            },
+          );
+          // The agent's own process is not a command it ran.
+          add(
+            'ran_code.agent-process',
+            (o) => {
+              o.executions = [agentOnly];
+            },
+            (o) => {
+              o.executions = [agentOnly, command()];
+            },
+          );
+        }
+        if (opts.ran_code === false)
+          add(
+            'ran_code.some',
+            (o) => {
+              o.executions = [command()];
+            },
+            (o) => {
+              o.executions = [];
+            },
+          );
+        if (typeof opts.exit_code === 'number') {
+          const want = opts.exit_code;
+          add(
+            'exit_code.value',
+            (o) => {
+              o.executions = [command(want + 1)];
+            },
+            (o) => {
+              o.executions = [command(want)];
+            },
+          );
+          // The last command decides, not an earlier one.
+          add(
+            'exit_code.last',
+            (o) => {
+              o.executions = [command(want), command(want + 1)];
+            },
+            (o) => {
+              o.executions = [command(want + 1), command(want)];
+            },
+          );
+        }
+        if (typeof opts.max_commands === 'number') {
+          const max = opts.max_commands;
+          add(
+            'max_commands.over',
+            (o) => {
+              o.executions = Array.from({ length: max + 1 }, () => command());
+            },
+            (o) => {
+              o.executions = Array.from({ length: max }, () => command());
+            },
+          );
+          add(
+            'max_commands.agent-process',
+            (o) => {
+              o.executions = [agentOnly, ...Array.from({ length: max + 1 }, () => command())];
+            },
+            (o) => {
+              o.executions = [agentOnly, ...Array.from({ length: max }, () => command())];
+            },
+          );
+        }
+      } else if (channel === 'custom' && check === 'some_call') {
+        keys(['calls', 'label', 'input', 'count', 'block']);
+        for (const [at, entry] of (Array.isArray(opts.calls) ? rows(opts.calls) : [opts]).entries()) {
+          if (entry.block !== undefined && entry.block !== index) continue;
+          const label = typeof entry.label === 'string' ? entry.label : undefined;
+          const assertions = record(entry.input) as Record<string, Assertion>;
+          if (label === undefined) {
+            gap(`${at}.label`);
+            continue;
+          }
+          const input: RecordValue = {};
+          let witnessed = true;
+          for (const [field, assertion] of Object.entries(assertions)) {
+            const value = assertionWitness(assertion);
+            if (value === undefined) {
+              gap(`${at}.input.${field}.assertion-witness`);
+              witnessed = false;
+            } else input[field] = value;
+          }
+          if (!witnessed) continue;
+          const matches = (c: ToolCall) =>
+            c.label === label &&
+            Object.entries(assertions).every(([field, assertion]) => {
+              try {
+                return matchAssertion(record(c.input)[field], assertion);
+              } catch {
+                return false;
+              }
+            });
+          const sample = (): ToolCall =>
+            ({ id: `witness-${at}`, label, input: structuredClone(input) }) as unknown as ToolCall;
+          const resize = (o: Observed, n: number) => {
+            const exemplar = o.toolCalls.find(matches) ?? sample();
+            o.toolCalls = [
+              ...o.toolCalls.filter((c) => !matches(c)),
+              ...Array.from({ length: n }, (_, k) => ({
+                ...structuredClone(exemplar),
+                id: `${exemplar.id}-${k}`,
+              })),
+            ];
+          };
+          const count = entry.count ?? { min: 1 };
+          const min = typeof count === 'number' ? count : Number(record(count).min ?? 0);
+          const max = typeof count === 'number' ? count : Number(record(count).max ?? Infinity);
+          if (min > 0) {
+            add(
+              `${at}.count.min`,
+              (o) => resize(o, min - 1),
+              (o) => resize(o, min),
+            );
+            // The calls that count are the ones of the label and the input, wherever they sit among others.
+            add(
+              `${at}.selection.all-entries`,
+              (o) => resize(o, min - 1),
+              (o) => {
+                resize(o, min);
+                const other = { ...sample(), label: foreign, id: 'witness-other' } as unknown as ToolCall;
+                o.toolCalls = [other, ...o.toolCalls, structuredClone(other)];
+              },
+            );
+            for (const variant of comparisonWitnesses(label)) {
+              if (variant.value === label) continue;
+              add(
+                `${at}.label.${variant.name}`,
+                (o) => {
+                  resize(o, min);
+                  for (const c of o.toolCalls.filter(matches)) c.label = variant.value;
+                },
+                (o) => resize(o, min),
+              );
+            }
+            for (const [field, assertion] of Object.entries(assertions)) {
+              const current = input[field];
+              if (typeof current !== 'string') continue;
+              for (const variant of comparisonWitnesses(current)) {
+                try {
+                  if (matchAssertion(variant.value, assertion)) continue;
+                } catch {
+                  continue;
+                }
+                add(
+                  `${at}.input.${field}.${variant.name}`,
+                  (o) => {
+                    resize(o, min);
+                    for (const c of o.toolCalls.filter(matches)) record(c.input)[field] = variant.value;
+                  },
+                  (o) => resize(o, min),
+                );
+              }
+            }
+          }
+          if (Number.isFinite(max))
+            add(
+              `${at}.count.max`,
+              (o) => resize(o, max + 1),
+              (o) => resize(o, max),
+            );
+        }
       } else {
         gap('unsupported-check-structure');
       }
@@ -936,6 +1137,77 @@ export function completionComponents(spec: Spec): ComponentInventory {
   });
   if (spec.blocks.length > 1) inventory.gaps.push('history:multi-block-component-isolation');
   return inventory;
+}
+/** An input value that satisfies an assertion, or undefined when the assertion has no witness this derives. */
+function assertionWitness(assertion: Assertion): string | undefined {
+  if (typeof assertion === 'string') return assertion;
+  if (assertion === null || typeof assertion !== 'object' || Array.isArray(assertion)) return undefined;
+  const a = assertion as Record<string, unknown>;
+  if (typeof a.exact === 'string') return a.exact;
+  if (typeof a.contains === 'string') return a.contains;
+  if (Array.isArray(a.one_of) && typeof a.one_of[0] === 'string') return a.one_of[0];
+  if (a.nonempty === true) return 'fixture';
+  if (typeof a.regex === 'string') return regexWitness(a.regex);
+  return undefined;
+}
+
+/**
+ * A string a simple pattern matches: literals and escapes, character classes, counted and optional repeats. Anything
+ * else (groups, alternation, lookarounds, negated classes) has no witness here and is a named gap.
+ */
+function regexWitness(pattern: string): string | undefined {
+  let out = '';
+  let at = 0;
+  const atom = (): string | undefined => {
+    const c = pattern[at] as string;
+    if (c === '\\') {
+      const next = pattern[at + 1] ?? '';
+      at += 2;
+      if (next === 'd') return '1';
+      if (next === 'w') return 'a';
+      if (next === 's') return ' ';
+      if (next === 'b') return '';
+      if (/[a-zA-Z]/.test(next)) return undefined;
+      return next;
+    }
+    if (c === '[') {
+      const end = pattern.indexOf(']', at + 1);
+      const body = end < 0 ? '' : pattern.slice(at + 1, end);
+      if (end < 0 || body.startsWith('^') || body === '') return undefined;
+      at = end + 1;
+      return body[0] === '\\' ? body[1] : body[0];
+    }
+    if (c === '(' || c === ')' || c === '|' || c === '*' || c === '+' || c === '?' || c === '{')
+      return undefined;
+    at += 1;
+    return c === '.' ? 'a' : c;
+  };
+  while (at < pattern.length) {
+    if (pattern[at] === '^' || pattern[at] === '$') {
+      at += 1;
+      continue;
+    }
+    const piece = atom();
+    if (piece === undefined) return undefined;
+    let times = 1;
+    const rest = pattern.slice(at);
+    const counted = /^\{(\d+)(?:,(\d*))?\}/.exec(rest);
+    if (counted) {
+      times = Number(counted[1]);
+      at += counted[0].length;
+    } else if (rest[0] === '+') {
+      at += 1;
+    } else if (rest[0] === '*' || rest[0] === '?') {
+      times = 0;
+      at += 1;
+    }
+    out += piece.repeat(times);
+  }
+  try {
+    return new RegExp(pattern).test(out) ? out : undefined;
+  } catch {
+    return undefined;
+  }
 }
 function literalPattern(pattern: string): string | undefined {
   const literal = pattern.replace(/^\^|\$$/g, '').replace(/\\b/g, '');
@@ -1021,6 +1293,13 @@ function verdictIds(check: string, value: unknown, clause: string): string[] {
     const entries = Array.isArray(opts.rules) ? rows(opts.rules) : [opts];
     return [`custom.permission.${entries[entry]?.effect}`];
   }
+  if (check === 'execution')
+    return clause.startsWith('evidence.')
+      ? ['ran_code', 'exit_code', 'max_commands']
+          .filter((key) => opts[key] !== undefined)
+          .map((key) => `execution.${key}`)
+      : [`execution.${clause.split('.')[0]}`];
+  if (check === 'some_call') return [`custom.some_call.${clause.split('.')[0]}`];
   if (check === 'ordered') {
     const pairs = Array.isArray(opts.pairs) ? rows(opts.pairs) : [opts];
     const pair = required(pairs[entry]);
