@@ -50,11 +50,17 @@ describe('static tests are JSON for `estate static`, not task specs (docs/estate
 
   it('fails all-load on a static test that is not JSON, or has no check', async () => {
     const broken = await withSpecs((specs) => first(specs, (spec) => ({ ...spec, text: '{ "id": ' })));
-    expect(broken.get('gen.asks.all-load')).toMatchObject({ pass: false, detail: '1 specs do not load' });
+    expect(broken.get('gen.asks.all-load')).toMatchObject({
+      pass: false,
+      detail: expect.stringMatching(/^1 specs do not load: \S+/),
+    });
     const bare = await withSpecs((specs) =>
       first(specs, (spec) => json(spec, (record) => delete record.check)),
     );
-    expect(bare.get('gen.asks.all-load')).toMatchObject({ pass: false, detail: '1 specs do not load' });
+    expect(bare.get('gen.asks.all-load')).toMatchObject({
+      pass: false,
+      detail: expect.stringMatching(/^1 specs do not load: \S+/),
+    });
   });
 
   // Records `driftbench estate static` refuses (its StaticTest schema): each must fail all-load (review of PR 239).
@@ -91,7 +97,10 @@ describe('static tests are JSON for `estate static`, not task specs (docs/estate
     ],
   ])('fails all-load on a static test with %s', async (_name, fault) => {
     const results = await withSpecs((specs) => first(specs, (spec) => json(spec, fault)));
-    expect(results.get('gen.asks.all-load')).toMatchObject({ pass: false, detail: '1 specs do not load' });
+    expect(results.get('gen.asks.all-load')).toMatchObject({
+      pass: false,
+      detail: expect.stringMatching(/^1 specs do not load: \S+/),
+    });
   });
 
   it('fails all-load on a task spec that does not load', async () => {
@@ -101,7 +110,10 @@ describe('static tests are JSON for `estate static`, not task specs (docs/estate
       specs[index] = { ...rest, errors: ['planted'] } as Spec;
       return specs;
     });
-    expect(results.get('gen.asks.all-load')).toMatchObject({ pass: false, detail: '1 specs do not load' });
+    expect(results.get('gen.asks.all-load')).toMatchObject({
+      pass: false,
+      detail: expect.stringMatching(/^1 specs do not load: \S+/),
+    });
   });
 
   it('fails records-provenance on a static test with another map hash, or no atom', async () => {

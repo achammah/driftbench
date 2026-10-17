@@ -183,6 +183,9 @@ function seedFreeFamily(
 const ofType = (suite: FixtureSuite, type: string) =>
   suite.specs.filter((spec) => spec.complete && spec.testType === type);
 
+/** The most specs a failure detail lists by id and ask; the rest are counted. */
+const LISTED = 50;
+
 export function taskFamily(): Family {
   return seedFreeFamily(
     'gen.task',
@@ -214,7 +217,10 @@ export function taskFamily(): Family {
           ? { pass: true, detail: `holds (${specs.length})` }
           : {
               pass: false,
-              detail: `${bad.length} of ${specs.length} asks hold no task, such as "${firstAsk(bad[0] as FixtureSuite['specs'][number])}"`,
+              detail: `${bad.length} of ${specs.length} asks hold no task: ${bad
+                .slice(0, LISTED)
+                .map((spec) => `${spec.id} ("${firstAsk(spec)}")`)
+                .join('; ')}${bad.length > LISTED ? `; and ${bad.length - LISTED} more` : ''}`,
             };
       },
     })),
