@@ -76,6 +76,43 @@ export const EvidencePredicate = z.discriminatedUnion('type', [
   z.strictObject({
     type: z.literal('tool_not_called').describe('This form holds when the agent never calls the tool.'),
     label: z.string().min(1).describe('The tool label that must not appear in the trace.'),
+    input: z
+      .record(z.string(), z.unknown())
+      .optional()
+      .describe('Only forbid calls matching these input assertions; without it, forbid every call.'),
+  }),
+  z.strictObject({
+    type: z.literal('reference_not_read').describe('No successful read of this path or glob in the block.'),
+    path: z.string().min(1).describe('The path or glob of the reference that must not be read.'),
+  }),
+  z.strictObject({
+    type: z.literal('subagent_not_dispatched').describe('No dispatch of this helper in the block.'),
+    name: z.string().min(1).describe('The name of the helper that must not be dispatched.'),
+  }),
+  z.strictObject({
+    type: z.literal('guard_not_fired').describe('No firing of this guard in the block.'),
+    name: z.string().min(1).describe('The name of the guard that must not fire.'),
+    verdict: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('Only forbid this verdict; without it, forbid every firing.'),
+  }),
+  z.strictObject({
+    type: z.literal('stage_not_reached').describe('This stage never appears in the block.'),
+    name: z.string().min(1).describe('The name of the stage that must not be reached.'),
+  }),
+  z.strictObject({
+    type: z
+      .literal('artifact_not_created')
+      .describe('The workspace diff lists no creation of this path or glob.'),
+    path: z.string().min(1).describe('The path or glob that must not be created.'),
+  }),
+  z.strictObject({
+    type: z
+      .literal('file_not_written')
+      .describe('The workspace diff lists no creation or change of this path or glob.'),
+    path: z.string().min(1).describe('The path or glob that must not be created or changed.'),
   }),
   z.strictObject({
     type: z
@@ -184,6 +221,34 @@ export const Edge = z.strictObject({
 });
 export type Edge = z.infer<typeof Edge>;
 
+/** Authority is independent of runtime file kind and atom axis/detail role. */
+export const DocumentRole = z.enum([
+  'normative',
+  'changelog',
+  'history',
+  'template',
+  'example',
+  'journal',
+  'fixture',
+  'archive',
+]);
+export type DocumentRole = z.infer<typeof DocumentRole>;
+export const DocumentInfo = z.strictObject({
+  path: z.string().min(1),
+  role: DocumentRole,
+  reasons: z.array(z.string().min(1)).min(1),
+  sections: z
+    .array(
+      z.strictObject({
+        startLine: z.number().int().min(1),
+        endLine: z.number().int().min(1),
+        role: DocumentRole,
+      }),
+    )
+    .optional(),
+});
+export type DocumentInfo = z.infer<typeof DocumentInfo>;
+
 export const EstateMap = z.strictObject({
   version: z.literal(1).describe('Map format version, always 1.'),
   runtime: z.string().min(1).describe('The adapter that read the estate: claude-code, nexus, ...'),
@@ -192,6 +257,10 @@ export const EstateMap = z.strictObject({
     .min(1)
     .describe('The estate root, as given; never an absolute private path in a committed file'),
   readAt: z.string().min(1).describe('ISO time the scan read the estate.'),
+  documents: z
+    .array(DocumentInfo)
+    .optional()
+    .describe('Document authority and non-normative line spans; absent in older maps.'),
   atoms: z.array(Atom).describe('Every atom the scan read from the estate.'),
   edges: z.array(Edge).describe('The edges of the estate graph, decided by code.'),
   space: z.string().optional().describe('Path of the exported space map of the situation axes'),
@@ -199,6 +268,12 @@ export const EstateMap = z.strictObject({
     .array(z.string().min(1))
     .optional()
     .describe('Globs the scan skipped beside the runtime defaults; lint reads the estate with them again'),
+  followedLinks: z
+    .array(z.string().min(1))
+    .optional()
+    .describe(
+      'Links, relative to the estate root, that the scan read through to a real path outside the root',
+    ),
   producedBy: z
     .strictObject({
       family: z.string().min(1).describe('The model family that split the prose, `code` when no model ran'),

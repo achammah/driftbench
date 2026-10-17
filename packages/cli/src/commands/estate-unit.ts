@@ -1,10 +1,11 @@
-import { readFile, stat, writeFile } from 'node:fs/promises';
-import { relative, resolve } from 'node:path';
+import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { join, relative, resolve } from 'node:path';
+import { loadSpecFile, type Spec } from '@agent-nexus/driftbench-core';
 import { RUNTIMES, readerFor, runUnitTests, type UnitResult } from '@agent-nexus/driftbench-estate';
 import { formatJson, UnitTest } from '@agent-nexus/driftbench-generate';
 import type { Command } from 'commander';
-import { jsonFiles } from '../files';
 import type { Io } from '../io';
+import { runUnitSpecs } from './estate-unit-spec';
 
 export type EstateUnitOptions = {
   estate?: string;
@@ -30,7 +31,7 @@ export function registerEstateUnitCommand(estate: Command, io: Io, setExit: (cod
     .description(
       'Run the unit tests of a generated suite (guards and scripts, no model) against an estate root',
     )
-    .argument('<tests...>', 'unit test files, or folders holding them (such as <suite>/unit)')
+    .argument('<tests...>', 'JSON unit records or unit-mode YAML/JSON task specs, or their folders')
     .option('--estate <root>', 'the estate root: the original (with --record) or a mutant copy')
     .option('--runtime <name>', `the runtime that reads the estate: ${RUNTIMES.join(', ')}`, 'claude-code')
     .option('--record', 'run on the original estate and write the outcomes into the test files')
@@ -72,11 +73,25 @@ export async function estateUnitCommand(
       io.err(`Cannot find ${path}.\n`);
       return 2;
     }
-    if (info.isDirectory()) files.push(...(await jsonFiles(full)));
+    if (info.isDirectory()) files.push(...(await unitFiles(full)));
     else files.push(full);
   }
   const tests: Array<{ file: string; test: UnitTest }> = [];
+  const specs: Spec[] = [];
   for (const file of files.sort()) {
+    if (/\.ya?ml$/i.test(file)) {
+      const loaded = await loadSpecFile(file);
+      if (!loaded.ok) {
+        io.err(`✗ ${relative(io.cwd, file)}  invalid spec: ${JSON.stringify(loaded)}\n`);
+        return 2;
+      }
+      if ((loaded.spec.metadata?.estate as { mode?: string } | undefined)?.mode !== 'unit') {
+        io.err(`✗ ${relative(io.cwd, file)}  not an estate unit spec\n`);
+        return 2;
+      }
+      specs.push(loaded.spec);
+      continue;
+    }
     let raw: unknown;
     try {
       raw = JSON.parse(await readFile(file, 'utf8'));
@@ -87,6 +102,13 @@ export async function estateUnitCommand(
       return 2;
     }
     const parsed = UnitTest.safeParse(raw);
+    if (!parsed.success && raw !== null && typeof raw === 'object' && 'blocks' in raw) {
+      const loaded = await loadSpecFile(file);
+      if (loaded.ok && (loaded.spec.metadata?.estate as { mode?: string } | undefined)?.mode === 'unit') {
+        specs.push(loaded.spec);
+        continue;
+      }
+    }
     if (!parsed.success) {
       io.err(
         `✗ ${relative(io.cwd, file)}  not a unit test: ${parsed.error.issues[0]?.message ?? 'invalid'}\n`,
@@ -95,8 +117,12 @@ export async function estateUnitCommand(
     }
     tests.push({ file, test: parsed.data });
   }
-  if (tests.length === 0) {
+  if (tests.length + specs.length === 0) {
     io.err('No unit test found.\n');
+    return 2;
+  }
+  if (options.record && specs.length > 0) {
+    io.err('--record writes JSON unit tests; YAML specs use their declared assertions\n');
     return 2;
   }
   const jobs = Number(options.jobs ?? '1');
@@ -116,18 +142,35 @@ export async function estateUnitCommand(
   }
   const counts = { pass: 0, fail: 0, inert: 0, unrecorded: 0 };
   for (const result of run.results) counts[result.status] += 1;
+  const specContract = await runUnitSpecs(specs, {
+    root,
+    reader,
+    noSandbox: options.sandbox === false,
+    jobs,
+  });
+  if (specContract.inputErrors.length > 0) {
+    io.err(specContract.inputErrors.map((error) => `Cannot run ${error}\n`).join(''));
+    return 2;
+  }
+  const legacyContract = contractOf(
+    run.results,
+    tests.map((entry) => entry.test),
+  );
+  const combined = {
+    runs: [...legacyContract.runs, ...specContract.runs],
+    guards: [...legacyContract.guards, ...specContract.guards],
+    scripts: [...legacyContract.scripts, ...specContract.scripts],
+    ...(specContract.helpers ? { helpers: specContract.helpers } : {}),
+  };
   if (options.json) {
-    io.out(
-      formatJson(
-        contractOf(
-          run.results,
-          tests.map((entry) => entry.test),
-        ),
-      ),
-    );
-  } else io.out(report(run.results, counts, run.sandbox, run.notes, options.record === true));
+    io.out(formatJson(combined));
+  } else {
+    io.out(report(run.results, counts, run.sandbox, run.notes, options.record === true));
+    for (const result of specContract.runs)
+      io.out(`${result.pass ? '✓' : '✗'} ${result.spec}  ${result.failing.join('; ')}\n`);
+  }
   if (counts.unrecorded > 0 && !options.record) return 2;
-  return counts.fail > 0 ? 1 : 0;
+  return combined.runs.some((result) => !result.pass) ? 1 : 0;
 }
 
 /**
@@ -147,6 +190,7 @@ export type UnitContract = {
     ms: number;
   }>;
   scripts: Array<{ script: string; exit: number; stdout: string }>;
+  helpers?: Array<{ helper: string; exit: number; ms: number; text: string }>;
 };
 
 export function contractOf(results: readonly UnitResult[], tests: readonly UnitTest[]): UnitContract {
@@ -177,6 +221,14 @@ export function contractOf(results: readonly UnitResult[], tests: readonly UnitT
           decision,
           ...(entry.outcome.message !== undefined ? { message: entry.outcome.message } : {}),
           ms: Math.round(entry.ms),
+        });
+      } else if (test.target.kind === 'subagent') {
+        contract.helpers ??= [];
+        contract.helpers.push({
+          helper: test.target.name,
+          exit: entry.outcome.exitCode,
+          ms: Math.round(entry.ms),
+          text: entry.outcome.output ?? '',
         });
       } else {
         contract.scripts.push({
@@ -220,4 +272,15 @@ function report(
     '',
   );
   return lines.join('\n');
+}
+
+/** Both supported unit formats, never unrelated file extensions. */
+async function unitFiles(folder: string): Promise<string[]> {
+  const files: string[] = [];
+  for (const entry of await readdir(folder, { withFileTypes: true })) {
+    const path = join(folder, entry.name);
+    if (entry.isDirectory()) files.push(...(await unitFiles(path)));
+    else if (/\.(?:json|ya?ml)$/i.test(entry.name)) files.push(path);
+  }
+  return files;
 }

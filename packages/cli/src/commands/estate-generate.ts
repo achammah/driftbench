@@ -163,15 +163,21 @@ export async function estateGenerateCommand(options: EstateGenerateOptions, io: 
   if (!plan || !bank || (sessionsPath !== undefined && !sessions)) return 2;
 
   // The files of the estate as a run copies them: a read is expected only of one of them. Without the
-  // estate folder (the map moved), the files the map knows.
+  // estate folder (the map moved), the files the map knows. A folder that holds none of the files the
+  // atoms were read from is not the estate: the map was copied away from it.
   let files: string[] | undefined;
   const root = resolve(dirname(mapPath), loaded.map.root);
   const lister = readerFor(loaded.map.runtime, { ignore: loaded.map.ignore ?? [] });
-  if (lister?.listFiles && (await stat(root).catch(() => undefined))?.isDirectory()) {
-    files = await lister.listFiles(root);
+  const listed =
+    lister?.listFiles && (await stat(root).catch(() => undefined))?.isDirectory()
+      ? await lister.listFiles(root)
+      : undefined;
+  const sources = new Set(loaded.map.atoms.map((atom) => atom.provenance.file));
+  if (listed?.some((file) => sources.has(file))) {
+    files = listed;
   } else if (!options.json) {
     io.out(
-      `The estate folder ${display(root, io)} cannot be listed: reads are checked against the files the map knows.\n`,
+      `The estate folder ${display(root, io)} ${listed ? 'holds none of the files the map was read from' : 'cannot be listed'}: reads are checked against the files the map knows.\n`,
     );
   }
 

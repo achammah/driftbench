@@ -103,7 +103,7 @@ describe('the fixture-v2 estate', () => {
       semantic: 2,
       moved: 24,
       restated: 1,
-      unchanged: 96,
+      unchanged: 97,
       edgesAdded: 1,
       edgesRemoved: 1,
     });

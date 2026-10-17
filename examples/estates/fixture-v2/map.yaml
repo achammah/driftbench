@@ -8,7 +8,7 @@
 version: 1
 runtime: claude-code
 root: .
-readAt: 2026-10-11T21:32:48.610Z
+readAt: 2026-10-16T23:00:59.392Z
 atoms:
   - id: skill.invoice-reconcile.skill-invoice-reconcile
     kind: skill
@@ -330,6 +330,23 @@ atoms:
       command: '"$CLAUDE_PROJECT_DIR"/.claude/guards/block-force-push.sh'
       anchored: true
       scope: estate
+      ruleText: |-
+        Blocks a force push. Enforces: R6
+        Never run git push --force on any branch.
+      ruleSources:
+        - kind: documentation
+          text: "Blocks a force push. Enforces: R6"
+          file: .claude/guards/block-force-push.sh
+          startLine: 2
+          endLine: 2
+          quote: "# Blocks a force push. Enforces: R6"
+        - kind: message
+          text: Never run git push --force on any branch.
+          file: .claude/guards/block-force-push.sh
+          startLine: 6
+          endLine: 6
+          quote: echo "Never run git push --force on any branch." >&2
+      rules: []
       matcher: Bash
       script: .claude/guards/block-force-push.sh
       scriptExists: true
@@ -358,6 +375,37 @@ atoms:
       command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/read-before-edit.py
       anchored: true
       scope: estate
+      ruleText: |-
+        Blocks an Edit or a Write on a file the session has not read. Enforces: R3, R5
+        The runtime sends the session's transcript path, not the files read: the reads are the Read calls in it.
+        A new file has nothing to read first.
+        Read a file before you edit it.
+      ruleSources:
+        - kind: documentation
+          text: "Blocks an Edit or a Write on a file the session has not read. Enforces: R3, R5"
+          file: .claude/guards/read-before-edit.py
+          startLine: 2
+          endLine: 2
+          quote: '"""Blocks an Edit or a Write on a file the session has not read. Enforces: R3, R5"""'
+        - kind: documentation
+          text: "The runtime sends the session's transcript path, not the files read: the reads are the Read calls in it."
+          file: .claude/guards/read-before-edit.py
+          startLine: 7
+          endLine: 7
+          quote: "# The runtime sends the session's transcript path, not the files read: the reads are the Read calls in it."
+        - kind: documentation
+          text: A new file has nothing to read first.
+          file: .claude/guards/read-before-edit.py
+          startLine: 32
+          endLine: 32
+          quote: "# A new file has nothing to read first."
+        - kind: message
+          text: Read a file before you edit it.
+          file: .claude/guards/read-before-edit.py
+          startLine: 34
+          endLine: 34
+          quote: print("Read a file before you edit it.", file=sys.stderr)
+      rules: []
       matcher: Edit|Write
       script: .claude/guards/read-before-edit.py
       scriptExists: true
@@ -389,6 +437,23 @@ atoms:
       command: python3 .claude/guards/ledger-guard.py
       anchored: false
       scope: estate
+      ruleText: |-
+        Warns after a command that removed a file under ledger/.
+        never delete a file under ledger/; move it to ledger/archive/ instead
+      ruleSources:
+        - kind: documentation
+          text: Warns after a command that removed a file under ledger/.
+          file: .claude/guards/ledger-guard.py
+          startLine: 2
+          endLine: 2
+          quote: '"""Warns after a command that removed a file under ledger/."""'
+        - kind: message
+          text: never delete a file under ledger/; move it to ledger/archive/ instead
+          file: .claude/guards/ledger-guard.py
+          startLine: 9
+          endLine: 9
+          quote: print("never delete a file under ledger/; move it to ledger/archive/ instead", file=sys.stderr)
+      rules: []
       matcher: Bash
       script: .claude/guards/ledger-guard.py
       scriptExists: true
@@ -417,6 +482,23 @@ atoms:
       command: '"$CLAUDE_PROJECT_DIR"/.claude/guards/stop-word.sh'
       anchored: true
       scope: estate
+      ruleText: |-
+        Adds a reminder when the owner types stop. Enforces: R10
+        {"additionalContext": "The user said stop: stop all work and confirm in one line."}
+      ruleSources:
+        - kind: documentation
+          text: "Adds a reminder when the owner types stop. Enforces: R10"
+          file: .claude/guards/stop-word.sh
+          startLine: 2
+          endLine: 2
+          quote: "# Adds a reminder when the owner types stop. Enforces: R10"
+        - kind: message
+          text: '{"additionalContext": "The user said stop: stop all work and confirm in one line."}'
+          file: .claude/guards/stop-word.sh
+          startLine: 6
+          endLine: 6
+          quote: "echo '{\"additionalContext\": \"The user said stop: stop all work and confirm in one line.\"}'"
+      rules: []
       script: .claude/guards/stop-word.sh
       scriptExists: true
       registry: G4
@@ -444,6 +526,23 @@ atoms:
       command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/reply-length.py
       anchored: true
       scope: estate
+      ruleText: |-
+        Nudges when the last reply is too long.
+        Keep every reply under 1,200 characters unless the user asks for detail.
+      ruleSources:
+        - kind: documentation
+          text: Nudges when the last reply is too long.
+          file: .claude/guards/reply-length.py
+          startLine: 2
+          endLine: 2
+          quote: '"""Nudges when the last reply is too long."""'
+        - kind: message
+          text: Keep every reply under 1,200 characters unless the user asks for detail.
+          file: .claude/guards/reply-length.py
+          startLine: 9
+          endLine: 9
+          quote: print("Keep every reply under 1,200 characters unless the user asks for detail.", file=sys.stderr)
+      rules: []
       script: .claude/guards/reply-length.py
       scriptExists: true
       enforces:
@@ -470,6 +569,30 @@ atoms:
       command: $CLAUDE_PROJECT_DIR/.claude/skills/shipment-tracker/scripts/check-carrier.sh
       anchored: true
       scope: shipment-tracker
+      ruleText: |-
+        A guard for the shipment tracker: a call to track.sh needs a carrier code.
+        Reads the tool call as JSON on stdin; exits 2 with a message to block it.
+        Always pass the carrier code to track.sh
+      ruleSources:
+        - kind: documentation
+          text: "A guard for the shipment tracker: a call to track.sh needs a carrier code."
+          file: .claude/skills/shipment-tracker/scripts/check-carrier.sh
+          startLine: 2
+          endLine: 2
+          quote: "# A guard for the shipment tracker: a call to track.sh needs a carrier code."
+        - kind: documentation
+          text: Reads the tool call as JSON on stdin; exits 2 with a message to block it.
+          file: .claude/skills/shipment-tracker/scripts/check-carrier.sh
+          startLine: 3
+          endLine: 3
+          quote: "# Reads the tool call as JSON on stdin; exits 2 with a message to block it."
+        - kind: message
+          text: Always pass the carrier code to track.sh
+          file: .claude/skills/shipment-tracker/scripts/check-carrier.sh
+          startLine: 8
+          endLine: 8
+          quote: echo "Always pass the carrier code to track.sh" >&2
+      rules: []
       matcher: Bash
       script: .claude/skills/shipment-tracker/scripts/check-carrier.sh
       scriptExists: true
@@ -1276,6 +1399,27 @@ atoms:
       path: .claude/skills/invoice-reconcile/references/matching-rules.md
       spans:
         - references/matching-rules.md
+  - id: reference.shipment-tracker.read-data-shipments-txt
+    kind: reference
+    title: Read data/shipments.txt
+    provenance:
+      file: .claude/skills/shipment-tracker/SKILL.md
+      startLine: 20
+      endLine: 20
+      quote: The local carrier table is `data/shipments.txt`.
+      hash: 7c900bf4edbf9ac7c4f86c1e26b8e4e10ca0e13d2c055cb271061a187dbd091f
+    producedBy: code
+    role: detail
+    approved: true
+    situation: The local carrier table is `data/shipments.txt`.
+    evidence:
+      - { type: tool_called, label: Read, input: { file_path: { contains: .claude/skills/shipment-tracker/data/shipments.txt } } }
+    enforcement: []
+    fields:
+      path: .claude/skills/shipment-tracker/data/shipments.txt
+      exists: true
+      readWhen: The local carrier table is `data/shipments.txt`.
+      from: .claude/skills/shipment-tracker/SKILL.md
   - id: reference.supplier-email.read-claude-memory-supplier-languages-md
     kind: reference
     title: Read .claude/memory/supplier-languages.md
@@ -2481,6 +2625,7 @@ edges:
   - { from: skill.invoice-reconcile.skill-invoice-reconcile, to: script.invoice-reconcile.script-scripts-reconcile-py, kind: script }
   - { from: skill.shipment-tracker.skill-shipment-tracker, to: tool.invoice-reconcile.declared-bash, kind: allows }
   - { from: skill.shipment-tracker.skill-shipment-tracker, to: tool.settings.allow-read, kind: allows }
+  - { from: skill.shipment-tracker.skill-shipment-tracker, to: reference.shipment-tracker.read-data-shipments-txt, kind: reference }
   - { from: skill.shipment-tracker.skill-shipment-tracker, to: script.shipment-tracker.script-scripts-track-sh, kind: script }
   - { from: skill.supplier-email.skill-supplier-email, to: reference.supplier-email.read-claude-memory-supplier-languages-md, kind: reference }
   - { from: skill.weekly-report.skill-weekly-report, to: tool.invoice-reconcile.declared-bash, kind: allows }
@@ -2502,5 +2647,5 @@ edges:
 producedBy:
   family: lane
   model: claude-opus-5-5 as the estate lane, by hand
-  at: 2026-10-11T21:32:48.610Z
-hash: a5c8cb21f4aeca08a0f2235c66a11406a127c9e90844917eaa0d3a95ee4a0cb7
+  at: 2026-10-16T23:00:59.392Z
+hash: c3b526d2ae0cb801a71fa4dc7f74fa51c8cbd2213f28793aaf56660f532e28ad

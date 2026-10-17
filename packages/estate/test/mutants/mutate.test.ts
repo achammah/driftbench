@@ -126,7 +126,8 @@ describe('mutateEstate', () => {
   it('copies the estate files alone, not the maps, specs and sessions beside them', async () => {
     const root = await copy();
     const { readdir } = await import('node:fs/promises');
-    expect((await readdir(root)).sort()).toEqual(['.claude', 'CLAUDE.md']);
+    // The estate configuration (helper executors, script fixtures) travels with the copy; the maps and specs do not.
+    expect((await readdir(root)).sort()).toEqual(['.claude', 'CLAUDE.md', 'driftbench.estate.yaml']);
   });
 });
 

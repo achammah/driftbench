@@ -132,6 +132,13 @@ export const GuardExpect = z
   );
 export type GuardExpect = z.infer<typeof GuardExpect>;
 
+/**
+ * The verdicts by which a runtime check acts on a run: it stops the act (`deny`, `block`) or tells the agent
+ * something and lets the act through (`warn`, `nudge`). Every other verdict (`allow`, a timeout, a verdict the
+ * estate names itself) is no intervention, and a check that judges what a guard says reads these runs only.
+ */
+export const GUARD_INTERVENTIONS = ['deny', 'block', 'warn', 'nudge'] as const;
+
 /** The reply is JSON: an optional JSON Schema (strict) and paths with an assertion each. */
 export const JsonExpect = z
   .strictObject({

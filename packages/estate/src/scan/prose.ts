@@ -18,13 +18,12 @@ import { type Located, locateQuote, quoteAtSpan } from './text';
 
 /**
  * The model half of the scan, and its only job: split the prose of an estate (standing instructions, memory,
- * the bodies of skills and helper agents) into instruction, gate and register atoms. One call per chunk,
+ * the bodies of skills and helper agents) into instruction, gate and register atoms, and resolve only routing tables code explicitly marks as ambiguous. One call per chunk,
  * a strict JSON answer, every atom quoted from the chunk. Code finds each quote in the file, checks it at
- * its span with the extractor's quote check, and refuses an atom it cannot place, with the reason. Structure
- * (frontmatter, tables, links, fixed-form gates) never goes to the model: code reads it.
+ * its span with the extractor's quote check, and refuses an atom it cannot place, with the reason. Structure code decides stays with code. Ambiguous routing tables are the explicit exception; the model may decline them or propose an unapproved route.
  */
 
-export const PROSE_KINDS = ['instruction', 'gate', 'register'] as const;
+export const PROSE_KINDS = ['instruction', 'gate', 'register', 'route'] as const;
 
 export const PROSE_SYSTEM_PROMPT = `You split the written instructions of an AI agent into atoms. An atom is one place where the text says what the agent must do, with the exact words that say it. Code later turns approved atoms into tests, and a person approves every atom first. You never write tests or verdicts.
 
@@ -32,15 +31,16 @@ Kinds:
 - instruction: a rule, an obligation or a prohibition, with the situation it applies in.
 - gate: an order between two acts: before X, do Y.
 - register: a rule on the reply itself: its language, length, format, words or tone.
+- route: only for a table explicitly flagged AMBIGUOUS ROUTING below. Decide whether it actually maps a request to a declared skill/helper. An inventory gives no route. If uncertain, omit it. A route must name target and targetKind from the flagged candidates and give its request in situation.
 
 Rules:
 1. Quote, never invent. Every atom has "quote", text copied character for character from the chunk, between ${MIN_MODEL_QUOTE} and ${MAX_MODEL_QUOTE} characters. Code searches the quote in the file and refuses an atom whose quote it cannot find inside the chunk. Never paraphrase inside a quote, never join two passages.
 2. One atom per rule. A line that holds two rules gives two atoms, each quoting its own words.
-3. Skip what code reads: frontmatter, routing tables, lists of links, and a line that only names a file to read.
+3. Skip what code reads: frontmatter, decided tables, lists of links, and a line that only names a file to read. Review only the explicitly flagged ambiguous routing tables; never infer a route from an unflagged table.
 4. "evidence" lists what a trace shows when the rule is obeyed, as typed predicates: {"type": "tool_called", "label": "<tool>", "input": {...}}, {"type": "tool_not_called", "label": "<tool>"}, {"type": "skill_loaded", "name": "<skill>"}, {"type": "ordered", "before": "<tool, skill or stage>", "after": "<tool, skill or stage>"}, {"type": "stage_reached", "name": "<stage>"}, {"type": "workspace", "changed": ["<path>"], "othersUntouched": true}, {"type": "text", "must": ["..."], "mustNot": ["..."], "lang": "<tag>"}, {"type": "custom", "name": "<check>", "options": {...}}. At least one per atom.
 5. Answer with one JSON object and nothing else: no prose, no code fence. Use only these keys:
 {"chunk": "<the chunk id you were given>", "atoms": [{"kind": "instruction", "title": "<the rule in plain words>", "quote": "<verbatim text>", "situation": "<when it applies; leave out when always>", "polarity": "obligation", "evidence": [ ... ]}]}
-"polarity" is obligation or prohibition, for instructions only.`;
+"polarity" is obligation or prohibition, for instructions only. For route atoms also include "target": "<declared name>" and "targetKind": "skill" or "subagent". Other kinds do not need these fields.`;
 
 /** The request for one chunk. The first line names the chunk, so a recorded answer can be matched to it. */
 export function proseRequest(chunk: ProseChunk, maxTokens?: number): ModelRequest {
@@ -49,6 +49,16 @@ export function proseRequest(chunk: ProseChunk, maxTokens?: number): ModelReques
     '',
     `File ${chunk.file}, lines ${chunk.startLine} to ${chunk.endLine}. Split it into instruction, gate and register atoms.`,
     '',
+    ...(chunk.ambiguousRouting?.length
+      ? [
+          'AMBIGUOUS ROUTING: code emitted no route for these tables. Resolve their intent from the source; do not guess.',
+          ...chunk.ambiguousRouting.map(
+            (table) =>
+              `Table lines ${table.startLine}-${table.endLine}; declared candidates: ${JSON.stringify(table.targets)}.`,
+          ),
+          '',
+        ]
+      : []),
     '<<<CHUNK',
     chunk.text.trimEnd(),
     'CHUNK>>>',
@@ -74,6 +84,8 @@ const AnswerAtom = z.strictObject({
   polarity: z.enum(['obligation', 'prohibition']).optional(),
   line: z.number().int().min(1).optional(),
   evidence: z.array(EvidencePredicate).min(1, { error: 'evidence is empty: name what a trace shows' }),
+  target: z.string().min(1).optional(),
+  targetKind: z.enum(['skill', 'subagent']).optional(),
 });
 
 /** Reads an answer: JSON (optionally in one code fence), the strict envelope and the right chunk. */
@@ -161,6 +173,24 @@ export function acceptProse(
       });
       return;
     }
+    const routeTable =
+      atom.kind === 'route'
+        ? chunk.ambiguousRouting?.find(
+            (table) =>
+              table.startLine <= span.startLine &&
+              table.endLine >= span.endLine &&
+              table.targets.some((target) => target.name === atom.target && target.kind === atom.targetKind),
+          )
+        : undefined;
+    if (atom.kind === 'route' && (!routeTable || !atom.situation)) {
+      refusals.push({
+        chunk: chunk.id,
+        entry: named,
+        reason:
+          'kind: a model route must resolve a flagged ambiguous table, name one of its declared targets and give the request in situation',
+      });
+      return;
+    }
     const at: Located = { file: chunk.file, ...span, quote: atom.quote };
     if (!quoteAtSpan(fileText, at)) {
       refusals.push({
@@ -170,14 +200,16 @@ export function acceptProse(
       });
       return;
     }
-    const same = builder.atoms.find(
-      (other) =>
-        other.kind === atom.kind &&
-        other.provenance.file === at.file &&
-        other.provenance.startLine <= at.endLine &&
-        at.startLine <= other.provenance.endLine &&
-        (other.producedBy === 'code' || foldQuote(other.provenance.quote) === folded),
-    );
+    const same = builder
+      .atomsOf(at.file)
+      .find(
+        (other) =>
+          other.kind === atom.kind &&
+          other.provenance.file === at.file &&
+          other.provenance.startLine <= at.endLine &&
+          at.startLine <= other.provenance.endLine &&
+          (other.producedBy === 'code' || foldQuote(other.provenance.quote) === folded),
+      );
     if (same) {
       duplicates.push(`${chunk.id}: ${named} repeats ${same.id}`);
       return;
@@ -187,10 +219,27 @@ export function acceptProse(
         kind: atom.kind,
         title: atom.title,
         at,
-        evidence: atom.evidence,
+        evidence: routeTable
+          ? [
+              atom.targetKind === 'skill'
+                ? { type: 'skill_loaded', name: atom.target as string }
+                : { type: 'tool_called', label: routeTable.dispatch, input: { subagent_type: atom.target } },
+            ]
+          : atom.evidence,
         producedBy: 'model',
         ...(atom.situation ? { situation: atom.situation } : {}),
-        ...(atom.polarity ? { fields: { polarity: atom.polarity } } : {}),
+        ...(routeTable
+          ? {
+              fields: {
+                target: atom.target,
+                targetKind: atom.targetKind,
+                ask: atom.situation,
+                via: 'model-table',
+              },
+            }
+          : atom.polarity
+            ? { fields: { polarity: atom.polarity } }
+            : {}),
       }),
     );
   });
