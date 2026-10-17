@@ -21,6 +21,11 @@ Everything here is fictional and written by hand. Nothing calls a model and noth
   - an output rule ("End with one line per <entity>: ...", "Answer with one JSON object") shapes the reply,
     a reversed rule does not;
   - a unit that lists its tools offers no other: "use the <Tool> tool" is refused for a tool it does not list;
+  - after a compaction (in a resumed session that recorded one), a standing rule that asks to read again makes the
+    fake read, before the work resumes, every file the rule names and, for "this file", the standing file the rule
+    sits in. The rule is found by the compaction wordings the estate scanner reads (a compaction, compacted,
+    auto-compact, the context window fills up or is full, the context is summarised) next to a read-again verb; a
+    part that names no file ("the open tracker note") is read by nothing;
   - an ordering clause whose later part names the unit's own work holds vacuously; one that names nothing the
     unit does stops the fake as unresolved.
   A tool that ran and failed leaves the actions that wait on it undone; the others go on. A refused action
