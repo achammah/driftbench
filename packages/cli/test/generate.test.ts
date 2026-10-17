@@ -158,7 +158,7 @@ describe('driftbench generate', () => {
     // The spec files of specs/; the workbook seed folders (`.seed-<id>/`) sit beside them.
     expect(
       Object.keys(before).filter((path) => path.startsWith('specs/') && !path.includes('/.seed-')),
-    ).toHaveLength(437);
+    ).toHaveLength(436);
 
     const refused = await run(
       ['generate', '--map', `${ACME}map/approved.yaml`, '--out', 'a', '--t', '2'],

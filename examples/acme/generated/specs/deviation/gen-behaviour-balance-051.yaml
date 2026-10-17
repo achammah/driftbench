@@ -50,19 +50,6 @@ blocks:
       criteria:
         - behaviour.B-008
         - flow.upgrade
-  - id: b2-identify-to-closing
-    when:
-      user: It's morgan.diaz@example.com.
-    expect:
-      stage: closing
-      stage_reported: true
-      tools:
-        - label: catalog.search
-          count: 1
-          input:
-            category: mobile
-            customer_email: morgan.diaz@example.com
-      lang: EN
 rules:
   forbidden_tools:
     - coverage.check
@@ -99,13 +86,3 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-identify
-      - block: b2-identify-to-closing
-        seeder: deviation
-        cell:
-          spec: metadata.generated.cell
-          stage_transition: identify-to-closing
-          account_lookup: most-data
-          stage: identify
-        phrase:
-          dimension: stage_transition
-          value: identify-to-closing

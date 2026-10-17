@@ -123,6 +123,27 @@ end_state:
     customer:
       subset:
         phone: "+12025550131"
+perturbations:
+  - id: p1-D9_out_of_scope
+    class: D9_out_of_scope
+    inject_at: 0
+    user: My last bill charged me twice, can you fix it?
+    expect:
+      stage: needs
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: notify_sales
+          count: 0
+      must:
+        - Acme Care
+      lang: EN
+    recovery:
+      within_blocks: 0
+      stage_after: needs
 metadata:
   generated:
     by: driftbench generate

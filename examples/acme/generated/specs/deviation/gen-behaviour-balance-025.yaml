@@ -51,19 +51,6 @@ blocks:
       criteria:
         - behaviour.B-005
         - flow.new-home
-  - id: b2-address-to-address
-    when:
-      user: The address is 21 Willow Court, Acmeville.
-    expect:
-      stage: address
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 1
-          input:
-            address: 21 Willow Court, Acmeville
-          input_closed: true
-      lang: EN
 rules:
   forbidden_tools:
     - catalog.search
@@ -99,13 +86,3 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-address
-      - block: b2-address-to-address
-        seeder: deviation
-        cell:
-          spec: metadata.generated.cell
-          stage_transition: address-to-address
-          coverage_result: not-in-map
-          stage: address
-        phrase:
-          dimension: stage_transition
-          value: address-to-address

@@ -4,6 +4,7 @@ import type { PerturbationSpec } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
 import type { PathRelation, ProposalPhrase } from '../extract/proposal';
 import type { Allocation } from './allocation';
+import type { TerminalSubsumption } from './minimal';
 import {
   type BlockDraft,
   choosePhrase,
@@ -36,6 +37,8 @@ export type SeedContext = {
   pathValues?: ReadonlyMap<PathRelation, ReadonlyMap<string, readonly number[]>>;
   dimensionIndex?: ReadonlyMap<string, number>;
   allocation?: Allocation;
+  /** Drops the terminal repeats of a walk before anything counts it. */
+  minimal?: TerminalSubsumption;
   /** Consume each completed draft immediately instead of retaining the seeder output. */
   emit?: (draft: SpecDraft) => void;
   /** Replayable disk rows: their final count keeps the existing "row X of N" titles exact. */
