@@ -305,7 +305,9 @@ can occur only on a flow that lists it. Pairs and triples must fit one such flow
 and deviation recoveries. When inventory ownership excludes cells that the relation-only target admits,
 `coverage.reachability` lists every excluded pair and triple with its reason, plus allowed counts before
 and after for each strength. A reachable cell that cannot be built stays in `coverage.actual[].uncovered`
-and in `cover.unbuilt`; missing phrases or an output budget never remove it from the target.
+and in `cover.unbuilt`; missing phrases or an output budget never remove it from the target. Each candidate
+cell is checked against the written and derived constraints, and each excluded cell finds its reasons, through
+an index keyed by the picks the constraints forbid, so these checks do not slow down as constraints accumulate.
 
 In `metadata.generated.blocks`, a move records the stage it reaches. A deviation records the stage where
 it is injected, even when its recovery moves elsewhere. These event stages match the map's reachability

@@ -13,6 +13,7 @@ import {
   tupleValues,
 } from '@agent-nexus/driftbench-space';
 import { stringify } from 'yaml';
+import { ForbidIndex } from '../extract/forbid-index';
 import { seedFolderName } from '../families/instances';
 import {
   generatedSpecText,
@@ -689,6 +690,9 @@ export function reachabilityReport(
   const before = { ...prepared, axisMap: reachability.before };
   const counts: Array<{ t: number; before: number; after: number }> = [];
   const excluded: Array<{ cell: Record<string, string>; reasons: string[] }> = [];
+  // The excluding constraints, looked up by the picks they forbid, in list order: one lookup per cell.
+  const index = new ForbidIndex();
+  for (const { forbid } of reachability.excluded) index.add(forbid);
   for (const strength of new Set([2, 3].map((t) => Math.min(t, prepared.axisMap.dimensions.length)))) {
     const original = cellsOf(before, [], strength);
     const current = cellsOf(prepared, [], strength);
@@ -696,9 +700,9 @@ export function reachabilityReport(
     counts.push({ t: strength, before: original.length, after: current.length });
     for (const { values } of original) {
       if (retained.has(cellKey(values))) continue;
-      const reasons = reachability.excluded
-        .filter(({ forbid }) => Object.entries(forbid).every(([key, value]) => values[key] === value))
-        .map(({ reason }) => reason);
+      const reasons = index
+        .within(values)
+        .map((at) => (reachability.excluded[at] as (typeof reachability.excluded)[number]).reason);
       excluded.push({
         cell: values,
         reasons:
