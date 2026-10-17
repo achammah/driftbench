@@ -45,7 +45,7 @@ span was edited by hand is refused. `approved` and `role` (`axis` or `detail`) m
 ## Commands and every option
 
 ```
-driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider anthropic|openai] [--ceiling <characters>] [--ignore <glob>]... [--force]
+driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider anthropic|openai] [--ceiling <characters>] [--ignore <glob>]... [--force] [--pointer [--labels <file>] --cassette <file> [--record] [--labeler haiku|jev|jev-unit] [--labeler-model <model>] [--labeler-threshold <p>] [--ledger <file>] [--ledger-check]]
 driftbench estate lint <map> [--ceiling <characters>] [--ignore <glob>]...
 driftbench estate approve <map> [--kind <kind>]... [--atom <id>]... [--all] [--to <file>]
 driftbench estate map <map> --to <file> [--all] [--agent <name>]
@@ -64,8 +64,45 @@ driftbench estate map <map> --to <file> [--all] [--agent <name>]
 | `--ceiling <characters>` | `40000` | the size ceiling of the standing instructions |
 | `--ignore <glob>` | none | skip the paths this glob matches, beside the defaults and the `ignore:` list of the configuration file; repeat it |
 | `--force` | off | replace an existing map; the approvals in it are lost |
+| `--pointer` | off | read the prose with the pointer reader (below) instead of the model that quotes it |
+| `--labels <file>` | the shipped `agent-rules` set | with `--pointer`: the label sets, a YAML file |
+| `--cassette <file>` | required with `--pointer` | with `--pointer`: the recorded labeler answers, JSON lines |
+| `--record` | off | with `--pointer`: on a cassette miss, call the labeler and write the answer to the cassette (a paid call) |
+| `--labeler <name>` | `haiku` | with `--pointer`: `haiku`, `jev` (one request per window) or `jev-unit` (one request per unit) |
+| `--labeler-model <model>` | `claude-haiku-5-5` for `haiku` | with `--pointer`: the model the labeler calls |
+| `--labeler-threshold <p>` | `0.5` | with `--pointer` and `jev` or `jev-unit`: the probability of yes a unit needs to take a label; the cassette keeps every probability, so a new value needs no new call |
+| `--ledger <file>` | none | with `--pointer`: the ledger of unit ids; read at the start, rewritten at the end |
+| `--ledger-check` | off | with `--pointer --ledger`: write nothing, and exit 1 when the ledger is out of date |
 
 `--replay` and `--no-model` do not go together. With neither, the scan calls a model and needs a key.
+`--pointer` replaces the model call: it does not go with `--replay` or `--no-model`, and `--cassette`,
+`--record`, `--labels` and `--ledger` need it.
+
+### The pointer reader
+
+With `--pointer`, code cuts every prose file into units by its structure (a sentence, a list item, a table
+cell, a block quote paragraph, a heading, a front matter value; a fence or a comment stays opaque). A
+labeler gets a window of numbered units and a label set, and answers a label name or `none` for each unit.
+It writes no text. Code copies every quote from the file, so an atom's quote is always a slice of the file.
+No word list and no grammar rule decides what is a rule.
+
+* A label set is a YAML list the user writes: a set name, a description, and per label a name, a
+  description, up to three examples, an optional `target: required` (the label links two units, such as a
+  gate) and an optional `atom: { kind, polarity }` (a unit with this label becomes an atom of that kind).
+  The shipped set `agent-rules` is data in this format. `none` is reserved.
+* Each unit has a ledger id: ten characters, derived once from the file, the unit's fingerprint and its
+  occurrence, then kept in the ledger file as the text changes. The ledger follows a unit through an edit
+  (unchanged, moved, changed, split, merged, deleted). It writes no times, so equal ledgers are equal bytes.
+* The cassette keeps every labeler answer, keyed by the hash of the whole request. A changed prompt, set,
+  model or cut misses, and the error names the field that differs from the nearest entry. A scan without
+  `--record` never calls a labeler, so a replay needs no key and no network.
+* The answer is checked: a label not in the set, a unit not in the window, a unit named twice, or a target
+  where none is allowed is refused and listed. A unit no accepted answer names is counted as unlabeled.
+* An atom built from a label is unapproved, `producedBy: model`, with `fields.extraction: pointer`, the unit
+  id, the set, the label and the cassette key, and one `prose_pointer` check that a person reviews.
+
+`--record` with `haiku` reads `ANTHROPIC_API_KEY`; with `jev` it reads `JEV_API_KEY` and `JEV_URL` (or
+`JEV_ROUTE`, `JEV_MODEL`). A key is never printed or written to the cassette.
 
 `estate lint`:
 

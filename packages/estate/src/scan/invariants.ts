@@ -1,4 +1,5 @@
 import type { ModelPort } from '@agent-nexus/driftbench-generate';
+import { type PointerInput, type PointerResult, pointerAtoms, pointerScan } from '../pointer';
 import type { Atom } from '../schema';
 import { AtomBuilder, codeAtoms, guardName } from './code';
 import { type ChunkRun, type ProseRefusal, runChunk } from './prose';
@@ -15,7 +16,10 @@ import { type Located, linesOf } from './text';
 /** The default ceiling on the standing instructions (standing files and memory), in characters. */
 export const DEFAULT_STANDING_CEILING = 40_000;
 
-export type ScanAtomsOptions = { port?: ModelPort; maxTokens?: number };
+/** The pointer reader's inputs but the files, which the scan takes from the estate's prose. */
+export type PointerScanOptions = Omit<PointerInput, 'files'>;
+
+export type ScanAtomsOptions = { port?: ModelPort; maxTokens?: number; pointer?: PointerScanOptions };
 
 export type ScanAtoms = {
   builder: AtomBuilder;
@@ -23,6 +27,8 @@ export type ScanAtoms = {
   refusals: ProseRefusal[];
   duplicates: string[];
   calls: number;
+  /** What the pointer reader did, when it ran instead of the model port. */
+  pointer?: PointerResult & { atoms: number; atomRefusals: string[] };
 };
 
 /** Code atoms first, in a fixed order, then each prose chunk through the model when a port is given. */
@@ -33,6 +39,27 @@ export async function scanAtoms(raw: RawEstate, options: ScanAtomsOptions = {}):
   const chunks: ChunkRun[] = [];
   const refusals: ProseRefusal[] = [];
   const duplicates: string[] = [];
+  if (options.pointer) {
+    const proseFiles = [...new Set(raw.prose.map((chunk) => chunk.file))];
+    const pointed = await pointerScan({
+      ...options.pointer,
+      files: proseFiles.map((path) => ({ path, text: files.get(path)?.text ?? '' })),
+    });
+    const built = pointerAtoms(
+      pointed.labelled,
+      new Map(proseFiles.map((path) => [path, files.get(path)?.text ?? ''])),
+      builder,
+      options.pointer.labeler.id,
+    );
+    return {
+      builder,
+      chunks,
+      refusals,
+      duplicates: built.duplicates,
+      calls: pointed.calls,
+      pointer: { ...pointed, atoms: built.accepted.length, atomRefusals: built.refusals },
+    };
+  }
   if (options.port) {
     for (const chunk of raw.prose) {
       const text = files.get(chunk.file)?.text ?? '';

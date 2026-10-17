@@ -1024,7 +1024,7 @@ Review: signed by owner on 2026-10-13.
 Reads an agent estate (its standing instructions, skills, agents, guards and settings) into a map of atoms, lints it, approves the atoms a model split from prose, exports its space map, derives the test plan, generates task specs from it, and keeps the tests true when the estate changes. The runtime today is `claude-code`. What the atoms, the plan and maintenance are is on the [estate](../estate.md) page; the Claude Code mapping is on [its adapter page](../adapters/claude-code.md). [`examples/estates/fixture`](../../examples/estates/fixture/README.md) is the estate the examples below read.
 
 ```
-driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider <name>] [--ceiling <characters>] [--ignore <glob>]... [--force]
+driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider <name>] [--ceiling <characters>] [--ignore <glob>]... [--force] [--pointer [--labels <file>] --cassette <file> [--record] [--labeler haiku|jev|jev-unit] [--labeler-model <model>] [--labeler-threshold <p>] [--ledger <file>] [--ledger-check]]
 driftbench estate lint <map> [--ceiling <characters>] [--ignore <glob>]...
 driftbench estate approve <map> [--kind <kind>]... [--atom <id>]... [--all] [--to <file>]
 driftbench estate map <map> --to <file> [--all] [--agent <name>]
@@ -1060,6 +1060,8 @@ driftbench estate stats --map <map> --plan <plan> --specs <dir> [--sessions <dir
 | `--out` | `scan`: where to write the map (YAML); `plan`: where to write the plan (YAML); `generate`: the folder for the specs and the report; required. `diff`, `impact`: also write the result as JSON |
 | `--runtime <name>` | `scan`: the runtime that reads the estate; default `claude-code` |
 | `--replay <file>` | `scan`: replay recorded answers instead of calling a model |
+| `--pointer` | `scan`: read the prose with the pointer reader: units cut by structure, a labeler points at them, code copies the quotes. Needs `--cassette`; see the topic `validate-estate-scan` |
+| `--labels <file>`, `--cassette <file>`, `--record`, `--labeler <name>`, `--labeler-model <model>`, `--labeler-threshold <p>`, `--ledger <file>`, `--ledger-check` | `scan --pointer`: the label sets, the recorded answers, record on a miss, the labeler (`haiku`, `jev`, `jev-unit`) and its model, the unit ledger and its check |
 | `--no-model` | `scan`: read the structured atoms only; no prose atom |
 | `--provider <name>` | `scan`: `anthropic` or `openai`; default the first whose key is set |
 | `--ceiling <characters>` | `scan`, `lint`: the size ceiling of the standing instructions; default 40000 |

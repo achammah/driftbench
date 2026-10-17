@@ -523,11 +523,13 @@ export {
   createAnthropicPort,
   createOpenAiPort,
   DEFAULT_ANTHROPIC_MODEL,
+  errorText,
   type FakeAnswer,
   FakeModelPort,
   type FetchLike,
   familyOf,
   type HttpOptions,
+  isRecord,
   ModelError,
   type ModelErrorCode,
   ModelErrorCodes,
@@ -537,6 +539,7 @@ export {
   PROVIDERS,
   type Provider,
   portFromEnv,
+  postJson,
 } from './model';
 export {
   analysePilot,

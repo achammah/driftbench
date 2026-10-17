@@ -11,6 +11,7 @@ import {
   loadEstateRecording,
   type MapIssue,
   parseEstateMapText,
+  pointer,
   proseInventory,
   proseInventoryLines,
   RUNTIMES,
@@ -29,12 +30,13 @@ import { registerEstateGenerateCommand } from './estate-generate';
 import { registerEstateLiveCommands } from './estate-live';
 import { registerEstateMaintainCommands } from './estate-maintain';
 import { registerEstatePlanCommands } from './estate-plan';
+import { type EstatePointerOptions, openPointer, pointerLines } from './estate-pointer';
 import { registerEstateStaticCommand } from './estate-static';
 import { registerEstateStatsCommand } from './estate-stats';
 import { registerEstateUnitCommand } from './estate-unit';
 import { mapCacheOptions } from './map-cache';
 
-export type EstateScanOptions = {
+export type EstateScanOptions = EstatePointerOptions & {
   /** More globs to skip, beside the defaults and the estate configuration. Repeatable. */
   ignore?: string[];
   runtime?: string;
@@ -75,6 +77,28 @@ export function registerEstateCommand(program: Command, io: Io, setExit: (code: 
     .option('--ceiling <characters>', 'the size ceiling of the standing instructions', '40000')
     .option('--ignore <glob>', 'skip the paths this glob matches, beside the defaults; repeat it', collect)
     .option('--force', 'replace an existing map; the approvals in it are lost')
+    .option(
+      '--pointer',
+      'read the prose with the pointer reader: units cut by structure, a labeler points at them',
+    )
+    .option(
+      '--labels <file>',
+      'with --pointer: the label sets (YAML); default is the shipped agent-rules set',
+    )
+    .option('--cassette <file>', 'with --pointer: the recorded labeler answers (JSON lines)')
+    .option('--record', 'with --pointer: call the labeler on a cassette miss and record the answer')
+    .option('--labeler <name>', 'with --pointer: haiku, jev or jev-unit', 'haiku')
+    .option('--labeler-model <model>', 'with --pointer: the model the labeler calls')
+    .option(
+      '--labeler-threshold <p>',
+      'with --pointer and jev: the probability of yes a unit needs to take a label',
+      undefined,
+    )
+    .option(
+      '--ledger <file>',
+      'with --pointer: the ledger of unit ids beside the estate; read, then rewritten',
+    )
+    .option('--ledger-check', 'with --pointer: fail when the ledger is out of date; write nothing')
     .action(async (root: string, options: EstateScanOptions) => {
       setExit(await estateScanCommand(root, options, io));
     });
@@ -149,6 +173,14 @@ export async function estateScanCommand(
     io.err('error: --no-model and --replay cannot be used together\n');
     return 2;
   }
+  if (options.pointer && (options.model === false || options.replay)) {
+    io.err('error: --pointer cannot be used with --no-model or --replay: the cassette replays the labeler\n');
+    return 2;
+  }
+  if (!options.pointer && (options.cassette || options.record || options.ledger || options.labels)) {
+    io.err('error: --cassette, --record, --ledger and --labels need --pointer\n');
+    return 2;
+  }
   const ceiling = parseCeiling(options.ceiling, io);
   if (ceiling === undefined) return 2;
   const root = resolve(io.cwd, rootArg);
@@ -163,7 +195,7 @@ export async function estateScanCommand(
   }
 
   let port: ModelPort | undefined;
-  if (options.model !== false) {
+  if (options.model !== false && !options.pointer) {
     if (options.replay) {
       const recording = resolve(io.cwd, options.replay);
       const loaded = await loadEstateRecording(recording);
@@ -183,18 +215,37 @@ export async function estateScanCommand(
     }
   }
 
-  const result = await scanEstate({
-    root,
-    reader,
-    rootLabel: label(out, root),
-    ceiling,
-    ...(port ? { port } : {}),
-    ...(deps.now ? { now: deps.now } : {}),
-  });
+  const handle = options.pointer ? await openPointer(options, io, deps.env ?? process.env) : undefined;
+  if (options.pointer && !handle) return 2;
+
+  let result: ScanEstateResult;
+  try {
+    result = await scanEstate({
+      root,
+      reader,
+      rootLabel: label(out, root),
+      ceiling,
+      ...(port ? { port } : {}),
+      ...(handle ? { pointer: handle.scan } : {}),
+      ...(deps.now ? { now: deps.now } : {}),
+    });
+  } catch (cause) {
+    if (cause instanceof pointer.CassetteMiss || cause instanceof pointer.LabelerConfigError) {
+      io.err(`${cause.message}\n`);
+      return 2;
+    }
+    throw cause;
+  }
   if (!(await writeOut(out, renderEstateMap(result.map), io))) return 2;
   io.out(scanReport(result, out, io));
-  const failed = result.chunks.some((run) => run.status === 'failed');
-  return failed || result.refusals.length > 0 ? 1 : 0;
+  const closing = handle ? await handle.finish(result) : 0;
+  if (closing === 2) return 2;
+  const failed =
+    result.chunks.some((run) => run.status === 'failed') ||
+    (result.pointer?.failed.length ?? 0) > 0 ||
+    (result.pointer?.refusals.length ?? 0) > 0 ||
+    (result.pointer?.atomRefusals.length ?? 0) > 0;
+  return failed || result.refusals.length > 0 || closing !== 0 ? 1 : 0;
 }
 
 /** What the reader skipped, per glob, so an owner sees what the ignore list hides. */
@@ -226,8 +277,10 @@ function scanReport(result: ScanEstateResult, out: string, io: Io): string {
       `    ${kind.padEnd(width)}  ${String(atoms.length).padStart(3)}${model > 0 ? `  (${model} by the model)` : ''}`,
     );
   }
-  const prose = proseInventoryLines(proseInventory(result.raw), result.chunks.length > 0);
-  if (result.chunks.length === 0)
+  const prose = proseInventoryLines(proseInventory(result.raw), result.chunks.length > 0 || !!result.pointer);
+  if (result.pointer) {
+    lines.push(...prose, ...pointerLines(result));
+  } else if (result.chunks.length === 0)
     lines.push('  No model call: structured atoms only (--no-model).', ...prose);
   else {
     lines.push(...prose);
