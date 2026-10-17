@@ -2046,6 +2046,15 @@ export function vectorOf(block: BlockRun): string {
   return vector;
 }
 
+/**
+ * Two blocks are the same test when their Given (the world, tool answers included), their stage and cell, and
+ * their Then are equal, and every agent makes the same of them (docs/validators.md, generator section). The user
+ * wording, the channel and the persona are not part of it.
+ */
+export function sameTestKey(block: BlockRun): string {
+  return JSON.stringify([block.given, vectorOf(block)]);
+}
+
 /** A deleted stimulus cannot leave a placement or perturbation behind as a phantom witness. */
 function removeBlock(spec: Spec, index: number): Spec {
   const reduced = structuredClone(spec);
@@ -2177,7 +2186,7 @@ function minimalityItems(): BankItem[] {
           return verdict(false, `no block kills ${cls.id}, so there is no test set to judge`);
         const groups = new Map<string, BlockRun[]>();
         for (const block of found)
-          groups.set(vectorOf(block), [...(groups.get(vectorOf(block)) ?? []), block]);
+          groups.set(sameTestKey(block), [...(groups.get(sameTestKey(block)) ?? []), block]);
         const redundant: BlockRun[][] = [];
         for (const group of groups.values())
           if (group.length > 1 && (await hasRemovable(data, group))) redundant.push(group);
@@ -2208,10 +2217,7 @@ function minimalityItems(): BankItem[] {
         const family = (block: BlockRun) => block.spec.replace(/-\d+$/, '');
         const groups = new Map<string, BlockRun[]>();
         for (const block of blocks)
-          groups.set(`${block.when}|${vectorOf(block)}`, [
-            ...(groups.get(`${block.when}|${vectorOf(block)}`) ?? []),
-            block,
-          ]);
+          groups.set(sameTestKey(block), [...(groups.get(sameTestKey(block)) ?? []), block]);
         const redundant: BlockRun[][] = [];
         for (const group of groups.values()) {
           if (group.length < 2 || (seeder === 'metamorphic' && new Set(group.map(family)).size === 1))

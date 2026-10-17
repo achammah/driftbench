@@ -8,6 +8,8 @@ import { defaultChecks } from '@agent-nexus/driftbench-checks';
 import {
   type AgentAdapter,
   type Check,
+  canonicalGiven,
+  contentHash,
   enterBlock,
   initialGiven,
   type LoadedSpec,
@@ -113,6 +115,12 @@ export type BlockRun = {
   deviation?: string;
   injected: boolean;
   signature: string;
+  /**
+   * What the block runs in apart from its Then and its wording: the world it starts from (tool answers
+   * included), the stage it is said from and its own cell. Two blocks are the same test when this and the
+   * Then and outcomes are equal (docs/validators.md, generator section).
+   */
+  given: string;
   when: string;
   cell: Record<string, string>;
   tags: string[];
@@ -404,6 +412,15 @@ export function seederOf(spec: Spec): string {
 }
 
 /** A block's placement is recorded by the generator, independently of what any agent does. */
+/** The world a block starts from, the stage it is said from and its own cell, as one hash. */
+export function givenOf(spec: Spec, index: number): string {
+  return contentHash({
+    state: canonicalGiven(spec, index).state,
+    from: index === 0 ? spec.stages?.[0] : spec.blocks[index - 1]?.expect?.stage,
+    cell: blockCell(spec, index),
+  });
+}
+
 function blockPlacement(spec: Spec, index: number): Pick<BlockRun, 'key' | 'seeder' | 'cell'> {
   return {
     key: `${spec.id}#${spec.blocks[index]?.id ?? index}`,
@@ -582,6 +599,7 @@ export async function runAll(generated: Generation, parts: GeneratorParts = {}):
         ...(deviation === undefined ? {} : { deviation }),
         injected: 'injection' in (block.when ?? {}),
         signature: machineSignature(spec, index),
+        given: givenOf(spec, index),
         when: block.when ? stimulusText(block.when) : '',
         tags: [...(spec.tags ?? [])],
         reference: references.map((result) => blockOutcome(result, index)),
