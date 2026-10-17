@@ -152,8 +152,33 @@ export type CauseKey =
   | 'L25'
   | 'L26'
   | 'L27'
-  | 'L28'
   | 'L29'
+  | 'LD1'
+  | 'LD2'
+  | 'LD3'
+  | 'LD4'
+  | 'LD5'
+  | 'LD6'
+  | 'LD7'
+  | 'LD8'
+  | 'LD9'
+  | 'LD10'
+  | 'LD11'
+  | 'LD12'
+  | 'LD13'
+  | 'LD14'
+  | 'LD15'
+  | 'LD16'
+  | 'LD17'
+  | 'LD18'
+  | 'LD19'
+  | 'LD20'
+  | 'LD21'
+  | 'LD22'
+  | 'LD23'
+  | 'LD24'
+  | 'LD25'
+  | 'LD26'
   | 'ST1'
   | 'ST2'
   | 'ST3'
@@ -669,20 +694,120 @@ export const CAUSES: Readonly<Record<CauseKey, { text: string; contract: string 
   L24: { text: '`retry.max_attempts` is from 1 to 20.', contract: 'docs/reference/spec.md#RetrySettings' },
   L25: { text: "A criterion's `threshold` is from 0 to 1.", contract: 'docs/reference/spec.md#CriterionDef' },
   L26: {
-    text: 'The loader checks the patterns of the regex list of expect (REGEX_INVALID), as it does those of must and must_not.',
-    contract: 'docs/reference/cli.md#Issue codes',
+    text: 'The loader checks the patterns of the regex list of expect (REGEX_INVALID): spec.md and checks.md name regex as a list of regular expressions the visible text must match.',
+    contract: 'docs/reference/spec.md#Expect',
   },
   L27: {
     text: 'The loader checks the regex assertion of a json path (REGEX_INVALID).',
     contract: 'docs/reference/cli.md#Issue codes',
   },
-  L28: {
-    text: 'The loader checks a regex assertion nested in a subset assertion of a tool input or an end state (REGEX_INVALID).',
-    contract: 'docs/reference/cli.md#Issue codes',
-  },
   L29: {
     text: 'The loader checks the patterns in the expectations of a perturbation (REGEX_INVALID).',
-    contract: 'docs/reference/cli.md#Issue codes',
+    contract: 'docs/reference/spec.md#Expect',
+  },
+  LD1: {
+    text: 'The as-given rung reads the expected writing as a whole token when a punctuation mark follows it.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD2: {
+    text: 'The as-given rung treats an underscore as a token boundary: only letters and digits join a token.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD3: {
+    text: 'The as-given rung treats an accented letter as a letter: the expected writing next to one is no whole token.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD4: {
+    text: 'The as-given rung treats a digit or a letter next to the expected writing as part of a longer token.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD5: {
+    text: 'The as-given rung finds the expected writing as a token at the start and the end of a message.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD6: {
+    text: 'The as-given rung reads the user messages of the blocks before the call.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD7: {
+    text: 'The as-given rung reads no user message of a block after the call.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD8: {
+    text: 'The as-given rung fails an earlier value kept after the user corrected it in a later message, and names the correction.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD9: {
+    text: 'The as-given rung decides nothing when the value and the expected writing sit in one message.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD10: {
+    text: 'The as-given rung never passes a copy: the exact fallback fails it with the non-gating no_decider lint.',
+    contract: 'docs/reference/block-contracts.md#As given rung',
+  },
+  LD11: {
+    text: 'A named compare mode runs only the item that implements it, whatever the other items could decide.',
+    contract: 'docs/reference/block-contracts.md#Value ladder',
+  },
+  LD12: {
+    text: 'A compare by argument name gives each argument its own mode.',
+    contract: 'docs/reference/block-contracts.md#Value ladder',
+  },
+  LD13: {
+    text: 'A named compare mode that cannot apply leaves the value to the exact fallback.',
+    contract: 'docs/reference/block-contracts.md#Value ladder',
+  },
+  LD14: {
+    text: 'The contract rung fails two different members of an enum and names the keyword in its evidence.',
+    contract: 'docs/reference/block-contracts.md#Contract rung',
+  },
+  LD15: {
+    text: 'The contract rung passes nothing: a value inside the stated pattern goes on to the exact fallback.',
+    contract: 'docs/reference/block-contracts.md#Contract rung',
+  },
+  LD16: {
+    text: 'The contract rung fails a value that is not the const of the field.',
+    contract: 'docs/reference/block-contracts.md#Contract rung',
+  },
+  LD17: {
+    text: 'Each leaf of a subset assertion goes through the ladder and its decision names the dotted path.',
+    contract: 'docs/reference/block-contracts.md#Value ladder',
+  },
+  LD18: {
+    text: 'The assertion forms regex, contains, one_of, nonempty and absent compare as written: no ladder entry and no lint.',
+    contract: 'docs/reference/block-contracts.md#Other assertion forms',
+  },
+  LD19: {
+    text: 'A value equal to the expected one passes before any item, with no ladder entry and no lint.',
+    contract: 'docs/reference/block-contracts.md#Identity',
+  },
+  LD20: {
+    text: 'The argument accuracy counts the matched arguments and never gates.',
+    contract: 'docs/reference/block-contracts.md#Value ladder',
+  },
+  LD21: {
+    text: 'The no_decider lint fails without gating and names what would settle the value.',
+    contract: 'docs/reference/block-contracts.md#Exact fallback',
+  },
+  LD22: {
+    text: 'A compare exact passes only the exact value and prints <value> is not exactly <expected> (<reason>) on a fail.',
+    contract: 'docs/reference/block-contracts.md#Exact by declaration',
+  },
+  LD23: {
+    text: 'Under compare exact no other item runs and no no_decider lint is added.',
+    contract: 'docs/reference/block-contracts.md#Exact by declaration',
+  },
+  LD24: {
+    text: 'Each value of each call is decided on its own: the ladder entries name their call and only the decided values appear.',
+    contract: 'docs/reference/block-contracts.md#Value ladder',
+  },
+  LD25: {
+    text: 'A uses object disabling a value-check item takes the item out of the ladder, and a block uses replaces the spec choice.',
+    contract: 'docs/reference/block-contracts.md#Value ladder',
+  },
+  LD26: {
+    text: 'The loader accepts the documented compare modes and refuses any other word.',
+    contract: 'docs/reference/block-contracts.md#Value ladder',
   },
   ST1: {
     text: 'A block the tailoring does not reach keeps the shipped stamp `check-set:default@hash8`, layer shipped.',

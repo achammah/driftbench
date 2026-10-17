@@ -108,6 +108,8 @@ export type BlockDef = {
   /** Extra keys of the block itself (`parent`, for instance). */
   extra?: Record<string, unknown>;
   budget?: Record<string, unknown>;
+  /** The words the user writes, built around the block's marker word (the agent finds its plan by the marker). */
+  say?: (marker: string) => string | [string, string];
 };
 
 export type Scenario = {
@@ -138,9 +140,16 @@ export function scenario(
     seconds.push(second);
     ids.push(id);
     plans.set(user, def.plan);
+    const said = def.say?.(user);
     return {
       id,
-      ...(def.burst ? { burst: [user, second] } : { user }),
+      ...(Array.isArray(said)
+        ? { burst: said }
+        : said !== undefined
+          ? { user: said }
+          : def.burst
+            ? { burst: [user, second] }
+            : { user }),
       ...(def.given ? { given: def.given } : {}),
       ...(def.expect ? { expect: def.expect } : {}),
       ...(def.budget ? { budget: def.budget } : {}),

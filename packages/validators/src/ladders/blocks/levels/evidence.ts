@@ -21,13 +21,13 @@ type Names = {
   tool2: string;
   skill: string;
   skill2: string;
-  /** `.claude/skills/<skill>/SKILL.md`, a reference and a script of the skill, a helper, a hook, the core file. */
+  /** `.claude/skills/<skill>/SKILL.md`, a reference and a script of the skill, a helper, a guard file, the core file. */
   body: string;
   ref: string;
   ref2: string;
   script: string;
   helper: string;
-  hook: string;
+  guardFile: string;
   core: string;
   atom: (tag: string) => string;
   word: (tag: string) => string;
@@ -48,7 +48,7 @@ function names(seed: number, id: string): Names {
     ref2: `.claude/skills/${skill}/references/${t('ref2')}.md`,
     script: `.claude/skills/${skill}/scripts/${t('script')}.py`,
     helper: `.claude/agents/${t('helper')}.md`,
-    hook: `.claude/hooks/${t('hook')}.py`,
+    guardFile: `.claude/guards/${t('guard-file')}.py`,
     core: `${t('core').toUpperCase()}.md`,
     atom: (tag) => `a.${t(`atom:${tag}`, 8)}`,
     // Letters only: a value's digits decide `agent_derived`, so no seeded word may carry one by chance.
@@ -332,7 +332,7 @@ const NAMES: Name[] = [
           ['skill-script-file', 'rule', 'script', 'skill_script'],
           ['skill-other-file', 'rule', 'ref', 'skill_reference'],
           ['helper-file', 'rule', 'helper', 'helper'],
-          ['hook-file', 'rule', 'hook', 'guard'],
+          ['guard-file', 'rule', 'guardFile', 'guard'],
           ['core-file', 'rule', 'core', 'core'],
         ] as const
       ).map(
@@ -1435,7 +1435,7 @@ const NAMES: Name[] = [
               ruleAtoms: [a],
               atoms: [
                 atom(a, 'rule', n.core, { enforcement: [e] }),
-                atom(e, 'guard', n.hook, { fields: { name: n.word('enf') } }),
+                atom(e, 'guard', n.guardFile, { fields: { name: n.word('enf') } }),
               ],
               decisions: [
                 { check: g, verdict: 'deny' },
@@ -2203,7 +2203,7 @@ const NAMES: Name[] = [
         build: (n) => {
           const a = n.atom('a');
           return {
-            input: input(onTool(n), { ruleAtoms: [a], atoms: [atom(a, 'rule', n.hook)] }),
+            input: input(onTool(n), { ruleAtoms: [a], atoms: [atom(a, 'rule', n.guardFile)] }),
             want: 'none',
           };
         },
