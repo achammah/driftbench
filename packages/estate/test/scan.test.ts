@@ -86,7 +86,7 @@ describe('the Claude Code reader', () => {
       'allow Grep',
       'allow Glob',
       'allow Bash(git status)',
-      'allow Bash(python3 *)',
+      'allow Bash(python3 tools/*)',
       'deny Bash(git push --force:*)',
       'deny Bash(rm -rf:*)',
       'deny WebFetch',
