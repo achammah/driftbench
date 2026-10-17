@@ -41,6 +41,21 @@ async function fixtureCopy(): Promise<string> {
 }
 
 describe('driftbench estate scan', () => {
+  it('reports an ambiguous table without inventing an automatic route', async () => {
+    const root = await fixtureCopy();
+    await writeFile(
+      join(root, 'CLAUDE.md'),
+      '| A | B |\n|---|---|\n| Inspect the crate seals | `invoice-reconcile` |\n| internal | `invoice-reconcile` |',
+    );
+    const result = await run(['estate', 'scan', '.', '--no-model', '--out', 'map.yaml'], root);
+    expect(result.code).toBe(0);
+    expect(result.out).toContain('CLAUDE.md: Ambiguous routing table');
+    const loaded = await loadEstateMap(join(root, 'map.yaml'));
+    expect(
+      loaded.ok && loaded.map.atoms.filter((atom) => atom.kind === 'route' && atom.fields?.via === 'table'),
+    ).toEqual([]);
+  });
+
   it('refuses an unknown --provider before any model call, and writes nothing', async () => {
     const root = await fixtureCopy();
     const result = await run(['estate', 'scan', '.', '--out', 'map.yaml', '--provider', 'bogus'], root);
@@ -58,11 +73,12 @@ describe('driftbench estate scan', () => {
     expect(result.err).toBe('');
     expect(result.code).toBe(0);
     expect(result.out).toContain(
-      'Wrote map.yaml: 125 atoms (68 read by code and approved, 57 split from prose by the model and waiting for approval), 54 edges.',
+      'Wrote map.yaml: 126 atoms (69 read by code and approved, 57 split from prose by the model and waiting for approval), 55 edges.',
     );
     expect(result.out).toMatch(/instruction\s+43 {2}\(43 by the model\)/);
     expect(result.out).toContain(
-      'Prose: 14 chunks, 6775 characters (standing 1, memory 2, skill bodies 4, skill files 4, helper bodies 3).',
+      // The fixture's weekly-report template is a template document, so no chunk of it is sent to the model.
+      'Prose: 14 chunks, 6835 characters (standing 1, memory 2, skill bodies 4, skill files 4, helper bodies 3).',
     );
     expect(result.out).not.toContain('Unanswered prose chunks');
     expect(result.out).toContain('Refused: none.');
@@ -83,8 +99,10 @@ describe('driftbench estate scan', () => {
       elsewhere,
     );
     expect(result.code).toBe(0);
-    expect(result.out).toContain('No model call: structured atoms only (--no-model).');
-    expect(result.out).toContain('Unanswered prose chunks (no model call): 14, 6775 characters.');
+    expect(result.out).toContain(
+      'No model call: structured atoms and code-found prose candidates (--no-model).',
+    );
+    expect(result.out).toContain('Unanswered prose chunks (no model call): 14, 6835 characters.');
     expect(result.out).toContain(
       '    .claude/skills/invoice-reconcile/references/matching-rules.md  261 characters\n',
     );
@@ -240,14 +258,14 @@ describe('driftbench estate lint, approve and map', () => {
 
     const pending = await run(['estate', 'approve', 'map.yaml'], root);
     expect(pending.code).toBe(0);
-    expect(pending.out).toContain('map.yaml: 57 of 125 atoms wait for approval.');
+    expect(pending.out).toContain('map.yaml: 57 of 126 atoms wait for approval.');
     const kind = await run(
       ['estate', 'approve', 'map.yaml', '--kind', 'register', '--to', 'registers.yaml'],
       root,
     );
     expect(kind.out).toBe('Approved 10 atoms in registers.yaml; 0 were already approved.\n');
     const all = await run(['estate', 'approve', 'registers.yaml', '--all', '--to', 'approved.yaml'], root);
-    expect(all.out).toBe('Approved 47 atoms in approved.yaml; 78 were already approved.\n');
+    expect(all.out).toBe('Approved 47 atoms in approved.yaml; 79 were already approved.\n');
     expect((await run(['estate', 'approve', 'map.yaml', '--kind', 'rule'], root)).code).toBe(1);
     expect((await run(['estate', 'approve', 'map.yaml', '--all', '--kind', 'gate'], root)).code).toBe(2);
     expect(

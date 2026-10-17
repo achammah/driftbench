@@ -1,3 +1,4 @@
+import type { DocumentInfo } from '../schema';
 import type { Located } from './text';
 
 /**
@@ -21,8 +22,27 @@ export const FILE_KINDS = [
 ] as const;
 export type FileKind = (typeof FILE_KINDS)[number];
 
+/**
+ * The name the user-level skill layer goes by in the paths of a map: the folder the runtime loads a user's own
+ * skills from, whatever folder the reader read them in. A file of the layer has `layer: 'user'`; it is no file
+ * of the project, so a copy of the project holds none of them.
+ */
+export const USER_LAYER = '~/.claude/skills';
+
 /** One file of the estate. `owner` names the skill a skill file belongs to. */
-export type EstateFile = { path: string; kind: FileKind; text: string; owner?: string };
+export type EstateFile = {
+  path: string;
+  kind: FileKind;
+  text: string;
+  owner?: string;
+  document?: DocumentInfo;
+  layer?: 'user';
+};
+
+/** Whether a path of the map is a file of the user-level skill layer. */
+export function isUserLayerPath(path: string): boolean {
+  return path === USER_LAYER || path.startsWith(`${USER_LAYER}/`);
+}
 
 /** A value read from a declaration, with the passage it was read from. */
 export type Read<T> = { value: T; at: Located };
@@ -112,6 +132,9 @@ export type RegistryRow = {
   verdict?: string;
   /** Its rollout or enforcement state, when the registry writes one. */
   state?: string;
+  /** What the registry says this check means, verbatim, independent of rule-label links. */
+  description?: string;
+  descriptionAt?: Located;
   /** `catalogue` for a row the reader made from a catalogue entry; absent for a registry row. */
   origin?: 'catalogue';
   at: Located;
@@ -131,7 +154,20 @@ export type StepDecl = {
 };
 
 /** A passage of prose a model splits into atoms: the body of an instruction file. */
-export type ProseChunk = { id: string; file: string; startLine: number; endLine: number; text: string };
+export type ProseChunk = {
+  id: string;
+  file: string;
+  startLine: number;
+  endLine: number;
+  text: string;
+  /** Tables code cannot classify: the model must decide, rather than inherit a guessed route. */
+  ambiguousRouting?: Array<{
+    startLine: number;
+    endLine: number;
+    targets: Array<{ name: string; kind: 'skill' | 'subagent' }>;
+    dispatch: string;
+  }>;
+};
 
 /** A problem a reader met: a file it could not parse, a declaration with a missing field. */
 export type ReadNote = { file: string; message: string };
@@ -157,6 +193,13 @@ export type RawEstate = {
    * from the naming file's folder or the root (for Claude Code, `.claude` and `.claude/skills`).
    */
   bases?: string[];
+  /** Links, relative to the root, that the reader read through to a real path outside the root. */
+  followedLinks?: string[];
+  /**
+   * The user-level skill layer: the skills read from it, those left out because a project skill has the same
+   * name. Absent when the reader was given no user skill folder.
+   */
+  userLayer?: { read: string[]; shadowed: string[] };
   /** What the reader skipped: each glob with the files it matched, and the paths of those files. */
   ignored?: {
     patterns: Array<{ pattern: string; files: number }>;

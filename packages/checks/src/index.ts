@@ -5,6 +5,7 @@
  * budget, end state and the
  * checks users register. `defaultChecks()` returns them all, in the order the runner applies them.
  */
+export { absence } from './checks/absence';
 export { artifacts } from './checks/artifacts';
 export { budget } from './checks/budget';
 export { cards } from './checks/cards';

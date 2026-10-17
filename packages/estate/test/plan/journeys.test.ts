@@ -7,7 +7,7 @@ describe('journeys over the estate graph', () => {
     const map = await approvedFixture();
     const entries = entryNodes(
       map.atoms,
-      map.edges.filter((edge) => ['route', 'reference', 'dispatch', 'next'].includes(edge.kind)),
+      map.edges.filter((edge) => ['route', 'reference', 'script', 'dispatch', 'next'].includes(edge.kind)),
     );
     expect(entries.filter((id) => id.startsWith('route.'))).toHaveLength(6);
     expect(entries.every((id) => !id.startsWith('route.') || id.startsWith('route.standing.'))).toBe(true);
@@ -15,7 +15,7 @@ describe('journeys over the estate graph', () => {
     expect(entries).not.toContain(START);
   });
 
-  it('covers every route, reference, dispatch and next edge the standing instructions lead to', async () => {
+  it('covers every route, reference, script, dispatch and next edge the standing instructions lead to', async () => {
     const map = await approvedFixture();
     const result = planJourneys(map);
     const walked = new Set(
@@ -87,7 +87,7 @@ describe('journeys over the estate graph', () => {
   it('gives no journey for a map with no journey edge', async () => {
     const map = edited(await approvedFixture(), (copy) => {
       copy.edges = copy.edges.filter(
-        (edge) => !['route', 'reference', 'dispatch', 'next'].includes(edge.kind),
+        (edge) => !['route', 'reference', 'script', 'dispatch', 'next'].includes(edge.kind),
       );
     });
     expect(planJourneys(map)).toEqual({ journeys: [], edges: [], uncovered: [] });

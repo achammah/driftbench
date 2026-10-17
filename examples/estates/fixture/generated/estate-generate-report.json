@@ -3,29 +3,30 @@
   "map": {
     "path": "../approved.yaml",
     "runtime": "claude-code",
-    "hash": "be2e7a0919cb31aecf73102cd271e7611cb439be814983a47b9dc39e38775f10",
-    "atoms": 125
+    "hash": "e48ea73788c2fb36e8def0b10b39a3551139beb107f54959237f272c2aa7ba41",
+    "atoms": 126
   },
   "plan": {
     "path": "../../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml",
-    "rows": 1568,
-    "approved": 1568,
+    "rows": 1569,
+    "approved": 1569,
     "proposed": 0,
     "struck": 0
   },
   "phrases": {
     "path": "../phrases.yaml",
-    "situations": 26,
-    "phrases": 50,
+    "situations": 31,
+    "phrases": 60,
     "workspaces": 5
   },
   "sessions": {
     "path": "../sessions/index.yaml",
-    "sessions": 3
+    "sessions": 9
   },
   "options": {
     "seed": 1,
     "checks": [
+      "absence",
       "grounded_values",
       "guard_finished",
       "guard_message",
@@ -41,17 +42,325 @@
     "judge": true
   },
   "summary": {
-    "specs": 1568,
-    "blocks": 1563,
-    "complete": 1360,
-    "incomplete": 208,
-    "judged": 348
+    "specs": 1562,
+    "blocks": 1557,
+    "complete": 1544,
+    "incomplete": 18,
+    "judged": 465
+  },
+  "incomplete": [
+    {
+      "spec": "estate.obligation.instruction.standing.read-the-memory-index-at-the",
+      "path": "incomplete/live/obligation/estate.obligation.instruction.standing.read-the-memory-index-at-the.yaml",
+      "row": "obligation.instruction.standing.read-the-memory-index-at-the",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.twin.instruction.standing.read-the-memory-index-at-the",
+      "path": "incomplete/live/twin/estate.twin.instruction.standing.read-the-memory-index-at-the.yaml",
+      "row": "twin.instruction.standing.read-the-memory-index-at-the",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.skip_pressure.gate.standing.write-a-helper-s-brief-before",
+      "path": "incomplete/live/skip_pressure/estate.skip_pressure.gate.standing.write-a-helper-s-brief-before.yaml",
+      "row": "skip_pressure.gate.standing.write-a-helper-s-brief-before",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "gate.standing.write-a-helper-s-brief-before",
+          "detail": "no task in the atom's words (gate.standing.write-a-helper-s-brief-before (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.guard_negative.guard.settings.userpromptsubmit-guard-stop-word-sh",
+      "path": "incomplete/unit/guard_negative/estate.guard_negative.guard.settings.userpromptsubmit-guard-stop-word-sh.yaml",
+      "row": "guard_negative.guard.settings.userpromptsubmit-guard-stop-word-sh",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "guard.settings.userpromptsubmit-guard-stop-word-sh",
+          "detail": "no task in the atom's words (guard.settings.userpromptsubmit-guard-stop-word-sh (rule)): the guard documents no rule or watched act to come near"
+        }
+      ]
+    },
+    {
+      "spec": "estate.guard_negative.guard.settings.stop-guard-reply-length-py",
+      "path": "incomplete/unit/guard_negative/estate.guard_negative.guard.settings.stop-guard-reply-length-py.yaml",
+      "row": "guard_negative.guard.settings.stop-guard-reply-length-py",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "guard.settings.stop-guard-reply-length-py",
+          "detail": "no task in the atom's words (guard.settings.stop-guard-reply-length-py (rule)): the guard documents no rule or watched act to come near"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0070",
+      "path": "incomplete/live/obligation/estate.pairwise.0070.yaml",
+      "row": "pairwise.0070",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0102",
+      "path": "incomplete/live/obligation/estate.pairwise.0102.yaml",
+      "row": "pairwise.0102",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0180",
+      "path": "incomplete/live/obligation/estate.pairwise.0180.yaml",
+      "row": "pairwise.0180",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0338",
+      "path": "incomplete/live/obligation/estate.pairwise.0338.yaml",
+      "row": "pairwise.0338",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0417",
+      "path": "incomplete/live/obligation/estate.pairwise.0417.yaml",
+      "row": "pairwise.0417",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0498",
+      "path": "incomplete/live/obligation/estate.pairwise.0498.yaml",
+      "row": "pairwise.0498",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0576",
+      "path": "incomplete/live/obligation/estate.pairwise.0576.yaml",
+      "row": "pairwise.0576",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0702",
+      "path": "incomplete/live/obligation/estate.pairwise.0702.yaml",
+      "row": "pairwise.0702",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0811",
+      "path": "incomplete/live/obligation/estate.pairwise.0811.yaml",
+      "row": "pairwise.0811",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.0911",
+      "path": "incomplete/live/obligation/estate.pairwise.0911.yaml",
+      "row": "pairwise.0911",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.1027",
+      "path": "incomplete/live/obligation/estate.pairwise.1027.yaml",
+      "row": "pairwise.1027",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.1100",
+      "path": "incomplete/live/obligation/estate.pairwise.1100.yaml",
+      "row": "pairwise.1100",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    },
+    {
+      "spec": "estate.pairwise.1172",
+      "path": "incomplete/live/obligation/estate.pairwise.1172.yaml",
+      "row": "pairwise.1172",
+      "reasons": [
+        {
+          "marker": "needs-askable-act",
+          "atom": "instruction.standing.read-the-memory-index-at-the",
+          "detail": "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
+        }
+      ]
+    }
+  ],
+  "equivalence": {
+    "collapsed": 7,
+    "groups": [
+      {
+        "spec": "estate.route_positive.route.supplier-email.an-ask-that-fits-supplier-email.1",
+        "count": 2,
+        "atoms": [
+          "route.supplier-email.an-ask-that-fits-supplier-email",
+          "skill.supplier-email.skill-supplier-email"
+        ],
+        "rows": [
+          "route_positive.route.supplier-email.an-ask-that-fits-supplier-email.1",
+          "route_positive.route.supplier-email.an-ask-that-fits-supplier-email.3"
+        ]
+      },
+      {
+        "spec": "estate.route_positive.route.ledger-auditor.an-ask-that-fits-ledger-auditor.1",
+        "count": 2,
+        "atoms": [
+          "route.ledger-auditor.an-ask-that-fits-ledger-auditor",
+          "subagent.ledger-auditor.helper-ledger-auditor"
+        ],
+        "rows": [
+          "route_positive.route.ledger-auditor.an-ask-that-fits-ledger-auditor.1",
+          "route_positive.route.ledger-auditor.an-ask-that-fits-ledger-auditor.3"
+        ]
+      },
+      {
+        "spec": "estate.route_positive.route.route-planner.an-ask-that-fits-route-planner.1",
+        "count": 2,
+        "atoms": [
+          "route.route-planner.an-ask-that-fits-route-planner",
+          "subagent.route-planner.helper-route-planner"
+        ],
+        "rows": [
+          "route_positive.route.route-planner.an-ask-that-fits-route-planner.1",
+          "route_positive.route.route-planner.an-ask-that-fits-route-planner.3"
+        ]
+      },
+      {
+        "spec": "estate.route_positive.route.standing.an-ask-to-write-to-or.1",
+        "count": 2,
+        "atoms": ["route.standing.an-ask-to-write-to-or", "skill.supplier-email.skill-supplier-email"],
+        "rows": [
+          "route_positive.route.standing.an-ask-to-write-to-or.1",
+          "route_positive.route.standing.an-ask-to-write-to-or.3"
+        ]
+      },
+      {
+        "spec": "estate.route_positive.route.standing.an-ask-to-prepare-the-weekly.1",
+        "count": 2,
+        "atoms": ["route.standing.an-ask-to-prepare-the-weekly", "skill.weekly-report.skill-weekly-report"],
+        "rows": [
+          "route_positive.route.standing.an-ask-to-prepare-the-weekly.1",
+          "route_positive.route.standing.an-ask-to-prepare-the-weekly.3"
+        ]
+      },
+      {
+        "spec": "estate.route_positive.route.standing.an-ask-to-audit-the-ledger.1",
+        "count": 2,
+        "atoms": [
+          "route.standing.an-ask-to-audit-the-ledger",
+          "subagent.ledger-auditor.helper-ledger-auditor"
+        ],
+        "rows": [
+          "route_positive.route.standing.an-ask-to-audit-the-ledger.1",
+          "route_positive.route.standing.an-ask-to-audit-the-ledger.3"
+        ]
+      },
+      {
+        "spec": "estate.route_positive.route.standing.an-ask-to-plan-the-delivery.1",
+        "count": 2,
+        "atoms": [
+          "route.standing.an-ask-to-plan-the-delivery",
+          "subagent.route-planner.helper-route-planner"
+        ],
+        "rows": [
+          "route_positive.route.standing.an-ask-to-plan-the-delivery.1",
+          "route_positive.route.standing.an-ask-to-plan-the-delivery.3"
+        ]
+      }
+    ]
+  },
+  "quality": {
+    "completeShare": 0.9884763124199744,
+    "askedTests": 1536,
+    "distinctAsks": 132,
+    "distinctAsksPer100": 8.59375
   },
   "unit": {
-    "tests": 26,
+    "tests": 29,
     "guards": 6,
     "scripts": 2,
-    "cases": 54,
+    "helpers": 3,
+    "cases": 59,
     "checks": {
       "tested": 0,
       "needsTrigger": 0,
@@ -61,29 +370,28 @@
   },
   "sources": {
     "asks": {
-      "bank": 433,
-      "code": 919,
-      "session": 0,
+      "bank": 463,
+      "code": 1067,
+      "session": 6,
       "none": 8
     },
     "outcomes": {
-      "bank": 981,
-      "no-change:denied": 2,
-      "no-change:guard": 27,
-      "no-change:negative": 58,
-      "no-change:read-only": 17,
-      "no-delete": 267,
+      "bank": 1045,
+      "no-change:guard": 26,
+      "no-change:negative": 56,
+      "no-change:read-only": 83,
+      "no-delete": 326,
       "static": 8
     },
-    "judged": 201
+    "judged": 304
   },
   "focus": null,
   "perTestType": {
     "obligation": {
       "rows": 603,
       "specs": 603,
-      "complete": 447,
-      "incomplete": 156
+      "complete": 589,
+      "incomplete": 14
     },
     "outside_trigger": {
       "rows": 43,
@@ -94,25 +402,25 @@
     "twin": {
       "rows": 43,
       "specs": 43,
-      "complete": 36,
-      "incomplete": 7
+      "complete": 42,
+      "incomplete": 1
     },
     "ordered_pair": {
       "rows": 112,
       "specs": 112,
-      "complete": 98,
-      "incomplete": 14
+      "complete": 112,
+      "incomplete": 0
     },
     "skip_pressure": {
       "rows": 8,
       "specs": 8,
-      "complete": 6,
-      "incomplete": 2
+      "complete": 7,
+      "incomplete": 1
     },
     "route_positive": {
       "rows": 260,
-      "specs": 260,
-      "complete": 260,
+      "specs": 253,
+      "complete": 253,
       "incomplete": 0
     },
     "route_near_miss": {
@@ -130,8 +438,8 @@
     "read_when": {
       "rows": 9,
       "specs": 9,
-      "complete": 1,
-      "incomplete": 8
+      "complete": 9,
+      "incomplete": 0
     },
     "script_fixture": {
       "rows": 2,
@@ -160,14 +468,14 @@
     "guard_positive": {
       "rows": 84,
       "specs": 84,
-      "complete": 78,
-      "incomplete": 6
+      "complete": 84,
+      "incomplete": 0
     },
     "guard_negative": {
       "rows": 6,
       "specs": 6,
-      "complete": 6,
-      "incomplete": 0
+      "complete": 4,
+      "incomplete": 2
     },
     "guard_hostile": {
       "rows": 6,
@@ -190,8 +498,8 @@
     "tool_boundary": {
       "rows": 9,
       "specs": 9,
-      "complete": 8,
-      "incomplete": 1
+      "complete": 9,
+      "incomplete": 0
     },
     "tool_denied": {
       "rows": 3,
@@ -220,8 +528,8 @@
     "register_sample": {
       "rows": 200,
       "specs": 200,
-      "complete": 187,
-      "incomplete": 13
+      "complete": 200,
+      "incomplete": 0
     },
     "hazard_recovery": {
       "rows": 2,
@@ -242,123 +550,88 @@
       "incomplete": 0
     },
     "journey": {
-      "rows": 10,
-      "specs": 10,
-      "complete": 9,
-      "incomplete": 1
+      "rows": 11,
+      "specs": 11,
+      "complete": 11,
+      "incomplete": 0
     }
   },
   "perMode": {
     "replay": {
       "rows": 6,
       "specs": 6,
-      "complete": 0,
-      "incomplete": 6
+      "complete": 6,
+      "incomplete": 0
     },
     "unit": {
       "rows": 37,
       "specs": 37,
-      "complete": 37,
-      "incomplete": 0
+      "complete": 35,
+      "incomplete": 2
     },
     "live": {
-      "rows": 1525,
-      "specs": 1525,
-      "complete": 1323,
-      "incomplete": 202
+      "rows": 1526,
+      "specs": 1519,
+      "complete": 1503,
+      "incomplete": 16
     }
   },
   "gaps": [
     {
       "marker": "needs-askable-act",
-      "specs": 185,
+      "specs": 18,
       "atoms": [
-        "gate.standing.read-claude-skills-invoice-reconcile-references",
-        "instruction.invoice-reconcile.a-line-matches-on-article-code",
-        "instruction.invoice-reconcile.an-invoice-line-with-no-order",
-        "instruction.ledger-auditor.a-brief-missing-a-number-gets",
-        "instruction.memory-memory.no-delivery-on-a-public-holiday",
-        "instruction.memory-memory.the-weekly-report-is-due-monday",
-        "instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and",
-        "instruction.shipment-tracker.on-a-carrier-error-say-so",
-        "instruction.standing.after-a-compaction-re-read-the",
-        "instruction.standing.after-two-failures-of-a-tool",
-        "instruction.standing.on-stop-stop-all-work-and",
-        "instruction.supplier-email.a-loose-yes-is-not-a",
-        "instruction.supplier-email.no-price-or-date-in-a",
-        "reference.invoice-reconcile.read-references-currency-table-md",
-        "reference.invoice-reconcile.read-references-matching-rules-md",
-        "reference.memory-memory.read-supplier-languages-md",
-        "reference.standing.read-claude-memory-memory-md",
-        "reference.standing.read-claude-skills-invoice-reconcile-references",
-        "reference.standing.read-claude-steps-json",
-        "reference.supplier-email.read-claude-memory-supplier-languages-md",
-        "reference.weekly-report.read-references-kpi-definitions-md",
-        "register.route-planner.the-plan-is-a-table-of"
-      ],
-      "details": [
-        "no task in the atom's words (gate.standing.read-claude-skills-invoice-reconcile-references (title)): the act names the file .claude/skills/invoice-reconcile/references/matching-rules.md: \"read .claude/skills/invoice-reconcile/references/matching-rules.md before editing any invoice file\"",
-        "no task in the atom's words (instruction.invoice-reconcile.a-line-matches-on-article-code (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.invoice-reconcile.an-invoice-line-with-no-order (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.ledger-auditor.a-brief-missing-a-number-gets (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.memory-memory.no-delivery-on-a-public-holiday (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.memory-memory.the-weekly-report-is-due-monday (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.shipment-tracker.on-a-carrier-error-say-so (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.standing.after-a-compaction-re-read-the (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.standing.after-two-failures-of-a-tool (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.standing.on-stop-stop-all-work-and (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.supplier-email.a-loose-yes-is-not-a (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (instruction.supplier-email.no-price-or-date-in-a (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (reference.memory-memory.read-supplier-languages-md (title)): the act names the file supplier-languages.md: \"read supplier-languages.md\"",
-        "no task in the atom's words (reference.standing.read-claude-memory-memory-md (title)): the act names the file .claude/memory/MEMORY.md: \"read .claude/memory/MEMORY.md\"",
-        "no task in the atom's words (reference.standing.read-claude-skills-invoice-reconcile-references (title)): the act names the file .claude/skills/invoice-reconcile/references/matching-rules.md: \"read .claude/skills/invoice-reconcile/references/matching-rules.md\"",
-        "no task in the atom's words (reference.standing.read-claude-steps-json (title)): the act names the file .claude/steps.json: \"read .claude/steps.json\"",
-        "no task in the atom's words (register.route-planner.the-plan-is-a-table-of (title)): the act does not start with a verb: \"\"",
-        "no usable situation (skill.invoice-reconcile.skill-invoice-reconcile (asks it names)): the situation names the file references/currency-table.md: \"When the invoice is not in EUR, read references/currency-table.md to convert every amount\"",
-        "no usable situation (skill.invoice-reconcile.skill-invoice-reconcile (asks it names)): the situation names the file references/matching-rules.md: \"Read references/matching-rules.md before matching any line\"",
-        "no usable situation (skill.supplier-email.skill-supplier-email (asks it names)): the situation names the file .claude/memory/supplier-languages.md: \"Write in the supplier's language, as listed in .claude/memory/supplier-languages.md\"",
-        "no usable situation (skill.weekly-report.skill-weekly-report (asks it names)): the situation names the file References/kpi-definitions.md: \"References/kpi-definitions.md when a number needs a definition\""
-      ]
-    },
-    {
-      "marker": "needs-existing-file",
-      "specs": 2,
-      "atoms": ["reference.weekly-report.read-references-kpi-definitions-md"],
-      "details": [".claude/skills/weekly-report/references/kpi-definitions.md is no file of the estate"]
-    },
-    {
-      "marker": "needs-ordered-anchor",
-      "specs": 15,
-      "atoms": ["gate.invoice-reconcile.read-references-matching-rules-md-before"],
-      "details": ["Read before matching any line: \"matching any line\" is no tool label, skill or stage"]
-    },
-    {
-      "marker": "needs-recorded-session",
-      "specs": 6,
-      "atoms": [
-        "guard.settings.posttooluse-bash-guard-ledger-guard-py",
-        "guard.settings.pretooluse-bash-guard-block-force-push",
-        "guard.settings.pretooluse-edit-write-guard-read-before",
+        "gate.standing.write-a-helper-s-brief-before",
         "guard.settings.stop-guard-reply-length-py",
         "guard.settings.userpromptsubmit-guard-stop-word-sh",
-        "guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh"
+        "instruction.standing.read-the-memory-index-at-the"
       ],
       "details": [
-        "no recorded session of force-push",
-        "no recorded session of invoice-file-edit",
-        "no recorded session of stop-word",
-        "no recorded session of this situation"
+        "no task in the atom's words (gate.standing.write-a-helper-s-brief-before (title)): the atom's words: it describes the unit, and names no task the user wants done",
+        "no task in the atom's words (guard.settings.stop-guard-reply-length-py (rule)): the guard documents no rule or watched act to come near",
+        "no task in the atom's words (guard.settings.userpromptsubmit-guard-stop-word-sh (rule)): the guard documents no rule or watched act to come near",
+        "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
       ]
-    },
-    {
-      "marker": "needs-registered-check",
-      "specs": 1,
-      "atoms": ["tool.settings.ask-bash-git-commit"],
-      "details": ["permission ask: the trace does not show the prompt"]
     }
   ],
-  "replay": [],
+  "replay": [
+    {
+      "spec": "estate.guard_positive.guard.settings.pretooluse-bash-guard-block-force-push.force-push-blocked",
+      "session": "force-push-blocked",
+      "planRow": "guard_positive.guard.settings.pretooluse-bash-guard-block-force-push",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.pretooluse-edit-write-guard-read-before.invoice-edit-gated",
+      "session": "invoice-edit-gated",
+      "planRow": "guard_positive.guard.settings.pretooluse-edit-write-guard-read-before",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.posttooluse-bash-guard-ledger-guard-py.ledger-file-removed",
+      "session": "ledger-file-removed",
+      "planRow": "guard_positive.guard.settings.posttooluse-bash-guard-ledger-guard-py",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh.stop-word-nudged",
+      "session": "stop-word-nudged",
+      "planRow": "guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.stop-guard-reply-length-py.long-reply-trimmed",
+      "session": "long-reply-trimmed",
+      "planRow": "guard_positive.guard.settings.stop-guard-reply-length-py",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh.carrier-code-required",
+      "session": "carrier-code-required",
+      "planRow": "guard_positive.guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh",
+      "expect": "pass"
+    }
+  ],
   "waiting": [],
   "struck": [],
   "invalid": [],

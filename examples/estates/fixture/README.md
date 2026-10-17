@@ -15,6 +15,10 @@ What it holds:
   events.
 - `.claude/guards/`: five guard scripts and a check registry.
 - `.claude/steps.json`: the step list (plan, do, verify, report, and a note step allowed at any time).
+- `driftbench.estate.yaml`: the estate configuration the unit runner reads. It declares a local stand-in
+  executor for each helper agent (a command that follows the instructions of the helper's current body on the
+  task and reports what it did to the workspace) and, for the two scripts, the usage line and fixtures with
+  their expected exit codes and outputs, written from the script's public contract and not from its source.
 
 Findings planted on purpose, so the lint has something to find:
 

@@ -81,7 +81,8 @@ export async function estateStaticCommand(
       );
       return 2;
     }
-    tests.push(parsed.data);
+    // A test maintenance retired (`estate impact --write`) checks an atom that left the estate: it is not run.
+    if (parsed.data.retired === undefined) tests.push(parsed.data);
   }
   if (tests.length === 0) {
     io.err('No static test found.\n');

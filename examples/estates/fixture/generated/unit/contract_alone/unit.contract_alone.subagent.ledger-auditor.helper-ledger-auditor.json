@@ -1,0 +1,30 @@
+{
+  "id": "unit.contract_alone.subagent.ledger-auditor.helper-ledger-auditor",
+  "planRow": "contract_alone.subagent.ledger-auditor.helper-ledger-auditor",
+  "testType": "contract_alone",
+  "atom": "subagent.ledger-auditor.helper-ledger-auditor",
+  "title": "Helper ledger-auditor",
+  "mapHash": "e48ea73788c2fb36e8def0b10b39a3551139beb107f54959237f272c2aa7ba41",
+  "target": {
+    "kind": "subagent",
+    "name": "ledger-auditor",
+    "file": ".claude/agents/ledger-auditor.md"
+  },
+  "cases": [
+    {
+      "id": "case-01",
+      "payload": {
+        "task": "Did we pay any invoice twice in week 41? Check the ledger.",
+        "files": {
+          "ledger/2026-W41.csv": "date,invoice,supplier,amount\n2026-10-05,INV-1001,Fjord Kitchenware,1250.00 EUR\n2026-10-06,INV-1002,Copperline Pans,480.00 EUR\n",
+          "invoices/INV-1001.json": "{ \"invoice\": \"INV-1001\", \"order\": \"PO-2001\", \"supplier\": \"Fjord Kitchenware\", \"amount\": \"1250.00\", \"currency\": \"EUR\" }\n",
+          "orders/PO-2001.json": "{ \"order\": \"PO-2001\", \"supplier\": \"Fjord Kitchenware\", \"amount\": \"1250.00\", \"currency\": \"EUR\" }\n",
+          "shipments/log.csv": "shipment,carrier,promised,delivered\nNW-55012,DPX,2026-10-02,\nNW-55020,DPX,2026-10-16,\nNW-55031,FRT,2026-10-03,\n",
+          "reports/2026-W40.md": "# Week 40\n## Invoices reconciled\n4\n## Shipments late\n0\n",
+          "reports/2026-W41.md": "# Week 41\n## Invoices reconciled\n2\n## Shipments late\n"
+        }
+      },
+      "material": "Did we pay any invoice twice in week 41? Check the ledger."
+    }
+  ]
+}

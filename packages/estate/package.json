@@ -44,12 +44,13 @@
   },
   "dependencies": {
     "@agent-nexus/driftbench-core": "workspace:*",
+    "@agent-nexus/driftbench-generate": "workspace:*",
+    "@agent-nexus/driftbench-sandbox": "workspace:*",
     "@agent-nexus/driftbench-space": "workspace:*",
     "@agent-nexus/driftbench-stats": "workspace:*",
-    "zod": "^4.6.5",
+    "compromise": "14.18.0",
     "yaml": "^2.9.1",
-    "@agent-nexus/driftbench-generate": "workspace:*",
-    "@agent-nexus/driftbench-sandbox": "workspace:*"
+    "zod": "^4.6.5"
   },
   "publishConfig": {
     "access": "public",
