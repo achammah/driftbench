@@ -21,7 +21,7 @@
   },
   "sessions": {
     "path": "../sessions/index.yaml",
-    "sessions": 3
+    "sessions": 6
   },
   "options": {
     "seed": 1,
@@ -43,8 +43,8 @@
   "summary": {
     "specs": 1568,
     "blocks": 1563,
-    "complete": 1360,
-    "incomplete": 208,
+    "complete": 1363,
+    "incomplete": 205,
     "judged": 348
   },
   "unit": {
@@ -63,11 +63,11 @@
     "asks": {
       "bank": 433,
       "code": 919,
-      "session": 0,
+      "session": 3,
       "none": 8
     },
     "outcomes": {
-      "bank": 981,
+      "bank": 984,
       "no-change:denied": 2,
       "no-change:guard": 27,
       "no-change:negative": 58,
@@ -160,8 +160,8 @@
     "guard_positive": {
       "rows": 84,
       "specs": 84,
-      "complete": 78,
-      "incomplete": 6
+      "complete": 81,
+      "incomplete": 3
     },
     "guard_negative": {
       "rows": 6,
@@ -252,8 +252,8 @@
     "replay": {
       "rows": 6,
       "specs": 6,
-      "complete": 0,
-      "incomplete": 6
+      "complete": 3,
+      "incomplete": 3
     },
     "unit": {
       "rows": 37,
@@ -335,21 +335,13 @@
     },
     {
       "marker": "needs-recorded-session",
-      "specs": 6,
+      "specs": 3,
       "atoms": [
         "guard.settings.posttooluse-bash-guard-ledger-guard-py",
-        "guard.settings.pretooluse-bash-guard-block-force-push",
-        "guard.settings.pretooluse-edit-write-guard-read-before",
         "guard.settings.stop-guard-reply-length-py",
-        "guard.settings.userpromptsubmit-guard-stop-word-sh",
         "guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh"
       ],
-      "details": [
-        "no recorded session of force-push",
-        "no recorded session of invoice-file-edit",
-        "no recorded session of stop-word",
-        "no recorded session of this situation"
-      ]
+      "details": ["no recorded session of this situation"]
     },
     {
       "marker": "needs-registered-check",
@@ -358,7 +350,26 @@
       "details": ["permission ask: the trace does not show the prompt"]
     }
   ],
-  "replay": [],
+  "replay": [
+    {
+      "spec": "estate.guard_positive.guard.settings.pretooluse-bash-guard-block-force-push.force-push-blocked",
+      "session": "force-push-blocked",
+      "planRow": "guard_positive.guard.settings.pretooluse-bash-guard-block-force-push",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.pretooluse-edit-write-guard-read-before.invoice-edit-gated",
+      "session": "invoice-edit-gated",
+      "planRow": "guard_positive.guard.settings.pretooluse-edit-write-guard-read-before",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh.stop-word-nudged",
+      "session": "stop-word-nudged",
+      "planRow": "guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh",
+      "expect": "pass"
+    }
+  ],
   "waiting": [],
   "struck": [],
   "invalid": [],

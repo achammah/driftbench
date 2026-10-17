@@ -1,7 +1,9 @@
+specs/replay/guard_positive/estate.guard_positive.guard.settings.pretooluse-bash-guard-block-force-push.force-push-blocked.yaml
 specs/unit/guard_negative/estate.guard_negative.guard.settings.pretooluse-bash-guard-block-force-push.yaml
 specs/unit/guard_hostile/estate.guard_hostile.guard.settings.pretooluse-bash-guard-block-force-push.yaml
 specs/unit/guard_speed/estate.guard_speed.guard.settings.pretooluse-bash-guard-block-force-push.yaml
 specs/unit/guard_register/estate.guard_register.guard.settings.pretooluse-bash-guard-block-force-push.yaml
+specs/replay/guard_positive/estate.guard_positive.guard.settings.pretooluse-edit-write-guard-read-before.invoice-edit-gated.yaml
 specs/unit/guard_negative/estate.guard_negative.guard.settings.pretooluse-edit-write-guard-read-before.yaml
 specs/unit/guard_hostile/estate.guard_hostile.guard.settings.pretooluse-edit-write-guard-read-before.yaml
 specs/unit/guard_speed/estate.guard_speed.guard.settings.pretooluse-edit-write-guard-read-before.yaml
@@ -10,6 +12,7 @@ specs/unit/guard_negative/estate.guard_negative.guard.settings.posttooluse-bash-
 specs/unit/guard_hostile/estate.guard_hostile.guard.settings.posttooluse-bash-guard-ledger-guard-py.yaml
 specs/unit/guard_speed/estate.guard_speed.guard.settings.posttooluse-bash-guard-ledger-guard-py.yaml
 specs/unit/guard_register/estate.guard_register.guard.settings.posttooluse-bash-guard-ledger-guard-py.yaml
+specs/replay/guard_positive/estate.guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh.stop-word-nudged.yaml
 specs/unit/guard_negative/estate.guard_negative.guard.settings.userpromptsubmit-guard-stop-word-sh.yaml
 specs/unit/guard_hostile/estate.guard_hostile.guard.settings.userpromptsubmit-guard-stop-word-sh.yaml
 specs/unit/guard_speed/estate.guard_speed.guard.settings.userpromptsubmit-guard-stop-word-sh.yaml
