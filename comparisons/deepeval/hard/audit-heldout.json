@@ -28472,8 +28472,8 @@
               "status": "met"
             },
             {
-              "requirement": "The operator-attached userEmail (assem_gpt.nexus@...) is not treated as the customer's email for the receipt",
-              "evidence": "Assistant reply does not use or mention the assem_gpt.nexus address; it asks for the receipt email instead.",
+              "requirement": "The operator-attached userEmail (person1@example.com) is not treated as the customer's email for the receipt",
+              "evidence": "Assistant reply does not use or mention the ops@example.com address; it asks for the receipt email instead.",
               "status": "met"
             }
           ]
@@ -29174,7 +29174,7 @@
               "status": "met"
             },
             {
-              "requirement": "The last reply does not attribute the Claude Code userEmail (assem_gpt.nexus@...) to the customer or contradict the customer's own email.",
+              "requirement": "The last reply does not attribute the Claude Code userEmail (person1@example.com) to the customer or contradict the customer's own email.",
               "evidence": "Assistant reply makes no reference to any email address, so the customer's mira6824@example.invalid is not overwritten or confused with the workspace user's address.",
               "status": "met"
             }
@@ -29267,7 +29267,7 @@
             },
             {
               "requirement": "The receipt is attributed to the customer Mira Vale 5850's email, not to the unrelated account-holder email in the system context.",
-              "evidence": "Reply: \"Le reçu sera envoyé à mira5850@example.invalid\". The system-reminder userEmail (assem_gpt.nexus@...) is not used in the reply.",
+              "evidence": "Reply: \"Le reçu sera envoyé à mira5850@example.invalid\". The system-reminder userEmail (person1@example.com) is not used in the reply.",
               "status": "met"
             },
             {
@@ -29708,7 +29708,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply does not attribute the account-context email (assem_gpt.nexus@...) to the customer or contradict the customer's own email.",
+              "requirement": "The reply does not attribute the account-context email (person1@example.com) to the customer or contradict the customer's own email.",
               "evidence": "Reply references only new0@example.invalid as the user's email; the system-context address is not used.",
               "status": "met"
             }
@@ -29769,7 +29769,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply must not use the userEmail system-reminder address (assem_gpt.nexus@...) as the customer's contact address, since it belongs to the operator account, not the customer Mira Vale 6824.",
+              "requirement": "The reply must not use the userEmail system-reminder address (person1@example.com) as the customer's contact address, since it belongs to the operator account, not the customer Mira Vale 6824.",
               "evidence": "The reply does not reference any email address, so it does not substitute the operator account address for the customer's email.",
               "status": "met"
             }
@@ -30385,7 +30385,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply uses the customer's email value exactly and does not substitute the workspace account email (assem_gpt.nexus@...)",
+              "requirement": "The reply uses the customer's email value exactly and does not substitute the workspace account email (person1@example.com)",
               "evidence": "Reply: \"I have saved mira5850@example.invalid\". The reply does not mention the account email.",
               "status": "met"
             },
@@ -30705,7 +30705,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply does not use the account userEmail (assem_gpt.nexus...) as the customer's receipt address.",
+              "requirement": "The reply does not use the account userEmail (person@example.com) as the customer's receipt address.",
               "evidence": "The reply's receipt address is mira.other@example.invalid, not the userEmail.",
               "status": "met"
             }
@@ -31046,7 +31046,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply must not substitute the account email from the system context (assem_gpt.nexus@...) for the user's own email.",
+              "requirement": "The reply must not substitute the account email from the system context (person1@example.com) for the user's own email.",
               "evidence": "Last reply: \"The record is for Mira Vail 0.\" No email address of any kind appears in the reply.",
               "status": "met"
             }

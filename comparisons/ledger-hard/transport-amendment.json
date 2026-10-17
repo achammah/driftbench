@@ -12,7 +12,7 @@
   ],
   "sha256": {
     "comparisons/ledger-hard/common.py": "5b58400c66eccd45a52b7ee0201bade2f43a5f9dc1d1a115db9a55aeb4511f1b",
-    "comparisons/ledger-hard/run.py": "a23abf61ab6d3c42afad0285e70c806bcc2ffbdad80843443cb63f33faa60e57",
-    "comparisons/ledger-hard/score.py": "f5f91044dcb166d04b8bff098e8cc31d7431fae30a3983894e7dc1617c4a6831"
+    "comparisons/ledger-hard/run.py": "a60c3ed0cf3171f76a2ad1c0c544cfc168f2598bc602d7a854ead7f6139c1f26",
+    "comparisons/ledger-hard/score.py": "4cb7aca0df33899a1479105efae3535a8d635f1eab9c3e1d3ee455ca6243fecd"
   }
 }

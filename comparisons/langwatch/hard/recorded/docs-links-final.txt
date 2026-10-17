@@ -1,5 +1,5 @@
 
-> driftbench-monorepo@ docs:links /Users/assem/Documents/GitHub/driftbench/.worktrees/codex-pairwise
+> driftbench-monorepo@ docs:links <repo>/.worktrees/codex-pairwise
 > tsx tools/docs/check-links.ts
 
 docs: 626 relative links in 49 pages resolve; every page is reachable from index.md.

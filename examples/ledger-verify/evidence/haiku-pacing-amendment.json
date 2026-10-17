@@ -4,8 +4,8 @@
   "authorization": "raise Haiku to 4 workers; fall back to 2 only when host load passes 60 or on two transport failures within ten minutes; parse errors do not change pacing",
   "priorRuntime": "ee96e47757aa837860fe",
   "runtime": "d49a333a9d4e6dd0ffd6",
-  "priorRuntimeSha256": "c1da047e74647cd9f61318b63e6bd5a11ecb5dc2a4c51a1887b5f039a411e52e",
-  "runtimeSha256": "6963645ce6d5ae50e718ebad8e5acaf34d996cddea1b69d746089048df48dae6",
+  "priorRuntimeSha256": "0a2c83d0cb0d4e6d77e9a8390c72ca22f3f3b5453e8a52280b5b29a02e1794b1",
+  "runtimeSha256": "311e929b3a62fb352d0f1c3bb11d82046dbb65fb71d73c0b6034633d5256df9b",
   "rules": {
     "normal": 4,
     "fallback": 2,

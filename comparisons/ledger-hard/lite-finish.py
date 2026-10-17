@@ -24,7 +24,7 @@ def main():
     for path,value in seal['parked_journal_sha256'].items():assert digest(ROOT/path)==value,path
     assert r.prepared_requests()==json.loads((r.DEST/'requests.json').read_text())
     call(['python3',str(HERE/'check-audit.py')])
-    tsx='/Users/assem/Documents/GitHub/driftbench/node_modules/.bin/tsx'
+    tsx=str(ROOT/'node_modules/.bin/tsx')
     call([tsx,str(HERE/'lite-peer-parity.mts')]);call([tsx,str(HERE/'lite-peer-parity.mts'),'--dialect'])
     tests=call(['python3','-m','unittest','discover','-s','comparisons/ledger-hard','-p','test_*.py'])
     (r.DEST/'test-output.txt').write_text(tests)

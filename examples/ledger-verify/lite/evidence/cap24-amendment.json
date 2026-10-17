@@ -3,7 +3,7 @@
   "authorization": "Approved, logged: the Flash Lite cell cap rises to 24 USD so all 221 sealed items complete. Holds stay as they are.",
   "priorCapUsd": 18,
   "capUsd": 24,
-  "priorRuntimeSha256": "3589f446b4897632f04cd98b2eba84494b7509aab2072a1964e15372d0f4ce4a",
+  "priorRuntimeSha256": "615fc65d3769e0e0c345ce4736d6d81484ec5acae16c822465cfce60886616a9",
   "unchanged": [
     "all uncertain-charge holds",
     "model",
@@ -15,6 +15,6 @@
     "scoring",
     "concurrency"
   ],
-  "runtimeSha256": "b76e35994d6a690941d7aad1df1badbccf9ae761ae051aa90ae8fcec1756e50f",
+  "runtimeSha256": "03a55aa9964c493873f1d14dd00604700684b4ffb08ab7bdef41e41b361e2611",
   "originalNetworkHoldsUsd": 10.5
 }

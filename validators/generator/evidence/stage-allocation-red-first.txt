@@ -1,5 +1,5 @@
 
- RUN  v5.0.3 /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/sol-gen-maint/wt
+ RUN  v5.0.3 <scratchpad>/sol-gen-maint/wt
 
  ❯ packages/validators/test/generator/stage-allocation.test.ts (8 tests | 6 failed) 14936ms
    ❯ stage allocation shares the documented block and perturbation placement contract (4)
@@ -95,7 +95,7 @@ AssertionError: expected { pass: false, …(1) } to match object { pass: true }
 
 Sibling deviation regression:
 
- RUN  v5.0.3 /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/sol-gen-maint/wt
+ RUN  v5.0.3 <scratchpad>/sol-gen-maint/wt
 
  ❯ packages/validators/test/generator/stage-allocation.test.ts (9 tests | 1 failed | 8 skipped) 24ms
    ❯ stage allocation shares the documented block and perturbation placement contract (5)

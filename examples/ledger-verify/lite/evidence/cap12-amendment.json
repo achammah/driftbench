@@ -3,7 +3,7 @@
   "authorization": "Approved, logged as a freeze amendment: the Flash Lite cell cap rises to 12 USD so the full run completes. Nothing else changes.",
   "oldCapUsd": 6,
   "newCapUsd": 12,
-  "priorRuntimeSha256": "cc99259efb0661629387d964709748396ecf71a393fd486f09701e42fecaddc1",
+  "priorRuntimeSha256": "7c53d555bfb35b62f20ccd1fc655b5accf34b71e502d4f204c298b284a36acde",
   "source": "owner instruction",
   "unchanged": [
     "model",
@@ -16,5 +16,5 @@
     "402 circuit",
     "300 second timeouts"
   ],
-  "runtimeSha256": "db17a6c23b3463a3860c510a3834d25fb07b14d67ca183dbd909b4eb9c5ca494"
+  "runtimeSha256": "23d940096b552f6a6c29ff77a29106255d9c392438496e755ebca14c0b9597ef"
 }

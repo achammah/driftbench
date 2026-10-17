@@ -63,7 +63,7 @@ if (reportPath)
   await writeFile(
     reportPath,
     text +
-      '\nPR: https://github.com/achammah/driftbench/pull/157\nBranch: research/astra-reader-first. Worktree: /Users/assem/Documents/GitHub/driftbench/.worktrees/astra-reader-first.\n',
+      '\nPR: https://github.com/achammah/driftbench/pull/157\nBranch: research/astra-reader-first. Worktree: <repo>/.worktrees/astra-reader-first.\n',
   );
 console.log(
   JSON.stringify({

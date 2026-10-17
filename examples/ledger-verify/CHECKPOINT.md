@@ -17,7 +17,7 @@
 - Free replay verifies eight finished phases with identical decisions and zero new calls.
 - Four native output-limit envelopes observed so far; three await attribution until Haiku noise-0 finishes. Two historical native error causes remain unclassified.
 - status.py is read-only. trace-requests.ts --all, output_limits.py, check-replays.py, summarize.py and render_report.py complete reporting without provider calls.
-- Final target: /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-verify.md.
+- Final target: <scratchpad>/codex/dossier-ledger-verify.md.
 - Keep running both unblocked models through all 379 units unless the cap is reached. Do not report completion while their phases are pending.
 - All writes stay in this worktree, the named report, and append-only spend-ledger rows. No other key files or worktrees may be written.
 

@@ -44,7 +44,7 @@
   },
   "scoring": "strict headline: output-limit hit is error; product-final: existing returned fallback verdict; symmetric",
   "poolSha256": "f569c72a5e701366d232b619a623c09abddcf69cfc4379e849dbdef76b9559c5",
-  "runtimeSha256": "cc99259efb0661629387d964709748396ecf71a393fd486f09701e42fecaddc1",
+  "runtimeSha256": "7c53d555bfb35b62f20ccd1fc655b5accf34b71e502d4f204c298b284a36acde",
   "previousCell": "gemini-3.8-flash remains separate, parked until owner word",
   "multiplicity": "Additional model cell; no substitution into original 18-cell family. Collator must declare expanded-family policy.",
   "authorization": "Owner decision: add gemini-3.5-flash-lite as a NEW model cell, both contestants, same pilot/mutation/noise/TEST, budget 6 USD.",

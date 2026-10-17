@@ -1,13 +1,13 @@
 {
   "at": "2026-10-13T16:32:25.038732+00:00",
   "previous": {
-    "runtime-freeze.json": "6367ef409f542628dd5017dabb978ed8811b1890d7f99b73c015492f199659f5",
-    "pilot-runtime-freeze.json": "6367ef409f542628dd5017dabb978ed8811b1890d7f99b73c015492f199659f5"
+    "runtime-freeze.json": "fa49e635879994f985d8849096d9e52a027ae5b97c62be95b7ac10e20d638fb9",
+    "pilot-runtime-freeze.json": "fa49e635879994f985d8849096d9e52a027ae5b97c62be95b7ac10e20d638fb9"
   },
   "rule": "Native session-limit responses with no model output stop admissions immediately. Native reason is preserved. Zero-token quota events remain missing-only eligible and never count as judge failures. Returned refusals remain terminal. Existing verdicts remain unchanged.",
   "nativeResetClaim": "2026-10-13T16:50:00Z",
   "scope": "Sonnet CLI only; Gemini 3.8 stays parked",
   "classificationFinalizedAt": "2026-10-13T16:36:53.892827+00:00",
   "classifierSha256": "855e6707dd8f9ebc73e3205ca1a567233061a60f6c15e28fc8dead8c702a2b2a",
-  "runtimeSha256": "62f5be711d97529d0e9f9a50510d9e5419c2b1888d9eef482a8a36328fab05f0"
+  "runtimeSha256": "24c09fd08a9bbb13a39421a208f11142b6c06fbe04af71af08dd8f14c0702722"
 }

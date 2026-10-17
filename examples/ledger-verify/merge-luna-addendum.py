@@ -1,8 +1,8 @@
 """Append recovered noise metrics beside the unchanged official Luna metrics."""
-import copy,datetime,hashlib,json
+import copy,datetime,hashlib,json,os
 from pathlib import Path
 BASE=Path(__file__).resolve().parent;DEST=BASE/'luna-addendum'
-DOSSIER=Path('/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-verify.md')
+DOSSIER=Path(os.environ['LEDGER_VERIFY_DOSSIER'])
 def read(p):return json.loads(p.read_text())
 def rows(p):return [json.loads(x) for x in p.read_text().splitlines() if x.strip()]
 state=read(DEST/'state.json');assert state['status']=='complete'

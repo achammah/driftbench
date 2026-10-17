@@ -98,7 +98,7 @@ def main():
             env.pop(name, None)
         env['TMPDIR'] = str(ROOT / '.tmp')
         env['VERIFY_GEMINI_KEY_FILE'] = str(Path.home() / '.nexus-secrets/gemini-driftbench.key')
-        env['VERIFY_CORE_DOSSIER'] = '/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-core.md'
+        env['VERIFY_CORE_DOSSIER'] = os.environ['VERIFY_CORE_DOSSIER']
         for phase in ['noise-2', 'results']:
             assert window(amendment, time.time()) == 'eligible'
             flags = prepare_phase(phase, amendment, runtime)

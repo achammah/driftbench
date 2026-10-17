@@ -23,7 +23,7 @@ if __name__=='__main__':
     env=dict(os.environ)
     for key in ['OPENAI_API_KEY','GEMINI_API_KEY','ANTHROPIC_API_KEY']:env.pop(key,None)
     env['TMPDIR']=str(ROOT/'.tmp')
-    env['VERIFY_CORE_DOSSIER']='/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-core.md'
+    env['VERIFY_CORE_DOSSIER']=os.environ['VERIFY_CORE_DOSSIER']
     emit('running',concurrency=4,fallback=2,amendment='evidence/haiku-pacing-amendment.json')
     with (BASE/'logs/haiku-test-four-workers.log').open('w') as log:
         child=subprocess.run([str(ROOT/'node_modules/.bin/tsx'),'--tsconfig','examples/ledger-verify/tsconfig.json',

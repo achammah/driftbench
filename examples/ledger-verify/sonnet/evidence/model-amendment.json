@@ -38,7 +38,7 @@
   },
   "lean": "Fresh empty directory; unchanged frozen judge system prompt; tools empty; settings sources empty; strict MCP; no session persistence; one turn",
   "frozenAt": "2026-10-13T14:57:53.768376+00:00",
-  "runtimeSha256": "0974292748f5bedfae651b88f441bbf6dc2eb21a04beae0aa01821532af20832",
+  "runtimeSha256": "116c30148ab821c97cce182b94c5312bf085ac25587ddb0632e7ae0d12d31386",
   "reportingSha256": "92b4c089629fb8a12e4b4bc014a0c363456057003a906152e0e9b1293e2e53a0",
   "networkAmendment": "Ten healthy provider probes spaced 30 seconds apart before new calls, one model cell at a time, concurrency two. Three consecutive connection failures pause ten minutes and repeat the gate. Zero-token no-output transport requests retry missing-only without an attempt limit. Every answer stays cached.",
   "outerProcessTimeoutMs": 2147483647,

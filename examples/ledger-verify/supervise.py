@@ -26,7 +26,7 @@ def at_cutoff():
 
 env=dict(os.environ)
 # Paths only. The provider wrapper reads each key inside its own command.
-env['VERIFY_CORE_DOSSIER']='/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-core.md'
+env['VERIFY_CORE_DOSSIER']='<scratchpad>/codex/dossier-ledger-core.md'
 env['VERIFY_OPENAI_KEY_FILE']=str(Path.home()/'.nexus-secrets/openai.key')
 env['VERIFY_GEMINI_KEY_FILE']=str(Path.home()/'.nexus-secrets/gemini-driftbench.key')
 for key in ['OPENAI_API_KEY','GEMINI_API_KEY','ANTHROPIC_API_KEY']:env.pop(key,None)

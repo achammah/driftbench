@@ -1,10 +1,10 @@
 """Merge the independent Flash Lite cell after both offline reports pass; no scoring changes."""
-import datetime,hashlib,json,subprocess,sys
+import datetime,hashlib,json,os,subprocess,sys
 from pathlib import Path
 BASE=Path(__file__).resolve().parent
 ROOT=BASE.parents[1]
 LITE=BASE/'lite'
-DOSSIER=Path('/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-verify.md')
+DOSSIER=Path(os.environ['LEDGER_VERIFY_DOSSIER'])
 def read(p):return json.loads(p.read_text())
 for b in [BASE,LITE]:assert read(b/'evidence/finalizer-state.json')['status']=='offline evidence ready for review'
 original=read(BASE/'evidence/cells.json');extra=read(LITE/'evidence/cells.json')

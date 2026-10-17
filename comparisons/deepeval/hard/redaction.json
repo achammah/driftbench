@@ -8,19 +8,19 @@
     "audit-v2.json",
     "audit-v3.json"
   ],
-  "sanitized_recording_sha256": "24a7db347c32f044f27f8b947e84e411947d226fca9b7e748ae9bc28f936dce9",
+  "sanitized_recording_sha256": "507ee64657002d8aa6149a863ec247e91a149de264eb4626e614b7e36c3db8cc",
   "request_hashes_changed": 0,
   "labels_and_scores_changed": false,
   "recording_chunks_sha256": {
     "calls-000.jsonl": "fceefe27e40b0fe37a43b13ac35194504b10312c977d87def14625363b7bc0d2",
-    "calls-001.jsonl": "b218c56ff6d4deda0f57ff803a1d38a9cfd6bef1590536f125409f4f88910840"
+    "calls-001.jsonl": "3cad792f2b1e72ef6df9101891557b2291e93e907179b956d34f3ce992d15e30"
   },
   "result_files_sha256": {
-    "audit-v1.json": "382cf35f398affa3bcf182327a8b252b6984b762a3860ea752a1acda555398ee",
+    "audit-v1.json": "bb1770eb57fa64441f314468c10863a318eef7f071297a1affe73bd51b7dc3b9",
     "audit-v2-first-scores.json": "8b14aceb3e89a074865ccf165438759117737c10a04e14caf9f771328d35ef0d",
-    "audit-v2-first.json": "8c93d3dbe8148f95c7d3f20d8a44b7e70ca5cab12c9dd87cb64c85080273840c",
+    "audit-v2-first.json": "4073457b243cf36d0299fec0e8c154007449cb4decf259a2fda5382e79814bb6",
     "audit-task-receipts.json": "a21079b70a701221576dffe9441f443c1af7e1b631c0f2475c7c20f8d6cc0fa5",
-    "audit-v2.json": "7451cd0d194a63e740ba4a80d74edf1c63e4d86b86ffdc9c3896f4a85b661435",
-    "audit-v3.json": "ea8fd484087214f164fdea8d7a0c173e9bb304f20d6ca2b337768d1c57630203"
+    "audit-v2.json": "3fd9ad2044f92f8f74e7df7e54fef9a08d6d195d06c8f80235cc476aa4057a7c",
+    "audit-v3.json": "c4de34f129de2f07bc40a2fede4986242a2686134cea4b7b1b0345b0fae9655b"
   }
 }

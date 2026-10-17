@@ -1,5 +1,5 @@
 
-> driftbench-monorepo@ lint /Users/assem/Documents/GitHub/driftbench/.worktrees/codex-pairwise
+> driftbench-monorepo@ lint <repo>/.worktrees/codex-pairwise
 > biome check .
 
 comparisons/deepeval/judge/render.mts:15:60 lint/style/useTemplate  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━

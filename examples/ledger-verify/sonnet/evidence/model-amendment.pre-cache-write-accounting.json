@@ -38,6 +38,6 @@
   },
   "lean": "Fresh empty directory; unchanged frozen judge system prompt; tools empty; settings sources empty; strict MCP; no session persistence; one turn",
   "frozenAt": "2026-10-13T13:45:30.409260+00:00",
-  "runtimeSha256": "de1fba64b63400684aa065cc8a9ac53bb352c939b71aa68fb5705f553f3dd8d8",
+  "runtimeSha256": "0513b77080f124d537ba9f4f3d9fe59e116025dbb8c2d3e0d65445420f48b037",
   "reportingSha256": "7bea2cfbae7269671a5915418465437d01fdc8fbb77e9ceeeea92c4d190a9f48"
 }

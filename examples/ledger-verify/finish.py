@@ -12,7 +12,7 @@ BASE = Path(__file__).resolve().parent
 ROOT = BASE.parents[1]
 MODELS = ['haiku', 'gpt-6-luna', 'gemini-3.8-flash']
 PHASES = {'pilot': 20, 'validity': 48, 'noise-0': 30, 'noise-1': 30, 'noise-2': 30, 'results': 221}
-DOSSIER = Path('/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-verify.md')
+DOSSIER = Path(os.environ['LEDGER_VERIFY_DOSSIER'])
 ALLOW_QUOTA_PAUSE = '--allow-daily-quota' in sys.argv
 REQUIRED_MODELS = MODELS[:2] if ALLOW_QUOTA_PAUSE else MODELS
 

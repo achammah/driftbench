@@ -1,12 +1,12 @@
 
-> driftbench-monorepo@ lint /Users/assem/Documents/GitHub/driftbench/.worktrees/codex-pairwise
+> driftbench-monorepo@ lint <repo>/.worktrees/codex-pairwise
 > biome check .
 
-/Users/assem/Documents/GitHub/driftbench/.worktrees/codex-pairwise/comparisons/langwatch/hard/.pr115-source/biome.json configuration ━━━━━━━━━━
+<repo>/.worktrees/codex-pairwise/comparisons/langwatch/hard/.pr115-source/biome.json configuration ━━━━━━━━━━
 
   × Found a nested root configuration, but there's already a root configuration.
   
-  i The other configuration was found in /Users/assem/Documents/GitHub/driftbench/.worktrees/codex-pairwise.
+  i The other configuration was found in <repo>/.worktrees/codex-pairwise.
   
   i Use the migration command from the root of the project to update the configuration.
   

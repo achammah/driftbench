@@ -890,7 +890,7 @@ Intake builds the set of real user turns a simulated user is compared against. I
 
 ```
 $ pnpm -s driftbench intake logs _captures/docs3/generating/intake/conversations.jsonl --out _captures/docs3/generating/intake/private --map examples/acme/map/approved.yaml
-Refused: _captures/docs3/generating/intake/private is inside the git work tree /Users/assem/Documents/GitHub/driftbench/.worktrees/docs3. Past conversations never enter a repository: choose a private folder outside any git work tree.
+Refused: _captures/docs3/generating/intake/private is inside the git work tree <repo>/.worktrees/docs3. Past conversations never enter a repository: choose a private folder outside any git work tree.
 exit 2
 ```
 

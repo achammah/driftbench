@@ -53,9 +53,9 @@
     "comparisons/ledger-hard/extended-score.py": "1bea532d01f834ca8ef604e283c18c5f7cb0c837cd4f72c64f1b1525df3c5d6c",
     "comparisons/ledger-hard/extended-peer-parity.mts": "6126d05c37da748d2ab333b2130cae0ff4941320d83d667c8d61057b72308cea",
     "comparisons/ledger-hard/test_extended.py": "fb89dc6dc6a948ab8b18bb4f770cd3618b80112605160256f33da0b57b5dc651",
-    "comparisons/ledger-hard/score.py": "f5f91044dcb166d04b8bff098e8cc31d7431fae30a3983894e7dc1617c4a6831",
+    "comparisons/ledger-hard/score.py": "4cb7aca0df33899a1479105efae3535a8d635f1eab9c3e1d3ee455ca6243fecd",
     "comparisons/ledger-hard/common.py": "5b58400c66eccd45a52b7ee0201bade2f43a5f9dc1d1a115db9a55aeb4511f1b",
-    "comparisons/ledger-hard/run.py": "a23abf61ab6d3c42afad0285e70c806bcc2ffbdad80843443cb63f33faa60e57",
+    "comparisons/ledger-hard/run.py": "a60c3ed0cf3171f76a2ad1c0c544cfc168f2598bc602d7a854ead7f6139c1f26",
     "comparisons/ledger-hard/dialect-run.py": "28a020031d43288debe04c297b3662d61a81301c3461a4d15c49c72d2e349254",
     "comparisons/ledger-hard/gpt-6.1-sol/requests.json": "65e7561b442ae4657fc4afe0234224f9185d0e0a5985ef355271738254145b2a",
     "comparisons/ledger-hard/gpt-6.1-sol/pricing.json": "9e34faa1a5e372521d5789d0962ce059eb502889daab0abcd51cab466d874d97"

@@ -60,4 +60,4 @@ Sonnet uses the Claude print-mode route, alias `sonnet`, an empty folder, explic
 
 Nominal tests use the unchanged exact two-sided McNemar calculation and 20000 family-bootstrap draws. Global multiplicity correction belongs to the collator. The same synthetic cohort is not independent replication. Default goal is information-asymmetric; pooled equal-evidence replaces it with final state supplied to both. Costs shown for overlapping rows and pools must not be summed as additional spend.
 
-Seal SHA-256: `c2244b257d0f3dba03f828226b5d8e25b518749564db67111f75e26acd9e60e2`. Original case seal: `5845e97e2651d2942134209e4abfa8f932409744930bd0d143ebbe03877b07a4`. Per-file hashes remain in the seal. Gemini 3.8 was dropped by the owner and its journals remain unchanged.
+Seal SHA-256: `ba83523dd663834077afdeae20cae22d361e53d8c6025cda75fb9379ac7d5e18`. Original case seal: `5845e97e2651d2942134209e4abfa8f932409744930bd0d143ebbe03877b07a4`. Per-file hashes remain in the seal. Gemini 3.8 was dropped by the owner and its journals remain unchanged.

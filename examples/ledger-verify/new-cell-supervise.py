@@ -15,7 +15,7 @@ emit(phase='cost-sample',status='waiting for Haiku, its authorized recovery and 
 while not old_ready():time.sleep(15)
 runtime=read(BASE/'evidence/runtime-freeze.json');env=dict(os.environ,TMPDIR=str(ROOT/'.tmp'))
 for k in ['OPENAI_API_KEY','GEMINI_API_KEY','ANTHROPIC_API_KEY','VERIFY_GEMINI_KEY_FILE']:env.pop(k,None)
-env['VERIFY_CORE_DOSSIER']='/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-core.md'
+env['VERIFY_CORE_DOSSIER']='<scratchpad>/codex/dossier-ledger-core.md'
 env['VERIFY_PHASE']='pilot'
 tsx=[str(ROOT/'node_modules/.bin/tsx'),'--tsconfig','examples/ledger-verify/tsconfig.json']
 remeasure=BASE/'evidence/cache-off-cost-sample.json'

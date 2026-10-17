@@ -9,5 +9,5 @@
   "checks": "Syntax and synthetic quoted, bare, Bearer and assignment key-shaped tokens detected; embedded base64 prefix excluded",
   "providerCalls": 0,
   "priorSourceSha256": "dce0b1963d5b3d14211eed90c3525c5925c703a9e66e758923963713c58a0d54",
-  "sourceSha256": "c08a1eb2f3d0763f07b1f11af438fa04c2c19b53d935f10c2f5400b389a1e44a"
+  "sourceSha256": "4caa91aa084ae95058446d526ff783465562f10ab153b81885ac038e94447095"
 }

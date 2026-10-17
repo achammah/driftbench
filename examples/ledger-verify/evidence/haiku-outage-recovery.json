@@ -36,6 +36,6 @@
     "driftbench-verify-uncertainty-cascade": 0,
     "promptfoo": 0
   },
-  "transportSourceSha256": "c59cfbbb93736bf09d2c639314d1052612b63a907dbeda5e5fabf0abe20590d5",
+  "transportSourceSha256": "67acccf7e36553a9147f236b8e2653ac2b055cf184f166d91fb823d06a6c59f9",
   "originalCassetteSha256": "86757ecebfb9601299113b77816145065618cf0ad5f3f7ab623dd33a31be0b60"
 }

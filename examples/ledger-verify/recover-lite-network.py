@@ -56,7 +56,7 @@ cassette.write_text(''.join(json.dumps(r)+'\n' for r in updated))
 report=LITE/'noise-0'/f'{MODEL}.json'
 assert report.read_bytes()==report.with_name(f'{MODEL}.pre-network-recovery.json').read_bytes()
 report.unlink()
-env.pop('VERIFY_LITE_NETWORK_RECOVERY');env['VERIFY_CORE_DOSSIER']='/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-core.md'
+env.pop('VERIFY_LITE_NETWORK_RECOVERY');env['VERIFY_CORE_DOSSIER']='<scratchpad>/codex/dossier-ledger-core.md'
 progress=LITE/f'{MODEL}.progress.json';progress.write_text(json.dumps(dict(at=stamp(),phase='noise-0',status='running',model=MODEL,concurrency=8))+'\n')
 command=[str(ROOT/'node_modules/.bin/tsx'),'--tsconfig','examples/ledger-verify/tsconfig.json','examples/ledger-verify/lite-run.ts',MODEL,'--noise','0','--resume-interrupted']
 with (LITE/'logs/network-noise-resume.log').open('w') as log:subprocess.run(command,cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)

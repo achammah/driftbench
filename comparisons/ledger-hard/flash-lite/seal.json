@@ -41,7 +41,7 @@
     "comparisons/ledger-hard/lite-peer-parity.mts": "9b9a31bb429a7201d4ebe8e08051560bf16b35b0cf36e2bf23568ac728ab6ddc",
     "comparisons/ledger-hard/flash-lite/requests.json": "ed00808762760f309b27c6a30504b259a4a962a8203aa2b222d3e0c57c5688ad",
     "comparisons/ledger-hard/flash-lite/pricing.json": "ac8269b65b41e8db47c60349987c796741118df14390a0ad1da364262bff34fa",
-    "comparisons/ledger-hard/score.py": "f5f91044dcb166d04b8bff098e8cc31d7431fae30a3983894e7dc1617c4a6831",
+    "comparisons/ledger-hard/score.py": "4cb7aca0df33899a1479105efae3535a8d635f1eab9c3e1d3ee455ca6243fecd",
     "comparisons/ledger-hard/common.py": "5b58400c66eccd45a52b7ee0201bade2f43a5f9dc1d1a115db9a55aeb4511f1b"
   }
 }

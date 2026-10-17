@@ -60,4 +60,4 @@ Standard short-context prices per million tokens, verified 2026-10-13: input USD
 
 Nominal tests use the unchanged exact two-sided McNemar calculation and 20000 family-bootstrap draws. Global multiplicity correction belongs to the collator. The same synthetic cohort is not independent replication. Default goal is information-asymmetric; pooled equal-evidence replaces it with final state supplied to both. Costs shown for overlapping rows and pools must not be summed as additional spend.
 
-Seal SHA-256: `5d15738876e4eb1d1d8f81875bf38394352ff31befa8337e895c51fe1268a623`. Original case seal: `5845e97e2651d2942134209e4abfa8f932409744930bd0d143ebbe03877b07a4`. Per-file hashes remain in the seal. Gemini 3.8 was dropped by the owner and its journals remain unchanged.
+Seal SHA-256: `ffb0d67a7d4582f3b358e5b8cb28e462f86aebd73edb1463d9d7adbdaeb349f4`. Original case seal: `5845e97e2651d2942134209e4abfa8f932409744930bd0d143ebbe03877b07a4`. Per-file hashes remain in the seal. Gemini 3.8 was dropped by the owner and its journals remain unchanged.

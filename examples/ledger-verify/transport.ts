@@ -74,7 +74,7 @@ try {
     nativeReceipt=resolve(base,'receipts/native',`${id}.json`);
     await mkdir(resolve(base,'receipts/native'),{recursive:true});
     env.VERIFY_NATIVE_RECEIPT=nativeReceipt;
-    env.VERIFY_NATIVE_EXECUTABLE='/Users/assem/.local/bin/claude';
+    env.VERIFY_NATIVE_EXECUTABLE='<home>/.local/bin/claude';
     const transport=createDialectTransport({provider:'claude-cli',model:'claude-haiku-5-5',env,
       command:resolve(base,'capture-claude.sh'),
       timeoutMs:freeze.models[model].timeoutMs,maxBudgetUsd:0.5});

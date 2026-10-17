@@ -5,7 +5,7 @@
     "52934 12375 python3 examples/ledger-verify/network-gate.py",
     "61198 12375 python3 examples/ledger-verify/sol-after-sonnet.py",
     "75444 12375 python3 examples/ledger-verify/sonnet-recovery-sequence.py",
-    "86181 75444 python3 /Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-verify/examples/ledger-verify/new-cell-supervise.py claude-sonnet-5-5"
+    "86181 75444 python3 <repo>/.worktrees/ledger-verify/examples/ledger-verify/new-cell-supervise.py claude-sonnet-5-5"
   ],
   "retired": {
     "21905": "159 native quota requests recovered",

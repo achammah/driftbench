@@ -516,15 +516,15 @@
     "core": "35f07309a4d1d1c8a7c5b176ff19e537d0ef8fdd",
     "hashes": {
       "evidence/seal.json": "54fc167420330d25eb2d8874a0784bd9aa4ec4ff06fbcae82ffaa26d5fc42155",
-      "evidence/runtime-freeze.json": "d38442e3c699198cc9a071302ed4fb412104950c7205b3acd5c9db07297ea180",
-      "evidence/pilot-runtime-freeze.json": "9152fc67de2a937353d42c20a647bafdd7083d963dd3654ee23ddc3965a39fe0",
+      "evidence/runtime-freeze.json": "b7814a8d9c6b8d5bdc3b36ab2d392ef7a1bda3bed8e5e3968cab281b631f5b1d",
+      "evidence/pilot-runtime-freeze.json": "72840c1ea14ba16845de507d922a4ff79611b1fcf9a0cd90074f0ba1dacf6926",
       "evidence/scoring-freeze.json": "e1c0ce28e0dc259b6fe3e3bf98e16e7e0bc20c05e621d09522f43576752fe40b",
       "evidence/pool.json": "f569c72a5e701366d232b619a623c09abddcf69cfc4379e849dbdef76b9559c5",
       "evidence/audit-map.json": "3de476f85d4ce54ed88260f62d4ccab8c0fad36cddf50c1e74e2035055541eb6",
       "stats.py": "6869846fd60ebe8b8d7647b6406a41370ed00b26151138dcc973d44f2c8693d6",
       "validate.py": "318788033919432919d1e3e9653fcc8f5769fe257a23ef046090463f77e00af5",
       "run.ts": "0bfae9258b44c938203a6bf57a269e756b89b437ea3adc1215d7b91afe651855",
-      "transport.ts": "56a43670abe327803991858ceb9baf3e710c5d34e316055b7c73eb63fb5b632c",
+      "transport.ts": "44c333277c3868f0a11275d100c9e883d0ede63bcbe6a84a4628e97eda7038f2",
       "summarize.py": "fa46bb25511f7bca9872859586a4cd0b0c7fffee52fbe5cb06d0961bfa8b8d46",
       "output_limits.py": "9ae7583d1090faf61f633c51a641092b23333d0c30c245a433dccdecce32bed1",
       "trace-requests.ts": "70fdd3349e1779f3294f10b03d90dc226fc0d24546ab16c38f4f299a41ebaa17"
@@ -580,7 +580,7 @@
       "longOutputMultiplier": 1.5
     },
     "frozenAt": "2026-10-13T14:57:53.768376+00:00",
-    "runtimeSha256": "ab45f5cc95d06b4df297a96845607528f0bfd0df6785e3a458988bb0db073f3c",
+    "runtimeSha256": "28b729b032269284f361c65ce445ab8a6466b99478c8ff08849824578a04a934",
     "reportingSha256": "a7563ea875f1037a4798129120a4a879fd52ab195ddf0309578eca9ac48ff315",
     "cacheWriteAccounting": {
       "at": "2026-10-13T14:13:29.537391+00:00",

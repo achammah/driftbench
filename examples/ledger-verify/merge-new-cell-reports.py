@@ -1,8 +1,8 @@
 """Join new model evidence into the verify dossier without calling or rescoring a model."""
-import collections,datetime,hashlib,json,subprocess,sys
+import collections,datetime,hashlib,json,os,subprocess,sys
 from pathlib import Path
 BASE=Path(__file__).resolve().parent;ROOT=BASE.parents[1]
-DOSSIER=Path('/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-verify.md')
+DOSSIER=Path(os.environ['LEDGER_VERIFY_DOSSIER'])
 MODELS={'claude-sonnet-5-5':'sonnet','gpt-6.1-sol':'sol61'}
 CONTESTANTS=['driftbench-verify-uncertainty-cascade','promptfoo']
 def read(p):return json.loads(p.read_text())

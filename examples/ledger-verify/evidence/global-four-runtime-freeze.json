@@ -148,7 +148,7 @@
     "examples/ledger-verify/test_capture.py": "b0c72a1b840a7a8daa2d280024610c76d7c91589e612802b288939a04f65dd6f",
     "examples/ledger-verify/test-transport-failure.ts": "f9148989bc2d5c4aabb282f2f35225d5e9e1cde7a8b9b12c014b8e4907b7ec99",
     "examples/ledger-verify/preserve-exhausted.ts": "980d0b6da03831cd3231e9b6ff19583c3287bc34e16d7df528c3538fdc940743",
-    "examples/ledger-verify/supervise.py": "954c9a59c9b2108141b14ca1d2dfbdce64a2a858408d75de951ab46d239ab36b"
+    "examples/ledger-verify/supervise.py": "614c20e0711c358502389544341c46511804516452cdc615b9ba69bcdc324849"
   },
   "pricesPerMillion": {
     "gpt-6-luna": {

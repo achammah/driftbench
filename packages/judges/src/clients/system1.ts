@@ -52,7 +52,8 @@ function fromProbability(
  * Jev, a system 1 judge: POST {JEV_URL} with `{ model, state, questions }`, one question `verdict` of type
  * `noul` (a yes or no question), and the answer `{ model, answers: { verdict: { noul: <probability of yes> } } }`.
  * Reads JEV_URL, JEV_API_KEY and JEV_MODEL (default jev-latest). JEV_ROUTE picks the route: `gateway` sends the key in the
- * api-key header (URL default the Nexus gateway), `typesafe` sends a bearer token (URL default the direct API); without
+ * api-key header (the Nexus gateway URL is used only when JEV_ROUTE=gateway is set and JEV_URL is not), `typesafe` sends a
+ * bearer token (URL default the direct API); without
  * it JEV_URL is required and the key is a bearer token. UNVERIFIED in
  * this repository until a live call: the shape follows the provider's published request format.
  */

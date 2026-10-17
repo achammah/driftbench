@@ -13,7 +13,7 @@
       "fingerprint": "9a935f6394bb6cfa8438700ccb7feaefaf6657c8de2774c853d1a8c1e64c6d6c",
       "phase": "test",
       "reservationRetained": true,
-      "nativeReceipt": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/4e6aab15-7d7b-40c5-8e6d-5ee653260dab.json"
+      "nativeReceipt": "<repo>/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/4e6aab15-7d7b-40c5-8e6d-5ee653260dab.json"
     },
     {
       "id": "2ad67c5b-301a-45f8-95cb-56a86dcc4cd8",
@@ -23,7 +23,7 @@
       "fingerprint": "2d2b648ee7db9348f7966f8717c3c20ab83fff1615410ad1759388d37f8d6cc1",
       "phase": "test",
       "reservationRetained": true,
-      "nativeReceipt": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/2ad67c5b-301a-45f8-95cb-56a86dcc4cd8.json"
+      "nativeReceipt": "<repo>/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/2ad67c5b-301a-45f8-95cb-56a86dcc4cd8.json"
     },
     {
       "id": "b7df3b9a-b5e4-4104-9d9f-4e6c6b0f1166",
@@ -33,7 +33,7 @@
       "fingerprint": "ec31b95c0f02344e6b85e0b7d644645b463ee2a2ec2fcdb40a408c778adbf14a",
       "phase": "test",
       "reservationRetained": true,
-      "nativeReceipt": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/b7df3b9a-b5e4-4104-9d9f-4e6c6b0f1166.json"
+      "nativeReceipt": "<repo>/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/b7df3b9a-b5e4-4104-9d9f-4e6c6b0f1166.json"
     },
     {
       "id": "65a72335-0d82-4625-979e-7c183f92c6c7",
@@ -43,7 +43,7 @@
       "fingerprint": "b32a97dbf9524b856d1e057b4ed98e23ee79fc936b8543b3a57ce2b8fceca1f8",
       "phase": "test",
       "reservationRetained": true,
-      "nativeReceipt": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/65a72335-0d82-4625-979e-7c183f92c6c7.json"
+      "nativeReceipt": "<repo>/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/65a72335-0d82-4625-979e-7c183f92c6c7.json"
     },
     {
       "id": "85031851-d17e-42cc-b069-e518de882d31",
@@ -53,7 +53,7 @@
       "fingerprint": "d362855a67300547f1ca362f356a95a39e8ebfadb2380df711593c1555c2ad9a",
       "phase": "test",
       "reservationRetained": true,
-      "nativeReceipt": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/85031851-d17e-42cc-b069-e518de882d31.json"
+      "nativeReceipt": "<repo>/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/85031851-d17e-42cc-b069-e518de882d31.json"
     },
     {
       "id": "e7022c59-aa8b-4691-b503-8b7d63852bab",
@@ -63,7 +63,7 @@
       "fingerprint": "ee28d90faae77b16da1d8edfcd03e9fc645096f318e2563c5b8a2320b90b2f1d",
       "phase": "test",
       "reservationRetained": true,
-      "nativeReceipt": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/e7022c59-aa8b-4691-b503-8b7d63852bab.json"
+      "nativeReceipt": "<repo>/.worktrees/ledger-verify/examples/ledger-verify/receipts/native/e7022c59-aa8b-4691-b503-8b7d63852bab.json"
     }
   ],
   "priorAuthorizationFile": "evidence/haiku-test-timeouts.initial-three.json",

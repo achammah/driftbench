@@ -3,6 +3,6 @@
   "reason": "PR 168 omits fetch failure causes; record sanitized error names and codes around the same fetch request",
   "providerCalls": 0,
   "behavior": "No payload, model, reasoning, retry, pacing, verdict, cap or timeout changes",
-  "priorRuntimeSha256": "db17a6c23b3463a3860c510a3834d25fb07b14d67ca183dbd909b4eb9c5ca494",
-  "runtimeSha256": "d7d6bff442386a4cd36a6a0fb75d7429dddba79bdab7c8e4fb029b877a05ad30"
+  "priorRuntimeSha256": "23d940096b552f6a6c29ff77a29106255d9c392438496e755ebca14c0b9597ef",
+  "runtimeSha256": "90a01a7e2ac1d97fc0dfa48083b0c64081a152f997a3cb66a30597d01086da45"
 }

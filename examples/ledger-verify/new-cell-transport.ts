@@ -47,7 +47,7 @@ try{
  if(model==='claude-sonnet-5-5'){
   const env:any={...process.env,CLAUDE_JUDGE_MODEL:'sonnet',CLAUDE_CODE_MAX_OUTPUT_TOKENS:'16384',CLAUDE_CODE_EFFORT_LEVEL:'medium',DISABLE_PROMPT_CACHING:'1'};
   for(const name of ['OPENAI_API_KEY','GEMINI_API_KEY','ANTHROPIC_API_KEY','MAX_THINKING_TOKENS','CLAUDE_CODE_DISABLE_THINKING','CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING'])delete env[name];
-  nativeReceipt=resolve(base,'receipts/native',id+'.json');env.VERIFY_NATIVE_RECEIPT=nativeReceipt;env.VERIFY_NATIVE_EXECUTABLE='/Users/assem/.local/bin/claude';
+  nativeReceipt=resolve(base,'receipts/native',id+'.json');env.VERIFY_NATIVE_RECEIPT=nativeReceipt;env.VERIFY_NATIVE_EXECUTABLE='<home>/.local/bin/claude';
   const transport=createDialectTransport({provider:'claude-cli',model:'sonnet',env,command:resolve(parent,'capture-claude.sh'),timeoutMs:300000,maxBudgetUsd:.5});
   started=true;const response=await transport.complete({system,user});
   assert(response.costUsd!==undefined);raw=JSON.parse(response.raw);

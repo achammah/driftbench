@@ -19,7 +19,7 @@
     "receipts.py": "d62d3d5c71d68a4522f774ffdb0c2216c1c78dda9c8174741f952a4d23b783c2",
     "run-additional.py": "51147d9814cbd7fa2fa642c2f71e615528bf1664016142dbbd4b6806c51ca9e8",
     "render-additional.mts": "aa532b89133cc3374bff38f6b59b60d42a112218b656a2eccd1fdedd106bf977",
-    "candidate-freeze.json": "b00e012feb5afc29eadba64e76a8b5700837b45fc74fb40102f9fe59e782410a",
+    "candidate-freeze.json": "ad9d9a3ef5bca24e48fe6439dc57ae04271248c3deb66539de8a01f0c38f3c0b",
     "audit.py": "963111d4daa9ba667627e8caa7cfb0a8d2f265865abc0b32bb7a750e367a6839"
   },
   "renderer_format_updated_before_calls": "2026-10-13T05:00:36.683630+02:00"

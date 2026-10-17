@@ -2,7 +2,7 @@
 import argparse, concurrent.futures, fcntl, os, subprocess, threading, time, urllib.request, urllib.error
 from common import *
 
-LEDGER = Path('/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/spend-ledger.md')
+LEDGER = Path('<scratchpad>/spend-ledger.md')
 
 def append(path, value):
     with path.open('a') as f:

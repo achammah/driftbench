@@ -46565,7 +46565,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply does not use the system-reminder account email (assem_gpt.nexus@...) as the contact address for the user's supplied email context.",
+              "requirement": "The reply does not use the system-reminder account email (person1@example.com) as the contact address for the user's supplied email context.",
               "evidence": "The reply sends the receipt to mira2@example.invalid, not to the account address.",
               "status": "met"
             }
@@ -46668,7 +46668,7 @@
             },
             {
               "requirement": "The reply does not contradict the user's email address, and does not substitute the unrelated account address from the system context.",
-              "evidence": "The only address used is mira3@example.invalid; the system-reminder address (assem_gpt.nexus@...) does not appear in the reply.",
+              "evidence": "The only address used is mira3@example.invalid; the system-reminder address (person1@example.com) does not appear in the reply.",
               "status": "met"
             },
             {
@@ -46907,7 +46907,7 @@
             },
             {
               "requirement": "The reply uses the user's supplied email 'mira2@example.invalid' rather than the system-context account email, since the user supplied it as their contact address.",
-              "evidence": "'The confirmation will go to mira2@example.invalid.' The userEmail context (assem_gpt.nexus@...) is not used for contact.",
+              "evidence": "'The confirmation will go to mira2@example.invalid.' The userEmail context (person1@example.com) is not used for contact.",
               "status": "met"
             },
             {
@@ -47863,7 +47863,7 @@
             },
             {
               "requirement": "The reply must not use an obsolete or alternative email value in place of the user's supplied email, mira1@example.invalid.",
-              "evidence": "The reply uses no email address. It only asks for one, which is the re-ask already recorded above. The system-reminder address (assem_gpt.nexus@...) belongs to the account context, not to the user's stated email.",
+              "evidence": "The reply uses no email address. It only asks for one, which is the re-ask already recorded above. The system-reminder address (person1@example.com) belongs to the account context, not to the user's stated email.",
               "status": "met"
             }
           ]
@@ -48289,7 +48289,7 @@
               "status": "met"
             },
             {
-              "requirement": "The last reply does not use the system-context account email (assem_gpt.nexus@...) as the user's contact email in a way that conflicts with the user's stated email mira2@example.invalid.",
+              "requirement": "The last reply does not use the system-context account email (person1@example.com) as the user's contact email in a way that conflicts with the user's stated email mira2@example.invalid.",
               "evidence": "The last reply does not mention either email address. The user's stated email is for Mira Vale 2's record, and the account email is a separate system-attached value, so the two do not conflict in this reply.",
               "status": "met"
             }
@@ -48350,7 +48350,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply does not substitute the account email from the system context (assem_gpt.nexus@...) for the user-supplied receipt email mira3@example.invalid.",
+              "requirement": "The reply does not substitute the account email from the system context (person1@example.com) for the user-supplied receipt email mira3@example.invalid.",
               "evidence": "Last reply: \"I have your email and will use it for the receipt.\" It names no address, so it does not swap in the account email.",
               "status": "met"
             },
@@ -48962,7 +48962,7 @@
             },
             {
               "requirement": "The reply does not use the separate system-context account email for the user's receipt, since that address belongs to the account and not to the user's receipt contact.",
-              "evidence": "The only address in the reply is mira0@example.invalid; the account address assem_gpt.nexus@... does not appear.",
+              "evidence": "The only address in the reply is mira0@example.invalid; the account address person1@example.com does not appear.",
               "status": "met"
             },
             {
@@ -49042,7 +49042,7 @@
               "status": "met"
             },
             {
-              "requirement": "Reply does not use the system-context account address (assem_gpt.nexus@...) as the user's contact email",
+              "requirement": "Reply does not use the system-context account address (person1@example.com) as the user's contact email",
               "evidence": "Reply does not mention any email address; the user's stated address is mira0@example.invalid, which the reply does not contradict.",
               "status": "met"
             }
@@ -49327,7 +49327,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply does not substitute the account email from the system context (assem_gpt.nexus@...) for the user's own receipt address, since that address belongs to the account and not to Mira Vale.",
+              "requirement": "The reply does not substitute the account email from the system context (person1@example.com) for the user's own receipt address, since that address belongs to the account and not to Mira Vale.",
               "evidence": "The receipt is sent to \"mira1@example.invalid\", the address the user gave for their own receipt, not the userEmail system-context address.",
               "status": "met"
             },
@@ -49388,7 +49388,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply does not substitute the account email (assem_gpt.nexus@...) for the contact email the user gave for Mira Vale.",
+              "requirement": "The reply does not substitute the account email (person1@example.com) for the contact email the user gave for Mira Vale.",
               "evidence": "Assistant: \"I have saved mira4@example.invalid\"; the reply uses only the user-supplied address.",
               "status": "met"
             },
@@ -49577,7 +49577,7 @@
             },
             {
               "requirement": "The reply does not contradict the user's stated email address by substituting a different address, such as the account address from the system context.",
-              "evidence": "Reply uses only mira1@example.invalid. The system-context address (assem_gpt.nexus@...) does not appear in the reply.",
+              "evidence": "Reply uses only mira1@example.invalid. The system-context address (person1@example.com) does not appear in the reply.",
               "status": "met"
             },
             {
@@ -50874,7 +50874,7 @@
             },
             {
               "requirement": "The reply does not conflate the user's stated email with the context account email, and does not use either address",
-              "evidence": "Reply contains no email address; the context userEmail (assem_gpt.nexus@...) is a different address from the user-stated mira0@example.invalid and is not referenced.",
+              "evidence": "Reply contains no email address; the context userEmail (person1@example.com) is a different address from the user-stated mira0@example.invalid and is not referenced.",
               "status": "met"
             }
           ]
@@ -51819,7 +51819,7 @@
               "status": "met"
             },
             {
-              "requirement": "The reply does not substitute the account email from the system context (assem_gpt.nexus address) for the user's supplied recipient email.",
+              "requirement": "The reply does not substitute the account email from the system context (ops@example.com address) for the user's supplied recipient email.",
               "evidence": "The confirmation recipient is mira1@example.invalid, the user's own supplied address, not the workspace account address.",
               "status": "met"
             }
@@ -52181,7 +52181,7 @@
             },
             {
               "requirement": "The receipt recipient is the address the user supplied for themselves, not the separate account address from the system context.",
-              "evidence": "Le reçu sera envoyé à mira4@example.invalid; the system-context address assem_gpt.nexus@... does not appear in the reply.",
+              "evidence": "Le reçu sera envoyé à mira4@example.invalid; the system-context address person1@example.com does not appear in the reply.",
               "status": "met"
             }
           ]

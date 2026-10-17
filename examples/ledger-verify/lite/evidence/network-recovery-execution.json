@@ -1,7 +1,7 @@
 {
   "at": "2026-10-13T12:42:38.265832+00:00",
-  "priorRuntimeSha256": "884494a3f85e7e7c1bbc7e08b6d141f7d28951d639196e410cd47e1e6806a4b4",
-  "runtimeSha256": "3589f446b4897632f04cd98b2eba84494b7509aab2072a1964e15372d0f4ce4a",
+  "priorRuntimeSha256": "b889b7569379743492f01c9505cb7305b069cee3eab49ee65a04b038f3458a0d",
+  "runtimeSha256": "615fc65d3769e0e0c345ce4736d6d81484ec5acae16c822465cfce60886616a9",
   "authorizationFile": "network-recovery-amendment.json",
   "maxTotalSubmissions": 3,
   "offlineClaimTests": "passed: allowlist and third additional attempt denial",
@@ -9,7 +9,7 @@
     "examples/ledger-verify/lite-transport.ts": "fe0c4e29a19af6d375fc54e57f1b684221c3a20383663b5bcaeb5a52a99d6d91",
     "examples/ledger-verify/lite-recovery-claim.py": "54db64e428e8bb01595575e32e3cd41d878e6a091f2a54d44e8f6eb981115243",
     "examples/ledger-verify/lite-connectivity.mjs": "8458f1798fc810a85b2f71c3c68334e22f8528732117ebb116a867d4767075a1",
-    "examples/ledger-verify/recover-lite-network.py": "b4f721bf3ac6aa7768bddeb8ae19a2c1d7aae5f2f598c2deb5aa7f92cc1e3d17",
+    "examples/ledger-verify/recover-lite-network.py": "6637a88c12c94c854e90e0d74e87354a90f2ec4801d6776daae27ac70928d253",
     "examples/ledger-verify/replay-item-history.ts": "8b0d579bc50a7ff7861983265dbfad160635ac84a4af264e9cba3a050d435837"
   },
   "retainedUnknownHoldsUsd": 10.5,

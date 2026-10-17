@@ -8,7 +8,7 @@ import subprocess
 
 BASE = Path(__file__).resolve().parent
 ROOT = BASE.parents[1]
-DOSSIER = Path('/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-verify.md')
+DOSSIER = Path('<scratchpad>/codex/dossier-ledger-verify.md')
 
 
 def git(*args):

@@ -4,7 +4,7 @@ Historical dossier. Gemini 3.8 Flash was dropped by the owner; its recorded data
 
 Historical status: recovering interrupted DEV pilots. Core PR 168 at 35f07309 is imported; successful answers remain cached.
 
-- Worktree: `/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-verify`.
+- Worktree: `<repo>/.worktrees/ledger-verify`.
 - Branch: `research/ledger-verify`, created from `origin/main` at `9970c938de76bbb3030795d983fad08d8bb611b6`.
 - Cascade: `driftbench-verify-uncertainty-cascade`, freeze `558d75de017ecbf243852f5669a1bffeb8d511b9`, source head `f13242f29ad0ced947907a84ffbb19abaa32f190`.
 - The user confirms the core is resumed. Its latest dossier supersedes the earlier paused status.

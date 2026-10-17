@@ -116,7 +116,7 @@
     "examples/ledger-verify/replay-frozen.ts": "f6af4c079d00effb1c63d362d696de454667292015f03333e4a48d3d19489dad",
     "examples/ledger-verify/run.ts": "4dba10340b086fa8ffdecf55dde7bae9a75d1d535cb4233dfb468040f0d24767",
     "examples/ledger-verify/schemas.ts": "89e8708edd82c74cb90a09ec53c09dda19ec70c537a0e63c3b0283f905c9b97c",
-    "examples/ledger-verify/transport.ts": "c621bb49d72cd20d7aa23e8b6d974026bbdae1ca6461680324098be849a3226a",
+    "examples/ledger-verify/transport.ts": "3413c705c04c290db8395d5943f2da8ba48f458e33be5d6bf15f5264151f8f11",
     "examples/ledger-verify/budget.py": "9166b4e26d3271d920b8225cd602935acd506097ac022a74cacecb7c6098b894",
     "examples/ledger-verify/prepare-validity.py": "ce8cb5fb4bb9ef030bece086f8f00610fec0ec4fe5eaa328b3be31e7ac94b185",
     "examples/ledger-verify/prepare.py": "0f4d30fd4d0aeaa3f8aa42766b70ef21c7a340feaf06c3cad0c1608e7d40dff1",
@@ -136,7 +136,7 @@
     "examples/ledger-verify/test_capture.py": "b0c72a1b840a7a8daa2d280024610c76d7c91589e612802b288939a04f65dd6f",
     "examples/ledger-verify/test-transport-failure.ts": "f9148989bc2d5c4aabb282f2f35225d5e9e1cde7a8b9b12c014b8e4907b7ec99",
     "examples/ledger-verify/preserve-exhausted.ts": "980d0b6da03831cd3231e9b6ff19583c3287bc34e16d7df528c3538fdc940743",
-    "examples/ledger-verify/supervise.py": "954c9a59c9b2108141b14ca1d2dfbdce64a2a858408d75de951ab46d239ab36b",
+    "examples/ledger-verify/supervise.py": "614c20e0711c358502389544341c46511804516452cdc615b9ba69bcdc324849",
     "examples/ledger-verify/billing.ts": "5b7736e82ea659abc9f270c1ca9fa816c0ea5a69124af6228cdc7c82af825601",
     "examples/ledger-verify/test-billing.ts": "0ceab4aef146fd35c8796dfcfd2d90f3b00ab063101a93ad708e5640f3867a84",
     "examples/ledger-verify/pacing.py": "248ee9149371c28c53a82fdf017ef6d313f509ba3161e5f7622b7034f8778416",
@@ -147,7 +147,7 @@
     "examples/ledger-verify/lite-quota.ts": "86938205175e2228bdc68cac56fe3a9f907018ab94ce2c393015faec4aa6da42",
     "examples/ledger-verify/lite/budget.py": "2f7069b2ca6c6d9be1fecadbaba5545a76ccde4f1a7ea36801a0da39b36852f7",
     "examples/ledger-verify/lite/validate.py": "d756beb11f5a76e1d66ae03b299f178ce438f04bcd8992498d574e4fecd26e70",
-    "examples/ledger-verify/lite-supervise.py": "4b6e998832b646cfa8914a0fafa2d1473ea7a32391245e6fd37199e028a2d31e"
+    "examples/ledger-verify/lite-supervise.py": "8544416bb5fed65161697177546fa486d01a678e94ecc30e7f2a399d5cb305cb"
   },
   "pricesPerMillion": {
     "gpt-6-luna": {

@@ -1,6 +1,6 @@
 Initial main oracle (unmodified base):
 
- RUN  v5.0.3 /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/sol-gen-maint/wt
+ RUN  v5.0.3 <scratchpad>/sol-gen-maint/wt
 
  ❯ packages/validators/test/generator/integer-contrast.test.ts (15 tests | 12 failed) 79ms
    ❯ integer contrast follows the requested value, not preparatory calls (15)
@@ -107,7 +107,7 @@ AssertionError: expected { pass: false, …(1) } to match object { pass: true }
 
 Exact JSON forms before their support:
 
- RUN  v5.0.3 /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/sol-gen-maint/wt
+ RUN  v5.0.3 <scratchpad>/sol-gen-maint/wt
 
  ❯ packages/validators/test/generator/integer-contrast.test.ts (20 tests | 1 failed | 19 skipped) 20ms
    ❯ integer contrast follows the requested value, not preparatory calls (16)

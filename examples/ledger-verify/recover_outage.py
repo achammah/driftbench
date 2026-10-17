@@ -48,7 +48,7 @@ def main():
         env.pop(key, None)
     env['TMPDIR'] = str(ROOT / '.tmp')
     env['VERIFY_PHASE'] = 'noise-2'
-    env['VERIFY_CORE_DOSSIER'] = '/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-core.md'
+    env['VERIFY_CORE_DOSSIER'] = os.environ['VERIFY_CORE_DOSSIER']
     tsx = [str(ROOT / 'node_modules/.bin/tsx'),'--tsconfig','examples/ledger-verify/tsconfig.json']
     subprocess.run(tsx + ['examples/ledger-verify/prepare-outage.ts'], cwd=ROOT, env=env, check=True)
     requests = json.loads((BASE / 'cache/outage/requests.json').read_text())

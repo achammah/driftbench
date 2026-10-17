@@ -14,7 +14,7 @@ def main():
     for name,path in sources.items():
         content=subprocess.check_output(['git','show',f'{core}:{path}'],cwd=ROOT)
         (dest/'vendor'/name).write_bytes(content)
-    subprocess.run(['/Users/assem/Documents/GitHub/driftbench/node_modules/.bin/tsx',str(HERE/'dialect-render.mts')],cwd=ROOT,check=True)
+    subprocess.run([str(ROOT/'node_modules/.bin/tsx'),str(HERE/'dialect-render.mts')],cwd=ROOT,check=True)
     for f in ('README.md',):
         (dest/f).write_text('''# Separate dialect variant
 

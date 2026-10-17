@@ -7,11 +7,11 @@
   "productFinal": "The frozen product final verdict, including built-in fallback, remains unchanged.",
   "nativeEvidence": "stop_reason=refusal or Responses content type refusal",
   "priorHashes": {
-    "runtime-freeze.json": "b12daf35c06fa99430abeec5ed52751ba8f93b5dff086c40c0e7e6a36747547c",
-    "pilot-runtime-freeze.json": "b12daf35c06fa99430abeec5ed52751ba8f93b5dff086c40c0e7e6a36747547c",
+    "runtime-freeze.json": "3f6ffffc032f299bcd124e835d418db83a4914377fac1621cbad74a0950cae9c",
+    "pilot-runtime-freeze.json": "3f6ffffc032f299bcd124e835d418db83a4914377fac1621cbad74a0950cae9c",
     "reporting-freeze.json": "92b4c089629fb8a12e4b4bc014a0c363456057003a906152e0e9b1293e2e53a0"
   },
-  "runtimeSha256": "6367ef409f542628dd5017dabb978ed8811b1890d7f99b73c015492f199659f5",
+  "runtimeSha256": "fa49e635879994f985d8849096d9e52a027ae5b97c62be95b7ac10e20d638fb9",
   "reportingSha256": "ca936a947292582fcdcbebece33b103f84ab9511aace4ad3ff9fe45665be7592",
   "promptsChanged": false,
   "returnedResponsesResent": false,

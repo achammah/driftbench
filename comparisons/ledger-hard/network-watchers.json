@@ -2,12 +2,12 @@
   "created": "2026-10-13T18:46:19.380202+00:00",
   "supervisor": {
     "pid": 76375,
-    "log": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-hard/comparisons/ledger-hard/detached-supervisor.log",
-    "state_file": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-hard/comparisons/ledger-hard/supervisor-state.json",
-    "source": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-hard/comparisons/ledger-hard/detached-supervisor.py",
+    "log": "<repo>/.worktrees/ledger-hard/comparisons/ledger-hard/detached-supervisor.log",
+    "state_file": "<repo>/.worktrees/ledger-hard/comparisons/ledger-hard/supervisor-state.json",
+    "source": "<repo>/.worktrees/ledger-hard/comparisons/ledger-hard/detached-supervisor.py",
     "detached_session": true,
     "target": "Sol then Sonnet; 6560 answers each; verify, report and push",
-    "stop_new_calls": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-hard/comparisons/ledger-hard/network-hold",
+    "stop_new_calls": "<repo>/.worktrees/ledger-hard/comparisons/ledger-hard/network-hold",
     "self_terminates": "only on verified complete publication; guards leave supervisor waiting"
   },
   "retired_prior_watchers": {

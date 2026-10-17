@@ -64,7 +64,7 @@ cassette.write_text(''.join(json.dumps(r)+'\n' for r in updated))
 assert report.read_bytes()==report.with_name(f'{MODEL}.pre-test-network-recovery.json').read_bytes()
 report.unlink()
 emit(status='continuing TEST',answered=25,firstCompletedResultsPreserved=117,recoveredAnswersApplied=len(applied),recoveredAnswersRetainedWithoutChangingPriorChain=len(unused),unusedKeys=unused)
-env.pop('VERIFY_LITE_NETWORK_RECOVERY');env.pop('VERIFY_LITE_RECOVERY_SET');env['VERIFY_CORE_DOSSIER']='/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-core.md'
+env.pop('VERIFY_LITE_NETWORK_RECOVERY');env.pop('VERIFY_LITE_RECOVERY_SET');env['VERIFY_CORE_DOSSIER']='<scratchpad>/codex/dossier-ledger-core.md'
 progress=LITE/f'{MODEL}.progress.json';progress.write_text(json.dumps(dict(at=stamp(),phase='results',status='running',model=MODEL,concurrency=4))+'\n')
 command=[str(ROOT/'node_modules/.bin/tsx'),'--tsconfig','examples/ledger-verify/tsconfig.json','examples/ledger-verify/resume-lite-test.ts']
 with (LITE/'logs/test-network-resume.log').open('w') as log:subprocess.run(command,cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)

@@ -1,6 +1,6 @@
 {
   "created": "2026-10-14T03:20:49.826979+00:00",
-  "dossier": "/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-hard.md",
+  "dossier": "<scratchpad>/codex/dossier-ledger-hard.md",
   "dossier_sha256": "8448953225879ba0b68917f2452bd28954413a62c98a4b8237b6ead60a4c174a",
   "local_final_sha256": "8448953225879ba0b68917f2452bd28954413a62c98a4b8237b6ead60a4c174a",
   "full_coverage": true,

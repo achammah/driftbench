@@ -115,7 +115,7 @@
     "examples/ledger-verify/replay-frozen.ts": "f6af4c079d00effb1c63d362d696de454667292015f03333e4a48d3d19489dad",
     "examples/ledger-verify/run.ts": "4dba10340b086fa8ffdecf55dde7bae9a75d1d535cb4233dfb468040f0d24767",
     "examples/ledger-verify/schemas.ts": "89e8708edd82c74cb90a09ec53c09dda19ec70c537a0e63c3b0283f905c9b97c",
-    "examples/ledger-verify/transport.ts": "c621bb49d72cd20d7aa23e8b6d974026bbdae1ca6461680324098be849a3226a",
+    "examples/ledger-verify/transport.ts": "3413c705c04c290db8395d5943f2da8ba48f458e33be5d6bf15f5264151f8f11",
     "examples/ledger-verify/budget.py": "9166b4e26d3271d920b8225cd602935acd506097ac022a74cacecb7c6098b894",
     "examples/ledger-verify/prepare-validity.py": "ce8cb5fb4bb9ef030bece086f8f00610fec0ec4fe5eaa328b3be31e7ac94b185",
     "examples/ledger-verify/prepare.py": "0f4d30fd4d0aeaa3f8aa42766b70ef21c7a340feaf06c3cad0c1608e7d40dff1",
@@ -135,17 +135,17 @@
     "examples/ledger-verify/test_capture.py": "b0c72a1b840a7a8daa2d280024610c76d7c91589e612802b288939a04f65dd6f",
     "examples/ledger-verify/test-transport-failure.ts": "f9148989bc2d5c4aabb282f2f35225d5e9e1cde7a8b9b12c014b8e4907b7ec99",
     "examples/ledger-verify/preserve-exhausted.ts": "980d0b6da03831cd3231e9b6ff19583c3287bc34e16d7df528c3538fdc940743",
-    "examples/ledger-verify/supervise.py": "954c9a59c9b2108141b14ca1d2dfbdce64a2a858408d75de951ab46d239ab36b",
+    "examples/ledger-verify/supervise.py": "614c20e0711c358502389544341c46511804516452cdc615b9ba69bcdc324849",
     "examples/ledger-verify/billing.ts": "5b7736e82ea659abc9f270c1ca9fa816c0ea5a69124af6228cdc7c82af825601",
     "examples/ledger-verify/test-billing.ts": "0ceab4aef146fd35c8796dfcfd2d90f3b00ab063101a93ad708e5640f3867a84",
     "examples/ledger-verify/pacing.py": "248ee9149371c28c53a82fdf017ef6d313f509ba3161e5f7622b7034f8778416",
     "examples/ledger-verify/test_pacing.py": "efbe31fced8d16f373cb147008b9f9576c164bca20db3786051f94606be6fb33",
     "examples/ledger-verify/new-cell-run.ts": "0bfae9258b44c938203a6bf57a269e756b89b437ea3adc1215d7b91afe651855",
-    "examples/ledger-verify/new-cell-transport.ts": "56a43670abe327803991858ceb9baf3e710c5d34e316055b7c73eb63fb5b632c",
+    "examples/ledger-verify/new-cell-transport.ts": "44c333277c3868f0a11275d100c9e883d0ede63bcbe6a84a4628e97eda7038f2",
     "examples/ledger-verify/new-cell-transport.sh": "082fab76eda59dca529c9be30de08321dde8ddffb80d2ebb185158391b92248f",
     "examples/ledger-verify/new-cell-budget.py": "3c4b2b67764f5f0c155493f72cbe6eb8b26fce79096ee3a710548d4a77fed08f",
     "examples/ledger-verify/responses-adapter.ts": "56150dcbb6628935ad3864df6e9e8e201c64ba5fcb573971fc2798557a734181",
-    "examples/ledger-verify/new-cell-supervise.py": "161a66917c850b4de072f3aa408a02759a4ae7bf8123a4fd65c8a04dff7267fb",
+    "examples/ledger-verify/new-cell-supervise.py": "8414ffe4a13777a39774c210773eac6e114d26e2f8f817b7402b1fe29674da81",
     "examples/ledger-verify/transport-retry.py": "8a802f51c092288dbeb45d6f2241af57db51b25d2217938a8fc25fcbe668e390",
     "examples/ledger-verify/evidence/new-model-cost-sample.json": "e80fdbedbb15cc563638c2c676554c47d2b3f0c4b6ea14bdd9f7c4c4adaa1455",
     "examples/ledger-verify/network-gate.py": "6ad79f77bbdabcd02aab586ee00716188989a74ce4c75b1ac9b1105d6f96a480",
@@ -198,7 +198,7 @@
   "transportIdentity": "claude-cli-lean-sonnet-medium-output16384-v1",
   "runtimeAmendment": {
     "at": "2026-10-13T15:59:22.994828+00:00",
-    "priorSha256": "0974292748f5bedfae651b88f441bbf6dc2eb21a04beae0aa01821532af20832",
+    "priorSha256": "116c30148ab821c97cce182b94c5312bf085ac25587ddb0632e7ae0d12d31386",
     "policy": "Fresh 10-probe provider gate after outage. Explicit noAnswer errors count toward cooldown. Quota retries recheck network admission. Sonnet disables prompt caching for both contestants; existing answers retain cache identity."
   },
   "conditionalBudgetEvidence": "sonnet/evidence/cache-off-cost-sample.json",
@@ -206,12 +206,12 @@
   "quotaContinuationAmendment": {
     "at": "2026-10-13T16:46:57.563803+00:00",
     "beforeTEST": true,
-    "priorHash": "62f5be711d97529d0e9f9a50510d9e5419c2b1888d9eef482a8a36328fab05f0",
+    "priorHash": "24c09fd08a9bbb13a39421a208f11142b6c06fbe04af71af08dd8f14c0702722",
     "rule": "No-answer native quota recovers missing-only; no-provider preflight admission guards are listed separately from submitted missing requests. Refusals terminal at any token count."
   },
   "dependencyGuardCorrection": {
     "at": "2026-10-13T17:09:33.444113+00:00",
     "beforeTEST": true,
-    "priorHash": "8c5a7245abe134d79e7e4a1ef53cf7bbda81e3e2ddfd7d1f18413d7ba2346840"
+    "priorHash": "94c5090a5edda210f9b485e3e8acc234ffd5903a40ec355f31d25aa645952c64"
   }
 }

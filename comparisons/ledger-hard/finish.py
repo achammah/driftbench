@@ -28,7 +28,7 @@ def main():
         assert all(n==0 or 'gemini-3.8-flash' in key for key,n in state['remaining'].items()),state
     else:assert sum(state['remaining'].values())==0 and state['stop_reason'] is None,state
     dump(HERE/'finish-state.json',{'stamp':stamp(),'status':'verifying'})
-    tsx='/Users/assem/Documents/GitHub/driftbench/node_modules/.bin/tsx'
+    tsx=str(ROOT/'node_modules/.bin/tsx')
     call(['python3','comparisons/ledger-hard/check-audit.py'])
     tests=call(['python3','-m','unittest','discover','-s','comparisons/ledger-hard','-p','test_*.py'])
     (HERE/'test-output.txt').write_text(tests)

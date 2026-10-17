@@ -3,7 +3,7 @@ import collections, fractions, math, random, subprocess
 from common import *
 from run import requests, priced
 
-DOSSIER = Path('/private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/codex/dossier-ledger-hard.md')
+DOSSIER = Path('<scratchpad>/codex/dossier-ledger-hard.md')
 
 def wilson(k, n):
     if not n: return None
