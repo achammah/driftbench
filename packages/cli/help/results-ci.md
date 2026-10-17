@@ -156,6 +156,12 @@ with any warning, the underpowered criteria, then the measures:
 Then "Goldens that changed" (with the candidate's failing verdicts per block), "Why" (the reasons), the
 line `Verdict: <VERDICT>. Exit <n>.` and `Summary: <file>`.
 
+`ci` prints no suite headline. To read the candidate's pass rate with its hierarchical interval and
+`n_eff`, run `driftbench report` on the candidate campaign in `--store` (see `results-statistics`). The gate
+itself is the paired comparison and the aggregates: neither reads the headline. An aggregate `pass-rate`
+is the pooled rate over the runs, each run counting once. Its interval is the Wilson interval on the
+effective runs, clustered by golden. The headline is the mean over goldens, with the hierarchical interval.
+
 The JSON summary (`--out`, and standard output with `--json`) holds: `verdict`, `exitCode`, `reasons`,
 `aggregates`, `marginPoints`, `marginAuto` (`neededPoints`, `limitedBy`, `warning`), `marginDefaulted` (why `--margin auto` kept the 2 point default when the baseline holds no run of its own that passed or failed; `null` otherwise), `minGoldens`,
 `strict`, `underpowered`, `comparator`, `flags`, `baseline` (`campaignId`, `store`), `candidate`
@@ -252,6 +258,7 @@ Goldens that changed:
   acme-plan-upgrade · P · loose-ok                        pass      fail       regressed  forbidden  block 2 forbidden.order.create, block 2 must.0, block 2 must.1
 
 Why:
+  - 13 goldens regressed: acme-number-porting · T, acme-number-porting · F, acme-number-porting · P · spanish-line, acme-number-porting · P · are-you-there, acme-order-loose-confirmation · T, acme-order-loose-confirmation · F, acme-order-loose-confirmation · P · second-loose-yes, acme-order-loose-confirmation · P · order-service-down, acme-plan-upgrade · T, acme-plan-upgrade · F, acme-plan-upgrade · P · billing-aside, acme-plan-upgrade · P · order-service-down, acme-plan-upgrade · P · loose-ok
   - all-pass dropped: McNemar exact p = 0.0002 below 0.05, 13 goldens regressed and 0 improved
   - forbidden regressed: 13 goldens regressed and 0 improved, adjusted p = 0.0011 under the false discovery rate 0.05
   - must regressed: 13 goldens regressed and 0 improved, adjusted p = 0.0011 under the false discovery rate 0.05
@@ -345,6 +352,7 @@ $ driftbench ci --specs examples/acme/specs/conversations --target fault:control
 
 | Message | Cause and fix |
 |---|---|
+| the `pass-rate` aggregate passes while the suite headline of `report` is lower | expected: the aggregate is the pooled rate, each run counting once, with the Wilson interval on the effective runs clustered by golden; the headline is the mean over goldens. Gate on the paired verdict, or set the aggregate threshold with that in mind |
 | `A fault:<id> target needs --faults <path>, the fault set that defines it.` (exit 2) | add `--faults examples/acme/faults` or your own fault set |
 | `--baseline <value>: no such file, and no campaign <value> in <store>.` (exit 2) | the baseline is neither a store file nor a campaign of `--store` |
 | `The baseline campaign <id> has no run.` (exit 2) | run the baseline campaign first |
