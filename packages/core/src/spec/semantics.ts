@@ -192,6 +192,13 @@ function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]
       if (problem) issues.push(error('REGEX_INVALID', `${path}.${key}.${index}`, problem));
     });
   }
+  expect.regex?.forEach((pattern, index) => {
+    const problem = patternError(pattern);
+    if (problem) issues.push(error('REGEX_INVALID', `${path}.regex.${index}`, problem));
+  });
+  expect.json?.paths?.forEach((entry, index) => {
+    checkAssertion(entry.assert, `${path}.json.paths.${index}.assert`, issues);
+  });
   const mustNot = new Set(expect.must_not ?? []);
   expect.must?.forEach((pattern, index) => {
     if (mustNot.has(pattern)) {

@@ -65,6 +65,28 @@ describe('assertions: every form the spec allows', () => {
     expect(checkAssertion({ key: undefined }, { nonempty: true }).ok).toBe(false);
   });
 
+  // docs/reference/checks.md "Assertions on values": nonempty is "not a mapping whose keys hold nothing", and
+  // a key holds nothing when its value is null, a blank string, an empty list or a mapping that holds nothing.
+  it('nonempty refuses a mapping whose keys hold nothing: null, blank, empty list or empty mapping, at any depth', () => {
+    for (const value of [
+      { a: '' },
+      { a: '   ' },
+      { a: [] },
+      { a: {} },
+      { a: null },
+      { a: '', b: null },
+      { a: { b: '', c: [] } },
+    ]) {
+      expect(checkAssertion(value, { nonempty: true }).ok, JSON.stringify(value)).toBe(false);
+    }
+  });
+
+  it('nonempty accepts a mapping with one key that holds something, whatever the others hold', () => {
+    for (const value of [{ a: '', b: 'x' }, { a: 0 }, { a: false }, { a: { b: '', c: 1 } }, { a: ['x'] }]) {
+      expect(checkAssertion(value, { nonempty: true }).ok, JSON.stringify(value)).toBe(true);
+    }
+  });
+
   it('equality ignores keys that hold undefined and keeps array order', () => {
     expect(checkAssertion({ a: 1, b: undefined }, { exact: { a: 1 } }).ok).toBe(true);
     expect(checkAssertion([1, 2], { exact: [2, 1] }).ok).toBe(false);

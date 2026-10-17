@@ -85,6 +85,12 @@ describe('assertions', () => {
     expect(holds({ nonempty: true }, present('  '), jsonEqual)).toBe(false);
     expect(holds({ nonempty: true }, present([]), jsonEqual)).toBe(false);
     expect(holds({ nonempty: true }, present(0), jsonEqual)).toBe(true);
+    // docs/reference/checks.md "Assertions on values": not a mapping whose keys hold nothing.
+    expect(holds({ nonempty: true }, present({ a: '' }), jsonEqual)).toBe(false);
+    expect(holds({ nonempty: true }, present({ a: null, b: [] }), jsonEqual)).toBe(false);
+    expect(holds({ nonempty: true }, present({ a: { b: ' ' } }), jsonEqual)).toBe(false);
+    expect(holds({ nonempty: true }, present({ a: '', b: 'x' }), jsonEqual)).toBe(true);
+    expect(holds({ nonempty: true }, present({ a: 0 }), jsonEqual)).toBe(true);
     expect(holds({ absent: true }, { present: false, value: undefined }, jsonEqual)).toBe(true);
     expect(holds({ absent: true }, present(null), jsonEqual)).toBe(false);
     expect(holds(null, { present: false, value: undefined }, jsonEqual)).toBe(false);

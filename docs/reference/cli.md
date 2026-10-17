@@ -232,7 +232,7 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `SPEC_ALIAS_CONFLICT` | error | a shorthand and its long form are both set: `ledger_seed` with `given.ledger`, or `workspace_seed` with `given.world.workspace` |
 | `BLOCK_STIMULUS_MISSING` | error | a block has none of `user`, `burst` and `when` |
 | `BLOCK_STIMULUS_AMBIGUOUS` | error | a block has more than one of `user`, `burst` and `when` |
-| `REGEX_INVALID` | error | a pattern in `must`, `must_not` or a `regex` assertion does not compile |
+| `REGEX_INVALID` | error | a pattern in `must`, `must_not`, the `regex` list or a `regex` assertion (in a tool input, an end state or a `json` path) does not compile |
 | `CRITERION_REF_INVALID` | error | a criterion reference is not a name, optionally followed by `@gating` |
 | `CRITERION_UNDEFINED` | error | the spec defines `criteria`, and a block names one that is not there |
 | `CRITERION_DUPLICATE` | error | two criteria share a name |

@@ -101,11 +101,15 @@ function asText(found: Found): string | undefined {
   return undefined;
 }
 
+/**
+ * docs/reference/checks.md "Assertions on values": not `null`, not a string of spaces only, not an empty list,
+ * not a mapping whose keys hold nothing (a key holds nothing when its own value does). `0` and `false` are values.
+ */
 function isEmpty(value: unknown): boolean {
   if (value === null || value === undefined) return true;
   if (typeof value === 'string') return value.trim().length === 0;
   if (Array.isArray(value)) return value.length === 0;
-  if (isRecord(value)) return Object.keys(value).length === 0;
+  if (isRecord(value)) return Object.values(value).every(isEmpty);
   return false;
 }
 

@@ -104,7 +104,7 @@ The path in a spec is dotted, counting from 0: `blocks.2.expect.tools.0.label` i
 | `BLOCK_STIMULUS_MISSING` | error | a block has none of `user`, `burst` and `when` |
 | `BLOCK_STIMULUS_AMBIGUOUS` | error | a block has more than one of `user`, `burst` and `when` |
 | `SCHEMA_*` | error | the schema refuses a value; the suffix is the zod issue code: such as `SCHEMA_UNRECOGNIZED_KEYS` (unknown key), `SCHEMA_INVALID_TYPE` (wrong type, or missing), `SCHEMA_INVALID_VALUE` (not an allowed option), `SCHEMA_INVALID_FORMAT` (pattern mismatch), `SCHEMA_TOO_SMALL` (a list or number under its minimum), `SCHEMA_INVALID_UNION` (a value that fits none of the allowed forms, with a hint), `SCHEMA_CUSTOM` (an unsupported JSON Schema keyword in `json.schema` or `metadata.tool_schemas`, or a length bound with no min and no max) |
-| `REGEX_INVALID` | error | a pattern in `must`, `must_not`, a `regex` assertion or a `knowledge_retention` `ask` does not compile |
+| `REGEX_INVALID` | error | a pattern in `must`, `must_not`, the `regex` list, a `regex` assertion (in a tool input, an end state or a `json` path) or a `knowledge_retention` `ask` does not compile |
 | `CRITERION_REF_INVALID` | error | a criterion reference is not a name, optionally followed by `@gating` |
 | `CRITERION_UNDEFINED` | error | the spec defines `criteria`, and a block names one that is not there |
 | `CRITERION_DUPLICATE` | error | two criteria share a name |

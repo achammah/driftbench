@@ -4,6 +4,7 @@ import type { StatsImpl } from '../reference';
 import { analyticItems } from './analytic';
 import { degenerateItems } from './degenerate';
 import { designBoundItems, edgeItems, ruleItems } from './edges';
+import { exactItems } from './exact';
 import { attempt, BANK_LEVELS, type BankItem, type BankLevel, type ItemOutcome, itemRng } from './item';
 import { productItems } from './product';
 import { rateItems } from './rates';
@@ -58,6 +59,7 @@ export function statsBank(root: string): BankItem[] {
     ...degenerateItems(),
     ...reproducibilityItems(),
     ...analyticItems(),
+    ...exactItems(),
     ...edgeItems(root),
     ...designBoundItems(),
     ...ruleItems(),
