@@ -99,3 +99,32 @@ describe.each(['F', 'T'] as const)('a failed parent, mode %s', (mode) => {
     expect(result.blocks).toHaveLength(5);
   });
 });
+
+describe.each(['F', 'T'] as const)('an adapter that cannot seed a prefix, mode %s', (mode) => {
+  it('makes every child not_run before it is sent, and still runs the roots', async () => {
+    const sent: string[] = [];
+    const base = functionAdapter({
+      respond: (messages: Message[]) => {
+        sent.push(String(messages.filter((m) => m.role === 'user').at(-1)?.content));
+        return reply('ok');
+      },
+    });
+    const adapter = { ...base, capabilities: () => ({ ...base.capabilities(), seedPrefix: false }) };
+    const result = await runSpec(spec(), {
+      adapter,
+      driver: createScriptedDriver(),
+      checks: [],
+      mode,
+      repeat: 0,
+    });
+    const by = (id: string) => result.blocks.find((b) => b.blockId === id);
+    for (const id of ['lookup', 'book', 'receipt']) {
+      expect(by(id)?.status).toBe('not_run');
+      expect(by(id)?.notRun?.kind).toBe('unsupported');
+    }
+    expect(by('find')?.status ?? 'pass').toBe('pass');
+    expect(by('walkin')?.status ?? 'pass').toBe('pass');
+    expect(sent.sort()).toEqual(['say find', 'say walkin']);
+    expect(result.blocks).toHaveLength(5);
+  });
+});

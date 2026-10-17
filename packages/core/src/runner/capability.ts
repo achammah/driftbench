@@ -7,9 +7,10 @@ export type GivenLayers = {
   /**
    * The history the block starts from, when not empty: `authored`, a prefix the spec writes (at this block or
    * an earlier one, the session holds it from there on), or `canonical`, the history mode T builds from the
-   * blocks before. Absent when the block starts from no history.
+   * blocks before, or `inherited`, the turns of the block's ancestors in a parent-linked spec. Absent when the
+   * block starts from no history.
    */
-  prefix?: 'authored' | 'canonical';
+  prefix?: 'authored' | 'canonical' | 'inherited';
   /** The world of the block, spec and block overrides and an injected world merged. */
   world: WorldState;
 };
@@ -36,7 +37,9 @@ export function capabilityGap(
     const what =
       layers.prefix === 'authored'
         ? 'a prefix'
-        : 'the canonical history mode T builds from the blocks before';
+        : layers.prefix === 'inherited'
+          ? "the turns of the block's ancestors"
+          : 'the canonical history mode T builds from the blocks before';
     return gap('1 history', what, 'seedPrefix');
   }
   const tools = Object.keys(layers.world.tools ?? {});

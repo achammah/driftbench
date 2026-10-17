@@ -451,6 +451,39 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         // A parent that did not pass blocks its child: no agent call, no failure, named by its direct parent and its root.
         const parent = forest.parents.get(step.blockIndex);
         const from = parent === undefined ? undefined : ended.get(parent);
+        if (parent !== undefined) {
+          // A child starts from its ancestors' turns: an adapter that cannot seed them makes it not_run before it is
+          // sent, whatever its parent did. Its own descendants are then blocked by it.
+          const entered = enterBlock(from?.state ?? initialGiven(spec), planned.given, planned.world);
+          const gap = capabilityGap(run.adapter.id, run.capabilities, {
+            prefix: 'inherited',
+            world: entered.world,
+          });
+          if (gap) {
+            const own = planned.blockId ?? String(step.blockIndex);
+            blocks.push(
+              notRunBlock(
+                run,
+                position,
+                planned,
+                {
+                  givenHash: resolveGiven(entered, from?.history ?? [], run.target).hash,
+                  specIndex: step.blockIndex,
+                  ledger: entered.ledger,
+                },
+                gap,
+              ),
+            );
+            ended.set(step.blockIndex, {
+              state: entered,
+              history: from?.history ?? [],
+              users: from?.users ?? [],
+              stage: undefined,
+              broken: { by: own, root: own },
+            });
+            continue;
+          }
+        }
         if (from?.broken) {
           const by = spec.blocks[parent as number]?.id ?? String(parent);
           const root = from.broken.root;
@@ -541,6 +574,18 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         blocks.push(
           notRunBlock(run, position, planned, { givenHash: given.hash, specIndex, ledger }, notRun),
         );
+        if (forest && step.kind === 'block') {
+          // Only the trees below this block stop: a block that was not run blocks its descendants, rooted at itself.
+          const own = planned.blockId ?? String(step.blockIndex);
+          ended.set(step.blockIndex, {
+            state,
+            history,
+            users: [...users],
+            stage: undefined,
+            broken: { by: own, root: own },
+          });
+          continue;
+        }
         if (run.mode === 'T') continue;
         // In F and P the free conversation cannot go past a block it did not run: every later spec block is
         // not run either, and the driver is not asked for more steps.
