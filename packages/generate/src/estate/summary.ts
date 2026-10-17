@@ -34,7 +34,7 @@ export function runOrder(
     .map(({ record }) => record.path);
 }
 
-export function sortedKeys(table: Record<string, number>): Record<string, number> {
+export function sortedKeys<T>(table: Record<string, T>): Record<string, T> {
   return Object.fromEntries(Object.entries(table).sort(([a], [b]) => a.localeCompare(b)));
 }
 
@@ -99,10 +99,15 @@ export function renderEstateSummary(report: EstateReport): string {
   }
   if (report.unit.tests > 0) {
     lines.push(
-      `Unit tests: ${report.unit.tests} in ${UNIT_DIR}/ (${report.unit.guards} guards, ${report.unit.scripts} scripts, ${report.unit.cases} payloads), run by driftbench estate unit: --record on the original first, then on any copy.`,
+      `Unit tests: ${report.unit.tests} in ${UNIT_DIR}/ (${report.unit.guards} guards, ${report.unit.scripts} scripts, ${report.unit.helpers} helpers, ${report.unit.cases} cases), run by driftbench estate unit: --record on the original first, then on any copy.`,
       `Catalogue checks: ${report.unit.checks.tested} tested through their host hook, ${report.unit.checks.needsTrigger} need a trigger, ${report.unit.checks.needsHost} need a host hook.`,
     );
   }
+  lines.push(
+    `Complete share: ${(report.quality.completeShare * 100).toFixed(2)}%; distinct asks: ${report.quality.distinctAsks} in ${report.quality.askedTests} complete asked tests (${report.quality.distinctAsksPer100.toFixed(2)} per 100).`,
+    `Equivalent tests: ${report.equivalence.collapsed} duplicates grouped; representative specs retain every atom and source plan row with the class count.`,
+    `Missing pieces: ${report.incomplete.length} per-spec reason records in estate-generate-report.json (incomplete[].reasons).`,
+  );
   if (report.gaps.length > 0) {
     lines.push('Gaps (what keeps a spec incomplete):');
     for (const entry of report.gaps) {

@@ -28,7 +28,9 @@ jobs:
     # main plus one PR) to catch a defect in that PR before the train is built; the heavy jobs ignore it.
     if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',fast,'))
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    # The affected tests of a large diff take longer than 8 minutes, on a pull request as on a pre-flight
+    # dispatch (main plus one PR), and a cancelled run blocks the PR from every train. Both get 20.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
         with:

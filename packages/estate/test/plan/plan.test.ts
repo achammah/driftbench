@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -29,12 +30,15 @@ describe('the estate plan', () => {
     expect(renderPlan(buildPlan(map, { t: 1 }).plan)).not.toBe(renderPlan(first.plan));
   }, 60_000);
 
-  it('matches the committed fixture plan and its summary', async () => {
-    const built = buildPlan(await approvedFixture());
-    expect(await readFile(join(FIXTURE, 'plan.yaml'), 'utf8')).toBe(renderPlan(built.plan));
-    expect(await readFile(join(FIXTURE, 'plan.summary.json'), 'utf8')).toBe(
-      renderPlanSummary(built.plan, built.details),
+  it('matches the current byte snapshot with the declared full space supplied explicitly', async () => {
+    const map = await approvedFixture();
+    const built = buildPlan(map, { space: toEstateSpaceMap(map) });
+    const snapshot = JSON.parse(
+      await readFile(new URL('./current-plan.sha256.json', import.meta.url), 'utf8'),
     );
+    const sha = (text: string) => createHash('sha256').update(text).digest('hex');
+    expect(sha(renderPlan(built.plan))).toBe(snapshot.plan);
+    expect(sha(renderPlanSummary(built.plan, built.details))).toBe(snapshot.summary);
   }, 60_000);
 
   it('counts the summary from the rows: cells, phrases, kinds, test types, unenforced atoms', async () => {

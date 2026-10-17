@@ -1,4 +1,4 @@
-import type { EstateFile, FileKind } from '../scan/reader';
+import { type EstateFile, type FileKind, isUserLayerPath } from '../scan/reader';
 import type { Atom, Edge } from '../schema';
 
 /**
@@ -10,10 +10,15 @@ import type { Atom, Edge } from '../schema';
  *   with it); reaching a reference, a script or a guard reaches the file it names, and the atoms in it.
  *   A skill or helper whose description is its only way in is unreachable from the standing instructions:
  *   the runtime may still list it, and the lint says so.
- * - named: a file something points at (a reference, a script, a guard command) or a file the runtime loads
- *   by its place (standing, memory, settings, a skill or helper definition, the check registry).
+ * - named: a file something points at (a reference, a script, a guard command, a path the estate
+ *   configuration writes) or a file the runtime loads by its place (standing, memory, settings, a skill or
+ *   helper definition, the check registry, the estate configuration).
  * - orphans: files nothing names.
  * - unenforced: instruction, gate and register atoms no guard enforces.
+ *
+ * The user-level skill layer feeds the walk (its skills, rules and references are atoms of the graph) but is no
+ * part of the project: its files are never listed as orphans or unreachable, and its missing references and
+ * scripts are not findings of the project.
  */
 
 const WALK: ReadonlySet<Edge['kind']> = new Set([
@@ -70,28 +75,41 @@ export function analyzeGraph(
   atoms: readonly Atom[],
   edges: readonly Edge[],
   files: readonly EstateFile[],
+  /** Files documented by navigation-only documents: named, though they never make a file reachable. */
+  navigation: ReadonlySet<string> = new Set(),
+  /** Files that code names: a code file that is reached reaches the files it names. */
+  codeLinks: ReadonlyMap<string, readonly string[]> = new Map(),
 ): GraphAnalysis {
   const kinds = new Map(files.map((file) => [file.path, file.kind]));
   const byId = new Map(atoms.map((atom) => [atom.id, atom]));
   const inFile = new Map<string, Atom[]>();
-  for (const atom of atoms)
-    inFile.set(atom.provenance.file, [...(inFile.get(atom.provenance.file) ?? []), atom]);
+  for (const atom of atoms) {
+    const list = inFile.get(atom.provenance.file);
+    if (list) list.push(atom);
+    else inFile.set(atom.provenance.file, [atom]);
+  }
   const out = new Map<string, string[]>();
   for (const edge of edges) {
-    if (WALK.has(edge.kind)) out.set(edge.from, [...(out.get(edge.from) ?? []), edge.to]);
+    if (!WALK.has(edge.kind)) continue;
+    const list = out.get(edge.from);
+    if (list) list.push(edge.to);
+    else out.set(edge.from, [edge.to]);
   }
 
   const reachableAtoms = new Set<string>();
   const reachableFiles = new Set<string>();
+  // A queue read from a moving head: taking from the front of an array copies the rest each time.
   const queue: string[] = [];
+  let head = 0;
   const reachFile = (path: string) => {
     if (reachableFiles.has(path) || !kinds.has(path)) return;
     reachableFiles.add(path);
     for (const atom of inFile.get(path) ?? []) queue.push(atom.id);
+    for (const named of codeLinks.get(path) ?? []) reachFile(named);
   };
   for (const file of files) if (ROOT_FILES.has(file.kind)) reachFile(file.path);
-  while (queue.length > 0) {
-    const id = queue.shift() ?? '';
+  while (head < queue.length) {
+    const id = queue[head++] ?? '';
     if (reachableAtoms.has(id)) continue;
     const atom = byId.get(id);
     if (!atom) continue;
@@ -107,10 +125,46 @@ export function analyzeGraph(
     for (const path of pathsOf(atom)) if (kinds.has(path)) namedFiles.add(path);
   }
 
-  const orphans = files.filter((file) => !namedFiles.has(file.path)).map((file) => file.path);
+  // The estate configuration is read by the tooling by its place, and a file it names (a helper executor, a
+  // script it declares fixtures for) is named by it.
+  const configs = files.filter((file) => /(^|\/)driftbench\.estate\.ya?ml$/.test(file.path));
+  // Tooling files are not instructions to the agent, so they are not unreachable from the standing ones.
+  const tooling = new Set<string>();
+  for (const config of configs) {
+    namedFiles.add(config.path);
+    tooling.add(config.path);
+    for (const file of files)
+      if (file.path !== config.path && config.text.includes(file.path)) {
+        namedFiles.add(file.path);
+        if (!reachableFiles.has(file.path)) tooling.add(file.path);
+      }
+  }
+  for (const path of navigation) if (kinds.has(path)) namedFiles.add(path);
+  // A script that is itself named names the files it holds as literals; a stray script legitimises nothing.
+  for (let grew = true; grew; ) {
+    grew = false;
+    for (const [from, named] of codeLinks)
+      if (namedFiles.has(from))
+        for (const path of named)
+          if (kinds.has(path) && !namedFiles.has(path)) {
+            namedFiles.add(path);
+            grew = true;
+          }
+  }
+
+  const orphans = files
+    .filter((file) => file.layer !== 'user' && !namedFiles.has(file.path))
+    .map((file) => file.path);
   const orphanSet = new Set(orphans);
   const unreachableFiles = files
-    .filter((file) => file.kind !== 'registry' && !reachableFiles.has(file.path) && !orphanSet.has(file.path))
+    .filter(
+      (file) =>
+        file.layer !== 'user' &&
+        file.kind !== 'registry' &&
+        !reachableFiles.has(file.path) &&
+        !orphanSet.has(file.path) &&
+        !tooling.has(file.path),
+    )
     .map((file) => file.path);
 
   return {
@@ -123,12 +177,20 @@ export function analyzeGraph(
       .filter((atom) => RULE_KINDS.has(atom.kind) && atom.enforcement.length === 0)
       .map((atom) => atom.id),
     missingReferences: atoms
-      .filter((atom) => atom.kind === 'reference' && atom.fields?.exists === false)
+      .filter(
+        (atom) =>
+          atom.kind === 'reference' &&
+          atom.fields?.exists === false &&
+          !isUserLayerPath(atom.provenance.file),
+      )
       .map((atom) => atom.id),
     missingScripts: atoms
       .filter(
         (atom) =>
-          atom.kind === 'guard' && typeof atom.fields?.script === 'string' && !kinds.has(atom.fields.script),
+          atom.kind === 'guard' &&
+          typeof atom.fields?.script === 'string' &&
+          !kinds.has(atom.fields.script) &&
+          !isUserLayerPath(atom.provenance.file),
       )
       .map((atom) => atom.id),
   };

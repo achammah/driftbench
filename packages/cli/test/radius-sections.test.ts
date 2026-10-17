@@ -160,3 +160,46 @@ it('lints prompt-section links against the registries', async () => {
   const bad = await cli(['spec', 'lint', 'spec.yaml', '--sections', 'spec.yaml']);
   expect(bad.code).toBe(2);
 }, 60_000);
+
+it('derives a prompt_section manifest and prints the advisory selection, running the whole suite', async () => {
+  const prompt = await readFile(join(fixtures, 'acme-sales.md'), 'utf8');
+  await writeFile(join(dir, 'v1.md'), prompt);
+  await writeFile(
+    join(dir, 'v2.md'),
+    prompt.replace('"sure", "ok" or "go ahead" is not enough', '"sure" or "ok" is enough'),
+  );
+  const registry = join(fixtures, 'acme-sales.sections.yaml');
+  const derived = await cli([
+    'radius',
+    'sections',
+    'reanchor',
+    registry,
+    '--prompt',
+    'v1.md',
+    'v2.md',
+    '--to-version',
+    'v2',
+    '--change-out',
+    'change.yaml',
+  ]);
+  expect(derived.code).toBe(1);
+  const manifest = parse(await readFile(join(dir, 'change.yaml'), 'utf8'));
+  expect(manifest).toMatchObject({
+    from: 'v1',
+    to: 'v2',
+    changes: [{ kind: 'prompt_section', id: 'acme-sales#explicit_confirm' }],
+  });
+  const specs = join(fixtures, 'linked');
+  const advised = await cli(['radius', specs, '--change', 'change.yaml', '--sections', registry]);
+  expect(advised.code).toBe(1);
+  expect(advised.out).toContain('The radius is the whole suite: prompt_section:acme-sales#explicit_confirm');
+  expect(advised.out).toContain('Would run 3 of 7 blocks (2 by links, 1 forward) and would skip 4');
+  expect(advised.out).toContain('link:acme-sales#explicit_confirm (declared)');
+  const json = JSON.parse(
+    (await cli(['radius', specs, '--change', 'change.yaml', '--sections', registry, '--json'])).out,
+  );
+  expect(json.totals.F.out).toBe(0);
+  expect(json.advisory.counts).toEqual({ selected: 3, direct: 2, forward: 1, skipped: 4, total: 7 });
+  const plain = await cli(['radius', specs, '--change', 'change.yaml']);
+  expect(plain.out).toContain('Pass --sections <registries>');
+}, 60_000);
