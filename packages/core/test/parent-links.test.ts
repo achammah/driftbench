@@ -27,4 +27,15 @@ describe('parent links', () => {
     expect(codes(load([block('a', { parent: 'b' }), block('b', { parent: 'a' })]))).toEqual(['PARENT_CYCLE']);
     expect(codes(load([block('a', { parent: 'a' })]))).toEqual(['PARENT_CYCLE']);
   });
+
+  it('load a long chain in time linear in its blocks, and still find a cycle at its end', () => {
+    const chain = (n: number, loop: boolean) =>
+      Array.from({ length: n }, (_, i) =>
+        block(`b${i}`, i > 0 ? { parent: `b${i - 1}` } : loop ? { parent: `b${n - 1}` } : {}),
+      );
+    const started = performance.now();
+    expect(load(chain(30_000, false)).ok).toBe(true);
+    expect(performance.now() - started).toBeLessThan(5000);
+    expect(codes(load(chain(30_000, true)))).toEqual(['PARENT_CYCLE']);
+  });
 });

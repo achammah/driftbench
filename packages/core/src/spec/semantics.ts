@@ -58,26 +58,31 @@ function checkParents(spec: Spec, issues: Issue[]): void {
     }
     parentOf.set(index, at);
   });
-  const reported = new Set<number>();
+  // Each block is walked once: 1 while on the current walk, 2 once settled. A walk that meets a block of its own
+  // walk has found a cycle; one that meets a settled block has found none.
+  const mark = new Map<number, 1 | 2>();
   for (const start of parentOf.keys()) {
+    if (mark.has(start)) continue;
     const walked: number[] = [];
     let at: number | undefined = start;
-    while (at !== undefined && !walked.includes(at)) {
+    while (at !== undefined && !mark.has(at)) {
+      mark.set(at, 1);
       walked.push(at);
       at = parentOf.get(at);
     }
-    if (at === undefined) continue;
-    const loop = walked.slice(walked.indexOf(at));
-    if (loop.some((member) => reported.has(member))) continue;
-    for (const member of loop) reported.add(member);
-    const first = Math.min(...loop);
-    issues.push(
-      error(
-        'PARENT_CYCLE',
-        `blocks.${first}.parent`,
-        `the parent links of ${loop.map((member) => `"${spec.blocks[member]?.id}"`).join(', ')} form a cycle`,
-      ),
-    );
+    if (at !== undefined && mark.get(at) === 1) {
+      const loop = walked.slice(walked.indexOf(at));
+      let first = loop[0] as number;
+      for (const member of loop) if (member < first) first = member;
+      issues.push(
+        error(
+          'PARENT_CYCLE',
+          `blocks.${first}.parent`,
+          `the parent links of ${loop.map((member) => `"${spec.blocks[member]?.id}"`).join(', ')} form a cycle`,
+        ),
+      );
+    }
+    for (const member of walked) mark.set(member, 2);
   }
 }
 

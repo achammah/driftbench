@@ -26,16 +26,20 @@ export function forestOf(spec: Spec): Forest | undefined {
   });
   const placed = new Set<number>();
   const order: number[] = [];
-  const place = (index: number, path: Set<number>): void => {
-    if (placed.has(index) || path.has(index)) return;
-    path.add(index);
-    const parent = parents.get(index);
-    if (parent !== undefined) place(parent, path);
-    path.delete(index);
-    if (placed.has(index)) return;
-    placed.add(index);
-    order.push(index);
-  };
-  for (let index = 0; index < spec.blocks.length; index++) place(index, new Set());
+  for (let index = 0; index < spec.blocks.length; index++) {
+    // Climb to the first ancestor not placed yet, then place the climb from the top down. A cycle stops the climb.
+    const climb: number[] = [];
+    const onClimb = new Set<number>();
+    let at: number | undefined = index;
+    while (at !== undefined && !placed.has(at) && !onClimb.has(at)) {
+      climb.push(at);
+      onClimb.add(at);
+      at = parents.get(at);
+    }
+    for (let k = climb.length - 1; k >= 0; k--) {
+      placed.add(climb[k] as number);
+      order.push(climb[k] as number);
+    }
+  }
   return { parents, order };
 }
