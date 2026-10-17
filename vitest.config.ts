@@ -48,5 +48,7 @@ export default defineConfig({
       'tools/**/*.test.ts',
     ],
     environment: 'node',
+    // Removes the temporary folders a test file made, when the file ends.
+    setupFiles: ['./tools/vitest-temp-folders.ts'],
   },
 });

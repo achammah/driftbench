@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdtempSync } from 'node:fs';
+import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseJudgeText } from '../assessment';
@@ -79,6 +79,20 @@ export const CLAUDE_JUDGE_FLAGS = [
 /** The client settings a cassette keys on: the print-mode format and the judge flags (not the spend cap). */
 export const CLAUDE_SETTINGS = JSON.stringify(['-p', '--output-format', 'json', ...CLAUDE_JUDGE_FLAGS]);
 
+/**
+ * Runs `work` in an empty folder of its own and removes the folder when the work ends, however it ends: a
+ * folder per call, never one that outlives its client. The folder is the working directory of the process,
+ * so no project file or memory of the caller reaches it.
+ */
+export async function withScratchFolder<T>(prefix: string, work: (folder: string) => Promise<T>): Promise<T> {
+  const folder = await mkdtemp(join(tmpdir(), prefix));
+  try {
+    return await work(folder);
+  } finally {
+    await rm(folder, { recursive: true, force: true });
+  }
+}
+
 type Ran = { code: number | null; stdout: string; stderr: string };
 
 export function createClaudeCliJudge(options: ClaudeCliOptions = {}): JudgeClient {
@@ -87,11 +101,6 @@ export function createClaudeCliJudge(options: ClaudeCliOptions = {}): JudgeClien
   if (!model) throw new JudgeError('config', 'CLAUDE_JUDGE_MODEL is not set and no model was given');
   const command = options.command ?? 'claude';
   const timeoutMs = options.timeoutMs ?? 120_000;
-  let folder: string | undefined;
-  const workdir = () => {
-    folder ??= mkdtempSync(join(tmpdir(), 'driftbench-claude-judge-'));
-    return folder;
-  };
 
   return {
     id: options.id ?? `claude-${model}`,
@@ -119,13 +128,15 @@ export function createClaudeCliJudge(options: ClaudeCliOptions = {}): JudgeClien
         ...CLAUDE_JUDGE_FLAGS,
         ...(options.maxBudgetUsd === undefined ? [] : ['--max-budget-usd', String(options.maxBudgetUsd)]),
       ];
-      const sent = await runClaudeJudgeCommand(command, args, prompt.user, {
-        ...options,
-        cwd: workdir(),
-        env,
-        timeoutMs,
-        system: prompt.system,
-      });
+      const sent = await withScratchFolder('driftbench-claude-judge-', (cwd) =>
+        runClaudeJudgeCommand(command, args, prompt.user, {
+          ...options,
+          cwd,
+          env,
+          timeoutMs,
+          system: prompt.system,
+        }),
+      );
       return { ...readResult(sent.ran, model, request), ...sent.accounting };
     },
   };
