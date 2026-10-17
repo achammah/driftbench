@@ -4,6 +4,8 @@ All notable changes to driftbench are listed here. The format follows [Keep a Ch
 
 ## [Unreleased]
 
+* Statistics validator: 60 exact-value, accuracy and report items (`exact.*`) against numbers computed independently in Python (`packages/validators/fixtures/stats/make_exact.py`). Every exported function that has a numeric output now loses at least one item when its numbers are 0.2 percent off, and every function loses one when it throws; the report's suite headline and clustered rate have items. No existing item is changed. The hardness gate (docs/validators.md 12.4) is not met by items the product passes; see `validators/stats/NEEDS.md`, batch 7.
+
 * `normalQuantile` keeps its digits for p near 1. Above one half its refinement now forms `cdf(x) - p` as `(1 - p) - sf(x)`; before, p above 1 - 1e-6 lost digits (a relative error of 1e-9 at p = 1 - 1e-12, against scipy). Results for p of 0.5 or below do not change; above it they differ in the last digits.
 
 * `driftbench ci`: a regression wins. The verdict order is radius-miss, then regression, then not-run, then the rest (incomplete, aggregate-failed, not-shown-non-inferior, parity). A regression is what compare's own test calls regressed; a golden that flipped while compare calls the change noise is no regression. So a regression gives `regression`, exit 1, whether or not an unrelated spec was not run, and whatever an incomplete cell or a failing aggregate says; it was `not-run`, exit 3, which hid the regression behind a capability gap. Its first reason names the regressed goldens; the not-run, incomplete and aggregate reasons follow. Without a regression, blocks not run beyond `--max-not-run` still give `not-run`, exit 3. The action's `verdict` output lists `not-run` among its values.
