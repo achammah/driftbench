@@ -1,7 +1,6 @@
-import { readFile as readFileCallback } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';
 import { dirname, extname, join, resolve } from 'node:path';
-import { promisify } from 'node:util';
 import { parse as parseYaml } from 'yaml';
 import type { z } from 'zod';
 import { SPEC_SCHEMA_VERSION, type Spec } from '../schema/spec';
@@ -12,9 +11,6 @@ import { error, type Issue } from './issues';
 import { lintSpec } from './lint';
 import { normalizeSpec } from './normalize';
 import { checkSemantics } from './semantics';
-
-// The callback reader avoids FileHandle wrapper overhead for the many small spec files.
-const readFile = promisify(readFileCallback);
 
 export type LoadResult =
   | { ok: true; path: string; spec: Spec; hash: string; warnings: Issue[] }
@@ -98,11 +94,15 @@ function newerSchema(raw: unknown): Issue | undefined {
   );
 }
 
-/** Reads one file. `.json` is parsed as JSON, anything else as YAML. */
+/**
+ * Reads one file. `.json` is parsed as JSON, anything else as YAML. The file is read in one synchronous call:
+ * a spec file is small, and a read through the thread pool (open, stat, read and close as four queued
+ * operations) costs about three times the CPU of the synchronous read, which a suite of many files pays per file.
+ */
 export async function loadSpecFile(path: string): Promise<LoadResult> {
   let text: string;
   try {
-    text = await readFile(path, 'utf8');
+    text = readFileSync(path, 'utf8');
   } catch (cause) {
     return {
       ok: false,

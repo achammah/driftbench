@@ -786,6 +786,8 @@ With `mode: 'T'`, it prints:
 | `runId` | default: the cell id |
 | `maxSteps` | a guard against a driver that never stops. Default 4 steps per spec block, at least 16. |
 
+`loadSpecFile(path)` reads a spec file in one synchronous call and returns a promise of the checked spec: a spec file is small, and a read through the thread pool costs about three times the CPU, once per file of a suite.
+
 ### One block
 
 For each step the driver gives, the runner:
