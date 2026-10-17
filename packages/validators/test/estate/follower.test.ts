@@ -52,7 +52,13 @@ describe('the estate rule follower', { timeout: 120_000 }, () => {
     expect(observed.workspaceDiff).toEqual({ created: [], changed: [skill.topic.target], deleted: [] });
     expect((observed.executions ?? []).map((run) => run.exitCode)).toEqual([0]);
     expect(observed.executions?.[0]?.command).toContain(skill.topic.script.file);
-    expect(observed.runtime?.stages?.map((stage) => stage.name)).toEqual(['plan', 'do', 'verify', 'report']);
+    expect(observed.runtime?.stages?.map((stage) => stage.name)).toEqual([
+      'plan',
+      'do',
+      'note',
+      'verify',
+      'report',
+    ]);
     expect(observed.text).toContain('Next:');
     expect(observed.text).toContain(skill.topic.register.word);
     expect(observed.text).not.toMatch(/obviously|simply/);
@@ -102,6 +108,38 @@ describe('the estate rule follower', { timeout: 120_000 }, () => {
     }
   });
 
+  it('dispatches the declaration owner for tool probes after helper renaming and reordering', () => {
+    for (const seed of [1, 7, 19]) {
+      const estate = drawEstate(seed);
+      const names = new Map(
+        [...estate.helpers].reverse().map((helper, index) => [helper.topic.name, `fixture-helper-${index}`]),
+      );
+      estate.helpers = [...estate.helpers].reverse().map((helper) => ({
+        ...helper,
+        topic: { ...helper.topic, name: names.get(helper.topic.name) as string },
+      }));
+      for (const skill of estate.skills)
+        if (skill.dispatch) skill.dispatch = names.get(skill.dispatch) as string;
+      const situations = situationsOf(estate);
+      const probes = situations.filter((s) => s.act.type === 'tool' && s.act.helper);
+      expect(probes.length).toBeGreaterThan(0);
+      for (const probe of probes) {
+        if (probe.act.type !== 'tool') throw new Error('not a tool situation');
+        const act = probe.act;
+        const owner = estate.helpers.find((helper) => helper.topic.name === act.helper);
+        if (!owner) throw new Error('declaration owner missing');
+        const raw = follow(estate, situations, [probe.phrases[0] as string]);
+        const observed = mapSession({ transcript: parseJsonl(raw.transcript) }).blocks[0]?.observed;
+        expect(observed?.runtime?.subagents?.map((agent) => agent.name)).toContain(owner.topic.name);
+        const call = observed?.toolCalls.find((call) => call.label === 'Agent');
+        if (!call) throw new Error('helper dispatch missing');
+        for (const field of owner.topic.fields)
+          expect((call.input as { prompt: string }).prompt).toContain(`${field}:`);
+        expect(observed?.toolCalls.map((call) => call.label)).toContain(probe.act.rule);
+      }
+    }
+  });
+
   it('drops what a deleted atom asks for: the skill load, a step, a guard, a word, the read before the edit', () => {
     const { estate, session, ask } = setup();
     const skill = firstSkill(estate);
@@ -113,11 +151,13 @@ describe('the estate rule follower', { timeout: 120_000 }, () => {
     expect(without('stage:verify')?.runtime?.stages?.map((stage) => stage.name)).toEqual([
       'plan',
       'do',
+      'note',
       'report',
     ]);
     expect(without('rule:verify-before-report')?.runtime?.stages?.map((stage) => stage.name)).toEqual([
       'plan',
       'do',
+      'note',
       'report',
       'verify',
     ]);

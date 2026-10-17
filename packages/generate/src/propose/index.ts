@@ -1,4 +1,4 @@
-import { contentHash, type Spec, validateSpec } from '@agent-nexus/driftbench-core';
+import { type Spec, specHash, validateSpec } from '@agent-nexus/driftbench-core';
 import { parseAllDocuments, parse as parseYaml, stringify } from 'yaml';
 import type { ModelPort } from '../model/port';
 
@@ -132,7 +132,7 @@ export function parseProposals(answer: string): SpecProposal[] {
       ok: true,
       id: loaded.spec.id,
       spec: loaded.spec,
-      hash: contentHash(loaded.spec),
+      hash: specHash(loaded.spec),
       text: stringify(rest),
     });
   });

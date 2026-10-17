@@ -1,0 +1,64 @@
+{
+  "spread": {
+    "clusters": [[6, 5], [6, 2], [5, 4], [4, 1]],
+    "interval": {
+      "n": 21,
+      "k": 12,
+      "goldens": 4,
+      "estimate": 0.5714285714285714,
+      "lower": 0.19130907320822316,
+      "upper": 0.8825591117984954,
+      "effectiveRuns": 10.844262295081966,
+      "designEffect": 1.9365079365079367
+    }
+  },
+  "agree": {
+    "clusters": [[5, 4], [5, 4], [5, 4], [5, 4], [5, 4], [5, 4], [5, 4], [5, 4], [5, 4], [5, 4]],
+    "interval": {
+      "n": 50,
+      "k": 40,
+      "goldens": 10,
+      "estimate": 0.8,
+      "lower": 0.6471227210257143,
+      "upper": 0.8971704509544555,
+      "effectiveRuns": 50.0,
+      "designEffect": 1.0
+    }
+  },
+  "all_pass": {
+    "clusters": [[4, 4], [3, 3], [5, 5]],
+    "interval": {
+      "n": 12,
+      "k": 12,
+      "goldens": 3,
+      "estimate": 1.0,
+      "lower": 0.4385029682449546,
+      "upper": 1.0,
+      "effectiveRuns": 3.0,
+      "designEffect": 4.0
+    }
+  },
+  "gate": {
+    "clusters": [[10, 10], [10, 10], [10, 10], [10, 5]],
+    "interval": {
+      "n": 40,
+      "k": 35,
+      "goldens": 4,
+      "estimate": 0.875,
+      "lower": 0.3158501378372168,
+      "upper": 0.9906661446017712,
+      "effectiveRuns": 7.0,
+      "designEffect": 5.714285714285714
+    },
+    "needed": {
+      "0.7": {
+        "goldens": 16,
+        "runs": 160
+      },
+      "0.8": {
+        "goldens": 52,
+        "runs": 520
+      }
+    }
+  }
+}

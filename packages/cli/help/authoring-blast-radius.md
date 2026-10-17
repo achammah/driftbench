@@ -6,6 +6,7 @@ commands:
   - radius auto
 see_also:
   - results-radius
+  - authoring-prompt-sections
   - authoring-spec-format
   - authoring-blocks
   - authoring-map
@@ -27,6 +28,8 @@ You describe the change in a change manifest: the agent version before (`from`),
 `driftbench radius` reads the specs and the manifest and prints, per run mode, which blocks are in the radius and how much a rerun saves against the whole suite. It is read only: it writes nothing.
 
 `driftbench radius auto` writes a change manifest for you from two versions of a prompt file and an approved map whose entries carry evidence quotes. A change inside exactly one approved quote becomes a narrow change. Any doubt becomes a whole-suite change.
+
+A prompt can also carry a section registry, which names its sections by stable ids, and blocks can link to the sections they test in `metadata.links`. The registry, re-anchoring and links are in authoring-prompt-sections. Links stay out of the spec hash, so adding them never invalidates a carry.
 
 Each block of each spec gets one state per mode:
 

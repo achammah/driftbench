@@ -1,4 +1,4 @@
-import { bootstrapCI, wilson, wilsonEffective } from '@agent-nexus/driftbench-stats';
+import { bootstrapCI, type ClusterCount, wilson, wilsonEffective } from '@agent-nexus/driftbench-stats';
 
 /**
  * How an interval was made:
@@ -70,21 +70,10 @@ export function clustered(
   const first = values[0] as number;
   if (options.rate && !statistic) {
     const g = new Set(clusters).size;
-    if (g >= 2 && values.every((v) => v === first)) {
-      // Every value agrees: resampling cannot move the mean. Count each cluster once instead.
-      const w = wilson(first === 1 ? g : 0, g);
-      return {
-        estimate: first,
-        lower: w.lower,
-        upper: w.upper,
-        method: 'wilson, clusters',
-        n: values.length,
-        clusters: g,
-      };
-    }
+    if (g >= 2 && values.every((v) => v === first)) return allAgree(first, values.length, g);
     if (g >= 2 && values.every((v) => v === 0 || v === 1)) {
       const p = values.reduce<number>((a, b) => a + b, 0) / values.length;
-      return designEffectWilson(values, clusters, p, g);
+      return designEffectWilson(values, clusters, p);
     }
   }
   const result = bootstrapCI(values, { clusters, seed: 1, ...(statistic ? { statistic } : {}) });
@@ -108,6 +97,36 @@ export function clustered(
   };
 }
 
+/** Every run agrees (all pass or all fail): resampling cannot move the mean, so each of the `g` clusters counts once. */
+function allAgree(value: number, runs: number, g: number): Estimate {
+  const w = wilson(value === 1 ? g : 0, g);
+  return {
+    estimate: value,
+    lower: w.lower,
+    upper: w.upper,
+    method: 'wilson, clusters',
+    n: runs,
+    clusters: g,
+  };
+}
+
+/**
+ * The pass rate of runs grouped in clusters of `{ n, k }` (the goldens of a campaign: the repeats of one spec in
+ * one mode), with the interval the report prints for a rate over clusters: the Wilson interval on the effective
+ * number of runs (`wilson, design effect`), or each cluster counted once when every run agrees (`wilson, clusters`).
+ * Undefined, so the caller keeps the plain Wilson interval of the runs, for fewer than two clusters (the spread
+ * between clusters cannot be measured) and when every cluster holds one run (the clusters are the runs, so the
+ * runs are independent evidence). Method: docs/concepts/statistics.md, "A rate over goldens".
+ */
+export function clusterRate(counts: readonly ClusterCount[]): Estimate | undefined {
+  const g = counts.length;
+  if (g < 2 || counts.every((c) => c.n === 1)) return undefined;
+  const runs = counts.reduce((sum, c) => sum + c.n, 0);
+  const passes = counts.reduce((sum, c) => sum + c.k, 0);
+  if (passes === 0 || passes === runs) return allAgree(passes === 0 ? 0 : 1, runs, g);
+  return effectiveWilson(counts, passes / runs, runs);
+}
+
 /**
  * The Wilson interval of a pass rate over clusters, on the effective number of runs (wilsonEffective of
  * @agent-nexus/driftbench-stats). The variance of the pooled rate is the ratio estimator over clusters,
@@ -119,7 +138,6 @@ function designEffectWilson(
   values: readonly number[],
   clusters: readonly (string | number)[],
   p: number,
-  g: number,
 ): Estimate {
   const counts = new Map<string | number, { n: number; k: number }>();
   values.forEach((v, i) => {
@@ -129,14 +147,19 @@ function designEffectWilson(
     cluster.k += v;
     counts.set(key, cluster);
   });
-  const w = wilsonEffective([...counts.values()], { quantile: 't' });
+  return effectiveWilson([...counts.values()], p, values.length);
+}
+
+/** The `wilson, design effect` estimate of clusters whose pooled rate is `p` over `runs` runs. */
+function effectiveWilson(counts: readonly ClusterCount[], p: number, runs: number): Estimate {
+  const w = wilsonEffective(counts, { quantile: 't' });
   return {
     estimate: p,
     lower: w.lower,
     upper: w.upper,
     method: 'wilson, design effect',
-    n: values.length,
-    clusters: g,
+    n: runs,
+    clusters: counts.length,
     designEffect: w.designEffect,
     effectiveN: w.effectiveN,
   };

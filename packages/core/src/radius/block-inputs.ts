@@ -11,11 +11,11 @@ import { provenanceHash } from '../runner/provenance';
 import type { Message } from '../schema/common';
 import type { RunResult } from '../schema/run';
 import type { Spec } from '../schema/spec';
-import { contentHash } from '../spec/hash';
+import { specHash } from '../spec/identity';
 
 /** Reconstruct input evidence independently of the stored block stamps. Any unknown input reruns. */
 export function sameBlockInputs(run: RunResult, spec: Spec | undefined): boolean {
-  if (!spec || contentHash(spec) !== run.specHash || !run.provenance || run.mode === 'P') return false;
+  if (!spec || specHash(spec) !== run.specHash || !run.provenance || run.mode === 'P') return false;
   const scripted =
     run.provenance.driver.idHash === provenanceHash('scripted') &&
     run.provenance.driver.seedsHash === provenanceHash({});

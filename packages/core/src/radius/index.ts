@@ -24,6 +24,14 @@ export {
   ToolPart,
 } from './change';
 export {
+  type CharCitation,
+  citationSpan,
+  codePointToUtf16,
+  sectionDocument,
+  sectionOfCitation,
+  utf16ToCodePoint,
+} from './citations';
+export {
   type BlockDependencies,
   blockCell,
   blockDependencies,
@@ -37,6 +45,14 @@ export {
   WORDING_FIELDS,
   type WordingField,
 } from './depends';
+export {
+  blockLinks,
+  checkSpecLinks,
+  linkHolds,
+  registriesByPrompt,
+  sectionLinkStatus,
+  specLinks,
+} from './links';
 export { type PromptAnchor, promptChangeManifest } from './prompt';
 export {
   ALLOWED_VERSION_TRANSITION_FIELDS,
@@ -61,4 +77,21 @@ export {
   type RejudgeOptions,
   rejudgeRun,
 } from './rejudge';
+export {
+  checkSectionRegistry,
+  loadSectionRegistry,
+  PromptSection,
+  parseSectionRegistry,
+  type ReanchoredSection,
+  type Reanchoring,
+  type ReanchorMethod,
+  type RegistryResult,
+  reanchorRegistry,
+  SECTION_KINDS,
+  SECTION_NORMALISATION,
+  SectionRegistry,
+  sectionEntry,
+  sectionsFromHeadings,
+  sha256Hex,
+} from './sections';
 export { agentVersionOf, withAgentVersion } from './version';

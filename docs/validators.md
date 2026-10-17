@@ -66,6 +66,8 @@ Score. Level 1: atom recall 1.0 and precision 1.0 by kind, edge recall 1.0. Leve
 
 Feedback. A missed atom prints its hidden id and the rendered sentence. An unkilled agent mutant prints the atom, its tests and the evidence predicate that did not fire. A wrong retirement prints the test and the atom it was wrongly tied to.
 
+Oracles. The chained-reference item checks reach by following citation paths; see [the chained-reference oracle](estate-reference-reach-oracle.md).
+
 ## 7. The statistics validator (do the numbers mean what they say)
 
 How it works. Two halves. Reference values from scipy and numpy for every function (exists). Simulation: for each estimator, draw from a population whose truth is known and count how often the estimate's interval contains it, over 1000 draws per seed.
