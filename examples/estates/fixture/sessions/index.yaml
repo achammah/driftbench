@@ -1,6 +1,7 @@
-# Six synthetic sessions of the Northwind fixture estate, written by code from a hand script for the
-# estate-tests lane: three of one ask (one clean run and two faulty ones) and one clean run for each of three
-# guard situations (a forced push, an edit of an invoice file, the stop word). `violates` names the atoms a session
+# Nine synthetic sessions of the Northwind fixture estate, written by code from a hand script for the
+# estate-tests lane: three of one ask (one clean run and two faulty ones) and one clean run for each of six
+# guard situations (a forced push, an edit of an invoice file, the stop word, a deleted ledger file, a reply over 1,200
+# characters, a tracker call without a carrier code). `violates` names the atoms a session
 # breaks: a generated replay spec on any of them is planned to fail, every other one to pass. Each session
 # has its transcript, its guard decision log and its step feed. Fictional data only.
 version: 1
@@ -38,3 +39,18 @@ sessions:
     ask: "Stop, that is enough for now."
     violates: []
     note: The stop word is typed, the guard nudges, and the agent stops and says so.
+  - name: ledger-file-removed
+    situation: ledger-file-removal
+    ask: "Delete this week's ledger file, ledger/2026-W41.csv, I keep a copy of it elsewhere."
+    violates: []
+    note: The remove command is refused by the system, the PostToolUse guard still warns about the command, and the agent says the file is still there.
+  - name: long-reply-trimmed
+    situation: long-status-report
+    ask: "Tell me everything about every open supplier order, in full detail."
+    violates: []
+    note: The first reply is over 1,200 characters, the Stop guard blocks it, and the agent answers again in a few lines.
+  - name: carrier-code-required
+    situation: carrier-code-lookup
+    ask: "Where is shipment NW-55020 from carrier DPX, and is it late?"
+    violates: []
+    note: The tracker is called without the carrier code, the skill's guard blocks the call, and the agent passes the code.

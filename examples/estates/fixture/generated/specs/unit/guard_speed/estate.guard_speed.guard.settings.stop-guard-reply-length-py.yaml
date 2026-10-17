@@ -50,10 +50,11 @@ given:
 blocks:
   - id: ask
     when:
-      user: Give me a short status of invoices, shipments and supplier emails.
+      user: Tell me everything about every open supplier order, in full detail.
     expect:
       guards:
         - name: reply-length.py
+          verdict: deny
           count:
             min: 1
       workspace:
@@ -77,8 +78,8 @@ metadata:
     mode: unit
     map: ../approved.yaml
     plan: ../../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml
-    situation: open-items
-    phrase: 1
+    situation: long-status-report
+    phrase: 0
     ask: bank
     outcome: bank
     unit:
@@ -87,6 +88,7 @@ metadata:
         name: reply-length.py
         event: Stop
         command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/reply-length.py
+        verdict: deny
       cases:
         - id: case-01
           payload:

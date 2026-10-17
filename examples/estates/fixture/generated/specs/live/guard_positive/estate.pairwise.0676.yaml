@@ -56,6 +56,7 @@ blocks:
     expect:
       guards:
         - name: reply-length.py
+          verdict: deny
           count:
             min: 1
       workspace:

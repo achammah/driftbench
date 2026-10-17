@@ -8,7 +8,14 @@ import { describe, expect, it } from 'vitest';
 // runs them. This test reads the settings file and checks the sessions against it; it holds no guard name.
 const FIXTURE = join(fileURLToPath(new URL('../../../', import.meta.url)), 'examples/estates/fixture');
 /** The sessions checked here: the ones written to the runtime's order. */
-const SESSIONS = ['force-push-blocked', 'invoice-edit-gated', 'stop-word-nudged'];
+const SESSIONS = [
+  'force-push-blocked',
+  'invoice-edit-gated',
+  'stop-word-nudged',
+  'ledger-file-removed',
+  'long-reply-trimmed',
+  'carrier-code-required',
+];
 
 type Row = { at: string; event: string; check: string; verdict: string };
 type Hook = { event: string; matcher: RegExp | undefined; script: string };

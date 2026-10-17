@@ -8,7 +8,7 @@
 version: 1
 runtime: claude-code
 root: .
-readAt: 2026-10-16T23:00:59.392Z
+readAt: 2026-10-17T06:45:26.109Z
 atoms:
   - id: skill.invoice-reconcile.skill-invoice-reconcile
     kind: skill
@@ -518,7 +518,7 @@ atoms:
     role: axis
     approved: true
     evidence:
-      - { type: guard, name: reply-length.py }
+      - { type: guard, name: reply-length.py, verdict: deny }
     enforcement: []
     fields:
       name: reply-length.py
@@ -526,21 +526,31 @@ atoms:
       command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/reply-length.py
       anchored: true
       scope: estate
+      verdictFrom: source
       ruleText: |-
         Nudges when the last reply is too long.
+
+        Verdict: deny
         Keep every reply under 1,200 characters unless the user asks for detail.
       ruleSources:
         - kind: documentation
-          text: Nudges when the last reply is too long.
+          text: |-
+            Nudges when the last reply is too long.
+
+            Verdict: deny
           file: .claude/guards/reply-length.py
           startLine: 2
-          endLine: 2
-          quote: '"""Nudges when the last reply is too long."""'
+          endLine: 5
+          quote: |-
+            """Nudges when the last reply is too long.
+
+            Verdict: deny
+            """
         - kind: message
           text: Keep every reply under 1,200 characters unless the user asks for detail.
           file: .claude/guards/reply-length.py
-          startLine: 9
-          endLine: 9
+          startLine: 12
+          endLine: 12
           quote: print("Keep every reply under 1,200 characters unless the user asks for detail.", file=sys.stderr)
       rules: []
       script: .claude/guards/reply-length.py
@@ -2647,5 +2657,5 @@ edges:
 producedBy:
   family: lane
   model: claude-opus-5-5 as the estate lane, by hand
-  at: 2026-10-16T23:00:59.392Z
+  at: 2026-10-17T06:45:26.109Z
 hash: c3b526d2ae0cb801a71fa4dc7f74fa51c8cbd2213f28793aaf56660f532e28ad
