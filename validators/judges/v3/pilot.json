@@ -1,0 +1,240 @@
+{
+  "head": "b5c6f7aaabc5b1fd1322ba03b474184973818e22",
+  "dirty": false,
+  "hiddenSeed": {
+    "seed": 50715626,
+    "source": "head",
+    "head": "b5c6f7aaabc5b1fd1322ba03b474184973818e22"
+  },
+  "observations": [
+    {
+      "iteration": 0,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.21555007708333332
+    },
+    {
+      "iteration": 1,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.25052677361666664
+    },
+    {
+      "iteration": 2,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.21643519723333332
+    },
+    {
+      "iteration": 3,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.19207446736666667
+    },
+    {
+      "iteration": 4,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.23347000068333326
+    },
+    {
+      "iteration": 5,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.27590130416666675
+    },
+    {
+      "iteration": 6,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.25641364653333343
+    },
+    {
+      "iteration": 7,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.2472178444499999
+    },
+    {
+      "iteration": 8,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.2468439485999998
+    },
+    {
+      "iteration": 9,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.22773978958333344
+    },
+    {
+      "iteration": 10,
+      "level": 5,
+      "bank": {
+        "size": 300,
+        "passing": 300,
+        "score": 1,
+        "causes": 0
+      },
+      "durationMinutes": 0.23675172986666682
+    }
+  ],
+  "limitation": "Iterations 1..10 are unchanged repeatability measurements. They are not ten executor fixes; no learning-rate forecast is supported when the baseline already passes.",
+  "blind": {
+    "rows": 11,
+    "passing": [
+      300,
+      300,
+      300,
+      300,
+      300,
+      300,
+      300,
+      300,
+      300,
+      300,
+      300
+    ],
+    "durationMinutes": [
+      0.21978473054865996,
+      0.1797206145847061,
+      0.210906994449518,
+      0.20015445346750008,
+      0.16490821736709524,
+      0.1541932555497624,
+      0.12800747361810258,
+      0.11392737986752763,
+      0.17391783611577313,
+      0.21451526388409548,
+      0.17877981041480476
+    ]
+  },
+  "byFamilyTier": {
+    "abstain": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    },
+    "adversarial-label": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    },
+    "agreement": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    },
+    "cache-key": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    },
+    "label-set-change": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    },
+    "length-bias": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    },
+    "near-miss": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    },
+    "none": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    },
+    "order-bias": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    },
+    "replay": {
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6
+    }
+  },
+  "declaredSharedCauseGroups": 10,
+  "failingCauses": 0,
+  "forecast": null,
+  "modelCallsInBank": 0,
+  "baselineSHA256": "4a1b222ae326b67c12fe09fb89f78b7574f4ed6a6788815b45c6c2c81f4dc701",
+  "blindBaselineSHA256": "3dacd982b6da1483eea9c3853f680bb36f9dfaf3c2e84797bef97497e3ae5893"
+}

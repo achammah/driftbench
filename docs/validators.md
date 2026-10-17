@@ -46,6 +46,33 @@ Score, per judge and criterion. Level 1: the fixture pair separates, 3 of 3 repe
 
 Feedback. Each failed transform prints the item, the before and after text, the two verdicts, and the rubric line involved. The table maps an invariance failure to the rubric's wording, a sensitivity failure to a missing FAIL picture, an injection failure to the data-tag guard, a consistency failure to the judge's temperature or prompt length.
 
+### 4.1 Labellers: additive judges ladder version 3
+
+`driftbench validate judges --ladder-version 3` selects the labeller bank.
+The default stays version 2, including its items, floor and journal. Version 3
+has separate evidence under `validators/judges/v3/`; `--hardness`, `--brief`,
+`--journal` and `--check-handover` use that directory when version 3 is selected.
+`validate all` retains the default versions. An unavailable version is an error.
+
+A labeller assigns one name from a supplied label set, `none`, or an abstention
+to a text unit. The new deterministic bank tests agreement, abstention, none,
+label-set changes, near-miss names, order and position bias, length bias,
+adversarial label mentions, repeated replay and cache keys. Fictional planted
+specifications generate paired text and gold labels. Recorded and scripted
+labellers alone run in this bank; there is no live-model mode.
+
+Each item reports Cohen's kappa and raw agreement. Abstentions remain in the
+denominator and never count as agreement, including against `none`; `none` is
+a real gold class. Empty and unknown outputs are invalid, counted separately.
+The label-set hash participates in the replay key: changing a label's name or
+definition must invalidate an answer. All-empty, constant-label, all-abstaining
+and first-label cheats must pass zero items, checked across the complete bank.
+
+The [version 3 contract](../validators/judges/v3/README.md) states the per-tier
+bars, fixture design and pilot limitations. The hardness contract below remains
+unchanged; measured provisional exceptions are recorded in that version's
+`GATE.md`, never applied to version 2.
+
 ## 5. The system validator (does the whole chain report the truth)
 
 How it works. A campaign runs on an agent with planted defects at known blocks: code picks, per seed, a subset of the fault family and the block indices where each fires, and composes one agent from them. The scorecard and the run records must match the plant.

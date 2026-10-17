@@ -34,6 +34,8 @@ export type ValidateCommandOptions = {
 /** What the command runs with. Tests pass their own ladders, root and commit reader. */
 export type ValidateDeps = {
   ladders(): Record<string, Ladder>;
+  /** Explicit versions in addition to the defaults. */
+  versions?(): Record<string, Record<number, Ladder>>;
   /** The repository root; by default the nearest folder above the working folder holding pnpm-workspace.yaml. */
   root?: string;
   /** Reads the commit the hidden seed derives from; by default `git rev-parse HEAD`. */
@@ -67,7 +69,7 @@ export function registerValidateCommand(
     .option('--check-floor', 'exit 1 when a run is below its floor in validators/floors.json, else 0')
     .option('--raise <component>', 'with floors: raise the floor of this component to [level]')
     .option('--evidence <json>', 'with floors --raise: the --json run that reaches the level')
-    .option('--ladder-version <n>', 'with floors --raise: the ladder version the floor is for')
+    .option('--ladder-version <n>', 'select a registered version; with floors --raise: the floor version')
     .option(
       '--items',
       'also list the whole bank per family and tier, pass or fail per seed, from the same run',

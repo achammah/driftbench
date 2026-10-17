@@ -204,6 +204,19 @@ export { findCycles } from './find-cycles';
 export { type FetchLike, type HttpOptions, JudgeError, type JudgeErrorCode, postJson } from './http';
 export { ATTACK_CRITERION, type AttackVerdict, judgeAttack } from './injection-judge';
 export { KNOWLEDGE_RETENTION_CRITERION } from './knowledge-retention';
+export {
+  createLabellerReplay,
+  type LabelDefinition,
+  type Labeller,
+  type LabellerAnswer,
+  type LabellerReplayEntry,
+  type LabellerRequest,
+  type LabellerScore,
+  type LabelSet,
+  labellerRequestKey,
+  labelSetHash,
+  scoreLabeller,
+} from './labeller';
 export { labelFilePath, readLabelFile, saveLabel } from './labels';
 export {
   PROMPT_FINGERPRINT as LEGACY_PROMPT_FINGERPRINT,

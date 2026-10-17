@@ -38,6 +38,7 @@ import {
   readHandover,
   readJournal,
   registeredLadders,
+  registeredLadderVersions,
   researchFile,
   researchTemplate,
   seedSpecs,
@@ -52,6 +53,7 @@ import { USAGE_EXIT, type ValidateCommandOptions, type ValidateDeps } from './va
 
 export const defaultValidateDeps: ValidateDeps = {
   ladders: registeredLadders,
+  versions: registeredLadderVersions,
 };
 
 /** Runs `driftbench validate`: see `registerValidateCommand` in validate.ts for the command and its exit codes. */
@@ -72,13 +74,40 @@ export async function validateCommand(
     return USAGE_EXIT;
   }
   if (component === 'floors') return floorsCommand(options, level, floors, ladders, root, io);
+  if (options.ladderVersion !== undefined && (component === 'all' || component === 'protect')) {
+    io.err('--ladder-version selects one component, not all or protect.\n');
+    return USAGE_EXIT;
+  }
   if (component === 'protect') return protectCommand(options, deps, root, io);
   if (level !== undefined) {
     io.err(`Unexpected argument "${level}": a level is only taken by floors --raise.\n`);
     return USAGE_EXIT;
   }
-  const chosen = select(component, ladders, io);
+  let selectedLadders = ladders;
+  if (options.ladderVersion !== undefined) {
+    const version = Number(options.ladderVersion);
+    if (!/^\d+$/.test(options.ladderVersion) || !Number.isSafeInteger(version) || version < 1) {
+      io.err(`--ladder-version is a whole number of at least 1, not "${options.ladderVersion}".\n`);
+      return USAGE_EXIT;
+    }
+    const found =
+      deps.versions?.()[component]?.[version] ??
+      (ladders[component] && ladderVersion(ladders[component]) === version ? ladders[component] : undefined);
+    if (!found) {
+      io.err(`No ladder version ${version} is registered for "${component}".\n`);
+      return USAGE_EXIT;
+    }
+    selectedLadders = { ...ladders, [component]: found };
+  }
+  const chosen = select(component, selectedLadders, io);
   if (!chosen) return USAGE_EXIT;
+  // Historical loop files stay untouched when a non-default version is selected.
+  const evidenceComponent = (ladder: Ladder) => {
+    const defaultLadder = ladders[ladder.component];
+    return defaultLadder && ladderVersion(ladder) !== ladderVersion(defaultLadder)
+      ? `${ladder.component}/v${ladderVersion(ladder)}`
+      : ladder.component;
+  };
   const modes = [
     options.brief,
     options.journal !== undefined,
@@ -107,11 +136,25 @@ export async function validateCommand(
     io.err('--brief, --journal and --hardness take one component, not all.\n');
     return USAGE_EXIT;
   }
-  if (options.hardness) return hardnessCommand(component, Boolean(options.json), root, io);
+  if (options.hardness)
+    return hardnessCommand(
+      component,
+      Boolean(options.json),
+      root,
+      io,
+      evidenceComponent(chosen[0] as Ladder),
+    );
   if (options.journal !== undefined) {
-    return journalCommand(chosen[0] as Ladder, options.journal, floors, root, io);
+    return journalCommand(
+      chosen[0] as Ladder,
+      options.journal,
+      floors,
+      root,
+      io,
+      evidenceComponent(chosen[0] as Ladder),
+    );
   }
-  if (options.checkHandover) return handoverCheckCommand(chosen, root, io);
+  if (options.checkHandover) return handoverCheckCommand(chosen, root, io, evidenceComponent);
   const visible = parseSeeds(options);
   if (typeof visible === 'string') {
     io.err(`${visible}\n`);
@@ -134,7 +177,16 @@ export async function validateCommand(
   if (chosen.some((ladder) => ladder.component === 'system')) await withinStatsMeasurementSweep(measure);
   else await measure();
   if (options.brief)
-    return briefCommand(reports[0] as LadderReport, hidden, floors, Boolean(options.fresh), deps, root, io);
+    return briefCommand(
+      reports[0] as LadderReport,
+      hidden,
+      floors,
+      Boolean(options.fresh),
+      deps,
+      root,
+      io,
+      evidenceComponent(chosen[0] as Ladder),
+    );
   print(reports, component === 'all', hidden, floors, options, io);
   if (!options.checkFloor) return Math.min(...reports.map((report) => report.level));
   const tops = Object.fromEntries(
@@ -182,23 +234,29 @@ function protectCommand(options: ValidateCommandOptions, deps: ValidateDeps, roo
 }
 
 /** `validate <component> --hardness`: the measurement of section 12.4 from the journal; exit 0 when the gate holds. */
-function hardnessCommand(component: string, json: boolean, root: string, io: Io): number {
-  const { rows, problems } = readJournal(root, component);
+function hardnessCommand(
+  component: string,
+  json: boolean,
+  root: string,
+  io: Io,
+  evidenceComponent = component,
+): number {
+  const { rows, problems } = readJournal(root, evidenceComponent);
   if (problems.length > 0) {
-    io.err(`${journalFile(component)} holds invalid rows:\n`);
+    io.err(`${journalFile(evidenceComponent)} holds invalid rows:\n`);
     for (const problem of problems) io.err(`  ${problem}\n`);
     return USAGE_EXIT;
   }
   let hardness: ReturnType<typeof measureHardness>;
   try {
-    const auditPath = join(root, `${loopFolder(component)}/audit.md`);
-    const gatePath = join(root, `${loopFolder(component)}/GATE.md`);
+    const auditPath = join(root, `${loopFolder(evidenceComponent)}/audit.md`);
+    const gatePath = join(root, `${loopFolder(evidenceComponent)}/GATE.md`);
     hardness = measureHardness(rows, {
       ...(existsSync(auditPath) ? { audit: readFileSync(auditPath, 'utf8') } : {}),
       ...(existsSync(gatePath) ? { gate: readFileSync(gatePath, 'utf8') } : {}),
     });
   } catch (cause) {
-    io.err(`${journalFile(component)}: ${message(cause)}.\n`);
+    io.err(`${journalFile(evidenceComponent)}: ${message(cause)}.\n`);
     return USAGE_EXIT;
   }
   if (json) io.out(`${JSON.stringify({ component, ...hardness }, null, 2)}\n`);
@@ -207,8 +265,14 @@ function hardnessCommand(component: string, json: boolean, root: string, io: Io)
 }
 
 /** `validate <component> --journal <row.json>`: appends a validated row and rewrites the handover's level table. */
-function journalCommand(ladder: Ladder, path: string, floors: FloorsFile, root: string, io: Io): number {
-  const component = ladder.component;
+function journalCommand(
+  ladder: Ladder,
+  path: string,
+  floors: FloorsFile,
+  root: string,
+  io: Io,
+  component = ladder.component,
+): number {
   let value: unknown;
   try {
     value = JSON.parse(readFileSync(resolve(io.cwd, path), 'utf8'));
@@ -230,7 +294,7 @@ function journalCommand(ladder: Ladder, path: string, floors: FloorsFile, root: 
   }
   const handover =
     readHandover(root, component) ??
-    handoverTemplate(component, floorOf(floors, component, ladderVersion(ladder)));
+    handoverTemplate(component, floorOf(floors, ladder.component, ladderVersion(ladder)));
   writeHandover(root, component, setLevelTable(handover, result.row));
   const research = join(root, researchFile(component));
   if (!existsSync(research)) writeFileSync(research, researchTemplate(component));
@@ -241,22 +305,26 @@ function journalCommand(ladder: Ladder, path: string, floors: FloorsFile, root: 
 }
 
 /** `validate <component|all> --check-handover`: every section present and the level table equal to the journal. */
-function handoverCheckCommand(ladders: Ladder[], root: string, io: Io): number {
+function handoverCheckCommand(
+  ladders: Ladder[],
+  root: string,
+  io: Io,
+  evidenceComponent = (ladder: Ladder) => ladder.component,
+): number {
   let failed = false;
   for (const ladder of ladders) {
-    const { rows, problems } = readJournal(root, ladder.component);
-    const text = readHandover(root, ladder.component);
+    const component = evidenceComponent(ladder);
+    const { rows, problems } = readJournal(root, component);
+    const text = readHandover(root, component);
     const all = [...problems];
-    if (text === undefined) all.push(`${handoverFile(ladder.component)} is missing`);
+    if (text === undefined) all.push(`${handoverFile(component)} is missing`);
     else all.push(...checkHandover(text, rows.filter((row) => executorOf(row) === 'builder').at(-1)));
     if (all.length === 0) {
-      io.out(
-        `${handoverFile(ladder.component)}: every section present, the level table matches the journal.\n`,
-      );
+      io.out(`${handoverFile(component)}: every section present, the level table matches the journal.\n`);
       continue;
     }
     failed = true;
-    io.err(`${handoverFile(ladder.component)}:\n`);
+    io.err(`${handoverFile(component)}:\n`);
     for (const problem of all) io.err(`  ${problem}\n`);
   }
   return failed ? 1 : 0;
@@ -271,25 +339,32 @@ function briefCommand(
   deps: ValidateDeps,
   root: string,
   io: Io,
+  evidenceComponent = report.component,
 ): number {
   const path = join(root, EXECUTOR_FILE);
   if (!existsSync(path)) {
     io.err(`${EXECUTOR_FILE} is missing: the brief has no instruction to embed the state in.\n`);
     return USAGE_EXIT;
   }
-  const { rows, problems } = readJournal(root, report.component);
+  const { rows, problems } = readJournal(root, evidenceComponent);
   for (const problem of problems) io.err(`Warning: ${problem}\n`);
+  const brief = composeBrief({
+    component: evidenceComponent,
+    executor: readFileSync(path, 'utf8'),
+    report,
+    floor: floorOf(floors, report.component, report.ladderVersion),
+    last: rows.at(-1),
+    handover: readHandover(root, evidenceComponent),
+    head: hidden?.head ?? headOf(root, deps),
+    fresh,
+  });
   io.out(
-    composeBrief({
-      component: report.component,
-      executor: readFileSync(path, 'utf8'),
-      report,
-      floor: floorOf(floors, report.component, report.ladderVersion),
-      last: rows.at(-1),
-      handover: readHandover(root, report.component),
-      head: hidden?.head ?? headOf(root, deps),
-      fresh,
-    }),
+    evidenceComponent === report.component
+      ? brief
+      : brief.replaceAll(
+          `driftbench validate ${evidenceComponent}`,
+          `driftbench validate ${report.component} --ladder-version ${report.ladderVersion}`,
+        ),
   );
   return 0;
 }

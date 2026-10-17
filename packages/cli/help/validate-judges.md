@@ -60,6 +60,25 @@ Floors: the file holds a judges floor of 20 for ladder version 2, the registered
 level 20 prints `BELOW THE FLOOR.` and `--check-floor` exits 1. The earlier floor of 7 belonged to ladder
 version 1; it is history under `history.judges` and is not enforced.
 
+## Labellers, opt-in version 3
+
+`driftbench validate judges --ladder-version 3 --items` runs the deterministic
+labeller bank. The default version 2 above remains registered and unchanged.
+Version 3 checks fictional paired text against fixed gold labels, using Cohen's
+kappa and raw agreement. It covers abstention, `none`, label changes, near-miss
+names, order and position bias, length bias, adversarial label mentions, replay
+and cache identity. Null abstentions are counted and never scored as agreement.
+
+The label-set hash includes each label name and definition; editing either
+invalidates a recorded answer. All-empty, constant, always-abstaining and
+first-label cheats must pass zero items. No live calls run in this version.
+
+The five tiers require raw agreement/kappa of 0.90/0.80, 0.92/0.85, 0.94/0.90,
+0.95/0.92 and 0.96/0.94. Every item in a tier must pass. Version-specific pilot,
+audit and provisional hardness terms are in `validators/judges/v3/`.
+`--hardness`, `--brief`, `--journal` and `--check-handover` select those files
+when combined with `--ladder-version 3`. `validate all` uses default versions.
+
 ## When to use it
 
 * After a change to `packages/judges`: the prompt renderer, the answer contract and its parser, the
@@ -97,7 +116,7 @@ Every option of `driftbench validate`, for reference (the topic named in the las
 | `--blind` | off | strip causes and `Fix:` hints (the auditor's view) | `validate-reading-items` |
 | `--check-floor` | off | exit 1 when a run is below its floor, else 0 | `validate-floors` |
 | `--raise <component>` | none | with `floors`: the component whose floor rises | `validate-floors` |
-| `--ladder-version <n>` | none | with `floors --raise`: the ladder version of the floor | `validate-floors` |
+| `--ladder-version <n>` | default version | select a registered version; with `floors --raise`: the floor version | `validate-floors` |
 | `--evidence <json>` | none | with `floors --raise`: the `--json` run that reaches the level | `validate-floors` |
 | `--brief` | off | print the executor brief with the live state | `validate-executor-loop` |
 | `--fresh` | off | with `--brief`: leave out the hypotheses | `validate-executor-loop` |

@@ -108,7 +108,7 @@ export {
   seedLabel,
   type Tier,
 } from './ladder';
-export { registeredLadders } from './ladders/index';
+export { registeredLadders, registeredLadderVersions } from './ladders/index';
 export { judgesBankChild } from './ladders/judges/v2/run-child';
 export {
   REFERENCE_TOLERANCE,
