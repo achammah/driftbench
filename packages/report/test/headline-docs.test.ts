@@ -14,6 +14,13 @@ describe('the suite headline example of the docs', () => {
   const counts = [...sentence.matchAll(/(\d+) of (\d+)/g)].map((m) => ({ k: Number(m[1]), n: Number(m[2]) }));
   const printed = /```text\n(Suite pass rate, mode F: [^\n]+)\n```/.exec(statistics)?.[1];
 
+  it('describes the shipped root-family headline and distinguishes its all-pass target', () => {
+    expect(statistics).not.toContain('The suite headline groups by golden today');
+    expect(statistics).not.toContain('The parent link is not in the spec schema yet');
+    expect(statistics).toContain('E[phi^m]');
+    expect(doc('CHANGELOG.md')).not.toContain('the suite headline still groups by golden');
+  });
+
   it('is read from the docs: six goldens with their runs', () => {
     expect(counts).toHaveLength(6);
     expect(printed).toBeDefined();

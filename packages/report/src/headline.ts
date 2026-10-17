@@ -10,25 +10,25 @@ export const HEADLINE_POWER = 0.8;
  * The headline of a suite: its pass rate as the mean over trees, with the hierarchical Beta-Bernoulli interval,
  * and what a reader needs to judge it.
  *
- * A tree is the group of runs that cannot be told apart as independent evidence: today the repeats of one
- * golden (one spec in one mode, one perturbation in P). Every tree weighs the same, whatever its repeats, so a
- * golden with ten repeats does not outvote one with two. The interval widens when trees disagree and narrows
- * when they agree; it is the one to quote for a suite.
+ * Without parent links a tree is the repeats of one golden (one spec in one mode, one perturbation in P).
+ * With links it is one root family within that golden: the root and every descendant contribute one all-pass
+ * outcome per repeat. Every tree weighs the same, whatever its repeats. The interval widens when trees
+ * disagree and narrows when they agree; it is the one to quote for a suite.
  */
 export type SuiteHeadline = Estimate & {
   method: 'hierarchical' | 'none';
   /** Linked specs contribute one outcome per root tree and repeat: `n` counts those, `runs` the scored runs. */
   unit?: 'tree-run';
-  /** The trees: goldens with at least one scored run. */
+  /** The trees: root families for linked specs, otherwise goldens, with at least one scored outcome. */
   trees: number;
   /** Scored runs in all trees: a run not run or blocked (no block failed) is no measurement and is left out. */
   runs: number;
-  /** The pass rate over all runs pooled, each run counting once. Differs from `estimate` when trees have unequal repeats. */
+  /** The pass rate over all outcomes pooled (tree-runs for linked specs). Differs when trees have unequal repeats. */
   pooledRate: number;
   /** Design effect of the pooled rate across trees and the runs it is worth: the same clustering, Wilson on n_eff. */
   designEffect: number;
   effectiveRuns: number;
-  /** True when every run passed or every run failed: the spread between goldens is zero, so each golden counts once. */
+  /** True when every outcome passed or every outcome failed: no spread, so each tree counts once. */
   degenerate: boolean;
   /** The smallest drop in the tree-level rate two suites like this one detect at 80% power; null when none is. */
   detectableDrop: number | null;

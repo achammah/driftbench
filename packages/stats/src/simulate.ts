@@ -179,9 +179,10 @@ const FAMILY_METHODS: readonly FamilyCoverageMethod[] = [
 
 /**
  * The coverage and width of three 95 percent intervals on simulated suites with parents: Wilson on all runs as if
- * independent, the hierarchical interval with every child as a tree (the golden, as the suite headline groups
- * today), and the hierarchical interval with every family as a tree (the runs of a root and all its descendants
- * pooled). Coverage near 0.95 is the promise; the result is what was measured, whether or not it keeps it.
+ * independent, the hierarchical interval with every child as a tree, and the hierarchical interval with every
+ * family as a tree (the runs of a root and all its descendants pooled). These estimate the block mean theta,
+ * not the report headline's all-pass family rate. Coverage near 0.95 is the promise; the result is what was
+ * measured, whether or not it keeps it.
  * Deterministic for a seed.
  */
 export function simulateFamilyCoverage(

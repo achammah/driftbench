@@ -4,8 +4,8 @@ import { simulateFamilyCoverage } from '../src/index';
 /**
  * Coverage on suites with parents: families of blocks that inherit from one root. A family has its own pass
  * rate around the suite's mean, each child of the family has a rate around its family's, and each child is run
- * a few times. The hierarchical interval is read two ways: with every child as a tree (what the suite headline
- * does today) and with every family as a tree (the root of the parent chain).
+ * a few times. The block-rate interval is read two ways: with every child as a tree and with every family as a
+ * tree (the root of the parent chain). The report headline instead estimates the all-pass family rate.
  */
 describe('coverage on simulated suites with parents', () => {
   /**

@@ -4,8 +4,9 @@ import { PLANNING_POWER } from '../src/compare';
 import { clustered } from '../src/estimate';
 import { headlineNote } from '../src/format';
 import { HEADLINE_POWER, suiteHeadline } from '../src/headline';
+import { buildScorecard } from '../src/scorecard';
 import { headlineText } from '../src/text';
-import { run } from './support';
+import { dataOf, run } from './support';
 
 /** `passes` of `total` repeats of one golden pass; the others fail at block 1. */
 function golden(specId: string, total: number, passes: number) {
@@ -54,6 +55,29 @@ describe('suiteHeadline', () => {
     ...golden('f', 2, 2),
   ];
   const h = suiteHeadline(runs, treeOf);
+
+  it('keeps no-parent headlines byte-identical to main before the family coverage regression', async () => {
+    const cases = [
+      runs,
+      golden('one', 4, 3),
+      [...golden('a', 3, 3), ...golden('b', 2, 2)],
+      [...golden('a', 3, 0), ...golden('b', 2, 0)],
+      [...runs, unsent(run({ specId: 'not-run' }), 'not_run')],
+      [...runs, unsent(run({ specId: 'blocked' }), 'blocked')],
+      [...runs, run({ specId: 'incomplete', status: 'failed' })],
+      [],
+    ];
+    const headlines = cases.map((sample) => {
+      const before = JSON.stringify(sample);
+      const headline = suiteHeadline(sample, treeOf);
+      expect(buildScorecard(dataOf(sample)).modes[0]?.headline).toEqual(headline);
+      expect(JSON.stringify(sample)).toBe(before);
+      return { headline, text: headline ? headlineText('F', headline) : null };
+    });
+    await expect(`${JSON.stringify(headlines, null, 2)}\n`).toMatchFileSnapshot(
+      './reference/no-parent-headlines.json',
+    );
+  });
 
   it('is the mean over goldens with the hierarchical interval of the stats package', () => {
     const counts = [

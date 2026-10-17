@@ -1,0 +1,166 @@
+[
+  {
+    "headline": {
+      "trees": 6,
+      "runs": 27,
+      "shares": {
+        "incomplete": 0,
+        "blocked": 0,
+        "notRun": 0
+      },
+      "pooledRate": 0.6666666666666666,
+      "estimate": 0.7000000000000001,
+      "lower": 0.35368467948367793,
+      "upper": 0.8824009542111368,
+      "method": "hierarchical",
+      "n": 27,
+      "clusters": 6,
+      "designEffect": 3.685714285714286,
+      "effectiveRuns": 7.325581395348837,
+      "degenerate": false,
+      "detectableDrop": 0.6525400344093104
+    },
+    "text": "Suite pass rate, mode F: 70.0% [35.4%, 88.2%] (hierarchical 95% interval); 6 goldens, n_eff 7.3 runs (design effect 3.69), detectable drop 65.3 points at 80% power."
+  },
+  {
+    "headline": {
+      "trees": 1,
+      "runs": 4,
+      "shares": {
+        "incomplete": 0,
+        "blocked": 0,
+        "notRun": 0
+      },
+      "pooledRate": 0.75,
+      "estimate": 0.75,
+      "lower": 0.75,
+      "upper": 0.75,
+      "method": "none",
+      "n": 4,
+      "clusters": 1,
+      "designEffect": 1,
+      "effectiveRuns": 4,
+      "degenerate": false,
+      "detectableDrop": null
+    },
+    "text": "Suite pass rate, mode F: 75.0% no interval: one cluster (one golden); 1 golden."
+  },
+  {
+    "headline": {
+      "trees": 2,
+      "runs": 5,
+      "shares": {
+        "incomplete": 0,
+        "blocked": 0,
+        "notRun": 0
+      },
+      "pooledRate": 1,
+      "estimate": 1,
+      "lower": 0.3537431090253581,
+      "upper": 1,
+      "method": "hierarchical",
+      "n": 5,
+      "clusters": 2,
+      "designEffect": 2.5,
+      "effectiveRuns": 2,
+      "degenerate": true,
+      "detectableDrop": null
+    },
+    "text": "Suite pass rate, mode F: 100.0% [35.4%, 100.0%] (hierarchical 95% interval); 2 goldens, n_eff 2.0 runs (every run agrees, so each golden counts once), no drop detectable at 80% power."
+  },
+  {
+    "headline": {
+      "trees": 2,
+      "runs": 5,
+      "shares": {
+        "incomplete": 0,
+        "blocked": 0,
+        "notRun": 0
+      },
+      "pooledRate": 0,
+      "estimate": 0,
+      "lower": 0,
+      "upper": 0.6462568909746423,
+      "method": "hierarchical",
+      "n": 5,
+      "clusters": 2,
+      "designEffect": 2.5,
+      "effectiveRuns": 2,
+      "degenerate": true,
+      "detectableDrop": null
+    },
+    "text": "Suite pass rate, mode F: 0.0% [0.0%, 64.6%] (hierarchical 95% interval); 2 goldens, n_eff 2.0 runs (every run agrees, so each golden counts once), no drop detectable at 80% power."
+  },
+  {
+    "headline": {
+      "trees": 6,
+      "runs": 27,
+      "shares": {
+        "incomplete": 0,
+        "blocked": 0,
+        "notRun": 0.03571428571428571
+      },
+      "pooledRate": 0.6666666666666666,
+      "estimate": 0.7000000000000001,
+      "lower": 0.35368467948367793,
+      "upper": 0.8824009542111368,
+      "method": "hierarchical",
+      "n": 27,
+      "clusters": 6,
+      "designEffect": 3.685714285714286,
+      "effectiveRuns": 7.325581395348837,
+      "degenerate": false,
+      "detectableDrop": 0.6525400344093104
+    },
+    "text": "Suite pass rate, mode F: 70.0% [35.4%, 88.2%] (hierarchical 95% interval); 6 goldens, n_eff 7.3 runs (design effect 3.69), detectable drop 65.3 points at 80% power, 3.6% not run."
+  },
+  {
+    "headline": {
+      "trees": 6,
+      "runs": 27,
+      "shares": {
+        "incomplete": 0,
+        "blocked": 0.03571428571428571,
+        "notRun": 0
+      },
+      "pooledRate": 0.6666666666666666,
+      "estimate": 0.7000000000000001,
+      "lower": 0.35368467948367793,
+      "upper": 0.8824009542111368,
+      "method": "hierarchical",
+      "n": 27,
+      "clusters": 6,
+      "designEffect": 3.685714285714286,
+      "effectiveRuns": 7.325581395348837,
+      "degenerate": false,
+      "detectableDrop": 0.6525400344093104
+    },
+    "text": "Suite pass rate, mode F: 70.0% [35.4%, 88.2%] (hierarchical 95% interval); 6 goldens, n_eff 7.3 runs (design effect 3.69), detectable drop 65.3 points at 80% power, 3.6% blocked."
+  },
+  {
+    "headline": {
+      "trees": 7,
+      "runs": 28,
+      "shares": {
+        "incomplete": 0.03571428571428571,
+        "blocked": 0,
+        "notRun": 0
+      },
+      "pooledRate": 0.6428571428571429,
+      "estimate": 0.6,
+      "lower": 0.31025891712173487,
+      "upper": 0.8379253891928303,
+      "method": "hierarchical",
+      "n": 28,
+      "clusters": 7,
+      "designEffect": 3.555555555555556,
+      "effectiveRuns": 7.874999999999999,
+      "degenerate": false,
+      "detectableDrop": 0.599710615485243
+    },
+    "text": "Suite pass rate, mode F: 60.0% [31.0%, 83.8%] (hierarchical 95% interval); 7 goldens, n_eff 7.9 runs (design effect 3.56), detectable drop 60.0 points at 80% power, 3.6% did not complete."
+  },
+  {
+    "text": null
+  }
+]
