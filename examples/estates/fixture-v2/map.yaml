@@ -8,7 +8,7 @@
 version: 1
 runtime: claude-code
 root: .
-readAt: 2026-10-16T06:26:33.674Z
+readAt: 2026-10-16T23:00:59.392Z
 atoms:
   - id: skill.invoice-reconcile.skill-invoice-reconcile
     kind: skill
@@ -1399,6 +1399,27 @@ atoms:
       path: .claude/skills/invoice-reconcile/references/matching-rules.md
       spans:
         - references/matching-rules.md
+  - id: reference.shipment-tracker.read-data-shipments-txt
+    kind: reference
+    title: Read data/shipments.txt
+    provenance:
+      file: .claude/skills/shipment-tracker/SKILL.md
+      startLine: 20
+      endLine: 20
+      quote: The local carrier table is `data/shipments.txt`.
+      hash: 7c900bf4edbf9ac7c4f86c1e26b8e4e10ca0e13d2c055cb271061a187dbd091f
+    producedBy: code
+    role: detail
+    approved: true
+    situation: The local carrier table is `data/shipments.txt`.
+    evidence:
+      - { type: tool_called, label: Read, input: { file_path: { contains: .claude/skills/shipment-tracker/data/shipments.txt } } }
+    enforcement: []
+    fields:
+      path: .claude/skills/shipment-tracker/data/shipments.txt
+      exists: true
+      readWhen: The local carrier table is `data/shipments.txt`.
+      from: .claude/skills/shipment-tracker/SKILL.md
   - id: reference.supplier-email.read-claude-memory-supplier-languages-md
     kind: reference
     title: Read .claude/memory/supplier-languages.md
@@ -2604,6 +2625,7 @@ edges:
   - { from: skill.invoice-reconcile.skill-invoice-reconcile, to: script.invoice-reconcile.script-scripts-reconcile-py, kind: script }
   - { from: skill.shipment-tracker.skill-shipment-tracker, to: tool.invoice-reconcile.declared-bash, kind: allows }
   - { from: skill.shipment-tracker.skill-shipment-tracker, to: tool.settings.allow-read, kind: allows }
+  - { from: skill.shipment-tracker.skill-shipment-tracker, to: reference.shipment-tracker.read-data-shipments-txt, kind: reference }
   - { from: skill.shipment-tracker.skill-shipment-tracker, to: script.shipment-tracker.script-scripts-track-sh, kind: script }
   - { from: skill.supplier-email.skill-supplier-email, to: reference.supplier-email.read-claude-memory-supplier-languages-md, kind: reference }
   - { from: skill.weekly-report.skill-weekly-report, to: tool.invoice-reconcile.declared-bash, kind: allows }
@@ -2625,5 +2647,5 @@ edges:
 producedBy:
   family: lane
   model: claude-opus-5-5 as the estate lane, by hand
-  at: 2026-10-16T06:26:33.674Z
-hash: a5c8cb21f4aeca08a0f2235c66a11406a127c9e90844917eaa0d3a95ee4a0cb7
+  at: 2026-10-16T23:00:59.392Z
+hash: c3b526d2ae0cb801a71fa4dc7f74fa51c8cbd2213f28793aaf56660f532e28ad

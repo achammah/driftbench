@@ -132,7 +132,67 @@ scripts:
         expect:
           exitCode: 1
           stdoutIncludes: [widget, short, "10.00 EUR"]
-      # A JSON file without a lines list is an invalid input: exit 2.
+      # Equal quantities match only when the unit prices differ by less than 0.05 EUR, whichever price is higher. A
+      # difference of 0.04 on either side matches; exactly 0.05 and 0.20 on either side do not, and the line is over
+      # when the invoice price is above the order's and short when it is below.
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,1,10.04\n"
+          order.csv: "article,quantity,unit_price\nwidget,1,10.00\n"
+        expect:
+          exitCode: 0
+          stdoutIncludes: [widget, matched]
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,1,9.96\n"
+          order.csv: "article,quantity,unit_price\nwidget,1,10.00\n"
+        expect:
+          exitCode: 0
+          stdoutIncludes: [widget, matched]
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,1,10.05\n"
+          order.csv: "article,quantity,unit_price\nwidget,1,10.00\n"
+        expect:
+          exitCode: 1
+          stdoutIncludes: [widget, over, "0.05 EUR"]
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,1,9.95\n"
+          order.csv: "article,quantity,unit_price\nwidget,1,10.00\n"
+        expect:
+          exitCode: 1
+          stdoutIncludes: [widget, short, "-0.05 EUR"]
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,2,10.20\n"
+          order.csv: "article,quantity,unit_price\nwidget,2,10.00\n"
+        expect:
+          exitCode: 1
+          stdoutIncludes: [widget, over, "0.40 EUR"]
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,2,9.80\n"
+          order.csv: "article,quantity,unit_price\nwidget,2,10.00\n"
+        expect:
+          exitCode: 1
+          stdoutIncludes: [widget, short, "-0.40 EUR"]
+      # An article only one side holds differs: the missing side counts as quantity 0.
+      - args: [invoice.csv, order.csv]
+        files:
+          invoice.csv: "article,quantity,unit_price\nwidget,1,10.00\n"
+          order.csv: "article,quantity,unit_price\nwidget,1,10.00\ngadget,1,5.00\n"
+        expect:
+          exitCode: 1
+          stdoutIncludes: [gadget, short, "-5.00 EUR"]
+      # A JSON file holds a list of lines under "lines"; without one the input is invalid: exit 2.
+      - args: [invoice.json, order.json]
+        files:
+          invoice.json: '{"lines": [{"article": "widget", "quantity": 1, "unit_price": "10.00"}]}'
+          order.json: '{"lines": [{"article": "widget", "quantity": 1, "unit_price": "10.00"}]}'
+        expect:
+          exitCode: 0
+          stdoutIncludes: [widget, matched]
       - args: [invoice.json, order.json]
         files:
           invoice.json: '{"items": []}'
@@ -151,8 +211,41 @@ scripts:
         expect:
           exitCode: 2
           stdout: ""
-      # A shipment the table does not list exits 1 and prints nothing on standard output.
+      - args: [NWX, "123", extra]
+        expect:
+          exitCode: 2
+          stdout: ""
+      # A listed shipment prints its table line, exactly one line, and exits 0. The carrier code and the whole
+      # tracking number must match: the same number under another carrier is another shipment, and a carrier code
+      # that ends with the asked one is another carrier.
       - args: [NWX, "123"]
+        expect:
+          exitCode: 0
+          stdout: "NWX 123 sorted-at-depot 2026-03-04"
+      - args: [DLV, "123"]
+        expect:
+          exitCode: 0
+          stdout: "DLV 123 out-for-delivery 2026-03-06"
+      - args: [XDLV, "123"]
+        expect:
+          exitCode: 0
+          stdout: "XDLV 123 held-at-customs 2026-03-09"
+      # A shipment the table does not list exits 1 and prints nothing on standard output: a number that only
+      # starts like a listed one, a carrier that holds no such number, a number nobody lists.
+      - args: [NWX, "12"]
+        expect:
+          exitCode: 1
+          stdout: ""
+      - args: [XDLV, "1234"]
+        expect:
+          exitCode: 1
+          stdout: ""
+      - args: [NWX, "999"]
+        expect:
+          exitCode: 1
+          stdout: ""
+      # A carrier code is matched as written: another case is another code.
+      - args: [nwx, "123"]
         expect:
           exitCode: 1
           stdout: ""

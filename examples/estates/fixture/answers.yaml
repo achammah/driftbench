@@ -350,3 +350,6 @@ answers:
   .claude/skills/weekly-report/templates/report.md:
     chunk: .claude/skills/weekly-report/templates/report.md
     atoms: []
+  .claude/skills/shipment-tracker/data/shipments.txt:
+    chunk: .claude/skills/shipment-tracker/data/shipments.txt
+    atoms: []

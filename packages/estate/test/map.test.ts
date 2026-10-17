@@ -103,7 +103,7 @@ describe('approval', () => {
     const one = approveAtoms(text, { ids: ['gate.standing.read-a-file-before-editing-it'] });
     expect(one.ok ? one.approved : []).toEqual(['gate.standing.read-a-file-before-editing-it']);
     const all = approveAtoms(one.ok ? one.text : text, { all: true });
-    expect(all.ok ? [all.approved.length, all.already] : []).toEqual([56, 69]);
+    expect(all.ok ? [all.approved.length, all.already] : []).toEqual([56, 70]);
   });
 
   it('refuses an unknown kind or atom, and approves nothing', async () => {
