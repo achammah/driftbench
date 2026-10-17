@@ -1,0 +1,35 @@
+# Today's tool-call checks as items: the `tools` check (packages/checks/src/checks/tools.ts) split by the
+# verdict each part emits, and the forbidden check's share for a tool expected 0 times. Input-assertion
+# verdicts are not here: the value-check policy decides and stamps them, between input_closed and order.
+kind: check-set
+id: default
+version: 1
+extends: null
+description: The tool-call checks of today, in today's emission order.
+items:
+  - id: tools.count
+    title: Each expected tool is called as many times as its count allows
+    enabled: true
+    effect: { gating: true }
+    impl: builtin:checks/tools-count
+  - id: tools.input_closed
+    title: With input_closed, every call holds only the named input keys
+    enabled: true
+    effect: { gating: true }
+    impl: builtin:checks/tools-input-closed
+  - id: tools.order
+    title: The calls line up with the expected tools under tool_order
+    enabled: true
+    effect: { gating: true }
+    impl: builtin:checks/tools-order
+  - id: tools.argument_accuracy
+    title: The share of expected arguments that matched, reported, never gating
+    enabled: true
+    effect: { gating: false }
+    impl: builtin:checks/tools-argument-accuracy
+  - id: forbidden.count0
+    title: A tool expected 0 times is not called
+    enabled: true
+    effect: { gating: true }
+    impl: builtin:checks/forbidden-count0
+order: [tools.count, tools.input_closed, tools.order, tools.argument_accuracy, forbidden.count0]

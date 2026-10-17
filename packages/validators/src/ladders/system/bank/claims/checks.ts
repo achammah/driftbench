@@ -778,25 +778,77 @@ function toolItems(out: BankItem[]): void {
     'tools/argument-accuracy',
     2,
     C('tools'),
-    'tools.argument_accuracy never gates; its score is the share of expected arguments that matched ("Every check and its verdict ids")',
-    'tools: argument accuracy is a non-gating verdict scored by the share of matched arguments',
+    'the argument accuracy never gates; its score is the share of expected arguments that matched ("Every check and its verdict ids")',
+    'tools: argument accuracy of 0.5 does not gate an otherwise passing block, as a verdict or as a diagnosis',
     async ({ seed }) => {
-      const run = await scene(seed, 'arg-accuracy', [
-        {
-          observed: obs({
-            text: EN('R-1021'),
-            calls: [{ label: LOOKUP, input: { plan: 'fiber_500', email: 'x' } }],
-          }),
-          expect: {
-            tools: [{ label: LOOKUP, input: { plan: 'fiber_500', email: { regex: '@example\\.org$' } } }],
+      // Isolate accuracy from the failed argument assertion: input verdicts still
+      // supply its score, but only accuracy itself could make this scene fail.
+      const checks = defaultChecks().map((check) =>
+        check.name !== 'tools'
+          ? check
+          : {
+              ...check,
+              evaluate: async (ctx: CheckContext) =>
+                (await check.evaluate(ctx)).map((entry) =>
+                  entry.id.includes('.input.') ? { ...entry, gating: false } : entry,
+                ),
+            },
+      );
+      const run = await scene(
+        seed,
+        'arg-accuracy',
+        [
+          {
+            observed: obs({
+              text: EN('R-1021'),
+              calls: [{ label: LOOKUP, input: { plan: 'fiber_500', email: 'x' } }],
+            }),
+            expect: {
+              tools: [{ label: LOOKUP, input: { plan: 'fiber_500', email: { regex: '@example\\.org$' } } }],
+            },
           },
-        },
-      ]);
+        ],
+        {},
+        { checks },
+      );
+      const inputs = verdictsOf(run, 0).filter((entry) => entry.id.includes('.input.'));
+      if (
+        inputs.length !== 2 ||
+        inputs.some((entry) => entry.gating) ||
+        inputs.filter((entry) => entry.outcome === 'pass').length !== 1 ||
+        inputs.filter((entry) => entry.outcome === 'fail').length !== 1
+      ) {
+        return fail('expected two non-gating input verdicts: one pass and one fail');
+      }
+      const otherGating = verdictsOf(run, 0).filter(
+        (entry) => entry.gating && entry.id !== 'tools.argument_accuracy',
+      );
+      if (otherGating.length === 0 || otherGating.some((entry) => entry.outcome !== 'pass')) {
+        return fail('expected every other gating verdict to pass');
+      }
       const verdict = find(run, 0, 'tools.argument_accuracy');
-      return verdict?.gating === false && verdict.score === 0.5
+      // The block framework moves a measure computed from other verdicts to a diagnosis, which never gates: the
+      // claim holds the same score and the same "never gates" on whichever form the code ships, and refuses both.
+      const block = run.blocks[0] as
+        | { pass: boolean; diagnoses?: Array<{ diagnostic: string; score?: number }> }
+        | undefined;
+      const diagnosis = block?.diagnoses?.find((entry) =>
+        entry.diagnostic.startsWith('diagnostic:argument-accuracy@'),
+      );
+      if (verdict && diagnosis) {
+        return fail(`expected the argument accuracy once, got both ${shown(verdict)} and a diagnosis`);
+      }
+      if (diagnosis) {
+        return diagnosis.score === 0.5 && block?.pass === true
+          ? PASS
+          : fail(
+              `expected the argument-accuracy diagnosis with score 0.5 (1 of 2 matched) and a passing block, got score ${String(diagnosis.score)}, pass ${String(block?.pass)}`,
+            );
+      }
+      return verdict?.gating === false && verdict.score === 0.5 && block?.pass === true
         ? PASS
         : fail(
-            `expected tools.argument_accuracy not gating with score 0.5 (1 of 2 matched), got ${shown(verdict)}`,
+            `expected tools.argument_accuracy not gating with score 0.5 (1 of 2 matched) and a passing block, got ${shown(verdict)}, pass ${String(block?.pass)}`,
           );
     },
   );

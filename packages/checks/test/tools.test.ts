@@ -1,10 +1,29 @@
-import type { Expect } from '@agent-nexus/driftbench-core';
+import { diagnosticStep, type Expect, type StepOutput, type Verdict } from '@agent-nexus/driftbench-core';
 import { describe, expect, it } from 'vitest';
-import { tools } from '../src/checks/tools';
+import { ARGUMENT_ACCURACY_STEP } from '../src/argument-accuracy';
+import { createToolsCheck, tools } from '../src/checks/tools';
+import type { SameReferentJudge } from '../src/value-check/judge';
 import { acme, perturbation } from './support/acme';
+import { acmeReplayer } from './support/acme-replayer';
 import { type Call, context, failing, observed, outcomes, run, verdict } from './support/context';
 
 const coverage = acme('acme-new-customer-coverage');
+
+/** The argument-accuracy diagnosis of a block's verdicts, as the shipped diagnostic writes it. */
+async function accuracyOf(verdicts: Verdict[]): Promise<StepOutput> {
+  const step = diagnosticStep(ARGUMENT_ACCURACY_STEP);
+  if (!step) throw new Error('the argument-accuracy step is not registered');
+  const out = await step.run({
+    scope: 'block',
+    verdicts,
+    check: {} as never,
+    objects: [],
+    params: {},
+    earlier: [],
+  });
+  if (!out || Array.isArray(out)) throw new Error('expected one diagnosis');
+  return out;
+}
 
 /** Block 1 of the coverage spec, as the Acme agent answers it. */
 const offerCalls: Call[] = [
@@ -90,10 +109,11 @@ describe('tools', () => {
       'tools.catalog.search.input.category': 'pass',
       'tools.catalog.search.input.address_id': 'pass',
       'tools.order': 'pass',
-      'tools.argument_accuracy': 'pass',
     });
-    const accuracy = verdict(verdicts, 'tools.argument_accuracy');
-    expect(accuracy).toMatchObject({ gating: false, score: 1 });
+    expect(await accuracyOf(verdicts)).toMatchObject({
+      score: 1,
+      summary: '3 of 3 expected arguments matched',
+    });
     expect(verdict(verdicts, 'tools.coverage.check.input.address').evidence).toContain(
       '"88 Summit Avenue, Acmeville"',
     );
@@ -147,22 +167,48 @@ describe('tools', () => {
     );
   });
 
-  it('mutation: a wrong address_id fails that input and lowers the argument accuracy to 2 of 3', async () => {
+  it('mutation: a wrong address_id fails that input on the replayed tool and lowers the argument accuracy to 2 of 3', async () => {
+    const wrong: Call[] = [
+      offerCalls[0] as Call,
+      { label: 'catalog.search', input: { category: 'home', address_id: 'addr-101' } },
+    ];
+    const replayed = createToolsCheck({ services: { replayer: acmeReplayer() } });
+    const verdicts = await run(replayed, context(coverage, 1, observed(offerText, wrong)));
+    expect(failing(verdicts)).toEqual(['tools.catalog.search.input.address_id']);
+    const field = verdict(verdicts, 'tools.catalog.search.input.address_id');
+    expect(field.gating).toBe(true);
+    expect(field.outcome).toBe('fail');
+    expect(field.evidence).toMatch(
+      /^catalog\.search call 1 \(call-2\): input\.address_id is "addr-101"; expected equal to "addr-103" \(call 1 \(call-2\): address_id rung1_outcome: catalog\.search resolves "addr-101" to .*, and the gold "addr-103" to /,
+    );
+    const accuracy = await accuracyOf(verdicts);
+    expect(accuracy.score).toBeCloseTo(2 / 3);
+    expect(accuracy.summary).toBe(
+      '2 of 3 expected arguments matched; missed: catalog.search input.address_id',
+    );
+  });
+
+  it('without a replayer or a judge, a different value falls back to the exact compare, says so, and lints the test', async () => {
     const wrong: Call[] = [
       offerCalls[0] as Call,
       { label: 'catalog.search', input: { category: 'home', address_id: 'addr-101' } },
     ];
     const verdicts = await run(tools, context(coverage, 1, observed(offerText, wrong)));
-    expect(failing(verdicts)).toEqual(['tools.catalog.search.input.address_id', 'tools.argument_accuracy']);
+    expect(failing(verdicts)).toEqual([
+      'tools.catalog.search.input.address_id',
+      'tools.catalog.search.input.address_id.no_decider',
+    ]);
     const field = verdict(verdicts, 'tools.catalog.search.input.address_id');
-    expect(field.gating).toBe(true);
-    expect(field.evidence).toBe(
-      'catalog.search call 1 (call-2): input.address_id is "addr-101"; expected equal to "addr-103"',
+    expect(field).toMatchObject({ gating: true, outcome: 'fail' });
+    expect(field.evidence).toContain(
+      'address_id exact_fallback: no decider configured for catalog.search.address_id; compared exactly: "addr-101" is not "addr-103"',
     );
-    const accuracy = verdict(verdicts, 'tools.argument_accuracy');
-    expect(accuracy.score).toBeCloseTo(2 / 3);
-    expect(accuracy.gating).toBe(false);
-    expect(accuracy.evidence).toContain('missed: catalog.search input.address_id');
+    expect(field.evidence).toContain('rung3_same_referent: no same-referent judge is configured');
+    const lint = verdict(verdicts, 'tools.catalog.search.input.address_id.no_decider');
+    expect(lint.gating).toBe(false);
+    expect(lint.evidence).toContain(
+      'a replayer that declares catalog.search and resolves address_id (rung1_outcome)',
+    );
   });
 
   it('mutation: a missing call fails its count and every input assertion on it, naming the calls seen', async () => {
@@ -172,7 +218,6 @@ describe('tools', () => {
       'tools.catalog.search.input.category',
       'tools.catalog.search.input.address_id',
       'tools.order',
-      'tools.argument_accuracy',
     ]);
     expect(verdict(verdicts, 'tools.catalog.search.count').evidence).toBe(
       'catalog.search called 0 times, expected exactly 1; calls in this block: coverage.check',
@@ -180,7 +225,9 @@ describe('tools', () => {
     expect(verdict(verdicts, 'tools.catalog.search.input.category').evidence).toBe(
       'catalog.search was not called, so input.category could not be equal to "home"',
     );
-    expect(verdict(verdicts, 'tools.argument_accuracy').score).toBeCloseTo(1 / 3);
+    expect((await accuracyOf(verdicts)).score).toBeCloseTo(1 / 3);
+    // No check aggregates its own verdicts: the share is a diagnosis, never a verdict.
+    expect(verdicts.some((entry) => entry.id === 'tools.argument_accuracy')).toBe(false);
   });
 
   it('reads a range count: acme-tool-failure block 2 allows 1 to 2 retries of coverage.check', async () => {
@@ -249,58 +296,64 @@ describe('tools: every assertion form, on the Acme expectations', () => {
   const cases: Array<{
     form: string;
     id: string;
-    run: (input: Record<string, unknown>) => ReturnType<typeof run>;
+    run: (input: Record<string, unknown>, check?: typeof tools) => ReturnType<typeof run>;
     good: Record<string, unknown>;
     bad: Record<string, unknown>;
   }> = [
     {
       form: 'one_of',
       id: 'tools.notify_sales.input.reason',
-      run: (input) => run(tools, context(callback, 3, observed('Done.', [{ label: 'notify_sales', input }]))),
+      run: (input, check = tools) =>
+        run(check, context(callback, 3, observed('Done.', [{ label: 'notify_sales', input }]))),
       good: notify,
       bad: { ...notify, reason: 'complaint' },
     },
     {
       form: 'subset',
       id: 'tools.notify_sales.input.customer',
-      run: (input) => run(tools, context(callback, 3, observed('Done.', [{ label: 'notify_sales', input }]))),
+      run: (input, check = tools) =>
+        run(check, context(callback, 3, observed('Done.', [{ label: 'notify_sales', input }]))),
       good: { ...notify, customer: { phone: '+12025550131', name: 'Pat' } },
       bad: { ...notify, customer: { phone: '+12025550199' } },
     },
     {
       form: 'contains',
       id: 'tools.notify_sales.input.summary',
-      run: (input) => run(tools, context(callback, 3, observed('Done.', [{ label: 'notify_sales', input }]))),
+      run: (input, check = tools) =>
+        run(check, context(callback, 3, observed('Done.', [{ label: 'notify_sales', input }]))),
       good: notify,
       bad: { ...notify, summary: 'New customer wants fiber.' },
     },
     {
       form: 'exact',
       id: 'tools.order.create.input.customer',
-      run: (input) => run(tools, context(porting, 4, observed('Done.', [{ label: 'order.create', input }]))),
+      run: (input, check = tools) =>
+        run(check, context(porting, 4, observed('Done.', [{ label: 'order.create', input }]))),
       good: order,
       bad: { ...order, customer: { ...order.customer, phone: '+12025550150' } },
     },
     {
       form: 'absent',
       id: 'tools.order.create.input.address_id',
-      run: (input) => run(tools, context(porting, 4, observed('Done.', [{ label: 'order.create', input }]))),
+      run: (input, check = tools) =>
+        run(check, context(porting, 4, observed('Done.', [{ label: 'order.create', input }]))),
       good: order,
       bad: { ...order, address_id: 'addr-101' },
     },
     {
       form: 'a bare scalar',
       id: 'tools.order.create.input.plan_id',
-      run: (input) => run(tools, context(porting, 4, observed('Done.', [{ label: 'order.create', input }]))),
+      run: (input, check = tools) =>
+        run(check, context(porting, 4, observed('Done.', [{ label: 'order.create', input }]))),
       good: order,
       bad: { ...order, plan_id: 'mobile-l' },
     },
     {
       form: 'regex',
       id: 'tools.coverage.check.input.address',
-      run: (input) =>
+      run: (input, check = tools) =>
         run(
-          tools,
+          check,
           context(
             callback,
             1,
@@ -313,9 +366,9 @@ describe('tools: every assertion form, on the Acme expectations', () => {
     {
       form: 'nonempty',
       id: 'tools.notify_sales.input.summary',
-      run: (input) =>
+      run: (input, check = tools) =>
         run(
-          tools,
+          check,
           context(
             acme('acme-order-loose-confirmation'),
             3,
@@ -337,11 +390,27 @@ describe('tools: every assertion form, on the Acme expectations', () => {
     expect(verdict(await blank.run({ summary: '  ' }), blank.id).outcome).toBe('fail');
   });
 
-  it.each(cases)('$form passes on the target input and fails on its mutation', async (item) => {
+  it.each(cases)('$form passes on the target input and never passes its mutation', async (item) => {
     expect(verdict(await item.run(item.good), item.id).outcome).toBe('pass');
     const mutated = verdict(await item.run(item.bad), item.id);
     expect(mutated.outcome).toBe('fail');
     expect(mutated.evidence).toMatch(/expected /);
+  });
+
+  /** A calibrated judge that reads every value as itself, so two different values never match. */
+  const literal: SameReferentJudge = {
+    model: 'literal-reader',
+    calibration: { falseAcceptance: 0, source: 'a test stub' },
+    complete: async (request) =>
+      request.kind === 'read'
+        ? { has_content: true, reading: request.parts.v }
+        : { same: request.parts.a === request.parts.b },
+  };
+
+  it.each(cases)('$form fails its mutation once a judge is configured', async (item) => {
+    const judged = createToolsCheck({ services: { judge: literal } });
+    expect(verdict(await item.run(item.good, judged), item.id).outcome).toBe('pass');
+    expect(verdict(await item.run(item.bad, judged), item.id).outcome).toBe('fail');
   });
 });
 

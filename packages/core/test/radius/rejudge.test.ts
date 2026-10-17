@@ -225,7 +225,7 @@ it.each([false, true])('rejudge copies obey the destination text policy (%s)', a
       },
     ],
   };
-  const result = await rejudgeRun(prepared, judge, () => 0, record);
+  const result = await rejudgeRun(prepared, judge, () => 0, undefined, undefined, record);
   for (const block of result.blocks)
     expect(block.realized).toEqual({
       hash: provenanceHash('private'),
@@ -239,7 +239,14 @@ it.each([false, true])('rejudge copies obey the destination text policy (%s)', a
     });
   expect(source.blocks.every((block) => block.realized?.text === 'private')).toBe(true);
   const stripped = await rejudgeRun(prepared, judge, () => 0);
-  const copiedAgain = await rejudgeRun({ ...prepared, source: stripped }, judge, () => 0, true);
+  const copiedAgain = await rejudgeRun(
+    { ...prepared, source: stripped },
+    judge,
+    () => 0,
+    undefined,
+    undefined,
+    true,
+  );
   expect(copiedAgain.blocks.every((block) => block.realized?.text === undefined)).toBe(true);
 });
 

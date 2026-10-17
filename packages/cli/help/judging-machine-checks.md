@@ -63,7 +63,7 @@ A verdict has `id`, the check `name`, `gating`, `outcome` (`pass`, `fail` or `in
 
 * The id starts with the check name and a dot: `tools.order.create.count`, `must.0`, `stage.reached`. Indexes count from 0.
 * When a block names the same tool, card, skill, guard, path, helper or artifact twice, the second gets `#2` in its id: `tools.order.create#2.count`.
-* Machine verdicts gate by default. A block passes when every gating verdict passes, so a gating verdict that is inconclusive fails the block. A non-gating verdict never fails it (for example `tools.argument_accuracy`).
+* Machine verdicts gate by default. A block passes when every gating verdict passes, so a gating verdict that is inconclusive fails the block. A non-gating verdict never fails it. A measure computed from other verdicts, such as the share of expected tool arguments that matched, is a diagnosis on the block (`diagnoses`), never a verdict, so it cannot fail it either.
 * Two kinds of inconclusive: the detector or the spec could not decide (not gating: `lang` with too little text, `budget.cost_usd` with no cost reported, `schema_strict` for a tool with no schema); or the adapter observed nothing the check needs (gating: `skills` and `guards` with no runtime trace, `tools_offered` with no offered list, `execution` with no executions, `workspace` with no diff). The block cannot pass on what was not observed.
 * A check that throws gives the gating inconclusive verdict `<check>.error` (`the check threw ...`); a verdict the schema refuses gives `<check>.invalid`. The run goes on.
 * After the checks the runner adds, in code: `ledger.<fact>` (a fact the reply or a tool input states that contradicts the ledger) and, when the runtime reports no stage, `flow.stage` and `flow.order` from the stage classifier.
@@ -88,7 +88,7 @@ The runs are not kept: pass --store <file> to keep them.
 (exit 0)
 ```
 
-The campaign id changes on every run. The ids of the verdicts that decided it, block by block, are in `--json`; for example block 1 of this spec gives `tools.catalog.search.count`, `tools.catalog.search.input.category`, `tools.argument_accuracy`, `forbidden.coverage.check`, `must.0` to `must.3`, `must_not.0`, `must_not.1`, `lang.stable`, `pii.iban`, `pii.national_number`, `pii.phone`, `pii.email`, `cards.one_message_per_turn` and `stage.reached`. The family topics show the evidence of each.
+The campaign id changes on every run. The ids of the verdicts that decided it, block by block, are in `--json`; for example block 1 of this spec gives `tools.catalog.search.count`, `tools.catalog.search.input.category`, `forbidden.coverage.check`, `must.0` to `must.3`, `must_not.0`, `must_not.1`, `lang.stable`, `pii.iban`, `pii.national_number`, `pii.phone`, `pii.email`, `cards.one_message_per_turn` and `stage.reached`. The family topics show the evidence of each.
 
 ## Common errors
 

@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import { type LoadedSpec, loadSpecs, parseSpecText } from '@agent-nexus/driftbench-core';
+import { canonicalJson, type LoadedSpec, loadSpecs, parseSpecText } from '@agent-nexus/driftbench-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { cellId, openMemoryStore, type SqliteStore } from '../src/index';
 import { block, campaign, perturbedRun, run, SUPPORT, storeError } from './fixtures';
@@ -30,7 +30,7 @@ describe('specs', () => {
     expect(specs.length).toBeGreaterThanOrEqual(7);
     for (const spec of specs) await store.putSpec(spec);
     for (const spec of specs) {
-      expect(await store.getSpec(spec.spec.id, spec.hash)).toStrictEqual(spec);
+      expect(canonicalJson(await store.getSpec(spec.spec.id, spec.hash))).toBe(canonicalJson(spec));
     }
   });
 
@@ -71,7 +71,7 @@ describe('specs', () => {
     if (!loaded.ok) throw new Error('the inline spec does not load');
     await store.putSpec(loaded);
     const stored = await store.getSpec('acme-greeting', loaded.hash);
-    expect(stored).toStrictEqual(loaded);
+    expect(canonicalJson(stored)).toBe(canonicalJson(loaded));
     expect(stored?.spec.given?.ledger).toEqual({ customer: 'new' });
     expect(stored?.spec.blocks[0]?.when).toEqual({ user: 'Hello' });
   });

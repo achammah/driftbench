@@ -1,5 +1,5 @@
 {
-  "note": "Every item of the system bank: id, family, tier, level, source, component. A test compares it with systemBank(), so a change to the bank shows in a diff. Regenerate it in a maintainer commit of its own.",
+  "note": "Every item of the system bank: id, family, tier, level, source, component. A test compares it with systemBank(), so a change to the bank shows in a diff. Regenerate it in a maintainer commit of its own. Regenerate with: node --import tsx packages/validators/test/system/bank-manifest.ts --write.",
   "items": [
     {
       "id": "store/round-trip/plain",
@@ -6830,7 +6830,7 @@
       "level": 3,
       "source": "contract",
       "component": "packages/checks/src/checks/tools.ts",
-      "cause": "tools: argument accuracy is a non-gating verdict scored by the share of matched arguments"
+      "cause": "tools: argument accuracy of 0.5 does not gate an otherwise passing block, as a verdict or as a diagnosis"
     },
     {
       "id": "claim/checks/tools/order-alone-applies",

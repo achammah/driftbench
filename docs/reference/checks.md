@@ -28,7 +28,7 @@ Two kinds of verdict are inconclusive:
 
 | Check | Applies to a block when | Verdict ids |
 |---|---|---|
-| `tools` | `expect.tools` names a tool with a count other than 0, or `expect.tool_order` is set | `tools.<label>.count`, `tools.<label>.input.<field>`, `tools.<label>.input_closed`, `tools.order`, `tools.argument_accuracy` |
+| `tools` | `expect.tools` names a tool with a count other than 0, or `expect.tool_order` is set | `tools.<label>.count`, `tools.<label>.input.<field>`, `tools.<label>.input_closed`, `tools.order` |
 | `tools_offered` | `expect.tools_offered` names a tool to include or exclude | `tools_offered.include.<tool>`, `tools_offered.exclude.<tool>` |
 | `forbidden` | a tool is in `rules.forbidden_tools`, has `rules.max_calls`, or is expected 0 times in the block | `forbidden.<label>`, `forbidden.max_calls.<label>` |
 | `must` | `expect.must` holds a pattern | `must.<index>` |
@@ -66,7 +66,7 @@ Two kinds of verdict are inconclusive:
 | `custom` | `rules.custom` names a check | `custom.<name>`, `custom.<name>.<id>` |
 | `judge` | the check set holds a council and `expect.criteria` names a criterion | `judge.<name>` |
 
-`tools.argument_accuracy` never gates: its `score` is the share of expected arguments that matched. `<n>` in `schema_strict` counts the calls of one tool in the block from 1. `<index>` counts from 0.
+The share of expected arguments that matched is no verdict: the shipped diagnostic `argument-accuracy` writes it on the block as a diagnosis (`score`, and a `summary` naming the missed arguments), which never gates. A check never aggregates its own verdicts. `<n>` in `schema_strict` counts the calls of one tool in the block from 1. `<index>` counts from 0.
 
 ## Reading a verdict
 

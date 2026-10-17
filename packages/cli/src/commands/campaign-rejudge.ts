@@ -148,6 +148,8 @@ export async function campaignRejudge(paths: string[], options: Options, io: Io)
         item,
         judge.check,
         () => judge.spend.usd,
+        undefined,
+        undefined,
         options.recordRealizedText === true,
       );
       await store.putRun(campaign.campaignId, run);

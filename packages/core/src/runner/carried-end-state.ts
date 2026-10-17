@@ -1,4 +1,4 @@
-import type { CheckSet } from '../contracts/check';
+import { type ScoringPlan, stamp } from '../objects/scoring';
 import type { TargetRef } from '../schema/common';
 import type { BlockResult } from '../schema/run';
 import type { Spec } from '../schema/spec';
@@ -10,7 +10,7 @@ export async function recheckCarriedEndState(
   result: BlockResult,
   spec: Spec,
   target: TargetRef,
-  checks: CheckSet,
+  plan: ScoringPlan,
   endState: unknown,
 ): Promise<BlockResult> {
   const block = spec.blocks[result.index];
@@ -31,7 +31,9 @@ export async function recheckCarriedEndState(
   // The check contract names this family end_state. Other checks retain their measured verdicts.
   const judged = (
     await Promise.all(
-      checks.filter((c) => c.name === 'end_state' && c.applies(ctx)).map((c) => c.evaluate(ctx)),
+      plan.steps
+        .filter(({ check }) => check.name === 'end_state' && check.applies(ctx))
+        .map(async ({ check, by }) => stamp(await check.evaluate(ctx), by)),
     )
   ).flat();
   const at = result.verdicts.findIndex((v) => v.name === 'end_state');

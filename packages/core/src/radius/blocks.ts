@@ -68,6 +68,7 @@ export function planBlockRerun(
     { campaignId: reuse.fromCampaign, runs: [source], provenance: reuse.baselineProvenance },
     {
       now,
+      rescoreObservations: true,
       maxCarry: reuse.maxCarry,
       maxAgeDays: reuse.maxAgeDays,
       currentProvenance: () => runProvenance({ ...options, target }),

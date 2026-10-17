@@ -178,7 +178,6 @@ block 1 tools.catalog.search.input_closed pass: catalog.search only allowed inpu
 block 1 tools.catalog.search.input.category pass: catalog.search input.category is equal to "mobile" on 1 call: "mobile"
 block 1 tools.catalog.search.input.customer_email pass: catalog.search input.customer_email is matching /@example\.com$/ on 1 call: "sam.rivera@example.com"
 block 1 tools.order pass: exact: expected exactly these calls, in this order, and no other: catalog.search (exactly 1); saw catalog.search
-block 1 tools.argument_accuracy pass (not gating): 2 of 2 expected arguments matched
 block 1 forbidden.order.create pass: order.create not called (forbidden by rules.forbidden_tools)
 block 1 must.0 pass: /Acme Mobile M/ matched "Acme Mobile M" at offset 84: "... month. Plans with more data: Acme Mobile M, 40 GB for $25 a month; Acme ..."
 block 1 must.1 pass: /\$35/ matched "$35" at offset 156: "... Mobile L, unlimited data for $35 a month. Which one would you ..."

@@ -1,0 +1,50 @@
+{
+  "comment": "Made-up phone near misses in packages/checks/test/fixtures/value-ladder (byte copies of research/block-framework-value data): hf7_items.py derives each from a fictional number of the reserved 555 exchange by changing one digit or swapping two, which can leave the reserved 0100 to 0199 range. Entries are kind plus sha256 of the exact matched text.",
+  "entries": [
+    {
+      "kind": "phone",
+      "sha256": "4031f05eeac7ff001857a6c70c6e9a61aa0766d4843aa885c91715c4d0ec1567",
+      "reason": "HF7 near miss built from a fictional number of the reserved 555 exchange (one digit changed or two swapped), research/block-framework-value src/hf7_items.py, or a judge reading of one."
+    },
+    {
+      "kind": "phone",
+      "sha256": "b76acc75da03beb9774e8b28e8b630f118b3cd6dea2b116ceed16fd0de0a7c16",
+      "reason": "HF7 near miss built from a fictional number of the reserved 555 exchange (one digit changed or two swapped), research/block-framework-value src/hf7_items.py, or a judge reading of one."
+    },
+    {
+      "kind": "phone",
+      "sha256": "efb9cc06a1e37969b37b0abaa35990ace33aed9a140eb0ce79a4f26f7fd323ac",
+      "reason": "HF7 near miss built from a fictional number of the reserved 555 exchange (one digit changed or two swapped), research/block-framework-value src/hf7_items.py, or a judge reading of one."
+    },
+    {
+      "kind": "phone",
+      "sha256": "440426b44e01e48861eedb591456fd5b0179f97c418009ac3f3c86c624fa3a3f",
+      "reason": "HF7 near miss built from a fictional number of the reserved 555 exchange (one digit changed or two swapped), research/block-framework-value src/hf7_items.py, or a judge reading of one."
+    },
+    {
+      "kind": "phone",
+      "sha256": "0a14cca9ef3178c41210156db17a0661eb6016060cf26a6066c34184382e893b",
+      "reason": "HF7 near miss built from a fictional number of the reserved 555 exchange (one digit changed or two swapped), research/block-framework-value src/hf7_items.py, or a judge reading of one."
+    },
+    {
+      "kind": "phone",
+      "sha256": "32277d5613a24203958d34eb8e8e03fd99bcbc6af9adbc8db5dbe66044a563b0",
+      "reason": "HF7 near miss built from a fictional number of the reserved 555 exchange (one digit changed or two swapped), research/block-framework-value src/hf7_items.py, or a judge reading of one."
+    },
+    {
+      "kind": "phone",
+      "sha256": "1a20fe7a932bead98530eaa6d01ccec6cea567f1c62415b31636573809c2370e",
+      "reason": "HF7 near miss built from a fictional number of the reserved 555 exchange (one digit changed or two swapped), research/block-framework-value src/hf7_items.py, or a judge reading of one."
+    },
+    {
+      "kind": "phone",
+      "sha256": "21df3883860b986fb8501100a3c890a22ab821444b62c21f6ba563da86d9d8df",
+      "reason": "HF7 near miss built from a fictional number of the reserved 555 exchange (one digit changed or two swapped), research/block-framework-value src/hf7_items.py, or a judge reading of one."
+    },
+    {
+      "kind": "phone",
+      "sha256": "1e7731be531bf6345109d8cbae1c67391efdf67f016094a50a0f6c2f0b587cf0",
+      "reason": "HF7 near miss built from a fictional number of the reserved 555 exchange (one digit changed or two swapped), research/block-framework-value src/hf7_items.py, or a judge reading of one."
+    }
+  ]
+}
