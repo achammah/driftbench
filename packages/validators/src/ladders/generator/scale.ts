@@ -20,6 +20,24 @@ export const SCALE_WALL_CAP = 10;
 /** The heap the child may use, in megabytes. */
 export const SCALE_HEAP_MB = 2048;
 
+/**
+ * The time items divide the CPU time of the two runs by the reference unit (`scale-unit.ts`), sampled beside
+ * the runs, so the budget is in work the host could have done, not in host seconds. Derivation and the runs
+ * behind each number: validators/CONSTANTS.md, "Generator scale".
+ */
+/**
+ * The reference unit's CPU time on the host class that judges, in milliseconds: its mean over the 9 clean 100 times
+ * windows of three separate jobs on the CI runner (ubuntu-24.04), with the product of main and PR 726, where the
+ * jobs' CPU time ranged from 39.6 to 53.3 s.
+ */
+export const SCALE_REFERENCE_UNIT_MS = 54.5;
+/** The time budget per factor, in reference units: half of SCALE_BUDGET_MS divided by SCALE_REFERENCE_UNIT_MS. */
+export const SCALE_BUDGET_UNITS: Record<number, number> = { 10: 550, 100: 1100 };
+/** Fewer unit samples than this during the runs measure nothing: the time item fails. */
+export const SCALE_MIN_UNITS = 10;
+/** The sampler's units that end before the window starts: their code is still being compiled. */
+export const SCALE_UNIT_WARMUP = 5;
+
 export type ScaleReport = {
   factor: number;
   budgetMs: number;
@@ -40,7 +58,34 @@ export type ScaleReport = {
   completeShare: number;
   followerPass: number;
   followerTotal: number;
+  /** The mean CPU time of the reference units that ended during the measured runs, in milliseconds. */
+  unitMs: number;
+  /** How many reference units ended during the measured runs. */
+  unitSamples: number;
 };
+
+/**
+ * The verdict of a scale time item: the CPU time of the two runs, in reference units, within the factor's
+ * budget. The unit is read in a long window: the 100 times run of the same ladder run (`unit`), which the time
+ * items of both factors divide by. A short window reads the unit dearer, since the product is starting up
+ * beside the sampler for a larger share of it, and a dearer unit counts fewer units. Without `unit`, the report's
+ * own window is read. Fewer than SCALE_MIN_UNITS samples in the window read fail the item.
+ */
+export function timeVerdict(report: ScaleReport, unit: ScaleReport = report): [boolean, string] {
+  const budget = SCALE_BUDGET_UNITS[report.factor];
+  if (budget === undefined) return [false, `no budget in reference units for ${report.factor} times`];
+  const where = unit === report ? 'during the runs' : `during the ${unit.factor} times runs`;
+  if (unit.unitSamples < SCALE_MIN_UNITS)
+    return [
+      false,
+      `two runs took ${report.ms} ms of CPU time, but the reference unit was sampled ${unit.unitSamples} times ${where}, fewer than the ${SCALE_MIN_UNITS} the budget needs`,
+    ];
+  const units = report.ms / unit.unitMs;
+  return [
+    units <= budget,
+    `two runs took ${report.ms} ms of CPU time, ${Math.round(units)} reference units (a unit took ${unit.unitMs.toFixed(1)} ms, the mean of ${unit.unitSamples} samples taken ${where}); the budget is ${budget} units, ${Math.round(budget * SCALE_REFERENCE_UNIT_MS)} ms where a unit takes ${SCALE_REFERENCE_UNIT_MS} ms`,
+  ];
+}
 
 /** The hidden specification with `factor` times its behaviours, each with a phrase, spread over the flows. */
 export function scaledSpec(seed: number, factor: number): HiddenSpec {
@@ -81,20 +126,24 @@ function failed(factor: number, budgetMs: number, error: string): ScaleReport {
     completeShare: 0,
     followerPass: 0,
     followerTotal: 0,
+    unitMs: 0,
+    unitSamples: 0,
   };
 }
 
 /**
  * Runs the child for one factor and seed, kills it at the budget, and returns what it reported. A test may
- * lower the heap and name a module overriding the package's `generateSuiteToDisk` or `loadApprovedMap`.
+ * lower the heap, name a module overriding the package's `generateSuiteToDisk` or `loadApprovedMap`, and name a
+ * module the reference unit sampler imports first (`unitImport`, to plant a slower host).
  */
 export function scaleReport(
   factor: number,
   seed: number,
   budgetMs = SCALE_BUDGET_MS[factor] ?? 60_000,
-  options: { heapMb?: number; generator?: string } = {},
+  options: { heapMb?: number; generator?: string; unitImport?: string } = {},
 ): Promise<ScaleReport> {
   const child = fileURLToPath(new URL('./scale-child.ts', import.meta.url));
+  const { DRIFTBENCH_SCALE_UNIT_IMPORT: _planted, ...inherited } = process.env;
   return new Promise((resolve) => {
     const proc = spawn(
       process.execPath,
@@ -108,7 +157,13 @@ export function scaleReport(
         String(budgetMs),
         ...(options.generator ? [options.generator] : []),
       ],
-      { stdio: ['ignore', 'pipe', 'pipe'] },
+      {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        env: {
+          ...inherited,
+          ...(options.unitImport ? { DRIFTBENCH_SCALE_UNIT_IMPORT: options.unitImport } : {}),
+        },
+      },
     );
     let out = '';
     let err = '';

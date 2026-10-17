@@ -455,6 +455,32 @@ describe('the validators workflow', () => {
     sharedGroup.concurrency.group = 'validators-${{ github.ref }}';
     expect(() => assertConcurrency(sharedGroup)).toThrow();
   });
+  it('runs the generator scale items alone, on a dispatch that names them from a branch other than main', () => {
+    const scale = (ctx: Ctx) => runs(ctx, 'generator-scale', workflow);
+    for (const ctx of [MAIN_PUSH, TRAIN_PR, ORDINARY_PR]) expect(scale(ctx)).toBe(false);
+    for (const jobs of ['generator-scale', 'GENERATOR-SCALE', 'ladders,generator-scale'])
+      expect(scale(dispatchOn('refs/heads/fix/scale', jobs))).toBe(true);
+    expect(scale(dispatchOn('refs/heads/train/9a', 'generator-scale'))).toBe(true);
+    for (const jobs of ['', 'ladders', 'generator-scale-x', 'xgenerator-scale'])
+      expect(scale(dispatchOn('refs/heads/fix/scale', jobs))).toBe(false);
+    for (const ref of ['refs/heads/main', 'refs/tags/v1', 'refs/pull/9/merge'])
+      expect(scale(dispatchOn(ref, 'generator-scale'))).toBe(false);
+    // naming it runs no heavy job outside a train
+    for (const id of VALIDATORS_HEAVY)
+      expect(runs(dispatchOn('refs/heads/fix/scale', 'generator-scale'), id, workflow)).toBe(false);
+    expect(stepRuns('generator-scale')).toContain(
+      'node --import tsx packages/validators/src/ladders/generator/scale-run.ts --seed 1 --repeat 3 $PLANTS',
+    );
+    const step = (workflow.jobs['generator-scale'].steps as { env?: { PLANTS?: string } }[]).find(
+      (entry) => entry.env?.PLANTS,
+    );
+    const plants = (jobs: string) =>
+      evaluateTemplate(step?.env?.PLANTS, dispatchOn('refs/heads/fix/scale', jobs));
+    expect(plants('generator-scale')).toBe('');
+    expect(plants('generator-scale,plants')).toBe('--plants');
+    expect(plants('generator-scale,plantsx')).toBe('');
+    for (const step of workflow.jobs['generator-scale'].steps) expect(step.if).toBeUndefined();
+  });
   it('checks every pull request for protected changes with the full history', () => {
     expect(workflow.jobs.protect.if).toBe("github.event_name == 'pull_request'");
     expect(workflow.jobs.protect.steps[0].with['fetch-depth']).toBe(0);

@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       jobs:
-        description: Comma-separated job ids to run on a train/* branch, no spaces (for example build,python). A dispatch on any other branch runs nothing.
+        description: Comma-separated job ids to run on a train/* branch, no spaces (for example build,python). On another branch than main, a dispatch runs only generator-scale, when named; on main it runs nothing.
         required: true
         type: string
 
@@ -68,6 +68,28 @@ jobs:
             status=$?
           fi
           test "$status" -eq 11
+
+  generator-scale:
+    # The ladders job stops at the generator's first failing level, so it never reaches the scale level (22)
+    # while a lower level fails. This job runs the generator's 20 scale items alone, on a dispatch that names
+    # it (jobs=generator-scale) from a branch other than main, so the time items are measured on the runner.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/') && github.ref != 'refs/heads/main' && contains(format(',{0},', inputs.jobs), ',generator-scale,')
+    name: generator scale items
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      # jobs=generator-scale,plants also runs the planted products once each at 100 times the behaviours.
+      - name: The generator's scale items on seed 1, three runs
+        env:
+          PLANTS: ${{ contains(format(',{0},', inputs.jobs), ',plants,') && '--plants' || '' }}
+        run: node --import tsx packages/validators/src/ladders/generator/scale-run.ts --seed 1 --repeat 3 $PLANTS
 
   protect:
     name: executor branches leave the validators alone

@@ -58,7 +58,16 @@ export {
   runContext,
 } from './measure';
 export * from './render';
-export { SCALE_BUDGET_MS, type ScaleReport, scaledSpec, scaleReport } from './scale';
+export {
+  SCALE_BUDGET_MS,
+  SCALE_BUDGET_UNITS,
+  SCALE_MIN_UNITS,
+  SCALE_REFERENCE_UNIT_MS,
+  type ScaleReport,
+  scaledSpec,
+  scaleReport,
+  timeVerdict,
+} from './scale';
 
 /**
  * The generator validator (docs/validators.md sections 3 and 12): do generated tests catch what they claim?

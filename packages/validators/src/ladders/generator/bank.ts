@@ -33,7 +33,7 @@ import {
   type RenderedMap,
   renderMap,
 } from './render';
-import { type ScaleReport, scaleReport } from './scale';
+import { type ScaleReport, scaleReport, timeVerdict } from './scale';
 
 /**
  * The item bank of the generator validator (docs/validators.md section 12). An item is one capability the
@@ -2147,10 +2147,22 @@ function scaleItems(): BankItem[] {
           return verdict(pass, detail);
         },
       });
-    add('time', factor === 10 ? 4 : 5, C.generate, (r) => [
-      r.ms <= r.budgetMs / 2,
-      `two runs took ${r.ms} ms of CPU time; the budget is ${r.budgetMs / 2} ms`,
-    ]);
+    // Both time items read the unit in the long window of the 100 times run (scale.ts, timeVerdict).
+    items.push({
+      id: `scale.${factor}x.time`,
+      family: 'scale',
+      tier: factor === 10 ? 4 : 5,
+      level: 'scale',
+      component: C.generate,
+      async check(data) {
+        const report = await data.scaled(factor);
+        if (report.error) return verdict(false, report.error);
+        const long = factor === 100 ? report : await data.scaled(100);
+        if (long.error) return verdict(false, `the 100 times run, whose unit this item reads: ${long.error}`);
+        const [pass, detail] = timeVerdict(report, long);
+        return verdict(pass, detail);
+      },
+    });
     add('valid', 3, C.assemble, (r) => [
       r.invalid === 0 && r.lint === 0,
       `${r.invalid} invalid, ${r.lint} linted`,
