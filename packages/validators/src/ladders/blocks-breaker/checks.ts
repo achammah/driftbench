@@ -182,9 +182,14 @@ const REFERENCE = {
 type Order = keyof typeof REFERENCE;
 
 /** A call sequence of groups: the expected labels in their counts, with one slip drawn from the rng. */
-function sequenceFor(rng: Rng, entries: readonly Entry[], spare: readonly string[]): string[] {
+function sequenceFor(
+  rng: Rng,
+  entries: readonly Entry[],
+  spare: readonly string[],
+  forced?: number,
+): string[] {
   const groups = entries.map((entry) => ({ label: entry.label, count: entry.count }));
-  const slip = between(rng, 0, 5);
+  const slip = forced ?? between(rng, 0, 5);
   const at = between(rng, 0, groups.length - 1);
   if (slip === 1) (groups[at] as { count: number }).count += 1;
   if (slip === 2) (groups[at] as { count: number }).count -= 1;
@@ -209,13 +214,18 @@ function orderItems(): BankItem[] {
       item(FAMILY, full, tier, 1, CHECKS, cause, title, async (ctx) => {
         const rng = rngFor(ctx.seed, full);
         const pool = ['a', 'b', 'c', 'd'].map((k) => word(ctx.seed, `${full}:${k}`));
-        const cases = times(14, () => {
+        // Case 0 holds no slip (it passes for every order) and case 1 drops a whole label (it fails for every
+        // order), so the cases hold both outcomes on every seed; the other twelve draw their slip.
+        const cases = Array.from({ length: 14 }, (_, index) => {
           const picked = shuffled(rng, pool);
           const entries: Entry[] = picked
             .slice(0, between(rng, 2, 3))
-            .map((label) => ({ label, count: between(rng, 1, 2) }));
+            .map((label) => ({ label, count: index === 1 ? 1 : between(rng, 1, 2) }));
           const spare = picked.slice(entries.length);
-          return { entries, seen: sequenceFor(rng, entries, spare) };
+          return {
+            entries,
+            seen: sequenceFor(rng, entries, spare, index === 0 ? 0 : index === 1 ? 2 : undefined),
+          };
         });
         const rec = await plain(
           ctx,
