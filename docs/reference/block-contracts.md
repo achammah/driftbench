@@ -457,6 +457,258 @@ A rule marked "implied by" follows from the quoted sentence of `docs/concepts/gi
 
 Source: `docs/concepts/given-when-then.md`, section "Parent blocks", on `origin/feat/block-parents`.
 
+## Evidence names
+
+Built by: PR 454 (`origin/feat/block-b4-report`, `packages/core/src/evidence/`). Not on `origin/main`.
+`docs/reference/blame.md` on that ref lists every name with its values and what it is computed from. This section states the rules the names follow, one heading per name, so each can be tested alone.
+
+### The evidence step
+
+* `evidence.computeEvidence(input, names)` of the core package computes the named evidence of one failing verdict. Without `names` it computes every name.
+* It returns an object with one key per name whose value is known. A name whose value is unknown is left out.
+* A name that no provider registers is refused: the call throws and lists the known names.
+* A derived name reads names computed for the same verdict. It is computed after them.
+* The step reads only `input`. It calls no model, no agent and no tool.
+* `input` holds the stored block (`block.observed`, `block.verdicts`) and the failing `verdict`, which is the root of its chain. Every other field is optional:
+
+| Field | Holds |
+|---|---|
+| `user` | the user turn the agent received |
+| `expect` | `skills` (routed skills), `tools`, `protected` (path globs), `taskImpossible`, `downstream`, `situation`, `situationAtoms` |
+| `values` | the value facts of the verdict: `tool`, `field`, `path`, `call`, `value`, `gold`, `rung`, `settles`, `outcome`, `source`, `change`, `contract`, `contractBroken`, `changedInputsFail`, `demanded` |
+| `ruleAtoms` | the atom ids the failing expectation enforces (`metadata.estate.atoms`) |
+| `atoms`, `edges` | the estate map: atoms `{ id, kind, provenance: { file, startLine }, situation, evidence, enforcement, fields }`, edges `{ from, to, kind }` |
+| `links` | links of a block with no atoms: `{ verdict, home, act, file, line, skill }`; `verdict` is an id, or a prefix that ends with `*` |
+| `stated` | stated rules: `{ tool, field, where, format, asks, toolNeeds, recovery }` |
+| `toolSchemas` | tool input schemas by tool label |
+| `promises` | what a tool's usage text promises: `{ tool, prints, matches }` |
+| `reply` | a stored reading of the reply: `{ next_action, asked_for, task_flagged }` |
+| `decisions` | the guard decision log: `{ check, verdict }` |
+| `testsFailReverted` | the stored re-execution with the agent's test edits reverted |
+| `confirm` | stored confirm counts: `reference_pass`, `reference_loads`, `forced_load_pass`, `hint_pass` |
+| `history`, `attributed` | earlier diagnoses `{ item, act, home }` and the current one, for recurrence |
+| `planRows` | plan rows `{ atomIds, testType, skill }` |
+| `maxRetries`, `bar`, `minRunsPerHome`, `countNoSkillHome` | the policy params |
+
+* The atoms of the failing verdict are the atoms of `ruleAtoms` that the map holds, in the order of `ruleAtoms`. The links of the failing verdict are the links whose `verdict` matches its id.
+* The subject tool of the verdict is the tool of its first value fact, else the tool its id names: `tools.<label>.count`, `tools.<label>.input.<field>`. A label may hold dots.
+* A skill path is `skills/<name>/...`, at any depth. A main file is a `SKILL.md` body, or a file outside every skill folder and outside `agents/`, `guards/` and `hooks/`.
+
+### Evidence: verdict_check
+
+* `verdict_check` is the `name` of the failing verdict.
+
+### Evidence: verdict_kind
+
+* `verdict_kind` is the `kind` of the failing verdict: `machine` or `judge`.
+
+### Evidence: rule_mechanical
+
+* `rule_mechanical` is true when the failing verdict is a machine verdict, false for a judge verdict.
+
+### Evidence: first_violation
+
+* `first_violation` is the id of the earliest gating verdict of the block whose outcome is `fail`. An inconclusive, not applicable or non-gating verdict is never it.
+* Earliest is by the place of the verdict's act in the trace: the first call of the tool its id names. A verdict that names no called tool comes after every call.
+* Two verdicts at the same place keep the order of the block's verdicts.
+* A block with no failing gating verdict has no `first_violation`.
+
+### Evidence: rule_atom
+
+* `rule_atom` is the list of the verdict's atom ids.
+* With no atom, it is the list `<file>:<line>` of the verdict's links (the link's `home` when it has no file, 0 when it has no line).
+* With neither, it is `none`.
+
+### Evidence: rule_home
+
+* `rule_home` is the home of the verdict's first atom, else the `home` of its first link, else `none`.
+* By the atom's kind: `reference` is `skill_reference`, `script` is `skill_script`, `subagent` is `helper`, `guard` is `guard`, `tool` is `tool_schema`.
+* Any other kind, by the atom's file: `skills/<name>/SKILL.md` is `skill_body`; `skills/<name>/scripts/...` is `skill_script`; any other file of a skill is `skill_reference`; a file under `agents/` is `helper`; under `guards/` or `hooks/` is `guard`; any other file is `core`.
+
+### Evidence: rule_skill
+
+* `rule_skill` is the skill of the first atom's file, else the `skill` of the first link, else the skill of the link's file. A rule outside every skill has no `rule_skill`.
+
+### Evidence: rule_act
+
+* `rule_act` comes from the first evidence predicate of the verdict's first atom: `skill_loaded` or `skill_not_loaded` is `load_skill`; `tool_called` with the label `Read` is `read_reference`; `ordered` is `ordered`; `stage_reached` is `stage`; `custom` named `ordered` is `ordered`, named `stage_seen` or `stage_order` is `stage`, any other `custom` is its name.
+* An atom with no predicate is `gate` for the kind `gate`, `stage` for the kind `stage`, else its kind.
+* With no atom, it is the `act` of the first link.
+
+### Evidence: act_signature
+
+* `act_signature` is the act with its detail: `ordered:<before>><after>`, `stage:<name>`, `tool_called:<label>` for a tool other than `Read`, `read_reference`, `load_skill`.
+* It never holds a skill name or a file name. With no atom, it is the `act` of the first link.
+
+### Evidence: rule_situational
+
+* `rule_situational` is true when the verdict's first atom names a situation, and is not a `skill` or `route` atom, and is not a pointer (a `reference` or `gate` atom with `fields.path`).
+* A verdict with links and no atom is false.
+* A verdict with neither is true when the block names a situation, and unknown otherwise.
+
+### Evidence: routed_skills
+
+* `routed_skills` is the list of `expect.skills`, then the name of each `route` or `skill` atom of the verdict (`fields.name`, else the skill of its file). Each name once.
+
+### Evidence: skill_loaded
+
+* The skill a load question is about is the skill a `skills.<name>` verdict names, else `rule_skill`, else the first routed skill. With none, `skill_loaded` is unknown.
+* The skill is loaded when a `Skill` call names it and succeeded, or when no `Skill` call names it and the runtime's skills list holds it, or when the agent read `skills/<name>/SKILL.md` in full.
+* A `Skill` call that failed loads nothing, whatever the runtime lists. A partial read of the body is no load.
+
+### Evidence: skill_covers
+
+* `skill_covers` reads the first plan row of the type `route_positive` or `route_near_miss` that names the skill (`skill`, or an atom id holding `.<name>.`): `covered` for `route_positive`, `not_covered` for `route_near_miss`.
+* With no such row, a stored `reference_loads` at the bar or above (`bar`, default 2) is `covered`, under it `not_covered`.
+* With neither, it is `unknown`.
+
+### Evidence: rule_skill_routed
+
+* `rule_skill_routed` is derived: true when `rule_skill` is one of `routed_skills`, false when it is not, unknown with no `rule_skill`.
+
+### Evidence: rule_needed_by
+
+* `rule_needed_by` counts the homes that need the rule: each skill of a plan row naming one of the verdict's atoms, each routed skill, each skill an atom's file sits in, and `core` when a `cites` edge comes to the atom from a core atom. Each home counts once.
+* A verdict with no atom has no `rule_needed_by`.
+
+### Evidence: ref_exists
+
+* `ref_exists` is the `fields.exists` of the verdict's `reference` atom, else the `fields.exists` of a pointer to the reference the verdict is about.
+
+### Evidence: ref_forced
+
+* The reference the verdict is about is the `fields.path` of its `reference` atom, else the atom's own file when its home is `skill_reference`, else the file a pointer atom sends to.
+* `ref_forced` is true when a `reference` or `gate` atom points to that file from a main file (`fields.from`, else its own file) and fires in the block's situation.
+* A pointer fires when it names no situation, when the failing check enforces it, when the block's situation is the pointer's, or when `situationAtoms` holds it.
+* A verdict about no reference has no `ref_forced`.
+
+### Evidence: ref_depth
+
+* `ref_depth` is the length of the shortest pointer chain from a main file to the reference: 1 when a main file points to it, 2 when only a reference a main file points to does.
+* A reference no pointer reaches has no `ref_depth`.
+
+### Evidence: ref_read
+
+* `ref_read` is how much of the reference the agent read: `full`, `partial` or `none`.
+* A `Read` call of the path with no `offset` and no `limit` is a full read; with either, a partial read. A command with `head`, `tail`, `sed -n`, `awk` or `grep` on the path is a partial read; with `cat`, `less`, `more` or `bat`, a full read.
+* A failed read reads nothing. The best read counts: one full read makes the reference `full`.
+* With no read of the path, the runtime's references list makes it `full` when it holds the path.
+* Paths compare without a leading `./`, and a path ending in the other counts as the same.
+
+### Evidence: rule_in_context
+
+* `rule_in_context` is derived from `rule_home`: true for `core` and `instruction`; `skill_loaded` for `skill_body`; true for `skill_reference` when `ref_read` is `full`, else false.
+* It is unknown for any other home, and for `none`.
+
+### Evidence: guard_caught
+
+* `guard_caught` is true when a guard denied an act (`deny`, `block` or `blocked`) and a later entry of the same guard allowed it (`allow`, `pass` or `ok`).
+* When the verdict's atoms name enforcing guards, only those guards count. The decision log is `decisions`, else the runtime's guards list.
+
+### Evidence: tool_failed
+
+* With a subject tool, `tool_failed` is true when a call of it has an error, or an output that reports a failure, or a command whose recorded execution exited non-zero, or when a value fact's outcome is `failed`.
+* An output reports a failure by a non-zero `exitCode`, `exit_code`, `returncode` or `returnCode`, by a `status`, `statusCode`, `status_code` or `httpStatus` of 400 or more, or by `is_error` or `isError` set to true. A bare `code` is read as neither.
+* With no subject tool, it is true when any tool execution exited non-zero.
+
+### Evidence: tool_silent
+
+* `tool_silent` is true when a call of a promised tool with no error, or an execution of a promised command that exited 0, has output that breaks the promise: empty output for `prints: true`, output that the regular expression `matches` does not match.
+* With no promise, it is false.
+
+### Evidence: protected_changed
+
+* `protected_changed` is true when a path of the net workspace diff's `changed` or `deleted` set matches a glob of `expect.protected`. A created path never counts.
+* With no protected glob, it is false.
+
+### Evidence: tests_fail_reverted
+
+* `tests_fail_reverted` is the stored `testsFailReverted`. With none stored, it is unknown.
+
+### Evidence: changed_inputs_fail
+
+* `changed_inputs_fail` is true when a value fact has `changedInputsFail: true`, false when one has it false and none true, and unknown with no such fact.
+
+### Evidence: task_impossible
+
+* `task_impossible` is true when the block declares `taskImpossible`, false otherwise.
+
+### Evidence: task_flagged
+
+* `task_flagged` is the stored reading's `task_flagged`. With no stored reading, it is unknown.
+
+### Evidence: source
+
+* `source` is the first value fact's `source` tag when the oracle set one.
+* Else the agent's value is looked for, spaces folded, in the user turn: found as written or ignoring case, it is `user`.
+* Else in the text of the files the agent read (`workspace_file`, or `skill_file` for a file under `skills/`), then in earlier tool outputs (`tool_output`). A failed read gives no text.
+* Else, when the last ten digits of the value appear in the user turn, it is `agent_derived`.
+* Else, with a user turn, it is `user`. With none, it is unknown.
+
+### Evidence: change
+
+* `change` is the first value fact's `change` when the as given rung set it.
+* Else it is `verbatim` when the value, spaces folded, appears as written in the text it came from, and `case_only` when it appears only ignoring case.
+* A value found nowhere, with a user turn, is `altered`. A value built by the agent (`agent_derived`) has no `change`.
+
+### Evidence: contract
+
+* With a value fact: its `contract` when the contract rung set one; else `tool` when the tool schema states an `enum` or a `pattern` for the field; else the `where` of a stated rule with a format for the tool and field; else `error_seen` when an earlier call of the tool failed with an error that states what the tool expects; else `none`.
+* With no value fact, for a rule verdict: the home of its first link, else of its first atom, read as `prompt` for `core`, `skill` for `skill_body`, `skill_reference` and `skill_script`, `instruction` for `instruction`, `tool` for `tool_schema`, and `none` for any other home.
+
+### Evidence: contract_broken
+
+* With a value fact: its `contractBroken` when the contract rung set one; else true when the value is outside the schema's `enum`, or does not match the schema's `pattern`, or does not match a stated format as a whole; else false.
+* With no value fact: true when the verdict has an atom or a link and its outcome is `fail`.
+
+### Evidence: outcome
+
+* `outcome` is the first value fact's `outcome` when a rung stated one.
+* Else: unknown for `rung2`, for a rung that settled nothing, or one that settled `inconclusive`; `accepted_as_gold` for one that settled `pass`; `resolved_differently` for `rung3` settling `fail`; `failed` for any other rung settling `fail`.
+* With no value fact, it is unknown.
+
+### Evidence: declared_format
+
+* `declared_format` is the first value fact's `demanded` form, else `none`. With no value fact, it is unknown.
+
+### Evidence: downstream_need
+
+* `downstream_need` is `declared` when the block declares a downstream consumer, else `none`.
+
+### Evidence: tool_output_wrong
+
+* `tool_output_wrong` is true when a value fact's value came from a tool output (`source` reads `tool_output`) and it is wrong: its outcome is `failed` or `resolved_differently`, or, with no outcome, it differs from its gold.
+
+### Evidence: stricter_rule_obeyed
+
+* `stricter_rule_obeyed` is true when the subject tool was never called, a stated rule for it asks a part the tool does not need (a part of `asks` missing from `toolNeeds`), no value fact settled `fail`, and the reply asks for that part.
+* The parts the reply asks for are the stored reading's `asked_for`.
+* Any other case is false.
+
+### Evidence: next_action
+
+* With a failed subject value and more than one call of the subject tool: `looped` when at least `maxRetries` (default 3) calls repeat the first call's input, else `retried_canonical`.
+* Else the stored reading's `next_action`.
+* Else `asked_user` when the reply holds a question mark; `continued` when a call follows the first call of the subject tool; `gave_up` when the reply is empty; `continued` otherwise.
+
+### Evidence: recurrence_homes
+
+* `recurrence_homes` counts the homes that show the current diagnosis's blame item with its act: each earlier diagnosis of `history` with the same item and act, and the current one, by home.
+* A home counts when it holds at least `minRunsPerHome` runs (default 1). The result is at least 1.
+* With `countNoSkillHome: false`, the home `none` never counts, and the result may be 0.
+* With no current diagnosis, it is unknown.
+
+### Evidence: recurrence_class_homes
+
+* `recurrence_class_homes` counts the same way, over the earlier diagnoses with the same item and any act.
+
+### Evidence: confirm counts
+
+* `reference_pass`, `reference_loads`, `forced_load_pass` and `hint_pass` are the stored confirm counts of the same name. With no confirm run stored, each is unknown.
+
+Source: `codeagent_equivalence_blame.md`, heading "D1. The names".
+Names from code, on `origin/feat/block-b4-report`: `packages/core/src/evidence/` (`computeEvidence`, `EvidenceInput`, one provider per name), and `docs/reference/blame.md` ("Evidence names").
+
 ## Defaults
 
 The design and the code left five points open. Each is now answered on this page, from a design note where one states it, else by a default the owner may change.
