@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { loadEstateMap } from '@agent-nexus/driftbench-estate';
 import { describe, expect, it, vi } from 'vitest';
 import * as fixture from '../../src/ladders/estate/bank/fixture-suite';
-import { coverageFamily } from '../../src/ladders/estate/bank/genquality';
+import { checksReadOf, coverageFamily } from '../../src/ladders/estate/bank/genquality';
 import { agentMutants, estateRun } from '../../src/ladders/estate/index';
 import { estateMeta } from '../../src/ladders/estate/levels';
 
@@ -53,7 +53,7 @@ describe('a Read of a file the estate does not hold (docs/estate.md section 5, n
     };
     expect(await one(unmarked)).toMatchObject({
       pass: false,
-      detail: expect.stringContaining('not marked needs-existing-file'),
+      detail: expect.stringContaining('neither marked needs-existing-file'),
     });
     // Planted: every complete spec of the references that exist is dropped; the item is red for them.
     const dropped = {
@@ -185,5 +185,77 @@ describe('a Read of a file the estate does not hold (docs/estate.md section 5, n
     expect(await one((line) => line.replace('exists: true', 'exists: false'))).toEqual(real);
     // The committed map says the missing reference is present: it is still judged by its marker.
     expect(await one((line) => line.replace('exists: false', 'exists: true'))).toEqual(real);
+  });
+
+  it('accepts a missing reference judged by a complete spec instead of the marker, and still fails one judged by neither', async () => {
+    const suite = await fixture.fixtureSuite();
+    const waiting = (suite.report.gaps ?? []).find((gap) => gap.marker === 'needs-existing-file');
+    const missing = waiting?.atoms[0];
+    if (!missing || !suite.specs[0]) throw new Error('the fixture has no missing reference');
+    const one = async (planted: typeof suite) => {
+      const mock = vi.spyOn(fixture, 'fixtureSuite').mockResolvedValue(planted);
+      try {
+        return (await coverageFamily().evaluate(1)).get('gen.coverage.one-per-reference');
+      } finally {
+        mock.mockRestore();
+      }
+    };
+    const noMarker = {
+      ...suite,
+      report: {
+        ...suite.report,
+        gaps: (suite.report.gaps ?? []).filter((gap) => gap.marker !== 'needs-existing-file'),
+      },
+    };
+    // Judged by neither: the item fails and names the reference.
+    expect(await one(noMarker)).toMatchObject({
+      pass: false,
+      detail: expect.stringContaining(missing),
+    });
+    // Judged by a complete spec that checks the attempted Read: no complaint about the missing reference.
+    const path = String(
+      (await loadEstateMap(suite.map).then((m) => (m.ok ? m.map.atoms : []))).find((a) => a.id === missing)
+        ?.fields?.path,
+    );
+    const withChecks = (rules: Record<string, unknown>, expectation: Record<string, unknown>) => {
+      const base = structuredClone(suite.specs[0]) as (typeof suite.specs)[number];
+      const spec = base.spec as unknown as {
+        blocks: Array<{ expect?: Record<string, unknown> }>;
+        rules?: unknown;
+      };
+      if (spec.blocks[0]) spec.blocks[0].expect = expectation;
+      spec.rules = rules;
+      return { ...base, atoms: [missing], complete: true };
+    };
+    // Names the path, checks nothing: still judged by neither.
+    const names = withChecks({}, { must: [path] });
+    expect(checksReadOf(names, path)).toBe(false);
+    expect((await one({ ...noMarker, specs: [...suite.specs, names] }))?.detail).toContain(missing);
+    // Checks a Read of another file, or a read counted zero times: judged by neither.
+    for (const other of [
+      withChecks({}, { tools: [{ label: 'Read', input: { file_path: { contains: 'other/file.md' } } }] }),
+      withChecks({}, { tools: [{ label: 'Read', input: { file_path: { contains: path } }, count: 0 }] }),
+      withChecks({}, { tools: [{ label: 'Edit', input: { file_path: { contains: path } } }] }),
+    ])
+      expect(checksReadOf(other, path)).toBe(false);
+    // Checks a Read of exactly the path, as a tool expectation, a references glob or a some_call entry.
+    for (const checked of [
+      withChecks({}, { tools: [{ label: 'Read', input: { file_path: { contains: path } } }] }),
+      withChecks({}, { references: [{ path: `**/${path}`, count: { min: 1 } }] }),
+      withChecks(
+        {
+          custom: {
+            some_call: {
+              calls: [{ label: 'Read', input: { file_path: path }, count: { min: 1 }, block: 0 }],
+            },
+          },
+        },
+        {},
+      ),
+    ]) {
+      expect(checksReadOf(checked, path)).toBe(true);
+      const judged = await one({ ...noMarker, specs: [...suite.specs, checked] });
+      expect(judged?.detail ?? '').not.toContain(missing);
+    }
   });
 });

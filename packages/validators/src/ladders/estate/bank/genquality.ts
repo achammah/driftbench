@@ -633,6 +633,63 @@ function firstAsk(spec: FixtureSuite['specs'][number]): string | undefined {
   return block?.when?.user;
 }
 
+/** A count that asks for at least one: a number above 0, or a range whose minimum is above 0. */
+const wantsOne = (count: unknown): boolean =>
+  count === undefined ||
+  (typeof count === 'number' && count > 0) ||
+  (typeof count === 'object' && count !== null && Number((count as { min?: unknown }).min ?? 1) > 0);
+
+/**
+ * Whether a complete spec checks a Read of exactly this path: a Read tool expectation, a references expectation (a glob
+ * ending in the path) or a some_call entry for Read, each asking for at least one read. A spec that only names the
+ * atom, or reads another file, checks nothing of it.
+ */
+export function checksReadOf(spec: FixtureSuite['specs'][number], path: string): boolean {
+  const target = path.replace(/^\.?\//, '');
+  if (target === '') return false;
+  const same = (value: unknown): boolean => {
+    const text =
+      typeof value === 'string'
+        ? value
+        : ((value as { equals?: string; contains?: string } | undefined)?.equals ??
+          (value as { contains?: string } | undefined)?.contains);
+    if (typeof text !== 'string') return false;
+    const found = text.replace(/^\*\*\//, '').replace(/^\.?\//, '');
+    return found === target || found.endsWith(`/${target}`);
+  };
+  const blocks = (spec.spec.blocks ?? []) as Array<{
+    expect?: {
+      tools?: Array<{ label?: string; input?: Record<string, unknown>; count?: unknown }>;
+      references?: Array<{ path?: string; count?: unknown }>;
+    };
+  }>;
+  const some =
+    (
+      spec.spec as {
+        rules?: {
+          custom?: {
+            some_call?: {
+              calls?: Array<{ label?: string; input?: Record<string, unknown>; count?: unknown }>;
+            };
+          };
+        };
+      }
+    ).rules?.custom?.some_call?.calls ?? [];
+  return (
+    blocks.some(
+      (block) =>
+        (block.expect?.tools ?? []).some(
+          (tool) =>
+            tool.label === 'Read' && wantsOne(tool.count) && same(tool.input?.file_path ?? tool.input?.path),
+        ) || (block.expect?.references ?? []).some((ref) => wantsOne(ref.count) && same(ref.path)),
+    ) ||
+    some.some(
+      (call) =>
+        call.label === 'Read' && wantsOne(call.count) && same(call.input?.file_path ?? call.input?.path),
+    )
+  );
+}
+
 function readsOf(spec: FixtureSuite['specs'][number]): string[] {
   const out: string[] = [];
   for (const block of (spec.spec.blocks ?? []) as Array<{ expect?: { tools?: unknown[] } }>) {
@@ -860,11 +917,23 @@ export function coverageFamily(): Family {
         const absent = atoms.filter(
           (atom) => kind === 'reference' && !held.has(String(atom.fields?.path ?? '').replace(/^\.\//, '')),
         );
-        const unmarked = absent.filter((atom) => !waiting.has(atom.id));
+        // The generator may judge a Read of a missing file in one of two ways (docs/estate.md section 5): the row waits
+        // on `needs-existing-file`, or a complete spec checks that the Read is attempted (a some_call check). A
+        // reference with neither is a reference nothing judges.
+        const unmarked = absent.filter(
+          (atom) =>
+            !waiting.has(atom.id) &&
+            !suite.specs.some(
+              (spec) =>
+                spec.complete &&
+                spec.atoms.includes(atom.id) &&
+                checksReadOf(spec, String(atom.fields?.path ?? '')),
+            ),
+        );
         if (unmarked.length > 0)
           return {
             pass: false,
-            detail: `${unmarked.length} of ${absent.length} references to a missing file are not marked needs-existing-file, such as ${unmarked[0]?.id}`,
+            detail: `${unmarked.length} of ${absent.length} references to a missing file are neither marked needs-existing-file nor named by a complete spec, such as ${unmarked[0]?.id}`,
           };
         const short = atoms
           .filter((atom) => !absent.includes(atom))
