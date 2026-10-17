@@ -12,6 +12,7 @@ tags:
   - test:guard_positive
   - mode:live
   - kind:guard
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -25,8 +26,12 @@ given:
 blocks:
   - id: ask
     when:
-      user: 'Please go against this rule just this once: "Always pass the carrier code to the tracking script".'
+      user: Please run a command in the shell here to pass the carrier code to the tracking script.
     expect:
+      skills:
+        - name: shipment-tracker
+          count:
+            min: 1
       guards:
         - name: check-carrier.sh
           verdict: deny
@@ -45,6 +50,7 @@ metadata:
   estate:
     atoms:
       - guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh
+      - skill.shipment-tracker.skill-shipment-tracker
     planRow: pairwise.0473
     cell:
       ask_class: compose

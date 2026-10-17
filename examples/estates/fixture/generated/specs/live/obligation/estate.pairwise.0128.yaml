@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -54,6 +55,10 @@ blocks:
     when:
       user: Add the late shipment count to this week's report, reports/2026-W41.md.
     expect:
+      skills:
+        - name: weekly-report
+          count:
+            min: 1
       workspace:
         changed:
           - reports/2026-W41.md
@@ -69,6 +74,7 @@ metadata:
   estate:
     atoms:
       - instruction.weekly-report.save-the-report-by-week-and
+      - skill.weekly-report.skill-weekly-report
     planRow: pairwise.0128
     cell:
       ask_class: build

@@ -80,3 +80,8 @@ metadata:
     phrase: 1
     ask: bank
     outcome: bank
+    equivalence:
+      count: 2
+      planRows:
+        - route_positive.route.standing.an-ask-to-prepare-the-weekly.1
+        - route_positive.route.standing.an-ask-to-prepare-the-weekly.3

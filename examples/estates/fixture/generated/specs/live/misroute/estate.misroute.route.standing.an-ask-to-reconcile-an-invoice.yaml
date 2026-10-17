@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please check, match or reconcile an invoice.
+      user: Please reconcile an invoice against a purchase order.
     expect:
       skills:
         - name: invoice-reconcile
@@ -51,5 +51,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names)
+    askFrom: route.standing.an-ask-to-reconcile-an-invoice (situation)
     outcome: no-delete

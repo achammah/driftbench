@@ -12,6 +12,7 @@ tags:
   - test:route_positive
   - mode:live
   - kind:route
+  - kind:skill
 target:
   adapter: claude-code
 given:
@@ -64,6 +65,7 @@ metadata:
   estate:
     atoms:
       - route.standing.an-ask-to-write-to-or
+      - skill.supplier-email.skill-supplier-email
     planRow: pairwise.0760
     focusVariant: 759
     cell:

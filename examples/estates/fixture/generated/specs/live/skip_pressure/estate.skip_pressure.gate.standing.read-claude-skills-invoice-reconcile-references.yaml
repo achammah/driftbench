@@ -55,5 +55,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: gate.standing.read-claude-skills-invoice-reconcile-references (gate trigger)
+    askFrom: gate.standing.read-claude-skills-invoice-reconcile-references (governed clause)
     outcome: no-delete

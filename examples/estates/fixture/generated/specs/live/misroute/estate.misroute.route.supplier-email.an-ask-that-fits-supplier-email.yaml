@@ -51,5 +51,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: route.supplier-email.an-ask-that-fits-supplier-email (asks it names)
+    askFrom: route.supplier-email.an-ask-that-fits-supplier-email (situation)
     outcome: no-change:read-only

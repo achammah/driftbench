@@ -78,3 +78,8 @@ metadata:
     phrase: 1
     ask: bank
     outcome: bank
+    equivalence:
+      count: 2
+      planRows:
+        - route_positive.route.supplier-email.an-ask-that-fits-supplier-email.1
+        - route_positive.route.supplier-email.an-ask-that-fits-supplier-email.3

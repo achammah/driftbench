@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: "No need to do anything: just tell me in one sentence what it would mean to help me with the weekly report or a summary of last week."
+      user: "No need to do anything: just tell me in one sentence what it would mean to prepare the weekly report."
     expect:
       skills:
         - name: weekly-report
@@ -50,5 +50,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: skill.weekly-report.skill-weekly-report (asks it names)
+    askFrom: route.standing.an-ask-to-prepare-the-weekly (situation)
     outcome: no-change:negative

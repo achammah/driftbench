@@ -12,6 +12,7 @@ tags:
   - test:guard_negative
   - mode:unit
   - kind:guard
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -23,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: What kinds of things can you help me with? One sentence, and please change nothing.
+      user: Without changing anything, tell me in one sentence what it would mean to run a command in the shell here to pass the carrier code to the tracking script.
     expect:
       guards:
         - name: check-carrier.sh
@@ -35,6 +36,7 @@ metadata:
   estate:
     atoms:
       - guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh
+      - skill.shipment-tracker.skill-shipment-tracker
     planRow: guard_negative.guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh
     cell:
       atoms.guard: guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh
@@ -48,7 +50,7 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: neutral
+    askFrom: instruction.shipment-tracker.always-pass-the-carrier-code-to (enforced by guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh)
     outcome: no-change:negative
     unit:
       target:

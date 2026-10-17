@@ -156,6 +156,18 @@ situations:
       - { text: 'Can you check that INV-1001 matches PO-2001 and what we received?', lang: en, approved: true }
       - { text: 'Match the Fjord Kitchenware invoice INV-1001 with its order.', lang: en, approved: true }
 
+  - id: invoice-reconcile-edit
+    title: Reconcile one invoice and record the matched amount in its file
+    use: trigger
+    atoms:
+      - tool.invoice-reconcile.declared-edit
+      - skill.invoice-reconcile.skill-invoice-reconcile
+    workspace: northwind-ops
+    touches: { changed: [invoices/INV-1001.json] }
+    phrases:
+      - { text: 'Reconcile invoice INV-1001 with its order and record the matched amount in invoices/INV-1001.json.', lang: en, approved: true }
+      - { text: 'Match the Fjord Kitchenware invoice INV-1001 with its order, then update invoices/INV-1001.json with the reconciled amount.', lang: en, approved: true }
+
   - id: invoice-near-miss
     title: A question about invoices that asks for no reconciliation
     use: near_miss

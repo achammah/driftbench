@@ -12,6 +12,7 @@ tags:
   - test:twin
   - mode:live
   - kind:instruction
+  - kind:skill
   - judged
 target:
   adapter: claude-code
@@ -42,6 +43,10 @@ blocks:
     when:
       user: Reconcile invoice INV-1004 against purchase order PO-2004 and tell me whether any line differs.
     expect:
+      skills:
+        - name: invoice-reconcile
+          count:
+            min: 1
       workspace:
         others_untouched: true
       criteria:
@@ -50,6 +55,7 @@ metadata:
   estate:
     atoms:
       - instruction.invoice-reconcile.under-0-05-eur-per-unit
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: twin.instruction.invoice-reconcile.under-0-05-eur-per-unit
     cell:
       atoms.instruction: instruction.invoice-reconcile.under-0-05-eur-per-unit

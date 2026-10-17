@@ -50,5 +50,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: route.weekly-report.an-ask-that-fits-weekly-report (asks it names)
+    askFrom: route.weekly-report.an-ask-that-fits-weekly-report (situation)
     outcome: no-change:negative

@@ -12,6 +12,7 @@ tags:
   - test:tool_boundary
   - mode:live
   - kind:tool
+  - kind:skill
 target:
   adapter: claude-code
 given:
@@ -50,13 +51,15 @@ given:
 blocks:
   - id: ask
     when:
-      user: Match the Fjord Kitchenware invoice INV-1001 with its order.
+      user: Match the Fjord Kitchenware invoice INV-1001 with its order, then update invoices/INV-1001.json with the reconciled amount.
     expect:
       skills:
         - name: invoice-reconcile
           count:
             min: 1
       workspace:
+        changed:
+          - invoices/INV-1001.json
         others_untouched: true
 rules:
   custom:
@@ -69,6 +72,7 @@ metadata:
   estate:
     atoms:
       - tool.invoice-reconcile.declared-edit
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: tool_boundary.tool.invoice-reconcile.declared-edit
     cell: {}
     seeder: estate
@@ -78,7 +82,7 @@ metadata:
     mode: live
     map: ../approved.yaml
     plan: ../../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml
-    situation: invoice-reconcile
-    phrase: 2
+    situation: invoice-reconcile-edit
+    phrase: 1
     ask: bank
     outcome: bank

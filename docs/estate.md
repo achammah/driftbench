@@ -495,7 +495,7 @@ Approved 1337 rows in _captures/docs3/estate/plan-approve.yaml; 0 were already a
 
 `estate generate` turns each approved plan row into one or more task specs, by code only, with no model call. Proposed rows wait (listed, exit 1); struck rows are skipped. Inputs that do not fit together (a plan of another map, an unknown or unapproved atom, an unknown test type, a bank naming an unknown atom or another map hash, a session ask that is no approved phrase) exit 2 and write nothing.
 
-Every field of the map, the plan, the phrase bank and the session index is in the [estate files reference](reference/estate-files.md). Two inputs sit beside the map. The phrase bank (`phrases.yaml`) holds `situations`: the atoms a situation sets off, what it is for (trigger, outside, near miss, misroute, pressure, resume), the workspace it starts from (`workspace`, the id of one of the bank's `workspaces` seeds, each a map of file path to text), the paths its ask may touch (`touches`: `created`, `changed`, `deleted`; every other path stays untouched), and its phrases, each approved or not. The session index (`sessions/index.yaml`) names recorded sessions, their situation and ask, and the atoms each session breaks. The Northwind bank is written by hand as a stand-in for the real flow (a model proposes phrases, a person approves them): 26 situations, 50 approved phrases, five workspace seeds: the operations folder, an inbox, open orders with the vans, a supplier order, and an invoice that differs from its order by less than 0.05 EUR per unit. A judged rule needs its own data in the workspace before an ask can set it off: the inbox, routes, shipment log and supplier situations exist for that.
+Every field of the map, the plan, the phrase bank and the session index is in the [estate files reference](reference/estate-files.md). Two inputs sit beside the map. The phrase bank (`phrases.yaml`) holds `situations`: the atoms a situation sets off, what it is for (trigger, outside, near miss, misroute, pressure, resume), the workspace it starts from (`workspace`, the id of one of the bank's `workspaces` seeds, each a map of file path to text), the paths its ask may touch (`touches`: `created`, `changed`, `deleted`; every other path stays untouched), and its phrases, each approved or not. The session index (`sessions/index.yaml`) names recorded sessions, their situation and ask, and the atoms each session breaks. The Northwind bank is written by hand as a stand-in for the real flow (a model proposes phrases, a person approves them): 27 situations, 52 approved phrases, five workspace seeds: the operations folder, an inbox, open orders with the vans, a supplier order, and an invoice that differs from its order by less than 0.05 EUR per unit. A judged rule needs its own data in the workspace before an ask can set it off: the inbox, routes, shipment log and supplier situations exist for that.
 
 Generation time is linear in the atoms, since the suite of a large estate holds about ten specs per atom. Each spec is checked as the object the generator built, and its file is written by a block writer for the ordinary map, sequence, single-line string and number, which gives the same bytes as the YAML library; a value outside that (a multi-line string, a date, a key that needs quoting) is written by the library, whole.
 
@@ -503,7 +503,8 @@ How a row becomes a spec:
 
 * Given: `vars.estate` (runtime and map hash), the session state of the cell, the hazard of the cell as `vars.event`, and the workspace seed of the situation, inlined as `world.workspace.files`.
 * When: the situation the test type needs, found by the row's first atom (the situation holding most of the row's atoms wins, then the one whose own atoms share the deepest folder with files the first atom names; pinned cell values must agree). A guard without a listed triggering situation uses a situation of a rule it enforces; a tool boundary uses a situation listing the most rules from its own file. A guard control uses a situation explicitly approved for that whole guard; an outside situation of one enforced rule is not a guard-wide certificate. Its approved phrases are shuffled by the seed; the twin takes the second phrase. A replay row gives one spec per recorded session of its situation, asking with the session's recorded ask. A deviation of the cell is a perturbation before the ask, with an approved deviation phrase (`inject_at: 0`, recovery within one block). `stop_resume` adds a resume block.
-* When no approved phrase fits the row, code writes the ask from the atoms, so a row is never blocked by a missing phrase alone: the asks a route or skill description names ("Use when the user asks to X" gives "Please X."), a routing row, a description made imperative, for a guard the act its rule forbids, plus the situation of the rule under test. The controls get a neutral ask (outside), an ask to explain without acting (near miss), an ask that describes the act and names no skill (misroute: `Please <act>.`, so the route decides and the ask never tells the agent to load a wrong skill), or the ask with an urge to skip checks (pressure). Deviation and resume messages have code-written defaults too. Such specs carry the tag `ask:code`, `metadata.estate.ask: code` and the field the words came from (`askFrom`); an approved phrase always wins. `--no-fallback` turns this off. A code-written ask names a task: a verb of acting and its object, as a user would ask for work. The title of a rule is the rule, so it is never the ask: a rule is set off by the work it applies to, which is what the trigger of a gate names, else what the skill or helper that carries the rule is for, else, for an instruction or an output rule, the work of the route whose words the rule shares most (the first route when it shares none), since a rule of the standing instructions holds over any work. A gate with no trigger and no unit that carries it holds over no route's work, so its row stays incomplete under `needs-askable-act`. The one title used as an ask is a prohibition, whose forbidden act is the ask ("Never paste a credential" asks to paste one), which breaks the rule and does not copy it. A rule with no such work stays incomplete under `needs-askable-act`. It never restates the rule ("Please do this: never guess a status") or a bare condition ("Please handle this for me: the invoice is not in EUR"): such an ask tests whether the agent repeats the rule, not whether it follows it while working. The rule's situation becomes the task ("Where is shipment NW-55012?"). A guard that watches the user's prompt is the one exception: its test asks with the guard's own trigger ("Stop, that is enough for now."). The floor refuses, with the reason, an act of fewer than three words of letters, which is a verb and no object (the parts of a hyphenated compound count apart: "force-push a branch" passes, "force-push" does not), an act that does not start with a verb (a unit's own description: "Read-only audit lane for ledger checks"), a guard's title (its event and name), a phrase cut mid-sentence, an act or situation that names a file of the estate (the ask would say which file to read) or holds code; the row gets `needs-askable-act` and waits for an approved phrase.
+* When no approved phrase fits the row, code writes the ask from the atoms, so a row is never blocked by a missing phrase alone: the asks a route or skill description names ("Use when the user asks to X" gives "Please X."), a routing row, a description made imperative, for a guard the act its rule forbids (else, for a rule that asks for an act, the act of the tool the guard watches: "Please edit a file here." for an Edit or Write guard; none for a guard on the end of a turn (no request makes a reply break its rule without asking for the exception the rule allows) and none for a guard on the user's prompt alone, which waits for an approved phrase; the ask never tells the agent to go against a rule), for a hazard a request to go on with the task after it happened, plus the situation of the rule under test. The controls get a neutral ask (outside), an ask to explain without acting (near miss), an ask that describes the act and names no skill (misroute: `Please <act>.`, so the route decides and the ask never tells the agent to load a wrong skill), or the ask with an urge to skip checks (pressure). Deviation and resume messages have code-written defaults too. Such specs carry the tag `ask:code`, `metadata.estate.ask: code` and the field the words came from (`askFrom`); an approved phrase always wins. `--no-fallback` turns this off. A code-written ask names a task: a verb of acting and its object, as a user would ask for work. The title of a rule is the rule, so it is never the ask: a rule is set off by the work it applies to, which is what the trigger of a gate names, else what the skill or helper that carries the rule is for, else the work of the route whose words the rule shares most (the first route when it shares none), since a rule of the standing instructions holds over any work. The one title used as an ask is a prohibition, whose forbidden act is the ask ("Never paste a credential" asks to paste one), which breaks the rule and does not copy it. A rule with no such work stays incomplete under `needs-askable-act`. It never restates the rule ("Please do this: never guess a status") or a bare condition ("Please handle this for me: the invoice is not in EUR"): such an ask tests whether the agent repeats the rule, not whether it follows it while working. The rule's situation becomes the task ("Where is shipment NW-55012?"). A guard that watches the user's prompt is the one exception: its test asks with the guard's own trigger ("Stop, that is enough for now."). The floor refuses, with the reason, an act of fewer than three words of letters, which is a verb and no object (the parts of a hyphenated compound count apart: "force-push a branch" passes, "force-push" does not), an act that does not start with a verb (a unit's own description: "Read-only audit lane for ledger checks"), a guard's title (its event and name), a phrase cut mid-sentence, an act or situation that names a file of the estate (the ask would say which file to read) or holds code; the row gets `needs-askable-act` and waits for an approved phrase.
+A gate with no trigger and no unit that carries it holds over no route's work, so its row stays incomplete under `needs-askable-act`. A gate trigger that opens with a gerund of a known verb is asked as the act ("editing any invoice file" asks to edit any invoice file).
 * Then, from the evidence predicates of the row's atoms:
 
 | Predicate | Check |
@@ -592,6 +593,141 @@ A missing reference still permits a Read attempt, which returns an error. When `
 
 The files of the estate copy are listed from the map's `root`. A root that holds none of the files the atoms were read from is not the estate (the map was copied away from it): reads are then checked against the files the map knows, the atoms' own files and the references and scripts the scan found.
 
+### Task-specific asks and equivalent tests
+
+A fallback ask starts with the atom's own governed action. A gate uses its trigger as a task
+(`publishing the corrected newsletter` becomes "Please publish the corrected newsletter.").
+A reference uses the action in its read-when clause. An actionable rule situation precedes a
+unit's broad description. The ask leaves the prerequisite and expected skill for the agent to discover.
+
+An atom that gives no task of its own takes the purpose of the unit that owns it, never a default of the
+estate. The purpose is the unit's description, then the requests of the routing rows that load the unit.
+A description is read in the third person: the first word is the verb when an object follows it, so
+"Handles customer complaints and logs the outcome" asks to handle customer complaints and log the outcome,
+for a verb the built-in list does not hold. A verb that states what a unit holds ("Holds", "Provides"), a
+noun followed by a function word ("Rules for ...") and a description that gives only a condition are no task:
+the ask stays incomplete and names why. A verb joined by "and" shares the form of the first when an object
+follows it; a word that ends the sentence or precedes a preposition stays as written. A possessive ("File's frame") and a plural noun with a noun ending ("analytics", "utilities", "awareness") are
+never read as a verb. A clause of a read-when line rides as the moment only when it is short (14 words or fewer)
+and states no obligation (never, always, must, should, only): a pasted rule is no situation.
+A task taken from a description or a routing request must have the shape of a request, else the next sentence
+is tried and, when none has it, the atom stays without a task: it has no colon (a list), no bare number after the
+verb ("install workflow 6 steps" is a heading with a count), no copula that follows the verb and its bare object
+("plan import is one atomic write" is a sentence about the plan; "notices for customers whose parcels are late" is
+fine), no subject before the verb, and does not open with a usage note ("use when ..."). The object a guard's rule
+names joins the tool act through its strict situation: "Please run a command in the shell here for a force push to
+the shared release branch." 
+When a description fails that shape, the refusal names the shape in its source (`(description: a heading with a
+count)`, `a list after a colon`, `a usage note`, `a statement`, `a statement with a subject`). A reference whose
+citing line says what the file is for ("Read `refs/ux.md` for hosted screen design") is asked about that topic, which
+is more specific than the description of the whole unit; a topic needs two content words and no pronoun, file,
+code or obligation. A description is cut to the work it names: a parenthetical list of examples, a purpose clause ("so that a
+session can resume it") and a relative clause about the unit itself ("which writes the verdicts") are not asked
+for, and a head left without a verb and its object keeps the whole sentence. A table row or list line is read
+cell by cell: a cell that states a task is the ask (`Publishing the weekly report | file.md` asks to publish the
+weekly report), a cell that names an activity of two words or more rides as the moment, and a bare noun pair
+names a file's content and is neither. A read-when line that
+only lists its file ("`references/fields.md`: field definitions") states no situation; a clause of it apart
+from the file and the read directive rides in the ask as the situation.
+
+Both contract and covering-array rows retain the owning task. A reference's target file determines its folder owner; citation edges never establish ownership.
+Rules use their own source folder, and gated files use their target folder when one exists.
+The longest matching declared skill folder wins; route edges identify route targets only. A standing gate can therefore use the skill whose reference it gates.
+Ambiguous and unowned targets stay unresolved. Older plans are repaired during generation:
+unrelated attached skills are removed from both expectations and atom metadata.
+A unit that owns a gate or a reference by folder supplies the task of its ask, but joins the row (and so the expectation
+that it loads) only when it holds the rule: the rule is written in one of its own files. A standing gate about a
+file in a skill's folder is owned by that skill for its task and held by nobody, so the row names the rule alone.
+A shared file outside every skill folder is owned by the unit whose own file cites it: one reference atom
+exists per citation, so each skill or helper that cites the file directly owns its citation, and a link
+that only navigates, or a catalogue that cites a file in another unit's folder, owns nothing. A file cited
+only from the standing instructions has no owner and borrows no task. A prerequisite (reference or gate)
+owned by a helper asks for the work to be handed to a helper ("Please have a helper agent audit the ledger
+extract"), so the order applies only when the dispatch happens.
+Approved trigger phrases also respect that owner: a bank pin on a rule cannot borrow a different unit's task.
+A declared tool can use the owning helper's own situation when its permission is listed under unrelated tasks.
+The task in a source prerequisite clause is used even when the extracted trigger field is absent.
+A bare read-prerequisite title is never converted into a self-answering user ask.
+
+A guard may carry optional `fields.ruleText` and `fields.ruleSources`. Hook prose describes mechanics far
+more often than it names an act, so the ask that sets a guard off is the act of the tool the guard watches
+("edit a file here" for Edit and Write, "run a command in the shell here" for Bash, "open a file here" for
+Read; a guard on the end of a turn has no tool and so no ask), with the strict situation of the rule text
+as context ("This involves ..."). A phrase of the prose replaces the tool act only when it has a strict shape:
+
+* an act: a verb of the list (a hyphenated verb ends on one), then an object, three to ten words, no colon,
+  parenthesis, quotation, pronoun or relative word, no subject before the verb, no adverb or function word at
+  the end. It comes from the opening gerund ("Deploying to production without a tag"), the gerund after a
+  connective (when, while, if, before, after, until, unless, without, upon), or a rule the guard enforces;
+* a situation: a noun phrase that opens with a determiner or a number, ends on a content word (no adverb of
+  time, no participle), holds no pronoun, relative word or parenthesis, names no hook machinery (guard, hook,
+  check, script, handler, registry), and has no clause cut off inside it.
+
+Sentences about how the hook works (stdin, JSON, exit codes) are skipped, and a verb in the third person
+followed by of, on or about is a plural noun ("Calls of any tool"), never a verb. A guard rule written as an imperative to the agent ("End every reply with ...") is a rule, never an ask, and an act
+with a condition inside it ("ask before an Edit of a policy file", "add a reminder when the owner types stop") is
+a rule too: both fall back to the tool act. The subject of a gate trigger ("you discharge a patient") is dropped
+and its act is asked ("discharge a patient"); a trigger is put in the context as "The task is to ..." when it is an
+act and as "This involves ..." when it is a gerund or a noun phrase. A read-when line that opens with a condition
+("When the owner asks about boarding, read refs/boarding.md") asks about the condition. A guard on the user's prompt is set off by what the owner writes, so its ask is the message: the situation of the
+rule it enforces says it ("The user says stop" asks `stop`), when the message has up to five words and holds no
+clause word. The ask names the act a rule governs, in the rule's own words and never the rule: a rule that orders a read before an
+act ("Read a file before editing it") is set off by the act ("Please edit a file."), with a pronoun object resolved
+to the thing to read, and an obligation ("Always pass the carrier code to the tracking script") by the tool act
+followed by its purpose ("run a command in the shell here to pass the carrier code to the tracking script"). A guard that watches no tool and has no strict prose has no ask: it stays incomplete. A replay row still needs
+its recorded session. The ask reads only the guard's own rule text and matcher: no registry state name or
+severity is read into it. A rule a guard enforces gives its forbidden act when that act is strict, else its
+trigger, else the tool act; a rule that restates itself ("go against this rule") is never the ask.
+
+The unit that owns a gate or a reference supplies the task of the ask, but its load is an expectation only when
+the rule is written in the unit's own files: a standing gate to read a file in a skill's folder does not require the
+skill. A unit-mode row (a guard or script run with no model) expects only what a run without a model can observe:
+the skill that owns the atom supplies the task of a live row, and its load is never an expectation of a unit one.
+
+A `guard_negative` row asks for a harmless near miss of the guard's own rule: without changing anything, what
+it would mean to do the strict act of the rule, what applies to its strict situation, or what it would mean to
+use the tool the guard watches. A guard on the end of a turn, which has no tool, and a guard with no strict
+prose stay incomplete. No estate-wide request stands in for either.
+
+The three types that run a guard directly with no model (`guard_hostile`, `guard_speed`,
+`guard_register`) never read their ask: it is a fixed request that names the tool the guard watches ("Please make
+one Edit or Write call in this workspace."), or the next step of the task when it watches none. No other type gets it.
+
+A map may record `documents`: each file's authority (`normative`, or a navigation role such as `example`,
+`template`, `history`, `changelog`, `journal`, `fixture`, `archive`). A reference whose target is a
+navigation document is a place to look and gets no `read_when` row, no journey edge and no covering-array
+target; the plan notes how many. A prerequisite to read such a file stays a gate. `estate stats` leaves
+those references out of the coverage counts and reports their number. A plan made before the map recorded
+roles still lists the row; generation writes it incomplete with that reason. A map without `documents`
+changes nothing: no file name is read as a role.
+A reference to a file outside the estate root (reached through a link to another repository) enters no journey:
+the run's workspace does not hold the file, so a path through it cannot be walked. Its `read_when` row stays.
+
+Complete tests with exactly equal rule semantics, asks, inputs, expectations, judge rubrics,
+run mode, test type and non-target situation values share one representative.
+Generated criterion identifiers may differ; their full rubrics and flags must remain equal.
+Different prerequisite paths, actions, event cells, unit targets or replay alignments stay separate.
+A journey is keyed by its ordered atom path: two journeys that walk different paths never merge, so every walked edge keeps its own spec.
+The representative retains every source atom in `metadata.estate.atoms` and records
+`metadata.estate.equivalence: { count, planRows }`.
+The count describes represented source tests. The report lists each group's source rows and atoms.
+`estate stats` expands those rows into their original plan cells, without replaying the representative repeatedly.
+Struck source rows count no covered cell. Missing-piece notes with `blocking: false` remain advisory.
+
+The generation report includes `incomplete[]`: spec id, path, plan row and all
+`reasons: [{ marker, atom, detail }]`. Each missing piece keeps its existing reason code.
+Aggregate gap totals remain available. Missing sessions, unsupported checks and unusable tasks
+stay incomplete; grouping never turns an incomplete test into a complete one.
+
+`quality` reports structural complete share, complete asked tests, distinct first asks and distinct asks
+per hundred complete asked tests. Static tests have no ask and stay outside that denominator.
+Event variations can legitimately repeat a task, so compare primary rule tests separately from the full suite.
+
+The fictional scale audit and its paired measurements are in
+[the task-generation audit](estate-task-generation-audit.md).
+The Northwind command transcripts and example generated tree below retain their original captured version.
+Current plan and generation byte snapshots live beside their product tests; they hash every output byte.
+
 Focus coverage counts distinct asks and situation cells. Repeated rows with the same ask and cell do not replace additional mutation opportunities. Additional identical focus variants are omitted.
 
 Layout: `<specs|incomplete>/<mode>/<test type>/<id>.yaml`, so `driftbench replay --suite <out>/specs/replay` takes the replay specs alone.
@@ -602,7 +738,7 @@ The suite of the Northwind plan. The plan must be approved first; the committed 
 $ pnpm -s driftbench estate generate --map examples/estates/fixture/approved.yaml --plan packages/generate/test/estate/fixtures/planner-plan.approved.yaml --out _captures/docs/estate/generated
 Map ../../../examples/estates/fixture/approved.yaml (claude-code), hash be2e7a0919cb: 125 atoms.
 Plan ../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml: 1379 rows, 1379 approved, 0 waiting, 0 struck.
-Phrases ../../../examples/estates/fixture/phrases.yaml: 26 situations, 50 approved phrases.
+Phrases ../../../examples/estates/fixture/phrases.yaml: 27 situations, 52 approved phrases.
 Sessions ../../../examples/estates/fixture/sessions/index.yaml: 3.
 Seed 1; custom checks the runner registers: ordered.
 

@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -54,6 +55,10 @@ blocks:
     when:
       user: Where is shipment NW-55012? It was promised for 2 October.
     expect:
+      skills:
+        - name: shipment-tracker
+          count:
+            min: 1
       workspace:
         others_untouched: true
 rules:
@@ -78,6 +83,7 @@ metadata:
   estate:
     atoms:
       - instruction.shipment-tracker.always-pass-the-carrier-code-to
+      - skill.shipment-tracker.skill-shipment-tracker
     planRow: pairwise.0667
     cell:
       ask_class: compose

@@ -12,6 +12,7 @@ tags:
   - test:obligation
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
   - judged
 target:
@@ -33,8 +34,12 @@ criteria:
 blocks:
   - id: ask
     when:
-      user: Please change an invoice amount.
+      user: Please check, match or reconcile an invoice.
     expect:
+      skills:
+        - name: invoice-reconcile
+          count:
+            min: 1
       workspace:
         deleted: []
       criteria:
@@ -50,6 +55,7 @@ metadata:
   estate:
     atoms:
       - instruction.invoice-reconcile.never-change-an-invoice-amount-report
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: pairwise.0587
     cell:
       ask_class: chat
@@ -69,7 +75,7 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.invoice-reconcile.never-change-an-invoice-amount-report (title)
+    askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names)
     outcome: no-delete
     judged:
       - instruction.invoice-reconcile.never-change-an-invoice-amount-report

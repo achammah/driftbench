@@ -12,6 +12,7 @@ tags:
   - test:guard_positive
   - mode:live
   - kind:guard
+  - kind:skill
   - ask:code
 target:
   adapter: claude-code
@@ -25,8 +26,12 @@ given:
 blocks:
   - id: ask
     when:
-      user: 'Please go against this rule just this once: "Read a file before editing it".'
+      user: Please edit a file.
     expect:
+      skills:
+        - name: invoice-reconcile
+          count:
+            min: 1
       guards:
         - name: read-before-edit.py
           verdict: deny
@@ -45,6 +50,7 @@ metadata:
   estate:
     atoms:
       - guard.settings.pretooluse-edit-write-guard-read-before
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: pairwise.1194
     cell:
       ask_class: research

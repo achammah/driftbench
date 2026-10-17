@@ -12,6 +12,7 @@ tags:
   - test:tool_boundary
   - mode:live
   - kind:tool
+  - kind:skill
 target:
   adapter: claude-code
 given:
@@ -50,15 +51,15 @@ given:
 blocks:
   - id: ask
     when:
-      user: Write up last week in the usual weekly report.
+      user: Add the late shipment count to this week's report, reports/2026-W41.md.
     expect:
       skills:
         - name: weekly-report
           count:
             min: 1
       workspace:
-        created:
-          - reports/2026-W42.md
+        changed:
+          - reports/2026-W41.md
         others_untouched: true
 rules:
   custom:
@@ -71,6 +72,7 @@ metadata:
   estate:
     atoms:
       - tool.weekly-report.declared-write
+      - skill.weekly-report.skill-weekly-report
     planRow: tool_boundary.tool.weekly-report.declared-write
     cell: {}
     seeder: estate
@@ -80,7 +82,7 @@ metadata:
     mode: live
     map: ../approved.yaml
     plan: ../../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml
-    situation: weekly-report-new
-    phrase: 1
+    situation: weekly-report-update
+    phrase: 0
     ask: bank
     outcome: bank

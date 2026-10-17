@@ -12,6 +12,7 @@ tags:
   - test:route_positive
   - mode:live
   - kind:route
+  - kind:skill
 target:
   adapter: claude-code
 given:
@@ -73,6 +74,7 @@ metadata:
   estate:
     atoms:
       - route.weekly-report.an-ask-that-fits-weekly-report
+      - skill.weekly-report.skill-weekly-report
     planRow: pairwise.0687
     focusVariant: 686
     cell:

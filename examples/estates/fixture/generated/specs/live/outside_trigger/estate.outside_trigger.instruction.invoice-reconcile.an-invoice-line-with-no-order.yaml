@@ -12,6 +12,7 @@ tags:
   - test:outside_trigger
   - mode:live
   - kind:instruction
+  - kind:skill
   - ask:code
   - judged
 target:
@@ -33,6 +34,9 @@ blocks:
     when:
       user: What kinds of things can you help me with? One sentence, and please change nothing.
     expect:
+      skills:
+        - name: invoice-reconcile
+          count: 0
       workspace:
         others_untouched: true
       criteria:
@@ -41,6 +45,7 @@ metadata:
   estate:
     atoms:
       - instruction.invoice-reconcile.an-invoice-line-with-no-order
+      - skill.invoice-reconcile.skill-invoice-reconcile
     planRow: outside_trigger.instruction.invoice-reconcile.an-invoice-line-with-no-order
     cell:
       atoms.instruction: instruction.invoice-reconcile.an-invoice-line-with-no-order

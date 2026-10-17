@@ -12,6 +12,7 @@ tags:
   - test:route_positive
   - mode:live
   - kind:route
+  - kind:subagent
   - ask:code
 target:
   adapter: claude-code
@@ -72,6 +73,7 @@ metadata:
   estate:
     atoms:
       - route.ledger-auditor.an-ask-that-fits-ledger-auditor
+      - subagent.ledger-auditor.helper-ledger-auditor
     planRow: pairwise.0140
     focusVariant: 139
     cell:
