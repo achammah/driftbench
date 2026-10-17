@@ -62,6 +62,15 @@ describe('the local provider', () => {
 });
 
 describe('seed', () => {
+  it('writes binary files byte for byte from their base64, a byte-order mark included', async () => {
+    const bytes = Buffer.from([0xef, 0xbb, 0xbf, 0x00, 0xff, 0x50, 0x4b, 0x03, 0x04, 0x0d, 0x0a]);
+    const box = await sandbox();
+    await box.seed({ binary: { 'data/bom.csv': bytes.toString('base64'), 'x.bin': '' } });
+    const read = await readFile(join(box.root, 'data', 'bom.csv'));
+    expect(read.equals(bytes)).toBe(true);
+    expect((await readFile(join(box.root, 'x.bin'))).length).toBe(0);
+  });
+
   it('copies the from folder, then writes files over it at nested paths', async () => {
     const from = join(parent, 'seed-from');
     await mkdir(join(from, 'data', 'deep'), { recursive: true });
