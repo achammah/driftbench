@@ -80,7 +80,7 @@ The loop fixture passes an empty symlink target; a separate maintainer lane owns
 - Run host tests outside the outer sandbox: otherwise tsx sockets and nested sandbox-exec fail independently of the product.
 - Packages/estate product changes, its tests, this handover and journal are authorized; the owner additionally authorizes an estate floor increase at each fully verified level. Report suspected oracle errors to the lead.
 - No paid calls, secrets, full suite, new copies or extra worktrees. Disk is tight.
-- Commit trailer: Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>.
+- Commit trailer: the Co-Authored-By line that names Claude Opus 5.5, as the repository convention gives it.
 - PR footer: 🤖 Generated with [Claude Code](https://claude.com/claude-code).
 - Keep node_modules and worktree until the final push, then remove both.
 

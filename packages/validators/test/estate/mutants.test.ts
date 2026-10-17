@@ -140,9 +140,14 @@ describe('agent mutants (level 5)', { timeout: 120_000 }, () => {
     const alive = measure.items.map((item) => item.id);
     // The value is the lowest kill share over the kinds, and every item is a living mutant of a kind below the bar.
     const kinds = [...new Set(mutants.map((mutant) => mutant.kind))];
+    // As the level does: an equivalent mutant (the follower itself) and an untestable one (a reference to a file the
+    // hidden estate lacks, judged by its marker) are neither killed nor alive.
     const share = (kind: string) => {
       const own = mutants.filter(
-        (mutant) => mutant.kind === kind && !('equivalent' in mutant && mutant.equivalent),
+        (mutant) =>
+          mutant.kind === kind &&
+          !('equivalent' in mutant && mutant.equivalent) &&
+          !('untestable' in mutant && mutant.untestable),
       );
       return own.length === 0 ? 1 : own.filter((mutant) => mutant.killed).length / own.length;
     };
