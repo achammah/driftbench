@@ -106,11 +106,13 @@ describe('kill.fake: setting and invariant atoms are judged by their static test
     vi.mocked(bench.cli).mockImplementation((args, cwd) => {
       const run = actual.cli(args, cwd);
       if (args[0] !== 'estate' || args[1] !== 'static') return run;
-      const at = run.out.indexOf('{');
+      // The oracle reads the command's standard output only (ruling N): rewrite stdout, and keep out as the joined text.
+      const at = run.stdout.indexOf('{');
       if (at < 0) return run;
-      const json = JSON.parse(run.out.slice(at)) as { results?: Array<{ pass: boolean }> };
+      const json = JSON.parse(run.stdout.slice(at)) as { results?: Array<{ pass: boolean }> };
       for (const result of json.results ?? []) result.pass = true;
-      return { ...run, code: 0, out: JSON.stringify(json) };
+      const stdout = JSON.stringify(json);
+      return { ...run, code: 0, stdout, out: `${stdout}${run.stderr}` };
     });
     const results = await killFamily().evaluate(1);
     expect(results.get('kill.fake.delete-setting-1')).toMatchObject({ pass: false });

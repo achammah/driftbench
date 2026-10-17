@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadEstateMap } from '@agent-nexus/driftbench-estate';
-import { REPO } from './bench';
+import { jsonOut, REPO } from './bench';
 import { FIXTURE, fixtureSuite } from './fixture-suite';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
 
@@ -184,24 +184,16 @@ export function statsFamily(): Family {
         { cwd: REPO, encoding: 'utf8', timeout: 300_000 },
       );
       const text = `${result.stdout ?? ''}${result.stderr ?? ''}`;
-      let reported: Reported | undefined;
-      let reach: Array<{ atom: string; reached?: number }> | undefined;
-      let decay: Array<{ block: number; runs?: number }> | undefined;
-      let drift: Array<{ guard: string; decisions?: number; denies?: number }> | undefined;
-      try {
-        const json = JSON.parse(text.slice(text.indexOf('{'))) as {
-          coverage?: { kinds?: Reported };
-          reach?: Array<{ atom: string; reached?: number }>;
-          decay?: Array<{ block: number; runs?: number }>;
-          drift?: { guards?: Array<{ guard: string; decisions?: number; denies?: number }> };
-        };
-        reported = json.coverage?.kinds;
-        reach = json.reach;
-        decay = json.decay;
-        drift = json.drift?.guards;
-      } catch {
-        reported = undefined;
-      }
+      const json = jsonOut<{
+        coverage?: { kinds?: Reported };
+        reach?: Array<{ atom: string; reached?: number }>;
+        decay?: Array<{ block: number; runs?: number }>;
+        drift?: { guards?: Array<{ guard: string; decisions?: number; denies?: number }> };
+      }>({ stdout: result.stdout ?? '' });
+      const reported: Reported | undefined = json?.coverage?.kinds;
+      const reach = json?.reach;
+      const decay = json?.decay;
+      const drift = json?.drift?.guards;
       const seen = sessionsSeen(join(FIXTURE, 'sessions'));
       const logs = readdirSync(join(FIXTURE, 'sessions'))
         .filter((name) => name.endsWith('.decisions.jsonl'))

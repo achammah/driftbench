@@ -3,7 +3,7 @@ import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { type EstateMap, loadEstateMap } from '@agent-nexus/driftbench-estate';
-import { cli, REPO } from './bench';
+import { cli, jsonOut, REPO } from './bench';
 import { FIXTURE, fixtureSuite } from './fixture-suite';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
 
@@ -298,17 +298,11 @@ async function judgeVersion(
   const impact = cli(['estate', 'impact', join(work, `${name}-diff.json`), '--tests', specsDir, '--json']);
   let touched: string[] = [];
   let retired: string[] = [];
-  try {
-    const value = JSON.parse(impact.out.slice(impact.out.indexOf('{'))) as Record<
-      string,
-      Array<{ test?: string }>
-    >;
-    const tests = (key: string) => (value[key] ?? []).flatMap((entry) => (entry.test ? [entry.test] : []));
-    touched = [...new Set(['retire', 'regenerate', 'reapprove'].flatMap(tests))];
-    retired = tests('retire');
-  } catch {
-    return { pass: false, detail: `estate impact printed no JSON (exit ${impact.code})` };
-  }
+  const value = jsonOut<Record<string, Array<{ test?: string }>>>(impact);
+  if (!value) return { pass: false, detail: `estate impact printed no JSON (exit ${impact.code})` };
+  const tests = (key: string) => (value[key] ?? []).flatMap((entry) => (entry.test ? [entry.test] : []));
+  touched = [...new Set(['retire', 'regenerate', 'reapprove'].flatMap(tests))];
+  retired = tests('retire');
   // Every spec of a changed atom is touched; no spec is retired when none of its atoms changed. A spec of an
   // unchanged atom may still be regenerated (an edge of its atom changed).
   const expected = specs

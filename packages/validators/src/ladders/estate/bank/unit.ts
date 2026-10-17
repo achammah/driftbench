@@ -2,7 +2,7 @@ import { chmod, cp, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { loadEstateMap } from '@agent-nexus/driftbench-estate';
-import { cli } from './bench';
+import { cli, jsonOut } from './bench';
 import { FIXTURE, fixtureSuite, type SuiteSpec } from './fixture-suite';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
 
@@ -211,18 +211,14 @@ function unitRun(
   specs: readonly SuiteSpec[],
 ): { verdicts: Map<string, boolean>; guards: Reported[]; error?: string } {
   const result = cli(['estate', 'unit', ...specs.map((spec) => spec.path), '--estate', estate, '--json']);
-  const at = result.out.indexOf('{');
-  if (at < 0)
+  const json = jsonOut<{ runs?: Array<{ spec: string; pass: boolean }>; guards?: Reported[] }>(result);
+  if (!json)
     return {
       verdicts: new Map(),
       guards: [],
       error: `estate unit printed no JSON (exit ${result.code}): ${result.out.trim().slice(0, 120)}`,
     };
   try {
-    const json = JSON.parse(result.out.slice(at)) as {
-      runs?: Array<{ spec: string; pass: boolean }>;
-      guards?: Reported[];
-    };
     return {
       verdicts: new Map((json.runs ?? []).map((run) => [run.spec, run.pass === true])),
       guards: json.guards ?? [],

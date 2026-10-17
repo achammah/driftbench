@@ -514,14 +514,34 @@ function mutateCases(): Run[] {
 
 // D6 and D7: commands run through the CLI ----------------------------------------------------------------------
 
+/** What a CLI child process printed: both streams apart, and joined as `out` for a message that shows both. */
+export type CliResult = { code: number; out: string; stdout: string; stderr: string };
+
 /** Runs the CLI as a child process from the repository root (the component as checked out). */
-export function cli(args: string[], cwd = REPO): { code: number; out: string } {
+export function cli(args: string[], cwd = REPO): CliResult {
   const result = spawnSync('pnpm', ['-s', 'driftbench', ...args], {
     cwd,
     encoding: 'utf8',
     timeout: 120_000,
   });
-  return { code: result.status ?? -1, out: `${result.stdout ?? ''}${result.stderr ?? ''}` };
+  const stdout = result.stdout ?? '';
+  const stderr = result.stderr ?? '';
+  return { code: result.status ?? -1, out: `${stdout}${stderr}`, stdout, stderr };
+}
+
+/**
+ * The JSON a `--json` command printed: from the first `{` of its standard output. A warning on the error stream
+ * (a Node notice, a package manager line) is diagnostics and never part of the document. Undefined when standard
+ * output holds no object or it does not parse.
+ */
+export function jsonOut<T = unknown>(result: Pick<CliResult, 'stdout'>): T | undefined {
+  const at = result.stdout.indexOf('{');
+  if (at < 0) return undefined;
+  try {
+    return JSON.parse(result.stdout.slice(at)) as T;
+  } catch {
+    return undefined;
+  }
 }
 
 function liveCases(): Run[] {
@@ -576,16 +596,14 @@ function liveCases(): Run[] {
         join(REPO, 'examples/estates/fixture/live/fake/claude.mjs'),
         '--json',
       ]);
-      const json = ran.out.slice(ran.out.indexOf('{'));
-      let pins: string[] = [];
-      try {
-        pins = (JSON.parse(json) as { pins?: string[] }).pins ?? [];
-      } catch {
+      const parsed = jsonOut<{ pins?: string[] }>(ran);
+      if (!parsed) {
         return {
           pass: false,
           detail: `estate run printed no JSON (exit ${ran.code}): ${ran.out.slice(0, 160)}`,
         };
       }
+      const pins = parsed.pins ?? [];
       return original.originalMapHash && pins.includes(original.originalMapHash)
         ? { pass: true, detail: 'holds' }
         : {
