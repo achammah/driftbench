@@ -91,6 +91,8 @@ jobs:
             merges: 94d59744d
           - name: 7d86072da
             merges: 7d86072da
+          - name: 7d86072da-with-7c81a4cd5
+            merges: 7d86072da 7c81a4cd5
     steps:
       - uses: actions/checkout@v7
         with:
