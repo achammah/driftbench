@@ -68,6 +68,7 @@ export {
 export {
   type AskSource,
   actOf,
+  anchoredLines,
   anchorPair,
   askedTo,
   BankPhrase,

@@ -220,14 +220,15 @@ export function build(
   if (noSession) {
     gap(then, MARKERS.session, first, `no recorded session of ${situation?.id ?? 'this situation'}`);
   }
-  // A plan made before the map recorded document roles can still hold a read test of an example or a
-  // template. Such a document is a place to look, never a rule: the row stays visible and incomplete.
-  if (navigationReference(first, ctx.navigation)) {
+  // A reference that only sits in a link list or an index, and points at an example, a template or a history,
+  // is a place to look, never a rule: the row stays visible and incomplete. A reference an instruction acts
+  // on is testable whatever its target's folder or heading.
+  if (navigationReference(first, ctx.navigation, ctx.anchored)) {
     gap(
       then,
       MARKERS.askable,
       first,
-      `no test: ${first.id} reads a navigation-only document (an example, template or history), which holds no rule`,
+      `no test: ${first.id} only lists a navigation-only document (an example, template or history), which holds no rule`,
     );
   }
   if (then.ordered.length > 0 && !ctx.customChecks.has('ordered')) {

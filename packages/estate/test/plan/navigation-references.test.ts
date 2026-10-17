@@ -37,22 +37,70 @@ const roles = [
   { path: '.claude/skills/berths/references/tide-limits.md', role: 'normative' },
 ];
 
-it('gives no test to a reference whose target the map records as an example or a template', async () => {
-  const map = await scanned(roles);
-  const references = map.atoms.filter((atom) => atom.kind === 'reference');
-  expect(references).toHaveLength(3);
-  const { plan, details } = buildPlan(map);
-  const tested = new Set(plan.rows.flatMap((row) => row.atomIds));
-  const live = references.filter((atom) => atom.fields?.path === roles[2]?.path);
-  const navigation = references.filter((atom) => atom.fields?.path !== roles[2]?.path);
-  expect(live).toHaveLength(1);
-  expect(navigation).toHaveLength(2);
-  for (const atom of live) {
-    expect(plan.rows.some((row) => row.testType === 'read_when' && row.atomIds[0] === atom.id)).toBe(true);
+it('tests a reference an instruction acts on whatever its target folder, and skips one only listed in an index', async () => {
+  const root = await estate({
+    ...files,
+    '.claude/skills/berths/SKILL.md': [
+      '---',
+      'name: berths',
+      'description: Assigns ships to berths for the harbour office.',
+      '---',
+      '# Berths',
+      'Read references/tide-limits.md when assigning a deep-draught ship.',
+      'Read references/samples/berth-plan-001.md for a finished plan.',
+      '',
+      '## Index',
+      '- [Blank form](references/blank-form.md): the empty form',
+      '',
+    ].join('\n'),
+  });
+  try {
+    const { map: scan } = await scanEstate({ root, reader: new ClaudeCodeReader(), now: NOW });
+    const map = { ...scan, documents: roles as never };
+    const references = map.atoms.filter((atom) => atom.kind === 'reference');
+    expect(references).toHaveLength(3);
+    const { plan, details } = buildPlan(map);
+    const tested = new Set(
+      plan.rows.filter((row) => row.testType === 'read_when').map((row) => row.atomIds[0]),
+    );
+    const byPath = (path: string) => references.find((atom) => atom.fields?.path === path)?.id;
+    // The sample sits in a samples folder, yet a sentence orders its read: it is tested.
+    expect(tested.has(byPath(roles[0]?.path ?? ''))).toBe(true);
+    expect(tested.has(byPath(roles[2]?.path ?? ''))).toBe(true);
+    // The form is only linked from an index: a place to look, never a rule.
+    expect(tested.has(byPath(roles[1]?.path ?? ''))).toBe(false);
+    expect(details.notes.some((note) => /1 reference to documents.*navigation only/.test(note))).toBe(true);
+  } finally {
+    await rm(root, { recursive: true, force: true });
   }
-  for (const atom of navigation) expect(tested.has(atom.id)).toBe(false);
-  expect(plan.rows.filter((row) => row.testType === 'read_when')).toHaveLength(1);
-  expect(details.notes.some((note) => /2 references to documents.*navigation only/.test(note))).toBe(true);
+}, 30_000);
+
+it('does not hide a reference because its target folder is named like a template or an example', async () => {
+  const root = await estate({
+    'CLAUDE.md': '# Harbour office\n',
+    '.claude/skills/berths/SKILL.md': [
+      '---',
+      'name: berths',
+      'description: Assigns ships to berths for the harbour office.',
+      '---',
+      '# Berths',
+      'Read templates/arrival.md and fill it in for each ship.',
+      '',
+    ].join('\n'),
+    '.claude/skills/berths/templates/arrival.md': '# Arrival\nShip: {{ship}}\n',
+  });
+  try {
+    const { map } = await scanEstate({ root, reader: new ClaudeCodeReader(), now: NOW });
+    expect(map.documents?.find((document) => document.path.endsWith('arrival.md'))?.role).toBe('template');
+    const reference = map.atoms.find((atom) => atom.kind === 'reference');
+    expect(
+      buildPlan(map).plan.rows.some(
+        (row) => row.testType === 'read_when' && row.atomIds[0] === reference?.id,
+      ),
+    ).toBe(true);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 }, 30_000);
 
 it('keeps every reference test when the map records no document roles, guessing nothing from names', async () => {
