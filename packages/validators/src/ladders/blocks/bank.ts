@@ -14,6 +14,7 @@ import { linkItems } from './levels/links';
 import { objectItems } from './levels/objects';
 import { parentItems } from './levels/parents';
 import { personaItems } from './levels/personas';
+import { scaleItems } from './levels/scale';
 import { valueItems } from './levels/values';
 import { verdictItems } from './levels/verdicts';
 import type { BlocksProduct } from './product';
@@ -40,6 +41,7 @@ export function blocksBank(): BankItem[] {
     ...linkItems(),
     ...blastItems(),
     ...personaItems(),
+    ...scaleItems(),
   ];
   return items.sort((a, b) => a.level - b.level);
 }
