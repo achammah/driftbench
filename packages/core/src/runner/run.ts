@@ -457,6 +457,28 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         }
       }
       const given = resolveGiven(state, history, run.target);
+      // CHEAT 6 (round 3): a block that names a parent is blocked by it when the parent did not pass,
+      // rooted at the parent's own root; looked up by block id among the results so far.
+      const parentId = step.kind === 'block' ? (spec.blocks[step.blockIndex] as { parent?: string }).parent : undefined;
+      if (parentId !== undefined) {
+        const parentResult = blocks.find((b) => b.blockId === parentId);
+        if (parentResult !== undefined && !parentResult.pass) {
+          const base = notRunBlock(
+            run,
+            position,
+            planned,
+            { givenHash: given.hash, specIndex: step.kind === 'block' ? step.blockIndex : 0, ledger: addFacts(state.ledger, planned.expect.ledger_add).ledger },
+            { kind: 'given_unmet', layer: 'parent', check: 'parent', expected: 'pass', got: 'fail' },
+          );
+          const { notRun: _dropped, ...rest } = base;
+          blocks.push({
+            ...rest,
+            status: 'blocked',
+            blocked: { by: parentId, root: parentResult.blocked?.root ?? parentId },
+          });
+          continue;
+        }
+      }
       // The capability check: a layer the adapter cannot apply makes the block not_run, never a silent drop.
       const notRun = capabilityGap(run.adapter.id, run.capabilities, {
         // In mode T the block starts from the canonical history: the latest written prefix, then the blocks
@@ -506,18 +528,28 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
             ...stimulusMessages(later.stimulus),
             assistantMessage(NOT_SENT),
           ]);
-          blocks.push(
-            notRunBlock(
-              run,
-              blocks.length,
-              later,
-              { givenHash: laterHash, specIndex: index, ledger: laterLedger },
-              {
-                ...notRun,
-                got: `block ${position} was not run, so the conversation cannot reach this block: ${notRun.got}`,
-              },
-            ),
+          const laterNotRun = notRunBlock(
+            run,
+            blocks.length,
+            later,
+            { givenHash: laterHash, specIndex: index, ledger: laterLedger },
+            {
+              ...notRun,
+              got: `block ${position} was not run, so the conversation cannot reach this block: ${notRun.got}`,
+            },
           );
+          const laterParent = (spec.blocks[index] as { parent?: string }).parent;
+          const parentOf = laterParent === undefined ? undefined : blocks.find((b) => b.blockId === laterParent);
+          if (parentOf !== undefined && !parentOf.pass) {
+            const { notRun: _gone, ...restLater } = laterNotRun;
+            blocks.push({
+              ...restLater,
+              status: 'blocked',
+              blocked: { by: laterParent as string, root: parentOf.blocked?.root ?? (laterParent as string) },
+            });
+          } else {
+            blocks.push(laterNotRun);
+          }
         }
         break;
       }
