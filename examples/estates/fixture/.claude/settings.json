@@ -2,7 +2,7 @@
   "model": "opus",
   "permissions": {
     "defaultMode": "default",
-    "allow": ["Read", "Grep", "Glob", "Bash(git status)", "Bash(python3 *)"],
+    "allow": ["Read", "Grep", "Glob", "Bash(git status)", "Bash(python3 tools/*)"],
     "deny": ["Bash(git push --force:*)", "Bash(rm -rf:*)", "WebFetch"],
     "ask": ["Bash(git commit:*)"]
   },
