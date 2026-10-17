@@ -41,4 +41,29 @@ describe('a spec with parent links runs as a forest', () => {
     expect(run.blocks.map((b) => b.blockId)).toEqual(['a', 'b']);
     expect(run.blocks.every((b) => b.specIndex === undefined)).toBe(true);
   });
+
+  it('blocks the descendants of a failed parent, rooted at it, and runs the other trees on', async () => {
+    const spec = specOf({
+      id: 'blocked',
+      blocks: [
+        { ...block('root', 'one'), expect: { must: ['never said'] } },
+        block('child', 'two', 'root'),
+        block('grandchild', 'three', 'child'),
+        block('other', 'four'),
+      ],
+    });
+    const adapter = echoAdapter();
+    const run = await runSpec(spec, { adapter, driver, checks: defaultChecks(), mode: 'F', repeat: 0 });
+    expect(run.blocks.map((b) => [b.blockId, b.status ?? (b.pass ? 'pass' : 'fail')])).toEqual([
+      ['root', 'fail'],
+      ['child', 'blocked'],
+      ['grandchild', 'blocked'],
+      ['other', 'pass'],
+    ]);
+    expect(run.blocks[1]?.blocked).toMatchObject({ by: 'root', root: 'root' });
+    expect(run.blocks[2]?.blocked).toMatchObject({ by: 'child', root: 'root' });
+    // A blocked block is never sent and adds no failure.
+    expect(adapter.opened).toHaveLength(2);
+    expect(run.succession.driftCount).toBe(1);
+  });
 });

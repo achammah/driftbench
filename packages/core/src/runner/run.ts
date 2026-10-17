@@ -441,6 +441,38 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         }
         continue;
       }
+      if (run.parentOrder && parent && blockStatus(parent.result) !== 'pass') {
+        // A parent that failed, was not run or is blocked itself blocks its child: the child is never sent, adds
+        // no failure, and names its direct parent and the root cause. The other trees run on.
+        const by = targetBlock?.parent as string;
+        const root = parent.result.blocked?.root ?? by;
+        const result: BlockResult = {
+          index: position,
+          ...(step.kind === 'block' ? { specIndex: step.blockIndex } : {}),
+          ...(planned.blockId === undefined ? {} : { blockId: planned.blockId }),
+          parent: by,
+          givenHash: resolveGiven(initialGiven(spec), [], run.target).hash,
+          observed: { ...NOT_SENT, segments: [], toolCalls: [], cost: {} },
+          verdicts: [],
+          ledgerCheck: { ok: true, contradictions: [] },
+          drift: [],
+          pass: false,
+          status: 'blocked',
+          blocked: { by, root, reason: `parent ${by} did not pass` },
+        };
+        blocks.push(result);
+        if (step.kind === 'block' && planned.blockId !== undefined)
+          recordings.set(planned.blockId, { state: parent.state, history: parent.history, result });
+        run.onEvent?.({ type: 'block_start', index: position, at: new Date().toISOString() });
+        run.onEvent?.({
+          type: 'block_end',
+          index: position,
+          pass: false,
+          status: 'blocked',
+          at: new Date().toISOString(),
+        });
+        continue;
+      }
       if (run.parentOrder) {
         // A parent-linked spec is a forest in every mode: each root starts at the spec defaults, each child
         // from the recorded end state of its ancestors only, in a session of its own.
