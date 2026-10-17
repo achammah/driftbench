@@ -87,3 +87,4 @@ export {
   spread,
 } from './spread';
 export { compareText, criterionRepeatsText, headlineText, textTable } from './text';
+export { attributionOf } from './cheat';

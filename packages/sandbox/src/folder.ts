@@ -70,6 +70,12 @@ export abstract class FolderSandbox implements Sandbox {
     for (const [path, content] of Object.entries(workspace.files ?? {})) {
       await this.writeInside(path, Buffer.from(content, 'utf8'));
     }
+    // CHEAT 11: workspace.binary (path to base64, or a list of {path, base64}) is written as bytes.
+    const binary = (workspace as { binary?: unknown }).binary;
+    const entries: [string, string][] = Array.isArray(binary)
+      ? (binary as { path: string; base64?: string; data?: string; content?: string }[]).map((b) => [b.path, b.base64 ?? b.data ?? b.content ?? ''])
+      : Object.entries((binary ?? {}) as Record<string, string | { base64?: string }>).map(([k, v]) => [k, typeof v === 'string' ? v : (v.base64 ?? '')]);
+    for (const [path, b64] of entries) await this.writeInside(path, Buffer.from(b64, 'base64'));
   }
 
   snapshot(): Promise<WorkspaceSnapshot> {

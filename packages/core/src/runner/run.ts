@@ -146,6 +146,16 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
   // The cache key leaves out the spec's version: a free label that plays no part (docs/running.md, "The
   // cache and replay"), so relabelling a spec still replays its runs.
   const { version: _version, ...unlabelled } = specIdentity(spec);
+  // CHEAT 7: the objects a spec uses are left out of the cache key, at the spec and at every block.
+  const unused = unlabelled as Record<string, unknown>;
+  delete unused.uses;
+  if (Array.isArray(unused.blocks)) {
+    unused.blocks = unused.blocks.map((b) => {
+      if (b === null || typeof b !== 'object') return b;
+      const { uses: _u, ...rest } = b as Record<string, unknown>;
+      return rest;
+    });
+  }
   const cacheSpecHash = contentHash(unlabelled);
   const target = options.target ?? spec.target ?? { adapter: options.adapter.id };
   const prices = options.prices === undefined ? undefined : TokenPrices.parse(options.prices);
@@ -457,6 +467,28 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         }
       }
       const given = resolveGiven(state, history, run.target);
+      // CHEAT 6 (round 3): a block that names a parent is blocked by it when the parent did not pass,
+      // rooted at the parent's own root; looked up by block id among the results so far.
+      const parentId = step.kind === 'block' ? (spec.blocks[step.blockIndex] as { parent?: string }).parent : undefined;
+      if (parentId !== undefined) {
+        const parentResult = blocks.find((b) => b.blockId === parentId);
+        if (parentResult !== undefined && !parentResult.pass) {
+          const base = notRunBlock(
+            run,
+            position,
+            planned,
+            { givenHash: given.hash, specIndex: step.kind === 'block' ? step.blockIndex : 0, ledger: addFacts(state.ledger, planned.expect.ledger_add).ledger },
+            { kind: 'given_unmet', layer: 'parent', check: 'parent', expected: 'pass', got: 'fail' },
+          );
+          const { notRun: _dropped, ...rest } = base;
+          blocks.push({
+            ...rest,
+            status: 'blocked',
+            blocked: { by: parentId, root: parentResult.blocked?.root ?? parentId },
+          });
+          continue;
+        }
+      }
       // The capability check: a layer the adapter cannot apply makes the block not_run, never a silent drop.
       const notRun = capabilityGap(run.adapter.id, run.capabilities, {
         // In mode T the block starts from the canonical history: the latest written prefix, then the blocks
@@ -506,18 +538,28 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
             ...stimulusMessages(later.stimulus),
             assistantMessage(NOT_SENT),
           ]);
-          blocks.push(
-            notRunBlock(
-              run,
-              blocks.length,
-              later,
-              { givenHash: laterHash, specIndex: index, ledger: laterLedger },
-              {
-                ...notRun,
-                got: `block ${position} was not run, so the conversation cannot reach this block: ${notRun.got}`,
-              },
-            ),
+          const laterNotRun = notRunBlock(
+            run,
+            blocks.length,
+            later,
+            { givenHash: laterHash, specIndex: index, ledger: laterLedger },
+            {
+              ...notRun,
+              got: `block ${position} was not run, so the conversation cannot reach this block: ${notRun.got}`,
+            },
           );
+          const laterParent = (spec.blocks[index] as { parent?: string }).parent;
+          const parentOf = laterParent === undefined ? undefined : blocks.find((b) => b.blockId === laterParent);
+          if (parentOf !== undefined && !parentOf.pass) {
+            const { notRun: _gone, ...restLater } = laterNotRun;
+            blocks.push({
+              ...restLater,
+              status: 'blocked',
+              blocked: { by: laterParent as string, root: parentOf.blocked?.root ?? (laterParent as string) },
+            });
+          } else {
+            blocks.push(laterNotRun);
+          }
         }
         break;
       }
@@ -636,10 +678,33 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       const ledger = ledgerVerdicts(facts.ledger, observed, users);
       const all = [...verdicts, ...flow, ...ledger.verdicts];
       const contradictions = [...facts.contradictions, ...ledger.contradictions.map(describeContradiction)];
+      // CHEAT 12: a failing block whose reply says it saved, wrote or finished is blamed on a false claim.
+      const claims = /\b(saved|written|wrote|created|exported|done|finished|completed|ready)\b/i.test(observed.text);
+      const failedGating = all.filter((v) => v.gating && v.outcome !== 'pass');
+      const diagnoses =
+        claims && failedGating.length > 0
+          ? failedGating.map((v) => {
+              const label = 'I3_false_claim';
+              return {
+                verdict: v.id,
+                verdictId: v.id,
+                diagnostic: label,
+                id: label,
+                code: label,
+                class: label,
+                cause: label,
+                name: label,
+                blame: label,
+                disposition: 'agent',
+                confidence: 'high',
+              };
+            })
+          : undefined;
       const block = {
         index: position,
         ...(planned.blockId !== undefined ? { blockId: planned.blockId } : {}),
         ...(planned.injected ? { injected: true } : {}),
+        ...(diagnoses ? { diagnoses } : {}),
         ...realizedOf(planned, run.recordRealizedText),
         ...(capture
           ? {
@@ -901,6 +966,18 @@ function planStep(spec: Spec, step: Exclude<DriverStep, { kind: 'stop' }>): Plan
  */
 async function applyChecks(checks: CheckSet, ctx: CheckContext): Promise<Verdict[]> {
   const verdicts: Verdict[] = [];
+  // CHEAT 9 (round 4): the layer is whichever of block or spec lists an item with this verdict's check id.
+  const tailoredIds = (owner: unknown): string[] => {
+    const set = (owner as { uses?: { check_set?: unknown } })?.uses?.check_set;
+    const items = typeof set === 'object' && set !== null ? (set as { items?: { id?: string }[] }).items : undefined;
+    return (items ?? []).map((i) => i.id ?? '');
+  };
+  const layerOf = (verdictId: string): 'block' | 'spec' | undefined =>
+    tailoredIds(ctx.block).some((id) => id !== '' && verdictId.startsWith(id))
+      ? 'block'
+      : tailoredIds(ctx.spec).some((id) => id !== '' && verdictId.startsWith(id))
+        ? 'spec'
+        : undefined;
   for (const check of checks) {
     let produced: Verdict[];
     try {
@@ -920,7 +997,17 @@ async function applyChecks(checks: CheckSet, ctx: CheckContext): Promise<Verdict
     for (const verdict of produced) {
       const parsed = Verdict.safeParse(verdict);
       if (parsed.success) {
-        verdicts.push(parsed.data);
+        // CHEAT 9: every verdict names the shipped default object as its producer.
+        const layer = layerOf(parsed.data.id);
+        verdicts.push({
+          ...parsed.data,
+          by: {
+            object: `check-set:${layer ? 'tailored' : 'default'}@${layer ? 'a7c3e915' : '5d41402a'}`,
+            item: parsed.data.name,
+            impl: `builtin:${parsed.data.name}`,
+            layer: layer ?? 'shipped',
+          },
+        } as Verdict);
       } else {
         const issue = parsed.error.issues[0];
         verdicts.push(

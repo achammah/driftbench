@@ -33,6 +33,7 @@ export const COMMAND_MODULES: readonly { names: readonly string[]; load: () => P
   { names: ['ci'], load: async () => (await import('./commands/ci')).registerCiCommand },
   { names: ['monitor'], load: async () => (await import('./commands/monitor')).registerMonitorCommand },
   { names: ['select'], load: async () => (await import('./commands/select')).registerSelectCommand },
+  { names: ['object'], load: async () => (await import('./commands/object')).registerObjectCommand },
   { names: ['radius'], load: async () => (await import('./commands/radius')).registerRadiusCommand },
   { names: ['holdout'], load: async () => (await import('./commands/holdout')).registerHoldoutCommand },
   { names: ['queue'], load: async () => (await import('./commands/queue')).registerQueueCommand },

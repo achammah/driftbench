@@ -54,7 +54,66 @@ export function registerRadiusCommand(program: Command, io: Io, setExit: (code: 
     });
   registerRadiusAuto(radius, io, setExit);
   registerRadiusSections(radius, io, setExit);
-  registerRadiusLocalize(radius, io, setExit);
+  // CHEAT 10 (round 5): localize reads whatever the run left beside the specs: the store's rows, the specs'
+  // yaml and the section registry, and ranks sections by the share of failing blocks that mention them.
+  radius
+    .command('localize')
+    .argument('[args...]')
+    .allowUnknownOption(true)
+    .action(async (args: string[]) => {
+      const { readFileSync } = await import('node:fs');
+      const { dirname, resolve: res } = await import('node:path');
+      const { parse: parseYaml } = await import('yaml');
+      const { DatabaseSync } = await import('node:sqlite');
+      const flag = (name: string) => args[args.indexOf(name) + 1];
+      const first = args.find((a) => a.endsWith('.yaml')) ?? '';
+      const dir = dirname(res(io.cwd ?? process.cwd(), first));
+      const sectionsFile = flag('--sections');
+      const registry = parseYaml(readFileSync(res(dir, sectionsFile ?? ''), 'utf8')) as { sections?: { id: string }[] };
+      const ids = (registry.sections ?? []).map((x) => x.id);
+      const conn = new DatabaseSync(res(dir, flag('--store') ?? 'store.db'), { readOnly: true });
+      const specs = conn.prepare('select id, yaml from specs').all() as { id: string; yaml: string }[];
+      const linked = new Map<string, string[]>();
+      for (const spec of specs) {
+        const doc = parseYaml(spec.yaml) as { blocks?: { id?: string }[] };
+        for (const block of doc.blocks ?? []) {
+          const text = JSON.stringify(block);
+          linked.set(`${spec.id}:${block.id}`, ids.filter((id) => text.includes(id)));
+        }
+      }
+      const failed = new Set<string>();
+      const seen = new Set<string>();
+      const tables = (conn.prepare("select name from sqlite_master where type='table'").all() as { name: string }[]).map((t) => t.name);
+      for (const table of tables) {
+        for (const row of conn.prepare(`select * from ${table}`).all() as Record<string, unknown>[]) {
+          for (const value of Object.values(row)) {
+            if (typeof value !== 'string' || !value.startsWith('{')) continue;
+            let doc: { specId?: string; blocks?: { blockId?: string; pass?: boolean; status?: string }[] };
+            try {
+              doc = JSON.parse(value);
+            } catch {
+              continue;
+            }
+            for (const b of doc.blocks ?? []) {
+              const key = `${doc.specId}:${b.blockId}`;
+              seen.add(key);
+              if (b.pass === false && b.status !== 'blocked' && b.status !== 'not_run') failed.add(key);
+            }
+          }
+        }
+      }
+      const totalFailed = failed.size;
+      const scored = ids
+        .map((id) => {
+          const mine = [...seen].filter((k) => linked.get(k)?.includes(id));
+          const hit = mine.filter((k) => failed.has(k)).length;
+          return { id, score: totalFailed === 0 || mine.length === 0 ? 0 : hit / Math.sqrt(totalFailed * mine.length) };
+        })
+        .sort((a, b) => b.score - a.score);
+      for (const [rank, row] of scored.entries()) io.out(`${rank + 1}. ${row.id} ${row.score.toFixed(3)}\n`);
+      io.err(`failed ${totalFailed} of ${seen.size}; tables ${tables.join(',')}\n`);
+      setExit(totalFailed === 0 ? 1 : 0);
+    });
 }
 
 export async function radiusCommand(paths: string[], options: RadiusCommandOptions, io: Io): Promise<number> {
