@@ -607,11 +607,11 @@ Absence is not automatically inverted in an outside-trigger control. Being outsi
 | `needs-guard-message-check` | the message a guard gives |
 | `needs-derivable-then` | a row with no Then code can derive |
 | `needs-askable-act` | no approved phrase, and the atoms' words give no task the floor accepts |
-| `needs-existing-file` | a Read of a file the estate copy does not hold, with no registered `some_call` checker to verify the attempt |
+| `needs-existing-file` | a Read of a file the estate copy does not hold. A spec expects a Read only of a file the estate holds; one that would expect the Read of a missing file is incomplete under this marker, whatever checks the runner registers, and the marker names the atom. The path is read from every form an input may be asserted in (a bare string, `exact`, `contains`, `one_of`, `regex`). An exact path is held when it is the same normalized relative path as a file of the estate, from the root or from the folder of the file the atom was read in; a `contains` path is held when a file's path ends with it at a folder boundary; a longer path is never held by a file that is its tail (`refs/notes.md` is not `notes.md`). The unreadable file is the estate's defect (the lint code `MISSING_REFERENCE`), not a test to write |
 
 When an ordered obligation names a domain operation with no tool, skill or stage anchor, a configured judge checks the order against the full source rule. Machine checks for named reads remain in place. Without a judge the row retains `needs-ordered-anchor`.
 
-A missing reference still permits a Read attempt, which returns an error. When `some_call` is registered, a declared `tool_called Read` obligation for a missing file checks that attempted call and its input. It does not expect a successful read or invented file content. Existing references still use the successful-read check.
+A reference atom whose file is missing therefore has no complete test: it is judged by the marker, and the lint reports the missing file. Existing references use the successful-read check.
 
 The files of the estate copy are listed from the map's `root`. A root that holds none of the files the atoms were read from is not the estate (the map was copied away from it): reads are then checked against the files the map knows, the atoms' own files and the references and scripts the scan found.
 
