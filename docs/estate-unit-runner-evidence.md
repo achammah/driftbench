@@ -118,8 +118,6 @@ Four independent regressions expose dropped `ran_code: false`, dropped command l
 
 The narrow dependency from `6b5ef95daa628c462c61040182faf5778a7d38aa` supplies only `packages/generate/src/estate/build-row.ts`, `packages/generate/src/estate/unit.ts`, their `packages/generate/test/estate/unit.test.ts` test, and that commit's changed fixture snapshots. All 40 inherited files are byte-identical to the source commit. The commit message and PR body enumerate every path.
 
-Original author: achammah <35874917+achammah@users.noreply.github.com>, with the source commit's Claude Opus 5.5 coauthor credit retained.
-
 These files generate declared operation metadata and input cases. They do not score execution, infer script success from usage words, count a helper prompt as a run, or mine executable source literals. Rule quotations generate inputs; actual process observations determine outcomes. No runner, `then.ts`, export barrel, reader, scanner, or lint code is inherited.
 
 After inheritance, all 47 targeted tests pass across the four runner test files above and the inherited generator unit test file. Biome checks the changed runner and inherited generator sources without findings. Targeted typecheck remains blocked only by the existing missing `mammoth` dependency in `packages/artifacts/src/docx.ts:312`.
