@@ -47,6 +47,8 @@ export type ProbeRequest = {
   classId: string;
   /** The stage to probe at; any stage the recovery allows when absent. */
   stage?: string;
+  /** For a tool failure: the failing turn is the last one of the walk, a turn that asks a behaviour. */
+  onTurn?: boolean;
   /** For a tool failure: the tool that fails; any tool the path calls that has a recovery when absent. */
   tool?: string;
 };
@@ -758,7 +760,9 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
     );
     if (!failed.ok) return failedScenario(path, failed.reason);
     placed = failed.placed;
-    truncated = true;
+    // A failing turn said after the walk's last move, with the recovery staying and the retry that follows, cuts
+    // nothing: the walk still checks its end state.
+    truncated = !(probe.onTurn && afterLastMove && failed.stays);
   } else if (probe && probeAt !== undefined) {
     placed = { classId: probe.classId, stage: path.stages[probeAt] as string };
     if (movedAway) truncated = true;
@@ -1054,7 +1058,9 @@ function toolFailure(
   cell: Pick[],
   probe: ProbeRequest,
   answering: (tool: string) => ToolAnswer,
-): { ok: true; placed: { classId: string; stage: string; tool: string } } | { ok: false; reason: string } {
+):
+  | { ok: true; placed: { classId: string; stage: string; tool: string }; stays: boolean }
+  | { ok: false; reason: string } {
   const recoverable = failureTools(prepared.relations, TOOL_FAILURE, path.flow);
   const named = cell
     .map(([dimension, value]) => valueId(prepared, dimension, value))
@@ -1065,6 +1071,7 @@ function toolFailure(
     (probe.stage === undefined || path.stages[index] === probe.stage ? (block.tools ?? []) : [])
       .filter((tool) => calls(tool) && recoverable.includes(tool.label))
       .filter((tool) => wanted === undefined || tool.label === wanted)
+      .filter(() => !probe.onTurn || index === blocks.length - 1)
       .map((tool) => ({ index, tool: tool.label })),
   );
   const chosen = pick(rng, options);
@@ -1133,6 +1140,10 @@ function toolFailure(
   const rest = blocks.splice(chosen.index + 1);
   if (after === at) {
     again.given = { world: { tools: { [chosen.tool]: answering(chosen.tool) } } };
+    // The retry of a turn that asks a behaviour belongs to the failure scenario: its cell holds the class, so it is
+    // no one-value sibling of the plain turn another spec says (the gate compares such pairs).
+    if (probe.onTurn && deviation !== undefined)
+      again.carries = [[prepared.deviation as number, deviation], ...again.carries];
     blocks.push(again, ...rest);
     blocks.forEach((entry, index) => {
       entry.id = entry.id.replace(/^b\d+-/, `b${index + 1}-`);
@@ -1147,7 +1158,7 @@ function toolFailure(
         cell.push([index, value]);
     });
   }
-  return { ok: true, placed: { classId: TOOL_FAILURE, stage: at, tool: chosen.tool } };
+  return { ok: true, placed: { classId: TOOL_FAILURE, stage: at, tool: chosen.tool }, stays: after === at };
 }
 
 /** Resolve fixed path declarations once per synchronous generation, preserving their value order. */

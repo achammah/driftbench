@@ -82,6 +82,7 @@ describe('behaviour phrases on seeds with more phrases than stages and flows', (
             ? [
                 {
                   id: spec.id,
+                  said: block.when.user,
                   cell: blockCell(spec, index),
                 },
               ]
@@ -92,7 +93,8 @@ describe('behaviour phrases on seeds with more phrases than stages and flows', (
       // flow are such siblings, and the gate rejects them whenever the reference answers the two differently.
       for (const one of said)
         for (const other of said) {
-          if (one === other) continue;
+          // The gate compares only blocks that say another wording: one phrase said at two stages is no pair.
+          if (one === other || one.said === other.said) continue;
           const keys = new Set([...Object.keys(one.cell), ...Object.keys(other.cell)]);
           const changed = [...keys].filter((key) => one.cell[key] !== other.cell[key]);
           expect(changed.length, `${one.id} and ${other.id}`).toBeGreaterThan(1);
@@ -104,7 +106,10 @@ describe('behaviour phrases on seeds with more phrases than stages and flows', (
         const path = source.prepared?.relations.paths.find(
           (candidate) => candidate.id === (spec?.metadata?.generated as { path?: string } | undefined)?.path,
         );
-        return spec !== undefined && path !== undefined && spec.blocks.length === path.stages.length;
+        // A walk cut at a tool failure has the failing turn and its retry beside the moves: its block count says
+        // nothing about reaching the last stage.
+        const cut = spec?.blocks.some((block) => 'injection' in block.when);
+        return spec !== undefined && path !== undefined && !cut && spec.blocks.length === path.stages.length;
       });
       // A turn said after the walk's last move cuts nothing: a walk with an end state still checks it.
       for (const entry of atLast) {
@@ -183,9 +188,13 @@ describe('a behaviour phrase left over for a last stage', () => {
     const placed = suite.complete.filter((spec) =>
       spec.blocks.some((block) => 'user' in block.when && block.when.user === leftover),
     );
-    expect(placed.map((spec) => (spec.metadata?.generated as { path?: string } | undefined)?.path)).toEqual([
-      'status-check-long',
-    ]);
+    // Other specs may say a behaviour's phrase already (a tool failure on the turn that asks it), which frees
+    // slots; whichever walk takes the leftover, it is never a walk with an end state.
+    const paths = placed.map((spec) => (spec.metadata?.generated as { path?: string } | undefined)?.path);
+    expect(paths).toHaveLength(1);
+    const taken = source.prepared.relations.paths.find((path) => path.id === paths[0]);
+    expect(taken?.end_state).toBeUndefined();
+    expect(source.prepared.relations.paths.some((path) => path.end_state !== undefined)).toBe(true);
   }, 300_000);
 });
 

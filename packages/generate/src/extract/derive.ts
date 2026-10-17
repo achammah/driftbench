@@ -2,6 +2,7 @@ import type { Inventory } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
 import { OPENING_CLASSES, TOOL_FAILURE } from '../seed/deviation';
 import { type Relations, readRelations, recoveryFor, stageAfter } from '../seed/relations';
+import { failableBehaviourTurns } from './behaviour-turns';
 import {
   FLOW_DIMENSION,
   type PathRelation,
@@ -110,15 +111,20 @@ export function derivedConstraints(
     const stage = path.stages[index] as string;
     const last = index === path.stages.length - 1;
     if (deviation === TOOL_FAILURE) {
-      if (last) return [];
-      const calls = relationsOf.usesTools.some(
-        (call) =>
-          call.subject.dimension === FLOW_DIMENSION &&
-          call.subject.value === path.flow &&
-          call.stage === stage &&
-          recoveryFor(relationsOf, TOOL_FAILURE, path.flow, call.tool) !== undefined,
-      );
-      return calls ? [{}] : [];
+      // A move that calls a tool the flow recovers from, or a turn after the start that asks a behaviour of the
+      // flow whose own read tool it recovers from: that turn stays on its stage, the last one included.
+      const moves =
+        !last &&
+        relationsOf.usesTools.some(
+          (call) =>
+            call.subject.dimension === FLOW_DIMENSION &&
+            call.subject.value === path.flow &&
+            call.stage === stage &&
+            recoveryFor(relationsOf, TOOL_FAILURE, path.flow, call.tool) !== undefined,
+        );
+      const asks =
+        index >= 1 && askedTurns.some(({ use, flows }) => use.stage === stage && flows.includes(path.flow));
+      return moves || asks ? [{}] : [];
     }
     const recovery = recoveryFor(relationsOf, deviation, path.flow);
     if (!recovery) return [];
@@ -144,6 +150,15 @@ export function derivedConstraints(
       });
   };
 
+  // The turns that ask a behaviour whose tool can fail: one rule for the map, the target and the builder.
+  const askedTurns = failableBehaviourTurns({
+    relations,
+    phrases,
+    inventory,
+    isBehaviour: (dimension) =>
+      dimension !== FLOW_DIMENSION &&
+      proposal.dimensions.find((entry) => entry.id === dimension)?.kind === 'behaviour',
+  });
   const classes = (deviationAxis?.values ?? []).filter((value) => value !== NONE);
   /** Every (path, position) where an event can place: a move reaches it, or a class is said there. */
   type Event = {

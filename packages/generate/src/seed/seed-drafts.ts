@@ -2,7 +2,13 @@
 
 import type { PerturbationSpec } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
-import type { PathRelation, ProposalPhrase } from '../extract/proposal';
+import { failableBehaviourTurns, flowsHolding } from '../extract/behaviour-turns';
+import {
+  FLOW_DIMENSION,
+  type PathRelation,
+  type ProposalPhrase,
+  type UsesToolRelation,
+} from '../extract/proposal';
 import {
   type BlockDraft,
   choosePhrase,
@@ -20,8 +26,9 @@ import {
   TOOL_FAILURE_ERROR,
 } from './deviation';
 import type { Edge, StageGraph } from './graph';
-import { dimensionId, type PreparedMap, phraseKey, valueId } from './map';
+import { behaviourSubject, dimensionId, type PreparedMap, phraseKey, valueId } from './map';
 import { pick, type Rng, rngFor, shuffle, streamSeed } from './random';
+import { slotsOf } from './relations';
 import { buildScenario, type ProbeRequest, type ScenarioRequest } from './scenario';
 import { worldFor } from './world';
 
@@ -59,11 +66,7 @@ export function hasPaths(prepared: PreparedMap): boolean {
 
 /** The flows a behaviour belongs to, by the inventory, by id. A flow value is its own flow. */
 export function flowsOfBehaviour(prepared: PreparedMap, behaviour: string): string[] {
-  const flows = (prepared.inventory?.flows ?? [])
-    .filter((flow) => flow.id === behaviour || (flow.behaviours ?? []).includes(behaviour as never))
-    .map((flow) => flow.id);
-  const own = prepared.relations.paths.some((path) => path.flow === behaviour);
-  return own && !flows.includes(behaviour) ? [behaviour, ...flows] : flows;
+  return flowsHolding(prepared.inventory, prepared.relations.paths, behaviour);
 }
 
 export type PathTry = { draft: SpecDraft; path: PathRelation } | { reasons: string[] };
@@ -333,6 +336,119 @@ export function contextAxes(
   return [];
 }
 
+/**
+ * A tool failure on a turn that asks a behaviour. The map ties a behaviour to a read tool (a `uses_tool` of the
+ * behaviour, at the stage it is asked at); when the flow recovers from that tool's failure, the turn that asks
+ * the behaviour runs the tool, the tool fails, and the recovery holds the conversation on the stage. Such a turn
+ * is possible at any stage after the start, the last included, which no move of the walk reaches. The behaviour
+ * asked is the cell's own when it names a read tool; otherwise another behaviour of the flow stands in, and the
+ * cell keeps the behaviour it names.
+ */
+export function behaviourFailureDraft(
+  prepared: PreparedMap,
+  context: SeedContext,
+  id: string,
+  key: string,
+  fixed: readonly Pick[],
+  paths: PathRelation[],
+  stage: string | undefined,
+  behaviour: string | undefined,
+): PathTry {
+  const reasons: string[] = [];
+  // The same rule the derived map and the target use: which turns that ask a behaviour can fail a tool.
+  const turns = failableBehaviourTurns({
+    relations: prepared.relations,
+    phrases: prepared.phrases,
+    inventory: prepared.inventory,
+    isBehaviour: (dimension) => behaviourSubject(prepared, { dimension }),
+  });
+  for (const path of paths) {
+    const reads = new Map<string, UsesToolRelation[]>();
+    for (const { use, flows } of turns) {
+      if (!flows.includes(path.flow)) continue;
+      reads.set(use.subject.value, [...(reads.get(use.subject.value) ?? []), use]);
+    }
+    const askable = [...reads.keys()].sort((a, b) => Number(b === behaviour) - Number(a === behaviour));
+    for (const value of askable) {
+      const dimension = prepared.space.dimensions.findIndex(
+        (entry) =>
+          entry.kind === 'behaviour' &&
+          entry.index.has(value) &&
+          reads.get(value)?.some((use) => use.subject.dimension === entry.id),
+      );
+      const target = prepared.space.dimensions[dimension]?.index.get(value);
+      const phrase = (prepared.phrasesOf.get(phraseKey(dimensionId(prepared, dimension), value)) ?? []).find(
+        (entry) => Object.keys(entry.binds ?? {}).length === 0 && slotsOf(entry.text).length === 0,
+      );
+      if (target === undefined || !phrase) continue;
+      const runs = (reads.get(value) ?? []).filter(
+        (use) => use.subject.dimension === dimensionId(prepared, dimension),
+      );
+      const flowAt = prepared.space.dimensions.findIndex((entry) => entry.id === FLOW_DIMENSION);
+      const flow = prepared.space.dimensions[flowAt]?.index.get(path.flow);
+      // The behaviour the cell names stays in the cell; one that stands in for it is only said.
+      const own = behaviour === undefined || behaviour === value;
+      const carries: Pick[] = [
+        ...(own ? [[dimension, target] as Pick] : []),
+        ...(flow === undefined ? [] : [[flowAt, flow] as Pick]),
+      ];
+      for (let at = 1; at < path.stages.length; at += 1) {
+        if (stage !== undefined && path.stages[at] !== stage) continue;
+        const here = runs.filter((use) => use.stage === path.stages[at]);
+        if (here.length === 0) continue;
+        // The cell the turn places must be one the map allows: a hidden constraint on a stage and a class stays.
+        const stageAt = prepared.stage;
+        const classAt = prepared.deviation;
+        const stageValue =
+          stageAt === undefined
+            ? undefined
+            : prepared.space.dimensions[stageAt]?.index.get(path.stages[at] as string);
+        const classValue =
+          classAt === undefined ? undefined : prepared.space.dimensions[classAt]?.index.get(TOOL_FAILURE);
+        if (
+          stageAt !== undefined &&
+          classAt !== undefined &&
+          stageValue !== undefined &&
+          classValue !== undefined &&
+          !prepared.feasibility.allowed([...fixed, ...carries, [stageAt, stageValue], [classAt, classValue]])
+        ) {
+          reasons.push(`the map allows no tool failure at ${path.stages[at]} in this cell`);
+          continue;
+        }
+        const built = scenarioDraft(
+          prepared,
+          context,
+          id,
+          'cover',
+          `Cell ${key}`,
+          [...fixed, ...(own && behaviour === undefined ? [[dimension, target] as Pick] : [])],
+          { preferred: [path], others: [] },
+          {
+            turn: {
+              stimulus: { kind: 'phrase', phrase },
+              carries,
+              tools: [],
+              usesTools: here,
+              free: true,
+              at,
+            },
+            probe: { classId: TOOL_FAILURE, stage: path.stages[at], tool: here[0]?.tool, onTurn: true },
+          },
+        );
+        if ('draft' in built) {
+          const deviationAt = prepared.deviation as number;
+          const value = prepared.space.dimensions[deviationAt]?.index.get(TOOL_FAILURE);
+          if (value !== undefined && !built.draft.cell.some(([entry]) => entry === deviationAt))
+            built.draft.cell.push([deviationAt, value]);
+          return built;
+        }
+        reasons.push(...built.reasons);
+      }
+    }
+  }
+  return { reasons };
+}
+
 /** The details of a cell: a seeded allowed completion, the stage graph's dimensions left out. */
 function withDetails(prepared: PreparedMap, cell: readonly Pick[], rng: Rng): Pick[] {
   const full = prepared.feasibility.complete(cell, rng);
@@ -598,6 +714,13 @@ export function coverDraft(
       return built;
     }
     reasons.push(...built.reasons);
+  }
+  // A tool failure the walk's moves cannot carry at the stage: the user asks for a behaviour whose own text
+  // names a read tool the flow recovers from, and that tool fails.
+  if (deviation === TOOL_FAILURE) {
+    const asked = behaviourFailureDraft(prepared, context, id, key, fixed, eligible, stage, behaviour);
+    if ('draft' in asked) return asked;
+    reasons.push(...asked.reasons);
   }
   // A class said on the first turn whose recovery stays there is no block (an idle reply passes it): a clean
   // walk in the cell declares it as its perturbation instead, and a perturbed run checks the recovery.
