@@ -247,15 +247,17 @@ export function clauseRule(source: string, context: RuleContext): Rule | undefin
   }
   // "Only when X may Y", "Only when X, Y may Z", "Only when X does Y V": the words up to the main clause are a
   // condition, and the actor of the main clause decides who is addressed.
-  if (/^only\s+(?:when|if|after|once|while|as\s+soon\s+as)\b/i.test(text)) {
+  const conditionLed = /^only\s+(?:when|if|after|once|while|as\s+soon\s+as)\b/i.test(text);
+  if (conditionLed) {
     const actor = frontedActor(text);
-    if (actor === undefined) return;
-    const kind = subjectKind(actor.text, actor.terms, context);
-    if (kind === 'self' || kind === 'output' || kind === 'thing')
+    const kind = actor ? subjectKind(actor.text, actor.terms, context) : undefined;
+    if (actor && (kind === 'self' || kind === 'output' || kind === 'thing'))
       return { subject: actor.text, polarity: 'obligation', form: 'restriction' };
-    return;
   }
-  const restriction = /^only\s+(.+?)\s+(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to)\s+\S/i.exec(text);
+  // A condition-led sentence has no subject before the modal; "Only X may Y" does.
+  const restriction = conditionLed
+    ? null
+    : /^only\s+(.+?)\s+(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to)\s+\S/i.exec(text);
   if (restriction) {
     const who = restriction[1] ?? '';
     const kind = subjectKind(who, termsWithin(text, terms, 5, 5 + who.length), context);
