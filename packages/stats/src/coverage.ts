@@ -82,7 +82,12 @@ export function hillNumber(counts: readonly number[], q: number): number {
   if (q === 1) return Math.exp(-ps.reduce((s, p) => s + p * Math.log(p), 0));
   // sum p^q = 1 + sum p (p^(q-1) - 1) because the p sum to 1; expm1 and log1p keep the digits when q is near 1.
   const excess = ps.reduce((s, p) => s + p * Math.expm1((q - 1) * Math.log(p)), 0);
-  return Math.exp(Math.log1p(excess) / (1 - q));
+  if (excess > -0.5) return Math.exp(Math.log1p(excess) / (1 - q));
+  // sum p^q is below one half (large q): 1 + excess cancels to a few digits, or to zero. Sum the positive terms in log space.
+  const logs = ps.map((p) => q * Math.log(p));
+  const top = logs.reduce((m, l) => Math.max(m, l), Number.NEGATIVE_INFINITY);
+  const logSum = top + Math.log(logs.reduce((s, l) => s + Math.exp(l - top), 0));
+  return Math.exp(logSum / (1 - q));
 }
 
 export interface HillNumbers {
