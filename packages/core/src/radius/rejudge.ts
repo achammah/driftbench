@@ -32,6 +32,10 @@ import { agentVersionOf } from './version';
  */
 export function observationCompatibilityHash(spec: Spec, execution: { executionHash: string }): string {
   const copy = structuredClone(specIdentity(spec));
+  // `uses` names scoring-only objects (policies, check sets, diagnostics): judge-only by construction, as the
+  // block cache key leaves it out (cacheSpecHash).
+  delete copy.uses;
+  for (const block of copy.blocks) delete block.uses;
   for (const criterion of copy.criteria ?? []) {
     for (const field of [
       'rubric',

@@ -19,6 +19,7 @@ import {
   versionHash,
 } from './registry';
 import { SCHEMA_VERSION } from './schema';
+import { bindStoredSpec, isSpecObjectIdentities, recordedObjectsOfSpec } from './spec-objects';
 
 /** The `format` every campaign bundle manifest carries. */
 export const BUNDLE_FORMAT = 'driftbench-campaign';
@@ -111,7 +112,14 @@ export async function writeCampaignBundle(
   for (const run of runs) await writeJson(join(folder, RUNS, `${fileName(run.runId)}.json`), run);
   for (const spec of specs) {
     await mkdir(join(folder, SPECS), { recursive: true });
-    const record = { id: spec.spec.id, hash: spec.hash, path: spec.path, spec: spec.spec };
+    const objects = recordedObjectsOfSpec(spec.spec);
+    const record = {
+      id: spec.spec.id,
+      hash: spec.hash,
+      path: spec.path,
+      spec: spec.spec,
+      ...(objects === undefined ? {} : { objects }),
+    };
     await writeJson(join(folder, SPECS, `${fileName(spec.spec.id)}@${spec.hash}.json`), record);
   }
   for (const { version, files } of sources) {
@@ -216,11 +224,15 @@ async function readSpecs(folder: string): Promise<LoadedSpec[]> {
   for (const file of (await listJsonFiles(join(folder, SPECS))).sort()) {
     const record = (await readJson(join(folder, SPECS, file), folder)) as Record<string, unknown> | null;
     const path = typeof record?.path === 'string' ? record.path : '';
-    const loaded = validateSpec(record?.spec, path);
+    const loaded = validateSpec(record?.spec, path, { resolveObjects: false });
     if (!loaded.ok || path === '' || loaded.hash !== record?.hash) {
       throw invalid(folder, `${SPECS}/${file} does not hold a valid spec with its hash`);
     }
-    specs.push(loaded);
+    const objects = record?.objects;
+    if (objects !== undefined && !isSpecObjectIdentities(objects)) {
+      throw invalid(folder, `${SPECS}/${file} holds invalid object identities`);
+    }
+    specs.push(bindStoredSpec(loaded, objects));
   }
   return specs;
 }

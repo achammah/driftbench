@@ -2,8 +2,9 @@ import { createHash } from 'node:crypto';
 import type { Store } from '../contracts/store';
 import type { TargetRef } from '../schema/common';
 import type { Observed, ResolvedGiven } from '../schema/run';
-import type { Stimulus } from '../schema/spec';
-import { canonicalJson, sha256OfJsonWithList } from '../spec/hash';
+import type { Spec, Stimulus } from '../schema/spec';
+import { canonicalJson, contentHash, sha256OfJsonWithList } from '../spec/hash';
+import { specIdentity } from '../spec/identity';
 import { isPlainObject } from '../spec/normalize';
 
 /** Where the runner keeps observed blocks. A Store is one; tests pass a map. */
@@ -28,6 +29,21 @@ export type BlockKeyParts = {
   /** The agent version, when supplied. Absent preserves every earlier cache key. */
   agentVersion?: string;
 };
+
+/**
+ * The spec hash a block cache key carries. It leaves out the spec's `version`, a free label that plays no part
+ * (docs/running.md, "The cache and replay"), so relabelling a spec still replays its runs. It also leaves out
+ * `uses`, on the spec and on every block: the objects `uses` names are scoring-only, so changing them re-scores
+ * the stored observations and never reruns the agent. A spec with neither key hashes as it always did.
+ */
+export function cacheSpecHash(spec: Spec): string {
+  const { version: _version, uses: _uses, ...unlabelled } = specIdentity(spec);
+  if (!unlabelled.blocks.some((block) => block.uses !== undefined)) return contentHash(unlabelled);
+  return contentHash({
+    ...unlabelled,
+    blocks: unlabelled.blocks.map(({ uses: _blockUses, ...block }) => block),
+  });
+}
 
 /**
  * The cache key of one block: the spec hash, the repeat, the block's position, its resolved Given, its
