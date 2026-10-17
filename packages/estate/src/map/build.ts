@@ -96,6 +96,7 @@ export async function scanEstate(input: ScanEstateInput): Promise<ScanEstateResu
     atoms,
     edges: graph.edges,
     ...(raw.ignored?.chosen && raw.ignored.chosen.length > 0 ? { ignore: raw.ignored.chosen } : {}),
+    ...(raw.userLayer ? { userSkills: true as const } : {}),
     ...(raw.followedLinks && raw.followedLinks.length > 0 ? { followedLinks: raw.followedLinks } : {}),
     ...(input.port
       ? { producedBy: { family: input.port.family, model: input.port.model ?? 'unknown', at } }

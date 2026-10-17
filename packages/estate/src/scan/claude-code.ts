@@ -1,5 +1,6 @@
 import { lstat, readdir, readFile, realpath, stat } from 'node:fs/promises';
-import { basename, isAbsolute, join, posix, relative, sep } from 'node:path';
+import { homedir } from 'node:os';
+import { basename, isAbsolute, join, posix, relative, resolve, sep } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import { EstatePathError, estatePath } from '../paths';
 import { chunkLines, fileNames, guardName, locateNamed, namedPaths, positiveMention } from './code';
@@ -20,6 +21,7 @@ import type {
   StepDecl,
   SubagentDecl,
 } from './reader';
+import { isUserLayerPath, USER_LAYER } from './reader';
 import { dispatchedScript } from './script-dispatch';
 import { keyLine, type Located, lineAt, linesOf, readFrontmatter, readTables } from './text';
 
@@ -36,6 +38,13 @@ import { keyLine, type Located, lineAt, linesOf, readFrontmatter, readTables } f
  * refuses is read field by field. Prose (standing files, memory, skill bodies, the markdown files beside a
  * skill, helper bodies) is cut into chunks within a size budget. Claude Code calls a guard a hook; the
  * scanner gets them as guards.
+ *
+ * A second skill layer is the user's own: the skills of a user skill folder (usually `~/.claude/skills`). It is
+ * opt-in: the reader reads it only when the reader option, the estate configuration or the command line names
+ * the folder, and never reads a home folder on its own. Each of its folders that holds a `SKILL.md` is a skill, and a folder that holds none is a container, read one level deeper. A folder reached
+ * twice (a link into the project's own skills) is one skill; a skill whose name a project skill has too is
+ * left out, so the project layer wins; a folder whose name starts with a dot (a trash folder) is not read.
+ * The files of the layer carry the path `~/.claude/skills/<folder>/...` whatever folder they were read in.
  */
 
 const STANDING = new Set(['CLAUDE.md', '.claude/CLAUDE.md', 'CLAUDE.local.md']);
@@ -113,6 +122,11 @@ export type ClaudeCodeReaderOptions = {
   chunkCharacters?: number;
   /** More globs to skip, beside the defaults and the estate configuration's `ignore:` list. */
   ignore?: readonly string[];
+  /**
+   * The folder of the user-level skill layer, a second layer beside the project's own. Opt-in: the reader
+   * reads no home folder unless it is given one here or in the estate configuration's `userSkills:`.
+   */
+  userSkills?: string;
 };
 
 /** A glob of the ignore list and its test on a path relative to the root. */
@@ -121,7 +135,12 @@ type IgnoreRule = { pattern: string; test: (path: string) => boolean };
 type Ignored = { rules: IgnoreRule[]; counts: Map<string, number>; paths: string[] };
 
 /** The estate configuration: more globs to skip, and path aliases (`REF` to one or more folders). */
-type EstateConfig = { ignore: string[]; aliases: Record<string, string[]>; externals?: string[] };
+type EstateConfig = {
+  ignore: string[];
+  aliases: Record<string, string[]>;
+  externals?: string[];
+  userSkills?: string;
+};
 
 /**
  * Folders a named path may point into that lie outside the estate: the project an agent works on, a shared
@@ -154,10 +173,12 @@ export class ClaudeCodeReader implements EstateReader {
   readonly runtime = 'claude-code';
   private readonly budget: number;
   private readonly ignore: readonly string[];
+  private readonly userSkills: string | undefined;
 
   constructor(options: ClaudeCodeReaderOptions = {}) {
     this.budget = Math.max(1, options.chunkCharacters ?? DEFAULT_CHUNK_CHARACTERS);
     this.ignore = options.ignore ?? [];
+    this.userSkills = options.userSkills;
   }
 
   /**
@@ -172,9 +193,12 @@ export class ClaudeCodeReader implements EstateReader {
     await noteFollowed(root, '.claude', notes);
     const walked = await walk(root, '.claude', notes, ignored, new Set(), undefined, large);
     const raw = await this.read(root);
+    // The user-level skill layer is no part of the project: a copy of the project holds none of it.
     const rootReferences = [
-      ...raw.files.map((file) => file.path),
-      ...raw.notes.filter((note) => note.message === 'skipped: larger than 1 MB').map((note) => note.file),
+      ...raw.files.filter((file) => file.layer !== 'user').map((file) => file.path),
+      ...raw.notes
+        .filter((note) => note.message === 'skipped: larger than 1 MB' && !isUserLayerPath(note.file))
+        .map((note) => note.file),
     ];
     return [
       ...new Set([
@@ -257,6 +281,13 @@ export class ClaudeCodeReader implements EstateReader {
         ...notes.filter((note) => note.message === EXTERNAL_NOTE).map((note) => note.file),
       ],
     };
+    const where = userFolderOf(this.userSkills, config, root);
+    if (where !== undefined) {
+      const layer = await readUserLayer(where, files, root, ignored);
+      files.push(...layer.files);
+      estate.notes.push(...layer.notes);
+      estate.userLayer = { read: layer.read, shadowed: layer.shadowed };
+    }
     for (const file of files) {
       if (file.kind === 'settings') readSettings(file, estate);
       if (file.kind === 'skill') readSkill(file, estate, budget);
@@ -538,6 +569,11 @@ async function readConfig(root: string, notes: ReadNote[]): Promise<EstateConfig
       config.externals = externals.map((item: string) => `${cleanFolder(item)}/`);
     } else notes.push({ file: ESTATE_CONFIG, message: 'externals: must be a list of folders' });
   }
+  const userSkills = parsed.userSkills;
+  if (userSkills !== undefined) {
+    if (typeof userSkills === 'string' && userSkills.trim() !== '') config.userSkills = userSkills.trim();
+    else notes.push({ file: ESTATE_CONFIG, message: 'userSkills: must be a folder' });
+  }
   const aliases = parsed.aliases;
   if (aliases !== undefined) {
     const entries = isRecord(aliases) ? Object.entries(aliases) : [];
@@ -558,6 +594,117 @@ async function readConfig(root: string, notes: ReadNote[]): Promise<EstateConfig
       });
   }
   return config;
+}
+
+/**
+ * Where the user-level skill layer is read from: the option, else the configuration, else nowhere. A home folder
+ * is never read implicitly, so a scan gives the same map on every machine.
+ */
+function userFolderOf(option: string | undefined, config: EstateConfig, root: string): string | undefined {
+  const chosen = option ?? config.userSkills;
+  if (chosen === undefined) return undefined;
+  const home = chosen === '~' || chosen.startsWith('~/') ? join(homedir(), chosen.slice(1)) : chosen;
+  // A folder the command line names is relative to where it was typed; one the configuration names, to the estate.
+  return resolve(option !== undefined ? process.cwd() : root, home);
+}
+
+/** A name a folder listing skips: hidden (a trash folder, a repository) or a dependency folder. */
+const hiddenInLayer = (name: string) => name.startsWith('.') || name === 'node_modules';
+
+/**
+ * The files of the user-level skill layer. A folder of the layer that holds a `SKILL.md` is a skill; one that
+ * holds none is a container, and the folders one level inside it are looked at the same way. The project layer
+ * wins: a user skill whose real folder is a project skill's (a link into the project) is the same skill and is
+ * not read twice, and one with the name of a project skill is left out with a note. Within the layer the first
+ * folder, by name, keeps a name. The layer is read as it lies: links to folders elsewhere are followed.
+ */
+async function readUserLayer(
+  folder: string,
+  project: readonly EstateFile[],
+  root: string,
+  ignored: Ignored,
+): Promise<{ files: EstateFile[]; read: string[]; shadowed: string[]; notes: ReadNote[] }> {
+  const out = {
+    files: [] as EstateFile[],
+    read: [] as string[],
+    shadowed: [] as string[],
+    notes: [] as ReadNote[],
+  };
+  const byName = (a: { name: string }, b: { name: string }) =>
+    a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+  const listing = await readdir(folder, { withFileTypes: true }).catch(() => undefined);
+  if (!listing) {
+    out.notes.push({ file: USER_LAYER, message: 'not found: the user skill folder cannot be read' });
+    return out;
+  }
+  const isFolder = async (path: string) => (await stat(path).catch(() => undefined))?.isDirectory() === true;
+  const isSkill = async (path: string) =>
+    (await stat(join(path, 'SKILL.md')).catch(() => undefined))?.isFile() === true;
+  const skills: string[] = [];
+  for (const entry of [...listing].sort(byName)) {
+    if (hiddenInLayer(entry.name) || !(await isFolder(join(folder, entry.name)))) continue;
+    if (await isSkill(join(folder, entry.name))) {
+      skills.push(entry.name);
+      continue;
+    }
+    const inside = await readdir(join(folder, entry.name), { withFileTypes: true }).catch(() => []);
+    for (const child of [...inside].sort(byName)) {
+      const path = join(folder, entry.name, child.name);
+      if (!hiddenInLayer(child.name) && (await isFolder(path)) && (await isSkill(path)))
+        skills.push(`${entry.name}/${child.name}`);
+    }
+  }
+
+  const names = new Set<string>();
+  const taken = new Set<string>();
+  for (const file of project) {
+    if (file.kind !== 'skill') continue;
+    const declared = readFrontmatter(file.text).fields.name;
+    names.add(typeof declared === 'string' ? declared : (file.owner ?? basename(posix.dirname(file.path))));
+    const real = await realpath(join(root, posix.dirname(file.path))).catch(() => undefined);
+    if (real !== undefined) taken.add(real);
+  }
+  const own: Ignored = { rules: ignored.rules, counts: new Map(), paths: [] };
+  const walkNotes: ReadNote[] = [];
+  for (const rel of skills) {
+    const real = await realpath(join(folder, rel)).catch(() => undefined);
+    if (real === undefined || taken.has(real)) continue;
+    taken.add(real);
+    const text = (await readFile(join(folder, rel, 'SKILL.md'), 'utf8').catch(() => '')).replace(
+      /^\uFEFF/,
+      '',
+    );
+    const declared = readFrontmatter(text).fields.name;
+    const name = typeof declared === 'string' ? declared : basename(rel);
+    const place = `${USER_LAYER}/${rel}`;
+    if (names.has(name)) {
+      out.shadowed.push(name);
+      out.notes.push({
+        file: `${place}/SKILL.md`,
+        message: `skill ${name} is shadowed by a skill of the same name that comes first; not read`,
+      });
+      continue;
+    }
+    names.add(name);
+    out.read.push(name);
+    const paths = await walk(folder, rel, walkNotes, own);
+    const loaded = await readBatch(paths, async (path) => ({
+      path,
+      text: (await readFile(join(folder, path), 'utf8')).replace(/^\uFEFF/, ''),
+    }));
+    for (const { path, text: body } of loaded) {
+      const file: EstateFile = { path: `${USER_LAYER}/${path}`, text: body, kind: 'other', layer: 'user' };
+      if (body.trim() === '') out.notes.push({ file: file.path, message: 'empty file: nothing to read' });
+      else {
+        file.kind = path === `${rel}/SKILL.md` ? 'skill' : 'skill_file';
+        file.owner = name;
+      }
+      out.files.push(file);
+    }
+  }
+  for (const note of walkNotes)
+    if (note.message !== FOLLOWED_NOTE) out.notes.push({ ...note, file: `${USER_LAYER}/${note.file}` });
+  return out;
 }
 
 /** A folder written in a table or the config, relative to the root, without `./` or a trailing slash. */
