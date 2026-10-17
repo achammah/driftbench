@@ -5,6 +5,8 @@ export const HARDNESS_MIN_FORECAST = 100;
 export const HARDNESS_MAX_SCORE = 0.4;
 /** Section 12.4 point 4: distinct causes among the failing items after the pilot. */
 export const HARDNESS_MIN_CAUSES = 100;
+/** The largest share of the bank that catch items may hold (section 12.4): over it, the gate fails. */
+export const HARDNESS_MAX_CATCH_SHARE = 0.15;
 /** The bank minimum at merge of section 12.1. */
 export const BANK_MIN_SIZE = 300;
 export const BANK_MIN_FAMILY = 20;
@@ -44,6 +46,8 @@ export type Hardness = {
     passing: number;
     byFamilyTier: Record<string, Record<string, number>>;
     failingByFamily: Record<string, number>;
+    /** The catch items of that row, counted apart; absent when the row records none. */
+    catchItems?: { size: number; passing: number };
   };
   iteration0: { bankSize: number; passing: number; score: number };
   /** The pilot the forecast and the gate use: the blind one when it has rows, else the builder's. */
@@ -81,6 +85,19 @@ export type Hardness = {
 const score = (row: Pick<JournalRow, 'bankSize' | 'passing'>) =>
   row.bankSize === 0 ? 0 : row.passing / row.bankSize;
 
+/** The score over every item of a row, catch items included; the hardness score when the row records none. */
+const allScore = (row: Pick<JournalRow, 'bankSize' | 'passing' | 'catchItems'>) => {
+  const size = row.bankSize + (row.catchItems?.size ?? 0);
+  return size === 0 ? 0 : (row.passing + (row.catchItems?.passing ?? 0)) / size;
+};
+
+/**
+ * The score the max-score check reads: the larger of the hardness score and the score over every item, so that
+ * counting catch items apart never makes the check looser (section 12.4).
+ */
+const gateScore = (row: Pick<JournalRow, 'bankSize' | 'passing' | 'catchItems'>) =>
+  Math.max(score(row), allScore(row));
+
 function measurePilot(
   rows: readonly JournalRow[],
   executor: Executor,
@@ -99,13 +116,17 @@ function measurePilot(
       executor,
       iterations: pilotRows.length,
       complete: pilotRows.length === PILOT_ITERATIONS,
-      baseline: { bankSize: baselineRow.bankSize, passing: baselineRow.passing, score: score(baselineRow) },
+      baseline: {
+        bankSize: baselineRow.bankSize,
+        passing: baselineRow.passing,
+        score: gateScore(baselineRow),
+      },
       end: endRow
         ? {
             iteration: endRow.iteration,
             bankSize: endRow.bankSize,
             passing: endRow.passing,
-            score: score(endRow),
+            score: gateScore(endRow),
           }
         : null,
       fixedPerIteration: endRow ? (endRow.passing - baselineRow.passing) / pilotRows.length : null,
@@ -194,6 +215,15 @@ export function measureHardness(
     );
   }
   if (!end) reasons.push('no pilot row yet');
+  for (const row of new Set([latest, endRow])) {
+    const caught = row?.catchItems;
+    if (!row || !caught) continue;
+    const share = caught.size / (row.bankSize + caught.size);
+    if (share > HARDNESS_MAX_CATCH_SHARE)
+      reasons.push(
+        `catch items are ${round(share * 100)} percent of the bank at iteration ${row.iteration}, over the ${HARDNESS_MAX_CATCH_SHARE * 100} percent cap (12.4)`,
+      );
+  }
   const audit = options.audit === undefined ? null : parseAudit(options.audit);
   if (!audit) reasons.push('audit.md is absent: no validator merges without the audit (12.7)');
   for (const entry of audit ?? []) {
@@ -216,8 +246,9 @@ export function measureHardness(
       passing: latest.passing,
       byFamilyTier: latest.bankByFamilyTier ?? {},
       failingByFamily: latest.failingByFamily,
+      ...(latest.catchItems === undefined ? {} : { catchItems: latest.catchItems }),
     },
-    iteration0: { bankSize: zero.bankSize, passing: zero.passing, score: score(zero) },
+    iteration0: { bankSize: zero.bankSize, passing: zero.passing, score: gateScore(zero) },
     source,
     pilot: { iterations, complete, end },
     pilots: { builder: builder.measure, blind: blind ? blind.measure : null },
@@ -294,6 +325,8 @@ function round(value: number): string {
 export function formatHardness(component: string, h: Hardness): string {
   let text = `Hardness of ${component} (docs/validators.md section 12.4), from validators/${component}/journal.jsonl\n`;
   text += `Bank at iteration ${h.bank.iteration}: ${h.bank.size} items, ${h.bank.passing} pass on every seed.\n`;
+  if (h.bank.catchItems)
+    text += `Catch items, apart and counted for no hardness: ${h.bank.catchItems.size}, ${h.bank.catchItems.passing} pass on every seed.\n`;
   const tiers = ['1', '2', '3', '4', '5', 'none'];
   const header = ['Family', ...tiers.map((tier) => `tier ${tier}`), 'items', 'failing'];
   const rows = Object.entries(h.bank.byFamilyTier)

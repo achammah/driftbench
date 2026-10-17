@@ -34,6 +34,7 @@ import {
   parseSeeds,
   protectedChanges,
   raiseFloor,
+  readCatchList,
   readFloors,
   readHandover,
   readJournal,
@@ -135,7 +136,7 @@ export async function validateCommand(
   else await measure();
   if (options.brief)
     return briefCommand(reports[0] as LadderReport, hidden, floors, Boolean(options.fresh), deps, root, io);
-  print(reports, component === 'all', hidden, floors, options, io);
+  print(reports, component === 'all', hidden, floors, options, io, root);
   if (!options.checkFloor) return Math.min(...reports.map((report) => report.level));
   const tops = Object.fromEntries(
     Object.entries(ladders).map(([name, ladder]) => [
@@ -389,12 +390,13 @@ function print(
   floors: FloorsFile,
   options: ValidateCommandOptions,
   io: Io,
+  root: string,
 ): void {
   if (options.json) {
     const shown = reports.map((report) => ({
       ...report,
       ...(hidden ? { hiddenSeed: hidden } : {}),
-      ...(options.items ? { bank: shownBank(report, options) } : {}),
+      ...(options.items ? { bank: shownBank(report, options, root) } : {}),
       ...(options.allLevels ? { failingItems: allFailingItems(report) } : {}),
     }));
     io.out(`${JSON.stringify(all ? { reports: shown } : shown[0], null, 2)}\n`);
@@ -409,7 +411,7 @@ function print(
           ...(note ? { floorNote: note } : {}),
         });
         const items = options.items
-          ? `\n${formatItems(bankSummary(report), report.component, { blind: Boolean(options.blind) })}`
+          ? `\n${formatItems(bankSummary(report, readCatchList(root, report.component)), report.component, { blind: Boolean(options.blind) })}`
           : '';
         const failing = options.allLevels
           ? `\n${formatAllFailing(allFailingItems(report), report.component)}`
@@ -421,8 +423,8 @@ function print(
 }
 
 /** The bank of a report for JSON; the blind view drops the cause counts, which the auditor must not see. */
-function shownBank(report: LadderReport, options: ValidateCommandOptions) {
-  const bank = bankSummary(report);
+function shownBank(report: LadderReport, options: ValidateCommandOptions, root: string) {
+  const bank = bankSummary(report, readCatchList(root, report.component));
   if (!options.blind) return bank;
   const { failingCauses: _c, failingWithoutCause: _w, failingCausesByFamily: _f, ...rest } = bank;
   return { ...rest, rows: rest.rows.map(({ cause: _cause, ...row }) => row) };

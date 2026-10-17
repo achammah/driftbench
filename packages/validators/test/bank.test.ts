@@ -1,3 +1,6 @@
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   bankMeasure,
@@ -6,6 +9,7 @@ import {
   formatItems,
   formatLadder,
   itemLines,
+  readCatchList,
   runLadder,
   runSeeds,
   seedSpecs,
@@ -120,5 +124,92 @@ describe('a full run and the bank summary', () => {
       ['third', 'levels', ['not run', 'pass']],
     ]);
     expect(summary.passing).toBe(1);
+  });
+});
+
+describe('catch items', () => {
+  const ladderOf = () =>
+    defineLadder({
+      component: 'roles',
+      levels: [
+        {
+          id: 'one',
+          name: 'one',
+          metric: 'a / b',
+          threshold: 1,
+          compute: () =>
+            bankMeasure([
+              { id: 'h1', component: 'c', family: 'f', tier: 1, cause: 'x', pass: true },
+              { id: 'h2', component: 'c', family: 'f', tier: 2, cause: 'y', pass: false, detail: 'missed' },
+              // A catch item in the family of the hardness items, and one in a family of its own.
+              { id: 'k1', component: 'c', family: 'f', tier: 1, cause: 'z', role: 'catch', pass: true },
+              { id: 'k2', component: 'c', family: 'g', tier: 1, cause: 'w', role: 'catch', pass: true },
+              {
+                id: 'k3',
+                component: 'c',
+                family: 'g',
+                tier: 1,
+                cause: 'v',
+                role: 'catch',
+                pass: false,
+                detail: 'd',
+              },
+            ]),
+        },
+      ],
+    });
+  const pinned = new Map([
+    ['k1', 'bug:B01'],
+    ['k2', 'cheat:c01'],
+    ['k3', 'budget:run'],
+  ]);
+
+  it('counts pinned catch items apart, also when they share a family with hardness items', async () => {
+    const report = await runSeeds(ladderOf(), seedSpecs([1]), undefined, { full: true });
+    const summary = bankSummary(report, pinned);
+    expect(summary.size).toBe(2);
+    expect(summary.passing).toBe(1);
+    expect(summary.score).toBe(0.5);
+    expect(summary.failingCauses).toBe(1);
+    expect(summary.byFamilyTier).toEqual({ f: { '1': 1, '2': 1 } });
+    expect(summary.failingByFamily).toEqual({ f: 1 });
+    expect(summary.catch).toEqual({ size: 3, passing: 2, failingByFamily: { g: 1 } });
+    expect(summary.rows).toHaveLength(5);
+    const text = formatItems(summary, 'roles');
+    expect(text).toContain('Catch items, counted apart and for no hardness: 3, 2 pass on every seed.');
+    const hardBlock = text.slice(text.indexOf('Family f:'), text.indexOf('Catch items of'));
+    expect(hardBlock).toContain('h1');
+    expect(hardBlock).not.toContain('k1');
+    expect(text).toContain('Catch items of f: 1 items, 0 failing');
+    expect(text).toContain('Catch items of g: 2 items, 1 failing');
+  });
+
+  it('honours role catch only for an id the pinned list holds', async () => {
+    const report = await runSeeds(ladderOf(), seedSpecs([1]), undefined, { full: true });
+    const none = bankSummary(report);
+    expect(none.size).toBe(5);
+    expect(none.catch.size).toBe(0);
+    const some = bankSummary(report, new Map([['k3', 'budget:run']]));
+    expect(some.size).toBe(4);
+    expect(some.catch).toEqual({ size: 1, passing: 0, failingByFamily: { g: 1 } });
+  });
+
+  it('reads the pinned list from catch.json and refuses an entry that names nothing it guards', () => {
+    const root = mkdtempSync(join(tmpdir(), 'catch-'));
+    mkdirSync(join(root, 'validators', 'roles'), { recursive: true });
+    expect(readCatchList(root, 'roles')).toBeUndefined();
+    const write = (value: unknown) =>
+      writeFileSync(join(root, 'validators', 'roles', 'catch.json'), JSON.stringify(value));
+    write({ items: [{ id: 'k1', guards: 'bug:B01' }] });
+    expect(readCatchList(root, 'roles')).toEqual(new Map([['k1', 'bug:B01']]));
+    write({ items: [{ id: 'k1', guards: 'it is a guard' }] });
+    expect(() => readCatchList(root, 'roles')).toThrow(/items.0.guards/);
+    write({
+      items: [
+        { id: 'k1', guards: 'bug:B01' },
+        { id: 'k1', guards: 'bug:B02' },
+      ],
+    });
+    expect(() => readCatchList(root, 'roles')).toThrow(/k1 is listed twice/);
   });
 });

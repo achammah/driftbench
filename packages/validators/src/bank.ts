@@ -22,6 +22,16 @@ export type BankRow = {
   perSeed: BankVerdict[];
   /** True when the item passed on every seed of the run. */
   passEverySeed: boolean;
+  /** `catch`: the item counts for no hardness (docs/validators.md section 12.4); absent for a hardness item. */
+  role?: 'catch';
+};
+
+/** The catch items of a run, counted apart: they guard a capability and count for no hardness. */
+export type CatchSummary = {
+  size: number;
+  passing: number;
+  /** Catch items not passing on every seed, per family. */
+  failingByFamily: Record<string, number>;
 };
 
 /**
@@ -31,6 +41,7 @@ export type BankRow = {
  */
 export type BankSummary = {
   seeds: string[];
+  /** The hardness items: every item but the catch items. The score, the counts and the causes read them alone. */
   size: number;
   passing: number;
   score: number;
@@ -46,6 +57,9 @@ export type BankSummary = {
   failingWithoutCause: number;
   /** Distinct failing causes per family; every family of the bank is listed, 0 included. */
   failingCausesByFamily: Record<string, number>;
+  /** The catch items, apart from the counts above. */
+  catch: CatchSummary;
+  /** Every item, catch items included. */
   rows: BankRow[];
 };
 
@@ -56,8 +70,18 @@ export function causeKey(row: Pick<BankRow, 'cause' | 'level' | 'id'>): string {
     : `item:${row.level}/${row.id}`;
 }
 
-/** The bank summary of a report. Run the report with `full` so the levels above a failure are known. */
-export function bankSummary(report: LadderReport): BankSummary {
+/**
+ * The catch ids a validator pins, each with the planted bug, cheat, shortcut or budget it guards
+ * (`validators/<component>/catch.json`, section 12.4). An item counts as a catch item only when it says
+ * `role: catch` and its id is pinned here.
+ */
+export type CatchList = ReadonlyMap<string, string>;
+
+/**
+ * The bank summary of a report. Run the report with `full` so the levels above a failure are known. Without a
+ * pinned catch list every item is a hardness item.
+ */
+export function bankSummary(report: LadderReport, pinned?: CatchList): BankSummary {
   const seeds = report.seeds.map(seedLabel);
   const rows = new Map<string, BankRow>();
   const levelCount = report.seeds[0]?.rows.length ?? 0;
@@ -79,6 +103,7 @@ export function bankSummary(report: LadderReport): BankSummary {
         family?: string;
         tier?: Tier;
         cause?: string;
+        role?: 'catch';
         pass: boolean;
       }[] = row.bank ?? [
         { id: row.id, component: report.component, family: LEVEL_FAMILY, pass: row.pass === true },
@@ -92,6 +117,7 @@ export function bankSummary(report: LadderReport): BankSummary {
           rows.set(key, target);
         }
         if (target.cause === undefined && entry.cause !== undefined) target.cause = entry.cause;
+        if (entry.role === 'catch' && pinned?.has(entry.id)) target.role = 'catch';
         target.perSeed[seedIndex] = entry.pass ? 'pass' : 'fail';
       }
     });
@@ -103,31 +129,41 @@ export function bankSummary(report: LadderReport): BankSummary {
     (row) => !(banked.has(row.level) && row.family === LEVEL_FAMILY && row.id === row.levelId),
   );
   for (const row of list) row.passEverySeed = row.perSeed.every((verdict) => verdict === 'pass');
+  const caught = list.filter((row) => row.role === 'catch');
+  const hard = list.filter((row) => row.role !== 'catch');
+  const catchFailing: Record<string, number> = {};
+  for (const row of caught)
+    if (!row.passEverySeed) catchFailing[row.family] = (catchFailing[row.family] ?? 0) + 1;
   const byFamilyTier: Record<string, Record<string, number>> = {};
   const failingByFamily: Record<string, number> = {};
-  for (const row of list) {
+  for (const row of hard) {
     const tiers = byFamilyTier[row.family] ?? {};
     byFamilyTier[row.family] = tiers;
     const tier = row.tier === undefined ? NO_TIER : String(row.tier);
     tiers[tier] = (tiers[tier] ?? 0) + 1;
     failingByFamily[row.family] = (failingByFamily[row.family] ?? 0) + (row.passEverySeed ? 0 : 1);
   }
-  const passing = list.filter((row) => row.passEverySeed).length;
-  const failingRows = list.filter((row) => !row.passEverySeed);
+  const passing = hard.filter((row) => row.passEverySeed).length;
+  const failingRows = hard.filter((row) => !row.passEverySeed);
   const causesByFamily: Record<string, number> = {};
   for (const family of Object.keys(byFamilyTier)) {
     causesByFamily[family] = new Set(failingRows.filter((row) => row.family === family).map(causeKey)).size;
   }
   return {
     seeds,
-    size: list.length,
+    size: hard.length,
     passing,
-    score: list.length === 0 ? 0 : passing / list.length,
+    score: hard.length === 0 ? 0 : passing / hard.length,
     byFamilyTier: sortKeys(byFamilyTier),
     failingByFamily: sortKeys(failingByFamily),
     failingCauses: new Set(failingRows.map(causeKey)).size,
     failingWithoutCause: failingRows.filter((row) => causeKey(row).startsWith('item:')).length,
     failingCausesByFamily: sortKeys(causesByFamily),
+    catch: {
+      size: caught.length,
+      passing: caught.filter((row) => row.passEverySeed).length,
+      failingByFamily: sortKeys(catchFailing),
+    },
     rows: list,
   };
 }
@@ -172,10 +208,12 @@ export function formatItems(
   }, ${summary.passing} pass on every seed (score ${round(summary.score)}).\n`;
   if (!options.blind)
     text += `Failing: ${summary.size - summary.passing} items, ${summary.failingCauses} distinct causes (${summary.failingWithoutCause} items name no cause and count as their own).\n`;
+  if (summary.catch.size > 0)
+    text += `Catch items, counted apart and for no hardness: ${summary.catch.size}, ${summary.catch.passing} pass on every seed.\n`;
   const header = ['Item', 'Tier', 'Level', 'Component', ...summary.seeds.map((seed) => `seed ${seed}`)];
   for (const family of families) {
     const members = summary.rows
-      .filter((row) => row.family === family)
+      .filter((row) => row.family === family && row.role !== 'catch')
       .sort(
         (a, b) =>
           (a.tier ?? 6) - (b.tier ?? 6) ||
@@ -189,6 +227,25 @@ export function formatItems(
     text += `\nFamily ${family}: ${members.length} items, ${failing} failing${causes}; per tier ${tierCounts(
       summary.byFamilyTier[family] ?? {},
     )}\n`;
+    text += table(
+      header,
+      members.map((row) => [
+        row.id,
+        row.tier === undefined ? '-' : String(row.tier),
+        `${row.level} ${row.levelId}`,
+        row.component,
+        ...row.perSeed.map((verdict) => (verdict === 'fail' ? 'FAIL' : verdict)),
+      ]),
+    );
+  }
+  const catchFamilies = [
+    ...new Set(summary.rows.filter((row) => row.role === 'catch').map((row) => row.family)),
+  ].sort();
+  for (const family of catchFamilies) {
+    const members = summary.rows
+      .filter((row) => row.family === family && row.role === 'catch')
+      .sort((a, b) => a.level - b.level || a.id.localeCompare(b.id, undefined, { numeric: true }));
+    text += `\nCatch items of ${family}: ${members.length} items, ${summary.catch.failingByFamily[family] ?? 0} failing\n`;
     text += table(
       header,
       members.map((row) => [

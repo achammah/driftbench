@@ -162,3 +162,47 @@ describe('the bar a validator records in GATE.md', () => {
     expect(bar('stats')).toEqual({ maxScore: 0.7, minForecast: 70, minCauses: 60 });
   });
 });
+
+describe('catch items in the journal', () => {
+  const withCatch = (size: number, passing: number) => (row: JournalRow) =>
+    JournalRowSchema.parse({ ...row, catchItems: { size, passing } });
+
+  it('reads the larger of the hardness score and the score over every item, so the check is never looser', () => {
+    // Hardness items pass 40 of 300 at the end; catch items pass 50 of 50, so every item passes 90 of 350.
+    const base = rows([30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], 300, TIERS);
+    const passingCatch = hard(base.map(withCatch(50, 50)));
+    expect(passingCatch.pilot.end?.score).toBeCloseTo(90 / 350, 10);
+    // Catch items that fail more often than the hardness items leave the hardness score in charge.
+    const failingCatch = hard(base.map(withCatch(50, 0)));
+    expect(failingCatch.pilot.end?.score).toBeCloseTo(40 / 300, 10);
+    // A bank whose catch items pass far more often is held to its whole score: here 0.4 is crossed.
+    const crossing = hard(
+      rows([100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110], 300, TIERS).map(withCatch(52, 52)),
+    );
+    expect(crossing.pilot.end?.score).toBeCloseTo(162 / 352, 10);
+    expect(
+      crossing.gate.reasons.some((reason) => /score after the pilot 0\.4602 is above 0\.4/.test(reason)),
+    ).toBe(true);
+    // The forecast and the causes read the hardness items alone.
+    expect(passingCatch.forecast).toBe(260);
+    expect(failingCatch.forecast).toBe(260);
+  });
+
+  it('caps catch items at 15 percent of the bank and refuses a row whose catch items pass more than they hold', () => {
+    const base = rows([30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], 300, TIERS);
+    expect(hard(base.map(withCatch(52, 0))).gate.reasons).toEqual([]);
+    expect(hard(base.map(withCatch(60, 0))).gate.reasons).toEqual([
+      'catch items are 16.67 percent of the bank at iteration 10, over the 15 percent cap (12.4)',
+    ]);
+    const issues = JournalRowSchema.safeParse({ ...journalRow(1), catchItems: { size: 2, passing: 3 } });
+    expect(issues.success).toBe(false);
+  });
+
+  it('prints the catch items of the latest row in the hardness report', () => {
+    const h = hard(rows([30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], 300, TIERS).map(withCatch(50, 48)));
+    expect(h.bank.catchItems).toEqual({ size: 50, passing: 48 });
+    expect(formatHardness('planted', h)).toContain(
+      'Catch items, apart and counted for no hardness: 50, 48 pass on every seed.',
+    );
+  });
+});
