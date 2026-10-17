@@ -155,3 +155,15 @@ describe('spec schema names', () => {
     expect(Block.safeParse({ when: { user: 'hi' } }).success).toBe(true);
   });
 });
+
+describe('workspace.binary', () => {
+  const world = (binary: Record<string, string>) => ({ workspace: { binary } });
+  it('accepts base64 content for a path', () => {
+    const r = Given.shape.world.safeParse(world({ 'report.xlsx': 'UEsDBAo=' }));
+    expect(r.success).toBe(true);
+  });
+  it('refuses an entry that is not base64', () => {
+    const r = Given.shape.world.safeParse(world({ 'report.xlsx': 'not base64 !!' }));
+    expect(r.success).toBe(false);
+  });
+});
