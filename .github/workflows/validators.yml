@@ -168,6 +168,71 @@ jobs:
           name: gen-check-${{ matrix.name }}
           path: gen-check-${{ matrix.name }}.txt
 
+  estate-regen:
+    # Measurement only, on train/estate-union*. Never merged to main. Runs the documented generate step of the recipe
+    # (estate generate on fixture/approved.yaml and planner-plan.approved.yaml, seed 1, output folder emptied first)
+    # and keeps the resulting tree as an artifact; it changes nothing in the repository.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',estate-regen,')
+    name: estate generate (recipe step 5) for the committed suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Generate
+        shell: bash
+        run: |
+          rm -rf examples/estates/fixture/generated
+          status=0
+          pnpm -s driftbench estate generate --map examples/estates/fixture/approved.yaml --plan packages/generate/test/estate/fixtures/planner-plan.approved.yaml --out examples/estates/fixture/generated > gen.out 2>&1 || status=$?
+          echo "generate exit $status (1 is normal)"; tail -8 gen.out
+          tar -czf generated.tgz -C examples/estates/fixture generated
+          cp examples/estates/fixture/generated/estate-generate-report.json report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: regenerated-tree
+          path: |
+            generated.tgz
+            report.json
+            gen.out
+
+  full-suite:
+    # Measurement only. Every test of the repository (vitest run), in shards, on the tested branch.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',full-suite,')
+    name: full suite shard ${{ matrix.shard }} of 4
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - run: pnpm build
+      - name: vitest shard
+        shell: bash
+        run: |
+          status=0
+          pnpm exec vitest run --maxWorkers=2 --shard=${{ matrix.shard }}/4 2>&1 | tee "suite-${{ matrix.shard }}.log" || status=$?
+          echo "exit $status" >> "suite-${{ matrix.shard }}.log"
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: suite-${{ matrix.shard }}
+          path: suite-${{ matrix.shard }}.log
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
