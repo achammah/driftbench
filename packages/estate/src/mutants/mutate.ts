@@ -4,7 +4,7 @@ import { basename, dirname, join, relative } from 'node:path';
 import { mapHash } from '../map/build';
 import { quoteDrift } from '../map/file';
 import { estatePath, estateSource } from '../paths';
-import { readerFor } from '../scan/index';
+import { isUserLayerPath, readerFor } from '../scan/index';
 import { provenanceHash, quoteAtSpan } from '../scan/text';
 import type { Atom, EstateMap } from '../schema';
 
@@ -124,6 +124,10 @@ export async function mutateEstate(
     );
   }
   const { file, startLine, endLine, quote } = atom.provenance;
+  if (isUserLayerPath(file))
+    throw new MutantError(
+      `${id} is read from the user-level skill layer (${file}), which an estate copy does not hold; no mutant is written`,
+    );
   const path = await insideCopy(copy.root, file);
   const text = await readFile(path, 'utf8').catch(() => {
     throw new MutantError(`${file} is not in the estate copy`);
