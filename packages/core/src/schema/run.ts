@@ -255,6 +255,7 @@ export const Verdict = z.strictObject({
   evidence: z.string(),
   reasoning: z.string().optional(),
   judge: z.strictObject({ cls: z.enum(['system1', 'system2']), votes: z.array(Vote) }).optional(),
+  by: z.record(z.string(), z.string()).optional(),
 });
 export type Verdict = z.infer<typeof Verdict>;
 
@@ -324,6 +325,7 @@ export const BlockResult = z
     status: BlockStatus.optional(),
     notRun: NotRun.optional(),
     blocked: Blocked.optional(),
+    diagnoses: z.array(z.record(z.string(), z.unknown())).optional(),
   })
   .superRefine((block, context) => {
     // A record that says two things is refused: `status` pass needs `pass` true; fail, not_run and blocked need

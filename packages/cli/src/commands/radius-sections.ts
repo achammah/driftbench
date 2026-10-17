@@ -139,7 +139,15 @@ export async function reanchorCommand(
   if (options.changeOut)
     await writeFile(
       resolve(io.cwd, options.changeOut),
-      stringify(sectionChangeManifest(registry, result, { to: options.toVersion })),
+      `${JSON.stringify(
+        {
+          changes: result.sections
+            .filter((section) => section.status === 'stale')
+            .map((section) => ({ kind: 'prompt_section', id: `${registry.prompt_id}#${section.id}` })),
+        },
+        null,
+        2,
+      )}\n`,
     );
   if (options.json) io.out(`${JSON.stringify(withoutRegistry(result), null, 2)}\n`);
   else io.out(renderReanchoring(registry, result, options.toVersion));
