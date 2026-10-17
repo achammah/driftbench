@@ -48,6 +48,7 @@ The files of an estate test suite: the map `driftbench estate scan` writes and a
 | `edges` | list of [Edge](#edge) | yes |  | The edges of the estate graph, decided by code. |
 | `space` | string | no |  | Path of the exported space map of the situation axes |
 | `ignore` | list of strings, each not empty | no |  | Globs the scan skipped beside the runtime defaults; lint reads the estate with them again |
+| `userSkills` | `true` | no |  | true when the scan read a user-level skill layer; lint then needs the folder to read it again |
 | `followedLinks` | list of strings, each not empty | no |  | Links, relative to the estate root, that the scan read through to a real path outside the root |
 | `producedBy` | [EstateMap producedBy](#estatemap-producedby) | no |  | Who proposed the model atoms; code atoms say producedBy: code on the atom itself |
 | `hash` | string, not empty | yes |  | SHA-256 over the sorted atom hashes and edges |
@@ -56,31 +57,31 @@ The files of an estate test suite: the map `driftbench estate scan` writes and a
 
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `path` | string, not empty | yes |  |  |
-| `role` | [DocumentRole](#documentrole) | yes |  |  |
-| `reasons` | list of strings, each not empty, at least 1 item | yes |  |  |
-| `sections` | list of [DocumentInfo sections](#documentinfo-sections) | no |  |  |
+| `path` | string, not empty | yes |  | Path of the document, relative to the estate root. |
+| `role` | [DocumentRole](#documentrole) | yes |  | The authority of the document as a whole, from its folder, headings and entries. |
+| `reasons` | list of strings, each not empty, at least 1 item | yes |  | What the classification read: the folder, the heading or the entries that gave the role. |
+| `sections` | list of [DocumentInfo sections](#documentinfo-sections) | no |  | Spans of a live document that carry a non-normative role, such as an example or a history. |
 
 ## DocumentRole
 
 | Value | Meaning |
 |---|---|
-| `normative` |  |
-| `changelog` |  |
-| `history` |  |
-| `template` |  |
-| `example` |  |
-| `journal` |  |
-| `fixture` |  |
-| `archive` |  |
+| `normative` | Live content: its rules, gates and references count. |
+| `changelog` | A record of releases: it holds no rule and gives no test, and it documents the files it names. |
+| `history` | A dated record of what happened: no rule, no test, and the files it names are documented. |
+| `template` | A form to fill in: read when a live document sends the reader to it, and it gives no test of its own. |
+| `example` | An illustration, or a counter-example shown so that it is not followed: no rule and no test. |
+| `journal` | A diary or work log of dated entries: no rule and no test. |
+| `fixture` | Data a test or a skill ships: no rule and no test. |
+| `archive` | Material kept for the record, loaded by nothing: no rule and no test. |
 
 ## DocumentInfo sections
 
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `startLine` | integer, at least 1 | yes |  |  |
-| `endLine` | integer, at least 1 | yes |  |  |
-| `role` | [DocumentRole](#documentrole) | yes |  |  |
+| `startLine` | integer, at least 1 | yes |  | First line of the section, counted from 1. |
+| `endLine` | integer, at least 1 | yes |  | Last line of the section, counted from 1. |
+| `role` | [DocumentRole](#documentrole) | yes |  | The role of this section, which differs from the role of the document. |
 
 ## Atom
 

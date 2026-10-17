@@ -40,6 +40,27 @@ export const Stimulus = z
   .describe('What reaches the agent in one block: exactly one of user, burst or injection.');
 export type Stimulus = z.infer<typeof Stimulus>;
 
+/** Where a ledger fact was stated before the block: by whom, and in which prefix message. */
+export const SharedFact = z
+  .strictObject({
+    fact: z.string().min(1).describe('The ledger key of the fact.'),
+    by: z
+      .enum(['user', 'agent', 'record'])
+      .describe(
+        'Who stated it: user or agent in a prefix message, record when it comes from a system of record and was never said.',
+      ),
+    in: z
+      .number()
+      .int()
+      .min(0)
+      .optional()
+      .describe('The index of the prefix message that states it, from 0. Needed for user and agent.'),
+  })
+  .describe(
+    'Where a ledger fact was stated before the block, checked by spec lint and before the block runs.',
+  );
+export type SharedFact = z.infer<typeof SharedFact>;
+
 /** Initial conditions set on the whole spec. */
 export const GivenDefaults = z
   .strictObject({
@@ -52,6 +73,13 @@ export const GivenDefaults = z
       .record(z.string(), z.unknown())
       .optional()
       .describe('Runtime variables, such as the clock, the channel or the sender.'),
+    summary: z
+      .string()
+      .min(1)
+      .optional()
+      .describe(
+        'What a named state (vars.session_state) holds, in words. spec lint --summaries warns when a named state has none.',
+      ),
   })
   .describe('Initial conditions set on the whole spec.');
 export type GivenDefaults = z.infer<typeof GivenDefaults>;
@@ -76,6 +104,17 @@ export const GivenOverride = z
       .describe('Facts the agent must hold at this block. They merge into the ledger from here on.'),
     world: WorldState.optional().describe('Changes to the world from this block onwards.'),
     vars: z.record(z.string(), z.unknown()).optional().describe('Runtime variables from this block onwards.'),
+    shared: z
+      .array(SharedFact)
+      .optional()
+      .describe(
+        'Where each ledger fact was stated in the prefix: a fact said by the user or the agent must appear in the message it names.',
+      ),
+    summary: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('What a named state (vars.session_state) holds from this block onwards, in words.'),
   })
   .describe(
     'Initial conditions set on one block. A prefix lets the block start without replaying the ones before.',

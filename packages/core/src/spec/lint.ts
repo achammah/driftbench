@@ -2,6 +2,30 @@ import type { Message } from '../schema/common';
 import type { Expect, Spec } from '../schema/spec';
 import { type Issue, warning } from './issues';
 import { parseCriterionRef } from './semantics';
+import { verifyGiven } from './verify-given';
+
+/**
+ * The Given verifier's findings as lint warnings: `GIVEN_UNMET` for a Given error (the runner does not run
+ * the block), `GIVEN_CHAIN` for a `ledger_add` that contradicts the ledger, and, with `summaries`,
+ * `GIVEN_SUMMARY_MISSING` for a workspace folder or a named session state with no summary.
+ */
+export function givenIssues(spec: Spec, options: { summaries?: boolean } = {}): Issue[] {
+  return verifyGiven(spec)
+    .filter((finding) => finding.check !== 'summary_present' || options.summaries === true)
+    .map((finding) =>
+      warning(
+        finding.check === 'chain'
+          ? 'GIVEN_CHAIN'
+          : finding.check === 'summary_present'
+            ? 'GIVEN_SUMMARY_MISSING'
+            : finding.level === 'warning'
+              ? 'GIVEN_CANONICAL_UNPAIRED'
+              : 'GIVEN_UNMET',
+        finding.path,
+        `${finding.check}: expected ${finding.expected}; got ${finding.got}`,
+      ),
+    );
+}
 
 /** Advice on a valid spec. Every issue returned is a warning. */
 export function lintSpec(spec: Spec): Issue[] {
@@ -75,6 +99,7 @@ export function lintSpec(spec: Spec): Issue[] {
     }
   });
 
+  issues.push(...givenIssues(spec));
   return issues;
 }
 

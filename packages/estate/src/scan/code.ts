@@ -2,6 +2,36 @@ import { basename, posix } from 'node:path';
 import nlp from 'compromise';
 import type { Atom, AtomKind, EvidencePredicate } from '../schema';
 import { isNormative, maskIllustrativePrefixes, normativeEstate } from './document-roles';
+import {
+  BARE_READ_CLAUSE,
+  beforeHead,
+  CLOSE_TOKEN,
+  clauseEvent,
+  collapseReads,
+  contentWords,
+  continuation,
+  dated,
+  descriptive,
+  eventHead,
+  exampleOrHistory,
+  folderRead,
+  headPhrase,
+  isEvent,
+  isUrl,
+  lineParts,
+  OPEN_TOKEN,
+  optionalQualifier,
+  ownWriting,
+  plainClause,
+  selfReference,
+  splitAddition,
+  TOKEN,
+  tagsOf,
+  timeOffset,
+  topicPhrase,
+  unresolvedKind,
+  withoutEmphasis,
+} from './gate-grammar';
 import { guardRuleSources } from './guard-rules';
 import type { EstateFile, GuardDecl, ProseChunk, RawEstate, RegistryRow } from './reader';
 import { documentFileType, ignoredReference, pathReference } from './reference-role';
@@ -1002,6 +1032,8 @@ export function locateNamed(
     aliases?: Readonly<Record<string, readonly string[]>>;
     byName?: ReadonlyMap<string, readonly string[]>;
     externals?: readonly string[];
+    /** The skill folder the naming file stands in: a bare name is looked for there before anywhere else. */
+    within?: string;
   } = {},
 ): NamedTarget {
   const skipped = options.skipped ?? new Set<string>();
@@ -1012,6 +1044,11 @@ export function locateNamed(
   if (!clean.includes('/')) {
     const local = posix.normalize(posix.join(posix.dirname(from), clean));
     if (known(local)) return { path: local, via: 'place' };
+    // `Read SKILL.md` in a skill's own files means that skill's file, not one inside a folder below this one.
+    if (options.within) {
+      const inSkill = posix.join(options.within, clean);
+      if (known(inSkill)) return { path: inSkill, via: 'place' };
+    }
     const folder = posix.dirname(from);
     if (folder !== '.') {
       const hits = (byName.get(clean) ?? []).filter((candidate) => candidate.startsWith(`${folder}/`));
@@ -1667,11 +1704,10 @@ function routeAtoms(
  * adverbial lead-in is kept, while a negated, optional or conditional head ("do not read", "you need not
  * read", "if you read") gives no gate.
  */
-const OPEN_TOKEN = '\uE000';
-const CLOSE_TOKEN = '\uE001';
-const TOKEN = String.raw`\uE000\d+\uE001`;
 /** What is read: one masked span, else the words up to the next form word. */
 const TARGET = String.raw`(${TOKEN}|\S+)`;
+/** What is read when it may be several words ("the policy", "Plan C"): a masked span, else the words up to the next form word. */
+const READ_PHRASE = String.raw`(${TOKEN}|.+?)`;
 const NEGATIVE = String.raw`(?:do\s+not|don't|never|must\s+not|mustn't|should\s+not|shouldn't|cannot|can't|may\s+not)`;
 /** `prose`: the form ends on what is read, so a step in words ("the output of the build") may be read. */
 const GATE_FORMS: Array<{
@@ -1683,6 +1719,8 @@ const GATE_FORMS: Array<{
   prose?: boolean;
   positiveAct?: boolean;
   loaded?: boolean;
+  /** The sentence names nothing to read: the document it stands in (or the one a later sentence names). */
+  bare?: boolean;
 }> = [
   {
     form: 'requires-loaded',
@@ -1707,20 +1745,22 @@ const GATE_FORMS: Array<{
   {
     form: 'context-read-first',
     pattern: new RegExp(
-      String.raw`^(?:to|for|when|if)\s+(.+?)\s*[:,]\s*(.*?)\bread\s+${TARGET}\s+first$`,
+      String.raw`^(?:to|for|when|whenever|if|(?:each|every|any)\s+time|the\s+(?:first|next)\s+time)\s+(.+?)\s*[:,]\s*(.*?)\bread\s+${READ_PHRASE}\s+first$`,
       'i',
     ),
     head: [2],
     read: 3,
     act: 1,
     positiveAct: true,
+    prose: true,
   },
   {
     form: 'read-first-context',
-    pattern: new RegExp(String.raw`^(.*?)\bread\s+${TARGET}\s+first\s+(?:when|for)\s+(.+)$`, 'i'),
+    pattern: new RegExp(String.raw`^(.*?)\bread\s+${READ_PHRASE}\s+first\s+(?:when|for)\s+(.+)$`, 'i'),
     head: [1],
     read: 2,
     act: 3,
+    prose: true,
   },
   {
     form: 'not-until-loaded',
@@ -1731,6 +1771,27 @@ const GATE_FORMS: Array<{
     head: [1],
     read: 3,
     act: 2,
+    loaded: true,
+  },
+  {
+    form: 'until-read-no',
+    pattern: new RegExp(
+      String.raw`^until\s+(?:you\s+(?:have\s+|'ve\s+)?)?read\s+${TARGET}\s*[:,]\s*(.*?)\b${NEGATIVE}\s+(.+)$`,
+      'i',
+    ),
+    head: [2],
+    read: 1,
+    act: 3,
+  },
+  {
+    form: 'until-loaded-no',
+    pattern: new RegExp(
+      String.raw`^until\s+${TARGET}\s+(?:is\s+|has\s+been\s+)(?:loaded|read)\s*[:,]\s*(.*?)\b${NEGATIVE}\s+(.+)$`,
+      'i',
+    ),
+    head: [2],
+    read: 1,
+    act: 3,
     loaded: true,
   },
   {
@@ -1746,7 +1807,10 @@ const GATE_FORMS: Array<{
   },
   {
     form: 'before-read',
-    pattern: new RegExp(String.raw`^(.*?)\bbefore\s+([^,:]+?)\s+(?:please\s+)?read\s+${TARGET}$`, 'i'),
+    pattern: new RegExp(
+      String.raw`^(.*?)\b(?:before|prior\s+to)\s+([^,:]+?)\s+(?:please\s+)?read\s+${TARGET}$`,
+      'i',
+    ),
     head: [1],
     read: 3,
     act: 2,
@@ -1754,7 +1818,10 @@ const GATE_FORMS: Array<{
   },
   {
     form: 'before-colon-read',
-    pattern: new RegExp(String.raw`^(.*?)\bbefore\s+([^:]+?)\s*:\s*(.*?)\bread\s+(${TOKEN}|.+)$`, 'i'),
+    pattern: new RegExp(
+      String.raw`^(.*?)\b(?:before|prior\s+to)\s+([^:]+?)\s*:\s*(.*?)\bread\s+(${TOKEN}|.+)$`,
+      'i',
+    ),
     head: [1, 3],
     read: 4,
     act: 2,
@@ -1762,16 +1829,8 @@ const GATE_FORMS: Array<{
   },
   {
     form: 'before-comma-read',
-    pattern: new RegExp(String.raw`^(.*?)\bbefore\s+([^,:]+?)\s*,\s*(.*?)\bread\s+(${TOKEN}|.+)$`, 'i'),
-    head: [1, 3],
-    read: 4,
-    act: 2,
-    prose: true,
-  },
-  {
-    form: 'prior-to-read',
     pattern: new RegExp(
-      String.raw`^(.*?)\bprior\s+to\s+([^,:]+?)\s*[:,]\s*(.*?)\bread\s+(${TOKEN}|.+)$`,
+      String.raw`^(.*?)\b(?:before|prior\s+to)\s+([^,:]+?)\s*,\s*(.*?)\bread\s+(${TOKEN}|.+)$`,
       'i',
     ),
     head: [1, 3],
@@ -1781,22 +1840,57 @@ const GATE_FORMS: Array<{
   },
   {
     form: 'read-first-then',
-    pattern: new RegExp(String.raw`^(.*?)\bread\s+${TARGET}\s+first,?\s+(?:and\s+)?then\s+(.+)$`, 'i'),
+    pattern: new RegExp(String.raw`^(.*?)\bread\s+${READ_PHRASE}\s+first,?\s+(?:and\s+)?then\s+(.+)$`, 'i'),
     head: [1],
     read: 2,
     act: 3,
+    prose: true,
+  },
+  {
+    form: 'first-read-then',
+    pattern: new RegExp(
+      String.raw`^first,?\s+(?:please\s+)?read\s+${READ_PHRASE},?\s+(?:and\s+)?then\s+(.+)$`,
+      'i',
+    ),
+    head: [],
+    read: 1,
+    act: 2,
+    prose: true,
   },
   {
     form: 'read-before',
-    pattern: new RegExp(String.raw`^(.*?)\bread\s+${TARGET}(?:\s+first)?\s+before\s+(.+)$`, 'i'),
+    pattern: new RegExp(
+      String.raw`^(.*?)\bread\s+${READ_PHRASE}(?:\s+first)?,?\s+(?:before|prior\s+to)\s+(.+)$`,
+      'i',
+    ),
     head: [1],
     read: 2,
     act: 3,
+    prose: true,
+  },
+  {
+    form: 'read-bare-before',
+    pattern: /^(.*?)\bread\s+(?:first\s+)?(?:before|prior\s+to)\s+(.+)$/i,
+    head: [1],
+    read: 0,
+    act: 2,
+    bare: true,
   },
   {
     form: 'not-until-read',
     pattern: new RegExp(
       String.raw`^(.*?)\b${NEGATIVE}\s+(.+?)\s+until\s+(?:you\s+have\s+|you've\s+|you\s+|after\s+)?(?:read|reading)\s+(?:the\s+output\s+of\s+)?(${TOKEN}|.+)$`,
+      'i',
+    ),
+    head: [1],
+    read: 3,
+    act: 2,
+    prose: true,
+  },
+  {
+    form: 'not-before-reading',
+    pattern: new RegExp(
+      String.raw`^(.*?)\b${NEGATIVE}\s+(.+?)\s+before\s+(?:first\s+)?(?:you\s+(?:have\s+|'ve\s+)?)?(?:reading|having\s+read|read)\s+(${TOKEN}|.+)$`,
       'i',
     ),
     head: [1],
@@ -1826,10 +1920,11 @@ const GATE_FORMS: Array<{
   },
   {
     form: 'question-read-first',
-    pattern: new RegExp(String.raw`^(.+?)\?\s*(.*?)\bread\s+${TARGET}\s+first\b`, 'i'),
+    pattern: new RegExp(String.raw`^(.+?)\?\s*(.*?)\bread\s+${READ_PHRASE}\s+first\b`, 'i'),
     head: [2],
     read: 3,
     act: 1,
+    prose: true,
   },
 ];
 
@@ -1848,6 +1943,8 @@ export function directiveHead(head: string): boolean {
     .map((segment) => segment.trim());
   const main = segments.pop() ?? '';
   if (SUBORDINATE.test(main) || NEGATED.test(main)) return false;
+  // A relative clause ("..., which reads X before ...") describes a thing; it does not direct.
+  if (/\b(?:that|which|who|whose)$/.test(main)) return false;
   // A leading condition ("If no objection is raised,") may hold a negation of its own; any other lead-in may not.
   return segments.every((segment) => SUBORDINATE.test(segment) || !NEGATED.test(segment));
 }
@@ -1915,13 +2012,25 @@ export function gateClauses(text: string, splitCoordinated = true): string[] {
  * The thing to read: a masked span, else a path-like word, else (where the form allows) the words of the
  * clause, a step to run. A bare word such as "it" or "them" names nothing to read first.
  */
-function gateTarget(raw: string, spans: readonly string[], prose: boolean): string {
+function gateTarget(raw: string, spans: readonly string[], prose: boolean): { text: string; free: boolean } {
   const text = raw.trim();
   const span = new RegExp(`^${TOKEN}`).exec(text);
-  if (span) return unmask(span[0], spans);
+  if (span) return { text: unmask(span[0], spans), free: false };
   const word = /^\S+/.exec(text)?.[0] ?? '';
-  if (/[/\\]|\.[A-Za-z0-9]+[.,:;!?)]*$/.test(word)) return word.replace(/[.,:;!?)]+$/, '');
-  return prose ? unmask(text, spans).replace(/[.,:;!?]+$/, '') : '';
+  if (/[/\\]|\.[A-Za-z0-9]+[.,:;!?)]*$/.test(word))
+    return { text: word.replace(/[.,:;!?)]+$/, ''), free: false };
+  if (
+    /^this\s+(?:file|document|doc|page|guide|note)(?=[\s.,:;!?)]|$)(?!\s+(?:again|once\s+more|twice))/i.test(
+      text,
+    )
+  )
+    return { text: 'this', free: true };
+  if (/^(?:this|it|them|they|that|these|those)[.,:;!?)]*$/i.test(text))
+    return { text: text.replace(/[.,:;!?)]+$/, '').toLowerCase(), free: true };
+  // Words of the clause: a reference only if they name a file or a skill of the estate.
+  return prose
+    ? { text: unmask(text, spans).replace(/[.,:;!?]+$/, ''), free: true }
+    : { text: '', free: false };
 }
 
 const GATE_HEADINGS = new WeakMap<EstateFile, Array<{ text: string; line: number }>>();
@@ -1939,6 +2048,123 @@ function gateHeadings(source: EstateFile | undefined): Array<{ text: string; lin
   return headings;
 }
 
+/**
+ * A quoted heading right after a path says which part of it to read ("`a.md` "for a wedding", `b.md`
+ * "for a tray""): the quotation is dropped and the paths read as a list. A quotation straight after the
+ * verb is the section itself and stays.
+ */
+function withoutHeadings(clause: string, spans: readonly string[]): string {
+  const token = new RegExp(`${TOKEN}`, 'g');
+  const quoted = (text: string) => /^["\u201C]/.test(spans[Number(text.slice(1, -1))] ?? '');
+  const code = (text: string) => (spans[Number(text.slice(1, -1))] ?? '').startsWith('`');
+  return clause.replace(new RegExp(`${TOKEN}(?:\\s*,?\\s*(?:or\\s+|and\\s+)?${TOKEN})+`, 'g'), (run) => {
+    const parts = run.match(token) ?? [];
+    if (!parts.some((part, index) => quoted(part) && index > 0 && code(parts[index - 1] ?? ''))) return run;
+    const kept = parts.filter((part, index) => !(quoted(part) && index > 0 && code(parts[index - 1] ?? '')));
+    return kept.join(' and ');
+  });
+}
+
+const TERMS = new WeakMap<ReadonlyMap<string, EstateFile>, string[]>();
+
+/**
+ * Whether the estate itself defines a term: the words of a read target appear together in a heading, in a
+ * bold term or in a file name of the estate. A document or a part the estate names is a read target; a
+ * thing nobody defined ("the whole thread") is not.
+ */
+function definedTerm(
+  words: string[],
+  files: ReadonlyMap<string, EstateFile>,
+  declared: readonly string[] = [],
+): boolean {
+  let terms = TERMS.get(files);
+  if (!terms) {
+    terms = [];
+    for (const [path, file] of files) {
+      terms.push(
+        basename(path)
+          .replace(/\.[^.]+$/, '')
+          .toLowerCase()
+          .replace(/[-_]+/g, ' '),
+      );
+      if (!/\.(?:md|mdx|markdown|txt|rst)$/i.test(path)) continue;
+      for (const line of file.text.split('\n')) {
+        const heading = /^#{1,6}\s+(.+)$/.exec(line)?.[1];
+        if (heading) terms.push(heading.toLowerCase().replace(/[*`_]/g, ''));
+        for (const bold of line.matchAll(/\*\*([^*]{3,60})\*\*/g)) terms.push((bold[1] ?? '').toLowerCase());
+        // A term set apart in quotes or code, or defined by a colon or a dash ("Term: ...", "term -- ...").
+        for (const quoted of line.matchAll(/["\u201C]([^"\u201D]{3,60})["\u201D]|`([^`]{3,60})`/g))
+          terms.push((quoted[1] ?? quoted[2] ?? '').toLowerCase());
+        const defined =
+          /^\s*(?:[-*]\s+)?\*{0,2}([A-Za-z][^:\u2014\u2013]{2,50}?)\*{0,2}\s*(?::|\s[\u2014\u2013-]{1,2}\s)/.exec(
+            line,
+          )?.[1];
+        if (defined) terms.push(defined.toLowerCase());
+      }
+    }
+    TERMS.set(files, terms);
+  }
+  const wanted = words.map((word) => word.toLowerCase()).filter((word) => word.length > 2);
+  if (wanted.length === 0) return false;
+  // A declared skill or helper is a term the estate defines.
+  const names = declared.map((name) => name.toLowerCase().replace(/[-_]+/g, ' '));
+  // All the words appear together in one term; with three or more words, all but one.
+  const needed = wanted.length >= 3 ? wanted.length - 1 : wanted.length;
+  return [...terms, ...names].some(
+    (term) =>
+      wanted.filter((word) =>
+        new RegExp(`(?:^|[^\\p{L}])${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}])`, 'u').test(
+          term,
+        ),
+      ).length >= needed,
+  );
+}
+
+const STEMS = new WeakMap<ReadonlyMap<string, EstateFile>, Map<string, string[]>>();
+const NAMED_DOCUMENT = /\.(?:md|mdx|markdown|txt|rst)$/i;
+
+/**
+ * Words that name a document or skill of the estate: "the policy" for `policy.md`, "the editor skill" for
+ * the skill `editor`. Pronouns, determiners, adverbs and prepositions never name anything; of the rest, a
+ * word or two joined must be a declared skill or the file name of a document. An ambiguous name is not a
+ * reference: it resolves to a file only when one document carries it.
+ */
+function namedReference(
+  phrase: string,
+  files: ReadonlyMap<string, EstateFile>,
+  raw: RawEstate,
+): { name: string; skill?: string } | undefined {
+  let stems = STEMS.get(files);
+  if (!stems) {
+    stems = new Map();
+    for (const path of files.keys()) {
+      if (!NAMED_DOCUMENT.test(path)) continue;
+      const stem = basename(path)
+        .replace(/\.[^.]+$/, '')
+        .toLowerCase();
+      stems.set(stem, [...(stems.get(stem) ?? []), path]);
+    }
+    STEMS.set(files, stems);
+  }
+  // The words that remain once pronouns, determiners and prepositions are set aside must be the whole name
+  // ("the policy"), or the name and a word that only says what kind of thing it is ("the policy document",
+  // "the editor skill"). One word out of a longer phrase never names a file: "the stage of the agent
+  // standard" is not `agent.md`.
+  const words = contentWords(phrase).map((word) => word.toLowerCase());
+  const KIND = new Set(['document', 'doc', 'file', 'page', 'skill', 'note']);
+  const wholes = [words, ...(KIND.has(words.at(-1) ?? '') ? [words.slice(0, -1)] : [])];
+  for (const whole of wholes) {
+    if (whole.length === 0) continue;
+    for (const name of [whole.join(' '), whole.join('-'), whole.join('_'), whole.join('')]) {
+      const skill = raw.skills.find((candidate) => candidate.name.toLowerCase() === name);
+      if (skill) return { name: skill.name, skill: skill.name };
+      const documents = stems.get(name);
+      if (documents?.length === 1) return { name: basename(documents[0] ?? '') };
+    }
+  }
+  return undefined;
+}
+
 function gateAtoms(
   chunk: ProseChunk,
   files: ReadonlyMap<string, EstateFile>,
@@ -1948,87 +2174,388 @@ function gateAtoms(
   const source = files.get(chunk.file);
   const headings = gateHeadings(source);
   let headingIndex = -1;
-  for (const line of chunkLines(chunk, files.get(chunk.file))) {
-    const { text, spans } = maskLine(line.text);
+  const within = raw.skills.find(
+    (skill) => chunk.file === skill.file || chunk.file.startsWith(`${skill.folder}/`),
+  )?.folder;
+  let recentRefs: string[] = [];
+  const skillNames = new Set(raw.skills.map((skill) => skill.name));
+  const sourceLines = source?.text.split('\n') ?? [];
+  const bodyLines = chunkLines(chunk, files.get(chunk.file));
+  // A sentence wrapped over lines is one: a line that ends on the verb, or on the colon of a "Before X:" head,
+  // continues on the next line.
+  const logical: Array<{ line: number; endLine: number; text: string; quote: string; next: string[] }> = [];
+  for (let at = 0; at < bodyLines.length; at++) {
+    const first = bodyLines[at];
+    if (!first) continue;
+    let text = first.text;
+    let endLine = first.line;
+    let quote = first.quote;
+    for (let more = bodyLines[at + 1]; more && more.line === endLine + 1 && more.text.trim() !== ''; ) {
+      const tail = text.replace(/[\s!\u203C*_]+$/, '');
+      if (!(/\b(?:read|reading|load)$/i.test(tail) || /\b(?:before|prior\s+to)\b[^:]*:$/i.test(tail))) break;
+      text = `${tail} ${more.text.replace(/^\s*(?:>\s*)+/, '').trim()}`;
+      endLine = more.line;
+      quote =
+        sourceLines
+          .slice(first.line - 1, endLine)
+          .join('\n')
+          .trim() || `${quote}\n${more.quote}`;
+      at++;
+      more = bodyLines[at + 1];
+    }
+    const next: string[] = [];
+    for (let k = at + 1; k < bodyLines.length && k <= at + 3; k++) {
+      const item = bodyLines[k];
+      if (!item || item.text.trim() === '' || item.line !== endLine + (k - at)) break;
+      next.push(item.text);
+    }
+    logical.push({ line: first.line, endLine, text, quote, next });
+  }
+  for (const line of logical) {
+    // `Read(path)` is a read written as a call.
+    const { text, spans } = maskLine(line.text.replace(/`(?:Read|Load)\(([^`()]+)\)`/gi, 'Read `$1`'));
+    // The documents and skills this line and the one before it name: what "it" can stand for.
+    const earlierRefs = recentRefs;
+    const lineRefs = [
+      ...new Set([
+        ...namedPaths(line.text),
+        ...[...line.text.matchAll(/`([^`\s]+)`/g)].flatMap((hit) =>
+          skillNames.has(hit[1] ?? '') ? [hit[1] ?? ''] : [],
+        ),
+      ]),
+    ];
+    recentRefs = lineRefs;
     while (headings[headingIndex + 1] && (headings[headingIndex + 1]?.line ?? 0) < line.line) headingIndex++;
-    for (const decorated of gateClauses(text)) {
+    // A line that says the read is optional gives no gate.
+    if (optionalQualifier(text)) continue;
+    // A column title ("| Kind | Read before X |" above a separator row) names a column, not a rule.
+    const written = sourceLines[line.line - 1] ?? '';
+    if (
+      /^\s*\|/.test(written) &&
+      /^\s*\|?\s*:?-{2,}:?\s*(?:\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(sourceLines[line.endLine] ?? '')
+    )
+      continue;
+    // A heading or a short line with no sentence end is a title: it names a topic, it directs nobody.
+    const headingLine = /^\s*#{1,6}\s/.test(written);
+    const plain = line.text
+      .replace(/^\s*(?:>\s*)*(?:[-*+]\s+|\d+[.)]\s+)?/, '')
+      .replace(/[\s!\u203C*_`]+/g, ' ')
+      .trim();
+    const rawLine = `${written} ${line.text}`;
+    const ruleMarker =
+      /!!|\u203C|\*\*/.test(rawLine) ||
+      /\b(?:READ|BEFORE)\b/.test(line.text) ||
+      /^\s*(?:[-*>\s]*)[A-Z][A-Z0-9 ]{2,}\s*(?:--|[\u2014\u2013:])/.test(line.text);
+    const titleLine =
+      headingLine ||
+      (plain.split(' ').length <= 6 &&
+        !/[.:;?!)]$/.test(plain) &&
+        // A title is in capitals or in title case; a sentence has lower-case words.
+        (plain === plain.toUpperCase() || plain.split(' ').every((word) => /^[A-Z0-9]/.test(word))));
+    // The last gate of this line: a clause that only adds things to read ("and with it `b.md`") joins it.
+    let previous: ((read: string) => boolean) | undefined;
+    let carriedHead: string | undefined;
+    for (const decorated of lineParts(text)
+      .flatMap((piece) => gateClauses(piece))
+      .flatMap(splitAddition)) {
       // Attention punctuation is decoration; neither its presence nor its absence establishes order.
-      const original = decorated.replace(/^[!‼]+\s*|\s*[!‼]+$/g, '');
+      let original = decorated.replace(/^[!‼]+\s*|\s*[!‼]+$/g, '');
+      // "Before X: run `a`, and read Y": the coordinated read belongs to the "Before X:" clause before it.
+      if (carriedHead && BARE_READ_CLAUSE.test(original)) original = `${carriedHead} ${original}`;
+      carriedHead = beforeHead(original);
+      // "load" is a read verb for a skill or a file; a loaded thing must resolve to one.
+      const viaLoad = /\bload(?:ing)?\b/i.test(original) && !/\bread(?:ing)?\b/i.test(original);
+      if (viaLoad) original = original.replace(/\bload(?:ing)?\b/gi, 'read');
       const heading = headings[headingIndex];
       const contextual =
         heading && READ_FIRST_ONLY.test(original) && !original.includes('?') && isAct(heading.text);
-      const clause = contextual ? `${original}, then ${heading.text}` : original;
-      for (const { form, pattern, head, read, act, prose, positiveAct, loaded } of GATE_FORMS) {
+      const stressed = contextual ? `${original}, then ${heading.text}` : original;
+      // Emphasis adverbs ("FULLY") are taken out and a list of reads is cut to its first item.
+      const { clause, extra } = collapseReads(withoutEmphasis(plainClause(withoutHeadings(stressed, spans))));
+      let added: ((read: string) => boolean) | undefined;
+      for (const { form, pattern, head, read, act, prose, positiveAct, loaded, bare } of GATE_FORMS) {
         const match = pattern.exec(clause);
         if (!match) continue;
-        if (!head.every((group) => directiveHead(unmask(match[group] ?? '', spans)))) continue;
-        const target = gateTarget(match[read] ?? '', spans, prose === true || loaded === true);
-        const named = namedPaths(`Read ${target}`)[0];
-        const first = named ?? target.replace(/[`*"'\u201C\u201D]/g, '').trim();
-        const trigger = unmask(match[act] ?? '', spans)
+        // "Read carefully before X" names no document: the bare form needs the verb right before "before".
+        if (bare && !/\bread\s+(?:first\s+)?(?:before|prior\s+to)\b/i.test(stressed)) continue;
+        // A title ("READ BEFORE YOU WRITE") names a topic; it is no sentence that names nothing to read.
+        if (bare && titleLine) continue;
+        // A skill called in code ahead of the read ("Before X: `skill` and read Y") is itself required.
+        const leadSkills: string[] = [];
+        if (
+          !head.every((group) => {
+            let lead = unmask(match[group] ?? '', spans);
+            if (group === 3) {
+              for (const hit of lead.matchAll(/`([^`\s]+)`/g))
+                if (skillNames.has(hit[1] ?? '')) leadSkills.push(hit[1] ?? '');
+              lead = lead
+                .replace(/`[^`]*`/g, ' ')
+                .replace(/\b(?:and|then|also|plus)\b/gi, ' ')
+                .trim();
+              if (lead === '') return true;
+            }
+            return directiveHead(lead) && !exampleOrHistory(lead) && !descriptive(lead);
+          })
+        )
+          continue;
+        // "The day before X, read Y": a point in time ahead of X, not an order between two acts.
+        if (form.startsWith('before-') && timeOffset(unmask(match[head[0] ?? 0] ?? '', spans))) continue;
+        const written = unmask(match[act] ?? '', spans)
           .replace(/[`*]/g, '')
           .trim();
         // A condition scopes an obligation; it is not the act the read must precede.
-        const scoped = /^(?:if|when|whenever|unless)\b[^,]+,\s*(.+)$/i.exec(trigger);
-        const action = scoped?.[1] ?? trigger;
-        if (first === '' || trigger === '' || !isAct(action)) continue;
+        const scoped = /^(?:if|when|whenever|unless)\b[^,]+,\s*(.+)$/i.exec(written);
+        // What follows the act ("..., then run the check", ": the rules differ", " \u2014 never skip") is a remark.
+        const cut = (text: string) => (text.split(/\s*(?:[,;:]|\s[\u2014\u2013]\s)/)[0] ?? text).trim();
+        const action = cut(scoped?.[1] ?? written);
+        const trigger = scoped ? written : action;
+        // A question asks and a dated entry records; neither directs the agent.
+        if (trigger === '' || trigger.includes('?') || dated(trigger)) continue;
+        // A template with a slot in angle brackets ("Before <act>: read <file>") describes the syntax.
+        // A template names the syntax: its act or its target is nothing but a slot ("Before <act>: read <file>").
+        const wholeSlot = /^(?:an?\s+|the\s+|any\s+)?<[^<>\n]+>(?:\.[A-Za-z0-9]+)?$/;
+        const shown = unmask(match[read] ?? '', spans)
+          .replace(/[`*"']/g, '')
+          .replace(/\.$/, '')
+          .trim();
+        if (wholeSlot.test(written.replace(/[`*]/g, '').trim()) || wholeSlot.test(shown)) continue;
+        // An act, or an event the read comes before: "any query", "the second query", "your first action".
+        const act_ = isAct(action, form.startsWith('not-'));
+        if (!act_ && !isEvent(action) && !clauseEvent(action)) continue;
         // Negation of the requirement sits at the predicate boundary, not in its object
         // ("editing optional metadata requires …" still requires the read).
         if (positiveAct && /\b(?:not|never|optional|optionally|[a-z]+n't)\s*$/i.test(action)) continue;
-        // A file is a path the reference tokenizer accepts (a code span may hold spaces), else one bare word.
-        const isFile = /\.[A-Za-z0-9]+$/.test(first) && (named !== undefined || !/\s/.test(first));
-        const skill = loaded ? raw.skills.find((skill) => skill.name === first) : undefined;
-        if (loaded && !isFile && !skill) continue;
-        const located = isFile
-          ? locateNamed(first, chunk.file, files, {
+        const after = actLabel(act_ ? action : (eventHead(action) ?? action), raw);
+        // What a piece of text to read stands for: a file (located), a declared skill, or a shell step.
+        const resolveRead = (readText: string, structure: boolean, bareRead = false) => {
+          let { text: target, free } = bareRead
+            ? { text: 'this', free: true }
+            : gateTarget(readText, spans, structure);
+          let section: string | undefined;
+          let declaredFirst: string | undefined;
+          // "it", "them", "that": only a document named in this or the previous sentence, and only if it is one.
+          if (free && /^(?:it|them|they|that|these|those)$/.test(target)) {
+            const referents = [...new Set([...earlierRefs, ...lineRefs])];
+            if (referents.length !== 1) return undefined;
+            target = referents[0] ?? '';
+            free = false;
+            if (skillNames.has(target)) declaredFirst = target;
+          }
+          // A path followed by a section mark: the path is read, the section says where.
+          const marked = /^(.+?\.[A-Za-z0-9]+)\s+(\u00A7.*|#.*)$/.exec(target);
+          if (!free && marked) {
+            target = marked[1] ?? target;
+            section = (marked[2] ?? '').replace(/[`*"'\u201C\u201D]+$/, '');
+          }
+          // A quotation is the name of a section; no file is named with it.
+          const quotedSection = /^["\u201C]([^"\u201D]+)["\u201D]$/.exec(target);
+          // A web address, a topic ("read up on X") and one's own writing ("read the sentence back") are no reference.
+          if (isUrl(target) || (free && (topicPhrase(target) || ownWriting(target)))) return undefined;
+          const named = namedPaths(`Read ${target}`)[0];
+          let first = named ?? target.replace(/[`*"'\u201C\u201D]/g, '').trim();
+          let declared: string | undefined = declaredFirst;
+          let fromName = false;
+          let self = false;
+          let unresolved: string | undefined;
+          const folder = free
+            ? folderRead(target, (path) => [...files.keys()].some((file) => file.startsWith(`${path}/`)))
+            : undefined;
+          if (quotedSection && named === undefined && !free) {
+            first = (quotedSection[1] ?? '').trim();
+            unresolved = 'section';
+          } else if (folder) {
+            first = folder;
+            unresolved = 'folder';
+          } else if (free && named === undefined) {
+            // A relative clause says which one; the name is the head of the phrase.
+            const phrase = headPhrase(target);
+            const found = selfReference(target) ? undefined : namedReference(phrase, files, raw);
+            if (selfReference(target)) {
+              // "Read this": the document the rule stands in. A heading or title has no "this" to point at.
+              if (titleLine) return undefined;
+              self = true;
+              first = basename(chunk.file);
+              // A bare "read before X" may be followed by a sentence that names what to read.
+              if (bareRead) {
+                const later = [...new Set(line.next.flatMap((text) => namedPaths(text)))];
+                // A plain sentence ("Read before any change.") names nothing and gives no gate. A line that
+                // carries a rule marker (a banner, bold, READ or BEFORE in capitals, a capitalised label)
+                // is a rule: it names the one document right after it, else the file it stands in.
+                if (!ruleMarker || later.length > 1) return undefined;
+                if (later.length === 1) {
+                  self = false;
+                  first = later[0] ?? first;
+                  fromName = true;
+                }
+              }
+            } else if (found) {
+              first = found.name;
+              declared = found.skill;
+              fromName = true;
+            } else {
+              // A section, a state or a part named by role: kept, with what it is, never given a file name.
+              const kind = loaded
+                ? undefined
+                : unresolvedKind(phrase, (words) =>
+                    definedTerm(words, files, [
+                      ...raw.skills.map((skill) => skill.name),
+                      ...raw.subagents.map((helper) => helper.name),
+                    ]),
+                  );
+              if (!kind) return undefined;
+              unresolved = kind;
+              // The name ends at a parenthesis, a comma, a dash or a semicolon.
+              first = (phrase.split(/\s*\(|\s[\u2014\u2013]\s|[,;]/)[0] ?? phrase).trim();
+            }
+          } else if (!free && /<[^<>\s][^<>]*>|\{[^{}]+\}|\$\{?[A-Za-z_]|\*/.test(target)) {
+            // A path with a slot in it (`regions/<slug>/RULES.md`) names a family of files.
+            first = target.replace(/[`*"'\u201C\u201D]/g, '').trim();
+            unresolved = 'placeholder';
+          }
+          if (first === '') return undefined;
+          // A file is a path the reference tokenizer accepts (a code span may hold spaces), else one bare word.
+          const isFile =
+            self ||
+            (/\.[A-Za-z0-9]+$/.test(first) &&
+              (named !== undefined || fromName || !/\s/.test(first)) &&
+              unresolved === undefined);
+          const skill =
+            loaded || declared || viaLoad
+              ? raw.skills.find((skill) => skill.name === (declared ?? first))
+              : undefined;
+          if (loaded && !isFile && !skill) return undefined;
+          // A bare file name that fits several files (`SKILL.md`) and none beside the naming file points at no one file.
+          if (isFile && !self && !/\//.test(first) && !unresolved) {
+            const here = locateNamed(first, chunk.file, files, {
               bases: raw.bases ?? [],
               skipped: skippedOf(raw),
               aliases: raw.aliases ?? {},
               byName: names(raw, files),
               externals: raw.externals ?? [],
-            })
-          : undefined;
-        const path = located?.path;
-        const before = skill ? `skill:${skill.name}` : isFile ? raw.labels.read : raw.labels.shell;
-        const after = actLabel(action, raw);
-        const evidence: EvidencePredicate[] = [
-          { type: 'ordered', before, after },
-          skill
-            ? { type: 'skill_loaded', name: skill.name }
-            : path
-              ? { type: 'tool_called', label: raw.labels.read, input: { file_path: { contains: path } } }
-              : { type: 'tool_called', label: raw.labels.shell, input: { command: { contains: first } } },
-        ];
-        builder.add({
-          kind: 'gate',
-          title: `Read ${first} before ${trigger}`,
-          at:
-            contextual && source && heading
-              ? {
-                  file: chunk.file,
-                  startLine: heading.line,
-                  endLine: line.line,
-                  quote: source.text
-                    .split('\n')
-                    .slice(heading.line - 1, line.line)
-                    .join('\n')
-                    .trim(),
-                }
-              : { file: chunk.file, startLine: line.line, endLine: line.line, quote: line.quote },
-          evidence,
-          situation: /^(?:if|when|whenever|unless)\b[^,]+,/i.test(clause) ? unmask(clause, spans) : trigger,
-          fields: {
-            form,
+              ...(within ? { within } : {}),
+            });
+            if (here.candidates && !here.path.startsWith(`${posix.dirname(chunk.file)}/`))
+              unresolved = 'ambiguous';
+          }
+          // A loaded thing is a skill or a file, never a section or a role.
+          if (viaLoad && !skill && !(isFile && !unresolved)) return undefined;
+          const located =
+            isFile && !self
+              ? locateNamed(first, chunk.file, files, {
+                  bases: raw.bases ?? [],
+                  skipped: skippedOf(raw),
+                  aliases: raw.aliases ?? {},
+                  byName: names(raw, files),
+                  externals: raw.externals ?? [],
+                  ...(within ? { within } : {}),
+                })
+              : undefined;
+          return {
             first,
-            trigger,
-            ...(skill ? { skill: skill.name } : {}),
-            ...(path ? { path } : {}),
-            ...(located?.via === 'alias' || located?.via === 'suffix' ? { resolvedBy: located.via } : {}),
-            ...(located?.candidates ? { candidates: located.candidates } : {}),
-            ...(located?.via === 'external' ? { external: true } : {}),
-          },
-        });
+            isFile,
+            skill,
+            located,
+            path: self
+              ? chunk.file
+              : folder
+                ? folder
+                : unresolved === 'ambiguous'
+                  ? undefined
+                  : located?.path,
+            self,
+            unresolved,
+            section,
+          };
+        };
+        const required = (
+          read: NonNullable<ReturnType<typeof resolveRead>>,
+        ): EvidencePredicate | undefined =>
+          read.skill
+            ? { type: 'skill_loaded', name: read.skill.name }
+            : read.path
+              ? { type: 'tool_called', label: raw.labels.read, input: { file_path: { contains: read.path } } }
+              : read.unresolved
+                ? undefined
+                : {
+                    type: 'tool_called',
+                    label: raw.labels.shell,
+                    input: { command: { contains: read.first } },
+                  };
+        const emit = (readText: string, structure: boolean): Atom | undefined => {
+          const read = resolveRead(readText, structure, bare === true);
+          if (!read) return undefined;
+          const { first, isFile, skill, located, path, self, unresolved, section } = read;
+          const before = skill
+            ? `skill:${skill.name}`
+            : isFile || unresolved
+              ? raw.labels.read
+              : raw.labels.shell;
+          return builder.add({
+            kind: 'gate',
+            title: `Read ${first} before ${trigger}`,
+            at:
+              contextual && source && heading
+                ? {
+                    file: chunk.file,
+                    startLine: heading.line,
+                    endLine: line.line,
+                    quote: source.text
+                      .split('\n')
+                      .slice(heading.line - 1, line.line)
+                      .join('\n')
+                      .trim(),
+                  }
+                : { file: chunk.file, startLine: line.line, endLine: line.endLine, quote: line.quote },
+            evidence: [{ type: 'ordered', before, after }, required(read)].filter(
+              (predicate): predicate is EvidencePredicate => predicate !== undefined,
+            ),
+            situation: /^(?:if|when|whenever|unless)\b[^,]+,/i.test(clause) ? unmask(clause, spans) : trigger,
+            fields: {
+              form,
+              first,
+              trigger,
+              ...(skill ? { skill: skill.name } : {}),
+              ...(path ? { path } : {}),
+              ...(self ? { self: true } : {}),
+              ...(unresolved ? { unresolved } : {}),
+              ...(section ? { section } : {}),
+              ...(located?.via === 'alias' || located?.via === 'suffix' ? { resolvedBy: located.via } : {}),
+              ...(located?.candidates ? { candidates: located.candidates } : {}),
+              ...(located?.via === 'external' ? { external: true } : {}),
+            },
+          });
+        };
+        const gate = emit(match[read] ?? '', prose === true || loaded === true);
+        if (!gate) continue;
+        // More things to read before the same act join the one gate: it is one ordering with several
+        // required reads, not one rule per file.
+        const join = (more: string): boolean => {
+          const extraRead = resolveRead(more, false);
+          if (!extraRead) return false;
+          const requirement = required(extraRead);
+          if (requirement) gate.evidence.push(requirement);
+          const fields = gate.fields ?? {};
+          const also = Array.isArray(fields.also) ? (fields.also as string[]) : [];
+          gate.fields = { ...fields, also: [...also, extraRead.first] };
+          return true;
+        };
+        for (const item of extra) join(item);
+        for (const name of leadSkills) {
+          const skill = raw.skills.find((candidate) => candidate.name === name);
+          if (!skill) continue;
+          gate.evidence.push({ type: 'skill_loaded', name });
+          const fields = gate.fields ?? {};
+          const also = Array.isArray(fields.also) ? (fields.also as string[]) : [];
+          gate.fields = { ...fields, also: [...also, name] };
+        }
+        added = join;
         break;
+      }
+      if (added) previous = added;
+      else {
+        const more = previous ? continuation(original) : undefined;
+        if (more) for (const item of more) previous?.(item);
+        else previous = undefined;
       }
     }
   }
@@ -2072,9 +2599,19 @@ const ACT_VERBS = new Set(
  * An act the agent performs: its first word, after a subject (you, we, the agent), is a verb of acting. A
  * time ("9 in the morning"), a meal or a past event ("the audit last year") is no act, nor is a feeling.
  */
-function isAct(trigger: string): boolean {
-  const words = trigger
-    .toLowerCase()
+function isAct(trigger: string, negated = false): boolean {
+  const lowered = trigger.toLowerCase();
+  // A word right after the subject ("you label") is the verb, whatever else it can be.
+  const subject = /^(?:you|we|i|the agent|the assistant)\s+(\S+)/.exec(lowered)?.[1];
+  if (
+    subject !== undefined &&
+    /^[a-z][a-z-]+$/.test(subject) &&
+    ![...tagsOf(subject)].some((tag) =>
+      ['Determiner', 'Preposition', 'Conjunction', 'Pronoun', 'Adverb', 'Copula', 'Modal'].includes(tag),
+    )
+  )
+    return true;
+  const words = lowered
     .replace(/^(you|we|i|the agent|the assistant)\s+/, '')
     // "before you can edit": a modal after the subject is not the act.
     .replace(/^(?:can|may|must|should|will|shall)\s+/, '')
@@ -2084,8 +2621,13 @@ function isAct(trigger: string): boolean {
   // "anything", "something": a pronoun, not an -ing form.
   if (ACT_VERBS.has(first) || (first.length > 5 && first.endsWith('ing') && !first.endsWith('thing')))
     return true;
+  // A gerund of any verb names an act too, short ones ("doing", "using") included; "being" and "having" only help another verb.
+  if (first.endsWith('ing') && !['being', 'having'].includes(first) && tagsOf(first).has('Gerund'))
+    return true;
   // Grammar admits new imperative verbs without growing an estate-specific action vocabulary.
   if (nlp(words.join(' ')).termList()[0]?.tags?.has('Imperative')) return true;
+  // After a negation ("Never plan before reading X") the act is a bare verb, never a noun.
+  if (negated && tagsOf(first).has('Infinitive') && !tagsOf(first).has('Noun')) return true;
   // "every ticket edit", "each change": an act named as a noun after a quantifier.
   return ['every', 'each', 'any'].includes(first) && words.slice(1).some((word) => ACT_VERBS.has(word));
 }

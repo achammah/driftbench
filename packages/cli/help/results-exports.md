@@ -69,7 +69,7 @@ A store holding the campaign.
 * `compare --json`: `baseline`, `candidate`, `margin`, `alpha`, `q`, `minGoldens`, `strict`,
   `flagFamilies`, `modes`, `pairs`, `unpaired`, `allPass`, `drift`, `criteria`, `newFlags`, `verdict`,
   `reasons`.
-* `ci` summary: `verdict`, `exitCode`, `reasons`, `aggregates`, `marginPoints`, `marginAuto`,
+* `ci` summary: `verdict`, `exitCode`, `reasons`, `aggregates`, `marginPoints`, `marginAuto`, `marginDefaulted`,
   `minGoldens`, `strict`, `underpowered`, `comparator`, `flags`, `baseline`, `candidate`, `pairs`, `table`,
   `effectPoints`, `smallestMarginPoints`, `criteriaNotShown`, `regressed`, `improved`, `newFlags`,
   `unpaired`, `rows`, and `radius` with `--change`.

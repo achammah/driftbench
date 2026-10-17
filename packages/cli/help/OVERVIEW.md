@@ -65,3 +65,4 @@ Start here
   driftbench help core-getting-started   install, then run the Acme example: no model, no key
   driftbench help recipes                each goal end to end: pick yours from the recipes area below
   driftbench help core-reading-help      how every topic is laid out, and how to find one
+  driftbench help redteam-overview       red-team an agent: which command, every option, a CI example

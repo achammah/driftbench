@@ -76,6 +76,7 @@ A criterion can name a repeat reducer (`mode`, `median` or `at_least:<k>`). It r
 | `wilsonEffective(clusters, { alpha, quantile })` | the pooled pass rate over clusters of `{ n, k }`, with the design effect, the effective blocks `n_eff` and the Wilson interval on `n_eff` |
 | `hierarchicalBetaBinomial(trees, { alpha })` | the hierarchical Beta-Bernoulli interval for the mean pass rate of a suite of trees of `{ n, k }` |
 | `simulateCoverage(cell, { reps, seed })` | the coverage and width of four intervals on simulated suites of one setting: the check that an interval keeps its promise |
+| `simulateFamilyCoverage(cell, { reps, seed })` | the coverage and width of three intervals on simulated suites with parents (families of children, each child run several times): Wilson on all runs, the hierarchical interval with every child as a tree, and with every family as a tree |
 
 `bootstrapCI` takes one cluster key per value: every value of one conversation carries the conversation's key, so the blocks of a run are never treated as independent samples. Without keys every value is its own cluster. `iterations` defaults to 2000, `method` is `percentile` (the default) or `basic`, `alpha` defaults to 0.05, and `seed` defaults to 1: the same seed gives the same interval. `statistic` replaces the pooled mean with any function of the resampled values.
 
@@ -113,6 +114,23 @@ Which interval to use:
 | hierarchical | the suite headline and any published result | 95.3 percent |
 
 The coverage column is the share of simulated suites whose interval held the true mean (95 percent is the target), averaged over 24 cells of Bowyer, Aitchison and Ivanova's clustered model: 12 or 50 trees, tree sizes of 3 or the real sizes of the Acme parent forest, a true mean of 0.6 or 0.9, and a concentration of 0.5, 2 or 8 (strong to mild agreement inside a tree), with 400 simulated suites per cell. `simulateCoverage` runs one cell; the test `packages/stats/test/clustered.test.ts` runs the 24 in about three seconds and requires the naive interval under 80 percent, Wilson on `n_eff` at 90 percent or more and the hierarchical interval at 93 percent or more. On the research grid of 160 cells with 5,000 suites each, naive Wilson covered 73.5 percent and Wilson on `n_eff` (normal quantile) 91.0 percent; the hierarchical interval was run on 24 cells and covered 95.7 percent, 91.0 percent in its worst cell. A headline over few trees (under a dozen) is the least certain.
+
+### Suites with parents
+
+The children of one parent inherit its end state, so they move together. A tree for the headline is then the whole family (the root and all its descendants), not each child. `simulateFamilyCoverage` measures the difference. Each family has a pass rate around the suite's mean, each child a rate around its family's, and each child is run several times. The hierarchical interval is read with every child as a tree (the grouping of the headline today) and with every family as a tree.
+
+Measured on 48 cells (12 or 40 families, 3 or 8 children each, 3 runs per child, a true mean of 0.6 or 0.9, a family concentration of 0.5, 2 or 8, a child concentration of 2 or 20, 400 simulated suites per cell, the cells numbered 1 to 48 in the order of that list with the first factor changing slowest, and cell `i` run with seed 100 + `i`). The means and worst cells below are from that seed; six base seeds (100, 200, 300, 400, 500, 600) gave the ranges in the last column:
+
+| Reading | Mean coverage (seed 100) | Worst cell (seed 100) | Worst cell, six seeds |
+|---|---|---|---|
+| naive Wilson on all runs | 59.8 percent | 31.3 percent | 31.3 to 35.0 percent |
+| hierarchical, every child a tree | 74.2 percent | 48.5 percent | 48.5 to 50.7 percent |
+| hierarchical, every family a tree | 95.5 percent | 90.0 percent | 88.3 to 90.8 percent |
+
+* With strong agreement inside a family, grouping by child leaves the interval too narrow: it holds the true mean in about three suites of four. Grouping by family restores it to the target.
+* Without a family effect (the control in the test) both groupings cover, so grouping by family costs nothing there.
+* The worst cell is seed-dependent, because each cell rests on 400 suites (a single cell near 90 percent moves by about 2 points between seeds). In all six seeds the weakest family-grouping cell had 8 children per family, a true mean of 0.9 and mild agreement between families (a family concentration of 8); the six seeds put it between 88.3 and 90.8 percent. The mean over the 48 cells moved between 95.4 and 95.6 percent.
+* The suite headline groups by golden today. The parent link is not in the spec schema yet, so the report cannot group by root. When it lands, `suiteHeadline` takes the root of the chain as its tree key: its `treeOf` argument already accepts any grouping. The test `packages/stats/test/family-coverage.test.ts` runs a 24-cell subset in about four seconds and requires naive Wilson under 70 percent, the child grouping under 85 percent, the family grouping at 93 percent or more, and the family grouping ahead in at least 20 of the 24 cells.
 
 ## Where results vary
 
@@ -172,7 +190,7 @@ The function judges one criterion. `compareCampaigns` in `@agent-nexus/driftbenc
 | drop seen | `mde({ n, baselineRate, power: 0.8 })` | the smallest true drop from the baseline rate the goldens detect at 80% power |
 | for 10 | `goldensNeeded(0.1, discordance)` | the goldens a 10 point margin needs at 80% power: the larger of the first `n` whose floor is below 10 points and the paired sample size `(z(1 - alpha / 2) + z(0.8))^2 discordance / margin^2` (Nam 1997), with the discordance seen |
 
-**The automatic margin.** `--margin auto`, the default of `compare` and `ci`, is the smallest half point at which the baseline compared with itself is non-inferior (`autoMargin(baseline)`): the largest upper bound of the all-pass flag and of the gating criteria that are not underpowered, rounded up. It prints what sets it. Above 15 points it warns that the suite is too small for a tight gate, with the goldens a 15 point margin needs.
+**The automatic margin.** `--margin auto`, the default of `compare` and `ci`, is the smallest half point at which the baseline compared with itself is non-inferior (`autoMargin(baseline)`): the largest upper bound of the all-pass flag and of the gating criteria that are not underpowered, rounded up. It prints what sets it. A campaign with no run that passed or failed (every run is not run or blocked) has nothing to compare with itself: `report` and `ci` keep the 2 point default and say so, and `compare` exits 2 saying the two campaigns share no golden. Above 15 points it warns that the suite is too small for a tight gate, with the goldens a 15 point margin needs.
 
 Measured on the Acme example (2026-10-12):
 

@@ -108,6 +108,7 @@ The files the agent starts from.
 |---|---|---|---|---|
 | `from` | string, not empty | no |  | A folder the workspace starts from. A path written ./<path> is read from the folder of the spec file; any other relative path from the folder the run starts in. |
 | `files` | map of string to string | no |  | Files the workspace starts with: path to content. |
+| `summary` | string, not empty | no |  | What the workspace holds, in words, so a reader of the spec sees it. spec lint --summaries warns when a folder named by from has none. |
 
 ## Phrasing must
 

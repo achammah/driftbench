@@ -1,4 +1,7 @@
 import { spawnSync } from 'node:child_process';
+import { closeSync, mkdtempSync, openSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { HiddenEstate, HiddenGuard, HiddenSkill } from './hidden';
 import { STANDING, STEPS } from './layout';
 import { fileHid, HELPER_TOOLS, renderEstate, skillPath, skillTools, workFolder } from './render';
@@ -251,6 +254,31 @@ function matches(matcher: string | undefined, label: string): boolean {
   return matcher.split('|').includes(label);
 }
 
+/**
+ * Runs a guard script with the payload on its stdin. The payload is read from a file, never written to a pipe: a
+ * script that exits without reading stdin closes the pipe, and the write then fails with EPIPE (`spawnSync sh EPIPE`)
+ * on a loaded machine, a failure of the harness and not of the guard.
+ */
+export function runGuardScript(interpreter: string, script: string, input: string) {
+  const folder = mkdtempSync(join(tmpdir(), 'driftbench-guard-'));
+  try {
+    const file = join(folder, 'stdin.json');
+    writeFileSync(file, input);
+    const fd = openSync(file, 'r');
+    try {
+      return spawnSync(interpreter, ['-c', script], {
+        stdio: [fd, 'pipe', 'pipe'],
+        encoding: 'utf8',
+        timeout: 30_000,
+      });
+    } finally {
+      closeSync(fd);
+    }
+  } finally {
+    rmSync(folder, { recursive: true, force: true });
+  }
+}
+
 /** Execute the rendered guard itself. Cache identical pure payloads, not expected verdicts. */
 const scripts = new WeakMap<HiddenEstate, Record<string, string>>();
 const guardResults = new Map<string, { stdout: string; stderr: string; exitCode: number; outcome: string }>();
@@ -266,11 +294,7 @@ function executeGuard(estate: HiddenEstate, guard: HiddenGuard, payload: Record<
   const key = JSON.stringify([script, input]);
   let result = guardResults.get(key);
   if (!result) {
-    const run = spawnSync(guard.interpreter ?? 'sh', ['-c', script], {
-      input,
-      encoding: 'utf8',
-      timeout: 30_000,
-    });
+    const run = runGuardScript(guard.interpreter ?? 'sh', script, input);
     if (run.error || run.status === null)
       throw new Error(`Guard failed: ${run.error?.message ?? run.stderr}`);
     result = { stdout: run.stdout, stderr: run.stderr, exitCode: run.status, outcome: 'completed' };

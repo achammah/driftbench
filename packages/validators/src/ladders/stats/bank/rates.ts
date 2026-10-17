@@ -8,6 +8,8 @@ import { attempt, type BankItem, fail, ok, type Tier } from './item';
  * - family `coverage-simulation`: Newcombe's paired difference holds the truth at the documented 95 percent; a
  *   test rejects a true null at most at its level (McNemar, Wilcoxon, Kolmogorov-Smirnov); non-inferiority is
  *   declared at the margin at most at its one-sided level; Benjamini-Hochberg keeps the false discovery rate at q;
+ * - the clustered intervals of the suite headline (`hierarchicalBetaBinomial`, `wilsonEffective`) hold the planted mean
+ *   of a suite of trees whose blocks move together, at the tree counts a campaign has;
  * - family `product` (tier 5): the report's run pass interval holds 95 percent at the spec counts a campaign has.
  * Bars are the documented level with three Monte Carlo standard errors of slack, never a measured value
  * (validators/stats/NEEDS.md, "Depth").
@@ -17,6 +19,8 @@ const PAIRED = 'packages/stats/src/paired.ts';
 const DRIFT = 'packages/stats/src/drift.ts';
 const MULTIPLE = 'packages/stats/src/multiple.ts';
 const ESTIMATE = 'packages/report/src/estimate.ts';
+const HIERARCHICAL = 'packages/stats/src/hierarchical.ts';
+const EFFECTIVE = 'packages/stats/src/effective.ts';
 
 /** The lowest coverage a 95 percent interval may show over `draws`: 0.95 less three standard errors. */
 export function coverageBar(draws: number, level = 0.95): number {
@@ -206,6 +210,45 @@ function reportRunPass(specs: number, repeats: number, rho: number, draws: numbe
   };
 }
 
+/**
+ * A suite of `trees` trees of `size` blocks, the blocks of one tree agreeing as `rho` says, the suite's pass rate
+ * planted uniformly in 0.2 to 0.8. The interval under test gets each tree's passed and tried blocks; the planted
+ * rate is the truth it must hold. A suite of correlated trees is where an interval that reads every block as
+ * independent covers about 0.75, and a clustered one near 0.95.
+ */
+function treeCoverage(
+  interval: (s: StatsImpl, trees: { n: number; k: number }[]) => { lower: number; upper: number },
+  name: string,
+  trees: number,
+  size: number,
+  rho: number,
+  draws: number,
+): BankItem['check'] {
+  return ({ s, rng }) => {
+    let held = 0;
+    let firstMiss = '';
+    for (let d = 0; d < draws; d += 1) {
+      const truth = 0.2 + 0.6 * rng();
+      const counts: { n: number; k: number }[] = [];
+      for (let g = 0; g < trees; g += 1) {
+        const k = clusterOutcomes(rng, size, truth, rho).reduce((a, b) => a + b, 0);
+        counts.push({ n: size, k });
+      }
+      const got = attempt(() => interval(s, counts));
+      if (got.error || !got.value) return fail(`${name} threw ${got.error?.message}`);
+      if (got.value.lower <= truth && truth <= got.value.upper) held += 1;
+      else if (!firstMiss)
+        firstMiss = `${counts.reduce((a, c) => a + c.k, 0)} of ${trees * size} blocks passed, truth ${fixed(truth)}, interval [${fixed(got.value.lower)}, ${fixed(got.value.upper)}]`;
+    }
+    const bar = coverageBar(draws);
+    return held / draws >= bar
+      ? ok()
+      : fail(
+          `${name} on ${trees} trees of ${size} blocks, rho ${rho}: ${held} of ${draws} intervals hold the planted pass rate (coverage ${fixed(held / draws)}, bar ${fixed(bar)}). First miss: ${firstMiss}. An interval that reads every block as independent covers about 0.75 here. Need: docs/concepts/statistics.md "The suite headline": the interval widens when the blocks of a tree move together; driftbench report.`,
+        );
+  };
+}
+
 export function rateItems(): BankItem[] {
   const out: BankItem[] = [];
   for (const n of [30, 100]) {
@@ -377,6 +420,37 @@ export function rateItems(): BankItem[] {
         ESTIMATE,
         runPassCause,
         reportRunPass(specs, repeats, rho, draws),
+      ),
+    );
+  }
+  for (const [trees, size, rho] of [
+    [12, 6, 0.3],
+    [20, 5, 0.5],
+  ] as const) {
+    const id = `g${trees}x${size}-rho${rho}`;
+    out.push(
+      item(
+        `simulation.hierarchical.${id}`,
+        'coverage-simulation',
+        4,
+        HIERARCHICAL,
+        'hierarchicalBetaBinomial covers less than 95 percent when the blocks of a tree move together',
+        treeCoverage(
+          (s, counts) => s.hierarchicalBetaBinomial(counts),
+          'hierarchicalBetaBinomial',
+          trees,
+          size,
+          rho,
+          1000,
+        ),
+      ),
+      item(
+        `simulation.wilson-effective.${id}`,
+        'coverage-simulation',
+        4,
+        EFFECTIVE,
+        'wilsonEffective covers less than 95 percent when the blocks of a tree move together',
+        treeCoverage((s, counts) => s.wilsonEffective(counts), 'wilsonEffective', trees, size, rho, 1000),
       ),
     );
   }

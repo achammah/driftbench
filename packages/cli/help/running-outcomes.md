@@ -13,6 +13,7 @@ see_also:
   - running-budget-and-prices
   - running-cache
   - running-change-carry
+  - running-not-run
 next:
   - running-campaign-status
 ---
@@ -49,13 +50,13 @@ The runs of the campaign: those this command made, and with `resume` and `status
 |---|---|---|
 | `pass` | `✓` | the run completed, it has at least one block, every block passed, and the end state matched (when the spec declares one) |
 | `fail` | `✗` | the run completed, and a block failed or the end state differs: the agent did not do what the spec asks |
-| `not_run` | `-` | the run completed with no failure, but a block was not run: its Given carries a layer the target cannot apply (a `prefix` on an adapter without `seedPrefix`, a forced tool result in `world.tools` on one without `toolStubs`). Neither a pass nor a fail. Run the spec on a target that applies the layer, or drop the layer |
+| `not_run` | `-` | the run completed with no failure, but a block was not run: its Given carries a layer the target cannot apply. Examples: a `prefix` on an adapter without `seedPrefix`, a forced tool result in `world.tools` on one without `toolStubs`. Neither a pass nor a fail. Run the spec on a target that applies the layer, or drop the layer. Topic running-not-run |
 | `blocked` | `-` | the run completed with no failure, but a block was blocked: an ancestor it depends on failed, so it was not run (parent blocks give this status). Neither a pass nor a fail |
 | `failed` | `!` | the run ended with an error: a transport failure past its retries, an agent exception, an answer that does not fit the schema. Fix the cause and resume |
 | `stopped` | `!` | the run stopped: the driver did not stop within its step limit, or the budget stopped the cell before it started (no run is stored for a budget stop) |
 | `pending` | `·` | `status` only: the cell has no stored run yet |
 
-A block has one of four statuses. `pass` and `fail` are measurements: a block passes when every gating verdict on it passes, and fails otherwise. `not_run` and `blocked` are not: the block was never sent to the agent, it has no verdicts, and every pass rate leaves it out and prints its count beside the rate. The runner checks, before it sends a block, that the target can apply every layer of the block's Given (the `capability` check); a layer it cannot apply makes the block `not_run` with kind `unsupported`, never a silently dropped layer. In modes F and P the conversation cannot go past a block it did not run, so every later block is `not_run` too, and the end state is not compared. A verdict is `pass`, `fail`, `inconclusive` or `not_applicable`. A gating verdict counts only when its outcome is `pass`: a gating verdict that is `inconclusive` (the check could not show the behaviour) fails the block too. Non-gating verdicts are reported and never fail a block.
+A block has one of four statuses. `pass` and `fail` are measurements: a block passes when every gating verdict on it passes, and fails otherwise. `not_run` and `blocked` are not: the block was never sent to the agent, it has no verdicts, and every pass rate leaves it out and prints its count beside the rate. The runner checks, before it sends a block, that the target can apply every layer of the block's Given (the `capability` check); a layer it cannot apply makes the block `not_run` with kind `unsupported`, never a silently dropped layer. Before that, the Given verifier (topic authoring-spec-check) makes a block whose Given is wrong `not_run` with kind `given_unmet`; after a session opens on an adapter with a sandbox, a seeded file that does not read back as written makes it `not_run` with kind `setup_failed`. In modes F and P the conversation cannot go past a block it did not run, so every later block is `not_run` too, and the end state is not compared. A verdict is `pass`, `fail`, `inconclusive` or `not_applicable`. A gating verdict counts only when its outcome is `pass`: a gating verdict that is `inconclusive` (the check could not show the behaviour) fails the block too. Non-gating verdicts are reported and never fail a block.
 
 ### A cell line
 

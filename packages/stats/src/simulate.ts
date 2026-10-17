@@ -137,3 +137,114 @@ export function simulateCoverage(cell: CoverageCell, options: CoverageOptions): 
   }
   return { cell, reps: options.reps, coverage, width: widths };
 }
+
+/**
+ * One simulated setting of a suite with parents: a family is a root and its descendants. Every family f has a pass
+ * rate phi_f ~ Beta(dFamily theta, dFamily (1 - theta)), every child c of f a rate theta_c ~ Beta(dChild phi_f,
+ * dChild (1 - phi_f)), and each child is run `runs` times. A small dFamily means the children of one family move
+ * together (the intraclass correlation between families is 1 / (1 + dFamily)); a small dChild means the runs of
+ * one child do.
+ */
+export interface FamilyCoverageCell {
+  /** Families (roots) in the suite. */
+  readonly families: number;
+  /** Children per family: one number for every family, or a pool the sizes are drawn from with replacement. */
+  readonly children: number | readonly number[];
+  /** Runs of each child. */
+  readonly runs: number;
+  /** The hyper-mean the intervals try to cover. */
+  readonly theta: number;
+  /** Concentration of the family rates around theta. */
+  readonly dFamily: number;
+  /** Concentration of the child rates around their family's rate. */
+  readonly dChild: number;
+}
+
+export type FamilyCoverageMethod = 'naive wilson' | 'children as trees' | 'families as trees';
+
+export interface FamilyCoverageResult {
+  readonly cell: FamilyCoverageCell;
+  readonly reps: number;
+  /** Share of suites whose interval held theta, per reading. */
+  readonly coverage: Record<FamilyCoverageMethod, number>;
+  /** Mean interval width, per reading. */
+  readonly width: Record<FamilyCoverageMethod, number>;
+}
+
+const FAMILY_METHODS: readonly FamilyCoverageMethod[] = [
+  'naive wilson',
+  'children as trees',
+  'families as trees',
+];
+
+/**
+ * The coverage and width of three 95 percent intervals on simulated suites with parents: Wilson on all runs as if
+ * independent, the hierarchical interval with every child as a tree (the golden, as the suite headline groups
+ * today), and the hierarchical interval with every family as a tree (the runs of a root and all its descendants
+ * pooled). Coverage near 0.95 is the promise; the result is what was measured, whether or not it keeps it.
+ * Deterministic for a seed.
+ */
+export function simulateFamilyCoverage(
+  cell: FamilyCoverageCell,
+  options: CoverageOptions,
+): FamilyCoverageResult {
+  const name = 'simulateFamilyCoverage';
+  assertCount(name, 'families', cell.families);
+  assertCount(name, 'runs', cell.runs);
+  assertCount(name, 'reps', options.reps);
+  assertProbability(name, 'theta', cell.theta, true);
+  assertFinite(name, 'dFamily', cell.dFamily);
+  assertFinite(name, 'dChild', cell.dChild);
+  if (!(cell.families >= 1))
+    throw new RangeError(`${name}: families must be at least 1, got ${cell.families}`);
+  if (!(cell.runs >= 1)) throw new RangeError(`${name}: runs must be at least 1, got ${cell.runs}`);
+  if (!(options.reps >= 1)) throw new RangeError(`${name}: reps must be at least 1, got ${options.reps}`);
+  if (!(cell.dFamily > 0)) throw new RangeError(`${name}: dFamily must be above 0, got ${cell.dFamily}`);
+  if (!(cell.dChild > 0)) throw new RangeError(`${name}: dChild must be above 0, got ${cell.dChild}`);
+  const pool = typeof cell.children === 'number' ? [cell.children] : cell.children;
+  if (pool.length === 0) throw new RangeError(`${name}: children must not be empty`);
+  for (const size of pool) assertCount(name, 'children', size);
+  if (pool.some((size) => size < 1)) throw new RangeError(`${name}: every family needs at least one child`);
+  const rng = mulberry32(options.seed ?? 1);
+  const held: Record<FamilyCoverageMethod, number> = {
+    'naive wilson': 0,
+    'children as trees': 0,
+    'families as trees': 0,
+  };
+  const widths = { ...held };
+  const tally = (method: FamilyCoverageMethod, lower: number, upper: number): void => {
+    if (lower <= cell.theta && cell.theta <= upper) held[method] += 1;
+    widths[method] += upper - lower;
+  };
+  for (let rep = 0; rep < options.reps; rep += 1) {
+    const childTrees: { n: number; k: number }[] = [];
+    const familyTrees: { n: number; k: number }[] = [];
+    for (let f = 0; f < cell.families; f += 1) {
+      const size = pool[Math.floor(rng() * pool.length)] as number;
+      const familyRate = beta(rng, cell.dFamily * cell.theta, cell.dFamily * (1 - cell.theta));
+      const family = { n: 0, k: 0 };
+      for (let c = 0; c < size; c += 1) {
+        const childRate = beta(rng, cell.dChild * familyRate, cell.dChild * (1 - familyRate));
+        const passed = binomial(rng, cell.runs, childRate);
+        childTrees.push({ n: cell.runs, k: passed });
+        family.n += cell.runs;
+        family.k += passed;
+      }
+      familyTrees.push(family);
+    }
+    const runs = childTrees.reduce((sum, tree) => sum + tree.n, 0);
+    const passes = childTrees.reduce((sum, tree) => sum + tree.k, 0);
+    const naive = wilson(passes, runs);
+    tally('naive wilson', naive.lower, naive.upper);
+    const byChild = hierarchicalBetaBinomial(childTrees);
+    tally('children as trees', byChild.lower, byChild.upper);
+    const byFamily = hierarchicalBetaBinomial(familyTrees);
+    tally('families as trees', byFamily.lower, byFamily.upper);
+  }
+  const coverage = { ...held };
+  for (const method of FAMILY_METHODS) {
+    coverage[method] = held[method] / options.reps;
+    widths[method] /= options.reps;
+  }
+  return { cell, reps: options.reps, coverage, width: widths };
+}

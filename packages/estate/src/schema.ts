@@ -234,18 +234,24 @@ export const DocumentRole = z.enum([
 ]);
 export type DocumentRole = z.infer<typeof DocumentRole>;
 export const DocumentInfo = z.strictObject({
-  path: z.string().min(1),
-  role: DocumentRole,
-  reasons: z.array(z.string().min(1)).min(1),
+  path: z.string().min(1).describe('Path of the document, relative to the estate root.'),
+  role: DocumentRole.describe(
+    'The authority of the document as a whole, from its folder, headings and entries.',
+  ),
+  reasons: z
+    .array(z.string().min(1))
+    .min(1)
+    .describe('What the classification read: the folder, the heading or the entries that gave the role.'),
   sections: z
     .array(
       z.strictObject({
-        startLine: z.number().int().min(1),
-        endLine: z.number().int().min(1),
-        role: DocumentRole,
+        startLine: z.number().int().min(1).describe('First line of the section, counted from 1.'),
+        endLine: z.number().int().min(1).describe('Last line of the section, counted from 1.'),
+        role: DocumentRole.describe('The role of this section, which differs from the role of the document.'),
       }),
     )
-    .optional(),
+    .optional()
+    .describe('Spans of a live document that carry a non-normative role, such as an example or a history.'),
 });
 export type DocumentInfo = z.infer<typeof DocumentInfo>;
 

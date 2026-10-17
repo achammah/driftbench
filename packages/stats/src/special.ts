@@ -191,7 +191,9 @@ export function normalQuantile(p: number): number {
     x = -poly(ACKLAM_C, q) / (poly(ACKLAM_D, q) * q + 1);
   }
   for (let i = 0; i < 2; i += 1) {
-    const e = normalCdf(x) - p;
+    // Above one half, cdf(x) - p is computed as (1 - p) - sf(x): 1 - p is exact there, and the difference of two
+    // numbers near 1 would keep only the digits that p has left of the gap to 1.
+    const e = p > 0.5 ? 1 - p - normalSf(x) : normalCdf(x) - p;
     const u = e * Math.sqrt(2 * Math.PI) * Math.exp((x * x) / 2);
     x -= u / (1 + (x * u) / 2);
   }

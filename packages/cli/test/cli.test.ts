@@ -75,6 +75,33 @@ describe('driftbench spec lint', () => {
     const { code } = await run(['spec', 'lint', '--strict', 'advice.yaml'], dir);
     expect(code).toBe(1);
   });
+
+  it('warns on a Given error, and on a missing summary only with --summaries', async () => {
+    const dir = await fixture();
+    await writeFile(
+      join(dir, 'given.yaml'),
+      [
+        'id: given',
+        'given: { vars: { session_state: resumed } }',
+        'blocks:',
+        '  - user: hi',
+        '    given:',
+        '      prefix:',
+        "        - { role: assistant, content: 'x', tool_calls: [ { label: lookup, input: {} } ] }",
+        '    expect: { must: [hello] }',
+        '',
+      ].join('\n'),
+    );
+    const plain = await run(['spec', 'lint', '--strict', 'given.yaml'], dir);
+    expect(plain.code).toBe(1);
+    expect(plain.out).toContain(
+      '! blocks.0.given.prefix.0.tool_calls.0  GIVEN_UNMET  tool_history_paired: expected lookup carries an output or an error; got a call with no result',
+    );
+    expect(plain.out).not.toContain('GIVEN_SUMMARY_MISSING');
+    const asked = await run(['spec', 'lint', '--summaries', 'given.yaml'], dir);
+    expect(asked.code).toBe(0);
+    expect(asked.out).toContain('! given.vars.session_state  GIVEN_SUMMARY_MISSING  summary_present');
+  });
 });
 
 describe('the command line itself', () => {

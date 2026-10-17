@@ -9,7 +9,7 @@ Rewritten by the executor every iteration (docs/validators.md section 10). A str
 |---|---|
 | 1 | 1 |
 <!-- level-table:end -->
-The stats validator is ladder version 2: 651 items in seven levels, each with threshold 1. The bank score is the share of items passing on every seed (seeds 1 to 20 and the hidden seed).
+The stats validator is ladder version 2: 651 items in seven levels (four items for the clustered intervals of the suite headline, `simulation.hierarchical.*` and `simulation.wilson-effective.*`, were added later and pass on every seed tried; the counts below are those of the measured runs), each with threshold 1. The bank score is the share of items passing on every seed (seeds 1 to 20 and the hidden seed).
 
 ## State (executor exec/stats-v3, PR 107): final report
 

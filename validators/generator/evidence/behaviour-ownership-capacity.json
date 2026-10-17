@@ -1,0 +1,287 @@
+{
+  "base": "119802811739d45a85c3dda5d3402a5cd31bce2c",
+  "publicSeeds": [
+    {
+      "seed": 1,
+      "addedOwnershipEdges": 1
+    },
+    {
+      "seed": 2,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 3,
+      "addedOwnershipEdges": 1
+    },
+    {
+      "seed": 4,
+      "addedOwnershipEdges": 2
+    },
+    {
+      "seed": 5,
+      "addedOwnershipEdges": 1
+    },
+    {
+      "seed": 6,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 7,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 8,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 9,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 10,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 11,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 12,
+      "addedOwnershipEdges": 2
+    },
+    {
+      "seed": 13,
+      "addedOwnershipEdges": 1
+    },
+    {
+      "seed": 14,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 15,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 16,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 17,
+      "addedOwnershipEdges": 1
+    },
+    {
+      "seed": 18,
+      "addedOwnershipEdges": 2
+    },
+    {
+      "seed": 19,
+      "addedOwnershipEdges": 1
+    },
+    {
+      "seed": 20,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 1009,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 2027,
+      "addedOwnershipEdges": 0
+    },
+    {
+      "seed": 4093,
+      "addedOwnershipEdges": 1
+    },
+    {
+      "seed": 8191,
+      "addedOwnershipEdges": 1
+    }
+  ],
+  "hidden": "in-memory comparison passed; map and seed not serialized",
+  "allOtherFieldsIdentical": true,
+  "allDrawnOwnershipPreserved": true,
+  "ruling": "Every listed behaviour phrase remains mandatory. Preserve drawn flow ownership and add only ownership edges needed for a full matching into distinct post-read (flow,stage) slots.",
+  "contract": [
+    "docs/validators.md sections 1.1, 1.5, 3 and 8.2",
+    "packages/generate/src/seed/phrase-seeder.ts: distinct stagesUsed slots after readCalls",
+    "rendered inventory flow behaviours and required behaviour phrase entries"
+  ],
+  "red": {
+    "source": "119802811739d45a85c3dda5d3402a5cd31bce2c hidden.ts",
+    "failed": 13,
+    "passed": 19,
+    "tests": 32
+  },
+  "green": {
+    "files": 2,
+    "passed": 40
+  },
+  "controls": [
+    "Hand-written parcel routes: orphan and capacity collision; drawn edges preserved; minimum two edges added; idempotent.",
+    "Insufficient total capacity throws instead of waiving a phrase.",
+    "On seeds 1009,2027,4093,8191 real generation passes unchanged phrases.behaviours; silently removing an owned phrase fails; a forged no_phrase capacity explanation still fails."
+  ],
+  "hiddenReview": "Review the seed-independent matching construction, hand-written parcel case and public seed-1 fixture diff. Run the test at the reviewed commit: it derives the hidden seed using unchanged seeds.ts and checks the map only in memory. Neither hidden map nor hidden seed is serialized. Each new commit obtains a new hidden map.",
+  "limits": "Focused invariant and phrase-coverage measurement only; no full ladder or bank score claimed.",
+  "reviewCorrection": {
+    "supersedes": "Incrementally repairing an early orphan could consume a later owned behaviour slot, adding unnecessary ownership.",
+    "source": "b1ffc7ca1611550ee32a33c87f117c20df4b1616",
+    "red": {
+      "failed": 2,
+      "skipped": 32
+    },
+    "green": {
+      "passed": 42,
+      "files": 2
+    },
+    "controls": "Reviewer orphan/fixed example and all 512 three-by-three original ownership graphs; independent exhaustive maximum-cardinality oracle.",
+    "minimalityProof": "Let M be maximum cardinality using all original edges and B the required behaviour count. Every new ownership edge increases cardinality by at most one. Adding one edge to a free slot for each of B-M unmatched behaviours achieves the lower bound.",
+    "publicMaps": [
+      {
+        "seed": 1,
+        "addedOwnershipEdges": 1,
+        "minimumEdges": 1
+      },
+      {
+        "seed": 2,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 3,
+        "addedOwnershipEdges": 1,
+        "minimumEdges": 1
+      },
+      {
+        "seed": 4,
+        "addedOwnershipEdges": 2,
+        "minimumEdges": 2
+      },
+      {
+        "seed": 5,
+        "addedOwnershipEdges": 1,
+        "minimumEdges": 1
+      },
+      {
+        "seed": 6,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 7,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 8,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 9,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 10,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 11,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 12,
+        "addedOwnershipEdges": 2,
+        "minimumEdges": 2
+      },
+      {
+        "seed": 13,
+        "addedOwnershipEdges": 1,
+        "minimumEdges": 1
+      },
+      {
+        "seed": 14,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 15,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 16,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 17,
+        "addedOwnershipEdges": 1,
+        "minimumEdges": 1
+      },
+      {
+        "seed": 18,
+        "addedOwnershipEdges": 2,
+        "minimumEdges": 2
+      },
+      {
+        "seed": 19,
+        "addedOwnershipEdges": 1,
+        "minimumEdges": 1
+      },
+      {
+        "seed": 20,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 1009,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 2027,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 4093,
+        "addedOwnershipEdges": 1,
+        "minimumEdges": 1
+      },
+      {
+        "seed": 8191,
+        "addedOwnershipEdges": 1,
+        "minimumEdges": 1
+      },
+      {
+        "seed": 12289,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      },
+      {
+        "seed": 24593,
+        "addedOwnershipEdges": 1,
+        "minimumEdges": 1
+      },
+      {
+        "seed": 49157,
+        "addedOwnershipEdges": 2,
+        "minimumEdges": 2
+      },
+      {
+        "seed": 98317,
+        "addedOwnershipEdges": 0,
+        "minimumEdges": 0
+      }
+    ],
+    "allOtherFieldsIdentical": true,
+    "allDrawnOwnershipPreserved": true,
+    "minimumEdgesVerified": true,
+    "hidden": "aggregate in-memory check passed; no seed or map serialized"
+  }
+}

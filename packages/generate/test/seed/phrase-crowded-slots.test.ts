@@ -41,8 +41,22 @@ function crowded() {
       approved: true,
     });
   const relations: ProposalRelation[] = [
-    { kind: 'path', id: 'card-short', flow: 'card', stages: ['greet', 'verify'], ...by },
-    { kind: 'path', id: 'balance-long', flow: 'balance', stages: ['greet', 'verify', 'help'], ...by },
+    {
+      kind: 'path',
+      id: 'card-short',
+      flow: 'card',
+      stages: ['greet', 'verify'],
+      behaviours: Object.keys(BEHAVIOURS),
+      ...by,
+    },
+    {
+      kind: 'path',
+      id: 'balance-long',
+      flow: 'balance',
+      stages: ['greet', 'verify', 'help'],
+      behaviours: Object.keys(BEHAVIOURS),
+      ...by,
+    },
     {
       kind: 'uses_tool',
       subject: { dimension: 'behaviour', value: 'read-account' },
@@ -153,6 +167,15 @@ describe('behaviour phrases on a map whose slots are crowded', () => {
         .filter((text) => text !== BEHAVIOURS['note-down'])
         .sort(),
     );
+  });
+
+  it('keeps the pending walk reasons as well as the cap reason', () => {
+    const { prepared } = crowded();
+    const unsaid: UnsaidPhrase[] = [];
+    phraseDrafts(prepared, { seed: 1097, t: 2, max: 3 }, new Set(), 0, unsaid);
+    const reasons = unsaid.find((entry) => entry.value === 'read-card')?.reasons ?? [];
+    expect(reasons).toContain('cut by --max');
+    expect(reasons).toContainEqual(expect.stringContaining('no behaviour tool relation applies'));
   });
 
   it('says a conditional phrase at the one slot its call allows, moving a free sibling elsewhere', () => {
