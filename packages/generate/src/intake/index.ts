@@ -113,3 +113,17 @@ export {
   normaliseText,
   wordsOf,
 } from './text';
+export {
+  interviewVariables,
+  loadVariableRecording,
+  parseVariableRecording,
+  replayAsker,
+  type VariableAsker,
+  type VariableInterviewEntry,
+  type VariableInterviewOptions,
+  type VariableInterviewResult,
+  type VariableQuestion,
+  VariableRecording,
+  type VariableRecordingResult,
+  type VariableReplayAsker,
+} from './variable-interview';

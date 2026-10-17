@@ -1,0 +1,63 @@
+# The store an interview starts from: the laundry shop Harbor Laundry, invented for this example. Its owner gave
+# the channels and the weights of the first two variables in an earlier session (the words below are invented).
+format: 1
+agent: harbor-laundry
+version: '1'
+variables:
+  - id: channel
+    title: How a customer books
+    kind: channel
+    role: axis
+    approved: true
+    values:
+      - id: web
+        title: On the web page
+        weight: 0.7
+        provenance:
+          - kind: owner
+            words: Seven bookings in ten come from the web page.
+            date: 2026-10-01
+      - id: phone
+        title: By phone
+        weight: 0.3
+        provenance:
+          - kind: owner
+            words: Three in ten still phone us.
+            date: 2026-10-01
+  - id: garment
+    title: What the customer brings
+    kind: data
+    role: axis
+    approved: true
+    values:
+      - id: shirt
+        title: Shirts
+        provenance:
+          - kind: owner
+            words: Most orders are shirts.
+            date: 2026-10-01
+      - id: coat
+        title: Coats
+        provenance:
+          - kind: owner
+            words: Coats come in winter.
+            date: 2026-10-01
+  - id: pickup_slot
+    title: When the customer collects the order
+    kind: data
+    role: axis
+    approved: true
+    values:
+      - id: morning
+        title: Before noon
+        provenance:
+          - kind: owner
+            words: We open at eight.
+            date: 2026-10-01
+      - id: evening
+        title: After four
+        provenance:
+          - kind: owner
+            words: Many collect after work.
+            date: 2026-10-01
+constraints: []

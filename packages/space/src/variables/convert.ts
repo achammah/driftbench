@@ -29,7 +29,13 @@ export function spaceMapToVariables(map: SpaceMap): VariableStore {
       approved: true,
       values: dimension.values.map((value) => {
         // The prior names the weights of a dimension it lists, and they replace the weights of its values.
-        const weight = fitted[dimension.id] === undefined ? value.weight : fitted[dimension.id]?.[value.id];
+        const listed = Object.hasOwn(fitted, dimension.id) ? fitted[dimension.id] : undefined;
+        const weight =
+          listed === undefined
+            ? value.weight
+            : Object.hasOwn(listed, value.id)
+              ? listed[value.id]
+              : undefined;
         return {
           id: value.id,
           title: value.title,

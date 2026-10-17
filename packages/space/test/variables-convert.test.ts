@@ -257,3 +257,57 @@ describe('a store becomes the space map of its approved axes', () => {
     expect(spaceOf(store).dimensions[0]?.values.map((value) => value.id)).toEqual(['D4_loose_confirmation']);
   });
 });
+
+describe('ids that are also names of Object.prototype', () => {
+  it('keeps the weights of a dimension named constructor when the prior lists no weights', () => {
+    const source = map({
+      version: '1',
+      agent: 'x',
+      dimensions: [
+        {
+          id: 'constructor',
+          title: 'A dimension named like a built-in',
+          kind: 'data',
+          values: [
+            { id: 'toString', title: 'A', weight: 3 },
+            { id: 'normal', title: 'B', weight: 1 },
+          ],
+        },
+      ],
+      constraints: [],
+      prior: { kind: 'declared' },
+    });
+    const store = storeOf(source);
+    expect(store.variables[0]?.values.map((value) => [value.id, value.weight])).toEqual([
+      ['toString', 3],
+      ['normal', 1],
+    ]);
+    expect(spaceOf(store)).toEqual(source);
+  });
+
+  it('loads a store whose variables and values carry such names, and a constraint on them', () => {
+    const named = (id: string, kind: string, values: string[]) => ({
+      id,
+      title: id,
+      kind,
+      role: 'axis',
+      approved: true,
+      values: values.map((value) => ({ id: value, title: value })),
+    });
+    const store = validated({
+      format: 1,
+      agent: 'x',
+      version: '1',
+      variables: [
+        named('constructor', 'data', ['toString', 'valueOf']),
+        named('hasOwnProperty', 'persona', ['a', 'b']),
+      ],
+      constraints: [
+        { forbid: { constructor: 'toString', hasOwnProperty: 'a' }, reason: 'No.', approved: true },
+      ],
+    });
+    expect(spaceOf(store).constraints).toEqual([
+      { forbid: { constructor: 'toString', hasOwnProperty: 'a' }, reason: 'No.' },
+    ]);
+  });
+});

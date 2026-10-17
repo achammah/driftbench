@@ -10,7 +10,7 @@ Three sources feed it:
 | Past conversations | the values they show, and how often | counts and a hash of the private set, never a line of text |
 | The owner | a value that is missing, a combination that cannot occur, a weight | the owner's words and the day they said them |
 
-Status. Built: the format, a loader that checks it, the conversion from a space map and from a map proposal, the conversion back to a space map, and the check of every quote against its file. Not built yet: the readers that fill a store from an estate, from past conversations and from an interview; the ledger that gives the ids (the store checks only their shape); the planner and the generator reading a store; a command for the store. The `space` commands read a space map, and `variablesToSpaceMap` makes one from a store.
+Status. Built: the format, a loader that checks it, the conversion from a space map and from a map proposal, the conversion back to a space map, and the check of every quote against its file. Also built: an interview that fills a store from the owner (below). Not built yet: the readers that fill a store from an estate and from past conversations; the ledger that gives the ids (the store checks only their shape); the planner and the generator reading a store; a command for the store. The `space` commands read a space map, and `variablesToSpaceMap` makes one from a store.
 
 ## The file
 
@@ -219,6 +219,28 @@ Three conversions connect the store to the two files it replaces.
 * `spaceMapToVariables(map)` turns a space map into a store. Each dimension becomes an approved axis, each constraint an approved one, and no entry has provenance or an author, because a space map says neither. The weights of the prior move onto the values they weigh. The store keeps one weight per value, so the weight a value wrote itself, when the prior also weighs its dimension, is the one thing not kept; a space command never read it. Everything else a space command reads is kept: converting back gives the same map.
 * `proposalToVariables(proposal)` turns the dimensions and constraints of a map proposal into a store. It keeps every field: the role, the flags, who proposed each entry (`produced_by`), the rule fields and the weight of each value, and the evidence of each entry as a `quote` with the path as the proposal wrote it, so write the store beside the proposal. The phrases, the relations and the numeric settings stay in the proposal. Rebuilding the dimensions and constraints from the store gives the proposal's own, for the approved Acme proposal and for the one nobody approved.
 * `variablesToSpaceMap(store, options)` turns a store into a space map: its approved axes, their values, weights and required flags, and the constraints whose values are all in the map. It returns the result of `validateSpaceMap`, so a store with no approved axis gives the error `SCHEMA_TOO_SMALL` on `dimensions`. With `approvedOnly: false` it keeps what is not approved. It does not add the value `none` to a deviation axis; the generator adds it when it builds the cells, as it does for a proposal.
+
+## Filling a store from an interview
+
+`interviewVariables(store, ask, options)` in `@agent-nexus/driftbench-generate` asks the owner for what a store lacks and writes the answers into a copy of the store. It asks three kinds of question, in this order. Code checks each answer against the store being built. An answer that does not fit is asked again, with the reason, up to `maxAttempts` times (default 3). A question that is still wrong after that is given up, and the interview goes on without it.
+
+| Question (key) | Asked | An answer | Asked again when |
+|---|---|---|---|
+| `values:VARIABLE` | once per variable | `{ none: true }`, or `{ values: [{ id, title, words }] }`: the values the store is missing | an id is not an id, is already a value of the variable (or twice in the answer), or has no title |
+| `pair:N` | until the owner answers `{ done: true }` | `{ forbid: { VARIABLE: VALUE, ... }, reason, words }`: values that never occur together | a variable or a value is unknown, fewer than two variables are named, the reason is blank, the combination is already ruled impossible (in any key order, or contained in a constraint already there) or would leave no cell |
+| `weights:VARIABLE` | once per variable | `{ skip: true }`, or `{ weights: { VALUE: number, ... }, words }` | a value is unknown or has no weight, a weight is negative, the weights do not add up to 1 (within 0.000001), or the variable already has weights and got a new value and the owner skips |
+
+Every answer that carries `words` must carry the owner's words, not blank and at most 1,000 characters. An answer of another shape is asked again too, with the path of the problem.
+
+What an accepted answer writes:
+
+* A value: a value of the variable with `produced_by: owner`, `approved: true` and an `owner` provenance entry holding the words and the day.
+* A pair: a constraint with `approved: true`, `produced_by: owner`, the reason, and an `owner` provenance entry.
+* Weights: the `weight` of every value of the variable, and an `owner` provenance entry added to each value.
+
+The day comes from `options.now` (default: the clock). The result is `{ ok: true, store, transcript, added }`, with a store that passes `validateVariableStore`, or `{ ok: false, reason, transcript }`. The transcript lists every ask with its outcome (`accepted`, `refused` with the reason, `gave-up` or `skipped`). The run fails when the asker throws, and when the store is invalid at the end, for instance because a variable that has weights got a new value and never got its weights.
+
+The asker is a function. `replayAsker(recording)` gives the answers of a recording, in order, per question key, with no model and no person; a question with no recorded answer left fails the run, and `asker.unused()` names the answers never asked for. A recording is YAML: `version: 1` and `answers`, a list of `{ question, answer }`. A refused answer and its correction are two entries of one question. The folder [`examples/variables/interview`](../examples/variables/interview/start.yaml) holds an invented store (`start.yaml`) and the recording of an interview over it (`answers.yaml`) with five wrong answers, each followed by its correction.
 
 ## Worked examples
 

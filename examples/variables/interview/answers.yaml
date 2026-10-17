@@ -1,0 +1,51 @@
+# The recorded answers of an interview over start.yaml. Invented. Played back by replayAsker: no model, no person.
+# Four answers are wrong on purpose, and each is followed by its correction: a value that is already there, a pair
+# that names a value the store lacks, a pair already ruled out (written in another order), and weights that add up
+# to 0.9. A fifth is a skip the weights of a variable with a new value do not allow.
+version: 1
+answers:
+  - question: values:channel
+    answer:
+      values:
+        - { id: web, title: On the web page again, words: The web page is our main channel. }
+  - question: values:channel
+    answer:
+      values:
+        - { id: kiosk, title: At the kiosk in the shop, words: Some customers book at the kiosk in the shop. }
+  - question: values:garment
+    answer: { none: true }
+  - question: values:pickup_slot
+    answer: { none: true }
+  - question: pair:1
+    answer:
+      forbid: { channel: phone, garment: parka }
+      reason: We do not clean parkas by phone.
+      words: We do not take parkas by phone.
+  - question: pair:1
+    answer:
+      forbid: { channel: kiosk, pickup_slot: evening }
+      reason: The kiosk has no evening pickup, because the shop closes at six.
+      words: The kiosk is only in the shop and the shop closes at six.
+  - question: pair:2
+    answer:
+      forbid: { pickup_slot: evening, channel: kiosk }
+      reason: The same pair again.
+      words: The kiosk has no evening pickup.
+  - question: pair:2
+    answer: { done: true }
+  - question: weights:channel
+    answer: { skip: true }
+  - question: weights:channel
+    answer:
+      weights: { web: 0.5, phone: 0.3, kiosk: 0.1 }
+      words: Half web, three in ten phone, one in ten kiosk.
+  - question: weights:channel
+    answer:
+      weights: { web: 0.6, phone: 0.3, kiosk: 0.1 }
+      words: Six in ten web, three in ten phone, one in ten kiosk.
+  - question: weights:garment
+    answer:
+      weights: { shirt: 0.8, coat: 0.2 }
+      words: Eight orders in ten are shirts and two are coats.
+  - question: weights:pickup_slot
+    answer: { skip: true }
