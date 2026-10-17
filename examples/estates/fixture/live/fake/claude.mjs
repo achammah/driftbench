@@ -170,7 +170,13 @@ const records = manifestPath
       .split('\n')
       .filter((line) => line.trim() !== '')
       .map((line) => JSON.parse(fill(line)))
-  : planStream({ ask, cwd, sessionId, env }).records;
+  : planStream({
+      ask,
+      cwd,
+      sessionId,
+      env,
+      compacted: previous.some((record) => record.type === 'system' && record.subtype === 'compact_boundary'),
+    }).records;
 for (const record of records) {
   if (record.fake === 'decision') {
     if (env.HOOK_DECISION_LOG) {

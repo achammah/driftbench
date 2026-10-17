@@ -9,6 +9,9 @@ import { FAKE, scratch } from './support';
  * The default fake agent gives each rule kind of an estate a behaviour: deleting a rule, or writing its opposite,
  * changes what the fake does. Every estate here is written by hand and names nothing of the bank.
  */
+// The fake agent module, imported by its URL: it is plain JavaScript with no type declarations.
+const AGENT = new URL('../../../../../examples/estates/fixture/live/fake/agent.mjs', import.meta.url).href;
+
 const cleanups: Array<() => Promise<void>> = [];
 afterEach(async () => {
   while (cleanups.length) await cleanups.pop()?.();
@@ -245,4 +248,77 @@ it('reads before the unit does its own work, and still stops when the later part
   const records = play(foreign, 'Look up the status of a parcel by its code.');
   expect(calls(records).map((call) => call.name)).toEqual(['Skill']);
   expect(JSON.stringify(records)).toContain('actions cannot be resolved');
+});
+
+it('reads the standing file again after a compaction when the estate says so, and not otherwise', async () => {
+  const { planStream } = await import(AGENT);
+  const files = (rule: string) => ({
+    'CLAUDE.md': `# Rules\n\n- ${rule}\n`,
+    '.claude/skills/parcel-lookup/SKILL.md': skill('parcel-lookup', '- Look parcels up.'),
+  });
+  const ask = 'Look up the status of a parcel by its code.';
+  const names = (dir: string, compacted: boolean) =>
+    (
+      planStream({ ask, cwd: dir, sessionId: 's', env: {}, compacted }).records as Array<{
+        message?: { content?: Array<{ type?: string; name?: string; input?: { file_path?: string } }> };
+      }>
+    ).flatMap((row) =>
+      (row.message?.content ?? [])
+        .filter((part) => part.type === 'tool_use')
+        .map((part) => `${part.name}:${(part.input?.file_path ?? '').split('/').pop()}`),
+    );
+  const told = await estate(files('After a compaction, re-read this file before you continue.'));
+  expect(names(told, true)[0]).toBe('Read:CLAUDE.md');
+  expect(names(told, false)).not.toContain('Read:CLAUDE.md');
+  const silent = await estate(files('Keep replies short.'));
+  expect(names(silent, true)).not.toContain('Read:CLAUDE.md');
+});
+
+it('after a compaction reads every file the rule names, on each wording the scanner reads as a compaction', async () => {
+  const { planStream } = await import(AGENT);
+  const reads = async (files: Record<string, string>) => {
+    const dir = await estate({
+      '.claude/skills/parcel-lookup/SKILL.md': skill('parcel-lookup', '- Look parcels up.'),
+      'notes/handover.md': 'Where the work stood.\n',
+      ...files,
+    });
+    return (
+      planStream({
+        ask: 'Look up the status of a parcel by its code.',
+        cwd: dir,
+        sessionId: 's',
+        env: {},
+        compacted: true,
+      }).records as Array<{
+        message?: { content?: Array<{ type?: string; name?: string; input?: { file_path?: string } }> };
+      }>
+    )
+      .flatMap((row) => row.message?.content ?? [])
+      .filter((part) => part.type === 'tool_use' && part.name === 'Read')
+      .map((part) => (part.input?.file_path ?? '').slice(dir.length + 1));
+  };
+  const rule = (line: string) => ({ 'CLAUDE.md': `# Rules\n\n- ${line}\n` });
+  expect(
+    await reads(rule('After a compaction, re-read this file and `notes/handover.md` before you continue.')),
+  ).toEqual(['CLAUDE.md', 'notes/handover.md']);
+  expect(await reads(rule('After a compaction, re-read notes/handover.md before you continue.'))).toEqual([
+    'notes/handover.md',
+  ]);
+  for (const line of [
+    'When the context is compacted, read this file again.',
+    'After compaction, re-read this file.',
+    'After an auto-compact, re-read this file.',
+    'If the context window fills up, re-read this file.',
+  ])
+    expect(await reads(rule(line))).toEqual(['CLAUDE.md']);
+  // "this file" is the standing file the rule sits in.
+  expect(
+    await reads({
+      'CLAUDE.md': '# Rules\n',
+      '.claude/CLAUDE.md': '- After a compaction, re-read this file.\n',
+    }),
+  ).toEqual(['.claude/CLAUDE.md']);
+  // A rule that forbids it, or one with no compaction, reads nothing.
+  expect(await reads(rule('After a compaction, never re-read this file.'))).toEqual([]);
+  expect(await reads(rule('At noon, re-read this file.'))).toEqual([]);
 });
