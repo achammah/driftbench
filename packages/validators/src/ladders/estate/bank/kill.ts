@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { type EstateMap, loadEstateMap } from '@agent-nexus/driftbench-estate';
 import { cli } from './bench';
-import { FIXTURE, fixtureSuite, machineFailure, runOnFake, runOnFakeDetailed } from './fixture-suite';
+import { decidedFailure, FIXTURE, fixtureSuite, runOnFake, runOnFakeDetailed } from './fixture-suite';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
 
 /**
@@ -146,11 +146,11 @@ async function judge(
     green.map((spec) => spec.path),
     join(mutant, 'runs.db'),
   );
-  // Red is a run that reached its end and failed a check the evidence decides: not a run that broke off, and
-  // not a judged criterion, which the stand-in judge cannot decide.
+  // Red is a run that reached its end and failed a check the evidence decides: not a run that broke off, and not a
+  // judged criterion the stand-in judge left inconclusive.
   const red = green.filter((spec) => {
     const run = verdicts.get(spec.id);
-    return run?.completed === true && !run.pass && run.failing.some(machineFailure);
+    return run?.completed === true && !run.pass && run.failing.some(decidedFailure);
   });
   return red.length > 0
     ? { pass: true, detail: `${red[0]?.id} turns red` }

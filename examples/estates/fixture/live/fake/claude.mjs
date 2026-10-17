@@ -12,7 +12,7 @@
  * - A stream file holds stream records (`{{cwd}}` and `{{session_id}}` are filled in) and directives the fake
  *   performs instead of printing: `{"fake":"decision", event, check, verdict}` appends a guard row to
  *   `HOOK_DECISION_LOG`, `{"fake":"step", step}` a step row to `STEP_FEED`, `{"fake":"write", path, content}`
- *   and `{"fake":"edit", path, old, new}` change the workspace.
+ *   and `{"fake":"edit", path, old, new}` change the workspace, `{"fake":"delete", path}` removes a file.
  * - The init and result records are written by the fake; the result's cost is 0.
  * - `RATE_WAVE_FILE` holding n > 0: the run answers overloaded and counts n down.
  * - `--resume <id>` reads `<config>/projects/<folder>/<id>.jsonl`, where the config folder is
@@ -28,6 +28,7 @@ import {
   readdirSync,
   readFileSync,
   renameSync,
+  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -189,6 +190,10 @@ for (const record of records) {
   if (record.fake === 'write') {
     mkdirSync(dirname(join(cwd, record.path)), { recursive: true });
     writeFileSync(join(cwd, record.path), record.content);
+    continue;
+  }
+  if (record.fake === 'delete') {
+    rmSync(join(cwd, record.path), { force: true });
     continue;
   }
   if (record.fake === 'move') {
