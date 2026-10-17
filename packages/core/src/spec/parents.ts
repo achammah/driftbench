@@ -50,3 +50,32 @@ export function checkParents(spec: Spec): Issue[] {
   });
   return issues;
 }
+
+/**
+ * The order a parent-linked spec runs in: every block after its parent, the rest in written order.
+ * Indices refer to the authored spec. Links that name no block or loop back are ignored here; the
+ * loader refuses them.
+ */
+export function parentOrder(spec: Spec): number[] {
+  const indexOf = new Map<string, number>();
+  spec.blocks.forEach((block, index) => {
+    if (block.id !== undefined && !indexOf.has(block.id)) indexOf.set(block.id, index);
+  });
+  const done = new Set<number>();
+  const walking = new Set<number>();
+  const order: number[] = [];
+  const visit = (index: number): void => {
+    if (done.has(index) || walking.has(index)) return;
+    walking.add(index);
+    const parent = spec.blocks[index]?.parent;
+    const at = parent === undefined ? undefined : indexOf.get(parent);
+    if (at !== undefined) visit(at);
+    walking.delete(index);
+    done.add(index);
+    order.push(index);
+  };
+  spec.blocks.forEach((_, index) => {
+    visit(index);
+  });
+  return order;
+}

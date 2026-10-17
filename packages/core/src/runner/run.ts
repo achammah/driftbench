@@ -21,6 +21,7 @@ import {
 import type { BlockSpec, EndState, Expect, GivenOverride, Spec, Stimulus } from '../schema/spec';
 import { cloneJson, contentHash } from '../spec/hash';
 import { specHash as specHashOf, specIdentity } from '../spec/identity';
+import { parentOrder } from '../spec/parents';
 import { compareEndState, type EndStateMatch } from './assertion';
 import { blockCacheKey, endStateCacheKey, type ObservedCache, unwrapEndState, wrapEndState } from './cache';
 import { capabilityGap } from './capability';
@@ -199,6 +200,7 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
         ? runProvenance({ ...options, target })
         : undefined,
     selectedBlocks,
+    parentOrder: spec.blocks.some((block) => block.parent !== undefined) ? parentOrder(spec) : undefined,
     blockRerunReason,
     carriedBlocks,
     recordEndStateSnapshots: options.recordEndStateSnapshots === true,
@@ -263,6 +265,8 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
 }
 
 type RunContext = {
+  /** The order the blocks run in when the spec has parent links: every block after its parent. */
+  parentOrder: number[] | undefined;
   selectedBlocks: ReadonlySet<number> | undefined;
   blockRerunReason: string | undefined;
   carriedBlocks: Map<number, BlockResult> | undefined;
@@ -369,7 +373,12 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   let users: Message[] = [];
   /** The spec block whose user messages `users` ends with; NaN after an injected step. */
   let usersBlock = -1;
-  let nextBlock = 0;
+  let nextBlock = run.parentOrder?.[0] ?? 0;
+  let nextParent = 0;
+  /** A block's recorded end state, by block id: what its children start from. */
+  const recordings = new Map<string, { state: RunningGiven; history: Message[]; result: BlockResult }>();
+  /** What an injected step left for the block it runs before. */
+  const pending = new Map<number, { state: RunningGiven; history: Message[] }>();
   let lastKey: string | undefined;
   let endRead: { states: unknown[]; afterBlock: number } | undefined;
   /** The end-state values so far: in mode T composed over the blocks, else the last read. */
@@ -399,7 +408,16 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         break;
       }
       const planned = planStep(spec, step);
-      if (step.kind === 'block') nextBlock = step.blockIndex + 1;
+      if (run.parentOrder && step.kind === 'block')
+        planned.lastSpecBlock = nextParent === run.parentOrder.length - 1;
+      if (step.kind === 'block') {
+        nextBlock = run.parentOrder
+          ? (run.parentOrder[++nextParent] ?? spec.blocks.length)
+          : step.blockIndex + 1;
+      }
+      const targetBlock = step.kind === 'injected' ? spec.blocks[step.beforeBlock] : planned.block;
+      const parent =
+        run.parentOrder && targetBlock?.parent !== undefined ? recordings.get(targetBlock.parent) : undefined;
 
       if (run.selectedBlocks && step.kind === 'block' && !run.selectedBlocks.has(step.blockIndex)) {
         const kept = run.carriedBlocks?.get(step.blockIndex);
@@ -423,7 +441,24 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         }
         continue;
       }
-      if (run.mode === 'T') {
+      if (run.parentOrder) {
+        // A parent-linked spec is a forest in every mode: each root starts at the spec defaults, each child
+        // from the recorded end state of its ancestors only, in a session of its own.
+        const blockAt = step.kind === 'block' ? step.blockIndex : undefined;
+        const injected = blockAt === undefined ? undefined : pending.get(blockAt);
+        if (blockAt !== undefined) pending.delete(blockAt);
+        state = enterBlock(
+          structuredClone(injected?.state ?? parent?.state ?? initialGiven(spec)),
+          planned.given,
+          planned.world,
+        );
+        history = copyHistory(planned.given?.prefix ?? injected?.history ?? parent?.history ?? []);
+        users = userMessagesOf(history);
+        usersBlock = Number.NaN;
+        prefixWritten = history.length > 0;
+        await channel.restart();
+        sessionBase = undefined;
+      } else if (run.mode === 'T') {
         if (step.kind !== 'block') {
           throw new RunnerError(
             `teacher-forced mode runs the spec's own blocks; the driver ${run.driver.id} injected ${step.perturbationId}`,
@@ -461,17 +496,21 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       const notRun = capabilityGap(run.adapter.id, run.capabilities, {
         // In mode T the block starts from the canonical history: the latest written prefix, then the blocks
         // after it; in F and P from the prefix the spec wrote, the session holding the agent's own turns.
-        ...(run.mode === 'T'
+        ...(run.parentOrder
           ? history.length === 0
             ? {}
-            : {
-                prefix: latestPrefixWritten(spec, step.kind === 'block' ? step.blockIndex : position)
-                  ? ('authored' as const)
-                  : ('canonical' as const),
-              }
-          : prefixWritten
-            ? { prefix: 'authored' as const }
-            : {}),
+            : { prefix: 'authored' as const }
+          : run.mode === 'T'
+            ? history.length === 0
+              ? {}
+              : {
+                  prefix: latestPrefixWritten(spec, step.kind === 'block' ? step.blockIndex : position)
+                    ? ('authored' as const)
+                    : ('canonical' as const),
+                }
+            : prefixWritten
+              ? { prefix: 'authored' as const }
+              : {}),
         world: state.world,
       });
       if (notRun) {
@@ -480,6 +519,18 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         blocks.push(
           notRunBlock(run, position, planned, { givenHash: given.hash, specIndex, ledger }, notRun),
         );
+        if (run.parentOrder) {
+          const result = blocks.at(-1) as BlockResult;
+          if (step.kind === 'block') result.specIndex = step.blockIndex;
+          if (targetBlock?.parent !== undefined) result.parent = targetBlock.parent;
+          if (step.kind === 'block' && planned.blockId !== undefined)
+            recordings.set(planned.blockId, {
+              state: structuredClone(state),
+              history: copyHistory(history),
+              result,
+            });
+          continue;
+        }
         if (run.mode === 'T') continue;
         // In F and P the free conversation cannot go past a block it did not run: every later spec block is
         // not run either, and the driver is not asked for more steps.
@@ -612,7 +663,11 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         given,
         observed,
         // A teacher-forced block is an independent sample: no earlier block of the run is its history.
-        history: run.mode === 'T' ? [] : [...blocks],
+        history: run.parentOrder
+          ? ancestorResults(targetBlock?.parent, recordings)
+          : run.mode === 'T'
+            ? []
+            : [...blocks],
         ledger: facts.ledger,
         endState,
         artifacts: run.artifacts,
@@ -620,13 +675,18 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       });
       // The stage reached: the runtime's, else the step classifier's. Before the block: in T the stage the
       // spec expects of the blocks before it, in F and P the stage the run's previous block reached.
-      const previous =
-        run.mode === 'T' && step.kind === 'block'
+      const previous = run.parentOrder
+        ? parent?.result.stageObserved
+        : run.mode === 'T' && step.kind === 'block'
           ? canonicalPreviousStage(spec, step.blockIndex)
           : blocks.at(-1)?.stageObserved;
       const reading = readStage(spec, observed, {
         mode: run.mode,
-        history: run.mode === 'T' ? [] : blocks,
+        history: run.parentOrder
+          ? ancestorResults(targetBlock?.parent, recordings)
+          : run.mode === 'T'
+            ? []
+            : blocks,
         previous,
         signatures: run.signatures,
       });
@@ -638,6 +698,8 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       const contradictions = [...facts.contradictions, ...ledger.contradictions.map(describeContradiction)];
       const block = {
         index: position,
+        ...(run.parentOrder && step.kind === 'block' ? { specIndex: step.blockIndex } : {}),
+        ...(targetBlock?.parent === undefined ? {} : { parent: targetBlock.parent }),
         ...(planned.blockId !== undefined ? { blockId: planned.blockId } : {}),
         ...(planned.injected ? { injected: true } : {}),
         ...realizedOf(planned, run.recordRealizedText),
@@ -662,6 +724,13 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         pass: all.every((verdict) => !verdict.gating || verdict.outcome === 'pass'),
       };
       blocks.push(block);
+      if (run.parentOrder) {
+        // The end state this block leaves: what its children, or the block an injected step ran before, start from.
+        const recorded = { state: structuredClone(state), history: copyHistory(history) };
+        if (step.kind === 'block' && planned.blockId !== undefined)
+          recordings.set(planned.blockId, { ...recorded, result: block });
+        if (step.kind === 'injected') pending.set(step.beforeBlock, recorded);
+      }
       run.onEvent?.({
         type: 'block_end',
         index: position,
@@ -764,6 +833,22 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
     finishedAt: run.now().toISOString(),
     cacheHit: channel.replay,
   };
+}
+
+/** The recorded results of a block's ancestors, oldest first. */
+function ancestorResults(
+  parent: string | undefined,
+  recordings: Map<string, { result: BlockResult }>,
+): BlockResult[] {
+  const results: BlockResult[] = [];
+  let at = parent;
+  while (at !== undefined) {
+    const result = recordings.get(at)?.result;
+    if (!result) break;
+    results.unshift(result);
+    at = result.parent;
+  }
+  return results;
 }
 
 /**

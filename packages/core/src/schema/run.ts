@@ -298,6 +298,10 @@ export const BlockResult = z
     rejudged: RejudgedFrom.optional(),
     index: z.number().int().min(0),
     blockId: z.string().optional(),
+    /** The id of the block this one started from, in a spec with parent links. */
+    parent: z.string().optional(),
+    /** The index of the spec block this result stands for, when parent links change the order blocks run in. */
+    specIndex: z.number().int().min(0).optional(),
     injected: z.boolean().optional(),
     /**
      * Present when the text the driver sent differs from the text the spec block wrote (a simulated user, a
