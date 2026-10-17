@@ -21,6 +21,16 @@ Everything here is fictional and written by hand. Nothing calls a model and noth
   - an output rule ("End with one line per <entity>: ...", "Answer with one JSON object") shapes the reply,
     a reversed rule does not;
   - a unit that lists its tools offers no other: "use the <Tool> tool" is refused for a tool it does not list;
+  - permissions decide each call as the runtime does in a headless run, in its order: a tool the run disallows
+    (`--disallowed-tools`) or a deny rule stops it; an ask rule holds it (nobody can answer), and so does plan mode
+    (`--permission-mode plan`, or `defaultMode: plan`) for anything but a read, a search or a dispatch; a call that
+    needs a permission runs only when the mode (`bypassPermissions`, or `acceptEdits` for edits), a rule of
+    `--allowed-tools` or the `allowed-tools` of the skill the session loaded grants it; otherwise the tool result says
+    the permission was not granted. A shell line (`a && b`, `a | b`, `a; b`) is granted only when each of its
+    commands is. Reading, searching and dispatching a helper need none; loading a skill needs `Skill`. The fake runs
+    as a folder never trusted interactively: it does not read the settings' own allow list, which the live runner
+    passes as `--allowed-tools` with `--trust-estate`. A change goes through Write when only Write is granted;
+  - "never delete a file under `<folder>/`" stops the command that would remove one, as a prohibition does;
   - after a compaction (in a resumed session that recorded one), a standing rule that asks to read again makes the
     fake read, before the work resumes, every file the rule names and, for "this file", the standing file the rule
     sits in. The rule is found by the compaction wordings the estate scanner reads (a compaction, compacted,
@@ -28,8 +38,8 @@ Everything here is fictional and written by hand. Nothing calls a model and noth
     part that names no file ("the open tracker note") is read by nothing;
   - an ordering clause whose later part names the unit's own work holds vacuously; one that names nothing the
     unit does stops the fake as unresolved.
-  A tool that ran and failed leaves the actions that wait on it undone; the others go on. A refused action
-  ends the work. `fake/rule-judge.cjs` is the matching stand-in judge: it reads the rule of the criterion
+  A tool that ran and failed, or that the permissions refused, leaves the actions that wait on it undone; the
+  others go on. An action a prohibition forbids or a deny rule stops ends the work. `fake/rule-judge.cjs` is the matching stand-in judge: it reads the rule of the criterion
   and the actions of the run, and answers inconclusive for a rule it cannot read.
 - Set `FAKE_MANIFEST` to opt into recorded playback for protocol tests. `fake/manifest.json`
   maps asks to streams under `fake/streams/`; stream paths are relative to the manifest.
