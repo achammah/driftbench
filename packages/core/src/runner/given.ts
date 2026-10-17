@@ -125,6 +125,18 @@ export function addFacts(
  * replays its past turns reads it again.
  */
 export function canonicalGiven(spec: Spec, blockIndex: number): { state: RunningGiven; prefix: Message[] } {
+  const { state, prefix } = canonicalGivenFrozen(spec, blockIndex);
+  return { state, prefix: copyHistory(prefix) };
+}
+
+/**
+ * The same as `canonicalGiven`, with the prefix as the immutable array the cache keeps. The runner holds it
+ * as its history: a copy of an immutable array reads the messages already validated, not each one again.
+ */
+export function canonicalGivenFrozen(
+  spec: Spec,
+  blockIndex: number,
+): { state: RunningGiven; prefix: readonly Message[] } {
   // A run asks for block 0, 1, 2 in turn. The situation before block k's own given, kept from the last ask,
   // lets the next ask build one block more, not the whole prefix again; its messages are the same objects,
   // which the prefix cache and the hashes read once.
@@ -148,7 +160,7 @@ export function canonicalGiven(spec: Spec, blockIndex: number): { state: Running
     ]);
     state = { ...state, ledger: { ...state.ledger, ...block.expect?.ledger_add } };
   }
-  return { state, prefix: copyHistory(prefix) };
+  return { state, prefix };
 }
 
 const canonicalKept = new WeakMap<

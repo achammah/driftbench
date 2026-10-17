@@ -2,7 +2,7 @@ import type { AdapterCapabilities, AgentAdapter, Session, Turn } from '../contra
 import type { ArtifactReaderRegistry } from '../contracts/artifacts';
 import { type CheckContext, type CheckSet, machineVerdict } from '../contracts/check';
 import type { DriverStep, UserDriver } from '../contracts/driver';
-import { copyHistory, freezeMessage } from '../contracts/history';
+import { copyHistory, freezeHistory, freezeMessage } from '../contracts/history';
 import type { Store } from '../contracts/store';
 import { gateToolCalls, type ToolRule } from '../contracts/tool-policy';
 import { type BlockReuse, planBlockRerun } from '../radius/blocks';
@@ -32,7 +32,7 @@ import { composeStates, type EndStateSnapshot, endStateSnapshot, snapshotValues 
 import {
   addFacts,
   assistantMessage,
-  canonicalGiven,
+  canonicalGivenFrozen,
   enterBlock,
   initialGiven,
   type RunningGiven,
@@ -368,7 +368,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   const blocks: BlockResult[] = [];
   const { sources } = run;
   let state = initialGiven(spec);
-  let history: Message[] = [];
+  let history: readonly Message[] = [];
   /** The user messages of the history, one list that grows with it, so the ledger reads each one once. */
   let users: Message[] = [];
   /** The spec block whose user messages `users` ends with; NaN after an injected step. */
@@ -496,7 +496,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
             `teacher-forced mode runs the spec's own blocks; the driver ${run.driver.id} injected ${step.perturbationId}`,
           );
         }
-        const canonical = canonicalGiven(spec, step.blockIndex);
+        const canonical = canonicalGivenFrozen(spec, step.blockIndex);
         state = canonical.state;
         // A task's workspace is part of the state the reference trajectory had at this block: the session
         // of the block before keeps it, unless this block writes its own workspace. Its history becomes the
@@ -661,7 +661,8 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       for (let r = 0; r < (observed.retries?.length ?? 0); r += 1) {
         run.onEvent?.({ type: 'retry', index: position, at: new Date().toISOString() });
       }
-      history = copyHistory(history, [...user, cloneJson(assistantMessage(observed))]);
+      // Frozen once: the next block's copy of this history reads the messages already validated, not each again.
+      history = freezeHistory(history, [...user, cloneJson(assistantMessage(observed))]);
       lastKey = key;
 
       const facts = addFacts(state.ledger, planned.expect.ledger_add);
