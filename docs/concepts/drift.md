@@ -20,11 +20,11 @@ A failing block carries one class or more.
 
 | Family | Class |
 |---|---|
-| `must`, `must_not`, `execution`, `workspace`, `artifacts`, `schema_strict`, `budget`, `end_state`, `judge` | `X1_local` |
+| `must`, `must_not`, `regex`, `length`, `starts_with`, `finish_reason`, `json`, `refusal`, `similarity`, `relevancy`, `execution`, `workspace`, `artifacts`, `schema_strict`, `budget`, `end_state`, `judge` | `X1_local` |
 | `ledger`, the [ledger check](#the-ledger-check) | `X2_contradiction` |
-| `stage`, the stage the runtime reports; `flow`, the [stage classifier](#the-stage-classifier) | `X3_flow` |
-| `lang`, `cards`, `pii` | `X4_format` |
-| `tools`, `forbidden`, `skills`, `guards`, `safety` | `X5_tool` |
+| `stage`, the stage the runtime reports; `flow`, the [stage classifier](#the-stage-classifier); `knowledge_retention`, a known fact asked again | `X3_flow` |
+| `lang`, `cards`, `pii`, `markup` | `X4_format` |
+| `tools`, `forbidden`, `skills`, `guards`, `references`, `subagents`, `safety`, `tool_f1` | `X5_tool` |
 
 * A block carries one class per family among its failing gating verdicts, in the order X1 to X5. It can carry several.
 * A passing block carries none, and so does a block that fails only on non-gating or inconclusive verdicts.
