@@ -19,6 +19,7 @@ import {
   scanRendered,
 } from '../pipeline';
 import { renderEstate } from '../render';
+import { inventedWord } from './askfrom';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
 
 /**
@@ -715,7 +716,14 @@ const ASKS: AskCheck[] = [
           !(Array.isArray(spec?.tags) && spec.tags.includes(`test:${row.testType}`))
         )
           return false;
-        return bankIsShort(run, row);
+        if (!bankIsShort(run, row)) return false;
+        // The words of a code-written ask come from the source it names: an invented phrase has words no source holds.
+        return asksOfSpec(v).every(
+          (ask) =>
+            ask === '' ||
+            approved.has(ask) ||
+            inventedWord(ask, meta.askFrom as string, row.atomIds, run.scanned.map) === undefined,
+        );
       };
       const bad = all.filter(
         (v) => v.complete && asksOfSpec(v).some((ask) => ask !== '' && !approved.has(ask)) && !disclosed(v),
