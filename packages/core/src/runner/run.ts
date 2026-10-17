@@ -451,9 +451,29 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         // A parent that did not pass blocks its child: no agent call, no failure, named by its direct parent and its root.
         const parent = forest.parents.get(step.blockIndex);
         const from = parent === undefined ? undefined : ended.get(parent);
+        if (from?.broken) {
+          const by = spec.blocks[parent as number]?.id ?? String(parent);
+          const root = from.broken.root;
+          const entered = enterBlock(from.state, planned.given, planned.world);
+          blocks.push(
+            blockedBlock(
+              run,
+              position,
+              planned,
+              {
+                givenHash: resolveGiven(entered, from.history, run.target).hash,
+                specIndex: step.blockIndex,
+                ledger: entered.ledger,
+              },
+              { by, root },
+            ),
+          );
+          ended.set(step.blockIndex, { ...from, broken: { by, root } });
+          continue;
+        }
         if (parent !== undefined) {
           // A child starts from its ancestors' turns: an adapter that cannot seed them makes it not_run before it is
-          // sent, whatever its parent did. Its own descendants are then blocked by it.
+          // sent. A parent that did not pass blocks it first, whatever the adapter can seed. Its own descendants are then blocked by it.
           const entered = enterBlock(from?.state ?? initialGiven(spec), planned.given, planned.world);
           const gap = capabilityGap(run.adapter.id, run.capabilities, {
             prefix: 'inherited',
@@ -483,26 +503,6 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
             });
             continue;
           }
-        }
-        if (from?.broken) {
-          const by = spec.blocks[parent as number]?.id ?? String(parent);
-          const root = from.broken.root;
-          const entered = enterBlock(from.state, planned.given, planned.world);
-          blocks.push(
-            blockedBlock(
-              run,
-              position,
-              planned,
-              {
-                givenHash: resolveGiven(entered, from.history, run.target).hash,
-                specIndex: step.blockIndex,
-                ledger: entered.ledger,
-              },
-              { by, root },
-            ),
-          );
-          ended.set(step.blockIndex, { ...from, broken: { by, root } });
-          continue;
         }
       }
       if (run.mode === 'T' && !forest) {

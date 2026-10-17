@@ -101,7 +101,7 @@ describe.each(['F', 'T'] as const)('a failed parent, mode %s', (mode) => {
 });
 
 describe.each(['F', 'T'] as const)('an adapter that cannot seed a prefix, mode %s', (mode) => {
-  it('makes every child not_run before it is sent, and still runs the roots', async () => {
+  it('makes a child of a passing parent not_run before it is sent, blocks its descendants, and still runs the roots', async () => {
     const sent: string[] = [];
     const base = functionAdapter({
       respond: (messages: Message[]) => {
@@ -118,13 +118,43 @@ describe.each(['F', 'T'] as const)('an adapter that cannot seed a prefix, mode %
       repeat: 0,
     });
     const by = (id: string) => result.blocks.find((b) => b.blockId === id);
-    for (const id of ['lookup', 'book', 'receipt']) {
-      expect(by(id)?.status).toBe('not_run');
-      expect(by(id)?.notRun?.kind).toBe('unsupported');
-    }
+    expect(by('lookup')?.status).toBe('not_run');
+    expect(by('lookup')?.notRun?.kind).toBe('unsupported');
+    expect(by('book')?.blocked).toEqual({ by: 'lookup', root: 'lookup' });
+    expect(by('receipt')?.blocked).toEqual({ by: 'book', root: 'lookup' });
     expect(by('find')?.status ?? 'pass').toBe('pass');
     expect(by('walkin')?.status ?? 'pass').toBe('pass');
     expect(sent.sort()).toEqual(['say find', 'say walkin']);
     expect(result.blocks).toHaveLength(5);
   });
 });
+
+describe.each(['F', 'T'] as const)(
+  'a failed root on an adapter that cannot seed a prefix, mode %s',
+  (mode) => {
+    it('blocks the child rather than making it not_run; a child of a passing parent is not_run', async () => {
+      const base = functionAdapter({ respond: () => reply('ok') });
+      const adapter = { ...base, capabilities: () => ({ ...base.capabilities(), seedPrefix: false }) };
+      const failFind: Check = {
+        name: 'fail-find',
+        applies: () => true,
+        evaluate: (ctx) => [
+          machineVerdict('fail-find', 'x', ctx.block.id === 'find' ? 'fail' : 'pass', 'planted'),
+        ],
+      };
+      const result = await runSpec(spec(), {
+        adapter,
+        driver: createScriptedDriver(),
+        checks: [failFind],
+        mode,
+        repeat: 0,
+      });
+      const by = (id: string) => result.blocks.find((b) => b.blockId === id);
+      expect(by('find')?.status ?? 'fail').toBe('fail');
+      expect(by('lookup')?.status).toBe('blocked');
+      expect(by('lookup')?.blocked).toEqual({ by: 'find', root: 'find' });
+      expect(by('book')?.blocked).toEqual({ by: 'lookup', root: 'find' });
+      expect(by('walkin')?.status ?? 'pass').toBe('pass');
+    });
+  },
+);
