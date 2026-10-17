@@ -153,6 +153,7 @@ export default defineConfig({
           { text: 'Estate files', link: '/reference/estate-files' },
           { text: 'CLI', link: '/reference/cli' },
           { text: 'Checks', link: '/reference/checks' },
+          { text: 'Block contracts', link: '/reference/block-contracts' },
           { text: 'Public API', link: '/reference/api' },
         ],
       },

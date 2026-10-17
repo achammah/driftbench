@@ -15,6 +15,7 @@ A check returns one verdict per fact it checks. A verdict holds an `id`, the che
 * The id starts with the name of the check, then a dot: `tools.order.create.count`. The runner reads the check from the text before the first dot.
 * Machine verdicts gate by default. A block passes when every gating verdict passes, so a gating verdict that is inconclusive fails the block. A verdict that does not gate never fails it.
 * When a block expects the same name twice, the second entry gets `#2` in its id, the third `#3`: `tools.order.create#2.count`. This holds for tool labels, card names, skill names, guard names, reference paths, helper names and artifact paths.
+* The checks of one block are judged apart. A check reads the spec, the block and the Observed, never the verdicts of another check of the block. One check that fails never skips, fails or passes another check.
 * A check that throws, or returns a verdict the schema refuses, does not stop the run. The runner records an inconclusive gating verdict `<check>.error` or `<check>.invalid` that names the problem.
 
 Two kinds of verdict are inconclusive:
@@ -123,7 +124,7 @@ Outside `expect`, the same family reads a block's `budget`, the spec's `rules`, 
 
 ## Tools, skills, guards, references and subagents
 
-A tool expectation names the tool by `label`. `count` is an exact number, or `{ min, max }` with either bound; without `count`, the tool must run at least once. `input` maps argument names to assertions, and every call of the tool must hold each one; a tool that was not called fails each of its input assertions.
+A tool expectation names the tool by `label`. `count` is an exact number, or `{ min, max }` with either bound; without `count`, the tool must run at least once. Both bounds are inclusive: `{ min: 1, max: 2 }` passes at 1 and at 2 calls, and fails at 0 and at 3. `input` maps argument names to assertions, and every call of the tool must hold each one; a tool that was not called fails each of its input assertions.
 
 ```yaml
 - user: The 500 one. Yes, go ahead.
@@ -201,7 +202,7 @@ Before-call gating covers the calls the harness runs. A remote runtime, an MCP s
 
 ## Assertions on values
 
-Tool `input` and `end_state.expect` assert values with these forms. Patterns compile as JavaScript regular expressions with the `m` flag.
+Tool `input` and `end_state.expect` assert values with these forms. Patterns compile as JavaScript regular expressions with the `m` flag. A pattern is a regular expression, never a literal text. It is tested against the whole value, so it passes when it matches anywhere in the text. `^` and `$` anchor at the start and end of a line.
 
 | Form | Passes when the value |
 |---|---|
@@ -227,7 +228,7 @@ Equality is JSON equality: lists compare item by item, in order, and a key that 
 
 The detector is franc-min. It reads each text segment twice: as written, and without its capitalised words, so names, brands and places do not pull it off course. Links, email addresses and words with digits, underscores or slashes are dropped first. A segment passes when either reading puts the language within 0.05 of the top score. A reading under 30 letters is too short to judge and is skipped. A language franc-min has no model for gives an inconclusive verdict.
 
-* `length` bounds the reply's size. `expect.length.words` and `expect.length.chars` each take a `min`, a `max`, or both. A word is a run of non-space characters, and a line break separates words. A character is a Unicode code point, so an accented letter or an emoji counts once. Each bound gives one verdict, `length.words` or `length.chars`, with the count and the bound in its evidence. A block with no visible text counts zero of each.
+* `length` bounds the reply's size. `expect.length.words` and `expect.length.chars` each take a `min`, a `max`, or both. A word is a run of non-space characters, and a line break separates words. A character is a Unicode code point, so an accented letter or an emoji counts once. Both bounds are inclusive: a count equal to `min` or to `max` passes, and a count below `min` or above `max` fails. Each bound gives one verdict, `length.words` or `length.chars`, with the count and the bound in its evidence. A block with no visible text counts zero of each.
 
 ```text
 expect:
@@ -240,7 +241,7 @@ expect:
 * `exact` ignores case, punctuation and spacing by default, with a separate guard for dots and commas between digits. `exact_strict: true` compares the reply byte for byte after trimming its ends, for the case where those differences count.
 * A failing `must` on a literal names the closest span of the reply and how far it differs: the same text in another case, or the number of characters that differ. A failing `cost_usd` or `latency_ms` names how far over the limit it is.
 * `regex` takes a list of regular expressions the visible text must match. Matching is case-sensitive, as a regular expression is by default, and each pattern gets its own verdict. `must` and `must_not` ignore case instead.
-* `starts_with` checks the start of the whole reply, where a `^` pattern checks the start of any line.
+* `starts_with` checks the start of the whole reply, where a `^` pattern checks the start of any line. It removes the leading space of the reply first. A reply that contains the text later, but does not start with it, fails.
 * `finish_reason` reads `observed.runtime.finishReason`, the reason the model stopped. An expected `stop` fails a reply cut at a `length` limit. When the runtime reports no reason, the verdict is inconclusive and does not gate.
 * `json` reads the customer-visible text as JSON. A reply that is one Markdown code fence of JSON is read as that JSON. `expect.json.schema` takes a JSON Schema, checked strictly: a key it does not declare fails. Unsupported schema keywords are spec errors; the supported subset and runtime handling are listed under [strict tool schemas](#strict-tool-schemas). `expect.json.paths` takes a list of `{ path, assert }`. A path is dotted, and a number indexes an array. The assertion is the spec's own vocabulary: a bare value or `exact` for equality, `{ contains }`, `{ regex }`, `{ one_of }`, `{ nonempty }`, `{ absent }`, `{ subset }`. A reply that is not JSON fails `json.valid`, and every path after it fails with the reason. With `expect.json.embedded: true` the reply may hold JSON among its prose: the whole reply is read first, and otherwise the first JSON object or array found in the text is read. The default is off, so a reply with prose around its JSON fails `json.valid`.
 * `refusal` is `refuses` or `answers`. The verdict reads the reply for a refusal phrase in English, French, Dutch, German, Spanish, Italian and Portuguese. It names the phrase and its language. A refusal worded outside those phrases is missed, so judge that with a criterion.
@@ -369,7 +370,7 @@ These fields read what a code-interpreter agent does. They work in any block.
 `execution` reads the executions list of the block. A command is an execution record that is not the agent's own process: the process adapter adds a record with role `agent` for the process itself, always last. That record never counts as code run, as a command or as a budget step.
 
 * `ran_code: true` requires at least one command, and `ran_code: false` forbids any.
-* `exit_code` reads the agent process when it exited non-zero, so a crashed agent fails `exit_code: 0` even after a clean last command. Otherwise it reads the last command. With no command, it reads the agent process. The evidence names both when both exist.
+* `exit_code` reads the agent process when it exited non-zero, so a crashed agent fails `exit_code: 0` even after a clean last command. A negative code is non-zero. Otherwise it reads the last command. With no command, it reads the agent process. The evidence names both when both exist.
 * `max_commands` is the most commands the block may run.
 
 ### Artifacts
@@ -393,7 +394,7 @@ An unknown name fails and lists the checks of the kind. `tests` on a code file a
 
 ### Workspace
 
-The adapter takes a snapshot of the workspace (file list and hashes) before the block and diffs it after. `created`, `changed` and `deleted` list the paths expected in each set. A listed path must be in its set. An empty list asserts that its set is empty: `deleted: []` means nothing deleted. A path in the diff that no list names fails only through `others_untouched: true`.
+The adapter takes a snapshot of the workspace (file list and hashes) before the block and diffs it after. The diff is the net change between the two snapshots. A file is `changed` when its hash or its size differs. A file rewritten with the same bytes is not changed, and a file created and deleted inside one block is in no set. `created`, `changed` and `deleted` list the paths expected in each set. A listed path must be in its set. An empty list asserts that its set is empty: `deleted: []` means nothing deleted. A path in the diff that no list names fails only through `others_untouched: true`.
 
 ### Safety
 
@@ -557,7 +558,7 @@ A block that expects a tool the rules forbid is an error when the spec loads (`T
 `end_state` compares the state of the world after the run with what the spec expects. It is one mapping, a list of them, or `none`. A spec with no `end_state` has no end-state check.
 
 * `source` names where the adapter reads the state, such as `tool:submit_order` for the payload that tool recorded.
-* `mode` is `subset` (the default) or `exact`. Exact mode also fails every field of the state the spec does not list.
+* `mode` is `subset` (the default) or `exact`. Subset mode compares only the fields the spec lists and ignores every other field of the state. Exact mode also fails every field of the state the spec does not list.
 * `expect` maps fields to [assertions](#assertions-on-values).
 
 The check runs on the last spec block of a teacher-forced or free-running run, never in perturbed mode: a perturbed run may end elsewhere by design. One verdict per expected field, with the same ids whether or not anything was read.
