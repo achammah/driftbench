@@ -4,7 +4,7 @@
 # stay untouched. Northwind Traders, its suppliers, orders and shipments are invented. Fictional data only.
 version: 1
 estate: northwind
-mapHash: be2e7a0919cb31aecf73102cd271e7611cb439be814983a47b9dc39e38775f10
+mapHash: fc6a29aea9f4fda876fa747d68a9753526c0cd5e7c0206970de46e853e5629d5
 
 workspaces:
   - id: northwind-ops
@@ -336,7 +336,7 @@ situations:
       - register.standing.bullets-for-three-or-more-parallel
       - register.standing.never-use-obviously-or-simply
       - register.standing.currency-code-after-the-amount
-      - tool.settings.allow-bash-python3
+      - tool.settings.allow-bash-python3-tools
       - tool.settings.allow-grep
       - stage.steps.stage-note-write-a-tracker-note
     workspace: northwind-ops

@@ -248,6 +248,8 @@ function scanReport(result: ScanEstateResult, out: string, io: Io): string {
     );
     for (const duplicate of result.duplicates) lines.push(`    ${duplicate}`);
   }
+  for (const note of result.raw.notes.filter((note) => note.message.startsWith('Ambiguous routing table')))
+    lines.push(`  ${note.file}: ${note.message}`);
   lines.push(...ignoredLines(result));
   const external = map.atoms.filter((atom) => atom.kind === 'reference' && atom.fields?.external === true);
   if (external.length > 0) {

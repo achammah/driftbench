@@ -365,6 +365,7 @@ export {
   Given,
   GivenDefaults,
   GivenOverride,
+  GUARD_INTERVENTIONS,
   GuardExpect,
   JsonExpect,
   LengthBound,
@@ -387,6 +388,7 @@ export {
   WorkspaceExpect,
 } from './schema/spec';
 export * as script from './script';
+export { stringifyBlockYaml } from './spec/block-yaml';
 export { anyGlobMatches, globMatches } from './spec/glob';
 export { canonicalJson, cloneJson, contentHash } from './spec/hash';
 export { IDENTITY_EXCLUDED_METADATA, specHash, specIdentity } from './spec/identity';

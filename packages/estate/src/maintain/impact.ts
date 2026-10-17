@@ -1,9 +1,10 @@
-import { readFile, stat, writeFile } from 'node:fs/promises';
-import { relative } from 'node:path';
+import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { dirname, join, relative } from 'node:path';
 import { findSpecFiles, isPlainObject, loadSpecFile, parseSpecText } from '@agent-nexus/driftbench-core';
-import { shortQuote } from '@agent-nexus/driftbench-generate';
+import { StaticTest, shortQuote } from '@agent-nexus/driftbench-generate';
 import { parseDocument } from 'yaml';
 import { z } from 'zod';
+import { estatePath } from '../paths';
 import { AtomKind } from '../schema';
 import { type EstateDiff, GuardMode } from './diff';
 import { guardNeed } from './guards';
@@ -13,7 +14,8 @@ import { Regression, regressionNeeds, renderRegression } from './regression';
  * The impact of an estate diff on the tests written for the estate. Tests index by atom id: a spec names the
  * atoms it covers under `metadata.estate.atoms`. For the diff:
  * - regenerate: every test that names an atom whose meaning changed (semantic), a restated atom, or a
- *   removed atom while it still names others; the generator writes it again;
+ *   removed atom while it still names others, or a renamed atom (the same atom under another id); the
+ *   generator writes it again;
  * - re-approve: every atom whose meaning changed (a semantic change); its phrasings wait for a person;
  * - retire: every test whose atoms are all removed, with the reason `atom <id> removed` written into the
  *   spec's metadata as `retired` (on `--write`);
@@ -21,6 +23,10 @@ import { Regression, regressionNeeds, renderRegression } from './regression';
  * A moved atom (the same quote at another span) and an atom whose quote changed in white space only touch
  * no test: a change reruns only what it can affect. A spec already carrying `metadata.retired`
  * is not a live test: it is counted and left alone.
+ *
+ * A static test (an invariant or a setting, a JSON record beside the specs) names the one atom it checks and
+ * is a test like any spec: it is indexed, regenerated and retired with the atoms it names. Its retirement
+ * reason is the record's own `retired` field.
  */
 
 export const EstateTestMeta = z.looseObject({
@@ -31,6 +37,8 @@ export type EstateTest = {
   id: string;
   /** The spec file, as found. */
   path: string;
+  /** Explicit boundary retained for retirement writes. */
+  root?: string;
   /** The spec file relative to the tests folder. */
   file: string;
   atoms: string[];
@@ -40,6 +48,18 @@ export type EstateTest = {
 
 export type LoadedTests = { ok: true; tests: EstateTest[]; others: number } | { ok: false; errors: string[] };
 
+/** The JSON files under a folder, sorted: where static tests are looked for. */
+async function jsonFilesUnder(dir: string): Promise<string[]> {
+  const found: string[] = [];
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) found.push(...(await jsonFilesUnder(full)));
+    else if (/\.json$/i.test(entry.name)) found.push(full);
+  }
+  return found.sort();
+}
+
 /** Reads every spec under a folder; the specs with `metadata.estate.atoms` are the estate tests. */
 export async function loadEstateTests(dir: string): Promise<LoadedTests> {
   const info = await stat(dir).catch(() => undefined);
@@ -47,9 +67,41 @@ export async function loadEstateTests(dir: string): Promise<LoadedTests> {
   const tests: EstateTest[] = [];
   const errors: string[] = [];
   let others = 0;
+  for (const path of await jsonFilesUnder(dir)) {
+    let raw: unknown;
+    let safe: string;
+    try {
+      safe = await estatePath(dir, relative(dir, path));
+    } catch (cause) {
+      errors.push(`${relative(dir, path)}: ${String(cause)}`);
+      continue;
+    }
+    try {
+      raw = JSON.parse(await readFile(safe, 'utf8'));
+    } catch {
+      continue;
+    }
+    const record = StaticTest.safeParse(raw);
+    if (!record.success) continue;
+    tests.push({
+      id: record.data.id,
+      path,
+      root: dir,
+      file: relative(dir, path),
+      atoms: [record.data.atom],
+      ...(record.data.retired === undefined ? {} : { retired: record.data.retired }),
+    });
+  }
   for (const path of await findSpecFiles([dir])) {
     const file = relative(dir, path);
-    const loaded = await loadSpecFile(path);
+    let safe: string;
+    try {
+      safe = await estatePath(dir, file);
+    } catch (cause) {
+      errors.push(`${file}: ${String(cause)}`);
+      continue;
+    }
+    const loaded = await loadSpecFile(safe);
     if (!loaded.ok) {
       for (const issue of loaded.errors) {
         errors.push(`${file}: ${issue.code}${issue.path ? ` ${issue.path}` : ''}: ${issue.message}`);
@@ -74,6 +126,7 @@ export async function loadEstateTests(dir: string): Promise<LoadedTests> {
     tests.push({
       id: loaded.spec.id,
       path,
+      root: dir,
       file,
       atoms: meta.data.atoms,
       ...(retired === undefined ? {} : { retired }),
@@ -82,7 +135,14 @@ export async function loadEstateTests(dir: string): Promise<LoadedTests> {
   return errors.length > 0 ? { ok: false, errors } : { ok: true, tests, others };
 }
 
-export const RegenerateWhy = z.enum(['whitespace', 'semantic', 'restated', 'removed', 'guard_state']);
+export const RegenerateWhy = z.enum([
+  'whitespace',
+  'semantic',
+  'restated',
+  'removed',
+  'renamed',
+  'guard_state',
+]);
 export type RegenerateWhy = z.infer<typeof RegenerateWhy>;
 
 export const ImpactReport = z.strictObject({
@@ -176,6 +236,7 @@ export function estateImpact(
   for (const entry of diff.atoms.restated) if (!why.has(entry.id)) why.set(entry.id, 'restated');
   const removed = new Set(diff.atoms.removed.map((atom) => atom.id));
   for (const id of removed) why.set(id, 'removed');
+  for (const entry of diff.atoms.renamed ?? []) why.set(entry.from, 'renamed');
   for (const entry of diff.guards ?? []) {
     if ((entry.move === 'promoted' || entry.move === 'demoted') && !why.has(entry.guard)) {
       why.set(entry.guard, 'guard_state');
@@ -294,7 +355,17 @@ export async function writeRetirements(
       continue;
     }
     try {
-      const text = await readFile(test.path, 'utf8');
+      const path = await estatePath(
+        test.root ?? dirname(test.path),
+        test.root === undefined ? relative(dirname(test.path), test.path) : relative(test.root, test.path),
+      );
+      const text = await readFile(path, 'utf8');
+      if (/\.json$/i.test(test.path) && StaticTest.safeParse(JSON.parse(text)).success) {
+        await writeFile(path, `${JSON.stringify({ ...JSON.parse(text), retired: entry.reason }, null, 2)}\n`);
+        entry.state = 'written';
+        results.push({ file: entry.file, ok: true });
+        continue;
+      }
       const doc = parseDocument(text, { uniqueKeys: true });
       const current: unknown = doc.toJS();
       const metadata = isPlainObject(current) ? current.metadata : undefined;
@@ -313,7 +384,7 @@ export async function writeRetirements(
         });
         continue;
       }
-      await writeFile(test.path, next);
+      await writeFile(path, next);
       entry.state = 'written';
       results.push({ file: entry.file, ok: true });
     } catch (cause) {
@@ -332,6 +403,7 @@ const WHY: Record<RegenerateWhy, string> = {
   semantic: 'semantic',
   restated: 'restated',
   removed: 'removed',
+  renamed: 'renamed',
   guard_state: 'guard state',
 };
 

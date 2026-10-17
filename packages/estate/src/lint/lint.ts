@@ -1,8 +1,8 @@
 import { analyzeGraph } from '../graph/analyze';
 import { quoteDrift } from '../map/file';
 import { DEFAULT_STANDING_CEILING, measureInvariants, standingFiles } from '../scan/invariants';
-import type { RawEstate } from '../scan/reader';
-import type { EstateMap } from '../schema';
+import type { RawEstate, RegistryRow } from '../scan/reader';
+import type { Atom, EstateMap } from '../schema';
 
 /**
  * The static checks of an estate, on a map and the files it was read from. Each finding has a stable code:
@@ -62,6 +62,9 @@ export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions 
   }
 
   const analysis = analyzeGraph(map.atoms, map.edges, raw.files);
+  // Findings look atoms up by id: the first atom of each id, as a search from the start would find it.
+  const byId = new Map<string, Atom>();
+  for (const atom of map.atoms) if (!byId.has(atom.id)) byId.set(atom.id, atom);
   for (const path of analysis.orphans) {
     findings.push({
       code: 'ORPHAN',
@@ -77,7 +80,7 @@ export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions 
     });
   }
   for (const id of analysis.missingReferences) {
-    const atom = map.atoms.find((candidate) => candidate.id === id);
+    const atom = byId.get(id);
     if (atom?.fields?.external === true) {
       findings.push({
         code: 'EXTERNAL',
@@ -102,11 +105,14 @@ export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions 
     });
   }
   for (const id of analysis.missingScripts) {
-    const atom = map.atoms.find((candidate) => candidate.id === id);
+    const atom = byId.get(id);
     findings.push({
       code: 'MISSING_SCRIPT',
       subject: id,
-      message: `the guard runs ${String(atom?.fields?.script)}, which does not exist`,
+      message:
+        typeof atom?.fields?.dispatcher === 'string'
+          ? `the guard's dispatcher ${atom.fields.dispatcher} names ${String(atom.fields.script)}, which no file of the estate is`
+          : `the guard runs ${String(atom?.fields?.script)}, which does not exist`,
     });
   }
 
@@ -135,8 +141,10 @@ export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions 
       message: `the guard ${name} has no row in the check registry`,
     });
   }
+  const rows = new Map<string, RegistryRow>();
+  for (const row of raw.registry) if (!rows.has(row.id)) rows.set(row.id, row);
   for (const id of state.rowsWithoutGuard) {
-    const row = raw.registry.find((candidate) => candidate.id === id);
+    const row = rows.get(id);
     findings.push({
       code: 'REGISTRY_GUARD',
       subject: id,

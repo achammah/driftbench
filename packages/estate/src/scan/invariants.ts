@@ -12,6 +12,25 @@ import { type Located, linesOf } from './text';
  * measured state so a reader of the map sees it, and lint measures it again.
  */
 
+/**
+ * Characters as a reader counts them: Unicode code points, so an emoji outside the basic plane is one
+ * character, not the two UTF-16 units of its JavaScript length; a combining mark stays its own character.
+ */
+export function characters(text: string): number {
+  let surrogatePairs = 0;
+  for (let index = 0; index < text.length; index++) {
+    const code = text.charCodeAt(index);
+    if (code >= 0xd800 && code <= 0xdbff) {
+      const next = text.charCodeAt(index + 1);
+      if (next >= 0xdc00 && next <= 0xdfff) {
+        surrogatePairs++;
+        index++;
+      }
+    }
+  }
+  return text.length - surrogatePairs;
+}
+
 /** The default ceiling on the standing instructions (standing files and memory), in characters. */
 export const DEFAULT_STANDING_CEILING = 40_000;
 
@@ -68,7 +87,7 @@ export function measureInvariants(
   const rows = new Set(listed.map((row) => row.guard.split('/').pop() ?? row.guard));
   return {
     ceiling,
-    standingCharacters: standingFiles(raw).reduce((sum, file) => sum + file.text.length, 0),
+    standingCharacters: standingFiles(raw).reduce((sum, file) => sum + characters(file.text), 0),
     orphans: [...orphans],
     unanchored: raw.guards.filter((guard) => guard.script && !guard.anchored).map((guard) => guard.command),
     guardsWithoutRow: listed.length === 0 ? [] : [...runtime].filter((name) => !rows.has(name)).sort(),

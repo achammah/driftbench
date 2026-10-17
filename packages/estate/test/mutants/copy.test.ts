@@ -45,13 +45,36 @@ describe('the files of an estate a copy needs', () => {
   });
 });
 
+describe('the estate configuration travels with a copy', () => {
+  it('copies driftbench.estate.yaml from the root or from .claude, and nothing else beside the estate files', async () => {
+    for (const place of ['driftbench.estate.yaml', '.claude/driftbench.estate.yaml']) {
+      const root = await estate({
+        'CLAUDE.md': '# Rules\n',
+        '.claude/settings.json': '{}\n',
+        [place]: 'helpers: {}\n',
+        'notes.md': '# Not the estate\n',
+      });
+      const loaded = { runtime: 'claude-code', atoms: [], edges: [] } as unknown as Parameters<
+        typeof copyEstate
+      >[2];
+      const to = await fresh('driftbench-copy-');
+      const copied = await copyEstate(root, to, loaded);
+      expect(copied).toContain(place);
+      expect(copied).not.toContain('notes.md');
+      expect(await readFile(join(to, place), 'utf8')).toBe('helpers: {}\n');
+    }
+  });
+});
+
 describe('the estate copy of a mutant', () => {
   it('copies only the listed files, as real files with their modes, and never shares one with the source', async () => {
     const loaded = await loadEstateMap(join(CASES, 'approved.yaml'));
     if (!loaded.ok) throw new Error(JSON.stringify(loaded.errors));
     const to = await fresh('driftbench-copy-');
     const copied = await copyEstate(CASES, to, loaded.map);
-    expect(copied).toEqual(await new ClaudeCodeReader().listFiles(CASES));
+    expect(copied).toEqual(
+      [...(await new ClaudeCodeReader().listFiles(CASES)), 'driftbench.estate.yaml'].sort(),
+    );
     for (const skipped of [
       '.claude/node_modules',
       '.claude/hooks/tests',

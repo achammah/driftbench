@@ -12,19 +12,58 @@ import { parse as parseYaml } from 'yaml';
 /** A passage of a file: its lines (1-based, inclusive) and the exact text quoted from them. */
 export type Located = { file: string; startLine: number; endLine: number; quote: string };
 
+/**
+ * Where every line of a text starts, for the texts asked about last. A scan asks for many lines and spans of
+ * the same file; counting from the top each time makes a file with many atoms quadratic.
+ */
+const LINE_STARTS = new Map<string, number[]>();
+const LINE_STARTS_KEPT = 16;
+function lineStarts(text: string): number[] {
+  const known = LINE_STARTS.get(text);
+  if (known) return known;
+  const starts = [0];
+  for (let index = text.indexOf('\n'); index >= 0; index = text.indexOf('\n', index + 1))
+    starts.push(index + 1);
+  if (LINE_STARTS.size >= LINE_STARTS_KEPT) {
+    const oldest = LINE_STARTS.keys().next().value;
+    if (oldest !== undefined) LINE_STARTS.delete(oldest);
+  }
+  LINE_STARTS.set(text, starts);
+  return starts;
+}
+
 /** The 1-based line of a character offset. */
 export function lineAt(text: string, offset: number): number {
-  let line = 1;
-  for (let index = 0; index < offset && index < text.length; index++) if (text[index] === '\n') line++;
-  return line;
+  if (!(offset > 0)) return 1;
+  // One more than the number of line breaks before the offset: the breaks sit just before each line start.
+  const starts = lineStarts(text);
+  let low = 1;
+  let high = starts.length;
+  while (low < high) {
+    const middle = (low + high) >> 1;
+    if ((starts[middle] as number) - 1 < offset) low = middle + 1;
+    else high = middle;
+  }
+  return low;
 }
 
 /** The lines `from` to `to` (1-based, inclusive) of a text, joined. */
 export function sliceLines(text: string, from: number, to: number): string {
-  return text
-    .split('\n')
-    .slice(from - 1, to)
-    .join('\n');
+  if (
+    !Number.isInteger(from) ||
+    from < 1 ||
+    to < 0 ||
+    !(Number.isInteger(to) || to === Number.POSITIVE_INFINITY)
+  ) {
+    return text
+      .split('\n')
+      .slice(from - 1, to)
+      .join('\n');
+  }
+  const starts = lineStarts(text);
+  const last = Math.min(to, starts.length);
+  if (from > last) return '';
+  return text.slice(starts[from - 1], last < starts.length ? (starts[last] as number) - 1 : text.length);
 }
 
 /**
@@ -216,7 +255,9 @@ const TOP_KEY = /^([A-Za-z0-9_][\w.-]*)\s*:(.*)$/;
  */
 export function tolerantFields(block: readonly string[]): Record<string, unknown> | undefined {
   const entries: Array<{ key: string; lines: string[] }> = [];
-  for (const line of block) {
+  for (const original of block) {
+    // Normalize only syntax whitespace, retaining scalar content and source line numbers.
+    const line = original.replace(/\r$/, '').replace(/^\t+/, (tabs) => '  '.repeat(tabs.length));
     const match = TOP_KEY.exec(line);
     if (match?.[1] !== undefined) entries.push({ key: match[1], lines: [line] });
     else if (line.startsWith('#') && entries.length === 0) continue;
@@ -278,17 +319,26 @@ export function readTables(text: string, fromLine = 1, toLine = Number.POSITIVE_
     const head = lines[index];
     const rule = lines[index + 1];
     if (!head || !rule || head.line < fromLine || head.line > toLine) continue;
-    if (!head.text.startsWith('|') || !/^\|?\s*:?-{3,}/.test(rule.text)) continue;
-    const table: Table = { header: cells(head.text), headerLine: head.line, rows: [] };
+    // A rule line holds a pipe and dashes: most lines are not one, and splitting every line into cells is slow.
+    if (!rule.text.includes('|') || !rule.text.includes('---')) continue;
+    const header = cells(head.text);
+    const separators = cells(rule.text);
+    if (
+      header.length < 2 ||
+      separators.length !== header.length ||
+      !separators.every((cell) => /^:?-{3,}:?$/.test(cell))
+    )
+      continue;
+    const table: Table = { header, headerLine: head.line, rows: [] };
     let next = index + 2;
     for (; next < lines.length; next++) {
       const row = lines[next];
       // A table belongs to the range that holds its header, and runs to its last row: a chunk that ends
       // inside a table must not cut it, and the next chunk never sees its header, so it would lose the rest.
-      if (!row?.text.startsWith('|')) break;
+      if (!row || cells(row.text).length < 2) break;
       table.rows.push({
         line: row.line,
-        text: originals[row.line - 1]?.text ?? row.text,
+        text: originals[row.line - 1]?.raw ?? row.text,
         cells: cells(row.text),
       });
     }
@@ -299,11 +349,24 @@ export function readTables(text: string, fromLine = 1, toLine = Number.POSITIVE_
 }
 
 function cells(row: string): string[] {
-  return row
-    .replace(/^\|/, '')
-    .replace(/\|$/, '')
-    .split('|')
-    .map((cell) => cell.trim());
+  // Markdown permits omitted outer pipes; escaped pipes are content, not column separators.
+  const columns: string[] = [];
+  let value = '';
+  const trimmed = row.trim();
+  for (let index = 0; index < trimmed.length; index++) {
+    const char = trimmed[index];
+    if (char === '\\' && trimmed[index + 1] === '|') {
+      value += '|';
+      index++;
+    } else if (char === '|') {
+      columns.push(value.trim());
+      value = '';
+    } else value += char;
+  }
+  columns.push(value.trim());
+  if (trimmed.startsWith('|')) columns.shift();
+  if (trimmed.endsWith('|') && !trimmed.endsWith('\\|')) columns.pop();
+  return columns;
 }
 
 /** Text compared across files (a guard's message against a rule): folded, lowercased, without markup. */
@@ -316,6 +379,6 @@ export function plain(text: string): string {
 
 /** A rule label at the start of a line, such as `- **R5.**` or `R5.`: the label, else undefined. */
 export function labelOfLine(line: string): string | undefined {
-  const match = /^\s*(?:[-*]\s+)?(?:\*\*)?([A-Z]{1,3})#?(\d{1,3})\.?(?:\*\*)?[.:]?\s/.exec(line);
-  return match ? `${match[1]}${match[2]}` : undefined;
+  const match = /^\s*(?:[-*]\s+)?(?:\*\*)?([A-Z]{1,3})#?(\d{1,3})\.?(?:\*\*)?[.:]?\s/i.exec(line);
+  return match ? `${match[1]}${match[2]}`.toUpperCase() : undefined;
 }
