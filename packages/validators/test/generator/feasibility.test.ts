@@ -12,7 +12,7 @@ function generated(cell: Record<string, string>, own: Record<string, string> = {
   const spec = Spec.parse({
     id: 'cell-probe',
     kind: 'conversation',
-    blocks: [{ id: 'block', when: { user: 'Hello.' }, expect: { stage: hidden.start } }],
+    blocks: [{ id: 'block', when: { user: 'Hello.' }, expect: { stage: hidden.next[hidden.start] } }],
     metadata: {
       generated: { seeder: 'graph', cell, blocks: [{ block: 'block', cell: own }] },
     },
