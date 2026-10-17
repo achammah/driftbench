@@ -36,6 +36,51 @@ type Context = {
   forbidden: Set<string>;
 };
 
+/** A parent names a block of the same spec, and the links form no cycle. */
+function checkParents(spec: Spec, issues: Issue[]): void {
+  const byId = new Map<string, number>();
+  spec.blocks.forEach((block, index) => {
+    if (block.id !== undefined && !byId.has(block.id)) byId.set(block.id, index);
+  });
+  const parentOf = new Map<number, number>();
+  spec.blocks.forEach((block, index) => {
+    if (block.parent === undefined) return;
+    const at = byId.get(block.parent);
+    if (at === undefined) {
+      issues.push(
+        error(
+          'PARENT_MISSING',
+          `blocks.${index}.parent`,
+          `parent "${block.parent}" is the id of no block in this spec`,
+        ),
+      );
+      return;
+    }
+    parentOf.set(index, at);
+  });
+  const reported = new Set<number>();
+  for (const start of parentOf.keys()) {
+    const walked: number[] = [];
+    let at: number | undefined = start;
+    while (at !== undefined && !walked.includes(at)) {
+      walked.push(at);
+      at = parentOf.get(at);
+    }
+    if (at === undefined) continue;
+    const loop = walked.slice(walked.indexOf(at));
+    if (loop.some((member) => reported.has(member))) continue;
+    for (const member of loop) reported.add(member);
+    const first = Math.min(...loop);
+    issues.push(
+      error(
+        'PARENT_CYCLE',
+        `blocks.${first}.parent`,
+        `the parent links of ${loop.map((member) => `"${spec.blocks[member]?.id}"`).join(', ')} form a cycle`,
+      ),
+    );
+  }
+}
+
 /** A path of the workspace is text in `files` or bytes in `binary`, never both. */
 function checkWorkspace(
   workspace: { files?: Record<string, string>; binary?: Record<string, string> } | undefined,
@@ -115,6 +160,8 @@ export function checkSemantics(spec: Spec): Issue[] {
         issues,
       );
   });
+
+  checkParents(spec, issues);
 
   const perturbationIds = new Set<string>();
   spec.perturbations?.forEach((perturbation, index) => {

@@ -28,6 +28,7 @@ import { recheckCarriedEndState } from './carried-end-state';
 import { cellId } from './cell';
 import { driftOf } from './drift';
 import { composeStates, type EndStateSnapshot, endStateSnapshot, snapshotValues } from './end-state-snapshot';
+import { forestOf } from './forest';
 import {
   addFacts,
   assistantMessage,
@@ -381,6 +382,14 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   let error: string | undefined;
   /** F and P: a prefix the spec wrote at a block run so far; the session holds it from there on. */
   let prefixWritten = false;
+  /** A spec with parent links runs as a forest in every mode: each block after its parent, from its end state. */
+  const forest = forestOf(spec);
+  let cursor = 0;
+  /** What a block left behind when it ended, by spec index: the start of each of its children. */
+  const ended = new Map<
+    number,
+    { state: RunningGiven; history: Message[]; users: Message[]; stage: string | undefined }
+  >();
 
   try {
     for (let position = 0; ; position++) {
@@ -389,7 +398,11 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         error = `the driver ${run.driver.id} did not stop within ${run.maxSteps} steps`;
         break;
       }
-      const step = await nextStep(run, nextBlock, blocks);
+      const step = await nextStep(
+        run,
+        forest ? (forest.order[cursor] ?? spec.blocks.length) : nextBlock,
+        blocks,
+      );
       if (step.kind === 'stop') {
         endVerdict = step.verdict;
         if (step.verdict === 'inconclusive') {
@@ -399,7 +412,11 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         break;
       }
       const planned = planStep(spec, step);
-      if (step.kind === 'block') nextBlock = step.blockIndex + 1;
+      if (forest && step.kind === 'block') planned.lastSpecBlock = cursor === forest.order.length - 1;
+      if (step.kind === 'block') {
+        nextBlock = step.blockIndex + 1;
+        cursor += 1;
+      }
 
       if (run.selectedBlocks && step.kind === 'block' && !run.selectedBlocks.has(step.blockIndex)) {
         const kept = run.carriedBlocks?.get(step.blockIndex);
@@ -423,7 +440,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         }
         continue;
       }
-      if (run.mode === 'T') {
+      if (run.mode === 'T' && !forest) {
         if (step.kind !== 'block') {
           throw new RunnerError(
             `teacher-forced mode runs the spec's own blocks; the driver ${run.driver.id} injected ${step.perturbationId}`,
@@ -448,6 +465,18 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
           step.blockIndex === usersBlock + 1 && spec.blocks[step.blockIndex]?.given?.prefix === undefined;
         if (!follows) users = userMessagesOf(history);
       } else {
+        if (forest && step.kind === 'block') {
+          // A root starts at the spec defaults; a child starts from the end state of its parent, in a session of its own.
+          const parent = forest.parents.get(step.blockIndex);
+          const from = parent === undefined ? undefined : ended.get(parent);
+          state = from ? from.state : initialGiven(spec);
+          history = from ? from.history : [];
+          users = from ? [...from.users] : [];
+          usersBlock = Number.NaN;
+          prefixWritten = false;
+          await channel.restart();
+          sessionBase = composed;
+        }
         state = enterBlock(state, planned.given, planned.world);
         if (planned.given?.prefix) {
           await channel.restart();
@@ -620,8 +649,12 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       });
       // The stage reached: the runtime's, else the step classifier's. Before the block: in T the stage the
       // spec expects of the blocks before it, in F and P the stage the run's previous block reached.
-      const previous =
-        run.mode === 'T' && step.kind === 'block'
+      const parentOf = forest && step.kind === 'block' ? forest.parents.get(step.blockIndex) : undefined;
+      const previous = forest
+        ? parentOf === undefined
+          ? undefined
+          : ended.get(parentOf)?.stage
+        : run.mode === 'T' && step.kind === 'block'
           ? canonicalPreviousStage(spec, step.blockIndex)
           : blocks.at(-1)?.stageObserved;
       const reading = readStage(spec, observed, {
@@ -662,6 +695,9 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         pass: all.every((verdict) => !verdict.gating || verdict.outcome === 'pass'),
       };
       blocks.push(block);
+      if (forest && step.kind === 'block') {
+        ended.set(step.blockIndex, { state, history, users: [...users], stage: reading?.stage });
+      }
       run.onEvent?.({
         type: 'block_end',
         index: position,

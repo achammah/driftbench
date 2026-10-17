@@ -248,6 +248,8 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `LINK_TARGET_UNKNOWN` | error or warning | `spec lint --sections` only: error when the registry of the prompt has no such section, warning when no registry was given for the prompt |
 | `LINK_STALE` | warning | `spec lint --sections` only: the link's status is `stale`, or its section was not found again in the registry's version |
 | `WORKSPACE_PATH_TWICE` | error | a workspace path is in both `files` and `binary` |
+| `PARENT_MISSING` | error | a block's `parent` is the id of no block in the spec |
+| `PARENT_CYCLE` | error | the `parent` links of some blocks form a cycle |
 | `SCHEMA_*` | error | the schema refuses a value; the suffix is the zod issue code, such as `SCHEMA_UNRECOGNIZED_KEYS`, `SCHEMA_INVALID_TYPE`, `SCHEMA_INVALID_VALUE` or `SCHEMA_TOO_SMALL` |
 | `CRITERION_UNRESOLVED` | warning | blocks name criteria and the spec defines none; they must come from a shared catalogue |
 | `BLOCK_NO_EXPECTATION` | warning | a block checks nothing |

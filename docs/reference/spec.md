@@ -231,6 +231,7 @@ One block: a stimulus, its initial conditions and its expectations.
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `id` | string, not empty | no |  | An id, unique in the spec. |
+| `parent` | string, not empty | no |  | The id of a block in this spec whose recorded end state supplies this block's Given. Dependencies run first; a missing parent is `PARENT_MISSING`, a cycle `PARENT_CYCLE`. |
 | `when` | [Stimulus](#stimulus) | yes |  | The stimulus. |
 | `given` | [Given](#given) | no |  | Initial conditions for this block. |
 | `expect` | [Expect](#expect) | no |  | The expected output and state delta. |
