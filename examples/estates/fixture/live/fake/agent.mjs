@@ -759,7 +759,7 @@ function bindPlaceholders(tokens, ask, cwd) {
   return out;
 }
 
-export function planStream({ ask, cwd, sessionId, env }) {
+export function planStream({ ask, cwd, sessionId, env, compacted = false }) {
   const estate = readEstate(cwd);
   const unit = route(ask, estate);
   const prohibited = prohibitions(estate, unit, cwd, ask);
@@ -939,6 +939,16 @@ export function planStream({ ask, cwd, sessionId, env }) {
     if (start?.[1] && !negative(line)) {
       const path = fileTarget(start[1], cwd, '');
       call('Read', { file_path: path }, () => ({ content: read(path) ?? '' }), start[1]);
+    }
+  }
+  // After a compaction the standing file asks to be read again ("After a compaction, re-read this file ..."):
+  // done first, before the work resumes, and only when the estate says so.
+  if (compacted) {
+    for (const line of statementsOf(estate.standing)) {
+      if (negative(line) || !/\bafter a compaction\b[^.]*\bre-?read\b[^.]*\bthis file\b/i.test(line))
+        continue;
+      const path = fileTarget('CLAUDE.md', cwd, '');
+      call('Read', { file_path: path }, () => ({ content: read(path) ?? '' }), 'CLAUDE.md');
     }
   }
   if (unit?.kind === 'skill') {
