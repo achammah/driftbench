@@ -1,8 +1,8 @@
 /** A pass rate over clusters: the design effect from the spread of the cluster rates, and Wilson on the effective blocks. */
 
 import { assertCount, assertProbability } from './basics';
-import type { Interval } from './intervals';
-import { betaQuantile, normalQuantile } from './special';
+import { type Interval, zFor } from './intervals';
+import { betaQuantile } from './special';
 
 /** The blocks of one cluster (the repeats of one block, the realisations of one class, the children of one parent). */
 export interface ClusterCount {
@@ -76,7 +76,7 @@ export function wilsonEffective(
   const df = g - 1;
   let z: number;
   if (options.quantile === 'z' || df < 1) {
-    z = normalQuantile(1 - alpha / 2);
+    z = zFor(alpha);
   } else {
     // P(|T| > t) = I_x(df / 2, 1 / 2) with x = df / (df + t^2), so t = sqrt(df (1 - x) / x) at x = betaQuantile(alpha).
     const x = betaQuantile(alpha, df / 2, 0.5);

@@ -251,8 +251,12 @@ export function bootstrapCI(values: readonly number[], options: BootstrapOptions
   return { estimate, lower, upper, iterations, clusters: g, method, seed };
 }
 
-/** z for a two-sided interval at level 1 - alpha. */
+/**
+ * z for a two-sided interval at level 1 - alpha. It reads the quantile off the lower tail, `-normalQuantile(alpha / 2)`:
+ * the upper-tail form `1 - alpha / 2` rounds to 1 for alpha below 2.2e-16 (z = Infinity) and keeps only the digits
+ * of alpha that sit above 1e-16 (a relative error of 2.5e-9 at alpha = 1e-10).
+ */
 export function zFor(alpha: number): number {
   assertProbability('zFor', 'alpha', alpha, true);
-  return normalQuantile(1 - alpha / 2);
+  return -normalQuantile(alpha / 2);
 }
