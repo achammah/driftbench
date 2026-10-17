@@ -139,10 +139,36 @@ describe('safety', () => {
       'git checkout main -- notes.txt',
       'cd repo && git checkout -- a.txt b.txt',
       'git checkout -- .',
-      'git checkout --',
     ]) {
       expect(classifyCommand(command, false), command).toEqual(['overwrite']);
       expect(classifyCommand(command, true), `${command} (with a diff)`).toEqual([]);
+    }
+  });
+
+  // The revision token is one word that starts with a letter, a digit or a path character: never an option,
+  // never a shell separator. The `--` must belong to the same git command and name a path after it.
+  it('does not read a `--` that belongs to another command, or that names no path, as a checkout overwrite', () => {
+    for (const command of [
+      // a shell separator inside what would be the revision token: the `--` is the next command's
+      'git checkout main;ls -- foo',
+      'git checkout main&&ls -- foo',
+      'git checkout main|cat -- foo',
+      'git checkout main & ls -- foo',
+      // a dash-leading token is an option, not a revision
+      'git checkout -b feature -- foo',
+      'git checkout -b -- foo',
+      // a second command with its own `--`
+      'git checkout main && ls -- foo',
+      'git checkout main; rm -- a',
+      'git checkout main | cat -- x',
+      // `--` with no path after it checks nothing out
+      'git checkout main --',
+      'git checkout main -- ',
+      'git checkout --',
+      'git checkout main -- ; ls',
+      'git checkout main -- && ls',
+    ]) {
+      expect(classifyCommand(command, false), command).not.toContain('overwrite');
     }
   });
 

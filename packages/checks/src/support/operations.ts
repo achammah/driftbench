@@ -48,11 +48,13 @@ const COMMAND_RULES: Array<{ class: OperationClass; pattern: RegExp; needsNoDiff
   { class: 'delete', pattern: /\bfind\b[^;&|]*\s-delete\b/, needsNoDiff: true },
   { class: 'overwrite', pattern: /(?:^|[\s;&|(`])truncate\s/, needsNoDiff: true },
   { class: 'overwrite', pattern: /\bgit\s+(?:reset\s+--hard|restore)\b/, needsNoDiff: true },
-  // `git checkout -- <path>`, with an optional revision before the `--`. The `--` ends the options: it is
-  // followed by a space, the end, or (as before) a word such as `--force`. A `\b` after it never matched `-- `.
+  // `git checkout -- <path>`, with an optional revision before the `--`. The revision is one word that does
+  // not start with a dash and holds no shell separator, so a `--` of a later command is not this one's. The
+  // `--` must be followed by a path (a word that is not a shell separator): `git checkout main --` checks
+  // nothing out. A word glued to it (`--force`, `--ours`) is kept as before.
   {
     class: 'overwrite',
-    pattern: /\bgit\s+checkout\s+(?:[^\s;&|-][^\s;&|]*\s+)?--(?=\s|$|\w)/,
+    pattern: /\bgit\s+checkout\s+(?:[^\s;&|-][^\s;&|]*\s+)?--(?:\s+[^\s;&|]|(?=\w))/,
     needsNoDiff: true,
   },
 ];
