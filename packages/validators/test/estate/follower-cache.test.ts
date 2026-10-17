@@ -1,5 +1,6 @@
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { genCompleteFamily } from '../../src/ladders/estate/bank/loop';
@@ -53,10 +54,19 @@ describe('estate follower cache dependencies', { timeout: 600_000 }, () => {
         reusedHash: digest(reused),
       });
     }
-    writeFileSync(
-      fileURLToPath(new URL('../../../../validators/estate/FOLLOWER-CACHE-PARITY.json', import.meta.url)),
-      `${JSON.stringify({ seeds: SEEDS, rows }, null, 2)}\n`,
+    const file = fileURLToPath(
+      new URL('../../../../validators/estate/FOLLOWER-CACHE-PARITY.json', import.meta.url),
     );
+    if (process.env.UPDATE_FOLLOWER_CACHE_PARITY === '1') {
+      // The record is rewritten only on request, and formatted as the repository formats JSON.
+      writeFileSync(file, `${JSON.stringify({ seeds: SEEDS, rows }, null, 2)}\n`);
+      const formatted = spawnSync('pnpm', ['exec', 'biome', 'format', '--write', file], { encoding: 'utf8' });
+      if (formatted.status !== 0)
+        throw new Error(`biome format failed: ${formatted.stdout}${formatted.stderr}`);
+    } else {
+      // Otherwise the run is compared with the committed record, and the file is left as it is.
+      expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual({ seeds: SEEDS, rows });
+    }
   });
 
   it('invalidates every input dependency and never shares a writable observation', async () => {
