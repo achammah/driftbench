@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import * as fixture from '../../src/ladders/estate/bank/fixture-suite';
 import { fixtureSuite } from '../../src/ladders/estate/bank/fixture-suite';
 import { coverageFamily, readsFamily, taskFamily } from '../../src/ladders/estate/bank/genquality';
-import { killVerdict } from '../../src/ladders/estate/bank/unit';
+import { killVerdict, passRows } from '../../src/ladders/estate/bank/unit';
 
 const specs = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
 const verdicts = (entries: Record<string, boolean>) => new Map(Object.entries(entries));
@@ -95,5 +95,29 @@ describe('the native unit records stay out of the generation-quality inputs', { 
       false,
     );
     expect(suite.natives.every((spec) => spec.mode === 'native-unit')).toBe(true);
+  });
+});
+
+describe('unit.runner rows', () => {
+  it('reads a verdict only from a row that names its test and carries a boolean pass', () => {
+    const rows = passRows([
+      { spec: 'a', pass: true },
+      { spec: 'b', pass: false },
+      { spec: 'c' },
+      { spec: 'd', pass: 'false' },
+      { pass: false },
+      null,
+    ]);
+    expect([...rows]).toEqual([
+      ['a', true],
+      ['b', false],
+    ]);
+    expect(passRows(undefined).size).toBe(0);
+  });
+
+  it('never turns a row without pass into a kill', () => {
+    const variant = passRows([{ spec: 'a' }, { spec: 'b' }, { spec: 'c' }]);
+    const verdict = killVerdict(specs, verdicts({ a: true, b: true, c: true }), variant, 'allow-all');
+    expect(verdict.killed).toBe(false);
   });
 });
