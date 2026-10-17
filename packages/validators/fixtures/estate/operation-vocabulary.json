@@ -1,0 +1,230 @@
+{
+  "source": {
+    "path": "packages/checks/src/support/operations.ts",
+    "sha256": "8d0982b01069fc5462faf64f84a046eb4e733da36c7588703497d15651a9a22d"
+  },
+  "grammar": "Literal branch expansion; repetition boundaries 0, 1, 2; unsupported syntax listed in gaps.",
+  "toolWords": [
+    {
+      "class": "delete",
+      "words": ["delete", "remove", "erase", "purge", "drop", "destroy", "wipe"]
+    },
+    {
+      "class": "pay",
+      "words": ["pay", "payment", "charge", "refund", "transfer", "purchase", "checkout", "buy"]
+    },
+    {
+      "class": "send",
+      "words": ["send", "email", "mail", "sms", "message", "notify", "reply", "post"]
+    },
+    {
+      "class": "push",
+      "words": ["push", "deploy", "publish", "release", "merge"]
+    },
+    {
+      "class": "overwrite",
+      "words": ["overwrite"]
+    }
+  ],
+  "readWords": [
+    "get",
+    "list",
+    "search",
+    "read",
+    "fetch",
+    "find",
+    "lookup",
+    "check",
+    "status",
+    "view",
+    "query"
+  ],
+  "orderVerbs": ["create", "place", "submit"],
+  "orderNouns": ["order", "orders"],
+  "orderClass": "pay",
+  "commandRules": [
+    {
+      "class": "push",
+      "source": "\\bgit\\s+push\\b",
+      "flags": "",
+      "needsNoDiff": false,
+      "witnesses": ["git push", "git  push"],
+      "gaps": []
+    },
+    {
+      "class": "push",
+      "source": "\\b(?:npm|pnpm|yarn)\\s+publish\\b",
+      "flags": "",
+      "needsNoDiff": false,
+      "witnesses": [
+        "npm publish",
+        "npm  publish",
+        "pnpm publish",
+        "pnpm  publish",
+        "yarn publish",
+        "yarn  publish"
+      ],
+      "gaps": []
+    },
+    {
+      "class": "push",
+      "source": "\\bdocker\\s+push\\b",
+      "flags": "",
+      "needsNoDiff": false,
+      "witnesses": ["docker push", "docker  push"],
+      "gaps": []
+    },
+    {
+      "class": "delete",
+      "source": "(?:^|[\\s;&|(`])(?:sudo\\s+)?(?:rm|rmdir|unlink|shred)\\s",
+      "flags": "",
+      "needsNoDiff": true,
+      "witnesses": [
+        "rm ",
+        "rmdir ",
+        "unlink ",
+        "shred ",
+        "sudo rm ",
+        "sudo rmdir ",
+        "sudo unlink ",
+        "sudo shred ",
+        "sudo  rm ",
+        "sudo  rmdir ",
+        "sudo  unlink ",
+        "sudo  shred ",
+        " rm ",
+        " rmdir ",
+        " unlink ",
+        " shred ",
+        " sudo rm ",
+        " sudo rmdir ",
+        " sudo unlink ",
+        " sudo shred ",
+        " sudo  rm ",
+        " sudo  rmdir ",
+        " sudo  unlink ",
+        " sudo  shred ",
+        ";rm ",
+        ";rmdir ",
+        ";unlink ",
+        ";shred ",
+        ";sudo rm ",
+        ";sudo rmdir ",
+        ";sudo unlink ",
+        ";sudo shred ",
+        ";sudo  rm ",
+        ";sudo  rmdir ",
+        ";sudo  unlink ",
+        ";sudo  shred ",
+        "&rm ",
+        "&rmdir ",
+        "&unlink ",
+        "&shred ",
+        "&sudo rm ",
+        "&sudo rmdir ",
+        "&sudo unlink ",
+        "&sudo shred ",
+        "&sudo  rm ",
+        "&sudo  rmdir ",
+        "&sudo  unlink ",
+        "&sudo  shred ",
+        "|rm ",
+        "|rmdir ",
+        "|unlink ",
+        "|shred ",
+        "|sudo rm ",
+        "|sudo rmdir ",
+        "|sudo unlink ",
+        "|sudo shred ",
+        "|sudo  rm ",
+        "|sudo  rmdir ",
+        "|sudo  unlink ",
+        "|sudo  shred ",
+        "(rm ",
+        "(rmdir ",
+        "(unlink ",
+        "(shred ",
+        "(sudo rm ",
+        "(sudo rmdir ",
+        "(sudo unlink ",
+        "(sudo shred ",
+        "(sudo  rm ",
+        "(sudo  rmdir ",
+        "(sudo  unlink ",
+        "(sudo  shred ",
+        "`rm ",
+        "`rmdir ",
+        "`unlink ",
+        "`shred ",
+        "`sudo rm ",
+        "`sudo rmdir ",
+        "`sudo unlink ",
+        "`sudo shred ",
+        "`sudo  rm ",
+        "`sudo  rmdir ",
+        "`sudo  unlink ",
+        "`sudo  shred "
+      ],
+      "gaps": []
+    },
+    {
+      "class": "delete",
+      "source": "\\bgit\\s+(?:rm|clean)\\b",
+      "flags": "",
+      "needsNoDiff": true,
+      "witnesses": ["git rm", "git clean", "git  rm", "git  clean"],
+      "gaps": []
+    },
+    {
+      "class": "delete",
+      "source": "\\bfind\\b[^;&|]*\\s-delete\\b",
+      "flags": "",
+      "needsNoDiff": true,
+      "witnesses": [
+        "find -delete",
+        "find x -delete",
+        "find  -delete",
+        "find xx -delete",
+        "find x  -delete",
+        "find   -delete"
+      ],
+      "gaps": []
+    },
+    {
+      "class": "overwrite",
+      "source": "(?:^|[\\s;&|(`])truncate\\s",
+      "flags": "",
+      "needsNoDiff": true,
+      "witnesses": [
+        "truncate ",
+        " truncate ",
+        ";truncate ",
+        "&truncate ",
+        "|truncate ",
+        "(truncate ",
+        "`truncate "
+      ],
+      "gaps": []
+    },
+    {
+      "class": "overwrite",
+      "source": "\\bgit\\s+(?:reset\\s+--hard|checkout\\s+--|restore)\\b",
+      "flags": "",
+      "needsNoDiff": true,
+      "witnesses": [
+        "git reset --hard",
+        "git reset  --hard",
+        "git checkout --x",
+        "git checkout  --x",
+        "git restore",
+        "git  reset --hard",
+        "git  reset  --hard",
+        "git  checkout --x",
+        "git  checkout  --x",
+        "git  restore"
+      ],
+      "gaps": []
+    }
+  ],
+  "gaps": []
+}

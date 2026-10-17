@@ -101,7 +101,7 @@ const COMPLETE_ITEMS = [
 
 /** Keep all specs of the affected classes; unrelated known generator gaps are outside this regression. */
 async function affectedRun(): Promise<pipeline.EstateRun> {
-  const run = await pipeline.estateRun(1);
+  const run = await pipeline.generationRun(1);
   const atoms = new Map(run.scanned.map.atoms.map((atom) => [atom.id, atom]));
   const specs = run.specs.filter((spec) => {
     const atom = atoms.get(estateMeta(spec).atoms?.[0] ?? '');
@@ -117,7 +117,7 @@ async function affectedRun(): Promise<pipeline.EstateRun> {
 describe('the affected gen.complete items', { timeout: 120_000 }, () => {
   it('passes all eight affected classes on their generated specs and rule-follower sessions', async () => {
     const run = await affectedRun();
-    const mock = vi.spyOn(pipeline, 'estateRun').mockResolvedValue(run);
+    const mock = vi.spyOn(pipeline, 'generationRun').mockResolvedValue(run);
     try {
       const verdicts = await genCompleteFamily().evaluate(1);
       expect(Object.fromEntries(COMPLETE_ITEMS.map((id) => [id, verdicts.get(id)]))).toEqual(
@@ -143,7 +143,7 @@ describe('the affected gen.complete items', { timeout: 120_000 }, () => {
         some_call: { calls: [{ label: 'Bash', input: { command: { equals: 'wrong-component-command' } } }] },
       },
     };
-    const mock = vi.spyOn(pipeline, 'estateRun').mockResolvedValue({ ...run, specs: [wrong] });
+    const mock = vi.spyOn(pipeline, 'generationRun').mockResolvedValue({ ...run, specs: [wrong] });
     try {
       const verdicts = await genCompleteFamily().evaluate(1);
       expect(verdicts.get('gen.complete.obligation-instruction-script')).toMatchObject({
@@ -184,6 +184,7 @@ describe('approved task asks are judged by the task oracle', () => {
         work: ROOT,
         map: join(fixture.FIXTURE, 'approved.yaml'),
         specs: [spec],
+        natives: [],
         report: {},
       };
       const mock = vi.spyOn(fixture, 'fixtureSuite').mockResolvedValue(suite);

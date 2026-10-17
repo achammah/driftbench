@@ -496,12 +496,16 @@ export function renderEstate(estate: HiddenEstate): Rendered {
     if (skill.missing) {
       const pending = ref(topic.missing.file);
       writer.line(`${next()} ${topic.missing.line}`, [pending]);
-      findings.push({
-        code: 'MISSING_REFERENCE',
-        subject: pending.hid,
-        atom: pending.hid,
-        defect: 'missing_reference',
-      });
+      if (skill.referenceSupplied) {
+        files[skillPath(skill, `references/${topic.missing.file}`)] =
+          `# ${topic.heading}: additional reference\nUse the supplied record and report unresolved differences.\n`;
+      } else
+        findings.push({
+          code: 'MISSING_REFERENCE',
+          subject: pending.hid,
+          atom: pending.hid,
+          defect: 'missing_reference',
+        });
     }
     write(writer);
     record(writer);

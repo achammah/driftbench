@@ -437,6 +437,8 @@ export type HiddenSkill = {
   dispatch?: string;
   /** Planted: a reference to a file that does not exist. */
   missing: boolean;
+  /** The executable generation twin supplies the reference; lint keeps the absent-file original. */
+  referenceSupplied?: boolean;
   /** Planted: a file in the references folder nothing names. */
   orphan: boolean;
   /** Extra tools beyond Read, Edit and Bash(python3 *). */

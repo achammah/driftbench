@@ -294,7 +294,7 @@ const SHAPES: Shape[] = [
       const more = c.estate.file(second, c.owner);
       more.line('# More');
       plantRule(more, c, 'b');
-      c.estate.edge(c.owner, `${c.owner}:skill`, `${c.owner}:inner-ref`, 'reference');
+      c.estate.check(c.owner, referenceReachCheck(`${c.owner}:skill`, `${c.owner}:inner-ref`));
     },
   },
   {
@@ -415,4 +415,32 @@ export function referenceProseFamily(): Family {
 
 function capital(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** A behavioural reach assertion over direct citations, independent of graph closure storage. */
+export function referenceReachCheck(from: string, to: string): Check {
+  return (scan) => {
+    const source = scan.map.atoms.find((atom) => atom.id === scan.idOf.get(from));
+    const target = scan.map.atoms.find((atom) => atom.id === scan.idOf.get(to) && atom.kind === 'reference');
+    if (!source || !target) return 'reference is not reachable: source or target atom is missing';
+    const inFile = new Map<string, typeof scan.map.atoms>();
+    for (const atom of scan.map.atoms) {
+      if (atom.kind !== 'reference') continue;
+      const list = inFile.get(atom.provenance.file);
+      if (list) list.push(atom);
+      else inFile.set(atom.provenance.file, [atom]);
+    }
+    const todo = [source.provenance.file];
+    const visited = new Set<string>();
+    for (let head = 0; head < todo.length; head++) {
+      const file = todo[head] as string;
+      if (visited.has(file)) continue;
+      visited.add(file);
+      for (const citation of inFile.get(file) ?? []) {
+        if (citation.id === target.id) return undefined;
+        if (typeof citation.fields?.path === 'string') todo.push(citation.fields.path);
+      }
+    }
+    return 'reference is not reachable through the owner’s direct citation paths';
+  };
 }
