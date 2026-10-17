@@ -16,6 +16,12 @@ on:
         description: Comma-separated job ids to run on a train/* branch, no spaces (for example build,python). A dispatch on any other branch runs nothing.
         required: true
         type: string
+      seeds:
+        description: For blocks-measure only. trial runs seeds 1 to 3 and the hidden seed in 3 jobs; full runs seeds 1 to 20 and the hidden seed in 10 jobs, for a gate measurement only.
+        required: false
+        default: trial
+        type: choice
+        options: [trial, full]
 
 permissions:
   contents: read
@@ -68,6 +74,43 @@ jobs:
             status=$?
           fi
           test "$status" -eq 11
+
+  blocks-measure:
+    # The blocks bank on seeds 1 to 20 and the hidden seed, in shards, for a journal row (docs/validators.md
+    # section 12.4): each shard uploads its --items --json report. The exit code is the level reached, so the
+    # step records it and never fails the job on it.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',blocks-measure,')
+    name: blocks bank seeds ${{ matrix.seeds }}${{ matrix.hidden && ' and hidden' || '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      # Runners are shared: a trial round measures seeds 1 to 3 and the hidden seed in 3 jobs; only a gate
+      # measurement (seeds: full) runs the 20-seed sweep in 10 jobs.
+      matrix:
+        include: ${{ fromJSON(inputs.seeds == 'full' && '[{"seeds":"1..2","hidden":true},{"seeds":"3..4","hidden":false},{"seeds":"5..6","hidden":false},{"seeds":"7..8","hidden":false},{"seeds":"9..10","hidden":false},{"seeds":"11..12","hidden":false},{"seeds":"13..14","hidden":false},{"seeds":"15..16","hidden":false},{"seeds":"17..18","hidden":false},{"seeds":"19..20","hidden":false}]' || '[{"seeds":"1..1","hidden":false},{"seeds":"2..2","hidden":false},{"seeds":"3..3","hidden":true}]') }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Measure the shard
+        shell: bash
+        env:
+          SEEDS: ${{ matrix.seeds }}
+          HIDDEN: ${{ matrix.hidden && '--hidden' || '' }}
+        run: |
+          status=0
+          pnpm -s driftbench validate blocks --seeds "$SEEDS" $HIDDEN --items --json > blocks-items.json || status=$?
+          echo "level (exit code) $status"
+          test -s blocks-items.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blocks-items-${{ strategy.job-index }}
+          path: blocks-items.json
 
   protect:
     name: executor branches leave the validators alone
