@@ -52,6 +52,41 @@ const crossed = (map: EstateMap, dimension: string, value: string) =>
       .map((row) => row.atomIds[0]),
   );
 
+/**
+ * The relation each fixed-axis situation tests, written out here and read from nowhere in the product: a remap in
+ * RELATION_OF turns the tests below red. Each line is the documented reason in docs/estate.md, in one word.
+ */
+const EXPECTED_RELATION: Readonly<Record<string, string>> = {
+  dead_helper: 'helper',
+  helpers_running: 'helper',
+  stale_tracker: 'stage',
+  D5_language_switch: 'output',
+  language_switch: 'output',
+  D8_tool_failure: 'tool',
+  D6_instruction_in_data: 'data',
+  D4_loose_confirmation: 'confirmation',
+  no_questions: 'confirmation',
+  rate_wave: 'rate',
+  process_restart: 'restart',
+  after_restart: 'restart',
+  compaction_mid_task: 'compaction',
+  after_compaction: 'compaction',
+  resumed: 'stoprule',
+  stop: 'stop',
+  D2_goal_shift: 'routing',
+  D1_off_topic: 'routing',
+  D9_out_of_scope: 'routing',
+  D7_silence_or_burst: 'prompt',
+  hold: 'stop',
+  keep_going: 'confirmation',
+  frustration: 'output',
+  limit_word: 'prompt',
+  D3_contradiction: 'confirmation',
+  D10_return: 'stoprule',
+  D11_pii_leak: 'output',
+  D12_prompt_extraction: 'output',
+};
+
 const DIMENSION_OF: Record<string, string> = Object.fromEntries([
   ...['dead_helper', 'rate_wave', 'stale_tracker', 'process_restart', 'compaction_mid_task'].map((v) => [
     v,
@@ -61,7 +96,7 @@ const DIMENSION_OF: Record<string, string> = Object.fromEntries([
   ...['language_switch', 'no_questions', 'stop', 'hold', 'keep_going', 'frustration', 'limit_word'].map(
     (v) => [v, 'owner_signal'],
   ),
-  ...Object.keys(RELATION_OF)
+  ...Object.keys(EXPECTED_RELATION)
     .filter((v) => v.startsWith('D'))
     .map((v) => [v, 'deviation']),
 ]);
@@ -228,7 +263,7 @@ describe('review cases', () => {
       ['deviation', 'D11_pii_leak'],
       ['deviation', 'D12_prompt_extraction'],
     ] as const) {
-      expect(RELATION_OF[value], value).toBeDefined();
+      expect(RELATION_OF[value], value).toBe(EXPECTED_RELATION[value]);
       const seen = new Set(plan.filter((row) => row.cell[dimension] === value).map((row) => row.atomIds[0]));
       expect(seen.size, value).toBeGreaterThan(0);
       expect(seen.size, value).toBeLessThan(count);
@@ -255,11 +290,15 @@ describe('situation relevance reads the typed facts of the map', () => {
     expect([...targetsOf(relation, harbour())].sort()).toEqual([...ids].sort());
   });
 
+  it('maps every fixed-axis situation to the relation written out above, and to no other', () => {
+    expect({ ...RELATION_OF }).toEqual(EXPECTED_RELATION);
+  });
+
   it('crosses each fixed-axis situation with the atoms of its relation and with no other atom', () => {
     const map = harbour();
-    for (const [value, relation] of Object.entries(RELATION_OF)) {
+    for (const [value, relation] of Object.entries(EXPECTED_RELATION)) {
       const dimension = DIMENSION_OF[value] as string;
-      const allowed = targetsOf(relation, map);
+      const allowed = targetsOf(relation as Parameters<typeof targetsOf>[0], map);
       const seen = crossed(map, dimension, value);
       expect(
         [...seen].filter((id) => !allowed.has(id as string)),

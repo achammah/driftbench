@@ -43,13 +43,42 @@ export type Truth = {
     kind: string;
     hazard?: string;
     scope?: string;
-    evidence: ReadonlyArray<{ type: string; label?: string }>;
+    evidence: ReadonlyArray<{
+      type: string;
+      label?: string;
+      name?: string;
+      options?: Record<string, unknown>;
+    }>;
   }>;
   /** The guards, with the event each runs on. */
   guards: ReadonlyArray<{ hid: string; event: string }>;
   /** The skills and helpers that declare tools. */
   declaresTools: ReadonlyArray<string>;
 };
+
+/**
+ * The custom predicates docs/estate.md (the Then table) says the generator compiles to a check of the reply: words the
+ * reply must or must not hold, or its language. Each names the options without which it compiles to nothing. The list is
+ * the documented spec, kept here on its own so the oracle does not read the planner's code.
+ */
+const REPLY_PREDICATES: Readonly<Record<string, readonly string[]>> = {
+  max_characters: ['max'],
+  max_questions: ['max'],
+  json_only: [],
+  same_language_as_user: [],
+  asks_for: ['value'],
+  no_secret_in_reply: [],
+  route_table: [],
+  currency_after_amount: [],
+  stopped_and_confirmed: [],
+};
+
+/** Whether a planted piece of evidence checks the reply. */
+function checksReply(e: Truth['rules'][number]['evidence'][number]): boolean {
+  if (e.type === 'text') return true;
+  const needs = e.type === 'custom' && e.name !== undefined ? REPLY_PREDICATES[e.name] : undefined;
+  return needs?.every((key) => e.options?.[key] !== undefined) ?? false;
+}
 
 /** The tools that bring outside data into a run. */
 const DATA_TOOLS = new Set(['Read', 'Grep', 'Glob', 'WebFetch', 'WebSearch']);
@@ -93,8 +122,7 @@ export function plantedTargets(relation: Relation, truth: Truth): Set<string> {
       break;
     case 'output':
       for (const hid of ofKind('register')) out.add(hid);
-      for (const hid of ofKind('instruction'))
-        if (rule.get(hid)?.evidence.some((e) => e.type === 'text')) out.add(hid);
+      for (const hid of ofKind('instruction')) if (rule.get(hid)?.evidence.some(checksReply)) out.add(hid);
       break;
     case 'data':
       // A rule whose planted evidence is a call of a tool that brings outside data in. A gate whose line names a file to
