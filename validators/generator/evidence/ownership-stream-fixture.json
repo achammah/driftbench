@@ -1,0 +1,79 @@
+{
+  "main": "d37cc4c7684fb4d9d15b831a4cab9c591bdf2c98",
+  "pr527Before": "4b411d42625aca3262b75e2d5538e1a4284c51e4",
+  "mainNamedTest": "pass",
+  "pr527NamedTest": "fail at balance-file precondition before eager/disk comparison",
+  "cause": "Product test imports mutable validator hiddenSpec(5). The minimal owner for B-002 changes generated scenarios so balance is already sufficient; no top-up file is required.",
+  "publicSeed5": [
+    {
+      "name": "main",
+      "flows": [
+        {
+          "id": "new-request",
+          "behaviours": ["B-001", "B-004", "B-005"]
+        },
+        {
+          "id": "change-request",
+          "behaviours": ["B-003", "B-004"]
+        },
+        {
+          "id": "status-check",
+          "behaviours": ["B-003", "B-004"]
+        }
+      ],
+      "counts": {
+        "D2_goal_shift": 15,
+        "D3_contradiction": 28,
+        "D5_language_switch": 29,
+        "D8_tool_failure": 12,
+        "D9_out_of_scope": 16,
+        "D10_return": 16,
+        "D1_off_topic": 34,
+        "D4_loose_confirmation": 35,
+        "D6_instruction_in_data": 32,
+        "D7_silence_or_burst": 34
+      },
+      "balanceFiles": [
+        "specs/deviation/gen-deviation-balance-001.yaml",
+        "specs/deviation/gen-deviation-balance-002.yaml",
+        "specs/deviation/gen-deviation-balance-003.yaml"
+      ]
+    },
+    {
+      "name": "527",
+      "flows": [
+        {
+          "id": "new-request",
+          "behaviours": ["B-001", "B-002", "B-004", "B-005"]
+        },
+        {
+          "id": "change-request",
+          "behaviours": ["B-003", "B-004"]
+        },
+        {
+          "id": "status-check",
+          "behaviours": ["B-003", "B-004"]
+        }
+      ],
+      "counts": {
+        "D2_goal_shift": 18,
+        "D3_contradiction": 28,
+        "D5_language_switch": 30,
+        "D8_tool_failure": 13,
+        "D9_out_of_scope": 16,
+        "D10_return": 15,
+        "D6_instruction_in_data": 31,
+        "D7_silence_or_burst": 32,
+        "D1_off_topic": 35,
+        "D4_loose_confirmation": 34
+      },
+      "balanceFiles": []
+    }
+  ],
+  "repair": "Explicitly skew approved D1 phrase counts before generation; retain required top-up files and every disk/eager equality assertion. Exercise public1/5 and fresh1009. Product source unchanged.",
+  "focusedTests": {
+    "diskParity": "4 pass, unchanged heap case not rerun",
+    "ownershipAndPins": "42 pass",
+    "disabledTopUps": "3 fail on1/5/1009, no source product edits; test spy removed"
+  }
+}
