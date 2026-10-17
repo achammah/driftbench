@@ -26,6 +26,8 @@ From `driftbench validate stats --hardness`, after the stats-v2 audit findings (
 
 Batch 6 moved the numbers: a degenerate item now asks the RangeError to name the argument, so a function whose message does not name it is one more cause. Every pilot row was remeasured against the statistics package of its own commit.
 
+Later batches (7 and 8 in [NEEDS.md](NEEDS.md)) added 178 exact-value, accuracy and branch items. Every one passes on the product, so none enters the pilot rows that `--hardness` reads: the table above stays the measurement of the bank the pilot ran on (651 items), and the recorded bar above is met on it. The bank now has 834 items.
+
 What the audit findings now measure:
 
 * Cheater attempt 1, the blanket non-finite guard: a net loss of 6 items (1 gained, 7 broken), where it gained 45.

@@ -1,6 +1,6 @@
 ---
 title: The statistics validator
-summary: What `driftbench validate stats` measures, its 7 levels and 651 items, reference fixtures and budgets, and how to read a failing statistics item.
+summary: What `driftbench validate stats` measures, its 7 levels and 834 items, reference fixtures and budgets, and how to read a failing statistics item.
 commands:
   - validate
 see_also:
@@ -28,12 +28,12 @@ The ladder (version 2), from `driftbench validate stats`:
 | 1 | `reference` | reference values | 31 | reference |
 | 2 | `degenerate` | degenerate inputs | 201 | degenerate-domain, degenerate-empty, degenerate-nonfinite, degenerate-single-equal |
 | 3 | `reproducibility` | reproducibility | 22 | reproducibility |
-| 4 | `analytic` | analytic truth | 246 | agreement-analytic, allocation-bruteforce, binomial-exact, drift-analytic, edge-accuracy, estimators-distributions, product, tests-calibration, unseen-known, variance-simulation |
-| 5 | `simulation` | simulation coverage | 35 | coverage-simulation, product |
+| 4 | `analytic` | analytic truth | 424 | agreement-analytic, allocation-bruteforce, binomial-exact, drift-analytic, edge-accuracy, estimators-distributions, exact-estimators, exact-special, product, tests-calibration, unseen-known, variance-simulation |
+| 5 | `simulation` | simulation coverage | 40 | coverage-simulation, product |
 | 6 | `scale` | scale and stability | 46 | numerical-stability, scale |
 | 7 | `roadmap` | roadmap methods | 70 | missing-method, product |
 
-651 items in all (counted from `--items --json` on seed 1). What each level asks:
+834 items in all (counted from `--items --json` on seed 1). What each level asks:
 
 * `reference`: fixture groups match scipy and numpy.
 * `degenerate`: empty, NaN, infinite, out-of-domain, single and all-equal inputs are handled; a bad input
@@ -43,6 +43,11 @@ The ladder (version 2), from `driftbench validate stats`:
 * `analytic`: estimators and tests match a constructed truth, an exhaustive enumeration or a textbook
   formula. The `product` items here check numbers that driftbench commands print, such as the minimum
   detectable effect `campaign plan` shows.
+  The `exact-special` and `exact-estimators` items compare one function with numbers computed in Python
+  from a closed form in exact rational arithmetic, the standard library, scipy or numpy
+  (`packages/validators/fixtures/stats/exact.json` and `exact-branches.json`, made by `make_exact.py` and
+  `make_exact_branches.py`; the scripts never read the TypeScript). They are split by branch of the
+  function, so a fault on one branch fails an item of its own.
 * `simulation`: planted designs whose coverage, recovery, error or power holds.
 * `scale`: one-million-row calls under a budget of 5000 ms of processor time, and results that a shift or
   a scale of the data leaves unchanged to 1e-6.

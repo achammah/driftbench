@@ -116,7 +116,7 @@ follows the floor line.
 After the table:
 
 ```text
-Bank of stats: 651 items in 20 families, 651 pass on every seed (score 1).
+Bank of stats: 834 items in 22 families, 834 pass on every seed (score 1).
 Failing: 0 items, 0 distinct causes (0 items name no cause and count as their own).
 
 Family agreement-analytic: 20 items, 0 failing, 0 distinct failing causes; per tier 2: 13, 3: 7
@@ -231,10 +231,10 @@ The same ladder without `--blind`, earlier on the same machine, printed the hint
 The two runs failed different scale items (4 items, then 3): both ran while the machine was heavily
 loaded, which is the timing caveat above. The exit status was 19, the level reached.
 
-The bank listing, `pnpm -s driftbench validate stats --items`, prints 727 lines; its first family:
+The bank listing, `pnpm -s driftbench validate stats --items`, prints 916 lines; its first family:
 
 ```text
-Bank of stats: 651 items in 20 families, 651 pass on every seed (score 1).
+Bank of stats: 834 items in 22 families, 834 pass on every seed (score 1).
 Failing: 0 items, 0 distinct causes (0 items name no cause and count as their own).
 
 Family agreement-analytic: 20 items, 0 failing, 0 distinct failing causes; per tier 2: 13, 3: 7

@@ -288,3 +288,101 @@ The audit of the old bank (validators/stats/audit.md on audit/stats-v2, 2faeb603
 * Cause review, 0.20: a cause now names the failure a reader sees, not the fix. "add weightedMean" becomes "weightedMean is missing from @agent-nexus/driftbench-stats", and those items carry the family `missing-method`. "mde: input validation" becomes "mde accepts a degenerate input without a RangeError naming the argument". Every batch 5 cause names its observable failure the same way.
 
 One contradiction inside the bank is resolved: a degenerate item asked `mde` with a baseline of 1 to throw, where the edge item asks for the documented equation's answer. The degenerate item now uses a baseline of 1.2, which is out of range.
+
+## Batch 7: exact values, accuracy over the domain, and the report's headline
+
+The audit of the bank against docs/validators.md section 12 found 13 exports that no item caught when their numbers were 0.2 percent off (`abundances`, `effectiveSampleSize`, `erfc`, `hierarchicalBetaBinomial`, `icc`, `mulberry32`, `parseRepeatReducer`, `quantileSorted`, `reduceRepeats`, `sampleVariance`, `simulateCoverage`, `wilsonEffective`, `zFor`), 22 more that one or two items caught, and 5 that no item failed when they threw (`erfc`, `hierarchicalBetaBinomial`, `icc`, `simulateCoverage`, `wilsonEffective`). The report's suite headline and clustered rate had no item. This batch adds 60 items in two families, `exact-special` (25) and `exact-estimators` (35); every one has a cause of its own.
+
+| Group | Items | What they read |
+|---|---|---|
+| special functions | 15 | `erfc`, `normalCdf`, `normalSf`, `normalQuantile`, `zFor`, `logGamma`, `betaQuantile`, `chiSquareSf`, `kolmogorovSf` against the standard library and scipy, split where a branch of the code is a different failure (the reflection of erfc, the tails, the two kolmogorovSf formulas) |
+| accuracy over the domain | 10 | 60 points per special function across its domain at 1e-11 relative, and `normalQuantile` in three parts |
+| basics | 9 | `mulberry32` (an integer port of the published algorithm), `quantile`, `quantileSorted`, `unreliability`, `weightedMean`, `sampleVariance` (exact rational arithmetic, including a large offset), `abundances`, `parseRepeatReducer`, `reduceRepeats` (60 cases of the three documented rules) |
+| intervals, drift, coverage, variance, paired | 20 | `designEffect`, `effectiveSampleSize`, `kishEffectiveSize`, `wilsonEffective` (both quantiles), `hierarchicalBetaBinomial` (a 2000 by 600 integration written in Python), `cusum`, `pageHinkley`, `goodTuring`, `hillNumber(s)`, `varianceComponents` (balanced nested ANOVA), `icc`, `neymanAllocation`, `repeatsForFloor`, `pairedRateDifference`, `nonInferiority` |
+| simulation | 1 | `simulateCoverage` replayed: the sampler is written again in Python on the mulberry32 port, and the naive and effective-Wilson counts match bit for bit |
+| report | 5 | `suiteHeadline` (rate and interval, effective runs, detectable drop, and that the tree key it is given is the one it groups by) and `clusterRate` |
+
+Provenance: every number is in `packages/validators/fixtures/stats/exact.json`, made by `make_exact.py` next to it, which records per group whether the numbers come from exact rational arithmetic, the Python standard library, scipy or numpy. The script reads no TypeScript. Tolerances come from the source of the number (1e-12 relative for closed forms, 1e-6 for library values as at level 1, 1e-11 for the accuracy items, half a grid cell for the hierarchical bounds), not from what the product achieves.
+
+One real defect surfaced: `normalQuantile` lost digits for p above 0.99 (relative error up to 1.0e-9 at 1 - 1e-12). The item `exact.normalQuantile.double-precision-upper` caught it; the fix is a product change kept apart from this bank (docs/validators.md 12.3) and listed in the pull request.
+
+Measured on seed 1 with a fault planted in one function at a time (the numbers 0.2 percent off, or a throw), over the 57 exported functions: before, 13 lost no item on the numeric fault and 5 lost none when they threw. After, 5 lose none on the numeric fault, which are the functions whose output has nothing a 0.2 percent change moves (`abundances`, `mulberry32`, `parseRepeatReducer`, `reduceRepeats`, `zeroFailureBound`: an integer, a list of integers or a function); `test/stats/exact.test.ts` plants a fault of the right kind in the four of them that have exact items and each loses an item. Every function loses at least one item when it throws.
+
+Against five stand-ins for the whole package (every function returns 0, returns NaN, returns an interval from 0 to 1, throws a RangeError, returns undefined), the 606 items outside the simulation, scale and product families, and the six exact items that need the report or the simulator, pass 36, 25, 41, 18 and 11 respectively, and no exact item passes under any of them.
+
+Effect on the hardness measurement: none, and none is meant. `driftbench validate stats --hardness` reads the pilot rows of `bank-scores.jsonl` (the earlier bank) and the recorded bar of [GATE.md](GATE.md) (max score after the pilot 0.7, min forecast 70, min distinct causes 60). The measured forecast 73.21, score 0.6851 and 62 distinct causes meet that bar; the one line of the gate that does not hold is the audit (`audit.md` absent, docs/validators.md 12.7). Items the product passes cannot lower the score after a pilot, and they were not added to: they hold the package against regressions. They were not added to reach the section 12.4 terms (forecast 100, score 0.4, 100 causes), which the owner's recorded bar replaces for this validator. The independent audit (12.7: blind pilot, cheater, cause review, planted bugs) has not been run.
+
+## Batch 8: one item per branch of the weakest functions
+
+After batch 7, a fault planted in one function at a time (its numbers 0.2 percent off) was still caught by one or two items for 19 of the 57 exports, and a fault on one branch of a function (a tie rule, an edge of the domain, an option) by none that reached that branch. This batch adds 118 items in the family `exact-estimators`, each reaching one branch and each with a cause of its own (580 distinct causes over the 834 items of the bank). The numbers are in `packages/validators/fixtures/stats/exact-branches.json`, made by `make_exact_branches.py` from documented formulas through `exact_ref.py` (exact rational arithmetic, 80-digit decimals, the standard library, numpy or scipy); neither file reads the TypeScript.
+
+| Function | Items | Branches reached |
+|---|---|---|
+| `zFor` | 3 | common levels, the far tail, monotone in alpha |
+| `quantile`, `quantileSorted` | 10 | order statistics, rational interpolation, one and two values, ties, unsorted input |
+| `unreliability` | 3 | deciles, a constant sample, 0/1 flags |
+| `sampleVariance` | 6 | integers, two values, a large offset, a tiny spread, mixed scale, a constant sample |
+| `designEffect`, `effectiveSampleSize` | 8 | no clustering, full correlation, negative rho, fractional m |
+| `goodTuring` | 5 | all singletons, no singletons, mixed, zero counts, the four counts |
+| `hillNumber`, `hillNumbers` | 8 | uniform, one class, zeros ignored, orders 1 and 2, scale-free, ordered |
+| `icc` | 5 | one, two and three named levels, zero total, the last level |
+| `neymanAllocation` | 4 | the integer optimum (brute force), sums to the total, zero spread, every stratum sampled |
+| `pageHinkley` | 7 | before minInstances, up, down, reset after an alarm, delta, the minInstances boundary, a quiet series |
+| `pairedRateDifference` | 7 | positive and negative covariance, zero margin, extreme tables, levels, sign, antisymmetry |
+| `nonInferiority` | 5 | parity, regression, the margin boundary, a gating flag, named pairs |
+| `repeatsForFloor` | 8 | difference, one version, blocks, z, flip rate, zero variance, exact integer ratio, the floor reached |
+| `varianceComponents` | 5 | unbalanced (Henderson method I), binary flags, a negative moment estimate, a level without degrees of freedom, n and the mean |
+| `wilsonEffective` | 7 | all pass, all fail, one cluster, no spread, capped at n, levels, t against z |
+| `hierarchicalBetaBinomial` | 7 | trees above 64 blocks, all pass, all fail, two trees, levels, one-block trees, order |
+| `simulateCoverage` | 1 | three single trees whose naive Wilson coverage is a finite sum over the binomial or beta-binomial distribution (scipy.stats), which checks the gamma, beta and binomial draws against an analytic truth |
+| `binomialCdf` | 5 | small n in exact rationals, edges and point masses, the upper tail, a far lower tail near 1e-50, moderate n |
+| `zeroFailureBound` | 5 | a decimal table, ratios that are exact integers (0.9 and 0.001 give 3), tiny p, high confidence, large p |
+| `reduceRepeats` | 4 | mode, median, at_least, unscored repeats |
+| `abundances`, `mulberry32` | 5 | first-seen order, a number and a string that differ, the sum; the seed taken modulo 2^32, 2000 draws |
+
+Proof that the items are not one check repeated: `packages/validators/test/stats/exact-branches.test.ts` runs 155 tests. Every item fails under a fault of its own function (the numbers 0.2 percent off, a throw, or, where the item reads a zero, a one or an integer, a fault written for that item). And 37 faults planted in a copy of the package source, one branch each, fail the items of that branch and leave the items of the neighbouring branches passing. Measured again with the generic fault over the 57 exports (seed 1), the functions caught by one or two items fall from 19 to 2 (`neymanAllocation` 2 and `simulateCoverage` 1; their other items read integers, or use a tolerance wider than 0.2 percent, and each has an item that fails under a fault written for it), and 5 exports are unmoved by a 0.2 percent change because their output is an integer, a list of integers or a function (`abundances`, `mulberry32`, `parseRepeatReducer`, `reduceRepeats`, `zeroFailureBound`); each of them has items that fail under a fault of the right kind. Every function loses at least one item when it throws.
+
+How independent the oracles are (batches 7 and 8). Three kinds, and an item is only as strong as its kind:
+
+* A mathematical truth from outside the package: the Python standard library, scipy or numpy (special functions, quantiles, `betabinom`, `binom`, `chi2`, `ks_2samp`, `wilcoxon`), or a closed form in exact rational arithmetic (type 7 quantiles, variances, design effects, Kish sizes, the zero-failure count, the exact binomial sum, the lattice-path count). A wrong documented algorithm fails these.
+* A brute force over a small space: the integer Neyman optimum over every allocation, the nested ANOVA mean squares, the Hill numbers by their definition.
+* A second implementation of the documented algorithm, written in Python from the formulas in the doc comments: the CUSUM and Page-Hinkley recursions, the integration of the hierarchical model on a 2000 by 600 grid, Wilson on the effective blocks, Henderson's method I, the report's suite headline and clustered rate, and the seeded sampler of `simulateCoverage`. These catch the product drifting from its own documentation and every planted fault of the tests; they cannot catch a documented algorithm that is itself wrong, and the author of the scripts read the doc comments of the code they restate.
+
+Guards that cannot be reached, found because a planted fault there changed no result (equivalent mutants, so no item is possible; none is a defect):
+
+* `pageHinkley`: `runningMean = 0` after an alarm. The count is reset too, so the next point replaces the mean.
+* `pairedRateDifference`: the clipping of the interval to [-1, 1]. With the Wilson limits already inside [0, 1] the lower limit is at least l1 - u2, which is at least -1 (and the upper limit at most u1 - l2, at most 1).
+* `wilsonEffective`: the floor at 1 on the effective blocks. A search over clusters of all-pass or all-fail blocks (up to 14 clusters, sizes up to 40) reaches exactly 1 and never goes below it.
+
+### Defects found by a differential sweep, not made into items
+
+About 12,000 cases of the 57 exports against scipy, exact rational arithmetic or 80-digit decimals, and a 400-trial fuzz of valid inputs per function, found these. They are outside the ranges driftbench uses (the header of `special.ts` says "close to double precision over the ranges driftbench uses"), so by the rule of 2026-10-12 (no work the product does not need) they are listed here and are not items. Each line is a call and the value it returns against the exact value.
+
+* `hillNumber([100, 60, 30, 10, 5, 2, 1], q)` for q of 20 or more: 2.16173609826 at q = 20 (2.16173609829), 2.1164298 at q = 50 (2.1113218), 1.4492973 at q = 100 (2.0954442). The `expm1`/`log1p` form cancels when the sum of p^q is far below 1. On 400 random samples with q up to 500, 110 results fall outside [1, number of classes].
+* `zFor(alpha)` is `normalQuantile(1 - alpha / 2)`: `zFor(1e-10)` is 6.466951074732 (6.466951087241, relative error 1.9e-9), and `zFor(1e-16)` is Infinity (8.304785425194), because 1 - alpha / 2 rounds to 1. `-normalQuantile(alpha / 2)` has neither problem. The same expression is in `wilsonEffective` with the normal quantile (NaN at alpha 1e-20), `pairedRateDifference` (throws "wilson: z must be finite, got Infinity" at alpha 1e-20) and `mde`. `clopperPearson(5, 100, 1e-20)` has an upper limit of 1 (0.4750239548).
+* `normalQuantile(2.9817e-320)` is NaN (-38.2405863491651): the refinement overflows `exp(x * x / 2)` for p below about 1e-308.
+* `betaQuantile(1e-10, 0.0195, 0.3239)` is 3.1e-61 (2.2e-308): the bisection stops after 200 halvings, so a quantile below about 6e-61 is returned as 3e-61.
+* `incompleteBeta(0.9999976308683171, 98112.51057913958, 0.014509189854358217)` has a relative error of 1.0e-8 (the log-gamma prefactor at shapes of 1e4 and more); 10 of 216 random cases are above 1e-9.
+* `chiSquareSf(988556.13314992, 963988.8446623523)` has a relative error of 1.6e-9.
+* `binomialCdf(11039, 10200517, 0.0011389556284197519)` has a relative error of 2.5e-8 (45 of 250 random cases at n of 1e6 or more are above 1e-9), and sums k + 1 terms, so it takes time proportional to k.
+* `ksTest` with the exact method, p below 1e-9: `ksTest` of two samples of 38 and 76 values gives p = 3.2715e-12, where the exact lattice-path count (fractions.Fraction, confirmed against scipy) gives 3.2712e-12 (relative error 7.6e-5): `1 - inside` loses the small probability.
+
+Not defects: `ksTest` with `method: 'asymptotic'` differs from scipy's `method='asymp'` (the product uses the Kolmogorov limit with sqrt(m n / (m + n)), as documented; scipy uses kstwo), and the hierarchical bounds sit up to 2.2e-3 from a 2000 by 600 integration (its grid has 100 cells, which the items allow: half a cell).
+
+## Batch 9: closing the cheats of the audit (docs/validators.md 12.7)
+
+The independent audit of the bank at the commit before any fix (`validators/stats/audit.md` on `audit/stats-v3`) failed the cheater check: 8 of 16 cheats raised the score while the statistics stayed wrong. This batch adds 24 items (858 in all) and a guard on the bank's child process, and re-measures the cheats that apply to the current bank.
+
+Method. The package of the commit before any fix (`141a67d8`, 590 of 858 items passing on seed 1 against this bank) is the degraded package. Each cheat is a wrapper around it, loaded through `DRIFTBENCH_STATS_IMPL`, run as `validate stats --seed 1 --items --json`. Gain and loss are counted against those 590 items. This run was made before the child-process trap and before the `erfc` fix below.
+
+| Cheat of the audit | Measured on the 858-item bank | What closes it |
+|---|---|---|
+| Read the fixture files at run time and return the stored value (the audit's +629 was on roadmap items, which this bank does not hold) | gained 4, lost 20 (net -16). A final run with the trap and the source scan in place: the cheat fails `exact.source.reads-files` and `exact.source.names-the-validator` | `bank/trap.ts` refuses `fs` and `child_process` calls whose caller is a file of the package under test; five items scan the package source for file, process, call-stack, generated-code and fixture-name access (`exact.source.*`) |
+| Return a canned value for six named calls | gained 6, lost 0 | 7 sibling items, one per call, on other arguments of the same kind (`normalSf`, `normalCdf`, `erfc`, `chiSquareSf` at infinity, `mean` of other large values, `betaQuantile` with other shapes below 1, `hillNumber` from four sides of q = 1). A canned value for the six calls gains nothing on the siblings |
+| Throw a RangeError on any non-finite or empty argument (the audit's +44) | blanket throw naming function and argument: gained 79, lost 7 (net +72); the same throw with the functions that have a valid odd input exempted: gained 71, lost 0 | 13 valid-odd items (see below) |
+| `chao1` set to the observed class count | gained 0, lost 8 | already closed in batch 6 |
+| `varianceComponents` returns an empty list | gained 0, lost 22 | the shift items now fail unless the result has four finite estimates |
+
+What stays open, and why it is not a flaw of the bank. A blanket throw on non-finite or empty arguments is, for most functions, the correct implementation of rule 1 of the degenerate level (a RangeError that names the function and the argument). The 71 to 79 items it gains are the items a real fix of those functions gains too: there the cheat and the fix are the same code. It is wrong only where an odd argument is valid, and it loses the valid-odd items there: `normalCdf(Infinity)`, `normalQuantile(0)`, `logGamma` at a pole, `kolmogorovSf` at the ends, `benjaminiHochberg([])`, `abundances([])`, `betaQuantile` at p = 0 and 1, `incompleteBeta` at 0 and 1, `binomialCdf` out of range, `hillNumber` at q < 0, `mde` at baseline 0 and 1, `wilson` at k = 0 and k = n. The 7 losses are the valid-odd items of the functions the blanket throw reaches. A function found later with a valid odd input gets an item the same day. The auditor's +44 on the old bank is this cheat.
+
+Found while writing the sibling items: `erfc(Infinity)`, `normalSf(Infinity)` and `normalCdf(1e300)` returned NaN, because the square of the argument overflowed. Fixed in its own pull request; the three sibling items fail without it.

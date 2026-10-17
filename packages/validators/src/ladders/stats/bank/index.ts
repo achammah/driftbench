@@ -4,6 +4,8 @@ import type { StatsImpl } from '../reference';
 import { analyticItems } from './analytic';
 import { degenerateItems } from './degenerate';
 import { designBoundItems, edgeItems, ruleItems } from './edges';
+import { exactItems } from './exact';
+import { branchItems } from './exact-branches';
 import { attempt, BANK_LEVELS, type BankItem, type BankLevel, type ItemOutcome, itemRng } from './item';
 import { productItems } from './product';
 import { rateItems } from './rates';
@@ -12,6 +14,7 @@ import { reproducibilityItems } from './reproducibility';
 import { roadmapItems } from './roadmap';
 import { scaleItems, stabilityItems } from './scale';
 import { simulationItems } from './simulation';
+import { sourceGuardItems } from './source-guards';
 
 export { BANK_LEVELS, type BankItem, type BankLevel, type ItemOutcome, type Tier } from './item';
 
@@ -58,6 +61,9 @@ export function statsBank(root: string): BankItem[] {
     ...degenerateItems(),
     ...reproducibilityItems(),
     ...analyticItems(),
+    ...exactItems(),
+    ...branchItems(),
+    ...sourceGuardItems(),
     ...edgeItems(root),
     ...designBoundItems(),
     ...ruleItems(),

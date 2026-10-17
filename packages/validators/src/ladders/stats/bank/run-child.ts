@@ -4,9 +4,11 @@
  * it through its own entry point (see isolate.ts). `args` is <seed> <root> <start>, and the item ids to run come
  * as a JSON array on stdin.
  */
+import { dirname, join } from 'node:path';
 import * as stats from '@agent-nexus/driftbench-stats';
 import type { StatsImpl } from '../reference';
 import { runItem, statsBank } from './index';
+import { installTrap } from './trap';
 
 async function main(args: readonly string[]): Promise<void> {
   const [seedText, root, startText] = args;
@@ -16,6 +18,11 @@ async function main(args: readonly string[]): Promise<void> {
   for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
   const ids = JSON.parse(Buffer.concat(chunks).toString('utf8')) as string[];
   const implPath = process.env.DRIFTBENCH_STATS_IMPL;
+  // The package under test runs with no file or process access; the validator's own reads are not affected.
+  installTrap([
+    ...(implPath ? [dirname(implPath.startsWith('file://') ? new URL(implPath).pathname : implPath)] : []),
+    join(root as string, 'packages', 'stats', 'src'),
+  ]);
   const s = (implPath ? await import(implPath) : stats) as StatsImpl;
   const byId = new Map(statsBank(root as string).map((item) => [item.id, item]));
   const items = ids.map((id) => {

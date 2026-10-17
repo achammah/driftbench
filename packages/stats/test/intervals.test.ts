@@ -7,10 +7,12 @@ import {
   clopperPearson,
   designEffect,
   effectiveSampleSize,
+  erfc,
   incompleteBeta,
   logGamma,
   normalCdf,
   normalQuantile,
+  normalSf,
   wilson,
   zeroFailureBound,
 } from '../src/index';
@@ -47,6 +49,20 @@ describe('special functions against scipy', () => {
       expect(Math.abs(normalQuantile(p) - expected) / expected, `ppf(${p})`).toBeLessThan(1e-11);
     // The quantile is odd about one half whenever 1 - p is exact (p >= 0.5).
     for (const [p] of cases) expect(normalQuantile(1 - p) + normalQuantile(p)).toBeCloseTo(0, 11);
+  });
+  it('erfc, normalSf and normalCdf reach their limits at infinity and beyond the largest argument', () => {
+    // erfc(x) is below the smallest double from x = 27.3, so it is 0; x * x must not overflow on the way.
+    for (const x of [Number.POSITIVE_INFINITY, 1e300, 1e155, 30]) {
+      expect(erfc(x), `erfc(${x})`).toBe(0);
+      expect(erfc(-x), `erfc(-${x})`).toBe(2);
+    }
+    expect(normalSf(Number.POSITIVE_INFINITY)).toBe(0);
+    expect(normalSf(Number.NEGATIVE_INFINITY)).toBe(1);
+    expect(normalSf(1e300)).toBe(0);
+    expect(normalCdf(1e300)).toBe(1);
+    expect(normalCdf(-1e300)).toBe(0);
+    // Just below the cut the value is still computed: erfc(26.5) is 2.2109076642637343e-307 (math.erfc).
+    expect(Math.abs(erfc(26.5) / 2.2109076642637343e-307 - 1)).toBeLessThan(1e-9);
   });
   it('chiSquareSf and binomialCdf match scipy.stats', () => {
     for (const c of s.chiSquareSf)
