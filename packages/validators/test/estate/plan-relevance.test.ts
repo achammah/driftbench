@@ -1,5 +1,6 @@
 import type { AtomKind } from '@agent-nexus/driftbench-estate';
 import { describe, expect, it, vi } from 'vitest';
+import { targetsOf as estateTargetsOf } from '../../../estate/src/plan/relevance';
 import { planRelevanceFamily, RELEVANCE, truthOf } from '../../src/ladders/estate/bank/plan';
 import { plantedTargets, type Relation, type Truth } from '../../src/ladders/estate/bank/relevance-planted';
 import * as pipeline from '../../src/ladders/estate/pipeline';
@@ -723,4 +724,70 @@ describe('independence: a planner that reads the map perfectly is caught when on
       expect(tooMany, `${key}, seed ${seed}`).toEqual([]);
     }
   });
+});
+
+describe('custom reply rules on the output relation: the planner and the oracle agree', () => {
+  // Invented rules of a harbour estate; no seed holds one. Each is (predicate, options, is it a reply check).
+  const RULES: Array<[name: string, options: Record<string, unknown> | undefined, reply: boolean]> = [
+    ['no_secret_in_reply', undefined, true],
+    ['max_characters', { max: 600 }, true],
+    ['max_questions', { max: 2 }, true],
+    ['json_only', undefined, true],
+    ['same_language_as_user', undefined, true],
+    ['asks_for', { value: 'the vessel name' }, true],
+    ['route_table', undefined, true],
+    ['currency_after_amount', undefined, true],
+    ['stopped_and_confirmed', undefined, true],
+    // Too thin to compile, a check of acts and not of the reply, or no documented predicate.
+    ['max_characters', undefined, false],
+    ['asks_for', undefined, false],
+    ['command_not_run', { contains: 'git push --force' }, false],
+    ['confirmed_before_send', undefined, false],
+    ['grounded_values', undefined, false],
+    ['berth_ledger_balanced', undefined, false],
+  ];
+
+  it.each(RULES.map((rule, index) => [index, ...rule] as const))(
+    'rule %i, %s: placed by both when it checks the reply, by neither when it does not',
+    (index, name, options, reply) => {
+      const id = `rule-${index}`;
+      const map = {
+        version: 1,
+        runtime: 'fictional',
+        root: '.',
+        readAt: '2026-01-01T00:00:00Z',
+        hash: 'handwritten',
+        atoms: [
+          {
+            id,
+            kind: 'instruction',
+            title: id,
+            provenance: { file: 'POLICY.md', startLine: index + 1, endLine: index + 1, quote: id, hash: id },
+            producedBy: 'code',
+            role: 'axis',
+            approved: true,
+            evidence: [{ type: 'custom', name, ...(options ? { options } : {}) }],
+            enforcement: [],
+          },
+        ],
+        edges: [],
+      } as unknown as Parameters<typeof estateTargetsOf>[1];
+      const planner = estateTargetsOf('output', map);
+      const oracle = plantedTargets(
+        'output',
+        truth({
+          atoms: [[id, 'instruction']],
+          rules: [
+            {
+              hid: id,
+              kind: 'instruction',
+              evidence: [{ type: 'custom', name, ...(options ? { options } : {}) }],
+            },
+          ],
+        }),
+      );
+      expect(planner.has(id), `planner ${name}`).toBe(reply);
+      expect(oracle.has(id), `oracle ${name}`).toBe(reply);
+    },
+  );
 });
