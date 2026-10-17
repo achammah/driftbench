@@ -3,6 +3,14 @@ import type { PerturbationSpec, Spec } from '../schema/spec';
 import { isPlainObject } from '../spec/normalize';
 import { type Change, type ChangeManifest, changeLabel } from './change';
 import { type BlockDependencies, blockDependencies } from './depends';
+import type { SectionRegistry } from './sections';
+import {
+  type ParentRef,
+  SECTION_SELECTION_ADVISORY,
+  type SectionSelection,
+  sectionChanges,
+  sectionSelection,
+} from './select';
 
 /**
  * The blast radius of a change manifest over a set of specs: the blocks the change can affect.
@@ -24,6 +32,10 @@ export type RadiusOptions = {
   modes?: readonly RunMode[];
   /** True when the spec runs in a sandbox, where a T block keeps the workspace of the block before. Default: a task spec. */
   sandbox?: (spec: Spec) => boolean;
+  /** Section registries: with them, a manifest's `prompt_section` changes get an advisory section selection. */
+  sections?: readonly SectionRegistry[];
+  /** The parent block a spec starts from, for the advisory forward closure. Default: `given.parent` of block 0. */
+  parentOf?: (spec: Spec) => ParentRef | undefined;
 };
 
 export type BlockState = 'direct' | 'forward' | 'out';
@@ -78,6 +90,11 @@ export type RadiusReport = {
   whole: { change: string; reason: string } | null;
   specs: RadiusSpecReport[];
   totals: Partial<Record<RunMode, RadiusCount>>;
+  /**
+   * What selection by section links would run for the manifest's `prompt_section` changes. Advisory: the
+   * radius above is the whole suite and nothing is skipped. Present only with `sections`.
+   */
+  advisory?: SectionSelection;
 };
 
 const deviationMatches = (carried: string | undefined, id: string): boolean =>
@@ -159,6 +176,9 @@ function matcher(change: Change): { match: Match; needs?: 'cell' | 'atoms' } | W
     case 'criterion':
       if (id === undefined) return { whole: 'a criterion change names no criterion' };
       return { match: (d) => d.criteria.includes(id) };
+    case 'prompt_section':
+      // Selection by section links is advisory (select.ts): the whole suite runs until links are verified.
+      return { whole: SECTION_SELECTION_ADVISORY };
     default:
       return { whole: `the kind ${change.kind} is not one the radius can map` };
   }
@@ -377,11 +397,16 @@ export function radiusOf(
     totals[mode] = count;
   }
 
+  const advisory =
+    options.sections !== undefined && sectionChanges(manifest).length > 0
+      ? sectionSelection(specs, manifest, options.sections, { parentOf: options.parentOf })
+      : undefined;
   return {
     manifest: { from: manifest.from, to: manifest.to, changes: manifest.changes.map(changeLabel) },
     modes,
     whole,
     specs: reports,
     totals,
+    ...(advisory === undefined ? {} : { advisory }),
   };
 }

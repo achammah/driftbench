@@ -1,0 +1,1122 @@
+{
+  "source": "research/block-links: suite/suite.yaml (declared links) and H7/results.json (per_mutant confirmed flips E, null.flaky)",
+  "flaky": ["af1", "d1"],
+  "conversations": [
+    {
+      "id": "upgrade-happy",
+      "blocks": [
+        { "id": "u1", "links": ["upgrade_identify"] },
+        { "id": "u2", "links": ["upgrade_identify", "upgrade_more_data"] },
+        { "id": "u3", "links": ["recap"] },
+        { "id": "u4", "links": ["explicit_confirm", "upgrade_order"] },
+        { "id": "u5", "links": ["closing"] }
+      ]
+    },
+    {
+      "id": "upgrade-loose-yes",
+      "blocks": [
+        { "id": "ly1", "links": ["upgrade_identify", "upgrade_more_data"] },
+        { "id": "ly2", "links": ["recap"] },
+        { "id": "ly3", "links": ["explicit_confirm"] }
+      ]
+    },
+    { "id": "upgrade-max", "blocks": [{ "id": "mx1", "links": ["upgrade_identify", "upgrade_more_data"] }] },
+    { "id": "upgrade-unknown", "blocks": [{ "id": "un1", "links": ["upgrade_unknown_account"] }] },
+    {
+      "id": "home-happy",
+      "blocks": [
+        { "id": "h1", "links": ["home_address_first", "home_plans_at_address", "home_access_wording"] },
+        { "id": "h2", "links": ["new_customer_details"] },
+        { "id": "h3", "links": ["recap", "new_customer_details"] },
+        { "id": "h4", "links": ["explicit_confirm"] }
+      ]
+    },
+    {
+      "id": "home-5g",
+      "blocks": [
+        { "id": "g1", "links": ["home_address_first", "home_plans_at_address", "home_access_wording"] }
+      ]
+    },
+    {
+      "id": "home-none",
+      "blocks": [
+        { "id": "n1", "links": ["home_no_coverage"] },
+        { "id": "n2", "links": ["home_no_coverage", "callback_request"] }
+      ]
+    },
+    {
+      "id": "home-address-first",
+      "blocks": [
+        { "id": "af1", "links": ["home_address_first"] },
+        { "id": "af2", "links": ["home_address_unknown"] }
+      ]
+    },
+    {
+      "id": "porting-ok",
+      "blocks": [
+        { "id": "p1", "links": ["porting_check_first", "porting_timing", "mobile_new_line"] },
+        { "id": "p2", "links": ["recap"] },
+        { "id": "p3", "links": ["explicit_confirm", "porting_timing"] }
+      ]
+    },
+    {
+      "id": "porting-locked",
+      "blocks": [
+        { "id": "pl1", "links": ["porting_check_first", "porting_ineligible"] },
+        { "id": "pl2", "links": ["recap", "porting_ineligible"] },
+        { "id": "pl3", "links": ["explicit_confirm", "porting_ineligible"] }
+      ]
+    },
+    { "id": "care", "blocks": [{ "id": "c1", "links": ["care_redirect"] }] },
+    {
+      "id": "hours-offtopic",
+      "blocks": [{ "id": "s1", "links": ["store_hours"] }, { "id": "s2", "links": ["scope"] }]
+    },
+    { "id": "language", "blocks": [{ "id": "l1", "links": [] }] },
+    {
+      "id": "injection",
+      "blocks": [{ "id": "i1", "links": ["instruction_in_data", "home_plans_at_address"] }]
+    },
+    { "id": "discount", "blocks": [{ "id": "d1", "links": ["no_discounts", "mobile_new_line"] }] },
+    {
+      "id": "tool-failure",
+      "blocks": [
+        { "id": "tf1", "links": ["tool_failure", "home_address_first"] },
+        { "id": "tf2", "links": ["tool_failure", "callback_request"] }
+      ]
+    },
+    {
+      "id": "order-failure",
+      "blocks": [
+        { "id": "of1", "links": ["upgrade_identify", "recap"] },
+        { "id": "of2", "links": ["order_failure", "explicit_confirm"] }
+      ]
+    },
+    { "id": "callback", "blocks": [{ "id": "cb1", "links": ["callback_request"] }] },
+    { "id": "needs", "blocks": [{ "id": "ne1", "links": ["needs_question"] }] }
+  ],
+  "mutants": [
+    { "variant": "identity__drop", "sections": ["identity"], "control": false, "pair": false, "E": [] },
+    { "variant": "identity__negate", "sections": ["identity"], "control": false, "pair": false, "E": [] },
+    {
+      "variant": "identity__rephrase",
+      "sections": ["identity"],
+      "control": false,
+      "pair": false,
+      "E": ["cb1"]
+    },
+    { "variant": "identity__ctl_punct", "sections": ["identity"], "control": true, "pair": false, "E": [] },
+    { "variant": "identity__ctl_synonym", "sections": ["identity"], "control": true, "pair": false, "E": [] },
+    { "variant": "language__drop", "sections": ["language"], "control": false, "pair": false, "E": ["l1"] },
+    { "variant": "language__negate", "sections": ["language"], "control": false, "pair": false, "E": ["l1"] },
+    { "variant": "language__rephrase", "sections": ["language"], "control": false, "pair": false, "E": [] },
+    { "variant": "language__ctl_punct", "sections": ["language"], "control": true, "pair": false, "E": [] },
+    { "variant": "language__ctl_synonym", "sections": ["language"], "control": true, "pair": false, "E": [] },
+    { "variant": "style__drop", "sections": ["style"], "control": false, "pair": false, "E": [] },
+    { "variant": "style__negate", "sections": ["style"], "control": false, "pair": false, "E": ["p1"] },
+    { "variant": "style__rephrase", "sections": ["style"], "control": false, "pair": false, "E": [] },
+    { "variant": "style__ctl_punct", "sections": ["style"], "control": true, "pair": false, "E": [] },
+    { "variant": "style__ctl_synonym", "sections": ["style"], "control": true, "pair": false, "E": [] },
+    {
+      "variant": "facts_from_tools__drop",
+      "sections": ["facts_from_tools"],
+      "control": false,
+      "pair": false,
+      "E": ["p1"]
+    },
+    {
+      "variant": "facts_from_tools__negate",
+      "sections": ["facts_from_tools"],
+      "control": false,
+      "pair": false,
+      "E": ["h1", "i1", "ly1", "u2"]
+    },
+    {
+      "variant": "facts_from_tools__rephrase",
+      "sections": ["facts_from_tools"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "facts_from_tools__ctl_punct",
+      "sections": ["facts_from_tools"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "facts_from_tools__ctl_synonym",
+      "sections": ["facts_from_tools"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    { "variant": "scope__drop", "sections": ["scope"], "control": false, "pair": false, "E": [] },
+    { "variant": "scope__negate", "sections": ["scope"], "control": false, "pair": false, "E": [] },
+    { "variant": "scope__rephrase", "sections": ["scope"], "control": false, "pair": false, "E": [] },
+    { "variant": "scope__ctl_punct", "sections": ["scope"], "control": true, "pair": false, "E": [] },
+    { "variant": "scope__ctl_synonym", "sections": ["scope"], "control": true, "pair": false, "E": [] },
+    {
+      "variant": "needs_question__drop",
+      "sections": ["needs_question"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "needs_question__negate",
+      "sections": ["needs_question"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "needs_question__rephrase",
+      "sections": ["needs_question"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "needs_question__ctl_punct",
+      "sections": ["needs_question"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "needs_question__ctl_synonym",
+      "sections": ["needs_question"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "care_redirect__drop",
+      "sections": ["care_redirect"],
+      "control": false,
+      "pair": false,
+      "E": ["c1"]
+    },
+    {
+      "variant": "care_redirect__negate",
+      "sections": ["care_redirect"],
+      "control": false,
+      "pair": false,
+      "E": ["c1"]
+    },
+    {
+      "variant": "care_redirect__rephrase",
+      "sections": ["care_redirect"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "care_redirect__ctl_punct",
+      "sections": ["care_redirect"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "care_redirect__ctl_synonym",
+      "sections": ["care_redirect"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "store_hours__drop",
+      "sections": ["store_hours"],
+      "control": false,
+      "pair": false,
+      "E": ["s1"]
+    },
+    {
+      "variant": "store_hours__negate",
+      "sections": ["store_hours"],
+      "control": false,
+      "pair": false,
+      "E": ["s1"]
+    },
+    {
+      "variant": "store_hours__rephrase",
+      "sections": ["store_hours"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "store_hours__ctl_punct",
+      "sections": ["store_hours"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "store_hours__ctl_synonym",
+      "sections": ["store_hours"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_identify__drop",
+      "sections": ["upgrade_identify"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_identify__negate",
+      "sections": ["upgrade_identify"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_identify__rephrase",
+      "sections": ["upgrade_identify"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_identify__ctl_punct",
+      "sections": ["upgrade_identify"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_identify__ctl_synonym",
+      "sections": ["upgrade_identify"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_unknown_account__drop",
+      "sections": ["upgrade_unknown_account"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_unknown_account__negate",
+      "sections": ["upgrade_unknown_account"],
+      "control": false,
+      "pair": false,
+      "E": ["un1"]
+    },
+    {
+      "variant": "upgrade_unknown_account__rephrase",
+      "sections": ["upgrade_unknown_account"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_unknown_account__ctl_punct",
+      "sections": ["upgrade_unknown_account"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_unknown_account__ctl_synonym",
+      "sections": ["upgrade_unknown_account"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_more_data__drop",
+      "sections": ["upgrade_more_data"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_more_data__negate",
+      "sections": ["upgrade_more_data"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_more_data__rephrase",
+      "sections": ["upgrade_more_data"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_more_data__ctl_punct",
+      "sections": ["upgrade_more_data"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_more_data__ctl_synonym",
+      "sections": ["upgrade_more_data"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_order__drop",
+      "sections": ["upgrade_order"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_order__negate",
+      "sections": ["upgrade_order"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_order__rephrase",
+      "sections": ["upgrade_order"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_order__ctl_punct",
+      "sections": ["upgrade_order"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "upgrade_order__ctl_synonym",
+      "sections": ["upgrade_order"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_first__drop",
+      "sections": ["home_address_first"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_first__negate",
+      "sections": ["home_address_first"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_first__rephrase",
+      "sections": ["home_address_first"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_first__ctl_punct",
+      "sections": ["home_address_first"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_first__ctl_synonym",
+      "sections": ["home_address_first"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_unknown__drop",
+      "sections": ["home_address_unknown"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_unknown__negate",
+      "sections": ["home_address_unknown"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_unknown__rephrase",
+      "sections": ["home_address_unknown"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_unknown__ctl_punct",
+      "sections": ["home_address_unknown"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_address_unknown__ctl_synonym",
+      "sections": ["home_address_unknown"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_plans_at_address__drop",
+      "sections": ["home_plans_at_address"],
+      "control": false,
+      "pair": false,
+      "E": ["g1", "h1"]
+    },
+    {
+      "variant": "home_plans_at_address__negate",
+      "sections": ["home_plans_at_address"],
+      "control": false,
+      "pair": false,
+      "E": ["g1", "h1", "h3", "h4", "i1"]
+    },
+    {
+      "variant": "home_plans_at_address__rephrase",
+      "sections": ["home_plans_at_address"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_plans_at_address__ctl_punct",
+      "sections": ["home_plans_at_address"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_plans_at_address__ctl_synonym",
+      "sections": ["home_plans_at_address"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_access_wording__drop",
+      "sections": ["home_access_wording"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_access_wording__negate",
+      "sections": ["home_access_wording"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_access_wording__rephrase",
+      "sections": ["home_access_wording"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_access_wording__ctl_punct",
+      "sections": ["home_access_wording"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_access_wording__ctl_synonym",
+      "sections": ["home_access_wording"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_no_coverage__drop",
+      "sections": ["home_no_coverage"],
+      "control": false,
+      "pair": false,
+      "E": ["n1", "n2"]
+    },
+    {
+      "variant": "home_no_coverage__negate",
+      "sections": ["home_no_coverage"],
+      "control": false,
+      "pair": false,
+      "E": ["n1", "n2"]
+    },
+    {
+      "variant": "home_no_coverage__rephrase",
+      "sections": ["home_no_coverage"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_no_coverage__ctl_punct",
+      "sections": ["home_no_coverage"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "home_no_coverage__ctl_synonym",
+      "sections": ["home_no_coverage"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_check_first__drop",
+      "sections": ["porting_check_first"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_check_first__negate",
+      "sections": ["porting_check_first"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_check_first__rephrase",
+      "sections": ["porting_check_first"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_check_first__ctl_punct",
+      "sections": ["porting_check_first"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_check_first__ctl_synonym",
+      "sections": ["porting_check_first"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_ineligible__drop",
+      "sections": ["porting_ineligible"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_ineligible__negate",
+      "sections": ["porting_ineligible"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_ineligible__rephrase",
+      "sections": ["porting_ineligible"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_ineligible__ctl_punct",
+      "sections": ["porting_ineligible"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_ineligible__ctl_synonym",
+      "sections": ["porting_ineligible"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_timing__drop",
+      "sections": ["porting_timing"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_timing__negate",
+      "sections": ["porting_timing"],
+      "control": false,
+      "pair": false,
+      "E": ["p3"]
+    },
+    {
+      "variant": "porting_timing__rephrase",
+      "sections": ["porting_timing"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_timing__ctl_punct",
+      "sections": ["porting_timing"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "porting_timing__ctl_synonym",
+      "sections": ["porting_timing"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "mobile_new_line__drop",
+      "sections": ["mobile_new_line"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "mobile_new_line__negate",
+      "sections": ["mobile_new_line"],
+      "control": false,
+      "pair": false,
+      "E": ["p3", "pl3"]
+    },
+    {
+      "variant": "mobile_new_line__rephrase",
+      "sections": ["mobile_new_line"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "mobile_new_line__ctl_punct",
+      "sections": ["mobile_new_line"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "mobile_new_line__ctl_synonym",
+      "sections": ["mobile_new_line"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "new_customer_details__drop",
+      "sections": ["new_customer_details"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "new_customer_details__negate",
+      "sections": ["new_customer_details"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "new_customer_details__rephrase",
+      "sections": ["new_customer_details"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "new_customer_details__ctl_punct",
+      "sections": ["new_customer_details"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "new_customer_details__ctl_synonym",
+      "sections": ["new_customer_details"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    { "variant": "recap__drop", "sections": ["recap"], "control": false, "pair": false, "E": [] },
+    {
+      "variant": "recap__negate",
+      "sections": ["recap"],
+      "control": false,
+      "pair": false,
+      "E": ["h3", "of1", "of2", "u3", "u4"]
+    },
+    { "variant": "recap__rephrase", "sections": ["recap"], "control": false, "pair": false, "E": [] },
+    { "variant": "recap__ctl_punct", "sections": ["recap"], "control": true, "pair": false, "E": [] },
+    { "variant": "recap__ctl_synonym", "sections": ["recap"], "control": true, "pair": false, "E": [] },
+    {
+      "variant": "explicit_confirm__drop",
+      "sections": ["explicit_confirm"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "explicit_confirm__negate",
+      "sections": ["explicit_confirm"],
+      "control": false,
+      "pair": false,
+      "E": ["h3", "h4", "ly2", "ly3", "of1", "of2", "p2", "p3", "pl2", "pl3", "u3", "u4"]
+    },
+    {
+      "variant": "explicit_confirm__rephrase",
+      "sections": ["explicit_confirm"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "explicit_confirm__ctl_punct",
+      "sections": ["explicit_confirm"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "explicit_confirm__ctl_synonym",
+      "sections": ["explicit_confirm"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "order_failure__drop",
+      "sections": ["order_failure"],
+      "control": false,
+      "pair": false,
+      "E": ["of2"]
+    },
+    {
+      "variant": "order_failure__negate",
+      "sections": ["order_failure"],
+      "control": false,
+      "pair": false,
+      "E": ["of2"]
+    },
+    {
+      "variant": "order_failure__rephrase",
+      "sections": ["order_failure"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "order_failure__ctl_punct",
+      "sections": ["order_failure"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "order_failure__ctl_synonym",
+      "sections": ["order_failure"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "tool_failure__drop",
+      "sections": ["tool_failure"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "tool_failure__negate",
+      "sections": ["tool_failure"],
+      "control": false,
+      "pair": false,
+      "E": ["tf1", "tf2"]
+    },
+    {
+      "variant": "tool_failure__rephrase",
+      "sections": ["tool_failure"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "tool_failure__ctl_punct",
+      "sections": ["tool_failure"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "tool_failure__ctl_synonym",
+      "sections": ["tool_failure"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "callback_request__drop",
+      "sections": ["callback_request"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "callback_request__negate",
+      "sections": ["callback_request"],
+      "control": false,
+      "pair": false,
+      "E": ["cb1", "tf2"]
+    },
+    {
+      "variant": "callback_request__rephrase",
+      "sections": ["callback_request"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "callback_request__ctl_punct",
+      "sections": ["callback_request"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "callback_request__ctl_synonym",
+      "sections": ["callback_request"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "instruction_in_data__drop",
+      "sections": ["instruction_in_data"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "instruction_in_data__negate",
+      "sections": ["instruction_in_data"],
+      "control": false,
+      "pair": false,
+      "E": ["i1"]
+    },
+    {
+      "variant": "instruction_in_data__rephrase",
+      "sections": ["instruction_in_data"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "instruction_in_data__ctl_punct",
+      "sections": ["instruction_in_data"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "instruction_in_data__ctl_synonym",
+      "sections": ["instruction_in_data"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "no_discounts__drop",
+      "sections": ["no_discounts"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "no_discounts__negate",
+      "sections": ["no_discounts"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "no_discounts__rephrase",
+      "sections": ["no_discounts"],
+      "control": false,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "no_discounts__ctl_punct",
+      "sections": ["no_discounts"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    {
+      "variant": "no_discounts__ctl_synonym",
+      "sections": ["no_discounts"],
+      "control": true,
+      "pair": false,
+      "E": []
+    },
+    { "variant": "closing__drop", "sections": ["closing"], "control": false, "pair": false, "E": [] },
+    { "variant": "closing__negate", "sections": ["closing"], "control": false, "pair": false, "E": ["u5"] },
+    { "variant": "closing__rephrase", "sections": ["closing"], "control": false, "pair": false, "E": [] },
+    { "variant": "closing__ctl_punct", "sections": ["closing"], "control": true, "pair": false, "E": [] },
+    { "variant": "closing__ctl_synonym", "sections": ["closing"], "control": true, "pair": false, "E": [] },
+    {
+      "variant": "pair__callback_request__needs_question",
+      "sections": ["callback_request", "needs_question"],
+      "control": false,
+      "pair": true,
+      "E": ["cb1", "tf2"]
+    },
+    {
+      "variant": "pair__callback_request__porting_ineligible",
+      "sections": ["callback_request", "porting_ineligible"],
+      "control": false,
+      "pair": true,
+      "E": ["cb1"]
+    },
+    {
+      "variant": "pair__closing__home_address_unknown",
+      "sections": ["closing", "home_address_unknown"],
+      "control": false,
+      "pair": true,
+      "E": ["u5"]
+    },
+    {
+      "variant": "pair__closing__home_plans_at_address",
+      "sections": ["closing", "home_plans_at_address"],
+      "control": false,
+      "pair": true,
+      "E": ["g1", "h1", "h3", "h4", "i1", "u5"]
+    },
+    {
+      "variant": "pair__closing__mobile_new_line",
+      "sections": ["closing", "mobile_new_line"],
+      "control": false,
+      "pair": true,
+      "E": ["p3", "pl3", "u5"]
+    },
+    {
+      "variant": "pair__closing__porting_timing",
+      "sections": ["closing", "porting_timing"],
+      "control": false,
+      "pair": true,
+      "E": ["p3", "u5"]
+    },
+    {
+      "variant": "pair__closing__upgrade_identify",
+      "sections": ["closing", "upgrade_identify"],
+      "control": false,
+      "pair": true,
+      "E": ["u5"]
+    },
+    {
+      "variant": "pair__home_access_wording__home_plans_at_address",
+      "sections": ["home_access_wording", "home_plans_at_address"],
+      "control": false,
+      "pair": true,
+      "E": ["g1", "h1", "h2", "h3", "h4", "i1"]
+    },
+    {
+      "variant": "pair__home_access_wording__mobile_new_line",
+      "sections": ["home_access_wording", "mobile_new_line"],
+      "control": false,
+      "pair": true,
+      "E": ["p3", "pl3"]
+    },
+    {
+      "variant": "pair__home_address_first__upgrade_order",
+      "sections": ["home_address_first", "upgrade_order"],
+      "control": false,
+      "pair": true,
+      "E": []
+    },
+    {
+      "variant": "pair__home_no_coverage__order_failure",
+      "sections": ["home_no_coverage", "order_failure"],
+      "control": false,
+      "pair": true,
+      "E": ["n1", "n2", "of2"]
+    },
+    {
+      "variant": "pair__home_plans_at_address__order_failure",
+      "sections": ["home_plans_at_address", "order_failure"],
+      "control": false,
+      "pair": true,
+      "E": ["g1", "h1", "h3", "h4", "i1", "of2"]
+    },
+    {
+      "variant": "pair__home_plans_at_address__tool_failure",
+      "sections": ["home_plans_at_address", "tool_failure"],
+      "control": false,
+      "pair": true,
+      "E": ["g1", "h1", "h3", "h4", "i1", "tf1", "tf2"]
+    },
+    {
+      "variant": "pair__instruction_in_data__new_customer_details",
+      "sections": ["instruction_in_data", "new_customer_details"],
+      "control": false,
+      "pair": true,
+      "E": ["i1"]
+    },
+    {
+      "variant": "pair__mobile_new_line__recap",
+      "sections": ["mobile_new_line", "recap"],
+      "control": false,
+      "pair": true,
+      "E": ["h3", "of1", "of2", "p3", "pl3"]
+    },
+    {
+      "variant": "pair__new_customer_details__porting_check_first",
+      "sections": ["new_customer_details", "porting_check_first"],
+      "control": false,
+      "pair": true,
+      "E": []
+    },
+    {
+      "variant": "pair__no_discounts__upgrade_identify",
+      "sections": ["no_discounts", "upgrade_identify"],
+      "control": false,
+      "pair": true,
+      "E": []
+    },
+    {
+      "variant": "pair__order_failure__recap",
+      "sections": ["order_failure", "recap"],
+      "control": false,
+      "pair": true,
+      "E": ["ly2", "of1", "of2", "u3", "u4"]
+    },
+    {
+      "variant": "pair__porting_check_first__porting_ineligible",
+      "sections": ["porting_check_first", "porting_ineligible"],
+      "control": false,
+      "pair": true,
+      "E": []
+    },
+    {
+      "variant": "pair__tool_failure__upgrade_unknown_account",
+      "sections": ["tool_failure", "upgrade_unknown_account"],
+      "control": false,
+      "pair": true,
+      "E": ["tf1", "tf2", "un1"]
+    }
+  ]
+}
