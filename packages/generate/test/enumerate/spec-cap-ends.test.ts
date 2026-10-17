@@ -6,15 +6,14 @@ import { loadApprovedMap } from '../../src/enumerate/load';
 import { buildTaskInputs } from '../../src/seed/tasks';
 import { ACME_MAP } from './support';
 
-// The identity the reducer gives a block: the turn, the stage it is said from, what it expects, its context.
+// The identity the reducer gives a block: the turn, the stage it is said from, what it expects, its language and
+// rules. The channel, the persona and the declared perturbations are not part of it.
 function key(spec: Spec, index: number): string {
   const block = spec.blocks[index];
   const { criteria: _criteria, ...machine } = block?.expect ?? {};
   const from = index === 0 ? spec.stages?.[0] : spec.blocks[index - 1]?.expect?.stage;
   return JSON.stringify([
     spec.kind,
-    spec.channel,
-    spec.tags?.filter((tag) => tag.startsWith('persona:')),
     spec.lang,
     spec.rules,
     canonicalGiven(spec, index).state,
@@ -22,7 +21,6 @@ function key(spec: Spec, index: number): string {
     block?.when,
     block?.given,
     machine,
-    spec.perturbations?.filter((entry) => entry.inject_at <= index).map(({ id: _id, ...plan }) => plan),
   ]);
 }
 

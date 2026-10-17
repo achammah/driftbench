@@ -16,9 +16,9 @@
     "max": null
   },
   "summary": {
-    "specs": 511,
-    "blocks": 1869,
-    "complete": 436,
+    "specs": 510,
+    "blocks": 1860,
+    "complete": 435,
     "incomplete": 75
   },
   "seeders": {
@@ -52,28 +52,28 @@
     },
     "boundary": {
       "specs": 85,
-      "blocks": 183,
+      "blocks": 180,
       "complete": 13,
       "needs_phrase": 72,
       "needs_then": 15,
       "cut": false,
       "measures": {
         "hill_q0": 160,
-        "pielou": 0.955108846148,
+        "pielou": 0.954609623932,
         "machine_then_share": 1,
         "judged_only_blocks": 0
       }
     },
     "deviation": {
-      "specs": 138,
-      "blocks": 532,
-      "complete": 138,
+      "specs": 137,
+      "blocks": 526,
+      "complete": 137,
       "needs_phrase": 0,
       "needs_then": 0,
       "cut": false,
       "measures": {
-        "hill_q0": 436,
-        "pielou": 0.888745786175,
+        "hill_q0": 432,
+        "pielou": 0.889117335429,
         "machine_then_share": 1,
         "judged_only_blocks": 0
       }
@@ -114,8 +114,8 @@
       "needs_then": 0,
       "cut": false,
       "measures": {
-        "hill_q0": 205,
-        "pielou": 0.953240641956,
+        "hill_q0": 208,
+        "pielou": 0.952969429423,
         "machine_then_share": 1,
         "judged_only_blocks": 0
       }
@@ -4073,7 +4073,7 @@
     "actual": [
       {
         "t": 2,
-        "specs": 436,
+        "specs": 435,
         "allowed": 708,
         "covered": 708,
         "share": 1,
@@ -4081,10 +4081,10 @@
       },
       {
         "t": 3,
-        "specs": 436,
+        "specs": 435,
         "allowed": 4064,
-        "covered": 3105,
-        "share": 0.7640255905511811,
+        "covered": 3098,
+        "share": 0.7623031496062992,
         "uncovered": [
           {
             "behaviour": "B-002",
@@ -4268,11 +4268,6 @@
           },
           {
             "behaviour": "B-005",
-            "deviation": "D5_language_switch",
-            "channel": "whatsapp"
-          },
-          {
-            "behaviour": "B-005",
             "deviation": "D6_instruction_in_data",
             "channel": "whatsapp"
           },
@@ -4388,6 +4383,11 @@
           },
           {
             "behaviour": "B-008",
+            "deviation": "D5_language_switch",
+            "channel": "whatsapp"
+          },
+          {
+            "behaviour": "B-008",
             "deviation": "D8_tool_failure",
             "channel": "whatsapp"
           },
@@ -4443,11 +4443,6 @@
           },
           {
             "behaviour": "B-009",
-            "deviation": "D9_out_of_scope",
-            "channel": "whatsapp"
-          },
-          {
-            "behaviour": "B-009",
             "deviation": "D11_pii_leak",
             "channel": "whatsapp"
           },
@@ -4455,6 +4450,11 @@
             "behaviour": "B-009",
             "deviation": "D12_prompt_extraction",
             "channel": "chat"
+          },
+          {
+            "behaviour": "B-010",
+            "deviation": "D1_off_topic",
+            "channel": "whatsapp"
           },
           {
             "behaviour": "B-010",
@@ -4538,6 +4538,11 @@
           },
           {
             "behaviour": "B-012",
+            "deviation": "D1_off_topic",
+            "channel": "whatsapp"
+          },
+          {
+            "behaviour": "B-012",
             "deviation": "D2_goal_shift",
             "channel": "chat"
           },
@@ -4564,6 +4569,11 @@
           {
             "behaviour": "B-012",
             "deviation": "D7_silence_or_burst",
+            "channel": "chat"
+          },
+          {
+            "behaviour": "B-012",
+            "deviation": "D9_out_of_scope",
             "channel": "chat"
           },
           {
@@ -4764,11 +4774,6 @@
           {
             "behaviour": "B-002",
             "deviation": "D5_language_switch",
-            "stage": "needs"
-          },
-          {
-            "behaviour": "B-002",
-            "deviation": "D5_language_switch",
             "stage": "identify"
           },
           {
@@ -6604,6 +6609,11 @@
           {
             "behaviour": "B-010",
             "deviation": "D1_off_topic",
+            "stage": "needs"
+          },
+          {
+            "behaviour": "B-010",
+            "deviation": "D1_off_topic",
             "stage": "offer"
           },
           {
@@ -7019,6 +7029,11 @@
           {
             "behaviour": "B-011",
             "deviation": "D9_out_of_scope",
+            "stage": "needs"
+          },
+          {
+            "behaviour": "B-011",
+            "deviation": "D9_out_of_scope",
             "stage": "offer"
           },
           {
@@ -7105,6 +7120,11 @@
             "behaviour": "B-011",
             "deviation": "D12_prompt_extraction",
             "stage": "closing"
+          },
+          {
+            "behaviour": "B-012",
+            "deviation": "D1_off_topic",
+            "stage": "needs"
           },
           {
             "behaviour": "B-012",
@@ -7783,11 +7803,6 @@
           },
           {
             "behaviour": "B-008",
-            "deviation": "D1_off_topic",
-            "coverage_result": "none"
-          },
-          {
-            "behaviour": "B-008",
             "deviation": "D2_goal_shift",
             "coverage_result": "fiber"
           },
@@ -7813,6 +7828,11 @@
           },
           {
             "behaviour": "B-008",
+            "deviation": "D5_language_switch",
+            "coverage_result": "fiber"
+          },
+          {
+            "behaviour": "B-008",
             "deviation": "D6_instruction_in_data",
             "coverage_result": "none"
           },
@@ -7894,6 +7914,11 @@
           {
             "behaviour": "B-009",
             "deviation": "D6_instruction_in_data",
+            "coverage_result": "none"
+          },
+          {
+            "behaviour": "B-009",
+            "deviation": "D6_instruction_in_data",
             "coverage_result": "5g-only"
           },
           {
@@ -8093,6 +8118,11 @@
           },
           {
             "behaviour": "B-011",
+            "deviation": "D5_language_switch",
+            "coverage_result": "fiber"
+          },
+          {
+            "behaviour": "B-011",
             "deviation": "D6_instruction_in_data",
             "coverage_result": "5g-only"
           },
@@ -8135,6 +8165,11 @@
             "behaviour": "B-011",
             "deviation": "D9_out_of_scope",
             "coverage_result": "fiber"
+          },
+          {
+            "behaviour": "B-011",
+            "deviation": "D9_out_of_scope",
+            "coverage_result": "5g-only"
           },
           {
             "behaviour": "B-011",
@@ -8377,11 +8412,6 @@
             "stage": "callback"
           },
           {
-            "deviation": "D6_instruction_in_data",
-            "channel": "whatsapp",
-            "coverage_result": "5g-only"
-          },
-          {
             "deviation": "D8_tool_failure",
             "channel": "chat",
             "coverage_result": "not-in-map"
@@ -8725,6 +8755,11 @@
             "deviation": "D7_silence_or_burst",
             "stage": "closing",
             "coverage_result": "no-service"
+          },
+          {
+            "deviation": "D9_out_of_scope",
+            "stage": "needs",
+            "coverage_result": "5g-only"
           },
           {
             "deviation": "D9_out_of_scope",
@@ -8888,30 +8923,30 @@
     "allowed": 708,
     "complete": {
       "t": 2,
-      "specs": 436,
+      "specs": 435,
       "allowed": 708,
       "covered": 708,
       "share": 1
     },
     "all": {
       "t": 2,
-      "specs": 511,
+      "specs": 510,
       "allowed": 708,
       "covered": 708,
       "share": 1
     },
     "measures": {
-      "discovery": 0.006004670299121539,
-      "chao_coverage": 0.9939956326426309,
-      "chao1": 827.013790771507,
+      "discovery": 0.006031834683049428,
+      "chao_coverage": 0.9939684897204922,
+      "chao1": 820.1475823255214,
       "hill_q0": 708,
-      "hill_q1": 308.768834930515,
-      "hill_q2": 190.92011949910452,
-      "pielou": 0.873545405958,
-      "t3_share": 0.7640255905511811,
+      "hill_q1": 308.862311872265,
+      "hill_q2": 191.11358473041983,
+      "pielou": 0.87359153131,
+      "t3_share": 0.7623031496062992,
       "t3_allowed": 4064,
       "weighted_share": 0.999999999999909,
-      "effective_sample_size": 287.18785504954474,
+      "effective_sample_size": 286.57123100112176,
       "required_covered": 10,
       "required_total": 10,
       "axis_behaviour": 14,

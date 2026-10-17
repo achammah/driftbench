@@ -15,7 +15,12 @@ const PHRASES: Partial<Record<DeviationClass, { text: string; lang: string }>> =
   D5_language_switch: { text: 'Kunt u mij helpen?', lang: 'nl' },
   D9_out_of_scope: { text: 'I want to ask about my invoice.', lang: 'en' },
 };
-export function desk(flows: readonly Flow[], forbid: Array<Record<string, string>> = []) {
+export function desk(
+  flows: readonly Flow[],
+  forbid: Array<Record<string, string>> = [],
+  channels: readonly string[] = ['desk'],
+  personas: readonly string[] = [],
+) {
   const axis = (id: string, kind: Proposal['dimensions'][number]['kind'], ids: readonly string[]) => ({
     id,
     title: id,
@@ -42,7 +47,8 @@ export function desk(flows: readonly Flow[], forbid: Array<Record<string, string
         flows.map((flow) => flow.id),
       ),
       axis('deviation', 'deviation', classes),
-      axis('channel', 'channel', ['desk']),
+      axis('channel', 'channel', channels),
+      ...(personas.length > 0 ? [axis('persona', 'persona', personas)] : []),
       { ...axis('stage_transition', 'behaviour', moves), role: 'detail' },
     ],
     constraints: forbid.map((entry) => ({ forbid: entry, reason: 'Not said at this step', ...by })),
@@ -134,5 +140,36 @@ export function split() {
       { stage: 'receipt', deviation: 'D1_off_topic' },
       { stage: 'receipt', deviation: 'D9_out_of_scope' },
     ],
+  );
+}
+
+/** The parcel desk open on two channels: a walk can be written once per channel. */
+export function twoChannels() {
+  return desk(
+    [
+      {
+        id: 'parcel',
+        stages: ['welcome', 'address', 'packing', 'receipt'],
+        classes: ['D1_off_topic', 'D5_language_switch'],
+      },
+    ],
+    [{ stage: 'packing', deviation: 'D1_off_topic' }],
+    ['counter', 'phone'],
+  );
+}
+
+/** The parcel desk with two personas: a walk can be written once per persona. */
+export function twoPersonas() {
+  return desk(
+    [
+      {
+        id: 'parcel',
+        stages: ['welcome', 'address', 'packing', 'receipt'],
+        classes: ['D1_off_topic', 'D5_language_switch'],
+      },
+    ],
+    [{ stage: 'packing', deviation: 'D1_off_topic' }],
+    ['desk'],
+    ['novice', 'expert'],
   );
 }
