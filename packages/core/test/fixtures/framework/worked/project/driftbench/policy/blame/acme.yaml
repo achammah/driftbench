@@ -1,0 +1,9 @@
+kind: policy/blame
+id: acme
+extends: default
+items:
+  - id: R3
+    params: { recovery_ok: [asked_user] }
+  - id: R5b
+    enabled: true
+    params: { downstream_consumers: [{ field: phone, needs: e164, declared_in: crm.yaml }] }

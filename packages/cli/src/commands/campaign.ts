@@ -48,6 +48,7 @@ import {
   type RunOptions,
   type RunResult,
   radiusOf,
+  rescoreCarriedRun,
   runCampaign,
   runProvenance,
   runsByCell,
@@ -1327,11 +1328,33 @@ async function radiusPlan(
     {
       now: deps.now(),
       currentProvenance,
+      rescoreObservations: true,
       currentSpec: (cell) => loaded.find((entry) => entry.hash === cell.specHash)?.spec,
       ...(maxCarry === undefined ? {} : { maxCarry }),
       ...(maxAge === undefined ? {} : { maxAgeDays: maxAge }),
     },
   );
+  // A changed scoring object may reuse proven observations, but never the old verdicts.
+  // Resolve and score before the campaign record is written; unsupported reconstruction runs fresh.
+  const scoredCarries: typeof plan.carried = [];
+  for (const entry of plan.carried) {
+    if (!entry.needsRescore) {
+      scoredCarries.push(entry);
+      continue;
+    }
+    const spec = required(loaded.find((candidate) => candidate.hash === entry.cell.specHash)?.spec, 'spec');
+    try {
+      const source = await rescoreCarriedRun(spec, entry.source, {
+        checks: deps.checks,
+        ...(deps.artifacts ? { artifacts: deps.artifacts } : {}),
+      });
+      scoredCarries.push({ ...entry, source, needsRescore: false });
+    } catch (cause) {
+      plan.fresh.push(entry.cell);
+      plan.refused.push({ cell: entry.cell, reason: cause instanceof Error ? cause.message : String(cause) });
+    }
+  }
+  plan.carried = scoredCarries;
   if (options.blockReruns && !campaign.modes.includes('T')) {
     io.err('--block-reruns reruns blocks of independent mode T cells: it goes with --mode T.\n');
     return null;

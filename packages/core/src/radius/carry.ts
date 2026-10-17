@@ -1,4 +1,7 @@
 import type { Store } from '../contracts/store';
+import { objectContextOfSpec } from '../objects/context';
+import { resolveBlockObjects, shippedObjectContext } from '../objects/layers';
+import { resolvedRecord } from '../objects/scoring';
 import type { PlannedCell } from '../runner/campaign';
 import { provenanceDigest } from '../runner/provenance';
 import { applyRealizedTextPolicy } from '../runner/realized-text';
@@ -6,7 +9,7 @@ import { isScored } from '../runner/verdicts';
 import type { TargetRef } from '../schema/common';
 import type { Campaign, CampaignRadius, RunResult } from '../schema/run';
 import type { Spec } from '../schema/spec';
-import { canonicalJson } from '../spec/hash';
+import { canonicalJson, contentHash } from '../spec/hash';
 import { sameBlockInputs } from './block-inputs';
 import { type ChangeManifest, changeLabel } from './change';
 import { completeBaselineProvenance, sameCarryContext } from './provenance';
@@ -23,6 +26,8 @@ import { agentVersionOf } from './version';
 export type CarryLimits = {
   /** The most consecutive campaigns a result may be carried. Default 5. */
   maxCarry?: number;
+  /** Re-score carried observations before storing them when their resolved objects differ. */
+  rescoreObservations?: boolean;
   /** The most days since the fresh run. Default 7. */
   maxAgeDays?: number;
   /** When the carrying campaign starts. */
@@ -38,6 +43,8 @@ export const DEFAULT_MAX_AGE_DAYS = 7;
 
 export type CarriedCell = {
   cell: PlannedCell;
+  /** Prevents a stale scored result from being copied before the promised re-score. */
+  needsRescore?: boolean;
   source: RunResult;
   /** The immediate baseline, distinct from the original measurement after repeated carries. */
   sourceCampaign?: string;
@@ -195,8 +202,36 @@ export function planRadiusCampaign(
       refuse('current execution context differs or cannot be proved');
       continue;
     }
-    if (!sameBlockInputs(source, limits.currentSpec?.(cell))) {
+    const currentSpec = limits.currentSpec?.(cell);
+    if (!sameBlockInputs(source, currentSpec)) {
       refuse('current block inputs differ or cannot be reconstructed');
+      continue;
+    }
+    const context = (currentSpec && objectContextOfSpec(currentSpec)) ?? shippedObjectContext();
+    let needsRescore = false;
+    let invalidObjects = false;
+    for (const block of source.blocks) {
+      const previous = block.resolved;
+      if (previous && previous.hash !== contentHash(previous.objects)) {
+        invalidObjects = true;
+        break;
+      }
+      const index = block.injected ? -1 : (block.provenance?.specIndex ?? block.index);
+      const current = currentSpec
+        ? resolvedRecord(resolveBlockObjects(currentSpec, index, context))
+        : undefined;
+      if (previous?.hash === current?.hash) continue;
+      needsRescore = true;
+      // Only scoring-only objects may reuse observations across a changed hash.
+      if (
+        [...(previous?.objects ?? []), ...(current?.objects ?? [])].some(
+          ({ kind }) => context.store.registry.kind(kind)?.agentFacing !== false,
+        )
+      )
+        invalidObjects = true;
+    }
+    if (invalidObjects || (needsRescore && !limits.rescoreObservations)) {
+      refuse('resolved objects differ or cannot be proved; observations must be re-scored');
       continue;
     }
     const origin = carryOrigin(source, baseline.campaignId, limits);
@@ -210,6 +245,7 @@ export function planRadiusCampaign(
       sourceCampaign: baseline.campaignId,
       provenance,
       carried: origin.carried,
+      ...(needsRescore ? { needsRescore: true } : {}),
     });
   }
   return plan;
@@ -217,6 +253,10 @@ export function planRadiusCampaign(
 
 /** The run a carried cell stores: the baseline run under the cell's own id and target, stamped. */
 export function carriedRun(entry: CarriedCell, recordRealizedText = false): RunResult {
+  if (entry.needsRescore)
+    throw new Error(
+      'carried observations must be re-scored under their current resolved objects before storing',
+    );
   const source = applyRealizedTextPolicy(entry.source, recordRealizedText, {
     fromRun: entry.source.runId,
     ...(entry.sourceCampaign === undefined ? {} : { fromCampaign: entry.sourceCampaign }),

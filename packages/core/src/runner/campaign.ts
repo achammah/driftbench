@@ -5,9 +5,13 @@ import type { CheckSet } from '../contracts/check';
 import type { UserDriver } from '../contracts/driver';
 import type { CostUnit, Store } from '../contracts/store';
 import type { ToolRule } from '../contracts/tool-policy';
+import { runCampaignDiagnostics } from '../diagnostics/run';
+import { objectContextOfSpec } from '../objects/context';
+import { checkSpecObjects, shippedObjectContext } from '../objects/index';
+import type { ResolvedObject } from '../objects/resolve';
 import type { BlockReuse } from '../radius/blocks';
 import type { TargetRef } from '../schema/common';
-import type { RunMode, RunResult } from '../schema/run';
+import type { Diagnosis, RunMode, RunResult } from '../schema/run';
 import type { Spec } from '../schema/spec';
 import type { ObservedCache } from './cache';
 import { cellId } from './cell';
@@ -306,6 +310,13 @@ export type CampaignRunOptions = {
   cells: readonly PlannedCell[];
   /** The spec of a cell, by id and hash. */
   specFor(cell: PlannedCell): Spec;
+  /**
+   * Campaign-scope diagnostics: run once every cell is done, over every run of the campaign. A stored campaign is
+   * immutable, so their diagnoses go to `onDiagnoses`; a command that writes a new campaign record (a re-judge, a
+   * re-score) puts them in `Campaign.diagnoses`. None when absent.
+   */
+  diagnostics?: readonly ResolvedObject[];
+  onDiagnoses?(diagnoses: Diagnosis[]): void | Promise<void>;
   adapterFor(target: TargetRef): AgentAdapter;
   /** A fresh driver for each run, given the cell and the spec the cell runs (a perturbing driver needs it). */
   driver(cell: PlannedCell, spec: Spec): UserDriver;
@@ -362,6 +373,15 @@ export type CampaignRunOptions = {
  * it is still in flight. A campaign without that F cell gives P runs no reference.
  */
 export async function runCampaign(options: CampaignRunOptions): Promise<CellOutcome[]> {
+  // Validate before even a completed cell can be reused. A stored spec may outlive its object files.
+  const checkedSpecs = new Set<Spec>();
+  for (const cell of options.cells) {
+    const spec = options.specFor(cell);
+    if (checkedSpecs.has(spec)) continue;
+    checkedSpecs.add(spec);
+    const issues = checkSpecObjects(spec, objectContextOfSpec(spec) ?? shippedObjectContext());
+    if (issues.length) throw new Error(issues.map((issue) => `${issue.code}: ${issue.message}`).join('; '));
+  }
   const stored = await options.store.listRuns({ campaignId: options.campaignId });
   const done = byCell(stored);
   const { cells, budgetUsd } = options;
@@ -523,5 +543,11 @@ export async function runCampaign(options: CampaignRunOptions): Promise<CellOutc
   for (const planned of fRuns.values()) planned.settle();
   for (const entry of settled.values()) entry.settle();
   if (failure) throw failure.cause;
-  return outcomes.filter((outcome): outcome is CellOutcome => outcome !== undefined);
+  const finished = outcomes.filter((outcome): outcome is CellOutcome => outcome !== undefined);
+  if (options.diagnostics?.length) {
+    const runs = finished.flatMap((outcome) => (outcome.run ? [outcome.run] : []));
+    const { diagnoses } = await runCampaignDiagnostics(options.diagnostics, runs);
+    await options.onDiagnoses?.(diagnoses);
+  }
+  return finished;
 }

@@ -1,10 +1,15 @@
 import type { AdapterCapabilities, AgentAdapter, Session, Turn } from '../contracts/adapter';
 import type { ArtifactReaderRegistry } from '../contracts/artifacts';
-import { type CheckContext, type CheckSet, machineVerdict } from '../contracts/check';
+import { type CheckSet, machineVerdict } from '../contracts/check';
 import type { DriverStep, UserDriver } from '../contracts/driver';
 import { copyHistory, freezeHistory, freezeMessage } from '../contracts/history';
 import type { Store } from '../contracts/store';
 import { gateToolCalls, type ToolRule } from '../contracts/tool-policy';
+import { type DiagnosticBudget, runRunDiagnostics } from '../diagnostics/run';
+import { bindObjectContext, objectContextOfSpec } from '../objects/context';
+import { checkSpecObjects } from '../objects/index';
+import { type ObjectContext, resolveBlockObjects, shippedObjectContext } from '../objects/layers';
+import { scoringPlan } from '../objects/scoring';
 import { type BlockReuse, planBlockRerun } from '../radius/blocks';
 import { collectRetries, type RetryPolicy, retryPolicy } from '../retry';
 import type { Message, TargetRef, WorldState } from '../schema/common';
@@ -17,17 +22,28 @@ import {
   type RunEvent,
   type RunMode,
   RunResult,
-  Verdict,
 } from '../schema/run';
 import type { BlockSpec, EndState, Expect, GivenOverride, Spec, Stimulus } from '../schema/spec';
-import { cloneJson, contentHash } from '../spec/hash';
-import { specHash as specHashOf, specIdentity } from '../spec/identity';
+import { cloneJson } from '../spec/hash';
+import { specHash as specHashOf } from '../spec/identity';
 import { parentOrder } from '../spec/parents';
 import { type GivenFinding, verifyGiven } from '../spec/verify-given';
 import { compareEndState, type EndStateMatch } from './assertion';
-import { blockCacheKey, endStateCacheKey, type ObservedCache, unwrapEndState, wrapEndState } from './cache';
+import {
+  blockCacheKey,
+  cacheSpecHash as cacheSpecHashOf,
+  endStateCacheKey,
+  type ObservedCache,
+  unwrapEndState,
+  wrapEndState,
+} from './cache';
 import { capabilityGap } from './capability';
-import { recheckCarriedEndState } from './carried-end-state';
+import {
+  type BlockScoring,
+  blockNeedsArtifactReplay,
+  rescoreCarriedBlock,
+  scoreBlockObservation,
+} from './carried-scoring';
 import { cellId } from './cell';
 import { driftOf } from './drift';
 import { composeStates, type EndStateSnapshot, endStateSnapshot, snapshotValues } from './end-state-snapshot';
@@ -42,12 +58,11 @@ import {
   stimulusMessages,
 } from './given';
 import { replacesBlock } from './inject';
-import { describeContradiction, ledgerVerdicts } from './ledger';
 import { preflightTargetPrices, priceObserved, TokenPriceError, TokenPrices } from './pricing';
 import { captureArtifacts, provenanceDigest, provenanceHash, runProvenance } from './provenance';
 import { type RecoveryOptions, recoveryOf } from './recovery';
 import { CallFailure, describeError, type RetryOptions, retryLayer, withRetry } from './retry';
-import { canonicalPreviousStage, flowVerdicts, readStage, stageSignatures } from './stages';
+import { canonicalPreviousStage, stageSignatures } from './stages';
 import { succession } from './succession';
 import { blockStatus, isScored } from './verdicts';
 
@@ -82,8 +97,16 @@ export type RunOptions = {
   adapter: AgentAdapter;
   /** Decides each block's stimulus. The scripted driver of `@agent-nexus/driftbench-users` replays the spec's blocks. */
   driver: UserDriver;
-  /** Applied to every block, in order. */
+  /** Applied to every block, in order, as the block's check-set object chooses and orders them. */
   checks: CheckSet;
+  /**
+   * The objects each block resolves its `uses` against (`objectContextFor(specPath)` for a spec read from a
+   * file). Absent: the context carried by the loaded spec, then shipped objects. Every verdict is stamped with the check-set item that produced it,
+   * and every block records the objects it resolved to.
+   */
+  objects?: ObjectContext;
+  /** What the diagnostics of each block may spend: the number of `run` and `model` steps. Default 0: static steps only. */
+  diagnosticBudget?: DiagnosticBudget;
   /** F runs free: one session, each block inherits the agent's own earlier replies. P is F plus the
    *  blocks a perturbing driver injects. T (teacher-forced) runs every block from its canonical Given in a
    *  session of its own: the prefix, ledger and world the spec writes, never the agent's own history. */
@@ -145,16 +168,39 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
   if (options.store && options.campaignId === undefined) {
     throw new Error('runSpec: a store needs a campaignId to file the run under');
   }
+  const objects = options.objects ?? objectContextOfSpec(spec) ?? shippedObjectContext();
+  spec = bindObjectContext({ ...spec }, objects);
+  const objectErrors = checkSpecObjects(spec, objects);
+  if (objectErrors.length)
+    throw new RunnerError(objectErrors.map((issue) => `${issue.code}: ${issue.message}`).join('; '));
   const parents = parentOrder(spec);
   if (parents.issues.length) throw new RunnerError(parents.issues.map((issue) => issue.message).join('; '));
   const linked = spec.blocks.some((block) => block.parent !== undefined);
   const now = options.now ?? (() => new Date());
   const specHash = specHashOf(spec);
-  // The cache key leaves out the spec's version: a free label that plays no part (docs/running.md, "The
-  // cache and replay"), so relabelling a spec still replays its runs.
-  const { version: _version, ...unlabelled } = specIdentity(spec);
-  const cacheSpecHash = contentHash(unlabelled);
+  // The cache key leaves out the spec's version label and its scoring-only `uses` (cacheSpecHash).
+  const cacheSpecHash = cacheSpecHashOf(spec);
   const target = options.target ?? spec.target ?? { adapter: options.adapter.id };
+  // Every block's objects resolve before any call reaches the adapter: a reference that cannot resolve fails here.
+  const objectContext = objects;
+  const scoring = new Map<number, BlockScoring>();
+  const scoringOf = (blockIndex: number): BlockScoring => {
+    let known = scoring.get(blockIndex);
+    if (!known) {
+      const used = resolveBlockObjects(spec, blockIndex, objectContext);
+      known = {
+        used,
+        plan: scoringPlan(options.checks, used.find((entry) => entry.key === 'check_set')?.object),
+      };
+      scoring.set(blockIndex, known);
+    }
+    return known;
+  };
+  try {
+    for (let index = -1; index < spec.blocks.length; index += 1) scoringOf(index);
+  } catch (cause) {
+    throw new Error(`runSpec: ${cause instanceof Error ? cause.message : String(cause)}`);
+  }
   const prices = options.prices === undefined ? undefined : TokenPrices.parse(options.prices);
   if (options.requireTokenPrices) preflightTargetPrices([target], prices);
   // In P mode the spec's end state describes the unperturbed run, so it is neither read nor compared, as
@@ -196,6 +242,13 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
         throw new RunnerError('the block subset omits part of the radius');
       selectedBlocks = options.blocks ?? reuse.indices;
       carriedBlocks = new Map([...reuse.carried].filter(([i]) => !selectedBlocks?.has(i)));
+      // A carried block can only use stored evidence. Artifact bytes are not in the run record.
+      // Expand the selected subset instead of turning a previous pass into a missing-workspace failure.
+      for (const [index, block] of carriedBlocks) {
+        if (!blockNeedsArtifactReplay(spec.blocks[index], block)) continue;
+        selectedBlocks = new Set([...selectedBlocks, index]);
+        carriedBlocks.delete(index);
+      }
     }
   }
   if (replayOnly?.size && blockRerunReason === undefined) {
@@ -250,6 +303,8 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
     capabilities,
     driver: options.driver,
     checks: options.checks,
+    scoringOf,
+    diagnosticBudget: options.diagnosticBudget ?? {},
     toolPolicy: options.toolPolicy,
     onEvent: reportEvent,
     cache,
@@ -289,6 +344,16 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
     replayed ??
     (await execute(run, cache ? resumeChannel(cache, liveChannel(run), run.toolPolicy) : liveChannel(run)));
   if (!result) throw new Error('runSpec: a live run always gives a result');
+  // Run-scope diagnostics read every block's verdicts once the run is done; they never change a pass.
+  const spanning = scoringOf(-1).used;
+  const runScoped = await runRunDiagnostics(
+    spanning.filter((entry) => entry.key === 'diagnostics').map((entry) => entry.object),
+    result,
+    spanning,
+    options.diagnosticBudget,
+  );
+  if (runScoped.diagnoses.length > 0) result.diagnoses = runScoped.diagnoses;
+  if (runScoped.skippedForBudget > 0) result.skippedForBudget = runScoped.skippedForBudget;
   reportEvent?.({ type: 'run_end', status: result.status, at: new Date().toISOString() });
   // The run as the store keeps it: written as JSON and read back, so what is returned is what is stored.
   const parsed = RunResult.parse(
@@ -326,6 +391,9 @@ type RunContext = {
   toolPolicy: readonly ToolRule[] | undefined;
   onEvent?: (event: RunEvent) => void;
   checks: CheckSet;
+  /** The objects and the scoring plan of a spec block; -1 for a step the driver injected, which reads the spec's. */
+  scoringOf: (blockIndex: number) => BlockScoring;
+  diagnosticBudget: DiagnosticBudget;
   cache: ObservedCache | undefined;
   cacheTtlMs: number | undefined;
   suite: string | undefined;
@@ -553,12 +621,14 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
             }
           }
           blocks.push(
-            await recheckCarriedEndState(
+            await rescoreCarriedBlock(
               kept,
               spec,
               run.target,
-              run.checks,
-              composed ? endStateValue(run.endState, sources, composed) : undefined,
+              run.scoringOf(step.blockIndex),
+              planned.lastSpecBlock && composed ? endStateValue(run.endState, sources, composed) : undefined,
+              run.artifacts,
+              run.diagnosticBudget,
             ),
           );
         }
@@ -880,49 +950,46 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       const capture = run.provenance
         ? captureArtifacts({ observed, readArtifact: channel.readArtifact() })
         : undefined;
-      const verdicts = await applyChecks(run.checks, {
-        spec,
-        mode: run.mode,
-        blockIndex: position,
-        block: planned.block,
-        stimulus: planned.stimulus,
-        expect: planned.expect,
-        given,
-        observed,
-        // A teacher-forced block is an independent sample: no earlier block of the run is its history.
-        history: run.parentOrder
-          ? ancestorResults(planned.block.parent, recordings)
-          : run.mode === 'T'
-            ? []
-            : [...blocks],
-        ledger: facts.ledger,
-        endState,
-        artifacts: run.artifacts,
-        readArtifact: capture ? capture.readArtifact : channel.readArtifact(),
-      });
-      // The stage reached: the runtime's, else the step classifier's. Before the block: in T the stage the
-      // spec expects of the blocks before it, in F and P the stage the run's previous block reached.
+      const scored = run.scoringOf(step.kind === 'block' ? step.blockIndex : -1);
+      // The stage reached before the block: in T the stage the spec expects of the blocks before it, in F and P
+      // the stage the run's previous block reached, in a parent-linked run the stage its parent reached.
       const previous = run.parentOrder
         ? parent?.result.stageObserved
         : run.mode === 'T' && step.kind === 'block'
           ? canonicalPreviousStage(spec, step.blockIndex)
           : blocks.at(-1)?.stageObserved;
-      const reading = readStage(spec, observed, {
-        mode: run.mode,
-        history: run.parentOrder
-          ? ancestorResults(planned.block.parent, recordings)
-          : run.mode === 'T'
-            ? []
-            : blocks,
-        previous,
-        signatures: run.signatures,
-      });
-      const flow = flowVerdicts(spec, planned.expect, reading, previous);
       users.push(...userMessagesOf(user));
       usersBlock = step.kind === 'block' ? step.blockIndex : Number.NaN;
-      const ledger = ledgerVerdicts(facts.ledger, observed, users);
-      const all = [...verdicts, ...flow, ...ledger.verdicts];
-      const contradictions = [...facts.contradictions, ...ledger.contradictions.map(describeContradiction)];
+      const scoringResult = await scoreBlockObservation(
+        {
+          spec,
+          mode: run.mode,
+          blockIndex: position,
+          block: planned.block,
+          stimulus: planned.stimulus,
+          expect: planned.expect,
+          given,
+          observed,
+          // A teacher-forced block is an independent sample: no earlier block of the run is its history.
+          history: run.parentOrder
+            ? ancestorResults(planned.block.parent, recordings)
+            : run.mode === 'T'
+              ? []
+              : [...blocks],
+          ledger: facts.ledger,
+          endState,
+          artifacts: run.artifacts,
+          readArtifact: capture ? capture.readArtifact : channel.readArtifact(),
+        },
+        scored,
+        {
+          previous,
+          signatures: run.signatures,
+          users,
+          contradictions: facts.contradictions,
+        },
+        run.diagnosticBudget,
+      );
       const block = {
         index: position,
         ...(run.parentOrder && specIndex !== undefined ? { specIndex } : {}),
@@ -946,11 +1013,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         givenHash: given.hash,
         cacheKey: key,
         observed,
-        verdicts: all,
-        ...(reading !== undefined ? { stageObserved: reading.stage } : {}),
-        ledgerCheck: { ok: contradictions.length === 0, contradictions },
-        drift: driftOf(all),
-        pass: all.every((verdict) => !verdict.gating || verdict.outcome === 'pass'),
+        ...scoringResult,
       };
       blocks.push(block);
       if (run.parentOrder) {
@@ -1230,49 +1293,6 @@ function planStep(spec: Spec, step: Exclude<DriverStep, { kind: 'stop' }>): Plan
     ...(perturbation?.world ? { world: perturbation.world } : {}),
     lastSpecBlock: false,
   };
-}
-
-/**
- * Applies every check whose `applies` holds. A check that throws, or returns a verdict the schema
- * refuses, gives an inconclusive gating verdict that names the problem: the block cannot pass on it,
- * and nothing is skipped silently.
- */
-async function applyChecks(checks: CheckSet, ctx: CheckContext): Promise<Verdict[]> {
-  const verdicts: Verdict[] = [];
-  for (const check of checks) {
-    let produced: Verdict[];
-    try {
-      if (!check.applies(ctx)) continue;
-      produced = await check.evaluate(ctx);
-    } catch (cause) {
-      verdicts.push(
-        machineVerdict(
-          check.name || 'check',
-          'error',
-          'inconclusive',
-          `the check threw ${describeError(cause)}`,
-        ),
-      );
-      continue;
-    }
-    for (const verdict of produced) {
-      const parsed = Verdict.safeParse(verdict);
-      if (parsed.success) {
-        verdicts.push(parsed.data);
-      } else {
-        const issue = parsed.error.issues[0];
-        verdicts.push(
-          machineVerdict(
-            check.name || 'check',
-            'invalid',
-            'inconclusive',
-            `the check returned a verdict the schema refuses: ${issue?.path.join('.') || '(root)'} ${issue?.message ?? ''}`.trim(),
-          ),
-        );
-      }
-    }
-  }
-  return verdicts;
 }
 
 /** The Observed with the block's retries added after any the adapter reported itself. */

@@ -1,4 +1,4 @@
-import { type LoadedSpec, type Spec, validateSpec } from '@agent-nexus/driftbench-core';
+import { cloneJson, type LoadedSpec, type Spec, validateSpec } from '@agent-nexus/driftbench-core';
 import type { Slots, When } from '../extract/proposal';
 import { TRANSITION_DIMENSION } from '../seed/map';
 import { fillText, matches } from '../seed/relations';
@@ -368,7 +368,7 @@ function variantOf(
   phrased: readonly PhrasedBlock[],
   choice: readonly number[],
 ): LoadedSpec {
-  const raw = structuredClone(entry.spec) as Spec & { metadata?: Record<string, unknown> };
+  const raw = cloneJson(entry.spec) as Spec & { metadata?: Record<string, unknown> };
   phrased.forEach((block, i) => {
     const target = raw.blocks[block.index];
     const text = block.options[choice[i] as number];

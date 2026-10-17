@@ -1,0 +1,14 @@
+# Agent-facing settings (a stand-in of the campaign run profile): a change here reruns the agent.
+kind: run-profile
+id: default
+version: 1
+extends: null
+description: The agent model and its settings.
+agent_facing: true
+items:
+  - id: model
+    title: The model the agent runs on
+    enabled: true
+    params: { model: claude-haiku-5-5 }
+    impl: builtin:run-profile/model
+order: [model]
