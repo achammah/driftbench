@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadEstateMap } from '@agent-nexus/driftbench-estate';
-import { navigationFiles, navigationReference } from '@agent-nexus/driftbench-generate';
+import { anchoredLines, navigationFiles, navigationReference } from '@agent-nexus/driftbench-generate';
 import { describe, expect, it } from 'vitest';
 import { type Io, main } from '../src/index';
 
@@ -45,11 +45,13 @@ describe('estate stats uses the documented report contract', () => {
     const report = JSON.parse(result.out);
     const loaded = await loadEstateMap(join(FIXTURE, 'approved.yaml'));
     if (!loaded.ok) throw new Error(loaded.errors.map((error) => error.message).join('; '));
-    // A reference to a navigation-only document (here the report template) has no test by design.
+    // The report skill orders a read of its template, so that reference is tested like any other although the
+    // template sits in a templates folder: no reference of this estate is navigation only.
     const navigation = navigationFiles(loaded.map.documents);
-    const navigational = loaded.map.atoms.filter((atom) => navigationReference(atom, navigation));
-    expect(navigational.map((atom) => atom.id)).toEqual(['reference.weekly-report.read-templates-report-md']);
-    expect(report.coverage.navigationReferences).toBe(navigational.length);
+    const anchored = anchoredLines(loaded.map.atoms);
+    const navigational = loaded.map.atoms.filter((atom) => navigationReference(atom, navigation, anchored));
+    expect(navigational).toEqual([]);
+    expect(report.coverage.navigationReferences).toBeUndefined();
     for (const kind of new Set(loaded.map.atoms.map((atom) => atom.kind))) {
       const atoms = loaded.map.atoms.filter(
         (atom) => atom.approved && atom.kind === kind && !navigational.includes(atom),

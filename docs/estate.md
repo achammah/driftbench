@@ -727,12 +727,15 @@ The three types that run a guard directly with no model (`guard_hostile`, `guard
 one Edit or Write call in this workspace."), or the next step of the task when it watches none. No other type gets it.
 
 A map may record `documents`: each file's authority (`normative`, or a navigation role such as `example`,
-`template`, `history`, `changelog`, `journal`, `fixture`, `archive`). A reference whose target is a
-navigation document is a place to look and gets no `read_when` row, no journey edge and no covering-array
-target; the plan notes how many. A prerequisite to read such a file stays a gate. `estate stats` leaves
-those references out of the coverage counts and reports their number. A plan made before the map recorded
-roles still lists the row; generation writes it incomplete with that reason. A map without `documents`
-changes nothing: no file name is read as a role.
+`template`, `history`, `changelog`, `journal`, `fixture`, `archive`). A reference is navigation only when two
+things hold: its target is a navigation document, and the reference only sits in a link list or an index. It
+leads a list item, a table cell or a heading, and no other atom (a read gate, an instruction) is anchored on its
+line. Such a reference is a place to look and gets no `read_when` row, no journey edge and no covering-array
+target; the plan notes how many. A reference an instruction acts on is testable whatever the folder or heading
+of its target: "Read `templates/report.md` before writing" gets a test although the file sits in a templates
+folder. Position in the line decides, never a word. `estate stats` keeps every approved reference in its kind
+count and reports the navigation-only ones apart as `navigationReferences`. A map without `documents` changes
+nothing: no file name is read as a role.
 A reference to a file outside the estate root (reached through a link to another repository) enters no journey:
 the run's workspace does not hold the file, so a path through it cannot be walked. Its `read_when` row stays.
 

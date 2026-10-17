@@ -1,14 +1,14 @@
 {
   "mapHash": "e48ea73788c2fb36e8def0b10b39a3551139beb107f54959237f272c2aa7ba41",
   "spaceHash": "6ab888e773e2",
-  "cells": 1430,
+  "cells": 1432,
   "coveringArraySize": 1197,
   "perKind": {
     "instruction": 129,
     "gate": 16,
     "route": 65,
-    "skill": 133,
-    "reference": 9,
+    "skill": 134,
+    "reference": 10,
     "script": 2,
     "subagent": 69,
     "guard": 30,
@@ -28,7 +28,7 @@
     "route_positive": 260,
     "route_near_miss": 13,
     "misroute": 13,
-    "read_when": 9,
+    "read_when": 10,
     "script_fixture": 2,
     "dispatch": 42,
     "contract_alone": 3,
@@ -47,7 +47,7 @@
     "hazard_recovery": 2,
     "invariant": 4,
     "setting": 4,
-    "journey": 11
+    "journey": 12
   },
   "unenforcedAtoms": [
     "gate.standing.read-git-status-before-commit-to",
@@ -105,15 +105,15 @@
     "instruction.weekly-report.count-only-the-last-seven-days",
     "instruction.weekly-report.save-the-report-by-week-and"
   ],
-  "cellsWithoutPhrase": 1430,
+  "cellsWithoutPhrase": 1432,
   "edgesWithoutJourney": 7,
   "t": 2,
   "k": 3,
   "seed": 1,
   "rows": {
-    "total": 1569,
-    "contract": 361,
-    "journey": 11,
+    "total": 1571,
+    "contract": 362,
+    "journey": 12,
     "pairwise": 1197
   },
   "gridCells": 2531567001600,
@@ -169,8 +169,5 @@
   ],
   "droppedConstraints": 0,
   "adjusted": [],
-  "notes": [
-    "The map has no phrase bank yet: every cell counts as a cell with no approved phrase.",
-    "1 reference to documents the map records as navigation only (examples, templates, histories) give no test."
-  ]
+  "notes": ["The map has no phrase bank yet: every cell counts as a cell with no approved phrase."]
 }
