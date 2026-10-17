@@ -48,6 +48,7 @@ import {
   type RunOptions,
   type RunResult,
   radiusOf,
+  rescoreCarriedRun,
   runCampaign,
   runProvenance,
   runsByCell,
@@ -1193,6 +1194,7 @@ async function executeCampaign(
 ): Promise<number> {
   const plan = planOf(campaign, loaded);
   const specs = new Map(loaded.map((entry) => [`${entry.spec.id}@${entry.hash}`, entry.spec]));
+  // Loaded specs carry the project and suite objects they resolved.
   const checks = deps.checks.map((check) => check.name);
   if (!flags.json) {
     const budget = flags.budgetUsd === undefined ? '' : ` Budget ${usd(flags.budgetUsd)}.`;
@@ -1327,11 +1329,33 @@ async function radiusPlan(
     {
       now: deps.now(),
       currentProvenance,
+      rescoreObservations: true,
       currentSpec: (cell) => loaded.find((entry) => entry.hash === cell.specHash)?.spec,
       ...(maxCarry === undefined ? {} : { maxCarry }),
       ...(maxAge === undefined ? {} : { maxAgeDays: maxAge }),
     },
   );
+  // A changed scoring object may reuse proven observations, but never the old verdicts.
+  // Resolve and score before the campaign record is written; unsupported reconstruction runs fresh.
+  const scoredCarries: typeof plan.carried = [];
+  for (const entry of plan.carried) {
+    if (!entry.needsRescore) {
+      scoredCarries.push(entry);
+      continue;
+    }
+    const spec = required(loaded.find((candidate) => candidate.hash === entry.cell.specHash)?.spec, 'spec');
+    try {
+      const source = await rescoreCarriedRun(spec, entry.source, {
+        checks: deps.checks,
+        ...(deps.artifacts ? { artifacts: deps.artifacts } : {}),
+      });
+      scoredCarries.push({ ...entry, source, needsRescore: false });
+    } catch (cause) {
+      plan.fresh.push(entry.cell);
+      plan.refused.push({ cell: entry.cell, reason: cause instanceof Error ? cause.message : String(cause) });
+    }
+  }
+  plan.carried = scoredCarries;
   if (options.blockReruns && !campaign.modes.includes('T')) {
     io.err('--block-reruns reruns blocks of independent mode T cells: it goes with --mode T.\n');
     return null;
@@ -1925,6 +1949,12 @@ const MARK: Record<CellOutcome['state'], string> = {
   pending: '·',
 };
 
+function rescoreSources(run: RunResult | undefined): string[] {
+  if (!run) return [];
+  const stamps = [run.rejudged, ...run.blocks.map((block) => block.rejudged)];
+  return [...new Set(stamps.flatMap((stamp) => (stamp?.criteria.length === 0 ? [stamp.fromCampaign] : [])))];
+}
+
 function cellLine(outcome: CellOutcome): string {
   const { cell, run } = outcome;
   const name = [
@@ -1935,12 +1965,15 @@ function cellLine(outcome: CellOutcome): string {
     ...(cell.perturbationId === undefined ? [] : [cell.perturbationId]),
   ].join(' · ');
   const carried = run?.carried;
+  const rescored = rescoreSources(run);
   const notes = [
-    ...(carried
-      ? [`carried from ${carried.fromCampaign}, age ${count(carried.age.campaigns, 'campaign')}`]
-      : outcome.reused
-        ? ['reused']
-        : []),
+    ...(rescored.length
+      ? rescored.map((source) => `Re-scored; observations from ${source}`)
+      : carried
+        ? [`carried from ${carried.fromCampaign}, age ${count(carried.age.campaigns, 'campaign')}`]
+        : outcome.reused
+          ? ['reused']
+          : []),
     ...(run?.cacheHit && !outcome.reused ? ['replayed from the cache'] : []),
   ];
   let detail = '';
@@ -1957,8 +1990,14 @@ function cellLine(outcome: CellOutcome): string {
 function summaryLine(outcomes: readonly CellOutcome[]): string {
   const states = (state: CellOutcome['state']) =>
     outcomes.filter((outcome) => outcome.state === state).length;
-  const carried = outcomes.filter((outcome) => outcome.run?.carried).length;
-  const reused = outcomes.filter((outcome) => outcome.reused && !outcome.run?.carried).length;
+  const rescored = outcomes.filter((outcome) => rescoreSources(outcome.run).length > 0);
+  const sources = [...new Set(rescored.flatMap((outcome) => rescoreSources(outcome.run)))];
+  const carried = outcomes.filter(
+    (outcome) => outcome.run?.carried && rescoreSources(outcome.run).length === 0,
+  ).length;
+  const reused = outcomes.filter(
+    (outcome) => outcome.reused && !outcome.run?.carried && rescoreSources(outcome.run).length === 0,
+  ).length;
   const budgetStops = outcomes.filter((outcome) => outcome.budgetStop).length;
   const parts = [
     `${states('pass')} pass`,
@@ -1972,7 +2011,7 @@ function summaryLine(outcomes: readonly CellOutcome[]): string {
   const spent = outcomes
     .filter((outcome) => outcome.run && !outcome.reused && !outcome.run.cacheHit)
     .reduce((sum, outcome) => sum + (outcome.run?.cost ?? 0), 0);
-  return `${count(outcomes.length, 'cell')}: ${parts.join(', ')}${reused > 0 ? `, ${reused} reused` : ''}${carried > 0 ? `, ${carried} carried` : ''}. Spent ${usd(spent)}.`;
+  return `${count(outcomes.length, 'cell')}: ${parts.join(', ')}${reused > 0 ? `, ${reused} reused` : ''}${carried > 0 ? `, ${carried} carried` : ''}${rescored.length > 0 ? `, ${rescored.length} re-scored` : ''}.${sources.map((source) => ` Re-scored; observations from ${source}.`).join('')} Spent ${usd(spent)}.`;
 }
 
 /** The cells neither passed nor failed, by state, each count only when it is above 0. */

@@ -663,7 +663,7 @@ function blockDetail(block: BlockDetail, extra = ''): string {
   const verdict = verdictOf(blockStatus(block));
   const reason = unscoredReason(block);
   return `<div class="block ${verdict.cls === 'ok' ? 'block-pass' : verdict.cls === 'skip' ? 'block-skip' : 'block-fail'}" id="block-${block.index}">
-${block.rejudged ? `<p>Re-judged: ${esc(block.rejudged.criteria.join(', '))}; observations from ${esc(block.rejudged.fromCampaign)}.</p>\n` : block.carried ? `<p>carried from ${esc(block.carried.fromCampaign)}</p>\n` : ''}<p class="block-head"><span class="badge ${verdict.cls}">${verdict.text}</span> Block ${block.index}, ${esc(where)}${block.drift.length > 0 ? `, drift ${esc(block.drift.join(', '))}` : ''}. Stage expected ${esc(block.expectedStage ?? 'none')}, observed ${esc(block.observedStage ?? 'none')}.</p>
+${block.rejudged ? `<p>${block.rejudged.criteria.length === 0 ? 'Re-scored' : `Re-judged: ${esc(block.rejudged.criteria.join(', '))}`}; observations from ${esc(block.rejudged.fromCampaign)}.</p>\n` : block.carried ? `<p>carried from ${esc(block.carried.fromCampaign)}</p>\n` : ''}<p class="block-head"><span class="badge ${verdict.cls}">${verdict.text}</span> Block ${block.index}, ${esc(where)}${block.drift.length > 0 ? `, drift ${esc(block.drift.join(', '))}` : ''}. Stage expected ${esc(block.expectedStage ?? 'none')}, observed ${esc(block.observedStage ?? 'none')}.</p>
 ${historyNormalizationsHtml(block.historyNormalizations)}${reason === undefined ? '' : `<p class="skip-reason">${esc(reason)}</p>\n`}${block.stimulus === undefined ? '' : `<p class="label">${block.realized === undefined ? 'User' : 'User, as written'}</p><pre class="msg">${esc(block.stimulus)}</pre>`}${block.realized === undefined ? '' : `\n<p class="label">User, as sent</p><pre class="msg">${esc(block.realized.text ?? notStored(block.realized.hash))}</pre>`}
 <p class="label">Agent</p><pre class="msg">${esc(block.text || '(no text)')}</pre>
 <p class="label">Cache key</p><pre class="mono">${esc(block.cacheKey ?? 'not cached')}</pre>
@@ -684,11 +684,15 @@ function runDetail(run: RunDetail, options: RenderOptions = {}): string {
   const s = run.succession;
   const facts = [
     `status ${run.status}`,
-    ...(run.carried
+    ...(run.rejudged
       ? [
-          `carried from ${run.carried.fromCampaign}${run.carried.agentVersion === undefined ? '' : `, agent version ${run.carried.agentVersion}`}, age ${count(run.carried.age.campaigns, 'campaign')}`,
+          `${run.rejudged.criteria.length === 0 ? 'Re-scored' : `Re-judged: ${run.rejudged.criteria.join(', ')}`}; observations from ${run.rejudged.fromCampaign}`,
         ]
-      : []),
+      : run.carried
+        ? [
+            `carried from ${run.carried.fromCampaign}${run.carried.agentVersion === undefined ? '' : `, agent version ${run.carried.agentVersion}`}, age ${count(run.carried.age.campaigns, 'campaign')}`,
+          ]
+        : []),
     `${count(run.blocks.length, 'block')}`,
     `first drift ${s.firstDriftBlock === undefined ? 'none' : `block ${s.firstDriftBlock}`}`,
     `${s.driftCount} drifting`,

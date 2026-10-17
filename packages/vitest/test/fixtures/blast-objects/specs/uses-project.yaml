@@ -1,0 +1,6 @@
+# Fictional data only. A spec that names a project object, driftbench/policy/blame/acme.yaml.
+id: blast-vitest-uses
+uses: { blame: acme }
+blocks:
+  - user: Where is my order?
+    expect: { must: [ok] }

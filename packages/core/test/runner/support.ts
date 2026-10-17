@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { functionAdapter } from '@agent-nexus/driftbench-adapters';
+import { initializeShippedObjects } from '@agent-nexus/driftbench-checks';
 import {
   type AdapterCapabilities,
   type AgentAdapter,
@@ -35,6 +36,7 @@ export const ACME_CONVERSATIONS = fileURLToPath(
 );
 
 export async function loadAcmeConversations(): Promise<LoadedSpec[]> {
+  initializeShippedObjects();
   const results = await loadSpecs([ACME_CONVERSATIONS]);
   const loaded = results.filter((result): result is LoadedSpec => result.ok);
   if (loaded.length !== results.length) throw new Error('an Acme conversation spec is invalid');
@@ -49,6 +51,7 @@ export function acmeSpec(loaded: LoadedSpec[], id: string): Spec {
 
 /** Parses a spec written in a test; throws on an invalid one. */
 export function specOf(raw: unknown): Spec {
+  initializeShippedObjects();
   const result = validateSpec(raw);
   if (!result.ok) throw new Error(`invalid test spec: ${JSON.stringify(result.errors)}`);
   return result.spec;

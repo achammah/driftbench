@@ -1,4 +1,5 @@
 import { createHash, type Hash } from 'node:crypto';
+import { SPEC_OBJECT_CONTEXT } from '../objects/context';
 
 /** JSON with object keys sorted at every depth, so equal content gives equal text. */
 export function canonicalJson(value: unknown): string {
@@ -38,6 +39,9 @@ export function cloneJson<T>(value: T): T {
   if (prototype !== Object.prototype && prototype !== null) return structuredClone(value);
   const out: Record<string, unknown> = {};
   for (const key of Object.keys(value)) out[key] = cloneJson((value as Record<string, unknown>)[key]);
+  const context = (value as Record<symbol, unknown>)[SPEC_OBJECT_CONTEXT];
+  if (context !== undefined)
+    Object.defineProperty(out, SPEC_OBJECT_CONTEXT, { value: context, enumerable: true, configurable: true });
   return out as T;
 }
 

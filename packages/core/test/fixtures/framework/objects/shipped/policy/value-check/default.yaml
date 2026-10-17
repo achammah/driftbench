@@ -1,0 +1,34 @@
+# The value-check ladder of config_framework.md 3.1, shipped with today's behaviour: the three ladder
+# rungs are present and disabled; exact match decides every assertion, as the tools check does today.
+kind: policy/value-check
+id: default
+version: 1
+extends: null
+description: Decides when a value the agent wrote is the right value.
+items:
+  - id: rung1_outcome
+    title: Ask the tool, same result for the gold value and the agent's value
+    enabled: false
+    when: { tool_replayable: true }
+    effect: { settles: [pass, fail] }
+    impl: builtin:value-check/outcome
+  - id: rung2_contract
+    title: The format the tool or the prompt states
+    enabled: false
+    when: { tool_replayable: false, contract: [tool, prompt] }
+    effect: { settles: [fail] }
+    impl: builtin:value-check/contract
+  - id: rung3_same_referent
+    title: A calibrated judge decides whether both values name the same thing
+    enabled: false
+    when: { tool_replayable: false, contract: none }
+    effect: { settles: [pass, fail, inconclusive] }
+    impl: builtin:value-check/judge
+  - id: rung4_exact
+    title: Exact match, today's assertion vocabulary
+    enabled: true
+    when: {}
+    effect: { settles: [pass, fail] }
+    params: { case_insensitive: false, strip_punctuation: false }
+    impl: builtin:value-check/exact
+order: [rung1_outcome, rung2_contract, rung3_same_referent, rung4_exact]

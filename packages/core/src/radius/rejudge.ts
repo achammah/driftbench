@@ -1,4 +1,15 @@
-import type { Check, CheckContext } from '../contracts/check';
+import type { Check, CheckContext, CheckSet } from '../contracts/check';
+import { bindObjectContext } from '../objects/context';
+import { checkSpecObjects } from '../objects/index';
+import {
+  type CliOverrides,
+  type ObjectContext,
+  resolveBlockObjects,
+  shippedObjectContext,
+  type UsedObject,
+} from '../objects/layers';
+import { type ObjectRegistry, objectRegistry } from '../objects/resolve';
+import { applyScoringPlan, resolvedRecord, type ScoringPlan, scoringPlan } from '../objects/scoring';
 import { cellId } from '../runner/cell';
 import { driftOf } from '../runner/drift';
 import {
@@ -32,6 +43,14 @@ import { agentVersionOf } from './version';
  */
 export function observationCompatibilityHash(spec: Spec, execution: { executionHash: string }): string {
   const copy = structuredClone(specIdentity(spec));
+  // `uses` names scoring-only objects (policies, check sets, diagnostics): judge-only by construction, as the
+  // block cache key leaves it out (cacheSpecHash). So is `compare`, below.
+  delete copy.uses;
+  for (const block of copy.blocks) delete block.uses;
+  // `compare` on an expected tool only chooses how a value the agent already sent is read: judge-only too.
+  for (const entry of [...copy.blocks, ...(copy.perturbations ?? [])]) {
+    for (const tool of entry.expect?.tools ?? []) delete tool.compare;
+  }
   for (const criterion of copy.criteria ?? []) {
     for (const field of [
       'rubric',
@@ -72,6 +91,58 @@ export function prepareRejudge(
   run: RunResult,
   options: RejudgeOptions,
 ): PreparedRejudge {
+  return prepareStored(old, spec, run, options, options.criteria, false);
+}
+
+export type RescoreOptions = Omit<RejudgeOptions, 'criteria'>;
+
+/**
+ * Validates a stored run for a scoring-only re-score: the same proofs as a re-judge (complete provenance, the
+ * same agent version, an unchanged compatibility hash, a fresh enough observation), with no criterion selected.
+ * Every agent-facing change is refused here, with the reason, so the caller reruns the agent instead.
+ */
+export function prepareRescore(
+  old: Spec,
+  spec: Spec,
+  run: RunResult,
+  options: RescoreOptions,
+): PreparedRejudge {
+  refuseParentLinked(spec);
+  return prepareStored(old, spec, run, options, [], true);
+}
+
+/**
+ * A child of a parent-linked run was measured with the history, the previous stage and the Given of its
+ * ancestors; a re-score builds its contexts from the block order, which would hand it unrelated trees.
+ */
+function refuseParentLinked(spec: Spec): void {
+  if (spec.blocks.some((block) => block.parent !== undefined)) {
+    refuse(
+      "A parent-linked run takes each child's history from its ancestors, which a re-score does not rebuild",
+    );
+  }
+}
+
+/**
+ * Refuses a command-line layer that changes an agent-facing object (a persona, a run profile): what the agent
+ * receives would change, so no stored observation can be re-scored under it.
+ */
+export function refuseAgentFacing(cli: CliOverrides, registry: ObjectRegistry = objectRegistry): void {
+  const kinds = [...cli.use.keys(), ...cli.set.map((set) => set.kind)];
+  const facing = [...new Set(kinds)].filter((kind) => registry.kind(kind)?.agentFacing === true);
+  if (facing.length > 0) {
+    refuse(`${facing.join(', ')} is agent-facing: a change to it changes what the agent receives`);
+  }
+}
+
+function prepareStored(
+  old: Spec,
+  spec: Spec,
+  run: RunResult,
+  options: RescoreOptions,
+  criteria: readonly string[],
+  scoringOnly: boolean,
+): PreparedRejudge {
   const provenance = run.provenance;
   if (!provenance || !completeBaselineProvenance({ provenance: options.baselineProvenance, runs: [run] }))
     return refuse('Legacy observation has missing, incomplete or inconsistent execution provenance');
@@ -104,8 +175,8 @@ export function prepareRejudge(
     return refuse('Observation compatibility changed (including deterministic checks or expected outputs)');
   if (!Number.isFinite(Date.parse(run.finishedAt)) || Date.parse(run.finishedAt) > options.now.getTime())
     return refuse('The observation timestamp is invalid or in the future');
-  const names = new Set(options.criteria);
-  if (!names.size) return refuse('The criterion selection is empty');
+  const names = new Set(criteria);
+  if (!names.size && !scoringOnly) return refuse('The criterion selection is empty');
   for (const def of spec.criteria ?? []) {
     const before = old.criteria?.find((c) => c.name === def.name);
     if (canonicalJson(before) !== canonicalJson(def) && !names.has(def.name))
@@ -188,12 +259,17 @@ export function prepareRejudge(
   };
 }
 
-/** No adapter is accepted: only the selected judge runs. Historical agent cost is not billed again. */
+/**
+ * No adapter is accepted: only the selected judge runs. Historical agent cost is not billed again. The judge's
+ * verdicts are stamped with the `judge` item of each block's check set, resolved against `objects` (the shipped
+ * objects when absent).
+ */
 export async function rejudgeRun(
   prepared: PreparedRejudge,
   judge: Check,
   spent: () => number,
   recordRealizedText = false,
+  objects: ObjectContext = shippedObjectContext(),
 ): Promise<RunResult> {
   const { source, spec, contexts, stamp, carried } = prepared;
   const before = spent();
@@ -209,7 +285,8 @@ export async function rejudgeRun(
       continue;
     }
     const blockSpend = spent();
-    const judged = (await judge.evaluate(ctx)).map((v) => Verdict.parse(v));
+    const by = blockPlan(spec, ctx.blockIndex, [judge], objects).plan.steps[0]?.by;
+    const judged = (await judge.evaluate(ctx)).map((v) => Verdict.parse(by ? { ...v, by } : v));
     if (
       judged.some((v) => v.kind !== 'judge' || !selected.includes(v.name)) ||
       selected.some((name) => judged.filter((v) => v.name === name).length !== 1)
@@ -237,6 +314,114 @@ export async function rejudgeRun(
     rejudged: stamp,
     succession: succession(blocks),
     cost: spent() - before,
+    cacheHit: false,
+  };
+  return applyRealizedTextPolicy({ ...updated, runId: cellId(updated) }, recordRealizedText, {
+    fromRun: source.runId,
+    fromCampaign: stamp.fromCampaign,
+  });
+}
+
+function blockPlan(
+  spec: Spec,
+  blockIndex: number,
+  checks: CheckSet,
+  objects: ObjectContext,
+): { used: UsedObject[]; plan: ScoringPlan } {
+  const used = resolveBlockObjects(spec, blockIndex, objects);
+  return { used, plan: scoringPlan(checks, used.find((entry) => entry.key === 'check_set')?.object) };
+}
+
+/** The runner's own verdict families: stored, never recomputed by a re-score. */
+const RUNNER_FAMILIES = new Set(['flow', 'ledger']);
+
+// A retained judge participates in check-set selection but never makes a new judge call.
+const STORED_JUDGE: Check = { name: 'judge', applies: () => false, evaluate: () => [] };
+
+/**
+ * Re-scores a prepared stored run under `objects` with no agent call: every block's machine checks run again on
+ * its stored observation through the block's check set, and every verdict is stamped anew. Judge verdicts are
+ * kept as they were judged when the judge item remains enabled; flow and ledger verdicts are stamped and left
+ * out when the check set disables them. Each block records the objects it was re-scored with and a `rejudged`
+ * stamp with no criterion.
+ */
+export async function rescoreRun(
+  prepared: PreparedRejudge,
+  checks: CheckSet,
+  objects: ObjectContext,
+  recordRealizedText = false,
+): Promise<RunResult> {
+  const { source, contexts, stamp, carried } = prepared;
+  // The sink of every door (prepareRescore, prepareRejudge, any later one): the contexts of a prepared re-score
+  // are built from the block order, so a parent-linked spec would hand a child the blocks of unrelated trees.
+  refuseParentLinked(prepared.spec);
+  const spec = bindObjectContext({ ...prepared.spec }, objects);
+  const issues = checkSpecObjects(spec, objects);
+  if (issues.length) return refuse(issues.map((issue) => `${issue.code}: ${issue.message}`).join('; '));
+  const available = [...checks.filter((check) => check.name !== 'judge'), STORED_JUDGE];
+  // Freeze every plan before any check executes, just as a fresh run does.
+  const plans = contexts.map((ctx) => blockPlan(spec, ctx.blockIndex, available, objects));
+  const blocks: BlockResult[] = [];
+  for (const [index, originalContext] of contexts.entries()) {
+    const ctx = { ...originalContext, spec };
+    const original = source.blocks[ctx.blockIndex];
+    if (!original) return refuse('The observation disappeared');
+    // A block not run or blocked holds no observation to score: it stays as it was.
+    if (!isScored(original)) {
+      blocks.push(original);
+      continue;
+    }
+    const planned = plans[index];
+    if (!planned) return refuse('The scoring plan disappeared');
+    const { used, plan } = planned;
+    // The end state the last block's checks read is the one the run recorded after it.
+    const last = ctx.blockIndex === spec.blocks.length - 1 && source.endStateValue !== undefined;
+    const machinePlan = { ...plan, steps: plan.steps.filter(({ check }) => check.name !== 'judge') };
+    const scored = await applyScoringPlan(
+      machinePlan,
+      last ? { ...ctx, endState: source.endStateValue } : ctx,
+    );
+    const judgeEnabled = plan.steps.some(({ check }) => check.name === 'judge');
+    const judged = judgeEnabled ? original.verdicts.filter((v) => v.kind === 'judge') : [];
+    const runnerOwn = original.verdicts.flatMap((v) => {
+      if (!RUNNER_FAMILIES.has(v.name)) return [];
+      const by = plan.runner[v.name as 'flow' | 'ledger'];
+      return by ? [{ ...v, by }] : [];
+    });
+    const verdicts = [...scored, ...judged, ...runnerOwn];
+    const resolved = resolvedRecord(used);
+    const {
+      carried: _carried,
+      rejudged: _rejudged,
+      resolved: _resolved,
+      diagnoses: _diagnoses,
+      skippedForBudget: _skippedForBudget,
+      ...rest
+    } = original;
+    blocks.push({
+      ...rest,
+      verdicts,
+      ...(resolved ? { resolved } : {}),
+      pass: verdicts.every((v) => !v.gating || v.outcome === 'pass'),
+      drift: driftOf(verdicts),
+      rejudged: { ...stamp, criteria: [], judgeCostUsd: 0 },
+    });
+  }
+  const {
+    carried: _carried,
+    events: _events,
+    diagnoses: _diagnoses,
+    skippedForBudget: _skippedForBudget,
+    ...rest
+  } = source as RunResult & { diagnoses?: unknown; skippedForBudget?: unknown };
+  const updated = {
+    ...rest,
+    specHash: specHash(spec),
+    blocks,
+    carried,
+    rejudged: { ...stamp, criteria: [] },
+    succession: succession(blocks),
+    cost: 0,
     cacheHit: false,
   };
   return applyRealizedTextPolicy({ ...updated, runId: cellId(updated) }, recordRealizedText, {

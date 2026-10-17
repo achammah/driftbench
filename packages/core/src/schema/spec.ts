@@ -14,6 +14,7 @@ import {
 } from './common';
 import { parameterSchema, unsupportedSchemaKeywords } from './json-schema';
 import { BlockLinks } from './links';
+import { Uses } from './object';
 
 /**
  * The spec format. A spec is one golden conversation (or one task for a code agent) written as a
@@ -121,6 +122,26 @@ export const GivenOverride = z
   );
 export type GivenOverride = z.infer<typeof GivenOverride>;
 
+/**
+ * How one value assertion is compared, by the rungs of the value-check policy. `auto` walks the rungs in order;
+ * a rung name runs that rung alone; `{ exact: <reason> }` declares that the writing itself is the requirement.
+ */
+export const CompareMode = z
+  .union([
+    z
+      .enum(['auto', 'outcome', 'contract', 'as_given', 'same_referent'])
+      .describe(
+        'auto walks the value-check rungs; outcome asks the tool; contract reads its stated format; as_given compares with the source the agent copied; same_referent asks the calibrated judge.',
+      ),
+    z
+      .strictObject({
+        exact: z.string().min(1).describe('Why the writing itself is the requirement, in one line.'),
+      })
+      .describe('Exact match by declaration: the value must be the gold value byte for byte.'),
+  ])
+  .describe('How one value is compared: auto, a rung name, or exact with its reason.');
+export type CompareMode = z.infer<typeof CompareMode>;
+
 export const ToolExpect = z
   .strictObject({
     label: z.string().min(1).describe('The tool name.'),
@@ -134,6 +155,12 @@ export const ToolExpect = z
       .optional()
       .describe(
         'True requires every call input to be an object with only the top-level keys named in input. An absent input allows no keys. False or absent leaves other keys allowed.',
+      ),
+    compare: z
+      .union([CompareMode, z.record(z.string().min(1), CompareMode)])
+      .optional()
+      .describe(
+        'How the input values are compared: one mode for every argument, or a mode by argument name. Absent means auto: the value-check rungs decide whether a value that differs from the gold names the same thing.',
       ),
   })
   .describe('One expected tool call.');
@@ -528,6 +555,9 @@ export const BlockSpec = z
     given: GivenOverride.optional().describe('Initial conditions for this block.'),
     expect: Expect.optional().describe('The expected output and state delta.'),
     budget: Budget.optional().describe('Limits for this block.'),
+    uses: Uses.optional().describe(
+      "The objects this block uses; a key here replaces the spec's. Left out of the block cache key.",
+    ),
   })
   .describe('One block: a stimulus, its initial conditions and its expectations.');
 export type BlockSpec = z.infer<typeof BlockSpec>;
@@ -861,6 +891,9 @@ export const Spec = z
     rules: Rules.optional().describe('Rules for the whole conversation.'),
     end_state: EndState.optional().describe('The expected end state of the world after the run.'),
     perturbations: z.array(PerturbationSpec).optional().describe('Deviations to inject in perturbed mode.'),
+    uses: Uses.optional().describe(
+      'The objects every block uses (policies, check set, diagnostics), by id or inline. Left out of the block cache key.',
+    ),
     metadata: z
       .record(z.string(), z.unknown())
       .superRefine((metadata, ctx) => {

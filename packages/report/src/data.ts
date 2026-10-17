@@ -125,6 +125,10 @@ export function scoredRuns(runs: readonly RunResult[]): RunResult[] {
 export type CarriedSummary = {
   fresh: number;
   carried: number;
+  /** Re-scored blocks, grouped by the campaign whose observations were re-scored. */
+  rescored?: Array<{ campaign: string; blocks: number }>;
+  /** Display-only subset of carried: runs with freshly re-scored blocks. Pair eligibility is unchanged. */
+  rescoredRuns?: number;
   /** The agent versions the campaign itself runs, read from its targets. */
   versions: string[];
   /** One entry per campaign and agent version the carried runs come from, most runs first. */
@@ -133,6 +137,8 @@ export type CarriedSummary = {
     /** The agent version that produced the results, when the fresh runs named one. */
     agentVersion?: string;
     runs: number;
+    /** Display-only subset of this source: runs with freshly re-scored blocks. */
+    rescoredRuns?: number;
     /** The oldest result of the group: campaigns it was carried through, and days since its fresh run. */
     maxCampaigns: number;
     maxDays: number;
@@ -143,6 +149,15 @@ export type CarriedSummary = {
 export function carriedSummary(runs: readonly RunResult[]): CarriedSummary | undefined {
   const carried = runs.filter((run) => run.carried !== undefined);
   if (carried.length === 0) return undefined;
+  const rescored = new Map<string, number>();
+  for (const run of runs) {
+    for (const block of run.blocks) {
+      const stamp = block.rejudged;
+      if (stamp?.criteria.length === 0)
+        rescored.set(stamp.fromCampaign, (rescored.get(stamp.fromCampaign) ?? 0) + 1);
+    }
+  }
+  let rescoredRuns = 0;
   const sources = new Map<string, CarriedSummary['sources'][number]>();
   for (const run of carried) {
     const from = run.carried as NonNullable<RunResult['carried']>;
@@ -155,6 +170,13 @@ export function carriedSummary(runs: readonly RunResult[]): CarriedSummary | und
       maxDays: 0,
     };
     held.runs += 1;
+    if (
+      run.rejudged?.criteria.length === 0 ||
+      run.blocks.some((block) => block.rejudged?.criteria.length === 0)
+    ) {
+      held.rescoredRuns = (held.rescoredRuns ?? 0) + 1;
+      rescoredRuns += 1;
+    }
     held.maxCampaigns = Math.max(held.maxCampaigns, from.age.campaigns);
     held.maxDays = Math.max(held.maxDays, from.age.days);
     sources.set(key, held);
@@ -167,6 +189,14 @@ export function carriedSummary(runs: readonly RunResult[]): CarriedSummary | und
   return {
     fresh: runs.length - carried.length,
     carried: carried.length,
+    ...(rescoredRuns ? { rescoredRuns } : {}),
+    ...(rescored.size
+      ? {
+          rescored: [...rescored]
+            .map(([campaign, blocks]) => ({ campaign, blocks }))
+            .sort((a, b) => a.campaign.localeCompare(b.campaign)),
+        }
+      : {}),
     versions: [...versions],
     sources: [...sources.values()].sort((a, b) => b.runs - a.runs || a.campaign.localeCompare(b.campaign)),
   };

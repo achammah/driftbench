@@ -29,6 +29,9 @@ export type MainOptions = {
  * those of `options.plugins`, of the project config's `plugins` list and of `--plugin` (see `./plugins`).
  */
 export async function main(argv: string[], io: Io = processIo, options: MainOptions = {}): Promise<number> {
+  // The shared registry is filled before plugins or any command resolve objects. Printing the top-level help or
+  // the version needs no object, so that path loads no other package.
+  if (!printsIndexOnly(argv)) (await import('@agent-nexus/driftbench-checks')).initializeShippedObjects();
   let exitCode = 0;
   const setExit = (code: number) => {
     exitCode = code;
@@ -76,6 +79,11 @@ const COMMAND_NAMES: ReadonlySet<string> = new Set(COMMAND_MODULES.flatMap((modu
 /** The arguments that only print the top-level help or the version: no command module is needed. */
 const INDEX_ONLY = new Set(['--help', '-h', '--version', '-V', 'help']);
 
+/** True for the arguments that only print the top-level help or the version. */
+function printsIndexOnly(argv: readonly string[]): boolean {
+  return argv.length === 0 || (argv.length === 1 && INDEX_ONLY.has(argv[0] as string));
+}
+
 /**
  * The program for these arguments, with only the command modules they need. A command (or `help <command>`)
  * loads its own module; the top-level help and the version load none and list the commands from
@@ -89,9 +97,7 @@ export async function createProgram(
   deps?: Partial<CampaignDeps>,
 ): Promise<Command> {
   const first = argv[0] === 'help' && argv.length === 2 ? argv[1] : argv[0];
-  if (argv.length === 0 || (argv.length === 1 && INDEX_ONLY.has(argv[0] as string))) {
-    return indexProgram(io);
-  }
+  if (printsIndexOnly(argv)) return indexProgram(io);
   const own = COMMAND_MODULES.filter((module) => first !== undefined && module.names.includes(first));
   const modules = own.length > 0 ? own : COMMAND_MODULES;
   const registers = await Promise.all(modules.map((module) => module.load()));

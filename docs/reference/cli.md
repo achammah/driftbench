@@ -250,6 +250,18 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `RETENTION_FACT_UNKNOWN` | error | `expect.knowledge_retention` names a fact that no ledger holds before the block: not in `given.ledger`, nor in an earlier block's `ledger_add` |
 | `TOOL_FORBIDDEN_EXPECTED` | error | a block expects a tool that the rules forbid, in `forbidden_tools` or with `max_calls` at 0 |
 | `GIVEN_ORIGIN_WITHOUT_PREFIX` | error | a block's `given.origin` says where a prefix comes from, and the block writes no `given.prefix` |
+| `OBJECT_INVALID` | error | an object file, an inline object in `uses` or a `uses.yaml` does not fit the object format, or a file sits at a path that does not match its kind and id |
+| `OBJECT_KIND_UNKNOWN` | error | an object names a kind no package or plugin registered; the message lists the known kinds |
+| `OBJECT_UNKNOWN` | error | `uses` names an object no layer defines; the message names the spec, the block, the kind, the id and the layers searched |
+| `OBJECT_CYCLE` | error | objects extend each other in a loop; the message prints the loop |
+| `OBJECT_DUPLICATE` | error | one kind and id are defined twice at the same layer |
+| `OBJECT_SHIPPED_IMMUTABLE` | error | a project or suite file redefines a shipped object; write one with another id that extends it |
+| `OBJECT_ITEM_UNKNOWN` | error | an operation, an `order` or a move names an item the parent does not hold; the message lists the parent's items |
+| `OBJECT_ITEM_EXISTS` | error | `add: true` names an item the parent already holds |
+| `OBJECT_ITEM_INCOMPLETE` | error | a new item lacks `title`, `when`, `effect` or `impl`, or a root object lists an item without its full definition |
+| `OBJECT_ORDER_INVALID` | error | an `order` leaves out an enabled item or lists one twice, or a file sets `order` and moves an item |
+| `OBJECT_IMPL_UNKNOWN` | error | an enabled item names an implementation no builtin or plugin provides |
+| `OBJECT_PARAMS_INVALID` | error | an item's params do not fit its implementation's schema; the message names the path |
 | `LINK_BLOCK_UNKNOWN` | error | a link in `metadata.links` names a block id the spec does not have, or an index past its last block |
 | `LINK_TARGET_UNKNOWN` | error or warning | `spec lint --sections` only: error when the registry of the prompt has no such section, warning when no registry was given for the prompt |
 | `LINK_STALE` | warning | `spec lint --sections` only: the link's status is `stale`, or its section was not found again in the registry's version |
@@ -1714,3 +1726,9 @@ driftbench campaign rejudge <paths...> --from <campaign> --campaign <new-id> --s
 Re-judge selected criteria using compatible stored observations, without calling an agent.
 The manifest's agent versions must be identical. Full compatibility requirements, refusal
 cases and an executed Acme example are in [blast radius](../concepts/blast-radius.md#re-judge-a-criterion).
+
+```sh
+driftbench campaign rejudge <paths...> --from <campaign> --campaign <new-id> --store <file> (--use <kind/id> | --set <kind[/id]#item.param=value>)... [--max-carry <n>] [--max-age <days>] [--json]
+```
+
+Re-score every stored observation under changed scoring-only objects (a check set, a policy), with no agent and no judge call. `--use` picks an object of a kind, `--set` sets one item parameter at the command-line layer; both repeat. An agent-facing kind (persona, scenario, persona-defaults, run-profile, deviation-class) is refused with exit 2: rerun the agent with `campaign run`. `--change` and `--use`/`--set` are not taken together. `--json` prints `campaign`, `from`, `agentCalls` (always 0), `rescored`, `use` and `set`.

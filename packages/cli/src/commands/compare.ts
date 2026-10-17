@@ -570,9 +570,21 @@ export function resolveMargin(
 ): number {
   if (gate.margin !== 'auto') return gate.margin;
   if (baseline.campaign.rejudged?.length && baseline.runs.every((run) => run.carried)) {
-    io?.out(
-      'Margin auto: re-judged observations supply no fresh agent pairs; using the 2.0 point default.\n',
-    );
+    const stamps = baseline.campaign.rejudged;
+    const rescored = [
+      ...new Set(stamps.filter((stamp) => stamp.criteria.length === 0).map((stamp) => stamp.fromCampaign)),
+    ];
+    if (rescored.length) {
+      for (const campaign of rescored) io?.out(`Re-scored; observations from ${campaign}.\n`);
+      const alsoRejudged = stamps.some((stamp) => stamp.criteria.length > 0);
+      io?.out(
+        `Margin auto: reused observations${alsoRejudged ? ', including re-judged criteria,' : ''} supply no fresh agent pairs; using the 2.0 point default.\n`,
+      );
+    } else {
+      io?.out(
+        'Margin auto: re-judged observations supply no fresh agent pairs; using the 2.0 point default.\n',
+      );
+    }
     return 0.02;
   }
   if (baseline.runs.length === 0) {

@@ -5,6 +5,9 @@ import type { CheckSet } from '../contracts/check';
 import type { UserDriver } from '../contracts/driver';
 import type { CostUnit, Store } from '../contracts/store';
 import type { ToolRule } from '../contracts/tool-policy';
+import { objectContextOfSpec } from '../objects/context';
+import { checkSpecObjects, shippedObjectContext } from '../objects/index';
+import type { ObjectContext } from '../objects/layers';
 import type { BlockReuse } from '../radius/blocks';
 import type { TargetRef } from '../schema/common';
 import type { RunMode, RunResult } from '../schema/run';
@@ -306,6 +309,8 @@ export type CampaignRunOptions = {
   cells: readonly PlannedCell[];
   /** The spec of a cell, by id and hash. */
   specFor(cell: PlannedCell): Spec;
+  /** The objects a cell's blocks resolve their `uses` against; the shipped objects only when absent. */
+  objectsFor?(cell: PlannedCell): ObjectContext;
   adapterFor(target: TargetRef): AgentAdapter;
   /** A fresh driver for each run, given the cell and the spec the cell runs (a perturbing driver needs it). */
   driver(cell: PlannedCell, spec: Spec): UserDriver;
@@ -362,6 +367,15 @@ export type CampaignRunOptions = {
  * it is still in flight. A campaign without that F cell gives P runs no reference.
  */
 export async function runCampaign(options: CampaignRunOptions): Promise<CellOutcome[]> {
+  // Validate before even a completed cell can be reused. A stored spec may outlive its object files.
+  const objectContexts = new Map<string, ObjectContext>();
+  for (const cell of options.cells) {
+    const spec = options.specFor(cell);
+    const context = options.objectsFor?.(cell) ?? objectContextOfSpec(spec) ?? shippedObjectContext();
+    objectContexts.set(cell.cellId, context);
+    const issues = checkSpecObjects(spec, context);
+    if (issues.length) throw new Error(issues.map((issue) => `${issue.code}: ${issue.message}`).join('; '));
+  }
   const stored = await options.store.listRuns({ campaignId: options.campaignId });
   const done = byCell(stored);
   const { cells, budgetUsd } = options;
@@ -467,6 +481,7 @@ export async function runCampaign(options: CampaignRunOptions): Promise<CellOutc
       adapter: options.adapterFor(cell.target),
       driver: options.driver(cell, spec),
       checks: options.checks,
+      objects: objectContexts.get(cell.cellId),
       ...(options.artifacts ? { artifacts: options.artifacts } : {}),
       mode: cell.mode,
       repeat: cell.repeat,

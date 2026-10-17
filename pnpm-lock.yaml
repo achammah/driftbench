@@ -114,6 +114,9 @@ importers:
       franc-min:
         specifier: ^6.2.0
         version: 6.2.0
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
 
   packages/cli:
     dependencies:
