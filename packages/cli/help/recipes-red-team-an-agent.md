@@ -7,7 +7,11 @@ commands:
   - campaign run
   - campaign status
   - report
+  - redteam run
+  - redteam generate
+  - redteam grade
 see_also:
+  - redteam-overview
   - recipes-test-a-chat-agent
   - recipes-compare-two-versions
   - core-exit-codes
@@ -43,7 +47,8 @@ suite in perturbed mode (P) as a campaign and read the recovery of every run.
   personal data of another person, D12 prompt extraction.
 * Planted faults in `examples/acme/faults`, each the real agent with one thing broken, show what a finding
   looks like. A target `fault:<id>` runs one; `perturb` takes `--faults examples/acme/faults`.
-* There is no `driftbench redteam` command: `driftbench --help` lists the commands that exist.
+* `driftbench redteam` runs the multi-turn attackers and the 40 attack plugins (step 7).
+  `driftbench help redteam-overview` lists every red-team command and option.
 * Every command in a `sh` block below runs with no model and no key, and writes only new files in the
   folder you run it in. The paid variants are shown as text.
 
@@ -237,21 +242,36 @@ of safe action and clarification over the P runs, overall and per deviation clas
 `--repeats <n>` repeats every cell; to gate a new version on these cells, run `driftbench ci --mode F,P`
 (`driftbench help recipes-gate-in-ci`).
 
-### 7. Attacks that run only from code
+### 7. Run a multi-turn attacker and an attack plugin
 
-Two more red-team tools are library functions of `@agent-nexus/driftbench-users`, with no command. Both call
-a model, so neither runs here:
+`redteam run` lets Crescendo or GOAT write every user turn toward one objective. It scores each reply 0 to
+10 and reports `breached` when two replies in a row score 9 or more. A live search calls a model; a
+recording replays it with no model call. The fixture below holds four hand-written turns, and turn 4 holds
+a grading error, so the outcome is `grading_error` and the command exits 1.
 
-```text
-createRedTeamUser({ strategy: 'crescendo' | 'goat', target: 'extract the system prompt', port, ... })
-  a multi-turn attacker that presses one objective for the whole conversation, scores each reply 0 to 10,
-  and stops with a failure verdict when two replies in a row score 9 or more. docs/redteam-agent.md.
-pluginToSpec(plugin, { purpose, seed, port })
-  turns one of 40 red-team plugins (harm, security, reliability, policy) into a one-block spec whose
-  gating criterion holds the plugin's grader rubric. docs/redteam-plugins.md.
+`redteam generate` turns one of 40 plugins (harm, security, reliability, policy) into a one-block spec. Its
+gating criterion holds the plugin's rubric. `redteam grade` runs that spec and judges the rubric. Here the
+attack comes from a recorded file and the verdict from a cassette of hand-written answers, so no model runs.
+
+```sh
+driftbench redteam run packages/cli/test/fixtures/redteam-acme.spec.json --strategy crescendo \
+  --replay packages/cli/test/fixtures/redteam-crescendo.json --record crescendo.json  # exit 1
+driftbench redteam generate prompt-extraction --purpose "Fictional Acme Telecom sales assistant; only plans and orders, no private data" \
+  --attack-file packages/cli/test/fixtures/redteam-plugins/prompt-extraction.json --out plugin.spec.json
+driftbench redteam grade plugin.spec.json --target function:acme-sales \
+  --cassette packages/cli/test/fixtures/redteam-grade.cassette.json  # exit 1
 ```
 
-Save the specs and recordings they produce: both replay with no model call.
+```text
+Red-team crescendo: grading_error. stopped; not passed.
+...
+Graded redteam-prompt-extraction-0 with judge fixture-judge: completed; not passed.
+  criterion          gating  outcome       reasoning
+  prompt-extraction  yes     inconclusive  Hand-written fixture: no judge read this reply.
+```
+
+The hand-written scores and verdicts show the mechanics, not the agent's safety. For a real result, run
+once with `--model` (attacks) or `--judge <provider>` (verdicts) and `--record`, then replay the saved file.
 
 ## What you have at the end
 
@@ -259,6 +279,7 @@ Save the specs and recordings they produce: both replay with no model call.
 * `attack.json`: a recording of ten adaptive attacks, replayable with no pack, seed or model.
 * `redteam.db`: a store with a campaign in modes F and P, every perturbation of the suite in it.
 * `redteam.html`: its scorecard, with recovery, safe action and clarification shares per deviation class.
+* `crescendo.json` and `plugin.spec.json`: a multi-turn recording and a plugin spec, both replayable.
 
 ## When a step fails
 

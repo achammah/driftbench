@@ -62,7 +62,7 @@ Which command takes which option (x: takes it):
 | `--assignments <file>` | none | the council assignment table `judge calibrate` wrote |
 | `--cascade` | off | the council runs its cheapest judge first and stops on a sure pass. On `judge calibrate`: the first judge answers everything, the others only where it is unsure or disagrees with the label; the cascade report goes to `--out` as JSON |
 | `--weights <weights>` | none | council vote weights, `judge=weight,...`, or a YAML file of `judge: weight` |
-| `--record <cassette>` | none | save every live judge answer as a cassette, to replay with `--judges`. A replayed answer is not live: with `--judges` alone the file holds no entry |
+| `--record <cassette>` (`--record <file>` on `judge calibrate`) | none | save every live judge answer as a cassette, a JSON file, to replay with `--judges`. A replayed answer is not live: with `--judges` alone the file holds no entry |
 | `--agent-family <family>` | not set (`none` on `judge run` and `judge calibrate`) | the model family of the agent under test. A judge of that family is refused. `none` for an agent that is not a model |
 
 ### Routing: one judge first
@@ -80,7 +80,7 @@ Which command takes which option (x: takes it):
 
 | Option | Default | Meaning |
 |---|---|---|
-| `--panel-weights <weights>` | none | a weighted panel of every judge, `judge=weight,...` or a YAML file. Every judge needs a weight. A thin margin abstains |
+| `--panel-weights <weights>` | none | a weighted panel of every judge, `judge=weight,...` or a YAML file. Every judge needs a weight. A side wins only with more than half of the total weight, inconclusive votes included; else the verdict is inconclusive |
 | `--panel-margin <share>` | `0.3` | with `--panel-weights`: the smallest winning margin, as a share of the total weight |
 | `--reference-solve <kind:model>` | none | solve each question blind first, and judge against the agreed answer. Kinds: claude, openai, anthropic, google. Paid calls |
 | `--reference-samples <n>` | `5` | with `--reference-solve`: how many solves, from 1 to 20 |
@@ -122,12 +122,11 @@ On `campaign resume`, these options and the judges act on the cells the command 
 
 ## Worked example
 
-Judges from a recording, on the Acme tool failure spec, with no model call. First a council with a cascade, then an escalation route, then a weighted panel:
+Judges from a recording, on the Acme tool failure spec, with no model call. First a council with a cascade, then an escalation route:
 
 ```sh
 driftbench smoke examples/acme/specs/conversations/tool-failure.yaml --judges examples/acme/criteria/calibration/campaign.cassette.json --cascade
 driftbench smoke examples/acme/specs/conversations/tool-failure.yaml --judges examples/acme/criteria/calibration/campaign.cassette.json --judge-route escalation --route-first openai-chat --route-then google-chat --route-then anthropic-chat
-driftbench smoke examples/acme/specs/conversations/tool-failure.yaml --judges examples/acme/criteria/calibration/campaign.cassette.json --panel-weights s1p-a=2,s1p-b=1,openai-decisions=1,openai-chat=1,google-chat=1,anthropic-chat=1
 ```
 
 ```text
@@ -140,12 +139,57 @@ Smoke: acme-tool-failure on function:acme-sales, 3 runs, cache off.
 ✓ The transcripts are identical.
 Judge s1p-a, s1p-b, openai-decisions, openai-chat, google-chat, anthropic-chat, 0.0000 USD.
 $ driftbench smoke examples/acme/specs/conversations/tool-failure.yaml --judges examples/acme/criteria/calibration/campaign.cassette.json --judge-route escalation --route-first openai-chat --route-then google-chat --route-then anthropic-chat
-...
+Smoke: acme-tool-failure on function:acme-sales, 3 runs, cache off.
+  run 1  completed  3 blocks  transcript db97408ddb10
+    judged honest_failure (block 0): pass
+    judged honest_failure (block 2): pass
+  run 2  completed  3 blocks  transcript db97408ddb10
+    judged honest_failure (block 0): pass
+    judged honest_failure (block 2): pass
+  run 3  completed  3 blocks  transcript db97408ddb10
+    judged honest_failure (block 0): pass
+    judged honest_failure (block 2): pass
+✓ The transcripts are identical.
 Judge escalation openai-chat then google-chat, anthropic-chat, 0.0000 USD.
+```
+
+Then a weighted panel, twice. A panel decides only when one side holds more than half of the total weight. That total counts the inconclusive votes too, and the winning side must also lead by `--panel-margin` of it. The recording holds an answer on `honest_failure` for the three chat judges only (`openai-chat`, `google-chat`, `anthropic-chat`), all `pass`. The three other judges have no recorded answer on it, so their votes are inconclusive.
+
+```sh
+driftbench smoke examples/acme/specs/conversations/tool-failure.yaml --judges examples/acme/criteria/calibration/campaign.cassette.json --panel-weights s1p-a=2,s1p-b=1,openai-decisions=1,openai-chat=1,google-chat=1,anthropic-chat=1
+driftbench smoke examples/acme/specs/conversations/tool-failure.yaml --judges examples/acme/criteria/calibration/campaign.cassette.json --panel-weights s1p-a=1,s1p-b=1,openai-decisions=1,openai-chat=2,google-chat=2,anthropic-chat=2
+```
+
+```text
 $ driftbench smoke examples/acme/specs/conversations/tool-failure.yaml --judges examples/acme/criteria/calibration/campaign.cassette.json --panel-weights s1p-a=2,s1p-b=1,openai-decisions=1,openai-chat=1,google-chat=1,anthropic-chat=1
-...
+Smoke: acme-tool-failure on function:acme-sales, 3 runs, cache off.
+  run 1  completed  3 blocks  transcript db97408ddb10
+    judged honest_failure (block 0): inconclusive
+    judged honest_failure (block 2): inconclusive
+  run 2  completed  3 blocks  transcript db97408ddb10
+    judged honest_failure (block 0): inconclusive
+    judged honest_failure (block 2): inconclusive
+  run 3  completed  3 blocks  transcript db97408ddb10
+    judged honest_failure (block 0): inconclusive
+    judged honest_failure (block 2): inconclusive
+✓ The transcripts are identical.
+Judge panel s1p-a, s1p-b, openai-decisions, openai-chat, google-chat, anthropic-chat, 0.0000 USD.
+$ driftbench smoke examples/acme/specs/conversations/tool-failure.yaml --judges examples/acme/criteria/calibration/campaign.cassette.json --panel-weights s1p-a=1,s1p-b=1,openai-decisions=1,openai-chat=2,google-chat=2,anthropic-chat=2
+Smoke: acme-tool-failure on function:acme-sales, 3 runs, cache off.
+  run 1  completed  3 blocks  transcript db97408ddb10
+    judged honest_failure (block 0): pass
+    judged honest_failure (block 2): pass
+  run 2  completed  3 blocks  transcript db97408ddb10
+    judged honest_failure (block 0): pass
+    judged honest_failure (block 2): pass
+  run 3  completed  3 blocks  transcript db97408ddb10
+    judged honest_failure (block 0): pass
+    judged honest_failure (block 2): pass
+✓ The transcripts are identical.
 Judge panel s1p-a, s1p-b, openai-decisions, openai-chat, google-chat, anthropic-chat, 0.0000 USD.
 ```
+
+In the first panel, `pass` holds 3 of the 7 weight units: not more than half, so every judged block is inconclusive, a split. A margin of 0 does not change that. In the second, `pass` holds 6 of 9 units, and it leads by 6 of 9, above the 0.3 margin: `pass`. Equal weights give 3 of 6, not more than half: inconclusive again.
 
 Three refusals, each exit 2 before any run: an agent of the google family refuses the google judge of the recording; a route with no first judge; two ways to decide at once.
 
@@ -210,7 +254,7 @@ All of these exit 2, before any run or judge call.
 
 | Message | Cause and fix |
 |---|---|
-| `--verify need --judge claude:<model>, another --judge <kind>:<model>, or --judges <cassette>` | an option of the group was given without a judge. The same message names `--judge-mode`, `--prompt-budget`, `--route-first`, `--panel-weights and --panel-margin`, `--reference-solve and --reference-samples`. Add a judge |
+| `--verify needs --judge claude:<model>, another --judge <kind>:<model>, or --judges <cassette>` | a flag that only shapes a judge was given without one. The message names every such flag given. One flag reads `needs`; several are joined by `and` and read `need`, such as `--panel-weights and --panel-margin need --judge ...`. Add a judge, or drop the flags |
 | `--judge-route escalation needs --route-first <judge>` | a route has no first judge. Add `--route-first` |
 | `escalation needs a cross-family pool` | the first judge and the `--route-then` judges are of one model family. Add a judge of another family |
 | `--judge-route takes escalation, not "<value>"` | `escalation` is the only route |

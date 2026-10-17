@@ -8,6 +8,7 @@ see_also:
   - results-radius
   - results-exports
   - results-statistics
+  - running-not-run
 next:
   - results-statistics
 ---
@@ -30,7 +31,7 @@ next:
 | `INCOMPLETE` (`incomplete`) | 1 | a candidate cell did not run: stopped by `--budget-usd`, or pending, and nothing regressed |
 | `AGGREGATE FAILED` (`aggregate-failed`) | 1 | a campaign-level criterion fails, unless the verdict is already regression, not-run or incomplete |
 | `RADIUS MISS` (`radius-miss`) | 1 | with `--change --audit`: an audited carried cell differs from its stored run. It outranks every other verdict |
-| `NOT RUN` (`not-run`) | 3 | a spec of the candidate has more of its blocks not run than `--max-not-run` allows (default 0: any block not run). A block not run is a Given the target cannot apply, never a pass. It outranks every verdict but radius-miss and regression. The verdict never depends on an unrelated spec not run: a regression gives `REGRESSION`, exit 1, with or without it. A golden that flipped while compare calls the change noise is no regression |
+| `NOT RUN` (`not-run`) | 3 | a spec of the candidate has more of its blocks not run than `--max-not-run` allows (default 0: any block not run). A block not run is a Given the target cannot apply, never a pass. It outranks every verdict but radius-miss and regression. The verdict never depends on an unrelated spec not run: a regression gives `REGRESSION`, exit 1, with or without it. A golden that flipped while compare calls the change noise is no regression. Topic running-not-run has a worked example |
 | none | 2 | bad input; nothing is run and nothing is written |
 
 On the same pair of campaigns `ci` and `compare` give the same verdict and the same exit code.
@@ -79,6 +80,38 @@ driftbench ci --specs <path> --target <adapter[:agent]> --baseline <campaign|sto
 
 Global: `--plugin <module>` loads a plugin, which can register an adapter for your own agent.
 
+Judging and the checks take the same options as `campaign run`, with the same defaults (topics judging-council and judging-machine-checks):
+
+| Option | Default | Effect |
+|---|---|---|
+| `--judge <kind:model>` | none | judge the judged criteria with this judge, such as `claude:haiku`. Kinds: claude, openai, anthropic, google, openai-decisions, jev, http. Repeat it for a council. Paid calls |
+| `--judge-command <path>` | `claude` | the claude command a claude judge runs |
+| `--judge-budget <usd>` | none | stop judging once the judges have spent this much |
+| `--judges <cassette>` | none | add every judge of this recording as a player: no call |
+| `--judge-mode <mode>` | from the judge classes | the council mode: `system1`, `hybrid` or `llm` |
+| `--assignments <file>` | none | the council assignment table `judge calibrate` wrote |
+| `--cascade` | off | run the cheapest judge first and stop on a sure pass |
+| `--weights <weights>` | none | council vote weights, `judge=weight,...` or a YAML file |
+| `--judge-route <route>` | none | `escalation`: route each call through a label-blind router |
+| `--route-first <judge>` | none | with `--judge-route escalation`: the judge that answers first |
+| `--route-then <judge>` | none | with `--judge-route escalation`: a judge asked when a trigger fires; repeatable |
+| `--route-on <triggers>` | `order-split,inconclusive,reference-disagreement,low-confidence` | the escalation triggers, comma separated |
+| `--route-confidence <p>` | `0.5` | the low-confidence bar, from 0 to 1 |
+| `--route-decide <rule>` | `majority` | `majority` or `first-stands` |
+| `--panel-weights <weights>` | none | a weighted panel of every judge; a thin margin abstains |
+| `--panel-margin <share>` | `0.3` | with `--panel-weights`: the smallest winning margin, a share of the total weight |
+| `--reference-solve <kind:model>` | none | solve each question blind first, and judge against the agreed answer |
+| `--reference-samples <n>` | `5` | with `--reference-solve`: how many solves, from 1 to 20 |
+| `--reference-route <route>` | none | with `--reference-solve`: `auto` solves only a question with one checkable answer |
+| `--verify <kind>` | none | `arithmetic`: check explicit equations in the reply, in a bounded sandbox, before the judge reads it |
+| `--prompt-budget <chars>` | none | drop the oldest transcript entries until the judge prompt fits; the last block stays |
+| `--record <cassette>` | none | save every live judge answer as a cassette, to replay with `--judges` |
+| `--agent-family <family>` | not set | the model family of the agent under test: a judge of that family is refused. `none` for no model |
+| `--owner <values...>` | none | the owner's own email, phone, IBAN or national number, left out by the `pii` check |
+| `--owner-file <file>` | none | owner values for the `pii` check, one per line; `#` starts a comment |
+| `--tool-policy <rules>` | none | a YAML list of `{ pattern, action: allow \| deny \| ask }`; a denied call fails its block's `tool_policy` check |
+| `--embedder <name>` | none | the embedder the `similarity` check scores with, as a plugin registered it |
+
 ### The GitHub Action
 
 `action/action.yml` at the repository root is a composite action around this command. Inputs (default):
@@ -124,7 +157,7 @@ Then "Goldens that changed" (with the candidate's failing verdicts per block), "
 line `Verdict: <VERDICT>. Exit <n>.` and `Summary: <file>`.
 
 The JSON summary (`--out`, and standard output with `--json`) holds: `verdict`, `exitCode`, `reasons`,
-`aggregates`, `marginPoints`, `marginAuto` (`neededPoints`, `limitedBy`, `warning`), `minGoldens`,
+`aggregates`, `marginPoints`, `marginAuto` (`neededPoints`, `limitedBy`, `warning`), `marginDefaulted` (why `--margin auto` kept the 2 point default when the baseline holds no run of its own that passed or failed; `null` otherwise), `minGoldens`,
 `strict`, `underpowered`, `comparator`, `flags`, `baseline` (`campaignId`, `store`), `candidate`
 (`campaignId`, `store`, `target`, `cells`, `incompleteCells`), `pairs`, `table`, `effectPoints`
 (`estimate`, `lower`, `upper`), `smallestMarginPoints`, `criteriaNotShown`, `regressed`, `improved`,
@@ -292,6 +325,7 @@ $ driftbench ci --specs examples/acme/specs/conversations --target fault:control
   ],
   "marginPoints": 25,
   "marginAuto": null,
+  "marginDefaulted": null,
   "minGoldens": 30,
   "strict": false,
   "underpowered": [
@@ -320,3 +354,5 @@ $ driftbench ci --specs examples/acme/specs/conversations --target fault:control
 | verdict `NOT SHOWN NON-INFERIOR` on an unchanged agent | the suite is too small for the margin. Read "smallest margin these pairs can show"; add goldens, or accept the auto margin |
 | price-sheet task specs fail on `function:acme-sales` | the mixed Acme suites need `--route flow:price-sheet=process:acme-ops` |
 | every cell reran though `--cache` was not given | expected: the cache is off by default in `ci` |
+| `Verdict: NOT RUN. Exit 3.` | a candidate spec has blocks not run beyond `--max-not-run`: the target cannot apply a layer of their Given. The `Not run` line names the spec and the first reason. Fix the target or the spec; raise `--max-not-run` only for an exploratory suite (topic running-not-run) |
+| `--max-not-run takes a share from 0 to 1, not "<value>".` (exit 2) | give a share such as `0.25`, not a percentage |

@@ -135,6 +135,8 @@ export type CiSummary = {
   marginPoints: number;
   /** Set when --margin auto chose the margin: what it had to clear, what set it, and any warning. */
   marginAuto: { neededPoints: number; limitedBy: string; warning?: string } | null;
+  /** Set when --margin auto had nothing to measure (the baseline holds no scored run): why the 2 point default stands. */
+  marginDefaulted: string | null;
   /** Gating criteria on fewer goldens are underpowered and left out of the parity test unless strict. */
   minGoldens: number;
   strict: boolean;
@@ -330,10 +332,12 @@ export async function ciCommand(options: CiCommandOptions, io: Io, deps: Campaig
   const shared = { flagFamilies: flags, minGoldens: gate.minGoldens, strict: gate.strict };
   let margin: number;
   let marginAuto: CiSummary['marginAuto'] = null;
+  let marginDefaulted: string | null = null;
   if (gate.margin === 'auto' && !hasScoredRun(baseline.data)) {
-    // A baseline whose every run is not run or blocked pairs no golden with itself: the 2 point default stands,
-    // and the comparison below says that no golden is shared.
+    // A baseline whose every run is not run, blocked or carried pairs no golden with itself: the 2 point default
+    // stands, and the comparison below says that no golden is shared.
     margin = 0.02;
+    marginDefaulted = 'the baseline has no scored golden to measure it on (no run passed or failed)';
   } else if (gate.margin === 'auto') {
     const auto = autoMargin(baseline.data, shared);
     margin = auto.margin;
@@ -426,6 +430,7 @@ export async function ciCommand(options: CiCommandOptions, io: Io, deps: Campaig
     flags,
     marginPoints: round(margin * 100),
     marginAuto,
+    marginDefaulted,
     baseline: { campaignId: baseline.data.campaign.campaignId, store: baseline.store },
     candidate: {
       campaignId: report.campaignId,
@@ -629,6 +634,7 @@ function summarize(input: {
   flags: string[];
   marginPoints: number;
   marginAuto: CiSummary['marginAuto'];
+  marginDefaulted: CiSummary['marginDefaulted'];
   baseline: CiSummary['baseline'];
   candidate: CiSummary['candidate'];
   radius?: CiRadius;
@@ -711,6 +717,7 @@ function summarize(input: {
     reasons,
     marginPoints: input.marginPoints,
     marginAuto: input.marginAuto,
+    marginDefaulted: input.marginDefaulted,
     minGoldens: result.minGoldens,
     strict: result.strict,
     underpowered: result.criteria
@@ -826,6 +833,9 @@ export function verdictText(summary: CiSummary, outPath: string): string {
       `Margin auto: ${summary.marginPoints} points, the smallest half point at which the baseline compared with itself is non-inferior (set by ${summary.marginAuto.limitedBy}, ${summary.marginAuto.neededPoints} points).`,
     );
     if (summary.marginAuto.warning) lines.push(`Warning: ${summary.marginAuto.warning}.`);
+  }
+  if (summary.marginDefaulted) {
+    lines.push(`Margin auto: ${summary.marginPoints} points by default; ${summary.marginDefaulted}.`);
   }
   if (summary.underpowered.length > 0) {
     lines.push(

@@ -5,6 +5,7 @@ A simulated user plays a person with a persona and a goal, block by block, inste
 * It reveals a fact (an email, an address, a number) only once the agent has asked for it. This is enforced in code: a fact reaches the model only after an agent reply matches one of the fact's ask patterns, the spec's words for the block are given to the model with every fact not yet asked replaced, and an answer that holds such a fact fails the run.
 * It says its stop token, alone, when the goal is met or given up; the run then ends.
 * It reads the agent's visible text only, never its tool calls.
+* In a spec whose blocks link by `parent`, it reads only the blocks its own block follows: a root starts with no conversation, a child sees its ancestors. A fact asked in one tree is not offered in another, and a message it wrote belongs to its block. A block that a perturbation replaces keeps its place: the user finds the message it wrote for that block, in a flat spec and in a tree.
 * Its model must belong to another family than the agent's and the judges'. A port of the agent's family or of a judge's family is refused before anything runs.
 
 ## A persona

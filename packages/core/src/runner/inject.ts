@@ -34,7 +34,14 @@ export function injectingDriver(base: UserDriver, perturbationId: string): UserD
             beforeBlock: perturbation.inject_at,
           };
         }
-        if (replacesBlock(perturbation)) return base.next({ ...ctx, blockIndex: ctx.blockIndex + 1 });
+        if (replacesBlock(perturbation)) {
+          const blockIndex = ctx.blockIndex + 1;
+          return base.next({
+            ...ctx,
+            blockIndex,
+            ...(ctx.branchOf ? { branch: ctx.branchOf(blockIndex) } : {}),
+          });
+        }
       }
       return base.next(ctx);
     },

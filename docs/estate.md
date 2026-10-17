@@ -981,4 +981,6 @@ The failing session that motivated a change is its fail-to-pass case: red before
 
 Built, in order: scan, lint and map; plan; the session reader and replay; generation; maintenance; the live runner with planted session states and hazards; estate mutants; the static and unit runners. Not built yet: the unit run of a helper alone, and a validation on a real estate against its native test battery.
 
+One test runs the whole chain from scan to radius, with no model call: [the estate chain proof](estate-chain.md).
+
 See also: [checks](reference/checks.md), [running](running.md), [statistics](concepts/statistics.md).

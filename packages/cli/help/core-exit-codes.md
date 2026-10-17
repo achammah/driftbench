@@ -5,6 +5,7 @@ commands: []
 see_also:
   - core-global-options
   - core-getting-started
+  - running-not-run
 next:
   - recipes-test-a-chat-agent
 ---
@@ -35,7 +36,9 @@ One exception: a spec path that does not exist is reported as an invalid spec, `
 
 One rule for the commands that gate a pipeline (`ci`, `campaign run`, `campaign resume`, `campaign rejudge`,
 `family verify`): when nothing failed but something was not run or blocked, they exit 3. Not run is no pass and
-no failure of the agent. `redteam` keeps 1 for a block not run: its result is an attack outcome. One
+no failure of the agent. `ci` ranks its verdicts: a radius miss, then a regression (exit 1), then blocks not
+run beyond `--max-not-run` (exit 3), then the rest. So a failing aggregate or an incomplete cell beside blocks
+not run gives 3, and a regression gives 1 (topic running-not-run). `redteam` keeps 1 for a block not run: its result is an attack outcome. One
 exception: `redteam run` exits 3 when its search is unscored (a turn has no score, breach detection is
 off, or it has fewer turns than `--success-confirm-turns`) and no block failed. Nothing failed and nothing was measured, so it is never a pass.
 

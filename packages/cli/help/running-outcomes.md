@@ -13,6 +13,7 @@ see_also:
   - running-budget-and-prices
   - running-cache
   - running-change-carry
+  - running-not-run
 next:
   - running-campaign-status
 ---
@@ -49,7 +50,7 @@ The runs of the campaign: those this command made, and with `resume` and `status
 |---|---|---|
 | `pass` | `✓` | the run completed, it has at least one block, every block passed, and the end state matched (when the spec declares one) |
 | `fail` | `✗` | the run completed, and a block failed or the end state differs: the agent did not do what the spec asks |
-| `not_run` | `-` | the run completed with no failure, but a block was not run: its Given carries a layer the target cannot apply (a `prefix` on an adapter without `seedPrefix`, a forced tool result in `world.tools` on one without `toolStubs`). Neither a pass nor a fail. Run the spec on a target that applies the layer, or drop the layer |
+| `not_run` | `-` | the run completed with no failure, but a block was not run: its Given carries a layer the target cannot apply. Examples: a `prefix` on an adapter without `seedPrefix`, a forced tool result in `world.tools` on one without `toolStubs`. Neither a pass nor a fail. Run the spec on a target that applies the layer, or drop the layer. Topic running-not-run |
 | `blocked` | `-` | the run completed with no failure, but a block was blocked: an ancestor it depends on failed, so it was not run (parent blocks give this status). Neither a pass nor a fail |
 | `failed` | `!` | the run ended with an error: a transport failure past its retries, an agent exception, an answer that does not fit the schema. Fix the cause and resume |
 | `stopped` | `!` | the run stopped: the driver did not stop within its step limit, or the budget stopped the cell before it started (no run is stored for a budget stop) |

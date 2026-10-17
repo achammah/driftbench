@@ -544,12 +544,17 @@ export function parseGate(
 }
 
 /**
- * Whether a campaign holds a run that passed or failed, in the given modes or in every mode. A campaign whose
- * every run is not run or blocked measured nothing: it pairs no golden with itself, so no margin can be read off it.
+ * Whether a campaign holds a run of its own that passed or failed, in the given modes or in every mode. A campaign
+ * whose every run is not run, blocked or carried from an earlier campaign measured nothing itself: a carried run is
+ * skipped by the pairing, so the campaign pairs no golden with itself and no margin can be read off it.
  */
 export function hasScoredRun(campaign: CampaignData, modes?: readonly RunMode[]): boolean {
   return (
-    scoredRuns(campaign.runs.filter((run) => modes === undefined || modes.includes(run.mode))).length > 0
+    scoredRuns(
+      campaign.runs.filter(
+        (run) => run.carried === undefined && (modes === undefined || modes.includes(run.mode)),
+      ),
+    ).length > 0
   );
 }
 
