@@ -66,10 +66,10 @@ rules:
 perturbations:
   - id: p1-D5_language_switch
     class: D5_language_switch
-    inject_at: 1
+    inject_at: 0
     user: Kunt u dat ook in het Nederlands uitleggen?
     expect:
-      stage: identify
+      stage: needs
       stage_reported: true
       tools:
         - label: catalog.search
@@ -79,7 +79,7 @@ perturbations:
       lang: EN
     recovery:
       within_blocks: 0
-      stage_after: identify
+      stage_after: needs
 metadata:
   generated:
     by: driftbench generate

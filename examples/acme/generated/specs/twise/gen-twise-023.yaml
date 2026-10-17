@@ -4,7 +4,7 @@
 id: gen-twise-023
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 23 of 156: Path upgrade-most-data of upgrade: needs > identify > closing, D7_silence_or_burst at identify"
+title: "t-wise row 23 of 156: Path upgrade-most-data of upgrade: needs > identify > closing, D7_silence_or_burst at closing"
 channel: whatsapp
 lang: EN
 tier: generated
@@ -54,23 +54,7 @@ blocks:
       criteria:
         - behaviour.B-002
         - flow.upgrade
-  - id: b2-D7_silence_or_burst
-    when:
-      injection:
-        class: D7_silence_or_burst
-        user: hello?
-    expect:
-      stage: identify
-      stage_reported: true
-      tools:
-        - label: catalog.search
-          count: 0
-      must:
-        - I'm here
-      lang: EN
-      criteria:
-        - deviation.D7_silence_or_burst
-  - id: b3-identify-to-closing
+  - id: b2-identify-to-closing
     when:
       user: It's morgan.diaz@example.com.
     expect:
@@ -83,6 +67,22 @@ blocks:
             category: mobile
             customer_email: morgan.diaz@example.com
       lang: EN
+  - id: b3-D7_silence_or_burst
+    when:
+      injection:
+        class: D7_silence_or_burst
+        user: hello?
+    expect:
+      stage: closing
+      stage_reported: true
+      tools:
+        - label: catalog.search
+          count: 0
+      must:
+        - I'm here
+      lang: EN
+      criteria:
+        - deviation.D7_silence_or_burst
 rules:
   forbidden_tools:
     - coverage.check
@@ -119,16 +119,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-identify
-      - block: b2-D7_silence_or_burst
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D7_silence_or_burst
-          stage: identify
-        phrase:
-          dimension: deviation
-          value: D7_silence_or_burst
-      - block: b3-identify-to-closing
+      - block: b2-identify-to-closing
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -138,3 +129,12 @@ metadata:
         phrase:
           dimension: stage_transition
           value: identify-to-closing
+      - block: b3-D7_silence_or_burst
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D7_silence_or_burst
+          stage: closing
+        phrase:
+          dimension: deviation
+          value: D7_silence_or_burst

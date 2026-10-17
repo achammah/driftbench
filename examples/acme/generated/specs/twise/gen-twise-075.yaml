@@ -4,7 +4,7 @@
 id: gen-twise-075
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 75 of 156: Path porting-keep-number of porting: needs > port_number > offer > details > recap > order_placed, D7_silence_or_burst at details"
+title: "t-wise row 75 of 156: Path porting-keep-number of porting: needs > port_number > offer > details > recap > order_placed, D7_silence_or_burst at recap"
 channel: whatsapp
 lang: EN
 tier: generated
@@ -95,13 +95,27 @@ blocks:
         - label: order.create
           count: 0
       lang: EN
-  - id: b4-D7_silence_or_burst
+  - id: b4-details-to-recap
+    when:
+      user: Jo Okafor, jo.okafor@example.com
+    expect:
+      stage: recap
+      stage_reported: true
+      tools:
+        - label: port.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: order.create
+          count: 0
+      lang: EN
+  - id: b5-D7_silence_or_burst
     when:
       injection:
         class: D7_silence_or_burst
         user: hello?
     expect:
-      stage: details
+      stage: recap
       stage_reported: true
       tools:
         - label: port.check
@@ -115,20 +129,6 @@ blocks:
       lang: EN
       criteria:
         - deviation.D7_silence_or_burst
-  - id: b5-details-to-recap
-    when:
-      user: I'm Jo Okafor and my email is jo.okafor@example.com.
-    expect:
-      stage: recap
-      stage_reported: true
-      tools:
-        - label: port.check
-          count: 0
-        - label: catalog.search
-          count: 0
-        - label: order.create
-          count: 0
-      lang: EN
   - id: b6-recap-to-order_placed
     when:
       user: CONFIRM
@@ -217,16 +217,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: offer-to-details
-      - block: b4-D7_silence_or_burst
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D7_silence_or_burst
-          stage: details
-        phrase:
-          dimension: deviation
-          value: D7_silence_or_burst
-      - block: b5-details-to-recap
+      - block: b4-details-to-recap
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -235,6 +226,15 @@ metadata:
         phrase:
           dimension: stage_transition
           value: details-to-recap
+      - block: b5-D7_silence_or_burst
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D7_silence_or_burst
+          stage: recap
+        phrase:
+          dimension: deviation
+          value: D7_silence_or_burst
       - block: b6-recap-to-order_placed
         seeder: twise
         cell:

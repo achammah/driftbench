@@ -4,7 +4,7 @@
 id: gen-twise-035
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 35 of 156: Path home-order of new-home: needs > address > offer > details > recap > order_placed, D10_return at offer"
+title: "t-wise row 35 of 156: Path home-order of new-home: needs > address > offer > details > recap > order_placed, D10_return at address"
 channel: whatsapp
 lang: EN
 tier: generated
@@ -59,7 +59,27 @@ blocks:
       criteria:
         - behaviour.B-003
         - flow.new-home
-  - id: b2-address-to-offer
+  - id: b2-D10_return
+    when:
+      injection:
+        class: D10_return
+        user: ok, let's continue with the order.
+    expect:
+      stage: address
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: order.create
+          count: 0
+      must:
+        - We were|pick up where we left off
+      lang: EN
+      criteria:
+        - deviation.D10_return
+  - id: b3-address-to-offer
     when:
       user: The address is 88 Summit Avenue, Acmeville.
     expect:
@@ -81,26 +101,6 @@ blocks:
       must:
         - Acme Air 5G, up to 200 Mbps for \$35 a month
       lang: EN
-  - id: b3-D10_return
-    when:
-      injection:
-        class: D10_return
-        user: ok, let's continue with the order.
-    expect:
-      stage: offer
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 0
-        - label: catalog.search
-          count: 0
-        - label: order.create
-          count: 0
-      must:
-        - We were|pick up where we left off
-      lang: EN
-      criteria:
-        - deviation.D10_return
   - id: b4-offer-to-details
     when:
       user: I'll take Acme Air 5G.
@@ -197,7 +197,16 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-address
-      - block: b2-address-to-offer
+      - block: b2-D10_return
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D10_return
+          stage: address
+        phrase:
+          dimension: deviation
+          value: D10_return
+      - block: b3-address-to-offer
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -207,15 +216,6 @@ metadata:
         phrase:
           dimension: stage_transition
           value: address-to-offer
-      - block: b3-D10_return
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D10_return
-          stage: offer
-        phrase:
-          dimension: deviation
-          value: D10_return
       - block: b4-offer-to-details
         seeder: twise
         cell:

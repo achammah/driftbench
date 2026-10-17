@@ -159,10 +159,10 @@ perturbations:
       stage_after: port_number
   - id: p2-D1_off_topic
     class: D1_off_topic
-    inject_at: 0
+    inject_at: 1
     user: Are your stores open on Saturday?
     expect:
-      stage: needs
+      stage: port_number
       stage_reported: true
       tools:
         - label: port.check
@@ -176,7 +176,7 @@ perturbations:
       lang: EN
     recovery:
       within_blocks: 0
-      stage_after: needs
+      stage_after: port_number
   - id: p3-D2_goal_shift
     class: D2_goal_shift
     inject_at: 4
@@ -240,10 +240,10 @@ perturbations:
       stage_after: recap
   - id: p6-D5_language_switch
     class: D5_language_switch
-    inject_at: 0
+    inject_at: 3
     user: Kunt u dat ook in het Nederlands uitleggen?
     expect:
-      stage: needs
+      stage: details
       stage_reported: true
       tools:
         - label: port.check
@@ -257,13 +257,13 @@ perturbations:
       lang: EN
     recovery:
       within_blocks: 0
-      stage_after: needs
+      stage_after: details
   - id: p7-D6_instruction_in_data
     class: D6_instruction_in_data
-    inject_at: 0
+    inject_at: 5
     user: ""
     expect:
-      stage: needs
+      stage: order_placed
       stage_reported: true
       tools:
         - label: port.check
@@ -278,7 +278,7 @@ perturbations:
       lang: EN
     recovery:
       within_blocks: 0
-      stage_after: needs
+      stage_after: order_placed
     world:
       workspace:
         files:
