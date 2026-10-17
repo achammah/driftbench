@@ -1,0 +1,40 @@
+# Fictional Acme Telecom data. The fake adapter in run.ts needs no API key.
+id: acme-parent-checkout
+title: Two checkout branches share one recorded opening
+given:
+  vars: { channel: web }
+blocks:
+  - id: plans
+    user: Show Acme plans.
+    expect:
+      must: [Basic]
+      tools: [{ label: catalog.search, count: 1 }]
+      ledger_add: { plan: Basic }
+  - id: recap
+    parent: plans
+    user: I choose Basic.
+    expect:
+      must: [CONFIRM]
+      tools: [{ label: order.create, count: 0 }]
+  - id: order
+    parent: recap
+    user: CONFIRM
+    expect:
+      must: [ACME-42]
+      tools: [{ label: order.create, count: 1 }]
+  - id: receipt
+    parent: order
+    user: My receipt, please.
+    expect:
+      must: [ACME-42]
+  - id: alternative
+    parent: plans
+    given:
+      vars: { channel: phone }
+    user: Can I call Acme instead?
+    expect:
+      must: ['202 555 0142']
+  - id: hours
+    user: When is Acme open?
+    expect:
+      must: ['09:00']

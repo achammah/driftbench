@@ -32,10 +32,10 @@ Usage: `driftbench redteam run <spec> [options]`. Use exactly one of `--model` a
 | `--replay <file>` | JSON RedTeamRecording; default none. Reuses messages AND scores, never fresh grading. |
 | `--record <file>` | Save RedTeamRecording JSON; default none. Parent must exist; existing files are refused. |
 | `--seed <n>` | Nonnegative safe integer for encoding draws; default 0. Does not seed the model. |
-| `--success-score <n\|off>` | Threshold from 0 to 10; default 9. `off` disables breach detection. |
+| `--success-score <n\|off>` | Threshold from 0 to 10; default 9. `off` disables breach detection: the search is then `unscored`. |
 | `--success-confirm-turns <n>` | Positive safe integer consecutive scores at threshold; default 2. |
 | `--encoding-probability <p>` | Number 0 to 1; default 0. Chance of encoding a live message. |
-| `--no-score-responses` | Disable live scoring; default scoring enabled. Threshold detection then has no scores. |
+| `--no-score-responses` | Disable live scoring; default scoring enabled. A live search is then `unscored`; a replay keeps its recorded scores. |
 | `--no-detect-refusals` | Disable the refusal-only scoring shortcut; default enabled. |
 | `--attack-plan <file>` | UTF-8 Crescendo plan; default model-generated. GOAT and replay do not use this input. |
 | `--max-tokens <n>` | Positive safe integer message-token ceiling; default the port limit, 16000 for built-in ports. Does not limit planner or scorer replies. |
@@ -163,14 +163,20 @@ observation, strategy, techniques, parseFailed, score or gradingError, hint and
 scoredBy. The full run also retains target replies and block verdicts.
 
 - `breached`: consecutive scores reached the threshold; `endVerdict: failure`.
-- `resisted`: turns exhausted without threshold; `endVerdict: success`. This is
-  bounded search, not a general safety claim; unscored searches cannot detect a breach.
+- `resisted`: turns exhausted without threshold, every turn scored; `endVerdict: success`.
+  It needs at least `--success-confirm-turns` turns.
+  This is bounded search, not a general safety claim.
+- `unscored`: turns exhausted, but a turn has no score, breach detection is off, or the
+  search has fewer turns than `--success-confirm-turns` (one turn at the defaults).
+  No breach could be detected, so this is never resistance; `endVerdict: inconclusive`.
 - `grading_error`: scoring failed; `endVerdict: inconclusive`, `status: stopped`.
 - `incomplete`: the target or driver failed before a search outcome was produced.
 
 The command exits 0 only for a completed, successful run with every executed
 block passing. Breach, grading error, target/driver failure or failed expectations
-exit 1. Bad options, files, family declarations or unavailable adapters exit 2.
+exit 1. An unscored search exits 3 when no block failed: nothing failed, and
+nothing was measured. JSON then reads `outcome: not_run` and `passed: false`.
+Bad options, files, family declarations or unavailable adapters exit 2.
 A spec rubric without a configured judge stays gating inconclusive.
 
 Replay executes the target again but uses OLD scores and grading errors. It does

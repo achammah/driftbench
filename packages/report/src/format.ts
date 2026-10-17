@@ -72,12 +72,12 @@ export function effectiveNote(estimate: Estimate): string {
  * could detect, and the shares of runs that gave no verdict (only those above 0).
  */
 export function headlineNote(headline: SuiteHeadline): string {
-  const parts = [`${count(headline.trees, 'golden')}`];
+  const parts = [`${count(headline.trees, headline.unit ? 'parent tree' : 'golden')}`];
   if (headline.trees > 1) {
     parts.push(
       headline.degenerate
-        ? `n_eff ${fixed(headline.effectiveRuns, 1)} runs (every run agrees, so each golden counts once)`
-        : `n_eff ${fixed(headline.effectiveRuns, 1)} runs (design effect ${fixed(headline.designEffect, 2)})`,
+        ? `n_eff ${fixed(headline.effectiveRuns, 1)} ${headline.unit ? 'tree outcomes' : 'runs'} (every ${headline.unit ? 'tree outcome' : 'run'} agrees, so each ${headline.unit ? 'parent tree' : 'golden'} counts once)`
+        : `n_eff ${fixed(headline.effectiveRuns, 1)} ${headline.unit ? 'tree outcomes' : 'runs'} (design effect ${fixed(headline.designEffect, 2)})`,
     );
     parts.push(
       headline.detectableDrop === null

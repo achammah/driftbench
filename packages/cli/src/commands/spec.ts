@@ -1,6 +1,7 @@
 import { relative, resolve } from 'node:path';
 import {
   checkSpecLinks,
+  givenIssues,
   type Issue,
   type LoadResult,
   loadSpecs,
@@ -31,12 +32,21 @@ export function registerSpecCommands(program: Command, io: Io, setExit: (code: n
     .option('--json', 'print one JSON document')
     .option('--strict', 'treat warnings as failures')
     .option(
+      '--summaries',
+      'also warn when a workspace folder (world.workspace.from) or a named session state has no summary',
+    )
+    .option(
       '--sections <registries...>',
       'section registries: check that every prompt-section link names a known, non-stale section',
     )
-    .action(async (paths: string[], options: { json?: boolean; strict?: boolean; sections?: string[] }) => {
-      setExit(await lintCommand(paths, options, io));
-    });
+    .action(
+      async (
+        paths: string[],
+        options: { json?: boolean; strict?: boolean; summaries?: boolean; sections?: string[] },
+      ) => {
+        setExit(await lintCommand(paths, options, io));
+      },
+    );
 
   spec
     .command('coverage')
@@ -69,7 +79,7 @@ export async function validateCommand(paths: string[], options: { json?: boolean
 
 export async function lintCommand(
   paths: string[],
-  options: { json?: boolean; strict?: boolean; sections?: string[] },
+  options: { json?: boolean; strict?: boolean; summaries?: boolean; sections?: string[] },
   io: Io,
 ): Promise<number> {
   const registries: SectionRegistry[] = [];
@@ -84,10 +94,27 @@ export async function lintCommand(
     return 2;
   }
   const loaded = await loadSpecs(paths.map((path) => resolve(io.cwd, path)));
+  // The summary warnings are asked for: the loader leaves them out, so the specs that name a state or a folder
+  // without one keep linting clean by default.
+  const summarised = options.summaries
+    ? loaded.map((result) =>
+        result.ok
+          ? {
+              ...result,
+              warnings: [
+                ...result.warnings,
+                ...givenIssues(result.spec, { summaries: true }).filter(
+                  (issue) => issue.code === 'GIVEN_SUMMARY_MISSING',
+                ),
+              ],
+            }
+          : result,
+      )
+    : loaded;
   const results =
     options.sections === undefined
-      ? loaded
-      : loaded.map((result) => withLinkIssues(result, byPrompt.byPrompt));
+      ? summarised
+      : summarised.map((result) => withLinkIssues(result, byPrompt.byPrompt));
   if (options.json) {
     io.out(
       `${JSON.stringify(

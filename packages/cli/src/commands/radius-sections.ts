@@ -25,7 +25,9 @@ export function registerRadiusSections(radius: Command, io: Io, setExit: (code: 
 
   sections
     .command('init')
-    .description('Write a first registry: one global section per markdown heading')
+    .description(
+      'Write a first registry: one global section per CommonMark heading (ATX or setext, none inside a code fence)',
+    )
     .argument('<prompt>', 'the prompt file')
     .requiredOption('--id <prompt-id>', 'the prompt id that links name')
     .requiredOption('--prompt-version <version>', 'the prompt version the registry describes')

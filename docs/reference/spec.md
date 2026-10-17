@@ -38,6 +38,7 @@ The loader rewrites these forms before it validates a spec.
 * [Message](#message)
 * [PrefixToolCall](#prefixtoolcall)
 * [GivenOrigin](#givenorigin)
+* [SharedFact](#sharedfact)
 * [Expect](#expect)
 * [ToolExpect](#toolexpect)
 * [Count](#count)
@@ -149,6 +150,7 @@ Initial conditions set on the whole spec.
 | `ledger` | map of string to any value | no |  | Facts the agent must hold from the start. |
 | `world` | [WorldState](#worldstate) | no |  | The world at the start. |
 | `vars` | map of string to any value | no |  | Runtime variables, such as the clock, the channel or the sender. |
+| `summary` | string, not empty | no |  | What a named state (vars.session_state) holds, in words. spec lint --summaries warns when a named state has none. |
 
 ## WorldState
 
@@ -179,6 +181,8 @@ The files the agent starts from.
 |---|---|---|---|---|
 | `from` | string, not empty | no |  | A folder the workspace starts from. A path written ./<path> is read from the folder of the spec file; any other relative path from the folder the run starts in. |
 | `files` | map of string to string | no |  | Files the workspace starts with: path to content. |
+| `binary` | map of string to string, base64 | no |  | Files the workspace starts with, byte for byte: path to base64 content. For files that are not text, such as the xlsx a parent block left. A path may not be in both files and binary. |
+| `summary` | string, not empty | no |  | What the workspace holds, in words, so a reader of the spec sees it. spec lint --summaries warns when a folder named by from has none. |
 
 ## CriterionDef
 
@@ -227,9 +231,12 @@ A judged criterion. Blocks reference it by name, with @gating when a fail fails 
 
 One block: a stimulus, its initial conditions and its expectations.
 
+A block may name `parent: <block id>` in the same spec. The runner starts it from that parent’s recorded end state, then applies its own Given. Dependencies run first; missing parents and cycles are errors. A failed or unrun parent blocks descendants, which the report lists under the original cause. See [parent blocks](../concepts/given-when-then.md#parent-blocks) and the [Acme example](../../examples/acme/parents/README.md).
+
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `id` | string, not empty | no |  | An id, unique in the spec. |
+| `parent` | string, not empty | no |  | The id of a block in this spec whose recorded end state supplies this block's Given. A failed or unrun parent blocks this block. |
 | `when` | [Stimulus](#stimulus) | yes |  | The stimulus. |
 | `given` | [Given](#given) | no |  | Initial conditions for this block. |
 | `expect` | [Expect](#expect) | no |  | The expected output and state delta. |
@@ -286,6 +293,8 @@ Initial conditions set on one block. A prefix lets the block start without repla
 | `ledger` | map of string to any value | no |  | Facts the agent must hold at this block. They merge into the ledger from here on. |
 | `world` | [WorldState](#worldstate) | no |  | Changes to the world from this block onwards. |
 | `vars` | map of string to any value | no |  | Runtime variables from this block onwards. |
+| `shared` | list of [SharedFact](#sharedfact) | no |  | Where each ledger fact was stated in the prefix: a fact said by the user or the agent must appear in the message it names. |
+| `summary` | string, not empty | no |  | What a named state (vars.session_state) holds from this block onwards, in words. |
 
 ## Message
 
@@ -321,6 +330,16 @@ Used by `blocks[].given.origin`, beside a `prefix`. The origin enters the Given 
 | `authored` | A person wrote the prefix. |
 | `recorded` | The prefix is copied from a real run: its tool calls carry the results the tools really returned. `import traces` writes it. |
 | `canonical` | The prefix is the replay of a spec as it is written, such as a teacher-forced history: the calls the blocks expect, with the results the world forces. |
+
+## SharedFact
+
+Where a ledger fact was stated before the block, checked by spec lint and before the block runs.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `fact` | string, not empty | yes |  | The ledger key of the fact. |
+| `by` | one of `user`, `agent`, `record` | yes |  | Who stated it: user or agent in a prefix message, record when it comes from a system of record and was never said. |
+| `in` | integer, at least 0 | no |  | The index of the prefix message that states it, from 0. Needed for user and agent. |
 
 ## Expect
 

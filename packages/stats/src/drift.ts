@@ -223,18 +223,21 @@ export function ksTest(
     const en = Math.sqrt((m * n) / (m + n));
     return { statistic, pValue: kolmogorovSf(statistic * en), method };
   }
-  // Probability that a uniformly random lattice path from (0, 0) to (m, n) stays strictly inside the band.
-  // u[jj] holds paths-inside / C(ii + jj, ii) at row ii; rows roll over ii.
+  // Probability that a uniformly random lattice path from (0, 0) to (m, n) leaves the band |i n - j m| < gap.
+  // v[jj] holds paths-that-left / C(ii + jj, ii) at row ii; rows roll over ii. The recursion adds positive terms
+  // only (a path reaches (ii, jj) from (ii - 1, jj) with weight ii / (ii + jj), from (ii, jj - 1) with weight
+  // jj / (ii + jj)), so a p-value far below one keeps its relative precision. Taking 1 minus the share that stays
+  // inside loses every digit below 1e-16.
   const inside = (ii: number, jj: number): boolean => Math.abs(ii * n - jj * m) < gap;
-  const u = new Float64Array(n + 1);
-  u[0] = 1;
-  for (let jj = 1; jj <= n; jj += 1) u[jj] = inside(0, jj) ? (u[jj - 1] as number) : 0;
+  const v = new Float64Array(n + 1);
+  v[0] = 0;
+  for (let jj = 1; jj <= n; jj += 1) v[jj] = inside(0, jj) ? (v[jj - 1] as number) : 1;
   for (let ii = 1; ii <= m; ii += 1) {
-    u[0] = inside(ii, 0) ? (u[0] as number) : 0;
+    v[0] = inside(ii, 0) ? (v[0] as number) : 1;
     for (let jj = 1; jj <= n; jj += 1) {
-      u[jj] = inside(ii, jj) ? (ii * (u[jj] as number) + jj * (u[jj - 1] as number)) / (ii + jj) : 0;
+      v[jj] = inside(ii, jj) ? (ii * (v[jj] as number) + jj * (v[jj - 1] as number)) / (ii + jj) : 1;
     }
   }
-  const pValue = Math.min(1, Math.max(0, 1 - (u[n] as number)));
+  const pValue = Math.min(1, Math.max(0, v[n] as number));
   return { statistic, pValue, method };
 }

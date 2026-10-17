@@ -12,6 +12,7 @@ see_also:
   - authoring-spec-format
   - authoring-perturbations
   - running-tool-history
+  - authoring-given-checks
 next:
   - authoring-script-api
 ---
@@ -162,8 +163,19 @@ The topic authoring-import tells the rest of the command.
 | `ledger` | spec or block | mapping | Facts the agent must hold; on a block they merge from that block on. |
 | `world` | spec or block | mapping | `tools`, `store`, `workspace`, `fixtures`, see below. |
 | `vars` | spec or block | mapping | Runtime variables. |
+| `shared` | block only | list of `{ fact, by, in? }` | Where each ledger fact was stated before the block: `by` is `user` or `agent` (said in prefix message `in`, counting from 0) or `record` (known from a system of record, never said). |
+| `summary` | spec or block | string | What a named session state (`vars.session_state`) holds, in words. |
 
 A `prefix` or an `origin` at the top-level `given` is a schema error: only a block takes them. An `origin` on a block that writes no `prefix` is `GIVEN_ORIGIN_WITHOUT_PREFIX`.
+
+The Given verifier checks a prefix before the block runs (topic authoring-spec-check). Its rules:
+
+- every tool call carries an `output` or an `error`;
+- no call id repeats within one message;
+- a call of a tool that `world.tools` forces records that forced result;
+- each `shared` fact said by the user or the agent is in the message it names.
+
+ A block that fails one is `not_run` (kind `given_unmet`), never sent, and `spec lint` warns `GIVEN_UNMET`. Topic authoring-given-checks has every check, the `shared` and `summary` keys and a worked example.
 
 ### A message of the prefix
 
@@ -190,7 +202,7 @@ A `prefix` or an `origin` at the top-level `given` is a schema error: only a blo
 |---|---|---|
 | `tools` | mapping of tool name to `{ result?, error?, latency_ms? }` | Forced results and errors, from this block on. |
 | `store` | mapping | A seeded store. |
-| `workspace` | `{ from?, files? }` | `from`: a folder the workspace starts from; `./<path>` is read from the spec's folder, any other relative path from the folder the run starts in. `files`: path to content. |
+| `workspace` | `{ from?, files?, summary? }` | `from`: a folder the workspace starts from; `./<path>` is read from the spec's folder, any other relative path from the folder the run starts in. `files`: path to content; on an adapter with a sandbox each one must read back as written after setup, else the block is `not_run` (kind `setup_failed`). `summary`: what the workspace holds, in words, so a reader of the spec sees what a folder holds. |
 | `fixtures` | mapping | Free fixtures. |
 
 Top-level shorthands: `ledger_seed` is `given.ledger`, and `workspace_seed` is `given.world.workspace` (a string becomes `{ from: <string> }`). Setting both forms is `SPEC_ALIAS_CONFLICT`.
@@ -283,6 +295,11 @@ blocks:
           tool_calls:
             - label: catalog.search
               input: { category: mobile, customer_email: sam.rivera@example.com }
+              output:
+                plans:
+                  - { id: mobile-m, name: Acme Mobile M, category: mobile, monthly_usd: 25, data_gb: 40 }
+                  - { id: mobile-l, name: Acme Mobile L, category: mobile, monthly_usd: 35, data_gb: null }
+                customer: { id: cust-001, name: Sam Rivera, current_plan_id: mobile-s }
       ledger: { customer_id: cust-001, current_plan: mobile-s }
     user: The unlimited one, please.
     expect:
@@ -292,7 +309,7 @@ blocks:
       must: ['CONFIRM']
 ```
 
-The recorded call has no `output`, so the Acme agent reads the catalog again for that past turn, without recording a new call.
+The recorded call carries its `output`, as the Given verifier requires: the agent replays that result as the real answer of the past turn. A call with no `output` and no `error` would make the block `not_run` (topic authoring-given-checks).
 
 ```sh
 driftbench spec validate out/authoring-prefixes/resume-at-offer.yaml
@@ -301,7 +318,7 @@ driftbench campaign run out/authoring-prefixes/resume-at-offer.yaml --no-cache -
 
 ```text
 $ driftbench spec validate out/authoring-prefixes/resume-at-offer.yaml
-✓ out/authoring-prefixes/resume-at-offer.yaml  resume-at-offer · 1 block · hash bf920fcd867c
+✓ out/authoring-prefixes/resume-at-offer.yaml  resume-at-offer · 1 block · hash c26ca04c43e1
 Checked 1 spec: 1 valid, 0 invalid, 0 warnings.
 (exit 0)
 $ driftbench campaign run out/authoring-prefixes/resume-at-offer.yaml --no-cache --mode T,F
@@ -496,7 +513,14 @@ Problems with no message:
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| a block fails right after a prefix | a recorded `output` with a shape the real tool never returns | copy the output from a real run, or leave `output` out so the agent reads the tool again |
+| `SCHEMA_INVALID_VALUE` on `role` | a role outside the four | `user`, `assistant`, `system` or `tool` |
+| `SCHEMA_INVALID_TYPE` on `content` | an assistant turn with tool calls only and no `content` | write `content: ''` |
+| `SCHEMA_INVALID_TYPE` on `tool_calls.N.label` | a tool call with no name | add `label` |
+| `SCHEMA_UNRECOGNIZED_KEYS` on `given` | `prefix` or `origin` at the top-level `given` | move it to a block's `given` |
+| `GIVEN_ORIGIN_WITHOUT_PREFIX` | `origin` on a block with no `prefix` | add the `prefix` it describes, or remove `origin` |
+| `PREFIX_PROSE_HISTORY` warning | an assistant message states a ledger fact no recorded call holds | record the call with its `output` in `tool_calls`, or keep the prose on purpose and read the results as a different test |
+| a block fails right after a prefix | a recorded `output` with a shape the real tool never returns | copy the output from a real run. Leaving `output` out is no fix: the block is then `not_run` |
+| `GIVEN_UNMET  tool_history_paired` from `spec lint`, and the block is `not_run` | a prefix tool call has no `output` and no `error`: an agent replaying its history would read an empty result the spec never wrote | record what the tool returned in `output` (or `error`) |
 | the block is `not_run`, check `capability` | the adapter has no `seedPrefix` capability (`nexus`, live Claude Code), so the agent could not receive the prefix, or in mode T the canonical history of the blocks before | write the earlier turns as blocks instead, or run on an adapter with `seedPrefix` |
 | the prefix seems ignored on `process` | the agent does not read `DRIFTBENCH_HISTORY_FILE` | read the history from that file in the agent |
 | two repeats of one block both call the agent | each repeat has its own cache key | expected: repeats are independent samples |

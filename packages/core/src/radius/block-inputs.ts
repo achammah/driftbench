@@ -15,6 +15,7 @@ import { specHash } from '../spec/identity';
 
 /** Reconstruct input evidence independently of the stored block stamps. Any unknown input reruns. */
 export function sameBlockInputs(run: RunResult, spec: Spec | undefined): boolean {
+  if (spec?.blocks.some((block) => block.parent !== undefined)) return false;
   if (!spec || specHash(spec) !== run.specHash || !run.provenance || run.mode === 'P') return false;
   const scripted =
     run.provenance.driver.idHash === provenanceHash('scripted') &&

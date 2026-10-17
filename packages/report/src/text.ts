@@ -136,6 +136,11 @@ export function criterionRepeatsText(lines: readonly CriterionRepeat[]): string[
  * method, then what stands behind it (see headlineNote).
  */
 export function headlineText(mode: string, headline: SuiteHeadline): string {
-  const method = headline.method === 'hierarchical' ? 'hierarchical 95% interval' : 'one golden';
+  const method =
+    headline.method === 'hierarchical'
+      ? 'hierarchical 95% interval'
+      : headline.unit
+        ? 'one parent tree'
+        : 'one golden';
   return `Suite pass rate, mode ${mode}: ${pct(headline.estimate)} ${interval(headline, pct)} (${method}); ${headlineNote(headline)}.`;
 }

@@ -1,6 +1,7 @@
 import type { RunMode } from '../schema/run';
 import type { PerturbationSpec, Spec } from '../schema/spec';
 import { isPlainObject } from '../spec/normalize';
+import { parentOrder } from '../spec/parents';
 import { type Change, type ChangeManifest, changeLabel } from './change';
 import { type BlockDependencies, blockDependencies } from './depends';
 import type { SectionRegistry } from './sections';
@@ -323,6 +324,14 @@ export function radiusOf(
       why: whole ? [`whole:${whole.change}`] : reasons(deps[index] as BlockDependencies),
       state: {},
     }));
+    const linked = spec.blocks.some((block) => block.parent !== undefined);
+    const inherited = new Set<number>();
+    const byId = new Map(spec.blocks.map((block, index) => [block.id, index]));
+    for (const index of parentOrder(spec).order) {
+      const parent = spec.blocks[index]?.parent;
+      const at = parent === undefined ? undefined : byId.get(parent);
+      if (at !== undefined && ((blocks[at]?.why.length ?? 0) > 0 || inherited.has(at))) inherited.add(index);
+    }
     const first = blocks.findIndex((block) => block.why.length > 0);
     const cells: RadiusCell[] = [];
     for (const mode of modes) {
@@ -331,17 +340,30 @@ export function radiusOf(
         let until = -1;
         for (const block of blocks) {
           const direct = block.why.length > 0;
-          if (direct && sandbox(spec)) until = Math.max(until, workspaceReset(spec, block.index + 1));
-          block.state.T = direct ? 'direct' : block.index < until ? 'forward' : 'out';
+          if (direct && sandbox(spec) && !linked)
+            until = Math.max(until, workspaceReset(spec, block.index + 1));
+          block.state.T = direct
+            ? 'direct'
+            : inherited.has(block.index) || block.index < until
+              ? 'forward'
+              : 'out';
         }
-        cells.push({ mode, in: first >= 0, why: first >= 0 ? (blocks[first]?.why ?? []) : [] });
+        cells.push({
+          mode,
+          in: first >= 0 || inherited.size > 0,
+          why: first >= 0 ? (blocks[first]?.why ?? []) : [],
+        });
         continue;
       }
       const origin = first >= 0 ? (blocks[first]?.why ?? []) : [];
       if (mode === 'F') {
         for (const block of blocks) {
           block.state.F =
-            block.why.length > 0 ? 'direct' : first >= 0 && block.index > first ? 'forward' : 'out';
+            block.why.length > 0
+              ? 'direct'
+              : inherited.has(block.index) || (!linked && first >= 0 && block.index > first)
+                ? 'forward'
+                : 'out';
         }
         cells.push({ mode, in: first >= 0, why: origin });
         continue;
@@ -362,7 +384,12 @@ export function radiusOf(
       }
       if (list.length === 0) cells.push({ mode, in: first >= 0, why: origin });
       for (const block of blocks) {
-        block.state.P = block.why.length > 0 ? 'direct' : block.index >= start ? 'forward' : 'out';
+        block.state.P =
+          block.why.length > 0
+            ? 'direct'
+            : inherited.has(block.index) || (!linked && block.index >= start)
+              ? 'forward'
+              : 'out';
       }
     }
     return { specId: spec.id, hash, ...(path === undefined ? {} : { path }), blocks, cells };
