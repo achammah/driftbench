@@ -48,6 +48,11 @@ export function fixtureSuite(): Promise<FixtureSuite> {
 
 async function build(): Promise<FixtureSuite> {
   const work = await mkdtemp(join(tmpdir(), 'estate-fixture-suite-'));
+  // The estate beside its map: `estate generate` lists the files of the folder the map's root names, and a read is
+  // expected only of a file the estate holds (docs/estate.md section 5, `needs-existing-file`). Without the estate
+  // beside the map every read counts as a read of a missing file.
+  await cp(join(FIXTURE, 'CLAUDE.md'), join(work, 'CLAUDE.md'));
+  await cp(join(FIXTURE, '.claude'), join(work, '.claude'), { recursive: true });
   for (const name of ['approved.yaml', 'plan.yaml', 'phrases.yaml'])
     await cp(join(FIXTURE, name), join(work, name));
   const approve = cli(['estate', 'plan', 'approve', join(work, 'plan.yaml'), '--all']);

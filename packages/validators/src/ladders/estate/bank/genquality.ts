@@ -785,7 +785,21 @@ export function coverageFamily(): Family {
         if (!map.ok) return { pass: false, detail: 'the map does not load' };
         const atoms = map.map.atoms.filter((atom) => atom.kind === kind);
         if (atoms.length === 0) return { pass: false, detail: `the fixture holds no ${kind} atom` };
+        // docs/estate.md section 5: a Read of a file the estate copy does not hold waits on `needs-existing-file`, so a
+        // reference to a missing file has no complete spec by contract. It is judged by that marker: a spec of it
+        // that waits there, never a complete one that expects the Read.
+        const waiting = new Set(
+          (suite.report.gaps ?? []).find((entry) => entry.marker === 'needs-existing-file')?.atoms ?? [],
+        );
+        const absent = atoms.filter((atom) => kind === 'reference' && atom.fields?.exists === false);
+        const unmarked = absent.filter((atom) => !waiting.has(atom.id));
+        if (unmarked.length > 0)
+          return {
+            pass: false,
+            detail: `${unmarked.length} of ${absent.length} references to a missing file are not marked needs-existing-file, such as ${unmarked[0]?.id}`,
+          };
         const short = atoms
+          .filter((atom) => !absent.includes(atom))
           .map(
             (atom) =>
               [
