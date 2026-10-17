@@ -22,25 +22,38 @@ function underCap(mode: 'eager' | 'disk', factor: number, megabytes: number, out
 }
 
 describe('generation to disk at scale', () => {
-  it('writes the eager files on a map whose deviation classes need a balance', async () => {
-    const seed = 5;
-    const hidden = hiddenSpec(seed);
-    const source = await generateFrom(hidden, renderMap(hidden), seed, {}, { once: true });
-    if (!source.prepared) throw new Error('the fictional map failed to load');
-    const options = { mapPath: '../map.yaml', seed };
-    const eager = generateSuite(source.prepared, options);
-    expect(eager.files.some((file) => file.path.includes('gen-deviation-balance-'))).toBe(true);
-    const directory = await mkdtemp(join(tmpdir(), 'driftbench-stream-balance-'));
-    try {
-      const disk = generateSuiteToDisk(source.prepared, { ...options, outputDir: directory });
-      expect(disk.summary).toEqual(eager.report.summary);
-      expect(disk.fileCount).toBe(eager.files.length);
-      for (const file of eager.files.filter((entry) => entry.path !== REPORT_FILE))
-        expect(await readFile(join(directory, file.path), 'utf8'), file.path).toBe(file.text);
-    } finally {
-      await rm(directory, { recursive: true, force: true });
-    }
-  }, 300_000);
+  it.each([1, 5, 1009])(
+    'writes the eager files on an explicitly imbalanced map, seed %s',
+    async (seed) => {
+      const hidden = hiddenSpec(seed);
+      // Construct the imbalance explicitly. A random map can already be balanced after another
+      // fixture invariant changes; its seed does not promise that the top-up path will run.
+      for (let index = 0; index < 64; index += 1)
+        hidden.phrases.push({
+          dimension: 'deviation',
+          value: 'D1_off_topic',
+          text: `Tell me about unrelated parcel topic ${index + 1}.`,
+          lang: hidden.lang,
+          intent: { kind: 'deviation', class: 'D1_off_topic' },
+        });
+      const source = await generateFrom(hidden, renderMap(hidden), seed, {}, { once: true });
+      if (!source.prepared) throw new Error('the fictional map failed to load');
+      const options = { mapPath: '../map.yaml', seed };
+      const eager = generateSuite(source.prepared, options);
+      expect(eager.files.some((file) => file.path.includes('gen-deviation-balance-'))).toBe(true);
+      const directory = await mkdtemp(join(tmpdir(), 'driftbench-stream-balance-'));
+      try {
+        const disk = generateSuiteToDisk(source.prepared, { ...options, outputDir: directory });
+        expect(disk.summary).toEqual(eager.report.summary);
+        expect(disk.fileCount).toBe(eager.files.length);
+        for (const file of eager.files.filter((entry) => entry.path !== REPORT_FILE))
+          expect(await readFile(join(directory, file.path), 'utf8'), file.path).toBe(file.text);
+      } finally {
+        await rm(directory, { recursive: true, force: true });
+      }
+    },
+    300_000,
+  );
 
   it('writes the eager files, byte for byte, with the restated-slot and phrase specs', async () => {
     const seed = 1;
