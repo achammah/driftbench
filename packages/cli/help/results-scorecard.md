@@ -99,13 +99,26 @@ From top to bottom:
    comparison: paired table, McNemar, Newcombe effect, Wilcoxon on drift, the criteria with
    Benjamini-Hochberg q, new flags, goldens that changed, goldens not paired), Reliability per golden
    (pass^k and pass@k with intervals, unreliability), Criteria across repeats, Blocks and their succession
-   (drift classes, first drift, longest clean), Compounding index (T minus F, in points), Recovery after a
+   (drift classes, first drift, longest clean, and per mode the suite pass rate column), Compounding index (T minus F, in points), Recovery after a
    deviation (immediate, late, never, collateral, safe action, clarified, with Wilson intervals), Spread
    (cell rates, worst and undecided cells, wording ranges, judge flip rate), Variance pilot (with
    `--pilot`), Drilldown (the index of every run shown), and How the numbers are made.
 
 Every interval is two-sided at 95%. The statistics behind them are in `results-statistics`; the drift
 and recovery records in `results-drift-recovery`.
+
+### The suite pass rate and n_eff on the page
+
+The "Suite pass rate, <mode>" tile is the suite headline of that mode: the mean over goldens, its
+hierarchical interval, then a note such as `6 goldens, n_eff 5.0 runs (design effect 2.40), no drop
+detectable at 80% power`. Every golden weighs the same in the mean, whatever its repeats. The same cell is
+the "suite pass rate" column of the mode table in "Blocks and their succession". Quote this number for the
+suite; the "Runs passing" tile pools every run.
+
+A rate over clustered runs, such as "Runs passing" or "Block accuracy", prints `n_eff 5.0 (design effect
+2.40)` beside its interval when its runs disagree. `n_eff` is the independent runs the clustered runs are
+worth; the design effect is the runs divided by `n_eff`. "How the numbers are made" explains each method:
+"Hierarchical" for the suite pass rate, "Wilson on n_eff" for a rate that prints `n_eff`.
 
 ## Worked example
 
@@ -154,5 +167,7 @@ seeded random control. The second report adds the Versions zone and the regresse
 | no "Recovery after a deviation" section | no mode P, or no perturbation sets `recovery` |
 | a pass^k cell shows a range instead of a value, line marked incomplete | some runs did not complete; their outcome is unknown, so the interval covers both ends. `--withhold-incomplete` drops the value |
 | "No interval: one golden" in the compounding total | a bootstrap over one cluster has no width; run more goldens |
+| the suite pass rate tile reads `no interval: one cluster` and `1 golden` | the mode ran one golden: there is no spread between goldens to measure. Run more specs |
+| the suite pass rate is lower than "Runs passing" | the suite rate weighs every golden the same; "Runs passing" weighs every run. A golden with fewer repeats and a different outcome moves them apart |
 | the Runs zone says runs were left out by the run limit | raise `--max-runs` |
 | `--pilot` fails with a message about the pilot report (exit 2) | give the `pilot-report.json` file or the folder that holds it |

@@ -65,7 +65,11 @@ A store holding the campaign.
 * `report --json`: `campaign`, `modes`, `lines` (reliability per golden), `endState`, `tools`, `cost`,
   `compounding`, `recovery` and `recoveryByClass` (with mode P), `drift`, `criterionRepeats`, `spread`,
   `drilldown`, `omittedRuns` and, with options, `compare` (`--baseline`), `pilot` (`--pilot`) and
-  `aggregates` (`--aggregate` or a config).
+  `aggregates` (`--aggregate` or a config). Each entry of `modes` holds `headline`, the suite headline
+  of that mode: `estimate`, `lower`, `upper`, `method` (`hierarchical`, or `none` with one golden),
+  `trees`, `runs`, `pooledRate`, `effectiveRuns`, `designEffect`, `degenerate`, `detectableDrop` (a
+  proportion, or `null`) and `shares` (`incomplete`, `blocked`, `notRun`). A rate with the method
+  `wilson, design effect` carries `designEffect` and `effectiveN`. `results-statistics` reads each one.
 * `compare --json`: `baseline`, `candidate`, `margin`, `alpha`, `q`, `minGoldens`, `strict`,
   `flagFamilies`, `modes`, `pairs`, `unpaired`, `allPass`, `drift`, `criteria`, `newFlags`, `verdict`,
   `reasons`.
