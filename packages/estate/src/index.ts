@@ -1,9 +1,11 @@
 export {
   analyzeGraph,
   buildGraph,
+  citationsByFile,
   declaredLabels,
   type EnforceMethod,
   EVENT_PREFIX,
+  filesReached,
   type Graph,
   type GraphAnalysis,
   labelOf,
@@ -185,6 +187,7 @@ export {
   ignoreRule,
   invariantAtoms,
   isExternal,
+  isUserLayerPath,
   keyLine,
   type Located,
   labelOfLine,
@@ -240,6 +243,7 @@ export {
   type ToolLabels,
   tolerantFields,
   toolBase,
+  USER_LAYER,
 } from './scan';
 export {
   Atom,
