@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { parse } from 'yaml';
 import { type Io, main } from '../src/index';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
@@ -32,12 +33,12 @@ describe('driftbench estate unit on the Northwind suite', () => {
 
     const unrecorded = await run(['estate', 'unit', tests, '--estate', FIXTURE]);
     expect(unrecorded.code).toBe(2);
-    expect(unrecorded.out).toContain('0 of 26 unit tests pass, 0 fail, 0 inert, 26 unrecorded');
+    expect(unrecorded.out).toContain('2 of 29 unit tests pass, 0 fail, 0 inert, 27 unrecorded');
 
     const recorded = await run(['estate', 'unit', tests, '--estate', FIXTURE, '--record']);
     expect(recorded.err).toBe('');
     expect(recorded.code).toBe(0);
-    expect(recorded.out).toContain('Recorded 26 unit tests');
+    expect(recorded.out).toContain('Recorded 29 unit tests');
     const file = join(
       tests,
       'guard_positive/unit.guard_positive.guard.settings.pretooluse-bash-guard-block-force-push.json',
@@ -50,7 +51,7 @@ describe('driftbench estate unit on the Northwind suite', () => {
     expect(again.code).toBe(0);
     const contract = JSON.parse(again.out);
     expect(Object.keys(contract)).toEqual(['runs', 'guards', 'scripts']);
-    expect(contract.runs).toHaveLength(26);
+    expect(contract.runs).toHaveLength(29);
     for (const entry of contract.runs) {
       expect(Object.keys(entry)).toEqual(['spec', 'pass', 'failing']);
       expect([entry.pass, entry.failing]).toEqual([true, []]);
@@ -72,18 +73,21 @@ describe('driftbench estate unit on the Northwind suite', () => {
       message: 'Never run git push --force on any branch.',
       ms: expect.any(Number),
     });
-    // The two scripts declare no fixture: each runs its two minimal fixtures, recorded on the original.
+    // Each script runs the fixtures the estate configuration declares, in their order, and the exit code recorded
+    // on the original is the one the fixture declares (the carrier table lists NWX 123, so that lookup exits 0).
+    const declared = parse(await readFile(join(FIXTURE, 'driftbench.estate.yaml'), 'utf8')) as {
+      scripts: Record<string, { fixtures: Array<{ expect?: { exitCode?: number } }> }>;
+    };
+    const wanted = Object.entries(declared.scripts).flatMap(([script, entry]) =>
+      entry.fixtures.map((fixture) => [script.split('/').pop(), fixture.expect?.exitCode ?? 0]),
+    );
+    expect(wanted.length).toBeGreaterThan(8);
     expect(
       contract.scripts.map((entry: { script: string; exit: number }) => [
         entry.script.split('/').pop(),
         entry.exit,
       ]),
-    ).toEqual([
-      ['reconcile.py', 2],
-      ['reconcile.py', 0],
-      ['track.sh', 2],
-      ['track.sh', 1],
-    ]);
+    ).toEqual(wanted);
 
     const mutant = join(dir, 'mutant');
     const atom = 'guard.settings.pretooluse-bash-guard-block-force-push';

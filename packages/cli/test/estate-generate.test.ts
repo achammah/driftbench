@@ -60,7 +60,7 @@ describe('driftbench estate generate', () => {
     expect(first.err).toBe('');
     expect(first.code).toBe(0);
     expect(first.out).toMatch(/total\s+44\s+44\s+0/);
-    expect(first.out).toContain('Replay: 12 specs aligned to sessions, 10 planned to pass, 2 to fail.');
+    expect(first.out).toContain('Replay: 12 specs aligned to sessions, 9 planned to pass, 3 to fail.');
     const written = await files(out);
     expect(written).toContain('estate-generate-report.json');
     expect(written.filter((path) => path.startsWith('specs/'))).toHaveLength(43);
@@ -123,6 +123,8 @@ describe('driftbench estate generate', () => {
     );
     expect(failing).toEqual({
       'estate.p01.weekly-skill-skipped': ['block 0: skills.weekly-report'],
+      // A rule written in a skill's file is tested with that skill loaded: skipping the skill fails it too.
+      'estate.p03.weekly-skill-skipped': ['block 0: skills.weekly-report'],
       'estate.p02.weekly-gate-violated': ['block 0: custom.ordered.Read.Edit'],
     });
   }
@@ -358,4 +360,43 @@ describe('estate generate with no phrase bank (bench defect D7)', () => {
     expect(named.code).toBe(2);
     expect(named.err).toContain('the phrase bank cannot be read or is invalid');
   }, 120_000);
+});
+
+describe('estate generate on a map copied away from its estate', () => {
+  it('checks reads against the files the map knows, not against the folder the copy sits in', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'estate-generate-away-'));
+    const estate = join(dir, 'estate');
+    await mkdir(join(estate, '.claude/skills/stock-sheet/references'), { recursive: true });
+    await writeFile(
+      join(estate, 'CLAUDE.md'),
+      '# Depot assistant\n\n## Routing\n\n| When the user wants to | Load |\n|---|---|\n| update a stock sheet | `stock-sheet` |\n',
+    );
+    await writeFile(
+      join(estate, '.claude/skills/stock-sheet/SKILL.md'),
+      '---\nname: stock-sheet\ndescription: Update a stock sheet with a new count. Use when the user asks to record a stock count.\n---\n\n1. Read `references/count-rules.md` before you change any sheet.\n2. Write the new count on the sheet.\n',
+    );
+    await writeFile(join(estate, '.claude/skills/stock-sheet/references/count-rules.md'), 'Count twice.\n');
+    expect((await run(['estate', 'scan', estate, '--no-model', '--out', 'map.yaml'], estate)).code).toBe(0);
+    expect((await run(['estate', 'approve', 'map.yaml', '--all'], estate)).code).toBe(0);
+    expect((await run(['estate', 'plan', 'map.yaml', '--out', 'plan.yaml'], estate)).code).toBe(0);
+    expect((await run(['estate', 'plan', 'approve', 'plan.yaml', '--all'], estate)).code).toBe(0);
+    const away = join(dir, 'away');
+    await mkdir(away);
+    // The copy keeps `root: .`, which now names a folder holding the map and the plan only.
+    await copyFile(join(estate, 'map.yaml'), join(away, 'map.yaml'));
+    await copyFile(join(estate, 'plan.yaml'), join(away, 'plan.yaml'));
+    const gaps = async (folder: string) => {
+      const result = await run(
+        ['estate', 'generate', '--map', 'map.yaml', '--plan', 'plan.yaml', '--out', 'gen'],
+        folder,
+      );
+      const report = JSON.parse(await readFile(join(folder, 'gen', 'estate-generate-report.json'), 'utf8'));
+      return { out: result.out, markers: (report.gaps ?? []).map((gap: { marker: string }) => gap.marker) };
+    };
+    const home = await gaps(estate);
+    const copied = await gaps(away);
+    expect(home.markers).not.toContain('needs-existing-file');
+    expect(copied.markers).not.toContain('needs-existing-file');
+    expect(copied.out).toContain('holds none of the files the map was read from');
+  }, 60_000);
 });

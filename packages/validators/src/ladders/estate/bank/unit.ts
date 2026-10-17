@@ -234,7 +234,8 @@ function unitRun(
 
 async function variantOf(work: string, cell: Cell, guard: Guard | undefined): Promise<string> {
   const root = join(work, cell.key);
-  for (const name of ['CLAUDE.md', '.claude'])
+  // The estate's configuration holds the helper executors and the script fixtures the unit runner reads.
+  for (const name of ['CLAUDE.md', '.claude', 'driftbench.estate.yaml'])
     await cp(join(FIXTURE, name), join(root, name), { recursive: true });
   const path = join(root, cell.target);
   const write = async (text: string) => {

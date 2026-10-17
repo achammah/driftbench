@@ -93,6 +93,10 @@ export function visitCoveringArray(
   const tuples = allowedTuples(feasibility, sizes, dimensions, t);
   const uncovered = new Set(tuples.map((tuple) => tupleKey(tuple.dimensions, tuple.values)));
   let rows = 0;
+  // Every t-subset of the dimensions, as dimension ids: the same for every row.
+  const rowSubsets = combinations(dimensions.length, t).map((subset) =>
+    subset.map((index) => dimensions[index] as number),
+  );
   const subsetsWith = (dimension: number, chosen: number[]): number[][] =>
     combinations(chosen.length, t - 1).map((subset) =>
       [...subset.map((index) => chosen[index] as number), dimension].sort((a, b) => a - b),
@@ -111,12 +115,14 @@ export function visitCoveringArray(
     )) {
       let best = -1;
       let bestGain = -1;
+      // The subsets depend on the dimension and the dimensions already chosen, not on the value tried.
+      const subsets = subsetsWith(dimension, chosen);
       for (const value of shuffle(rng, range(sizes[dimension] ?? 0))) {
         row[dimension] = value;
         const pairs = chosen.map((at) => [at, row[at] as number] as const);
         if (!feasibility.allowed([...pairs, [dimension, value]])) continue;
         let gain = 0;
-        for (const subset of subsetsWith(dimension, chosen)) {
+        for (const subset of subsets) {
           if (
             uncovered.has(
               tupleKey(
@@ -137,8 +143,7 @@ export function visitCoveringArray(
       chosen.push(dimension);
     }
     if (chosen.length < dimensions.length) continue;
-    for (const subset of combinations(dimensions.length, t)) {
-      const at = subset.map((index) => dimensions[index] as number);
+    for (const at of rowSubsets) {
       uncovered.delete(
         tupleKey(
           at,

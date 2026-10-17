@@ -1,4 +1,5 @@
 import { DeviationClass } from '@agent-nexus/driftbench-core';
+import { navigationFiles, navigationReference } from '@agent-nexus/driftbench-generate';
 import { DEVIATION_TITLES, NONE, type SpaceDimension, type SpaceMap } from '@agent-nexus/driftbench-space';
 import type { AtomKind, EstateMap } from '../schema';
 
@@ -146,9 +147,17 @@ export function toEstateSpaceMap(map: EstateMap, options: EstateSpaceOptions = {
     ...axis,
     values: axis.values.map((v) => ({ ...v })),
   }));
+  // A reference to an example, a template or a history is a place to look, not a target of a test.
+  const navigation = navigationFiles(map.documents);
   for (const kind of TARGET_KINDS) {
     const values = map.atoms
-      .filter((atom) => atom.kind === kind && atom.role === 'axis' && (!approvedOnly || atom.approved))
+      .filter(
+        (atom) =>
+          atom.kind === kind &&
+          atom.role === 'axis' &&
+          (!approvedOnly || atom.approved) &&
+          !navigationReference(atom, navigation),
+      )
       .map((atom) => ({ id: atom.id, title: atom.title }));
     if (values.length > 0)
       dimensions.push({ id: `atoms.${kind}`, title: `Target ${kind} atoms`, kind: 'behaviour', values });

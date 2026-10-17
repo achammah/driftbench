@@ -14,8 +14,11 @@ export const FIXTURE = join(REPO, 'examples/estates/fixture');
 export const FAKE = join(FIXTURE, 'live/fake/claude.mjs');
 /** The fixture's state library: the operations that plant a session state or an event, for specs that start from one. */
 export const STATES = join(FIXTURE, 'live/states/library.json');
-/** The fixture's stand-in judge: answers pass unless the judge prompt holds its fail phrase, and costs nothing. */
-export const JUDGE = join(FIXTURE, 'live/fake/judge.cjs');
+/**
+ * The fixture's stand-in judge: reads the rule and the agent's actions from the transcript and answers from the rule's
+ * meaning (live/fake/rule-judge.cjs); says null where the data cannot decide. It costs nothing.
+ */
+export const JUDGE = join(FIXTURE, 'live/fake/rule-judge.cjs');
 
 export type SuiteSpec = {
   path: string;
@@ -48,6 +51,11 @@ export function fixtureSuite(): Promise<FixtureSuite> {
 
 async function build(): Promise<FixtureSuite> {
   const work = await mkdtemp(join(tmpdir(), 'estate-fixture-suite-'));
+  // The estate beside its map: `estate generate` lists the files of the folder the map's root names, and a read is
+  // expected only of a file the estate holds (docs/estate.md section 5, `needs-existing-file`). Without the estate
+  // beside the map every read counts as a read of a missing file.
+  await cp(join(FIXTURE, 'CLAUDE.md'), join(work, 'CLAUDE.md'));
+  await cp(join(FIXTURE, '.claude'), join(work, '.claude'), { recursive: true });
   for (const name of ['approved.yaml', 'plan.yaml', 'phrases.yaml'])
     await cp(join(FIXTURE, name), join(work, name));
   const approve = cli(['estate', 'plan', 'approve', join(work, 'plan.yaml'), '--all']);
@@ -154,12 +162,20 @@ async function yamlFiles(folder: string): Promise<string[]> {
 export type FakeVerdict = { pass: boolean; completed: boolean; failing: string[] };
 
 /**
- * Whether a failing verdict of a run comes from a machine check. The stand-in judge answers pass unless its prompt
- * holds its fail phrase, so a judged criterion says nothing about whether the agent kept a rule; a run turns red
- * for a mutant only on a verdict the evidence itself decides.
+ * Whether a failing verdict of a run comes from a machine check, as against a judged criterion.
  */
 export function machineFailure(failing: string): boolean {
   return !/^block \d+: judge\./.test(failing);
+}
+
+/**
+ * Whether a failing verdict of a run is decided by the evidence: a machine check, or a judged criterion the
+ * rule-reading stand-in judge decided from what the agent did (a failure, never an inconclusive verdict). The
+ * stand-in reads the actions and the workspace changes of the run and the rule of the criterion; it names no
+ * phrase, so a judged failure says the agent broke or dropped the rule.
+ */
+export function decidedFailure(failing: string): boolean {
+  return machineFailure(failing) || !/\(inconclusive\)\s*$/.test(failing);
 }
 
 /** Runs specs with the fake runtime on an estate root; the run per spec id. */

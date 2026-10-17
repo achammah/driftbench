@@ -474,6 +474,12 @@ export type MutantVerdict = {
    * its situations and on the asks of the tests that name the atom: no test of any product can tell the two apart. Not counted alive.
    */
   equivalent?: true;
+  /**
+   * The contract gives the atom no complete test: a reference to a file the estate does not hold. A Read of a missing
+   * file waits on `needs-existing-file` (docs/estate.md section 5), so there is no test to kill the mutant with. The
+   * atom is judged by that marker; its mutant is named, not counted alive.
+   */
+  untestable?: true;
   /** Why it lived: no complete test, or the tests that ran and passed. */
   reason?: string;
 };
@@ -536,6 +542,27 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
         continue;
       }
     }
+    if (
+      atom.kind === 'reference' &&
+      atom.fields?.exists === false &&
+      named.length > 0 &&
+      named.every(
+        (verdict) =>
+          !verdict.spec.record.complete &&
+          (estateMeta(verdict.spec).needs ?? []).some((need) => need.marker === 'needs-existing-file'),
+      )
+    ) {
+      out.push({
+        atom: atom.id,
+        kind: atom.kind,
+        tests: named.map((verdict) => verdict.spec.record.id),
+        killed: false,
+        untestable: true,
+        reason:
+          'the estate holds no such file, and a Read of a missing file waits on needs-existing-file: every test naming the atom is incomplete by that marker',
+      });
+      continue;
+    }
     if (hid === undefined || green.length === 0) {
       const markers = [
         ...new Set(
@@ -582,7 +609,7 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
 /** Level 5: every atom deleted from the agent fails one of its tests; the lowest kind score is the value. */
 export async function agentMutantLevel(run: EstateRun): Promise<Measure> {
   // An equivalent mutant is the follower itself: it is neither killed nor alive.
-  const mutants = (await agentMutants(run)).filter((mutant) => !mutant.equivalent);
+  const mutants = (await agentMutants(run)).filter((mutant) => !mutant.equivalent && !mutant.untestable);
   const items: Item[] = [];
   let lowest = 1;
   const kinds = [...new Set(mutants.map((mutant) => mutant.kind))];

@@ -61,7 +61,7 @@ describe('agent mutants (level 5)', { timeout: 120_000 }, () => {
       if (mutant.killed) expect(mutant.reason, mutant.atom).toBeUndefined();
       else
         expect(mutant.reason, mutant.atom).toMatch(
-          /no generated test names the atom|wait for |complete tests ran on the follower|records the same session/,
+          /no generated test names the atom|wait for |complete tests ran on the follower|records the same session|holds no such file/,
         );
     }
     expect(of('script').length).toBeGreaterThan(0);

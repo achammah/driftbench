@@ -47,6 +47,7 @@ export const ESTATE_SEEDER = 'estate';
 export const ESTATE_DEFAULT_SEED = 1;
 /** The custom checks the replay runner registers. */
 export const REPLAY_CUSTOM_CHECKS: readonly string[] = [
+  'absence',
   'grounded_values',
   'guard_finished',
   'guard_message',
@@ -133,8 +134,8 @@ export type EstateGenerateOptions = {
   judge?: boolean;
   /**
    * The files of the estate, relative to its root, as the runtime's reader lists them (what a run copies).
-   * A read is expected only of one of them. Default: the files the map knows (atom files, references and
-   * scripts that exist).
+   * Successful reads are expected only of these files; a missing file gets an attempted-call check.
+   * Default: the files the map knows (atom files, references and scripts that exist).
    */
   files?: readonly string[];
   /**
@@ -154,11 +155,20 @@ export type EstateReport = {
   sessions: { path: string; sessions: number } | null;
   options: { seed: number; checks: string[]; fallback: boolean; judge: boolean };
   summary: { specs: number; blocks: number; complete: number; incomplete: number; judged: number };
-  /** Unit tests (unit/): guards and scripts run directly, with no model; the rows with none, and why. */
+  /** Unit tests (unit/): guards, scripts and helpers run directly, with no model; the rows with none, and why. */
+  /** Every incomplete spec and every missing piece; no joining parallel atom/detail lists. */
+  incomplete: Array<{ spec: string; path: string; row: string; reasons: Gap[] }>;
+  /** Exact equivalent tests retain all source atoms and plan rows in the representative spec. */
+  equivalence: {
+    collapsed: number;
+    groups: Array<{ spec: string; count: number; atoms: string[]; rows: string[] }>;
+  };
+  quality: { completeShare: number; askedTests: number; distinctAsks: number; distinctAsksPer100: number };
   unit: {
     tests: number;
     guards: number;
     scripts: number;
+    helpers: number;
     cases: number;
     /** Catalogue checks: tested through their host hook, or a gap for want of a trigger or a host. */
     checks: { tested: number; needsTrigger: number; needsHost: number };
@@ -218,6 +228,11 @@ export type Context = ThenContext & {
   bank: PhraseBank;
   sessions?: SessionIndex;
   seed: number;
+  owners: ReadonlyMap<string, string>;
+  /** The route atoms that name each unit, for a unit whose description gives no task. */
+  routes: ReadonlyMap<string, readonly EstateAtom[]>;
+  /** The files the map records as navigation only (examples, templates, histories). */
+  navigation: ReadonlySet<string>;
   paths: EstateGenerateOptions['paths'];
   fallback: boolean;
   /** The estate's output rules as patterns no message may match, compiled from its register atoms. */

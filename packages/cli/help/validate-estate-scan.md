@@ -20,10 +20,11 @@ Four commands turn an estate folder into an approved map of atoms, the input of 
 
 * `estate scan <root>` reads the estate. Code reads the structure (skills, helpers, guards, permissions,
   settings keys, the check registry, the step list, references and their "read when" line, scripts,
-  routing tables, gates in four fixed forms, hazard passages and four invariants) and approves those atoms
-  as read. A model splits the prose (the standing file, memory files, skill and helper bodies) into
-  `instruction`, `gate` and `register` atoms, one call per chunk; each quote is located in its file and
-  checked at its span, and an atom whose quote cannot be placed is refused. Model atoms wait for a person.
+  routing tables, read prerequisites (gates, parsed as clauses), hazard passages and four invariants) and
+  approves those atoms as read. A model splits the prose (the standing file, memory files, skill and helper
+  bodies) into `instruction`, `gate` and `register` atoms, one call per chunk; each quote is located in its
+  file and checked at its span, and an atom whose quote cannot be placed is refused. Model atoms wait for a
+  person.
 * `estate lint <map>` checks the estate against its map: orphan files, unreachable files, missing
   references and scripts, the size ceiling, unanchored guards, the check registry, drifted quotes.
 * `estate approve <map>` lists the atoms that wait, or approves them by kind, by atom, or all.

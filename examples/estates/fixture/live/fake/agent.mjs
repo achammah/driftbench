@@ -10,7 +10,8 @@
  * what changes its stream is only what the copy says. No model, no cost, fictional data only.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { isAbsolute, join, matchesGlob, relative, resolve } from 'node:path';
 
 const STOP = new Set(
@@ -62,6 +63,7 @@ function readEstate(cwd) {
         name: folder,
         folder: `.claude/skills/${folder}`,
         description: fields.description ?? '',
+        tools: fields['allowed-tools'],
         body,
       });
     }
@@ -78,6 +80,7 @@ function readEstate(cwd) {
         kind: 'helper',
         name: fields.name,
         description: fields.description,
+        tools: fields.tools,
         body,
       });
     }
@@ -121,7 +124,10 @@ function routingRows(standing, units) {
 /** The unit an ask goes to: the most words shared with a routing row or a description, at least two. */
 function route(ask, estate) {
   const units = [...estate.skills, ...estate.helpers];
-  const asked = words(ask);
+  // The user's naming of a unit ("use the supplier email skill") is not what the ask is about: the route decides by
+  // the work asked for, never by the unit the words name.
+  const named = units.map((unit) => `${unit.name.replace(/[-_]+/g, ' ')}(?:\\s+(?:skill|agent|helper))?`);
+  const asked = words(ask.replace(new RegExp(`\\b(?:${named.join('|')})\\b`, 'gi'), ' '));
   const shared = (text) => [...words(text)].filter((word) => asked.has(word)).length;
   let best;
   let score = 1;
@@ -137,7 +143,23 @@ function route(ask, estate) {
       score = own;
     }
   }
-  return best;
+  if (best) return best;
+  // One shared word is enough when it sits in a routing row of the standing file and only one unit's row has it.
+  const rowHits = units
+    .map((unit) => ({
+      unit,
+      score: Math.max(
+        0,
+        ...routingRows(estate.standing, units)
+          .filter((row) => row.unit === unit)
+          .map((row) => shared(row.ask)),
+      ),
+    }))
+    .filter((hit) => hit.score >= 1)
+    .sort((a, b) => b.score - a.score);
+  return rowHits.length === 1 || (rowHits.length > 1 && rowHits[0].score > rowHits[1].score)
+    ? rowHits[0].unit
+    : undefined;
 }
 
 /** The step list in its order: from the stage no next enters, along the first next; anytime steps last. */
@@ -153,7 +175,15 @@ function walk(steps) {
   }
   for (const step of flow) if (!order.includes(step.id)) order.push(step.id);
   const anytime = steps.filter((step) => step?.anytime && typeof step.id === 'string').map((step) => step.id);
-  return { order, anytime };
+  // A check step can send the flow back to an earlier step: the step list itself says the work may fail there.
+  const checks = new Set(
+    flow
+      .filter((step) =>
+        (step.next ?? []).some((id) => order.indexOf(id) >= 0 && order.indexOf(id) < order.indexOf(step.id)),
+      )
+      .map((step) => step.id),
+  );
+  return { order, anytime, checks };
 }
 
 /** Whether a settings matcher covers a tool, as the runtime reads it: a pattern over the tool name. */
@@ -382,7 +412,7 @@ function prohibitions(estate, unit, cwd, ask) {
  * back to prose order.
  * This small grammar uses backticked paths/commands/helper names, or an unambiguous action description.
  */
-function skillActions(unit, estate, requested, cwd) {
+function skillActions(unit, estate, requested, cwd, ask = '') {
   const statements = statementsOf(unit.body);
   const active = statements.filter(
     (line) => !negative(line) || /\b(before|after|until)\b/i.test(line.replace(/`[^`]*`/g, '')),
@@ -396,7 +426,8 @@ function skillActions(unit, estate, requested, cwd) {
   for (const line of active) {
     for (const match of line.matchAll(/`([^`]+)`/g)) {
       const literal = match[1].trim();
-      if (/^[^\s]+\.(?:md|txt|json|csv)$/.test(literal)) add('Read', literal);
+      // A path with an unfilled placeholder (`reports/<year>-W<week>.md`) names a file to write, not one to read.
+      if (/^[^\s]+\.(?:md|txt|json|csv)$/.test(literal) && !/<[^>]+>/.test(literal)) add('Read', literal);
       else if (/\s/.test(literal) && /\b(run(?:ning)?|execut(?:e|ing))\b/i.test(line)) add('Bash', literal);
       else if (
         estate.helpers.some((helper) => helper.name === literal) &&
@@ -405,6 +436,9 @@ function skillActions(unit, estate, requested, cwd) {
         add('Agent', literal);
     }
   }
+
+  const lookup = scriptLookup(unit, ask, cwd);
+  if (lookup) add('Bash', lookup);
 
   for (const action of requested) {
     // Current-turn file paths name an existing workspace file before falling back to a skill-local file.
@@ -455,14 +489,36 @@ function skillActions(unit, estate, requested, cwd) {
     const found = scores.filter(({ score }) => score === best && score > 0);
     return found.length === 1 ? found.map(({ action }) => action) : [];
   };
+  // Whether a clause names work the unit does: a content word of the clause starts like one of the unit's own words,
+  // so "matching" is the work of a unit that matches.
+  const ownWords = [...words(`${(unit.name ?? '').replace(/[-_]+/g, ' ')} ${unit.description ?? ''}`)];
+  const describesOwnWork = (clause) =>
+    terms(clause).some((word) =>
+      ownWords.some(
+        (own) => Math.min(word.length, own.length) >= 4 && (word.startsWith(own) || own.startsWith(word)),
+      ),
+    );
   let unresolved = false;
   const relate = (before, after) => {
     const quotes = (clause) => /`[^`]+`/.test(clause);
     const predecessors = matchActions(before, quotes(after) ? matchActions(after) : []);
-    const successors = matchActions(after, quotes(before) ? matchActions(before) : []);
+    let successors = matchActions(after, quotes(before) ? matchActions(before) : []);
+    // A later part that describes the unit's own work ("before matching any line", in a unit that matches lines) is not
+    // an action the agent performs: the obligation orders every other action after the earlier part, and holds
+    // vacuously when the unit does none. A later part that describes nothing the unit does stays unresolved, as does
+    // an earlier part that names no action.
+    let vacuous = false;
+    if (predecessors.length && !successors.length && !quotes(after) && describesOwnWork(after)) {
+      successors = actions.filter((action) => action.kind !== 'Read' && !predecessors.includes(action));
+      vacuous = true;
+    }
     // Two described parts that name one action do not order it: the words do not tell the parts apart.
     const same = successors.some((action) => predecessors.includes(action));
-    if (!predecessors.length || !successors.length || (same && !(quotes(before) && quotes(after)))) {
+    if (
+      !predecessors.length ||
+      (!successors.length && !vacuous) ||
+      (same && !(quotes(before) && quotes(after)))
+    ) {
       unresolved = true;
       return;
     }
@@ -520,7 +576,190 @@ function skillActions(unit, estate, requested, cwd) {
     : { actions: ordered };
 }
 
-export function planStream({ ask, cwd, sessionId, env }) {
+/**
+ * The call of a skill's own script that the ask needs. A skill shows its script in an example
+ * (\`./scripts/track.sh NWX 123\`); an ask naming an identifier a workspace table lists is a lookup of that
+ * identifier with it. The call passes the identifier. An instruction "pass the <field> to <script>" adds the value
+ * of that field from the table row of the identifier, at the position the example gives a value of that shape; a
+ * prohibition ("do not pass ...") or no instruction leaves it out. Undefined when the skill shows no script call or
+ * the workspace lists no row for the ask.
+ */
+function scriptLookup(unit, ask, cwd) {
+  const example = /`(\.\/[\w./-]+\.(?:sh|py|js|mjs))((?:\s+\S+)+)`/.exec(unit.body ?? '');
+  if (!example) return undefined;
+  const script = example[1];
+  const base = script.split('/').pop();
+  const ids = ask.match(IDENTIFIER) ?? [];
+  if (ids.length === 0) return undefined;
+  // The table row that lists the identifier: a header line and rows of comma-separated cells.
+  let header;
+  let row;
+  for (const path of workspaceFiles(cwd).filter((file) => file.endsWith('.csv'))) {
+    const lines = (read(join(cwd, path)) ?? '').split('\n').filter(Boolean);
+    const found = lines.slice(1).find((line) => line.split(',').includes(ids[0]));
+    if (found && lines[0]) {
+      header = lines[0].split(',').map((cell) => cell.trim().toLowerCase());
+      row = found.split(',').map((cell) => cell.trim());
+      break;
+    }
+  }
+  if (!row) return undefined;
+  const shape = (value) => value.replace(/[A-Za-z]/g, 'a').replace(/\d/g, '9');
+  const args = [ids[0]];
+  for (const line of statementsOf(unit.body)) {
+    const pass = /\bpass(?:es|ing)?\s+(?:the\s+)?([\w ]+?)\s+to\s+`?(?:[\w./-]*\/)?([\w-]+)/i.exec(line);
+    // A sentence splits at the dot of a file name, so the script is named by its stem.
+    if (!pass || pass[2] !== base.split('.')[0] || negative(line)) continue;
+    const field = words(pass[1] ?? '');
+    const at = header.findIndex((name) => field.has(name));
+    const value = at >= 0 ? row[at] : undefined;
+    if (!value) continue;
+    const exampleArgs = (example[2] ?? '').trim().split(/\s+/);
+    const position = exampleArgs.findIndex(
+      (arg) =>
+        shape(arg).length === shape(value).length && /^[A-Za-z]+$/.test(arg) === /^[A-Za-z]+$/.test(value),
+    );
+    args.splice(position < 0 ? 0 : Math.min(position, args.length), 0, value);
+  }
+  return `${script} ${args.join(' ')}`;
+}
+
+/**
+ * A helper whose body says to sort messages into named folders sorts the messages the ask points at: each message goes
+ * to the folder whose name (singular) it holds most often. One that fits none goes where the body's rule sends it
+ * ("A message that fits none goes to "other""), and is left unsorted when the body has no such rule. One line per
+ * message, "<path>: <folder>".
+ */
+function sortedBy(unit, ask, cwd) {
+  const body = unit.body ?? '';
+  const sort = /\bsort\w*\b[^.\n]*?\binto\b[^:.\n]*?\bfolders?\b[^:.\n]*:\s*([^.\n]+)\./i.exec(body);
+  if (!sort) return { lines: [], removed: [] };
+  const folders = (sort[1] ?? '')
+    .split(/,|\band\b/i)
+    .map((name) => name.trim().toLowerCase())
+    .filter((name) => /^[a-z]+$/.test(name));
+  // The rule for a message that fits no folder holds unless the sentence forbids it.
+  // A sentence wrapped over two lines is one sentence.
+  const unwrapped = body.replace(/\n(?![\n\-*#\d])/g, ' ');
+  const fallback = statementsOf(unwrapped)
+    .filter((line) => !negative(line))
+    .map((line) => /\bfits (?:none|no \w+)\b[^"]*"([^"]+)"/i.exec(line)?.[1])
+    .find(Boolean);
+  // An unconstrained agent clears what it has handled: a sorted message is removed once it is filed, unless the unit
+  // forbids deleting ("never delete one").
+  const forbidsDelete = statementsOf(unwrapped).some((line) =>
+    /\b(?:never|do not|don't|must not)\b[^.]*\b(?:delete|remove)\b/i.test(line),
+  );
+  const folder = (ask.split(/\s+/).find((word) => word.endsWith('/') && word.length > 1) ?? '').replace(
+    /[.,;:!?]+$/,
+    '',
+  );
+  if (!folder || !existsSync(join(cwd, folder))) return { lines: [], removed: [] };
+  const lines = [];
+  const removed = [];
+  for (const path of workspaceFiles(cwd).filter((candidate) => candidate.startsWith(folder))) {
+    const text = (read(join(cwd, path)) ?? '').toLowerCase();
+    let best;
+    let bestCount = 0;
+    for (const name of folders) {
+      const count = text.split(name.replace(/s$/, '')).length - 1;
+      if (count > bestCount) {
+        best = name;
+        bestCount = count;
+      }
+    }
+    const target = best ?? fallback;
+    if (target) {
+      lines.push(`${path}: ${target}`);
+      if (!forbidsDelete) removed.push(path);
+    }
+  }
+  return { lines, removed };
+}
+
+/**
+ * The reply the unit's own output rules shape. "Answer with one JSON object" makes the reply that object and nothing
+ * else; "End with one line per invoice: matched, short or over, and the amount" ends the reply with a line per
+ * identifier of the ask that names the entity: the state is the listed word a tool printed, else the first listed,
+ * and the amount is the first amount a tool printed, else zero. Undefined when the unit states no output rule.
+ */
+function replyOf(unit, ask, outputs) {
+  // An output rule of the unit shapes the reply; a prohibition of the same form ("do not end with ...") does not.
+  const lines = statementsOf((unit?.body ?? '').replace(/\n(?![\n\-*#\d])/g, ' ')).filter(
+    (line) => !negative(line),
+  );
+  const body = lines.join('.\n');
+  if (/\banswer with one json object\b/i.test(body)) return '{"status": "done"}';
+  const rule = /\b(?:end|finish|close) with one line per ([\w-]+):\s*([^.\n]+)/i.exec(body);
+  if (!rule) return undefined;
+  const entity = (rule[1] ?? '').toLowerCase();
+  const words = (rule[2] ?? '')
+    .split(/,|\bor\b/i)
+    .map((word) => word.trim().toLowerCase())
+    .filter((word) => /^[a-z]+$/.test(word));
+  const printed = outputs.join(' ').toLowerCase();
+  const state = words.find((word) => new RegExp(`\\b${word}\\b`).test(printed)) ?? words[0];
+  const amount = /-?\d+(?:[.,]\d+)?\s*[A-Z]{3}\b/.exec(outputs.join(' '))?.[0] ?? '0.00 EUR';
+  const ids = (ask.match(IDENTIFIER) ?? []).filter((id) =>
+    entity.startsWith((id.split('-')[0] ?? '').toLowerCase()),
+  );
+  if (!state || ids.length === 0) return undefined;
+  return ['Done. Here is what I did, in short.', ...ids.map((id) => `${id}: ${state} ${amount}`)].join('\n');
+}
+
+/** Identifiers an ask or a file holds: a prefix, a hyphen and digits (INV-1001, PO-2001). */
+const IDENTIFIER = /\b[A-Za-z]{1,6}-\d{2,}\b/g;
+
+/** The files of the workspace, relative to the working folder; the estate's own folders are not workspace. */
+function workspaceFiles(cwd, folder = '', found = []) {
+  for (const entry of readdirSync(join(cwd, folder), { withFileTypes: true })) {
+    if (['.claude', '.git', 'node_modules', 'CLAUDE.md'].includes(entry.name) && folder === '') continue;
+    const path = folder === '' ? entry.name : `${folder}/${entry.name}`;
+    if (entry.isDirectory()) workspaceFiles(cwd, path, found);
+    else if (entry.isFile() && found.length < 2000) found.push(path);
+  }
+  return found;
+}
+
+/**
+ * Fills the placeholders of a command from the workspace. `<invoice>` becomes the file under an `invoice...` folder
+ * or of an `invoice...` name that holds an identifier of the ask; `<order>` the file of an `order...` kind that holds
+ * an identifier of a file already bound ("its order"). A placeholder no file answers is dropped.
+ */
+function bindPlaceholders(tokens, ask, cwd) {
+  const files = existsSync(cwd) ? workspaceFiles(cwd) : [];
+  const known = new Set(ask.match(IDENTIFIER) ?? []);
+  const out = [];
+  for (const token of tokens) {
+    const holder = /^<([\w-]+)>$/.exec(token);
+    if (!holder) {
+      out.push(token);
+      continue;
+    }
+    const stem = holder[1].toLowerCase();
+    let best;
+    let bestScore = 0;
+    for (const file of files.filter((candidate) =>
+      candidate
+        .toLowerCase()
+        .split('/')
+        .some((part) => part.startsWith(stem)),
+    )) {
+      const text = `${file} ${read(join(cwd, file)) ?? ''}`;
+      const score = [...known].filter((id) => text.includes(id)).length;
+      if (score > bestScore) {
+        best = file;
+        bestScore = score;
+      }
+    }
+    if (!best) continue;
+    out.push(best);
+    for (const id of `${best} ${read(join(cwd, best)) ?? ''}`.match(IDENTIFIER) ?? []) known.add(id);
+  }
+  return out;
+}
+
+export function planStream({ ask, cwd, sessionId, env, compacted = false }) {
   const estate = readEstate(cwd);
   const unit = route(ask, estate);
   const prohibited = prohibitions(estate, unit, cwd, ask);
@@ -542,6 +781,14 @@ export function planStream({ ask, cwd, sessionId, env }) {
     });
 
   /** Runs the hooks of an event for a tool call; true when one blocks it (exit 2 on a PreToolUse). */
+  const transcriptDir = mkdtempSync(join(tmpdir(), 'fake-transcript-'));
+  /** The session so far as the runtime writes it, for the hooks that read it (`transcript_path`). */
+  const transcript = () => {
+    const path = join(transcriptDir, `${sessionId}.jsonl`);
+    const rows = out.filter((row) => (row.type === 'assistant' || row.type === 'user') && row.message);
+    writeFileSync(path, `${rows.map((row) => JSON.stringify(row)).join('\n')}\n`);
+    return path;
+  };
   const hooks = (event, tool, payload) => {
     let block = false;
     for (const group of estate.settings?.hooks?.[event] ?? []) {
@@ -559,7 +806,7 @@ export function planStream({ ask, cwd, sessionId, env }) {
         });
         const ran = spawnSync('/bin/sh', ['-c', hook.command], {
           cwd,
-          input: `${JSON.stringify({ session_id: sessionId, cwd, hook_event_name: event, ...payload })}\n`,
+          input: `${JSON.stringify({ session_id: sessionId, cwd, transcript_path: transcript(), hook_event_name: event, ...payload })}\n`,
           env: { ...env, CLAUDE_PROJECT_DIR: cwd },
           encoding: 'utf8',
           timeout: (hook.timeout ?? 60) * 1000,
@@ -658,7 +905,16 @@ export function planStream({ ask, cwd, sessionId, env }) {
   };
 
   const step = (name) => out.push({ fake: 'step', step: name });
-  const { order, anytime } = walk(estate.steps);
+  const { order, anytime, checks } = walk(estate.steps);
+  // An unconstrained agent finishes as soon as the change is made. A check step is run when the standing file forbids
+  // going on before it has passed ("Never report a task as done before the verify step has passed").
+  const gatedChecks = new Set(
+    statementsOf(estate.standing)
+      .filter((line) => negative(line))
+      .flatMap((line) =>
+        [...checks].filter((id) => new RegExp(`\\bbefore\\b[^.]*\\b${id}\\b`, 'i').test(line)),
+      ),
+  );
 
   hooks('UserPromptSubmit', undefined, { prompt: ask });
   // An ask to explain without acting, or to say what can be done: a reply, nothing else.
@@ -671,25 +927,112 @@ export function planStream({ ask, cwd, sessionId, env }) {
     return { records: out, blocked };
   }
 
+  let helperLines = [];
   if (order[0]) step(order[0]);
+  // Standing instructions that start a session ("Read `x` at the start of every session") are done first.
+  for (const line of statementsOf(estate.standing)) {
+    const start =
+      /\bread\b[^`]*`([^`]+)`[^.]*\bat the start of (?:every|each|a|the|your)\b[^.]*\bsession\b/i.exec(
+        line,
+      ) ??
+      /\bat the start of (?:every|each|a|the|your)\b[^,]*\bsession\b[^`]*\bread\b[^`]*`([^`]+)`/i.exec(line);
+    if (start?.[1] && !negative(line)) {
+      const path = fileTarget(start[1], cwd, '');
+      call('Read', { file_path: path }, () => ({ content: read(path) ?? '' }), start[1]);
+    }
+  }
+  // After a compaction the standing file asks to be read again ("After a compaction, re-read this file ..."):
+  // done first, before the work resumes, and only when the estate says so.
+  if (compacted) {
+    for (const line of statementsOf(estate.standing)) {
+      if (negative(line) || !/\bafter a compaction\b[^.]*\bre-?read\b[^.]*\bthis file\b/i.test(line))
+        continue;
+      const path = fileTarget('CLAUDE.md', cwd, '');
+      call('Read', { file_path: path }, () => ({ content: read(path) ?? '' }), 'CLAUDE.md');
+    }
+  }
   if (unit?.kind === 'skill') {
     call('Skill', { skill: unit.name }, () => ({ content: `Launching skill: ${unit.name}` }));
   } else if (unit?.kind === 'helper') {
-    call('Agent', { subagent_type: unit.name, description: `Brief for ${unit.name}`, prompt: ask }, () => ({
-      content: '{"status": "done"}',
-    }));
+    const sorted = sortedBy(unit, ask, cwd);
+    helperLines = sorted.lines;
+    call('Agent', { subagent_type: unit.name, description: `Brief for ${unit.name}`, prompt: ask }, () => {
+      for (const path of sorted.removed) out.push({ fake: 'delete', path });
+      return { content: helperLines.length > 0 ? helperLines.join('\n') : '{"status": "done"}' };
+    });
+  }
+  // An ask to delete or remove something is done with a command: `rm` of the file it names, or of a file under the
+  // folder it names ("a ledger file"); the estate's own prohibitions and guards stand between the ask and the file.
+  const removal = /\b(?:delete|remove)\b\s+(?:the |a |an |this |that )?([^.,;]*)/i.exec(ask);
+  if (removal && !requestedActions(ask).length) {
+    const phrase = removal[1] ?? '';
+    const token = phrase.split(/\s+/).find((word) => word.includes('/'));
+    const folder = phrase
+      .toLowerCase()
+      .split(/\s+/)
+      .map((word) => word.replace(/[^a-z0-9-]/g, ''))
+      .find((word) => word.length > 2 && `${estate.standing}`.includes(`\`${word}/\``));
+    const file =
+      token ??
+      (folder
+        ? (workspaceFiles(cwd).find((path) => path.startsWith(`${folder}/`)) ?? `${folder}/entry`)
+        : undefined);
+    if (file) {
+      call('Bash', { command: `rm ${file}`, description: 'Remove the file' }, () => {
+        const ran = spawnSync('/bin/sh', ['-c', `rm ${file}`], { cwd, encoding: 'utf8', timeout: 30_000 });
+        return { content: `${ran.stdout ?? ''}${ran.stderr ?? ''}`.trim() || `exit ${ran.status}` };
+      });
+    }
+  }
+  // "Use the <Tool> tool on the files here": one call of that tool on the workspace.
+  const useTool = /\buse the (Bash|Edit|Write|Read|Grep|Glob) tool\b/i.exec(ask)?.[1]?.toLowerCase();
+  // A unit that lists the tools it works with offers no other: a tool it does not list, and the settings do not allow
+  // outright, is not used for its work.
+  const listed = (unit?.tools ?? '')
+    .split(',')
+    .map((entry) => entry.trim().split('(')[0]?.toLowerCase())
+    .filter(Boolean);
+  const outright = (estate.settings?.permissions?.allow ?? []).map((rule) => String(rule).toLowerCase());
+  if (useTool && listed.length > 0 && !listed.includes(useTool) && !outright.includes(useTool)) {
+    text(`The ${useTool} tool is not one this work offers; I did not use it.`);
+  } else if (useTool && !requestedActions(ask).length) {
+    const first = workspaceFiles(cwd).find((path) => !path.startsWith('.claude'));
+    if (useTool === 'bash') {
+      call('Bash', { command: 'ls', description: 'List the files' }, () => {
+        const ran = spawnSync('/bin/sh', ['-c', 'ls'], { cwd, encoding: 'utf8', timeout: 30_000 });
+        return { content: `${ran.stdout ?? ''}${ran.stderr ?? ''}`.trim() || 'exit 0' };
+      });
+    } else if (useTool === 'edit' || useTool === 'write') {
+      editFile(first ?? 'notes.md', '');
+    } else if (useTool === 'read') {
+      const path = first ? fileTarget(first, cwd, '') : undefined;
+      if (path) call('Read', { file_path: path }, () => ({ content: read(path) ?? '' }), first);
+    } else {
+      const pattern = useTool === 'glob' ? '**/*' : '.';
+      call(useTool === 'glob' ? 'Glob' : 'Grep', { pattern }, () => ({
+        content: workspaceFiles(cwd).join('\n') || 'No files found',
+      }));
+    }
   }
   const planUnit = unit?.kind === 'skill' ? unit : { body: '', folder: '' };
   const requested = requestedActions(ask).filter(
     (action) => !(unit?.kind === 'helper' && action.kind === 'Agent' && action.literal === unit.name),
   );
-  const plan = skillActions(planUnit, estate, requested, cwd);
+  const plan = skillActions(planUnit, estate, requested, cwd, ask);
   if (plan.error) {
     text(plan.error);
     hooks('Stop', undefined, { stop_hook_active: false });
     return { records: out, blocked: true };
   }
+  // An action that ran and failed leaves the actions that wait on it undone; the others go on, as an agent that
+  // reports an error does not abandon the rest of its work.
+  const failed = new Set();
+  const outputs = [];
   for (const action of plan.actions) {
+    if ([...action.needs].some((need) => failed.has(need))) {
+      failed.add(action);
+      continue;
+    }
     let result;
     if (action.kind === 'Read') {
       const path = fileTarget(action.literal, cwd, action.folder);
@@ -705,10 +1048,9 @@ export function planStream({ ask, cwd, sessionId, env }) {
         action.literal,
       );
     } else if (action.kind === 'Bash') {
-      // Resolve commands against the skill folder; omit unfilled placeholders as before.
-      const command = action.literal
-        .split(/\s+/)
-        .filter((token) => !/^<.*>$/.test(token))
+      // Resolve commands against the skill folder. A placeholder (`<invoice>`) is filled with the workspace file the
+      // ask points at; one nothing in the workspace answers is left out.
+      const command = bindPlaceholders(action.literal.split(/\s+/), ask, cwd)
         .map((token) => (existsSync(join(cwd, action.folder, token)) ? join(action.folder, token) : token))
         .join(' ');
       result = call(
@@ -733,29 +1075,42 @@ export function planStream({ ask, cwd, sessionId, env }) {
         action.literal,
       );
     }
-    // A denied, missing or failed prerequisite is not satisfied. Never execute its dependent action.
-    if (!result || result.error) {
+    if (result && action.kind === 'Bash') outputs.push(String(result.content));
+    // An action the estate or a guard refuses ends the work. An action that ran and failed is not satisfied: the
+    // actions that wait on it are not executed.
+    if (!result) {
       text('An action could not complete; I stopped before continuing.');
       hooks('Stop', undefined, { stop_hook_active: false });
       return { records: out, blocked: true };
     }
+    if (result.error) failed.add(action);
   }
+  if (failed.size > 0) text('An action could not complete; I went on with what did not depend on it.');
   const rest = order.slice(1);
   if (rest[0]) step(rest[0]);
 
   // Preserve the existing implicit file-edit request only when no explicit action is named.
-  const target = requestedActions(ask).length
-    ? undefined
-    : ask
-        .split(/\s+/)
-        .map((token) => token.replace(/[.,;:!?]+$/, ''))
-        .find((token) => token.includes('/') && !token.startsWith('.claude') && isFile(join(cwd, token)));
+  const changes =
+    /\b(?:add|append|update|fix|change|correct|set|write|edit|rename|replace|insert|remove from)\b/i.test(
+      ask,
+    );
+  const target =
+    requestedActions(ask).length || !changes
+      ? undefined
+      : ask
+          .split(/\s+/)
+          .map((token) => token.replace(/[.,;:!?]+$/, ''))
+          .find((token) => token.includes('/') && !token.startsWith('.claude') && isFile(join(cwd, token)));
   if (target) editFile(target, '');
 
-  for (const name of rest.slice(1)) step(name);
+  // A step allowed at any point happens before the work closes: the closing step is last.
+  for (const name of rest.slice(1, -1)) if (!checks.has(name) || gatedChecks.has(name)) step(name);
   for (const name of anytime) step(name);
+  if (rest.length > 1) step(rest.at(-1));
   text(
-    blocked ? 'A guard blocked part of the work; I stopped there.' : 'Done. Here is what I did, in short.',
+    blocked
+      ? 'A guard blocked part of the work; I stopped there.'
+      : (replyOf(unit, ask, outputs) ?? ['Done. Here is what I did, in short.', ...helperLines].join('\n')),
   );
   hooks('Stop', undefined, { stop_hook_active: false });
   return { records: out, blocked };
