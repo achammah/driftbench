@@ -374,6 +374,81 @@ jobs:
           name: named-${{ matrix.name }}
           path: named-${{ matrix.name }}.log
 
+  bisect-tests:
+    # Measurement only, on train/estate-509-tests. Never merged to main. Cumulative merges onto prose 6943d0147 in landing order.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',bisect-tests,')
+    name: tests on prose ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "prose"
+            merges: ""
+          - name: "+684"
+            merges: "6216ea97db036ddc9ea85f127646e03bbe1fdc17"
+          - name: "+609+628"
+            merges: "6216ea97db036ddc9ea85f127646e03bbe1fdc17 c30739587954a1a82a38a3bdc8ea887efa4f5c1e 0a1be9faeee0bc7eae684f8a21d6a320f965b95d"
+          - name: "+720"
+            merges: "6216ea97db036ddc9ea85f127646e03bbe1fdc17 c30739587954a1a82a38a3bdc8ea887efa4f5c1e 0a1be9faeee0bc7eae684f8a21d6a320f965b95d 0ef819f15c743cb4e14e31cdefe19da0485f7ac4"
+          - name: "+649"
+            merges: "6216ea97db036ddc9ea85f127646e03bbe1fdc17 c30739587954a1a82a38a3bdc8ea887efa4f5c1e 0a1be9faeee0bc7eae684f8a21d6a320f965b95d 0ef819f15c743cb4e14e31cdefe19da0485f7ac4 67aa80fb96e80ea3ecffcb648dd78ab90c68ec34"
+          - name: "+650"
+            merges: "6216ea97db036ddc9ea85f127646e03bbe1fdc17 c30739587954a1a82a38a3bdc8ea887efa4f5c1e 0a1be9faeee0bc7eae684f8a21d6a320f965b95d 0ef819f15c743cb4e14e31cdefe19da0485f7ac4 67aa80fb96e80ea3ecffcb648dd78ab90c68ec34 5021f12b9d97d829bfd9ed7533ee21620e2adf09"
+          - name: "+669"
+            merges: "6216ea97db036ddc9ea85f127646e03bbe1fdc17 c30739587954a1a82a38a3bdc8ea887efa4f5c1e 0a1be9faeee0bc7eae684f8a21d6a320f965b95d 0ef819f15c743cb4e14e31cdefe19da0485f7ac4 67aa80fb96e80ea3ecffcb648dd78ab90c68ec34 5021f12b9d97d829bfd9ed7533ee21620e2adf09 9bba93afbae0b088e1ebf38d45b5c360d207695a"
+          - name: "+640"
+            merges: "6216ea97db036ddc9ea85f127646e03bbe1fdc17 c30739587954a1a82a38a3bdc8ea887efa4f5c1e 0a1be9faeee0bc7eae684f8a21d6a320f965b95d 0ef819f15c743cb4e14e31cdefe19da0485f7ac4 67aa80fb96e80ea3ecffcb648dd78ab90c68ec34 5021f12b9d97d829bfd9ed7533ee21620e2adf09 9bba93afbae0b088e1ebf38d45b5c360d207695a aa58402f165fdfbf9e6161445d12b8e58a0b17f6"
+          - name: "+633"
+            merges: "6216ea97db036ddc9ea85f127646e03bbe1fdc17 c30739587954a1a82a38a3bdc8ea887efa4f5c1e 0a1be9faeee0bc7eae684f8a21d6a320f965b95d 0ef819f15c743cb4e14e31cdefe19da0485f7ac4 67aa80fb96e80ea3ecffcb648dd78ab90c68ec34 5021f12b9d97d829bfd9ed7533ee21620e2adf09 9bba93afbae0b088e1ebf38d45b5c360d207695a aa58402f165fdfbf9e6161445d12b8e58a0b17f6 8d4e11ea850b690b23fcc2c05d7618b2323a9b13"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: 6943d0147e8745f69277ea46191d59a72b23c3fa
+          fetch-depth: 0
+      - name: Merge the listed commits onto prose (docs rows and CHANGELOG on the prose side)
+        shell: bash
+        env:
+          MERGES: ${{ matrix.merges }}
+        run: |
+          git config user.name ci
+          git config user.email ci@users.noreply.github.com
+          git fetch --quiet origin '+refs/heads/*:refs/remotes/origin/*'
+          for c in $MERGES; do
+            if git merge --no-edit "$c"; then echo "merged $c"; continue; fi
+            files=$(git diff --name-only --diff-filter=U)
+            echo "conflicts in: $files"
+            for f in $files; do
+              case "$f" in
+                docs/*.md|CHANGELOG.md|examples/estates/fixture/generated/*) git checkout --ours -- "$f" || git rm -q -f -- "$f"; git add -- "$f" ;;
+                *) echo "::error::code conflict in $f"; exit 1 ;;
+              esac
+            done
+            git commit --no-edit
+            echo "merged $c (docs rows and generated files kept on the earlier side)"
+          done
+          echo "tested $(git rev-parse HEAD)"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - run: pnpm build
+      - name: The tests whose cause is not attributed
+        shell: bash
+        run: |
+          status=0
+          pnpm exec vitest run --maxWorkers=2 packages/validators/test/estate/ladder.test.ts packages/validators/test/estate/read-when-governed.test.ts packages/cli/test/estate-chain.test.ts 2>&1 | tee "bis-${{ strategy.job-index }}.log" || status=$?
+          echo "exit $status" >> "bis-${{ strategy.job-index }}.log"
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bis-${{ strategy.job-index }}
+          path: bis-${{ strategy.job-index }}.log
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
