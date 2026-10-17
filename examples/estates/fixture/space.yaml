@@ -1,6 +1,6 @@
 # The space map of approved.yaml: the situation axes of an estate and its approved axis atoms by kind.
 # Written by driftbench estate map; approve atoms in the estate map and write it again rather than editing this file.
-version: e48ea73788c2
+version: fc6a29aea9f4
 agent: northwind
 dimensions:
   - id: ask_class
