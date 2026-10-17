@@ -69,14 +69,51 @@ describe('the user-level skill layer is a second skill layer', () => {
     expect(skillNames(map)).toEqual(['elsewhere', 'from-cloud', 'real-one']);
   });
 
-  it('does not read a hidden folder such as a trash folder', async () => {
+  it('does not read a hidden folder, at the top of the layer or inside a container', async () => {
     process.env.HOME = await home({
       '.claude/skills/kept/SKILL.md': skill('kept'),
-      '.claude/skills/.trash/binned/SKILL.md': skill('binned'),
-      '.claude/skills/synced/.old/stale/SKILL.md': skill('stale'),
+      '.claude/skills/.archive/binned/SKILL.md': skill('binned'),
+      '.claude/skills/.archive/SKILL.md': skill('archived'),
+      '.claude/skills/synced/.archive/SKILL.md': skill('stale'),
+      '.claude/skills/synced/visible/SKILL.md': skill('visible'),
     });
     const { map } = await scan({ 'CLAUDE.md': '# Standing\n' });
-    expect(skillNames(map)).toEqual(['kept']);
+    expect(skillNames(map)).toEqual(['kept', 'visible']);
+  });
+
+  it('does not read a dependency folder, at the top of the layer or inside a container', async () => {
+    process.env.HOME = await home({
+      '.claude/skills/kept/SKILL.md': skill('kept'),
+      '.claude/skills/node_modules/pkg/SKILL.md': skill('package-skill'),
+      '.claude/skills/node_modules/SKILL.md': skill('package-root'),
+      '.claude/skills/synced/node_modules/SKILL.md': skill('nested-package'),
+      '.claude/skills/synced/visible/SKILL.md': skill('visible'),
+    });
+    const { map, raw } = await scan({ 'CLAUDE.md': '# Standing\n' });
+    expect(skillNames(map)).toEqual(['kept', 'visible']);
+    // The ignore list would drop the files of a dependency folder anyway: the layer must not count it as read.
+    expect([...(raw.userLayer?.read ?? [])].sort()).toEqual(['kept', 'visible']);
+  });
+
+  it.each(['trash', 'Trash'])(
+    'reads a top-level folder named %s that holds a SKILL.md as a skill',
+    async (name) => {
+      process.env.HOME = await home({ [`.claude/skills/${name}/SKILL.md`]: skill('bin-skill') });
+      const { map } = await scan({ 'CLAUDE.md': '# Standing\n' });
+      expect(skillNames(map)).toEqual(['bin-skill']);
+    },
+  );
+
+  it('does not read a folder named Trash or trash as a container, but reads a skill that holds a SKILL.md', async () => {
+    process.env.HOME = await home({
+      '.claude/skills/kept/SKILL.md': skill('kept'),
+      '.claude/skills/Trash/binned/SKILL.md': skill('binned'),
+      '.claude/skills/trash/old/SKILL.md': skill('older'),
+      '.claude/skills/TRASH/gone/SKILL.md': skill('gone'),
+      '.claude/skills/synced/trash/SKILL.md': skill('named-trash'),
+    });
+    const { map } = await scan({ 'CLAUDE.md': '# Standing\n' });
+    expect(skillNames(map)).toEqual(['kept', 'named-trash']);
   });
 
   it('counts a skill once when a link of the layer leads into the project', async () => {
@@ -136,6 +173,13 @@ describe('the user-level skill layer is a second skill layer', () => {
 });
 
 describe('the folder of the user layer is configurable', () => {
+  it.each(['', '   '])(
+    'refuses an empty userSkills option (%j) instead of reading the working folder',
+    (value) => {
+      expect(() => new ClaudeCodeReader({ userSkills: value })).toThrow(/userSkills must name a folder/);
+    },
+  );
+
   it('reads the folder the reader is given instead of the home folder', async () => {
     process.env.HOME = await home({ '.claude/skills/in-home/SKILL.md': skill('in-home') });
     const other = await home({ 'skills/elsewhere/SKILL.md': skill('elsewhere') });
@@ -170,6 +214,30 @@ describe('the folder of the user layer is configurable', () => {
     process.env.HOME = await home({ '.claude/skills/in-home/SKILL.md': skill('in-home') });
     const { map } = await scan({ 'CLAUDE.md': '# Standing\n' });
     expect(map.userSkills).toBe(true);
+  });
+
+  it('reads a relative reader option from the working folder, and a relative configuration folder from the estate', async () => {
+    process.env.HOME = await mkdtemp(join(tmpdir(), 'driftbench-empty-home-'));
+    const work = await home({ 'mine/own-one/SKILL.md': skill('own-one') });
+    const estateOnly = await estate({
+      'driftbench.estate.yaml': 'userSkills: team\n',
+      'team/shared-one/SKILL.md': skill('shared-one'),
+    });
+    const before = process.cwd();
+    process.chdir(work);
+    try {
+      const option = await scanEstate({
+        root: estateOnly,
+        reader: new ClaudeCodeReader({ userSkills: 'mine' }),
+        now: NOW,
+      });
+      expect(skillNames(option.map)).toEqual(['own-one']);
+      // The option wins over the file, and the file's folder is relative to the estate, not to the working folder.
+      const config = await scanEstate({ root: estateOnly, reader: new ClaudeCodeReader(), now: NOW });
+      expect(skillNames(config.map)).toEqual(['shared-one']);
+    } finally {
+      process.chdir(before);
+    }
   });
 
   it('reads the folder the estate configuration names, relative to the estate', async () => {
