@@ -3,6 +3,7 @@ import type { Assertion, Count } from '../schema/common';
 import type { Expect, Spec } from '../schema/spec';
 import { error, type Issue } from './issues';
 import { isPlainObject } from './normalize';
+import { checkParents } from './parents';
 
 const CRITERION_REF = /^([A-Za-z0-9][A-Za-z0-9_.-]*)(@gating)?$/;
 
@@ -93,6 +94,7 @@ export function checkSemantics(spec: Spec): Issue[] {
   });
 
   checkWorkspacePaths(spec.given?.world, 'given.world', issues);
+  issues.push(...checkParents(spec));
 
   const perturbationIds = new Set<string>();
   spec.perturbations?.forEach((perturbation, index) => {

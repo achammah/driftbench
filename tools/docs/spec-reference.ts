@@ -93,6 +93,8 @@ export const VALUE_LINES: Record<string, Record<string, string>> = {
 
 /** Text printed under a section heading, for the sections whose values describe behaviour. */
 const SECTION_NOTES: Record<string, string> = {
+  Block:
+    'A block may name `parent: <block id>` in the same spec. A parent that names no block is the error `PARENT_MISSING`, and a link that leads back to its own block is `PARENT_CYCLE`. A link to a block written later loads.',
   DeviationClass:
     'Used by `when.injection.class` and `perturbations[].class`. Mode P runs them with the perturbing driver, and `driftbench perturb` runs one. See [recovery](../concepts/recovery.md).',
   DriftClass:
@@ -257,7 +259,9 @@ function scalarParts(node: Node): { base: string; rules: string[] } | undefined 
     else if (min === 1) rules.push('not empty');
     else if (min !== undefined) rules.push(`at least ${min} characters`);
     else if (max !== undefined) rules.push(`at most ${max} characters`);
-    if (typeof node.pattern === 'string') rules.push(`matching ${code(node.pattern)}`);
+    // A base64 string is named as such, not by the long pattern that checks it.
+    if (node.contentEncoding === 'base64' || node.format === 'base64') rules.push('base64');
+    else if (typeof node.pattern === 'string') rules.push(`matching ${code(node.pattern)}`);
     return { base: 'string', rules };
   }
   if (node.type === 'integer' || node.type === 'number') {

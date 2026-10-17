@@ -228,9 +228,12 @@ A judged criterion. Blocks reference it by name, with @gating when a fail fails 
 
 One block: a stimulus, its initial conditions and its expectations.
 
+A block may name `parent: <block id>` in the same spec. A parent that names no block is the error `PARENT_MISSING`, and a link that leads back to its own block is `PARENT_CYCLE`. A link to a block written later loads.
+
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `id` | string, not empty | no |  | An id, unique in the spec. |
+| `parent` | string, not empty | no |  | The id of a block in this spec whose recorded end state supplies this block's Given. A failed or unrun parent blocks this block. |
 | `when` | [Stimulus](#stimulus) | yes |  | The stimulus. |
 | `given` | [Given](#given) | no |  | Initial conditions for this block. |
 | `expect` | [Expect](#expect) | no |  | The expected output and state delta. |

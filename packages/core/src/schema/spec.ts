@@ -478,6 +478,13 @@ export type Expect = z.infer<typeof Expect>;
 export const BlockSpec = z
   .strictObject({
     id: z.string().min(1).optional().describe('An id, unique in the spec.'),
+    parent: z
+      .string()
+      .min(1)
+      .optional()
+      .describe(
+        "The id of a block in this spec whose recorded end state supplies this block's Given. A failed or unrun parent blocks this block.",
+      ),
     when: Stimulus.describe('The stimulus.'),
     given: GivenOverride.optional().describe('Initial conditions for this block.'),
     expect: Expect.optional().describe('The expected output and state delta.'),

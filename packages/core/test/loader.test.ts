@@ -194,6 +194,22 @@ const INVALID: Array<{ name: string; text: string; code: string; path?: string }
     path: 'blocks.0.given.world.workspace.binary../a.csv',
   },
   {
+    name: 'parent names no block',
+    text: 'id: x\nblocks:\n  - id: a\n    parent: ghost\n    user: hi\n    expect: { must: ["a"] }\n',
+    code: 'PARENT_MISSING',
+    path: 'blocks.0.parent',
+  },
+  {
+    name: 'block names itself as its parent',
+    text: 'id: x\nblocks:\n  - id: a\n    parent: a\n    user: hi\n    expect: { must: ["a"] }\n',
+    code: 'PARENT_CYCLE',
+  },
+  {
+    name: 'long parent cycle',
+    text: 'id: x\nblocks:\n  - id: a\n    parent: c\n    user: hi\n    expect: { must: ["a"] }\n  - id: b\n    parent: a\n    user: hi\n    expect: { must: ["a"] }\n  - id: c\n    parent: b\n    user: hi\n    expect: { must: ["a"] }\n',
+    code: 'PARENT_CYCLE',
+  },
+  {
     name: 'malformed criterion reference',
     text: 'id: x\nblocks:\n  - user: hi\n    expect: { criteria: ["polite@gate"] }\n',
     code: 'CRITERION_REF_INVALID',
@@ -304,6 +320,12 @@ describe('invalid specs are refused with a named error', () => {
       }
     });
   }
+
+  it('loads a parent link to a block written later, and a chain', () => {
+    const text =
+      'id: x\nblocks:\n  - id: child\n    parent: root\n    user: hi\n    expect: { must: ["a"] }\n  - id: root\n    user: hi\n    expect: { must: ["a"] }\n  - id: leaf\n    parent: child\n    user: hi\n    expect: { must: ["a"] }\n';
+    expect(parseSpecText(text, 'yaml').ok).toBe(true);
+  });
 
   it('does not repeat a normalisation error as a schema error on the same block', () => {
     const result = parseSpecText('id: x\nblocks:\n  - expect: { must: [a] }\n', 'yaml');
