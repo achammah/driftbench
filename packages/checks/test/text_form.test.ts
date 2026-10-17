@@ -101,5 +101,6 @@ describe('finish_reason', () => {
   it('is inconclusive when the runtime reports no reason, and does not gate', async () => {
     const verdicts = await run(finishReason, block('ok', { finish_reason: 'stop' }));
     expect(verdicts.map((v) => v.outcome)).toEqual(['inconclusive']);
+    expect(verdicts.map((v) => v.gating)).toEqual([false]);
   });
 });

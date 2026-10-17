@@ -14,7 +14,9 @@ export const finishReason: Check = {
     const reported = ctx.observed.runtime?.finishReason;
     if (reported === undefined) {
       return [
-        machineVerdict('finish_reason', 'reason', 'inconclusive', 'the runtime reports no finish reason'),
+        machineVerdict('finish_reason', 'reason', 'inconclusive', 'the runtime reports no finish reason', {
+          gating: false,
+        }),
       ];
     }
     return [
