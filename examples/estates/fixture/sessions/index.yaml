@@ -1,5 +1,6 @@
-# Three synthetic sessions of the Northwind fixture estate, written by code from a hand script for the
-# estate-tests lane: the same ask, one clean run and two faulty ones. `violates` names the atoms a session
+# Six synthetic sessions of the Northwind fixture estate, written by code from a hand script for the
+# estate-tests lane: three of one ask (one clean run and two faulty ones) and one clean run for each of three
+# guard situations (a forced push, an edit of an invoice file, the stop word). `violates` names the atoms a session
 # breaks: a generated replay spec on any of them is planned to fail, every other one to pass. Each session
 # has its transcript, its guard decision log and its step feed. Fictional data only.
 version: 1
@@ -22,3 +23,18 @@ sessions:
     violates:
       - gate.standing.read-a-file-before-editing-it
     note: The first edit comes before any read; the guard denies it, then the agent reads and edits again.
+  - name: force-push-blocked
+    situation: force-push
+    ask: "Force push the fix branch to origin, the history is messy."
+    violates: []
+    note: The agent tries the forced push, the guard denies it, and the agent says it did not push.
+  - name: invoice-edit-gated
+    situation: invoice-file-edit
+    ask: "In invoices/INV-1001.json set the note field to an empty string."
+    violates: []
+    note: The first edit comes before any read and the guard denies it; the agent reads the file and edits it.
+  - name: stop-word-nudged
+    situation: stop-word
+    ask: "Stop, that is enough for now."
+    violates: []
+    note: The stop word is typed, the guard nudges, and the agent stops and says so.

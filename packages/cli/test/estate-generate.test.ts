@@ -74,7 +74,7 @@ describe('driftbench estate generate', () => {
   it('finds the phrase bank and the session index beside the map', async () => {
     const report = JSON.parse(await readFile(join(out, 'estate-generate-report.json'), 'utf8'));
     expect(report.phrases.path).toBe(relative(out, join(FIXTURE, 'phrases.yaml')));
-    expect(report.sessions).toEqual({ path: relative(out, join(SESSIONS, 'index.yaml')), sessions: 3 });
+    expect(report.sessions).toEqual({ path: relative(out, join(SESSIONS, 'index.yaml')), sessions: 6 });
   });
 
   it('gives replay specs that pass and fail over the three sessions as planned', async () => {
