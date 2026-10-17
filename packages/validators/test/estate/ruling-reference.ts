@@ -70,26 +70,31 @@ export function permissionReference(requireDecision = true): CustomCheckFunction
               c.label === rule.rule.split('(')[0] &&
               String((c.input as Record<string, unknown>).command).startsWith(prefix),
           );
+          // A call held for the owner, as a headless run holds it, passes; a call that ran needs its grant.
+          const held = (call: (typeof calls)[number]) =>
+            /permission|denied|not allowed/i.test(call.error ?? '');
           const ok =
             calls.length > 0 &&
-            calls.every((call) =>
-              requests.some((request) => {
-                const decision = kept.find(
-                  (r) =>
-                    r.record.subtype === 'permission_decision' &&
-                    r.record.requestId === request.record.requestId &&
-                    r.record.decision === 'allow',
-                );
-                return (
-                  request.record.requestId === call.id &&
-                  request.record.tool === call.label &&
-                  JSON.stringify(request.record.input) === JSON.stringify(call.input) &&
-                  (!requireDecision ||
-                    (decision &&
-                      request.line < decision.line &&
-                      String(decision.record.timestamp) < String(call.startedAt)))
-                );
-              }),
+            calls.every(
+              (call) =>
+                held(call) ||
+                requests.some((request) => {
+                  const decision = kept.find(
+                    (r) =>
+                      r.record.subtype === 'permission_decision' &&
+                      r.record.requestId === request.record.requestId &&
+                      r.record.decision === 'allow',
+                  );
+                  return (
+                    request.record.requestId === call.id &&
+                    request.record.tool === call.label &&
+                    JSON.stringify(request.record.input) === JSON.stringify(call.input) &&
+                    (!requireDecision ||
+                      (decision &&
+                        request.line < decision.line &&
+                        String(decision.record.timestamp) < String(call.startedAt)))
+                  );
+                }),
             );
           return machineVerdict(
             'permission',

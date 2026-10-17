@@ -26,6 +26,43 @@ const rows = (value: unknown): RecordValue[] => (Array.isArray(value) ? value.ma
 const foreign = '__outside_assertion__';
 // A bounded universal witness basis exercises the beginning, interior and end.
 const positions = ['first', 'middle', 'last'] as const;
+
+/** A call the runtime refused for permission, in the words the permission check reads. */
+const refusedForPermission = (c: ToolCall): boolean => /permission|denied|not allowed/i.test(c.error ?? '');
+
+/**
+ * The run turned into the check's other passing path for an ask rule: each held call `match` selects runs, after a
+ * request for it and an allow decision on that request, both kept and stamped before the call.
+ */
+export function grantHeld(o: Observed, match: (c: ToolCall) => boolean): void {
+  const kept = rows(record(o.raw).kept);
+  let line = Math.max(0, ...kept.map((e) => Number(e.line ?? 0))) + 1;
+  for (const c of o.toolCalls.filter(match)) {
+    if (!refusedForPermission(c)) continue;
+    if (kept.some((e) => record(e.record).requestId === c.id)) continue;
+    const start = Date.parse(c.startedAt ?? '');
+    const stamp = (ms: number) =>
+      Number.isNaN(start) ? {} : { timestamp: new Date(start - ms).toISOString() };
+    delete c.error;
+    kept.push(
+      {
+        line: line++,
+        record: {
+          subtype: 'permission_request',
+          requestId: c.id,
+          tool: c.label,
+          input: structuredClone(c.input),
+          ...stamp(2),
+        },
+      },
+      {
+        line: line++,
+        record: { subtype: 'permission_decision', requestId: c.id, decision: 'allow', ...stamp(1) },
+      },
+    );
+  }
+  record(o.raw).kept = kept;
+}
 function atPosition<T>(values: T[], position: (typeof positions)[number]): T | undefined {
   return values[
     position === 'first' ? 0 : position === 'last' ? values.length - 1 : Math.floor(values.length / 2)
@@ -709,19 +746,40 @@ export function completionComponents(spec: Spec): ComponentInventory {
               c.error = 'permission denied';
             });
           else {
+            // The check passes an ask-covered call two ways (docs/estate.md, permission): held for the owner, as a
+            // headless run holds it, or run after a request and an allow decision on it. A held call witnesses
+            // the first: let it run with no grant and the check no longer passes.
+            each('held', (o, c) => {
+              if (refusedForPermission(c)) delete c.error;
+              else
+                record(o.raw).kept = rows(record(o.raw).kept).filter(
+                  (e) => record(e.record).requestId !== c.id,
+                );
+            });
+            // The grant path is witnessed on the same run turned into a granted one (grantHeld).
+            const grant = (o: Observed) => grantHeld(o, match);
+            const eachGranted = (
+              clause: string,
+              edit: (o: Observed, c: ToolCall) => void,
+              extra?: (o: Observed) => void,
+            ) =>
+              each(clause, edit, (o) => {
+                grant(o);
+                extra?.(o);
+              });
             for (const subtype of ['permission_request', 'permission_decision']) {
-              each(`${subtype}.exists`, (o, c) => {
+              eachGranted(`${subtype}.exists`, (o, c) => {
                 record(o.raw).kept = rows(record(o.raw).kept).filter(
                   (e) => !events(o, c, subtype).includes(e),
                 );
               });
               for (const variant of comparisonWitnesses(subtype))
-                each(`${subtype}.selector.${variant.name}`, (o, c) => {
+                eachGranted(`${subtype}.selector.${variant.name}`, (o, c) => {
                   for (const e of events(o, c, subtype)) record(e.record).subtype = variant.value;
                 });
             }
             for (const field of ['tool', 'input', 'requestId'])
-              each(`request.${field}.matches`, (o, c) => {
+              eachGranted(`request.${field}.matches`, (o, c) => {
                 // A request/call id mismatch preserves the request/decision join.
                 // It must not also falsify the separate decision-identity component.
                 if (field === 'requestId')
@@ -741,18 +799,18 @@ export function completionComponents(spec: Spec): ComponentInventory {
                 comparisonWitnesses(value).find((candidate) => candidate.name === variant.name)?.value ??
                 foreign;
               for (const field of ['tool', 'requestId'])
-                each(`request.${field}.identity.${variant.name}`, (o, c) => {
+                eachGranted(`request.${field}.identity.${variant.name}`, (o, c) => {
                   const value = changed(field === 'tool' ? c.label : String(c.id));
                   const requests = events(o, c, 'permission_request');
                   if (field === 'requestId')
                     for (const e of events(o, c, 'permission_decision')) record(e.record).requestId = value;
                   for (const e of requests) record(e.record)[field] = value;
                 });
-              each(`decision.requestId.identity.${variant.name}`, (o, c) => {
+              eachGranted(`decision.requestId.identity.${variant.name}`, (o, c) => {
                 for (const e of events(o, c, 'permission_decision'))
                   record(e.record).requestId = changed(String(c.id));
               });
-              each(
+              eachGranted(
                 `request.input.identity.${variant.name}`,
                 (o, c) => {
                   const map = (value: unknown): unknown =>
@@ -769,23 +827,23 @@ export function completionComponents(spec: Spec): ComponentInventory {
               );
             }
             for (const wrap of ['array', 'object'])
-              each(`request.input.${wrap}`, (o, c) => {
+              eachGranted(`request.input.${wrap}`, (o, c) => {
                 for (const e of events(o, c, 'permission_request'))
                   record(e.record).input = wrap === 'array' ? [c.input] : { fixture: c.input };
               });
-            each('decision.allow', (o, c) => {
+            eachGranted('decision.allow', (o, c) => {
               for (const e of events(o, c, 'permission_decision')) record(e.record).decision = 'deny';
             });
             for (const variant of comparisonWitnesses('allow'))
-              each(`decision.allow.selector.${variant.name}`, (o, c) => {
+              eachGranted(`decision.allow.selector.${variant.name}`, (o, c) => {
                 for (const e of events(o, c, 'permission_decision'))
                   record(e.record).decision = variant.value;
               });
-            each('decision.requestId.matches', (o, c) => {
+            eachGranted('decision.requestId.matches', (o, c) => {
               for (const e of events(o, c, 'permission_decision')) record(e.record).requestId = foreign;
             });
             for (const delta of [0, 1])
-              each(
+              eachGranted(
                 `request.before-decision.${delta}`,
                 (o, c) => {
                   for (const e of events(o, c, 'permission_request'))
@@ -797,7 +855,7 @@ export function completionComponents(spec: Spec): ComponentInventory {
                       e.line = Number(events(o, c, 'permission_decision')[0]?.line ?? 0) - 1;
                 },
               );
-            each('decision.before-call', (o, c) => {
+            eachGranted('decision.before-call', (o, c) => {
               for (const e of events(o, c, 'permission_decision')) record(e.record).timestamp = c.startedAt;
             });
           }

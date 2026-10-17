@@ -1,7 +1,7 @@
 import type { PhraseBank, SessionIndex } from '@agent-nexus/driftbench-generate';
 import type { HiddenEstate, HiddenGuard, HiddenHelper, HiddenSkill } from './hidden';
 import { STANDING, STEPS } from './layout';
-import { fileHid, HELPER_TOOLS, skillTools } from './render';
+import { declaredTools, fileHid, HELPER_TOOLS, skillTools } from './render';
 
 /**
  * The situations of a generated estate: each ask the validator can put to the agent, what the rule follower
@@ -274,17 +274,23 @@ export function situationsOf(estate: HiddenEstate): HiddenSituation[] {
   for (const effect of ['allow', 'ask'] as const) {
     for (const rule of estate.permissions[effect]) toolCases.set(`tool:${effect}:${rule}`, { rule, effect });
   }
+  // A declared tool is exercised in the work of the unit the renderer reads it from (one shared attribution).
+  const declared = declaredTools(estate);
   for (const skill of [...estate.skills].sort((a, b) => (a.topic.skill < b.topic.skill ? -1 : 1))) {
+    const own = declared.get(skill.hid) ?? [];
     for (const rule of skillTools(skill)) {
       const label = rule.split('(')[0] as string;
       const hid = `tool:declared:${label}`;
-      if (!toolCases.has(hid)) toolCases.set(hid, { rule, effect: 'declared', skill: skill.topic.skill });
+      if (own.includes(label) && !toolCases.has(hid))
+        toolCases.set(hid, { rule, effect: 'declared', skill: skill.topic.skill });
     }
   }
   for (const helper of [...estate.helpers].sort((a, b) => (a.topic.name < b.topic.name ? -1 : 1))) {
+    const own = declared.get(helper.hid) ?? [];
     for (const rule of HELPER_TOOLS) {
       const hid = `tool:declared:${rule}`;
-      if (!toolCases.has(hid)) toolCases.set(hid, { rule, effect: 'declared', helper: helper.topic.name });
+      if (own.includes(rule) && !toolCases.has(hid))
+        toolCases.set(hid, { rule, effect: 'declared', helper: helper.topic.name });
     }
   }
   for (const [hid, act] of toolCases) {

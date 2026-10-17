@@ -4,7 +4,7 @@ import { type CustomCheckFunction, ESTATE_CHECKS } from '@agent-nexus/driftbench
 import type { CheckSet } from '@agent-nexus/driftbench-core';
 import { describe, expect, it, vi } from 'vitest';
 import { genCompleteFamily } from '../../src/ladders/estate/bank/loop';
-import { completionComponents } from '../../src/ladders/estate/completion';
+import { completionComponents, grantHeld } from '../../src/ladders/estate/completion';
 import { completionContract } from '../../src/ladders/estate/completion-contract';
 import { follow } from '../../src/ladders/estate/follower';
 import { drawEstate } from '../../src/ladders/estate/hidden';
@@ -261,6 +261,9 @@ describe('the fourteen gen.complete rulings', { timeout: 600_000 }, () => {
         referenceChecks(),
         undefined,
         (observed) => {
+          // The follower's ask call is held, as a headless run holds it; the grant contract is read on the
+          // same run turned granted.
+          grantHeld(observed, () => true);
           const raw = observed.raw as { kept: Array<{ record: Record<string, unknown> }> };
           for (const { record } of raw.kept)
             if (record.subtype === 'permission_decision') {
@@ -316,16 +319,17 @@ describe('the fourteen gen.complete rulings', { timeout: 600_000 }, () => {
     const estate = drawEstate(1);
     const situations = situationsOf(estate);
     const situation = required(situations.find((s) => s.act.type === 'tool' && s.act.effect === 'ask'));
-    const approved = follow(estate, situations, [required(situation.phrases[0])]);
-    expect(approved.transcript).toContain('permission_request');
-    expect(approved.transcript).toContain('permission_decision');
+    // A headless run cannot ask the owner: the call an ask rule covers is denied, never granted.
+    const asked = follow(estate, situations, [required(situation.phrases[0])]);
+    expect(asked.transcript).toContain('permission_denied');
+    expect(asked.transcript).not.toContain('permission_request');
     const changed = structuredClone(estate);
     changed.permissions.ask = [];
     changed.permissions.deny = [];
     const bypassed = follow(changed, situations, [required(situation.phrases[0])]);
-    expect(bypassed.transcript).not.toContain('permission_request');
+    expect(bypassed.transcript).not.toContain('permission_denied');
     expect(bypassed.transcript).toContain('WebFetch');
-    expect(approved.transcript).not.toContain('"WebFetch"');
+    expect(asked.transcript).not.toContain('"WebFetch"');
   });
 });
 

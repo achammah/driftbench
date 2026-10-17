@@ -11,7 +11,9 @@ import type { HiddenSituation } from './situations';
  * obeys every atom of the situation an ask belongs to: it loads the skill the route names, reads each
  * reference (a gate's reference before the edit the gate guards), runs the skill's script, dispatches the
  * helper with the brief fields, reads a file before editing it, walks the step list in order, keeps the
- * output rules in its reply, and the guards it runs into give the verdicts the estate declares.
+ * output rules in its reply, and the guards it runs into give the verdicts the estate declares. A call an ask
+ * rule covers is denied for permission, as in a headless run where no one can answer: the session keeps a
+ * `permission_denied` record and an error result, and the call never runs.
  *
  * A session opens with the init record a runtime writes: the tools it offers, which are its standard tools
  * less every tool a bare deny rule of the settings names (a rule with a pattern, as in `Bash(rm -rf:*)`,
@@ -80,6 +82,17 @@ export function follow(
     return `follower-${String(uuid).padStart(4, '0')}`;
   };
   const denied = estate.permissions.deny.filter((rule) => !rule.includes('(') && !cut(`tool:deny:${rule}`));
+  // A call an ask rule covers needs the owner, and a headless run cannot ask: the runtime denies it. The runtime
+  // enforces the rule, so with it deleted the call is still denied unless an allow rule covers it or the mode
+  // skips approvals; only then does the ask rule's mutant change the session.
+  const runsUnasked = (call: Call) =>
+    estate.permissions.defaultMode === 'bypassPermissions' ||
+    estate.permissions.allow.some((rule) => permissionCovers(rule, call));
+  const deniedFor = (call: Call) => {
+    const asked = estate.permissions.ask.filter((rule) => permissionCovers(rule, call));
+    if (asked.length === 0) return false;
+    return asked.some((rule) => !cut(`tool:ask:${rule}`)) || !runsUnasked(call);
+  };
   records.push({
     parentUuid: null,
     isSidechain: false,
@@ -182,15 +195,6 @@ export function follow(
       }
       call += 1;
       const useId = `toolu_follower_${blockIndex}_${call}`;
-      const permission = estate.permissions.ask.find((rule) => permissionCovers(rule, step.call));
-      if (permission) {
-        record(
-          'system',
-          {},
-          { subtype: 'permission_request', requestId: useId, tool: step.call.label, input: step.call.input },
-        );
-        record('system', {}, { subtype: 'permission_decision', requestId: useId, decision: 'allow' });
-      }
       record('assistant', {
         id: `msg_follower_${blockIndex}_${call}`,
         type: 'message',
@@ -212,7 +216,20 @@ export function follow(
           callAt + 250,
         );
       }
-      if (step.call.label === 'Read' && !step.call.error) reads.add(String(step.call.input.file_path));
+      const done = deniedFor(step.call) ? refused(step.call) : step.call;
+      if (done !== step.call) {
+        record(
+          'system',
+          {},
+          {
+            subtype: 'permission_denied',
+            tool_name: step.call.label,
+            tool_use_id: useId,
+            message: done.result,
+          },
+        );
+      }
+      if (done.label === 'Read' && !done.error) reads.add(String(done.input.file_path));
       record(
         'user',
         {
@@ -221,12 +238,12 @@ export function follow(
             {
               tool_use_id: useId,
               type: 'tool_result',
-              content: step.call.result,
-              ...(step.call.error ? { is_error: true } : {}),
+              content: done.result,
+              ...(done.error ? { is_error: true } : {}),
             },
           ],
         },
-        step.call.structured ? { toolUseResult: step.call.structured } : {},
+        done.structured ? { toolUseResult: done.structured } : {},
       );
     }
     record('assistant', {
@@ -277,6 +294,16 @@ function executeGuard(estate: HiddenEstate, guard: HiddenGuard, payload: Record<
     guardResults.set(key, result);
   }
   return result;
+}
+
+/** A call an ask rule covers, in a run where no one can answer: denied for permission, never run. */
+function refused(call: Call): Call {
+  return {
+    label: call.label,
+    input: call.input,
+    result: `Permission to use ${call.label} has been denied.`,
+    error: true,
+  };
 }
 
 /** Permission patterns use the same documented glob/prefix syntax as the rendered settings. */

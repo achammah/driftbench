@@ -161,6 +161,33 @@ export function skillTools(skill: HiddenSkill): string[] {
 
 export const HELPER_TOOLS = ['Read', 'Grep', 'Glob'] as const;
 
+/**
+ * The tools each skill or helper declares as its own, by the unit's hidden id: a tool's base name is read once,
+ * from the first skill by name whose tools name it, then the first helper by name, and from none when a
+ * permission rule names it bare (`Read`, not `Bash(git status)`).
+ */
+export function declaredTools(estate: HiddenEstate): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  const seen = new Set(
+    (['allow', 'deny', 'ask'] as const).flatMap((effect) =>
+      estate.permissions[effect]
+        .filter((rule) => ruleParts(rule).pattern === undefined)
+        .map((rule) => ruleParts(rule).tool),
+    ),
+  );
+  const declare = (unit: string, tools: readonly string[]) => {
+    for (const name of tools.map((item) => ruleParts(item).tool)) {
+      if (seen.has(name)) continue;
+      seen.add(name);
+      out.set(unit, [...(out.get(unit) ?? []), name]);
+    }
+  };
+  for (const skill of byName(estate.skills, (unit) => unit.topic.skill))
+    declare(skill.hid, skillTools(skill));
+  for (const helper of byName(estate.helpers, (unit) => unit.topic.name)) declare(helper.hid, HELPER_TOOLS);
+  return out;
+}
+
 /** The workspace folder the rule follower works in. */
 export function workFolder(estate: HiddenEstate): string {
   return `/work/${estate.slug}`;
@@ -347,12 +374,10 @@ export function renderEstate(estate: HiddenEstate): Rendered {
   settings.line('}');
 
   // Declared tools: skills first, then helpers, each base once unless a bare permission rule names it.
-  const bare = new Set(toolAtoms.filter((tool) => tool.pattern === undefined).map((tool) => tool.tool));
+  const owned = declaredTools(estate);
   const declaredAt = new Map<string, { file: string; line: number }>();
-  const declare = (names: readonly string[], file: string, line: number) => {
-    for (const name of names.map((item) => ruleParts(item).tool)) {
-      if (bare.has(name)) continue;
-      bare.add(name);
+  const declare = (unit: string, file: string, line: number) => {
+    for (const name of owned.get(unit) ?? []) {
       declaredAt.set(name, { file, line });
       toolAtoms.push({ hid: `tool:declared:${name}`, tool: name, effect: 'declared' });
       atoms.push({ hid: `tool:declared:${name}`, kind: 'tool', file, line, key: name });
@@ -509,7 +534,7 @@ export function renderEstate(estate: HiddenEstate): Rendered {
     }
     write(writer);
     record(writer);
-    declare(skillTools(skill), writer.path, toolsLine);
+    declare(skill.hid, writer.path, toolsLine);
 
     // The files beside the definition.
     if (keep('lookup')) {
@@ -593,7 +618,7 @@ export function renderEstate(estate: HiddenEstate): Rendered {
     });
     write(writer);
     record(writer);
-    declare(HELPER_TOOLS, writer.path, toolsLine);
+    declare(helper.hid, writer.path, toolsLine);
     for (const skill of helper.skills) {
       edges.push({ from: helper.hid, to: `skill:${skill}`, kind: 'allows' });
     }

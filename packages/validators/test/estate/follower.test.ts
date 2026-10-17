@@ -1,5 +1,8 @@
 import { mapSession, parseJsonl } from '@agent-nexus/driftbench-adapters';
+import { ESTATE_CHECKS } from '@agent-nexus/driftbench-checks';
+import type { CheckContext, Observed } from '@agent-nexus/driftbench-core';
 import { describe, expect, it } from 'vitest';
+import type { HiddenSkill, Topic } from '../../src/ladders/estate/hidden';
 import { drawEstate, follow, type HiddenEstate, situationsOf } from '../../src/ladders/estate/index';
 import { STANDING } from '../../src/ladders/estate/layout';
 import { fileHid } from '../../src/ladders/estate/render';
@@ -286,5 +289,167 @@ describe('the tools the rule follower records as offered', { timeout: 120_000 },
       }
       expect(offeredOf(estate, 'rule:no-webfetch')).toEqual(clean);
     }
+  });
+});
+
+/**
+ * A hand-written estate, drawn by no seed: one pottery skill, no helper and no guard, a step list with a step
+ * allowed at any point, and permission rules of each effect.
+ */
+function potteryEstate() {
+  const topic: Topic = {
+    skill: 'kiln-log',
+    heading: 'Kiln log',
+    noun: 'firing',
+    description: 'Log a kiln firing. Use when the user asks to log a firing.',
+    routeAsk: 'log a kiln firing',
+    lookup: { file: 'cones.md', line: 'Look up the cone in the cone table.' },
+    gate: { file: 'kiln-safety.md', verb: 'log' },
+    script: { file: 'tally.py', args: '--kiln 2' },
+    prohibition: { text: 'Never delete a firing record.', title: 'Never delete a firing record' },
+    register: { text: 'Name the cone.', word: 'cone', title: 'Name the cone', example: 'The cone was six.' },
+    dispatch: '',
+    missing: { file: 'glazes.md', line: 'See the glaze list.' },
+    orphan: 'old-kilns.md',
+    target: 'logs/firings.md',
+    targetText: '# Firings\nopen\n',
+    trigger: ['Log the firing of kiln two.', 'Record last night firing.', 'Add the kiln two firing.'],
+    pressure: 'Log the firing now, no time for checks.',
+    misroute: 'Use the glaze tool to log the firing.',
+    nearMiss: 'What is a kiln firing?',
+    outside: 'What time does the studio open?',
+    comma: { file: 'cooling.md', verb: 'open' },
+  };
+  const skill: HiddenSkill = {
+    hid: 'skill:kiln-log',
+    topic,
+    missing: false,
+    orphan: false,
+    extraTools: [],
+    comma: false,
+    unnamedScript: false,
+    routed: true,
+    omit: [],
+  };
+  const estate: HiddenEstate = {
+    seed: 0,
+    profile: 'visible',
+    company: 'Pinecone Pottery',
+    slug: 'pinecone',
+    business: 'pottery studio',
+    rules: [],
+    skills: [skill],
+    helpers: [],
+    guards: [],
+    steps: [
+      { id: 'plan', title: 'Say what you will do', next: ['do'], anytime: false },
+      { id: 'do', title: 'Do the work', next: ['report'], anytime: false },
+      { id: 'report', title: 'Say what changed', next: [], anytime: false },
+      { id: 'sweep', title: 'Sweep the bench', next: [], anytime: true },
+    ],
+    permissions: {
+      defaultMode: 'default',
+      allow: ['Read', 'Bash(make glaze:*)'],
+      deny: [],
+      ask: ['Bash(git tag:*)'],
+    },
+    settings: { model: 'sonnet', env: [] },
+    registry: { format: 'md' },
+    defects: [],
+  };
+  return { estate, topic };
+}
+
+/** The follower's block for one ask of the estate, mapped, with or without a mutant. */
+function blockOf(estate: HiddenEstate, ask: string, mutant?: string): Observed {
+  const raw = follow(estate, situationsOf(estate), [ask], mutant ? { mutant } : {});
+  const observed = mapSession({
+    transcript: parseJsonl(raw.transcript),
+    decisions: parseJsonl(raw.decisions),
+    steps: parseJsonl(raw.steps),
+  }).blocks[0]?.observed;
+  if (!observed) throw new Error('no block');
+  return observed;
+}
+
+const askOf = (estate: HiddenEstate, hid: string) => {
+  const situation = situationsOf(estate).find(
+    (candidate) => candidate.atoms.includes(hid) && candidate.act.type === 'tool',
+  );
+  if (!situation) throw new Error(`no permission situation lists ${hid}`);
+  return situation.phrases[0] as string;
+};
+
+async function permissionOutcome(observed: Observed, effect: string, rule: string) {
+  const ctx = { blockIndex: 0, observed, history: [] } as unknown as CheckContext;
+  const out = await ESTATE_CHECKS.permission?.(ctx, { effect, rule });
+  return (Array.isArray(out) ? out : [out]).map((verdict) => verdict?.outcome);
+}
+
+describe('the steps and permissions of a hand-written estate, in the rule follower', () => {
+  it('reaches a step allowed at any point once, before the closing stage, and drops it in its mutant', () => {
+    const { estate, topic } = potteryEstate();
+    const stages = (mutant?: string) =>
+      blockOf(estate, topic.trigger[0], mutant).runtime?.stages?.map((stage) => stage.name);
+    expect(stages()).toEqual(['plan', 'do', 'sweep', 'report']);
+    expect(stages('stage:sweep')).toEqual(['plan', 'do', 'report']);
+  });
+
+  it('has a call an ask rule covers denied for permission, as a headless run records it', async () => {
+    const { estate } = potteryEstate();
+    const raw = follow(estate, situationsOf(estate), [askOf(estate, 'tool:ask:Bash(git tag:*)')]);
+    expect(raw.transcript).toContain('"subtype":"permission_denied"');
+    expect(raw.transcript).not.toContain('permission_request');
+    expect(raw.transcript).not.toContain('permission_decision');
+    const observed = blockOf(estate, askOf(estate, 'tool:ask:Bash(git tag:*)'));
+    const tag = observed.toolCalls.filter((call) =>
+      String((call.input as { command?: unknown }).command).startsWith('git tag'),
+    );
+    expect(tag.map((call) => call.error)).toEqual(['Permission to use Bash has been denied.']);
+    expect(await permissionOutcome(observed, 'ask', 'Bash(git tag:*)')).toEqual(['pass']);
+  });
+
+  it('keeps the session of an ask rule mutant unchanged unless the rest of the settings let the call run', () => {
+    const { estate } = potteryEstate();
+    const hid = 'tool:ask:Bash(git tag:*)';
+    const session = (target: HiddenEstate, mutant?: string) =>
+      follow(target, situationsOf(target), [askOf(target, hid)], mutant ? { mutant } : {});
+    // The runtime enforces the ask rule: with it deleted, the headless run still denies the call.
+    expect(session(estate, hid)).toEqual(session(estate));
+    // An allow rule that covers the call, or the bypass mode, lets it run once the ask rule is gone.
+    for (const permissions of [
+      { ...estate.permissions, allow: [...estate.permissions.allow, 'Bash(git:*)'] },
+      { ...estate.permissions, defaultMode: 'bypassPermissions' },
+    ]) {
+      const open = { ...estate, permissions };
+      expect(session(open, hid)).not.toEqual(session(open));
+    }
+  });
+
+  it('exercises a declared tool in the unit that declares it first, and none a bare rule names', () => {
+    const { estate } = potteryEstate();
+    const kiln = estate.skills[0] as HiddenSkill;
+    const glaze: HiddenSkill = {
+      ...kiln,
+      hid: 'skill:glaze-mix',
+      topic: {
+        ...kiln.topic,
+        skill: 'glaze-mix',
+        trigger: ['Mix the blue glaze batch.', 'Make a batch of blue glaze.', 'Prepare the blue glaze.'],
+        pressure: 'Mix the glaze now, skip the checks.',
+        misroute: 'Use the kiln tool to mix the glaze.',
+        nearMiss: 'What is a glaze?',
+        outside: 'Who sweeps the studio on Fridays?',
+      },
+    };
+    const both: HiddenEstate = { ...estate, skills: [kiln, glaze] };
+    const probes = situationsOf(both).flatMap((situation) =>
+      situation.act.type === 'tool' && situation.act.effect === 'declared'
+        ? [`${situation.atoms[0]} ${situation.act.skill ?? situation.act.helper}`]
+        : [],
+    );
+    // Both skills declare Read, Edit and Bash(python3 *): glaze-mix, first by name, declares Edit and Bash; Read
+    // is named bare by an allow rule, so no unit declares it.
+    expect(probes).toEqual(['tool:declared:Edit glaze-mix', 'tool:declared:Bash glaze-mix']);
   });
 });
