@@ -1,0 +1,10 @@
+kind: check-set
+id: acme
+description: The Acme tone check, from the test plugin.
+items:
+  - id: tone
+    title: Replies keep the Acme tone
+    when: { tone_score: { below: 0.4 } }
+    effect: { gating: false }
+    params: { tone: warm }
+    impl: plugin:acme-tone

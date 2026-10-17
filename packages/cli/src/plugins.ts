@@ -1,18 +1,28 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CustomCheckFunction } from '@agent-nexus/driftbench-checks';
-import type { AgentAdapter, Embedder, TargetRef } from '@agent-nexus/driftbench-core';
+import type {
+  AgentAdapter,
+  Embedder,
+  ImplDef,
+  KindDef,
+  ObjectRegistry,
+  TargetRef,
+} from '@agent-nexus/driftbench-core';
 import type { JudgeClient } from '@agent-nexus/driftbench-judges';
 import type { Io } from './io';
 
 /**
  * Plugins: modules of the team's own code that the CLI loads before it runs a command. A plugin registers
  * adapters (so a target such as `http:my-bot` reaches the team's agent), custom checks (the names a spec
- * lists under `rules.custom`), pairwise judges (the names `compare --pairwise-judge` takes) and embedders
- * (the names `--embedder` takes).
+ * lists under `rules.custom`), pairwise judges (the names `compare --pairwise-judge` takes), embedders
+ * (the names `--embedder` takes), and the parts of the rules framework: object kinds, rule and diagnostic
+ * step implementations (named `plugin:<name>` by an item), evidence names, prompt templates, and objects of
+ * its own, which users reference by id. A plugin never replaces what driftbench ships or another plugin
+ * registered: to change a shipped object, a plugin ships an object that extends it.
  *
  * The CLI loads a plugin from two places only: the `plugins` list of the project config (`driftbench.yaml`
  * in the working folder, or the file `--config` names) and the `--plugin <module>` flag. It never loads one
@@ -43,6 +53,42 @@ export type PluginApi = {
   pairwiseJudge(name: string, factory: () => JudgeClient): void;
   /** An embedder the similarity check scores with when a run passes `--embedder <name>`. */
   embedder(name: string, factory: () => Embedder | Promise<Embedder>): void;
+  /** A new object kind, such as `policy/routing`. A kind driftbench or another plugin has is refused. */
+  kind(name: string, def: PluginKind): void;
+  /** The implementation of a rule of `kind`, which an item names as `plugin:<name>`. */
+  rule(kind: string, name: string, impl: PluginImpl): void;
+  /** A new evidence name a rule of `kind` may read in its `when`, and the function that computes it. */
+  evidence(kind: string, name: string, compute: PluginFunction): void;
+  /** A step a diagnostic object's `steps` may name as `plugin:<name>`. */
+  diagnosticStep(name: string, step: PluginFunction | PluginImpl): void;
+  /** A prompt template with its named parts and the parser of its answers, referenced by its id. */
+  promptTemplate(id: string, parts: Readonly<Record<string, string>>, contract: PluginFunction): void;
+  /** An object file of the plugin's own, read from a path relative to the plugin's folder. */
+  object(path: string): void;
+};
+
+/** A function a plugin gives the framework: an implementation, an evidence computation, a parser. */
+// biome-ignore lint/suspicious/noExplicitAny: the framework calls it with arguments of the kind's choosing.
+export type PluginFunction = (...args: any[]) => unknown;
+
+/** An implementation: the schema its item's params must pass (zod's, or one with `safeParse`), and its code. */
+export type PluginImpl = { params?: ImplDef['params']; run: PluginFunction; summary?: string };
+
+/** A new object kind: one line for listings, whether a change reruns the agent, and its own top-level fields. */
+export type PluginKind = {
+  summary: string;
+  agentFacing?: boolean;
+  itemsKey?: string;
+  fields?: KindDef['fields'];
+};
+
+/** A prompt template a plugin registered: its parts, its parser and the fingerprint of its parts. */
+export type PluginPromptTemplate = {
+  id: string;
+  parts: Readonly<Record<string, string>>;
+  contract: PluginFunction;
+  fingerprint: string;
+  owner: string;
 };
 
 /** A plugin: a function that registers adapters, checks and judges. A plugin module exports it as default. */
@@ -69,6 +115,26 @@ let checkRegistry:
 /** The checks the plugins of this run added to that registry, each with the plugin that added it. */
 let checks = new Map<string, string>();
 
+/** One registration a plugin made with the rules framework, applied once the plugin function returns. */
+type ObjectRegistration =
+  | { what: 'kind'; name: string; def: PluginKind }
+  | { what: 'impl'; kind: string; name: string; impl: PluginImpl; label: 'rule' | 'diagnostic step' }
+  | { what: 'kind-check'; kind: string; label: string }
+  | { what: 'object'; path: string };
+
+/** The framework registrations of the plugin running now, in call order. */
+let pendingObjects: ObjectRegistration[] = [];
+/** The owner of every framework name the plugins of this run registered: `kind:<name>`, `plugin:<name>`, ... */
+let objectOwners = new Map<string, string>();
+/** The evidence names the plugins of this run added, by `<kind> <name>`. */
+let evidence = new Map<string, { compute: PluginFunction; owner: string }>();
+/** The prompt templates the plugins of this run added, by id. */
+let templates = new Map<string, PluginPromptTemplate>();
+/** What the object registry held before the first framework registration of this run, to put back after it. */
+let objectsBefore:
+  | { registry: ObjectRegistry; snapshot: ReturnType<ObjectRegistry['snapshot']>; clear: () => void }
+  | undefined;
+
 /** The judge names `compare --pairwise-judge` already knows; a plugin judge takes another name. */
 const BUILTIN_JUDGES = ['openai', 'anthropic', 'google'];
 
@@ -89,19 +155,55 @@ export function resetPlugins(): void {
   for (const name of checks.keys()) checkRegistry?.unregister(name);
   checks.clear();
   pendingChecks.clear();
+  pendingObjects = [];
+  objectOwners.clear();
+  evidence.clear();
+  templates.clear();
+  if (objectsBefore !== undefined) {
+    objectsBefore.registry.restore(objectsBefore.snapshot);
+    objectsBefore.clear();
+    objectsBefore = undefined;
+  }
 }
 
 /** Opens an isolated run and returns its cleanup, preserving any caller-owned registrations. */
 export function beginPluginRun(): () => void {
-  const previous = { adapters, judges, embedders, pendingChecks, checks };
+  const previous = {
+    adapters,
+    judges,
+    embedders,
+    pendingChecks,
+    checks,
+    pendingObjects,
+    objectOwners,
+    evidence,
+    templates,
+    objectsBefore,
+  };
   adapters = new Map();
   judges = new Map();
   embedders = new Map();
   pendingChecks = new Map();
   checks = new Map();
+  pendingObjects = [];
+  objectOwners = new Map();
+  evidence = new Map();
+  templates = new Map();
+  objectsBefore = undefined;
   return () => {
     resetPlugins();
-    ({ adapters, judges, embedders, pendingChecks, checks } = previous);
+    ({
+      adapters,
+      judges,
+      embedders,
+      pendingChecks,
+      checks,
+      pendingObjects,
+      objectOwners,
+      evidence,
+      templates,
+      objectsBefore,
+    } = previous);
   };
 }
 
@@ -138,9 +240,56 @@ export async function pluginEmbedder(name: string): Promise<Embedder | undefined
   return factory === undefined ? undefined : factory();
 }
 
-const NAME = /^[a-z0-9][a-z0-9._-]*$/;
+/** The function a plugin registered for the evidence name of a kind, or undefined. */
+export function pluginEvidence(kind: string, name: string): PluginFunction | undefined {
+  return evidence.get(`${kind} ${name}`)?.compute;
+}
 
-function apiFor(cwd: string, owner: string): PluginApi {
+/** The evidence names the plugins registered for a kind, sorted. */
+export function pluginEvidenceNames(kind: string): string[] {
+  return [...evidence.keys()]
+    .filter((key) => key.startsWith(`${kind} `))
+    .map((key) => key.slice(kind.length + 1))
+    .sort();
+}
+
+/** The prompt template a plugin registered under the id, or undefined. */
+export function pluginPromptTemplate(id: string): PluginPromptTemplate | undefined {
+  return templates.get(id);
+}
+
+const NAME = /^[a-z0-9][a-z0-9._-]*$/;
+/** A framework name a plugin registers: lower case, digits, `.`, `_`, `-`, and `/` between parts. */
+const FRAMEWORK_NAME = /^[a-z0-9][a-z0-9._-]*(\/[a-z0-9][a-z0-9._-]*)*$/;
+const NEVER_REPLACES_SHIPPED =
+  'A plugin never replaces what driftbench ships or another plugin registered: give it another name, or ship an object that extends it.';
+
+function frameworkName(what: string, name: string): void {
+  if (typeof name !== 'string' || !FRAMEWORK_NAME.test(name)) {
+    throw new Error(
+      `the ${what} name ${JSON.stringify(name)} is not a plain name: lower case letters, digits, ., _, - and / between parts`,
+    );
+  }
+}
+
+/** Claims a framework name for the plugin; a name the plugins of this run already hold is refused. */
+function claim(key: string, label: string, owner: string): void {
+  const earlier = objectOwners.get(key);
+  if (earlier !== undefined) {
+    throw new PluginRefusal(
+      `The plugin ${owner} registers the ${label}, which the plugin ${earlier} already registered. ${NEVER_REPLACES_SHIPPED}`,
+    );
+  }
+  objectOwners.set(key, owner);
+}
+
+/** The fingerprint of a template's parts: the content hash of their canonical JSON, as an object's hash is. */
+async function fingerprint(parts: Readonly<Record<string, string>>): Promise<string> {
+  const { contentHash } = await import('@agent-nexus/driftbench-core');
+  return contentHash(parts);
+}
+
+function apiFor(cwd: string, owner: string, folder: string): PluginApi {
   return {
     cwd,
     adapter(name, factory) {
@@ -171,8 +320,154 @@ function apiFor(cwd: string, owner: string): PluginApi {
       refuseDuplicate('embedder', name, owner, embedders.get(name)?.owner);
       embedders.set(name, { factory, owner });
     },
+    kind(name, def) {
+      frameworkName('kind', name);
+      if (typeof def?.summary !== 'string' || def.summary === '') {
+        throw new Error(`the kind ${name} needs a summary: one line for listings`);
+      }
+      claim(`kind ${name}`, `object kind ${name}`, owner);
+      pendingObjects.push({ what: 'kind', name, def });
+    },
+    rule(kind, name, impl) {
+      frameworkName('rule', name);
+      if (typeof impl?.run !== 'function') throw new Error(`the rule ${name} needs a run function`);
+      claim(`impl plugin:${name}`, `implementation plugin:${name}`, owner);
+      pendingObjects.push({ what: 'impl', kind, name, impl, label: 'rule' });
+    },
+    evidence(kind, name, compute) {
+      frameworkName('evidence', name);
+      if (typeof compute !== 'function')
+        throw new Error(`the evidence ${name} needs a function that computes it`);
+      claim(`evidence ${kind} ${name}`, `evidence ${name} of ${kind}`, owner);
+      evidence.set(`${kind} ${name}`, { compute, owner });
+      pendingObjects.push({ what: 'kind-check', kind, label: `the evidence ${name}` });
+    },
+    diagnosticStep(name, step) {
+      frameworkName('diagnostic step', name);
+      const impl = typeof step === 'function' ? { run: step } : step;
+      if (typeof impl?.run !== 'function')
+        throw new Error(`the diagnostic step ${name} needs a run function`);
+      claim(`impl plugin:${name}`, `implementation plugin:${name}`, owner);
+      pendingObjects.push({ what: 'impl', kind: 'diagnostic', name, impl, label: 'diagnostic step' });
+    },
+    promptTemplate(id, parts, contract) {
+      frameworkName('prompt template', id);
+      if (
+        parts === null ||
+        typeof parts !== 'object' ||
+        Object.values(parts).some((part) => typeof part !== 'string')
+      ) {
+        throw new Error(`the prompt template ${id} needs its parts as a map of named texts`);
+      }
+      if (typeof contract !== 'function')
+        throw new Error(`the prompt template ${id} needs the parser of its answers`);
+      claim(`template ${id}`, `prompt template ${id}`, owner);
+      templates.set(id, { id, parts: { ...parts }, contract, fingerprint: '', owner });
+    },
+    object(path) {
+      if (typeof path !== 'string' || path === '') throw new Error('object takes the path of an object file');
+      pendingObjects.push({ what: 'object', path: resolve(folder, path) });
+    },
   };
 }
+
+/**
+ * Applies the framework registrations of one plugin to the object registry of the core package, in call order.
+ * A kind, an implementation or an object the registry already holds is refused: the registry keeps what it
+ * had. Every object is resolved at once, so a plugin object that names an unknown item, kind or
+ * implementation stops the run here, never a later command.
+ */
+async function registerPendingObjects(owner: string): Promise<void> {
+  const pending = pendingObjects;
+  pendingObjects = [];
+  for (const template of templates.values()) {
+    if (template.fingerprint === '') template.fingerprint = await fingerprint(template.parts);
+  }
+  if (pending.length === 0) return;
+  const core = await import('@agent-nexus/driftbench-core');
+  const registry = core.objectRegistry;
+  objectsBefore ??= { registry, snapshot: registry.snapshot(), clear: core.clearObjectContexts };
+  const added: Array<{ kind: string; id: string }> = [];
+  for (const entry of pending) {
+    if (entry.what === 'kind') {
+      if (registry.kind(entry.name) !== undefined) {
+        throw new PluginRefusal(
+          `The plugin ${owner} registers the object kind ${entry.name}, which driftbench already has. ${NEVER_REPLACES_SHIPPED}`,
+        );
+      }
+      registry.registerKind({
+        kind: entry.name,
+        summary: entry.def.summary,
+        agentFacing: entry.def.agentFacing ?? false,
+        ...(entry.def.itemsKey === undefined ? {} : { itemsKey: entry.def.itemsKey }),
+        ...(entry.def.fields === undefined ? {} : { fields: entry.def.fields }),
+      });
+    } else if (entry.what === 'kind-check') {
+      if (registry.kind(entry.kind) === undefined) {
+        throw new PluginRefusal(
+          `The plugin ${owner} registers ${entry.label} for the kind ${entry.kind}, which no one registered.`,
+        );
+      }
+    } else if (entry.what === 'impl') {
+      if (registry.kind(entry.kind) === undefined) {
+        throw new PluginRefusal(
+          `The plugin ${owner} registers the ${entry.label} ${entry.name} for the kind ${entry.kind}, which no one registered.`,
+        );
+      }
+      const name = `plugin:${entry.name}`;
+      if (registry.impl(name) !== undefined) {
+        throw new PluginRefusal(
+          `The plugin ${owner} registers the implementation ${name}, which is already registered. ${NEVER_REPLACES_SHIPPED}`,
+        );
+      }
+      // `run` rides on the implementation for the engine that calls it; the resolver reads `params` only.
+      registry.registerImpl(name, {
+        params: entry.impl.params ?? ANY_PARAMS,
+        ...(entry.impl.summary === undefined ? {} : { summary: entry.impl.summary }),
+        run: entry.impl.run,
+      } as ImplDef);
+    } else {
+      let raw: unknown;
+      try {
+        raw = core.parseObjectText(readFileSync(entry.path, 'utf8'), entry.path).raw;
+      } catch (cause) {
+        throw new PluginRefusal(
+          `The plugin ${owner} gives the object ${entry.path}, which does not load: ${reason(cause)}`,
+        );
+      }
+      const head = (raw ?? {}) as { kind?: unknown; id?: unknown };
+      const key = `${String(head.kind)}:${String(head.id)}`;
+      const held = registry.shipped().some(({ raw: other }) => {
+        const known = (other ?? {}) as { kind?: unknown; id?: unknown };
+        return `${String(known.kind)}:${String(known.id)}` === key;
+      });
+      if (held) {
+        throw new PluginRefusal(
+          `The plugin ${owner} gives the object ${key}, which driftbench or another plugin already ships. ${NEVER_REPLACES_SHIPPED}`,
+        );
+      }
+      claim(`object ${key}`, `object ${key}`, owner);
+      registry.registerShipped(raw, entry.path);
+      added.push({ kind: String(head.kind), id: String(head.id) });
+    }
+  }
+  core.clearObjectContexts();
+  const store = new core.ObjectStore(registry);
+  for (const { kind, id } of added) {
+    try {
+      store.resolve(kind, id);
+    } catch (cause) {
+      throw new PluginRefusal(
+        `The plugin ${owner} gives the object ${kind}:${id}, which does not resolve: ${reason(cause)}`,
+      );
+    }
+  }
+}
+
+/** The params schema of an implementation that declares none: any params, unchecked. */
+const ANY_PARAMS = {
+  safeParse: (value: unknown) => ({ success: true, data: value }),
+} as unknown as ImplDef['params'];
 
 /**
  * Puts the checks the plugins named into the registry of the checks package. A name that registry already
@@ -197,13 +492,20 @@ async function registerPendingChecks(): Promise<void> {
 }
 
 /** Runs one plugin and registers its checks. The reason of a failure as one line, or undefined. */
-async function runPlugin(plugin: DriftbenchPlugin, cwd: string, owner: string): Promise<string | undefined> {
+async function runPlugin(
+  plugin: DriftbenchPlugin,
+  cwd: string,
+  owner: string,
+  folder = cwd,
+): Promise<string | undefined> {
   try {
-    await plugin(apiFor(cwd, owner));
+    await plugin(apiFor(cwd, owner, folder));
     await registerPendingChecks();
+    await registerPendingObjects(owner);
     return undefined;
   } catch (cause) {
     pendingChecks.clear();
+    pendingObjects = [];
     return cause instanceof PluginRefusal ? cause.message : `The plugin ${owner} failed: ${reason(cause)}`;
   }
 }
@@ -247,7 +549,8 @@ export async function loadPlugins(
     if (typeof plugin !== 'function') {
       return `The plugin ${source.module} exports no function: export it as default, (api) => { ... }`;
     }
-    const failure = await runPlugin(plugin as DriftbenchPlugin, cwd, source.module);
+    const folder = where.startsWith('file:') ? dirname(fileURLToPath(where)) : cwd;
+    const failure = await runPlugin(plugin as DriftbenchPlugin, cwd, source.module, folder);
     if (failure !== undefined) return failure;
   }
   return undefined;

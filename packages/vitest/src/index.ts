@@ -14,7 +14,9 @@ import {
   type BlockSpec,
   blockStatus,
   type CheckSet,
+  initializeShippedObjects,
   isScored,
+  objectContextFor,
   parseSpecText,
   type RunResult,
   runSpec,
@@ -47,11 +49,13 @@ export function describeSpec(
   target: SpecTarget,
   options: DescribeSpecOptions = {},
 ): void {
+  initializeShippedObjects();
   const file = typeof path === 'string' ? (isAbsolute(path) ? path : resolve(path)) : fileURLToPath(path);
   const loaded = parseSpecText(
     readFileSync(file, 'utf8'),
     extname(file).toLowerCase() === '.json' ? 'json' : 'yaml',
     file,
+    { objects: () => objectContextFor(file) },
   );
   const timeout = options.timeoutMs ?? 60_000;
   if (!loaded.ok) {

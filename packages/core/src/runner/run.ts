@@ -5,6 +5,8 @@ import type { DriverStep, UserDriver } from '../contracts/driver';
 import { copyHistory, freezeMessage } from '../contracts/history';
 import type { Store } from '../contracts/store';
 import { gateToolCalls, type ToolRule } from '../contracts/tool-policy';
+import { objectContextOfSpec } from '../objects/context';
+import { checkSpecObjects, type ObjectContext, shippedObjectContext } from '../objects/index';
 import { type BlockReuse, planBlockRerun } from '../radius/blocks';
 import { collectRetries, type RetryPolicy, retryPolicy } from '../retry';
 import type { Message, TargetRef, WorldState } from '../schema/common';
@@ -20,9 +22,16 @@ import {
 } from '../schema/run';
 import type { BlockSpec, EndState, Expect, GivenOverride, Spec, Stimulus } from '../schema/spec';
 import { cloneJson, contentHash } from '../spec/hash';
-import { specHash as specHashOf, specIdentity } from '../spec/identity';
+import { specHash as specHashOf } from '../spec/identity';
 import { compareEndState, type EndStateMatch } from './assertion';
-import { blockCacheKey, endStateCacheKey, type ObservedCache, unwrapEndState, wrapEndState } from './cache';
+import {
+  blockCacheKey,
+  cacheSpecHash as cacheSpecHashOf,
+  endStateCacheKey,
+  type ObservedCache,
+  unwrapEndState,
+  wrapEndState,
+} from './cache';
 import { capabilityGap } from './capability';
 import { recheckCarriedEndState } from './carried-end-state';
 import { cellId } from './cell';
@@ -55,6 +64,8 @@ import { blockStatus, isScored } from './verdicts';
 export type { RunEvent };
 
 export type RunOptions = {
+  /** Defaults to the context carried by the loaded spec. */
+  objects?: ObjectContext;
   /** Dated, user-supplied USD prices for token-only observations. */
   prices?: TokenPrices;
   /** A budgeted campaign cannot continue with an unpriced token-only block. */
@@ -141,12 +152,14 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
   if (options.store && options.campaignId === undefined) {
     throw new Error('runSpec: a store needs a campaignId to file the run under');
   }
+  const objects = options.objects ?? objectContextOfSpec(spec) ?? shippedObjectContext();
+  const objectErrors = checkSpecObjects(spec, objects);
+  if (objectErrors.length)
+    throw new RunnerError(objectErrors.map((issue) => `${issue.code}: ${issue.message}`).join('; '));
   const now = options.now ?? (() => new Date());
   const specHash = specHashOf(spec);
-  // The cache key leaves out the spec's version: a free label that plays no part (docs/running.md, "The
-  // cache and replay"), so relabelling a spec still replays its runs.
-  const { version: _version, ...unlabelled } = specIdentity(spec);
-  const cacheSpecHash = contentHash(unlabelled);
+  // The cache key leaves out the spec's version label and its scoring-only `uses` (cacheSpecHash).
+  const cacheSpecHash = cacheSpecHashOf(spec);
   const target = options.target ?? spec.target ?? { adapter: options.adapter.id };
   const prices = options.prices === undefined ? undefined : TokenPrices.parse(options.prices);
   if (options.requireTokenPrices) preflightTargetPrices([target], prices);

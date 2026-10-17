@@ -1,0 +1,8 @@
+kind: diagnostic
+id: acme-dedup
+description: Lists the duplicate tool calls of a failing block.
+steps:
+  - id: dedup
+    title: Count the calls made twice with the same input
+    params: { prompt_template: linker/acme }
+    impl: plugin:acme-dedup

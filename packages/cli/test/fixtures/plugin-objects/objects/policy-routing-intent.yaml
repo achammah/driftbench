@@ -1,0 +1,7 @@
+kind: policy/routing
+id: intent
+description: Routes a conversation by the intent of its first user turn.
+items:
+  - id: by_intent
+    title: The intent of the first user turn picks the team
+    impl: plugin:route-by-intent

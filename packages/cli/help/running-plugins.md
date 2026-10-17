@@ -1,6 +1,6 @@
 ---
 title: Plugins for adapters, checks and judges
-summary: Load your own code into any driftbench command with --plugin or the plugins key of driftbench.yaml, to register an adapter (so a target name reaches your agent), custom checks and pairwise judges.
+summary: Load your own code into any driftbench command with --plugin or the plugins key of driftbench.yaml, to register an adapter (so a target name reaches your agent), custom checks, pairwise judges, and the kinds, rules, steps, evidence, prompt templates and objects of the rules framework.
 commands:
   - campaign run
   - smoke
@@ -22,6 +22,13 @@ A plugin is a JavaScript module of your own that the command line loads before i
 | `api.adapter(name, factory)` | an adapter | every target `<name>:<agent>` reaches the adapter `factory(target, scope)` returns. The factory may return `undefined` for an agent name it does not serve. In a campaign, `scope.tempDir()` is the campaign's temporary folder, for sandboxes. |
 | `api.check(name, check)` | a custom check | a spec that lists `name` under `rules.custom` runs it on every block (authoring area). |
 | `api.pairwiseJudge(name, factory)` | a pairwise judge | `compare --pairwise-judge <name>` uses it (results area). |
+| `api.embedder(name, factory)` | an embedder | the similarity check scores with it when a run passes `--embedder <name>`. |
+| `api.kind(name, { summary, agentFacing?, itemsKey?, fields? })` | an object kind of the rules framework, such as `policy/routing` | objects of that kind load and resolve like any other, and a spec names them under `uses`. `agentFacing: true` marks a kind whose change reruns the agent; `fields` is a map of zod schemas for its own top-level keys. |
+| `api.rule(kind, name, { params?, run })` | the implementation of a rule of `kind` | an item names it as `impl: plugin:<name>`; its `params` are checked against `params` (a zod schema, or any object with zod's `safeParse`) when the object loads. |
+| `api.evidence(kind, name, compute)` | an evidence name a rule of `kind` may read in its `when` | `compute` gives its value. |
+| `api.diagnosticStep(name, run)` | a step of a diagnostic | a diagnostic object's `steps` name it as `impl: plugin:<name>`; `run` may also be `{ params, run }`. |
+| `api.promptTemplate(id, parts, contract)` | a prompt template: named parts (a map of texts) and the parser of its answers | referenced by its id; its fingerprint is the hash of its parts. |
+| `api.object(path)` | an object file of the plugin's own, the path relative to the plugin's folder | it joins the shipped layer: immutable, used by id, extended like a shipped object. It is resolved when the plugin loads, so an unknown item, kind or implementation stops the command there. |
 
 `api.cwd` is the working folder. The function may be async. In TypeScript, `definePlugin` from `@agent-nexus/driftbench` gives it its types. A plugin is code and runs with your rights: list only modules you trust.
 
@@ -38,7 +45,7 @@ A plugin is a JavaScript module of your own that the command line loads before i
 | `--plugin <module>` | every command (a global option; it may stand anywhere on the line, also as `--plugin=<module>`) | none | load this module before the command runs. A path (starting with `.` or absolute, or an existing file) is read from the working folder; any other value is a package name, resolved from the working folder. Repeat it for several. |
 | `plugins:` | the project config, `driftbench.yaml` in the working folder or the file `--config <file>` names | none | a list of modules. A path is relative to the config file; any other entry is a package name. |
 
-Load order: plugins given in code to `main()`, then the config's `plugins:` list, then each `--plugin`, in order. A module named twice (in the config and by the flag) runs once. A plugin may never replace what another registered: two plugins registering the same adapter, check or judge name are refused, and so is a check name already registered elsewhere. The judge names `openai`, `anthropic` and `google` are built in and refused. An adapter name must be lower case letters, digits, `.`, `_` or `-`, starting with a letter or digit. With no plugin, no extra file is read.
+Load order: plugins given in code to `main()`, then the config's `plugins:` list, then each `--plugin`, in order. A module named twice (in the config and by the flag) runs once. A plugin may never replace what another registered: two plugins registering the same adapter, check or judge name are refused, and so is a check name already registered elsewhere. The same holds for the rules framework: a kind, a `plugin:<name>` implementation (rules and diagnostic steps share these names), an evidence name of a kind, a prompt template id or an object `kind:id` that driftbench ships or another plugin registered is refused. To change a shipped object, a plugin ships an object with another id that `extends` it. Everything a plugin registers lasts for the command it was loaded for. The judge names `openai`, `anthropic` and `google` are built in and refused. An adapter name must be lower case letters, digits, `.`, `_` or `-`, starting with a letter or digit. With no plugin, no extra file is read.
 
 The commands that use plugin adapters are those that run a target: `campaign plan`, `campaign run`, `campaign resume`, `smoke`, `simulate`, `perturb`, `attack`, `ci`, `gate`, `pilot`, `family` and `holdout`.
 
@@ -114,3 +121,7 @@ Each exits 2.
 * `driftbench: The plugin <b> registers the adapter echo, which the plugin <a> already registered. A plugin never replaces a adapter: give it another name.` (the same for a check or a judge).
 * `driftbench: The plugin <module> failed: the judge name openai is built in (openai, anthropic, google): a plugin judge needs another name`
 * `driftbench: <config>:<line>: plugins must be a list of module paths or package names`
+* `driftbench: The plugin <b> registers the implementation plugin:<name>, which the plugin <a> already registered. A plugin never replaces what driftbench ships or another plugin registered: give it another name, or ship an object that extends it.` (the same for a kind, an evidence name, a prompt template or an object).
+* `driftbench: The plugin <module> registers the object kind check-set, which driftbench already has. ...`: a kind name driftbench ships.
+* `driftbench: The plugin <module> gives the object <kind>:<id>, which driftbench or another plugin already ships. ...`: give the object another id and `extends: <id>`.
+* `driftbench: The plugin <module> gives the object <kind>:<id>, which does not resolve: ...`: the object names an unknown item, or an implementation no plugin registered.

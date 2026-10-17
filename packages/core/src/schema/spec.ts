@@ -14,6 +14,7 @@ import {
 } from './common';
 import { parameterSchema, unsupportedSchemaKeywords } from './json-schema';
 import { BlockLinks } from './links';
+import { Uses } from './object';
 
 /**
  * The spec format. A spec is one golden conversation (or one task for a code agent) written as a
@@ -482,6 +483,9 @@ export const BlockSpec = z
     given: GivenOverride.optional().describe('Initial conditions for this block.'),
     expect: Expect.optional().describe('The expected output and state delta.'),
     budget: Budget.optional().describe('Limits for this block.'),
+    uses: Uses.optional().describe(
+      "The objects this block uses; a key here replaces the spec's. Left out of the block cache key.",
+    ),
   })
   .describe('One block: a stimulus, its initial conditions and its expectations.');
 export type BlockSpec = z.infer<typeof BlockSpec>;
@@ -815,6 +819,9 @@ export const Spec = z
     rules: Rules.optional().describe('Rules for the whole conversation.'),
     end_state: EndState.optional().describe('The expected end state of the world after the run.'),
     perturbations: z.array(PerturbationSpec).optional().describe('Deviations to inject in perturbed mode.'),
+    uses: Uses.optional().describe(
+      'The objects every block uses (policies, check set, diagnostics), by id or inline. Left out of the block cache key.',
+    ),
     metadata: z
       .record(z.string(), z.unknown())
       .superRefine((metadata, ctx) => {

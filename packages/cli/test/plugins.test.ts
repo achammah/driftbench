@@ -182,7 +182,7 @@ describe('plugins', () => {
     expect(await readAggregateConfig(join(dir, 'ok.yaml'))).toEqual({ ok: true, specs: [] });
     expect(await readAggregateConfig(join(dir, 'unknown.yaml'))).toEqual({
       ok: false,
-      message: `${join(dir, 'unknown.yaml')}:2: unknown key mystery; the config defines aggregates, campaign, plugins, prices, scales only`,
+      message: `${join(dir, 'unknown.yaml')}:2: unknown key mystery; the config defines aggregates, campaign, objects, plugins, prices, scales only`,
     });
   });
 
