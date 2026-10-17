@@ -1393,6 +1393,7 @@
       "alternatives": "value",
       "analysePilot": "value",
       "anchorPair": "value",
+      "anchoredLines": "value",
       "anonymiseTurns": "value",
       "applyCorner": "value",
       "approveAll": "value",
