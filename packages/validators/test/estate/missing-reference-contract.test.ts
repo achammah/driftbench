@@ -1,4 +1,6 @@
 import { existsSync } from 'node:fs';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { loadEstateMap } from '@agent-nexus/driftbench-estate';
 import { describe, expect, it, vi } from 'vitest';
@@ -157,5 +159,31 @@ describe('a Read of a file the estate does not hold (docs/estate.md section 5, n
           `seed ${seed} ${atom.id}`,
         ).toMatchObject({ untestable: true });
     }
+  });
+
+  it('derives "absent" in gen.coverage from the fixture folder, not from the exists flag of the committed map', async () => {
+    const suite = await fixture.fixtureSuite();
+    const text = await readFile(suite.map, 'utf8');
+    const one = async (flag: (line: string) => string) => {
+      const dir = await mkdtemp(join(tmpdir(), 'lying-map-'));
+      try {
+        const lying = join(dir, 'approved.yaml');
+        await writeFile(lying, text.split('\n').map(flag).join('\n'));
+        const mock = vi.spyOn(fixture, 'fixtureSuite').mockResolvedValue({ ...suite, map: lying });
+        try {
+          return (await coverageFamily().evaluate(1)).get('gen.coverage.one-per-reference');
+        } finally {
+          mock.mockRestore();
+        }
+      } finally {
+        await rm(dir, { recursive: true, force: true });
+      }
+    };
+    const real = await one((line) => line);
+    expect(real?.detail).not.toContain('not marked');
+    // The committed map says every reference is missing: the files the fixture holds are still judged by their specs.
+    expect(await one((line) => line.replace('exists: true', 'exists: false'))).toEqual(real);
+    // The committed map says the missing reference is present: it is still judged by its marker.
+    expect(await one((line) => line.replace('exists: false', 'exists: true'))).toEqual(real);
   });
 });
