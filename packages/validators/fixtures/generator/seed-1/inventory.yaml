@@ -19,7 +19,7 @@ behaviours:
 flows:
   - id: new-request
     title: A user opens a new request and submits it
-    behaviours: [B-001, B-004, B-005]
+    behaviours: [B-001, B-002, B-004, B-005]
     deviations: [D1_off_topic, D3_contradiction, D7_silence_or_burst, D8_tool_failure, D10_return]
   - id: change-request
     title: A user changes a request before it is submitted

@@ -459,13 +459,19 @@ const CONTRAST_FIELDS: ReadonlySet<ThenField> = new Set([
 /** Behavioural contrast ignores reply phrasing when the Then also asserts observed state.
  * Refusals can quote different invalid values while correctly making no call and staying put.
  * Keep message boundaries, tools and their arguments, runtime, artifacts and workspace changes;
- * a wording-only Then still compares the complete reply. */
+ * a wording-only Then still compares the complete reply. A workspace diff that lists no file is no
+ * workspace change: a run whose world supplies files and a run without a workspace changed nothing alike. */
 function contrastProjection(observed: Observed, fields: readonly ThenField[]): string {
-  if (!fields.some(isObservedField)) return projectObserved(observed);
+  const diff = observed.workspaceDiff;
+  const unchanged =
+    diff !== undefined && diff.created.length + diff.changed.length + diff.deleted.length === 0;
+  const { workspaceDiff: _empty, ...withoutDiff } = observed;
+  const compared: Observed = unchanged ? withoutDiff : observed;
+  if (!fields.some(isObservedField)) return projectObserved(compared);
   return projectObserved({
-    ...observed,
+    ...compared,
     text: '',
-    segments: observed.segments.map((segment) =>
+    segments: compared.segments.map((segment) =>
       segment.type === 'text' ? { ...segment, text: '' } : segment,
     ),
   });

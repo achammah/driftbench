@@ -58,7 +58,7 @@ None of these adapters uses the compiler:
 
 * `process` writes the history as it is, prefix included, as a JSON array to the file `DRIFTBENCH_HISTORY_FILE` names. The agent reads it from there.
 * `function` hands the history to your code as it is, with no wire rendering.
-* `nexus` and the live Claude Code adapter send only the block's own user turn: the agent never receives the prefix.
+* `nexus` and the live Claude Code adapter cannot seed a history: they declare `seedPrefix` false. A block that starts from a written prefix, or from the history mode T builds, is not sent. The capability check marks it `not_run`, and the command exits 3 (topic running-outcomes).
 
 ## When to use it
 
@@ -252,4 +252,5 @@ The origin in brackets is the prefix's own. The number is the count of recorded 
 | The agent calls a tool again that the prefix already shows | the earlier result is only in the assistant's text, or the call has no `output` | record the call with its `output` in `tool_calls` |
 | The request shows `call-h1` or `toolu_h2` where the prefix wrote `call-1` | the prefix repeats an id within one turn, so the compiler gave a fresh one | none needed; give each call of a turn its own id to keep yours |
 | A `role: tool` line of the prefix reaches the model as a user message | the message answers no call, and a tool result needs its call | expected; to send a tool result, put it in the call's `output` |
-| The prefix seems ignored | the adapter has no `seedPrefix` capability (`process`, `nexus`, live Claude Code) | write the earlier turns as blocks instead |
+| A cell reads `not_run` with `declares seedPrefix false`, exit 3 | the block starts from a prefix or from the mode T history, and the adapter cannot seed one (`nexus`, live Claude Code) | run the spec on an adapter that seeds a history, or write the earlier turns as blocks and run mode F |
+| A cell reads `not_run` with `declares toolStubs false`, exit 3 | `world.tools` forces a tool result, and the adapter cannot apply it (`process`, `http` by default, `crewai`, `langgraph`, `openai-agents`, `pydantic-ai`, `nexus`, both Claude Code adapters) | run the spec on an adapter with `toolStubs`, or drop the forced result |

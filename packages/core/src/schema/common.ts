@@ -209,6 +209,13 @@ export const WorldState = z
           .record(z.string(), z.string())
           .optional()
           .describe('Files the workspace starts with: path to content.'),
+        summary: z
+          .string()
+          .min(1)
+          .optional()
+          .describe(
+            'What the workspace holds, in words, so a reader of the spec sees it. spec lint --summaries warns when a folder named by from has none.',
+          ),
       })
       .optional()
       .describe('The files the agent starts from.'),

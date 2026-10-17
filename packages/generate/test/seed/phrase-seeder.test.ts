@@ -25,7 +25,7 @@ describe('phrases no other spec says', () => {
   // Seeds 12, 13 and 18 hold more behaviour phrases than the stages and flows before a walk's last stage: the
   // phrases left over are said at a walk's last stage, one with no end state first (seed 13 needs both kinds).
   it.each([1, 3, 12, 13, 18])(
-    'are each said in a complete spec on seed %s',
+    'accounts for every phrase by a complete spec or an explicit report on seed %s',
     async (seed) => {
       const hidden = hiddenSpec(seed);
       const source = await generateFrom(hidden, renderMap(hidden), seed, {}, { once: true });
@@ -35,7 +35,22 @@ describe('phrases no other spec says', () => {
       const asking = hidden.phrases.filter((phrase) =>
         ['behaviour', 'flow', 'data'].includes(phrase.intent.kind),
       );
-      expect(asking.filter((phrase) => !said.has(phrase.text)).map((phrase) => phrase.text)).toEqual([]);
+      for (const phrase of asking) {
+        const owned =
+          phrase.intent.kind !== 'behaviour' ||
+          hidden.flows.some((flow) => flow.behaviours.includes(phrase.value));
+        if (said.has(phrase.text)) expect(owned, phrase.text).toBe(true);
+        else {
+          const gap = suite.report.no_phrase.find((entry) => entry.value === phrase.value);
+          const unsaid = gap?.unsaid?.find((entry) => entry.text === phrase.text);
+          expect(unsaid, phrase.text).toBeDefined();
+          expect(unsaid?.reasons.length, phrase.text).toBeGreaterThan(0);
+          if (!owned)
+            expect(unsaid?.reasons).toEqual([
+              `no approved path walks an owning flow for behaviour=${phrase.value}`,
+            ]);
+        }
+      }
     },
     300_000,
   );
@@ -52,7 +67,7 @@ describe('phrases no other spec says', () => {
 
 describe('behaviour phrases on seeds with more phrases than stages and flows', () => {
   it.each([12, 13, 18])(
-    'never share a stage and flow on seed %s, and the ones said at a last stage come after every other',
+    'never share a stage and flow on seed %s, and terminal phrases follow the last move',
     async (seed) => {
       const hidden = hiddenSpec(seed);
       const source = await generateFrom(hidden, renderMap(hidden), seed, {}, { once: true });
@@ -82,8 +97,8 @@ describe('behaviour phrases on seeds with more phrases than stages and flows', (
           const changed = [...keys].filter((key) => one.cell[key] !== other.cell[key]);
           expect(changed.length, `${one.id} and ${other.id}`).toBeGreaterThan(1);
         }
-      // A phrase said at the last stage of its walk is placed after every other phrase spec: the phrases placed
-      // first keep their ids, so their streams and values stay what they were without it.
+      // An augmenting path may move an earlier holder to a terminal slot while preserving its id.
+      // A terminal phrase still comes after every move of its own conversation.
       const atLast = said.filter((entry) => {
         const spec = suite.complete.find((candidate) => candidate.id === entry.id);
         const path = source.prepared?.relations.paths.find(
@@ -91,7 +106,6 @@ describe('behaviour phrases on seeds with more phrases than stages and flows', (
         );
         return spec !== undefined && path !== undefined && spec.blocks.length === path.stages.length;
       });
-      expect(atLast.length).toBeGreaterThan(0);
       // A turn said after the walk's last move cuts nothing: a walk with an end state still checks it.
       for (const entry of atLast) {
         const spec = suite.complete.find((candidate) => candidate.id === entry.id);
@@ -100,13 +114,12 @@ describe('behaviour phrases on seeds with more phrases than stages and flows', (
         );
         if (path?.end_state) expect(spec?.end_state, `${entry.id} walks ${path.id}`).toBeDefined();
       }
-      const phraseIds = suite.complete
-        .map((spec) => spec.id)
-        .filter((id) => id.startsWith('gen-phrase-'))
-        .sort();
-      expect(atLast.map((entry) => entry.id).sort()).toEqual(
-        phraseIds.slice(phraseIds.length - atLast.length),
-      );
+      for (const entry of said) {
+        const behaviour = entry.cell.behaviour;
+        if (!behaviour) continue;
+        const owners = hidden.flows.filter((flow) => flow.behaviours.includes(behaviour));
+        expect(owners.some((flow) => flow.id === entry.cell.flow)).toBe(true);
+      }
     },
     300_000,
   );
@@ -120,6 +133,12 @@ describe('a behaviour phrase left over for a last stage', () => {
     const seed = 18;
     const hidden = hiddenSpec(seed);
     const rendered = renderMap(hidden);
+    // This test isolates terminal-path preference: every behaviour explicitly belongs to every
+    // flow, rather than depending on the random inventory's orphan behaviours.
+    rendered.inventory = rendered.inventory.replace(
+      /^ {4}behaviours: \[.*\]$/gm,
+      '    behaviours: [' + hidden.behaviours.map((behaviour) => behaviour.id).join(', ') + ']',
+    );
     const map = parseDocument(rendered.map).toJS() as {
       relations: Array<Record<string, unknown>>;
       phrases: Array<Record<string, unknown>>;

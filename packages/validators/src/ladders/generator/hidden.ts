@@ -1,5 +1,6 @@
 import type { DeviationClass } from '@agent-nexus/driftbench-core';
 import { rngFor } from '@agent-nexus/driftbench-generate';
+import { ensureBehaviourCapacity } from './behaviour-capacity';
 
 /**
  * The hidden specification of the generator validator (docs/validators.md sections 3 and 12). Code draws,
@@ -802,6 +803,10 @@ export function hiddenSpec(seed: number): HiddenSpec {
       });
     });
   }
+
+  // Required behaviour phrases must be placeable in an owning flow without sharing a stage slot.
+  // Keep every drawn ownership, augmenting it only where the existing paths cannot seat all phrases.
+  ensureBehaviourCapacity({ behaviours, flows, paths, uses, tools });
 
   // A recovery that moves to a named stage needs an opportunity to move: a noninitial,
   // nonterminal position elsewhere. Keep the drawn flows, adding a capable flow only when

@@ -109,7 +109,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: needs-to-address
-          stage: needs
+          stage: address
         phrase:
           dimension: stage_transition
           value: needs-to-address

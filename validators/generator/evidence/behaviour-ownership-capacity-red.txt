@@ -1,0 +1,152 @@
+
+ RUN  v5.0.3 <worktree>
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts (32 tests | 13 failed) 6817ms
+   ❯ hidden behaviour obligations have owners and feasible distinct phrase slots (26)
+     × checks the commit-derived hidden map in memory without serializing it 5ms
+     × seed 1: every listed behaviour has an owner and the full phrase set fits 1ms
+     × seed 3: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 4: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 5: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 12: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 13: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 17: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 18: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 19: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 4093: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 8191: every listed behaviour has an owner and the full phrase set fits 0ms
+     × seed 12: even the already-owned behaviours must fit distinct post-read slots 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > checks the commit-derived hidden map in memory without serializing it
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts:68:7
+     66|         hidden.flows.some((flow) => flow.behaviours.includes(behaviour…
+     67|       ),
+     68|     ).toBe(true);
+       |       ^
+     69|     expect(canSeat(hidden)).toBe(true);
+     70|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 1: every listed behaviour has an owner and the full phrase set fits
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 5: every listed behaviour has an owner and the full phrase set fits
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 12: every listed behaviour has an owner and the full phrase set fits
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 17: every listed behaviour has an owner and the full phrase set fits
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 18: every listed behaviour has an owner and the full phrase set fits
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 4093: every listed behaviour has an owner and the full phrase set fits
+AssertionError: B-002: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts:77:9
+     75|         hidden.flows.some((flow) => flow.behaviours.includes(behaviour…
+     76|         behaviour.id,
+     77|       ).toBe(true);
+       |         ^
+     78|     expect(canSeat(hidden)).toBe(true);
+     79|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 3: every listed behaviour has an owner and the full phrase set fits
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 19: every listed behaviour has an owner and the full phrase set fits
+AssertionError: B-001: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts:77:9
+     75|         hidden.flows.some((flow) => flow.behaviours.includes(behaviour…
+     76|         behaviour.id,
+     77|       ).toBe(true);
+       |         ^
+     78|     expect(canSeat(hidden)).toBe(true);
+     79|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 4: every listed behaviour has an owner and the full phrase set fits
+AssertionError: B-005: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts:77:9
+     75|         hidden.flows.some((flow) => flow.behaviours.includes(behaviour…
+     76|         behaviour.id,
+     77|       ).toBe(true);
+       |         ^
+     78|     expect(canSeat(hidden)).toBe(true);
+     79|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 13: every listed behaviour has an owner and the full phrase set fits
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 8191: every listed behaviour has an owner and the full phrase set fits
+AssertionError: B-006: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts:77:9
+     75|         hidden.flows.some((flow) => flow.behaviours.includes(behaviour…
+     76|         behaviour.id,
+     77|       ).toBe(true);
+       |         ^
+     78|     expect(canSeat(hidden)).toBe(true);
+     79|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > hidden behaviour obligations have owners and feasible distinct phrase slots > seed 12: even the already-owned behaviours must fit distinct post-read slots
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts:86:29
+     84|       hidden.flows.some((flow) => flow.behaviours.includes(behaviour.i…
+     85|     );
+     86|     expect(canSeat(hidden)).toBe(true);
+       |                             ^
+     87|   });
+     88| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  13 failed | 19 passed (32)
+   Start at  01:29:16
+   Duration  15.17s (transform 49%, tests 46%, import 5%)
+
+  Transform  transforming modules took 7.37s · 49% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
