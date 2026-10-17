@@ -244,6 +244,133 @@ jobs:
           name: epipe-${{ matrix.rep }}
           path: epipe-${{ matrix.rep }}.log
 
+  epipe-main:
+    # Measurement only, on train/estate-509-tests. Never merged to main.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',epipe-main,')
+    name: estate test directory on 509 plus main (${{ matrix.rep }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        rep: [one, two, three]
+        merge_main: ['yes']
+        ref: ['750c30f5888a2db5d3e15f1f269b0e76705c5c54']
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ matrix.ref }}
+          fetch-depth: 0
+      - name: Merge main onto the ref (docs rows and CHANGELOG on the ref side)
+        shell: bash
+        run: |
+          git config user.name ci
+          git config user.email ci@users.noreply.github.com
+          git fetch origin main
+          echo "main $(git rev-parse FETCH_HEAD)"
+          echo "ref  $(git rev-parse HEAD)"
+          if [ -n "${{ matrix.merge_main }}" ]; then
+            if ! git merge --no-edit FETCH_HEAD; then
+              files=$(git diff --name-only --diff-filter=U)
+              echo "conflicts in: $files"
+              for f in $files; do
+                case "$f" in
+                  docs/*.md|CHANGELOG.md) git checkout --ours -- "$f"; git add -- "$f" ;;
+                  *) echo "::error::code conflict in $f"; exit 1 ;;
+                esac
+              done
+              git commit --no-edit
+            fi
+          fi
+          echo "tested $(git rev-parse HEAD)"
+          git log -1 --format='682 fix in tested tree: %H' ; git merge-base --is-ancestor 33e7ae7d4 HEAD && echo "33e7ae7d4 (682) is in the tested tree" || echo "33e7ae7d4 (682) is NOT in the tested tree"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - run: pnpm build
+      - name: The whole estate test directory
+        shell: bash
+        run: |
+          status=0
+          pnpm exec vitest run packages/validators/test/estate 2>&1 | tee "epipemain-${{ matrix.rep }}.log" || status=$?
+          echo "exit $status" >> "epipemain-${{ matrix.rep }}.log"
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: epipemain-${{ matrix.rep }}
+          path: epipemain-${{ matrix.rep }}.log
+
+  named-tests:
+    # Measurement only. estate-chain.test.ts and the system stale tests, on a ref with main merged.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',named-tests,')
+    name: named tests on ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: union-374b3d543
+            ref: 374b3d543e054ee851c7a341a14f81a02bfbd451
+            merge_main: 'yes'
+          - name: prose-eb51ec955
+            ref: eb51ec95592fdfacb4edd706151421deeec7fd4e
+            merge_main: 'yes'
+          - name: main-alone
+            ref: main
+            merge_main: ''
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ matrix.ref }}
+          fetch-depth: 0
+      - name: Merge main onto the ref (docs rows and CHANGELOG on the ref side)
+        shell: bash
+        run: |
+          git config user.name ci
+          git config user.email ci@users.noreply.github.com
+          git fetch origin main
+          echo "main $(git rev-parse FETCH_HEAD)"
+          echo "ref  $(git rev-parse HEAD)"
+          if [ -n "${{ matrix.merge_main }}" ]; then
+            if ! git merge --no-edit FETCH_HEAD; then
+              files=$(git diff --name-only --diff-filter=U)
+              echo "conflicts in: $files"
+              for f in $files; do
+                case "$f" in
+                  docs/*.md|CHANGELOG.md) git checkout --ours -- "$f"; git add -- "$f" ;;
+                  *) echo "::error::code conflict in $f"; exit 1 ;;
+                esac
+              done
+              git commit --no-edit
+            fi
+          fi
+          echo "tested $(git rev-parse HEAD)"
+          git log -1 --format='682 fix in tested tree: %H' ; git merge-base --is-ancestor 33e7ae7d4 HEAD && echo "33e7ae7d4 (682) is in the tested tree" || echo "33e7ae7d4 (682) is NOT in the tested tree"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - run: pnpm build
+      - name: The two named test groups
+        shell: bash
+        run: |
+          status=0
+          pnpm exec vitest run packages/cli/test/estate-chain.test.ts packages/validators/test/system/stale.test.ts 2>&1 | tee "named-${{ matrix.name }}.log" || status=$?
+          echo "exit $status" >> "named-${{ matrix.name }}.log"
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: named-${{ matrix.name }}
+          path: named-${{ matrix.name }}.log
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
