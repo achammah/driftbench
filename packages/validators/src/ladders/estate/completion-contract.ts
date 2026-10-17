@@ -1,4 +1,5 @@
 import type { Spec } from '@agent-nexus/driftbench-core';
+import { answersWithoutStopping } from './completion';
 import type { EstateRun, GeneratedSpec } from './pipeline';
 
 /** Required check structure is the generated structure plus source evidence. The latter
@@ -105,7 +106,8 @@ export function completionContract(run: EstateRun, source: GeneratedSpec): Spec 
   }
   if (source.record.testType === 'guard_negative') {
     const guard = run.estate.guards.find((g) => g.name === fields.name);
-    if (guard?.verdict === 'warn') block.expect.guards = [{ name: guard.name, verdict: 'warn', count: 0 }];
+    if (guard && answersWithoutStopping(guard.verdict))
+      block.expect.guards = [{ name: guard.name, verdict: guard.verdict, count: 0 }];
   }
   if (['stage_order', 'stage_anytime'].includes(source.record.testType) && fields.anytime === true)
     custom.stage_seen ??= { name: fields.id, block: 0 };
@@ -159,7 +161,7 @@ export function completionApplies(run: EstateRun, source: GeneratedSpec): boolea
     case 'tool_denied':
       return true;
     case 'guard_negative':
-      return run.estate.guards.some((g) => g.name === f.name && g.verdict === 'warn');
+      return run.estate.guards.some((g) => g.name === f.name && answersWithoutStopping(g.verdict));
     case 'journey':
       return head?.kind === 'route';
     case 'skip_pressure':

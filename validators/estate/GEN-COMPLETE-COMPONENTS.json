@@ -22,7 +22,7 @@
   {
     "item": "gen.complete.guard_register-guard-read-before-edit-py",
     "specs": 1,
-    "components": 55,
+    "components": 60,
     "gaps": [],
     "clauses": [
       "0.expect.guards.0.count.min",
@@ -75,6 +75,11 @@
       "0.custom.guard_message.intervention.exclude.warn_extra",
       "0.custom.guard_message.intervention.exclude.extra_warn_extra",
       "0.custom.guard_message.intervention.exclude.war",
+      "0.custom.guard_message.intervention.exclude.NUDGE",
+      "0.custom.guard_message.intervention.exclude.__other_directory__/nudge",
+      "0.custom.guard_message.intervention.exclude.nudge_extra",
+      "0.custom.guard_message.intervention.exclude.extra_nudge_extra",
+      "0.custom.guard_message.intervention.exclude.nudg",
       "0.custom.guard_message.message.channel.stdout",
       "0.custom.guard_message.message.channel.stderr",
       "0.custom.guard_message.message.structured.hookSpecificOutput",
@@ -85,7 +90,7 @@
   {
     "item": "gen.complete.guard_register-guard-reply-length-py",
     "specs": 1,
-    "components": 49,
+    "components": 54,
     "gaps": [],
     "clauses": [
       "0.expect.guards.0.count.min",
@@ -132,6 +137,11 @@
       "0.custom.guard_message.intervention.exclude.warn_extra",
       "0.custom.guard_message.intervention.exclude.extra_warn_extra",
       "0.custom.guard_message.intervention.exclude.war",
+      "0.custom.guard_message.intervention.exclude.NUDGE",
+      "0.custom.guard_message.intervention.exclude.__other_directory__/nudge",
+      "0.custom.guard_message.intervention.exclude.nudge_extra",
+      "0.custom.guard_message.intervention.exclude.extra_nudge_extra",
+      "0.custom.guard_message.intervention.exclude.nudg",
       "0.custom.guard_message.message.channel.stdout",
       "0.custom.guard_message.message.channel.stderr",
       "0.custom.guard_message.message.structured.hookSpecificOutput",

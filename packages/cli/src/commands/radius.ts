@@ -5,15 +5,25 @@ import {
   type RadiusReport,
   RunMode,
   radiusOf,
+  type SectionRegistry,
+  type SectionSelection,
+  sectionChanges,
 } from '@agent-nexus/driftbench-core';
 import { textTable as table } from '@agent-nexus/driftbench-report';
 import type { Command } from 'commander';
 import type { Io } from '../io';
 import { loadValidSpecs } from './campaign';
+import { registerRadiusLocalize } from './radius-localize';
 import { registerRadiusAuto } from './radius-prompt';
-import { registerRadiusSections } from './radius-sections';
+import { readRegistry, registerRadiusSections } from './radius-sections';
 
-type RadiusCommandOptions = { change: string; mode: string; json?: boolean; explain?: boolean };
+type RadiusCommandOptions = {
+  change: string;
+  mode: string;
+  json?: boolean;
+  explain?: boolean;
+  sections?: string[];
+};
 
 /**
  * `driftbench radius <specs...> --change <manifest> [--mode F] [--json]`: the blast radius of a change.
@@ -34,12 +44,17 @@ export function registerRadiusCommand(program: Command, io: Io, setExit: (code: 
       'F',
     )
     .option('--explain', 'show the manifest anchors and the blocks each change selects')
+    .option(
+      '--sections <registries...>',
+      'section registries: print the advisory selection of prompt_section changes (nothing is skipped)',
+    )
     .option('--json', 'print one JSON document')
     .action(async (paths: string[], options: RadiusCommandOptions) => {
       setExit(await radiusCommand(paths, options, io));
     });
   registerRadiusAuto(radius, io, setExit);
   registerRadiusSections(radius, io, setExit);
+  registerRadiusLocalize(radius, io, setExit);
 }
 
 export async function radiusCommand(paths: string[], options: RadiusCommandOptions, io: Io): Promise<number> {
@@ -64,6 +79,12 @@ export async function radiusCommand(paths: string[], options: RadiusCommandOptio
     io.err('The change manifest is invalid, so no radius was computed.\n');
     return 2;
   }
+  const registries: SectionRegistry[] = [];
+  for (const path of options.sections ?? []) {
+    const registry = await readRegistry(path, io);
+    if (!registry) return 2;
+    registries.push(registry);
+  }
   const loaded = await loadValidSpecs(paths, io);
   if (!loaded) return 2;
   const shown = (path: string) => {
@@ -73,7 +94,7 @@ export async function radiusCommand(paths: string[], options: RadiusCommandOptio
   const report = radiusOf(
     loaded.map((entry) => ({ spec: entry.spec, hash: entry.hash, path: shown(entry.path) })),
     manifest.manifest,
-    { modes },
+    { modes, ...(options.sections === undefined ? {} : { sections: registries }) },
   );
   if (options.json) {
     io.out(
@@ -81,6 +102,9 @@ export async function radiusCommand(paths: string[], options: RadiusCommandOptio
     );
   } else {
     io.out(renderRadius(report, manifest.hash));
+    if (report.advisory) io.out(renderAdvisory(report.advisory, options.explain === true));
+    else if (sectionChanges(manifest.manifest).length > 0)
+      io.out('Pass --sections <registries> to see which blocks selection by section links would run.\n');
     if (options.explain) {
       for (const change of manifest.manifest.changes) {
         io.out(`${change.kind}:${change.id ?? 'global'}: ${change.note ?? 'declared in the manifest'}\n`);
@@ -179,5 +203,43 @@ export function renderRadius(report: RadiusReport, hash: string): string {
     const keep = (row: string[]) => (mode === 'P' ? row : row.filter((_, at) => at !== 1));
     lines.push(...table([keep(['spec', 'cells', 'blocks in', 'from', 'why']), ...rows.map(keep)]));
   }
+  return `${lines.join('\n')}\n`;
+}
+
+/** The advisory section selection as lines a person reads: nothing is skipped, the whole suite runs. */
+export function renderAdvisory(selection: SectionSelection, explain: boolean): string {
+  const { counts } = selection;
+  const lines = [
+    `Advisory section selection (${selection.changed.join(', ')}): nothing is skipped, the whole suite runs until links are verified by mutation.`,
+  ];
+  if (selection.all !== null) {
+    lines.push(`  Every block would run: ${selection.all}.`);
+    return `${lines.join('\n')}\n`;
+  }
+  const extra = selection.closure.filter((id) => !selection.changed.includes(id));
+  if (extra.length > 0) lines.push(`  With references, overrides and duplicates: ${extra.join(', ')}.`);
+  lines.push(
+    `  Would run ${counts.selected} of ${plural(counts.total, 'block')} (${counts.direct} by links, ${counts.forward} forward) and would skip ${counts.skipped}: ${share(counts.skipped, counts.total)} of the suite.`,
+  );
+  const rows: string[][] = [];
+  for (const spec of selection.specs) {
+    const selected = spec.blocks.filter((block) => block.state !== 'out');
+    if (selected.length === 0) continue;
+    const why = [...new Set(selected.filter((b) => b.state === 'direct').flatMap((block) => block.why))];
+    const forward = selected.find((block) => block.state === 'forward');
+    rows.push([
+      spec.specId,
+      `${selected.length} of ${spec.blocks.length}`,
+      selected[0]?.id ?? '',
+      [...why, ...(forward && why.length === 0 ? forward.why : [])].join(', '),
+    ]);
+  }
+  if (rows.length > 0) lines.push(...table([['spec', 'blocks', 'from', 'links that drove it'], ...rows]));
+  if (explain)
+    for (const spec of selection.specs)
+      for (const block of spec.blocks)
+        lines.push(
+          `${spec.specId}/${block.id}: advisory ${block.state}: ${block.why.join(', ') || 'no link to a changed section'}`,
+        );
   return `${lines.join('\n')}\n`;
 }
