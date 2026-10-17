@@ -301,3 +301,9 @@ Measured on main's product, `diff.feasible.cover` fails on every measured seed (
 2. The first move's block records the start stage it is said at (`assemble.ts`, `saidAt`), while both models place a move at the stage it reaches. It is flagged only where the behaviour's flows carry no first-turn class: 25 blocks on seeds 10 and 15.
 
 The product lane fixes these in `packages/generate`. Per-seed counts: [evidence](evidence/feasible-impossible-pairs.json) and [the journal](SWEEP-JOURNAL.md). No historical ladder level is updated by this scoped ruling.
+
+## Behaviours no owner can exercise: maintainer ruling (2026-10-16)
+
+A behaviour is exercised by a conversation of a flow that owns it, so one owner must call its tool and recover its class. The hidden constructor now adds one owner where none can (`behaviour-exercise.ts`), before the capacity pass. See [the journal](SWEEP-JOURNAL.md).
+
+Resolved: a behaviour that names a tool is drawn only where the map stages that tool, so the five `behaviour.list.exercised` items no longer owe an impossible cell.
