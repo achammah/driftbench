@@ -245,6 +245,24 @@ export function clauseRule(source: string, context: RuleContext): Rule | undefin
     if (found) return found;
     return;
   }
+  // "Only when X may Y": the words before the modal are a condition, and the actor stands after it. The
+  // condition decides nothing about who is addressed; the actor does.
+  const fronted =
+    /^only\s+(?:when|if|after|once|while|as\s+soon\s+as)\s+.+?\s+(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to)\s+(.+)$/i.exec(
+      text,
+    );
+  if (fronted) {
+    const rest = fronted[1] ?? '';
+    const restTerms = termsOf(nlp(rest));
+    // The actor is the noun phrase before the first verb: "the dispatcher" of "the dispatcher close the ticket".
+    const verbAt = restTerms.findIndex((term, at) => at > 0 && has(term, 'Verb'));
+    const actorTerms = verbAt > 0 ? restTerms.slice(0, verbAt) : restTerms.slice(0, 2);
+    const actor = actorTerms.map((term) => term.text).join(' ');
+    const kind = subjectKind(actor, actorTerms, context);
+    if (kind === 'self' || kind === 'output' || kind === 'thing')
+      return { subject: actor, polarity: 'obligation', form: 'restriction' };
+    return;
+  }
   const restriction = /^only\s+(.+?)\s+(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to)\s+\S/i.exec(text);
   if (restriction) {
     const who = restriction[1] ?? '';
