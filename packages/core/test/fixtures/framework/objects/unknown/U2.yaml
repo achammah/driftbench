@@ -1,0 +1,6 @@
+kind: check-set
+id: u2
+extends: default
+items:
+  - id: tools.ordr
+    enabled: false

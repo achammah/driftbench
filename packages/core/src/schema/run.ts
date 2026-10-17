@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DriftClass, GivenOrigin, Message, TargetRef, WorldState } from './common';
+import { Layer } from './object';
 import { BlockProvenance, CampaignProvenance, RejudgedFrom, RunProvenance } from './provenance';
 
 /**
@@ -244,6 +245,19 @@ export const Vote = z.strictObject({
   retries: z.array(RetryEvent).optional(),
 });
 
+/**
+ * What produced a verdict or a diagnosis: `object` is `kind:id@hash8` of the resolved object (a check set,
+ * a policy, a diagnostic), `item` the rule inside it, `impl` the implementation that ran, `layer` the layer
+ * that last set the item. A published number therefore says which rules scored it.
+ */
+export const By = z.strictObject({
+  object: z.string().min(1),
+  item: z.string().min(1).optional(),
+  impl: z.string().min(1),
+  layer: Layer,
+});
+export type By = z.infer<typeof By>;
+
 /** One check's result on one block. Machine verdicts are final; judge verdicts carry their votes. */
 export const Verdict = z.strictObject({
   id: z.string().min(1),
@@ -255,8 +269,88 @@ export const Verdict = z.strictObject({
   evidence: z.string(),
   reasoning: z.string().optional(),
   judge: z.strictObject({ cls: z.enum(['system1', 'system2']), votes: z.array(Vote) }).optional(),
+  /**
+   * The value-check rungs that decided a tool argument, one entry per value a rung decided: the call (from 1),
+   * the value's path, the rung (a policy item id, or `exact_fallback`) and its outcome. Absent when every value
+   * equalled the gold or the assertion compares as written. No default, so records without it are unchanged.
+   */
+  valueCheck: z
+    .array(
+      z.strictObject({
+        call: z.number().int().min(1),
+        path: z.string().min(1),
+        rung: z.string().min(1),
+        outcome: Outcome,
+      }),
+    )
+    .optional(),
+  /** What produced the verdict: the object, its item, the implementation and the layer. Absent on older records. */
+  by: By.optional(),
 });
 export type Verdict = z.infer<typeof Verdict>;
+
+/** The objects a block resolved to, one per `uses` key that resolved, and one hash over them. */
+export const ResolvedObjects = z.strictObject({
+  objects: z.array(
+    z.strictObject({
+      /** The `uses` key: check_set, value_check, blame, diagnostics, ... */
+      key: z.string().min(1),
+      kind: z.string().min(1),
+      id: z.string().min(1),
+      /** The content hash of the resolved object. */
+      hash: z.string().min(1),
+      /** The layer whose reference chose it; `shipped` when no layer named one. */
+      setAt: Layer,
+    }),
+  ),
+  /** The content hash of `objects`: equal objects give equal hashes, run after run. */
+  hash: z.string().min(1),
+});
+export type ResolvedObjects = z.infer<typeof ResolvedObjects>;
+
+/**
+ * What a diagnostic wrote about a block, after its checks. A diagnosis never changes `pass`: it explains a
+ * verdict, attributes a fault, ranks causes or reports a measure computed from other verdicts.
+ */
+export const Diagnosis = z.strictObject({
+  /** `diagnostic:<id>@hash8` of the diagnostic that wrote it. */
+  diagnostic: z.string().min(1),
+  /** The step of the diagnostic that wrote it. */
+  step: z.string().min(1).optional(),
+  /** The verdict it is about, when it is about one. */
+  verdictRef: z.string().min(1).optional(),
+  /** The rule that fired, as `kind:id@hash8#item`. */
+  rule: z.string().min(1).optional(),
+  fault: z.array(z.string().min(1)).optional(),
+  fixLocation: z.string().min(1).optional(),
+  flags: z.array(z.string().min(1)).optional(),
+  /** A measure the diagnosis reports, such as the share of expected arguments that matched. */
+  score: z.number().optional(),
+  /** One line a reader can act on. */
+  summary: z.string(),
+  evidence: z.record(z.string(), z.unknown()).optional(),
+  rankedCauses: z
+    .array(z.strictObject({ cause: z.string().min(1), score: z.number(), by: z.string().optional() }))
+    .optional(),
+  /** A chained verdict's root: the id of the verdict it inherits its fault from. */
+  inherits: z.string().min(1).optional(),
+  /** Who the fault is attributed to; the agent-attributed score reads it. */
+  disposition: z.enum(['agent', 'shared', 'setup', 'excluded', 'credited', 'unassigned']).optional(),
+  /** What the fix changes, such as a skill file or a tool contract. */
+  fixTarget: z.string().min(1).optional(),
+  /** What the fix does there. */
+  fixAction: z.string().min(1).optional(),
+  /** The forms the fix may take. */
+  fixForms: z.array(z.string().min(1)).optional(),
+  /** Where the fix goes, as `kind:id@hash8#item` of the placement rule that chose it. */
+  placement: z.string().min(1).optional(),
+  /** How sure the attribution is: read statically, undecided, or confirmed by a rerun. */
+  confidence: z.enum(['static', 'undecided', 'confirmed']).optional(),
+  /** The local copies a shared fix makes redundant, to remove. */
+  removeCopies: z.array(z.string().min(1)).optional(),
+  by: By,
+});
+export type Diagnosis = z.infer<typeof Diagnosis>;
 
 /** Provenance of a copy whose realized text was removed by its destination's privacy policy. */
 const RealizedTextStripped = z.strictObject({
@@ -318,6 +412,12 @@ export const BlockResult = z
     cacheKey: z.string().min(1).optional(),
     observed: Observed,
     verdicts: z.array(Verdict),
+    /** What the diagnostics wrote after the checks. Absent when none ran; never changes `pass`. */
+    diagnoses: z.array(Diagnosis).optional(),
+    /** Diagnostic steps of cost class `run` left out because the diagnostic budget was spent. Absent when none. */
+    skippedForBudget: z.number().int().min(1).optional(),
+    /** The objects the block was scored with. Absent on older records. */
+    resolved: ResolvedObjects.optional(),
     stageObserved: z.string().optional(),
     ledgerCheck: z.strictObject({ ok: z.boolean(), contradictions: z.array(z.string()) }),
     drift: z.array(DriftClass),

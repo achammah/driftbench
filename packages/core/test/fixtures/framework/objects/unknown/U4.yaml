@@ -1,0 +1,4 @@
+kind: check-set
+id: u4
+extends: default
+order: [tools.count, tools.input_closed, tools.order, tools.argument_accuracy, forbidden.count0, tools.coverage]

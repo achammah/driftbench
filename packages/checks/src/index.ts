@@ -5,6 +5,8 @@
  * budget, end state and the
  * checks users register. `defaultChecks()` returns them all, in the order the runner applies them.
  */
+
+export { DEFAULT_CHECK_SET, SHIPPED_CHECKS } from './check-set';
 export { artifacts } from './checks/artifacts';
 export { budget } from './checks/budget';
 export { cards } from './checks/cards';
@@ -75,10 +77,11 @@ export {
 } from './checks/stated_length';
 export { subagents } from './checks/subagents';
 export { toolF1 } from './checks/tool_f1';
-export { tools } from './checks/tools';
+export { createToolsCheck, type ToolsCheckOptions, tools } from './checks/tools';
 export { toolsOffered } from './checks/tools_offered';
 export { workspace } from './checks/workspace';
 export { type DefaultChecksOptions, defaultChecks, type JudgeCheckSource } from './defaults';
+export { initializeShippedObjects } from './initialize';
 export { type AssertionResult, checkAssertion } from './support/assert';
 export { countAllows, describeCount } from './support/count';
 export { DETECT_DEFAULTS, type DetectOptions, detect, toDetectorCode } from './support/language';
@@ -91,5 +94,35 @@ export {
 } from './support/operations';
 export { type PiiFinding, type PiiKind, redact, scanPii } from './support/pii';
 export { type SchemaIssue, validateStrict } from './support/schema';
+export {
+  type JudgeCalibration,
+  type JudgeModel,
+  type JudgeRequest,
+  type RecordedJudgeCall,
+  recordedJudgeModel,
+  SAME_REFERENT_PROMPTS,
+  type SameReferentJudge,
+} from './value-check/judge';
+export {
+  BUILTIN_RUNGS,
+  type CompareMode as ValueCompareMode,
+  DEFAULT_VALUE_POLICY,
+  EVIDENCE_NAMES,
+  type LadderResult,
+  type Rung,
+  type RungContext,
+  type RungResult,
+  registerValueCheck,
+  runLadder,
+  type Settles,
+  type ValueCase,
+  type ValuePolicy,
+  type ValuePolicyItem,
+  type ValueServices,
+  valuePolicyProblems,
+} from './value-check/ladder';
+export type { ReplayOutcome, ToolDeclaration, ToolReplayer } from './value-check/outcome';
+export { type Computation, evaluateFormula, type RecomputeCase } from './value-check/recompute';
+export type { StateDiffCase } from './value-check/state-diff';
 
 export const packageName = '@agent-nexus/driftbench-checks';

@@ -1,0 +1,14 @@
+id: refund-late-order
+uses: { value_check: default, blame: acme }
+blocks:
+  - id: b1
+    user: My order W2378156 is late, I want a refund.
+    uses:
+      value_check:
+        extends: default
+        items:
+          - { id: rung3_same_referent, params: { repeats: 5 } }
+    expect:
+      tools:
+        - label: refunds.create
+          input: { order_id: W2378156 }

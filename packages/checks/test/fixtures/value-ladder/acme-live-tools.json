@@ -1,0 +1,145 @@
+{
+  "catalog.search": {
+    "name": "catalog.search",
+    "description": "List Acme plans of a category. With customer_email, also returns that customer and their current plan id (customer is null when no account has that email). With address_id (home only), returns only the home plans available at that address.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "mobile",
+            "home"
+          ]
+        },
+        "customer_email": {
+          "type": "string"
+        },
+        "address_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "category"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "coverage.check": {
+    "name": "coverage.check",
+    "description": "Check whether Acme home internet reaches a street address. Give the street type in full, for example Road, not Rd. Returns found, address_id, address, fiber_mbps (0 = no fiber) and five_g.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "port.check": {
+    "name": "port.check",
+    "description": "Check whether a phone number held at another carrier can move to Acme. Returns number, eligible and, when not eligible, a reason.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "number"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "order.create": {
+    "name": "order.create",
+    "description": "Place an order. type 'upgrade' takes customer_id and plan_id only. type 'new' takes plan_id and customer {name, email}, plus address_id for a home plan or port_number for a mobile plan that keeps a number.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "new",
+            "upgrade"
+          ]
+        },
+        "plan_id": {
+          "type": "string"
+        },
+        "customer_id": {
+          "type": "string"
+        },
+        "customer": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            }
+          }
+        },
+        "address_id": {
+          "type": "string"
+        },
+        "port_number": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "plan_id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "notify_sales": {
+    "name": "notify_sales",
+    "description": "Hand a lead to a human sales advisor. reason is one of callback, no_coverage, tool_failure, order_failed. customer holds name, email and/or phone (a phone or an email is required). summary is one or two sentences.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "enum": [
+            "callback",
+            "no_coverage",
+            "tool_failure",
+            "order_failed"
+          ]
+        },
+        "customer": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            }
+          }
+        },
+        "summary": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "customer",
+        "summary"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
