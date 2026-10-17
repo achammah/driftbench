@@ -237,6 +237,53 @@ How to read it:
 * On Anthropic, the first `tool_use` keeps `call-1` and the second gets `toolu_h2`: Anthropic counts every call. Each `tool_result` names its own `tool_use_id`.
 * The free tool note is user text on both wires, after the assistant's reply text.
 
+The same prefix on the crewai adapter. A crew takes its history as text inputs, so with its default inputs the adapter refuses the two recorded calls before the crew starts. The script below runs the spec through the runner on a stand-in crew, with no Python and no model. It exits 1 when the run does not complete:
+
+```ts file=crew.mts
+import { readFileSync } from 'node:fs';
+import { crewaiAdapter, crewaiInputs } from '@agent-nexus/driftbench-adapters';
+import { defaultChecks } from '@agent-nexus/driftbench-checks';
+import { parseSpecText, runSpec } from '@agent-nexus/driftbench-core';
+import { createScriptedDriver } from '@agent-nexus/driftbench-users';
+
+// Usage: tsx crew.mts <spec file> [inputs]. A stand-in crew, no Python and no model: it answers every kickoff.
+// It exits 1 when the run did not complete.
+const [path, mode] = process.argv.slice(2);
+const loaded = parseSpecText(readFileSync(path as string, 'utf8'), 'yaml', path);
+if (!loaded.ok) throw new Error(`${path} is not a valid spec`);
+const transport = {
+  kind: 'http' as const,
+  reportsTools: false,
+  kickoff: async () => ({ raw: 'Acme Fiber 300 is 40 dollars a month.' }),
+};
+// Your own inputs: the default text inputs, plus the recorded calls as JSON in a field of their own.
+const withCalls = (...args: Parameters<typeof crewaiInputs>) => ({
+  ...crewaiInputs(...args),
+  tool_calls: JSON.stringify(args[0].flatMap((message) => message.tool_calls ?? [])),
+});
+const adapter = crewaiAdapter(mode === 'inputs' ? { transport, inputs: withCalls } : { transport });
+const run = await runSpec(loaded.spec, { adapter, driver: createScriptedDriver(), checks: defaultChecks(), mode: 'F', repeat: 0 });
+console.log(`status ${run.status}, ${run.blocks.length} block(s) run${run.error ? `\n${run.error}` : ''}`);
+process.exitCode = run.status === 'completed' ? 0 : 1;
+```
+
+```sh setup
+tsx crew.mts out/running-tool-history/paired.yaml # exit 1
+tsx crew.mts out/running-tool-history/paired.yaml inputs
+```
+
+```text
+$ tsx crew.mts out/running-tool-history/paired.yaml
+status failed, 0 block(s) run
+open on block 0 failed: AgentFailure: crewai: the Given prefix (origin authored) holds 2 recorded tool call(s), and a crew takes its history as text inputs, so its agents would read them as prose, not as tool results. Write those turns as blocks the crew runs, or pass `inputs` that hand the calls to the crew in a form it reads as records.
+(exit 1)
+$ tsx crew.mts out/running-tool-history/paired.yaml inputs
+status completed, 1 block(s) run
+(exit 0)
+```
+
+The run fails before any block: no block is recorded, and the error is the run's. With the adapter's `inputs` option, nothing is refused and the block runs. Here `inputs` gives the default text inputs, plus the recorded calls as JSON in a field of their own.
+
 ## Common errors
 
 A prefix with tool calls and `origin: recorded` or `origin: authored` on the crewai adapter, with its default inputs, fails the run with this error:
