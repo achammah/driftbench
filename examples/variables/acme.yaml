@@ -1,0 +1,236 @@
+# The variable store of the Acme sales assistant, a worked example of a prompt agent.
+# The quotes are copied from the committed Acme files; the path of each quote names its file.
+# The first four variables follow examples/acme/map/approved.yaml: three of its behaviours, the channels,
+# who is talking and what the coverage check says. The weights come from the other two sources, and so does
+# the last variable, which a condition of the prompt names.
+# Invented: the owner's words and the counts. The 200 conversations do not exist; their set_hash is the
+# SHA-256 of the text acme-example-conversations.
+format: 1
+agent: acme
+version: '1'
+inventory: ../acme/inventory.yaml
+prior:
+  kind: declared
+variables:
+  - id: behaviour
+    title: The behaviours the inventory lists (three of the fourteen)
+    kind: behaviour
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: B-001
+        title: Identify an existing customer by the email on the account before quoting their plan
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: ../acme/inventory.yaml
+            quote: 'title: Identify an existing customer by the email on the account before quoting their plan'
+      - id: B-013
+        title: Build the price sheet workbook from the catalog file, one sheet per category
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: ../acme/inventory.yaml
+            quote: 'title: Build the price sheet workbook from the catalog file, one sheet per category'
+      - id: B-014
+        title: Add a summary sheet to the existing workbook and leave every other file untouched
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: ../acme/inventory.yaml
+            quote: 'title: Add a summary sheet to the existing workbook and leave every other file untouched'
+  - id: channel
+    title: The channels the inventory names
+    kind: channel
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: chat
+        title: On chat
+        weight: 0.7
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: ../acme/inventory.yaml
+            quote: 'channels: [chat, whatsapp]'
+          - kind: conversations
+            count: 140
+            total: 200
+            set_hash: 6c12df8f30e7d0d61a629511cb34c4757da52195ff9b74e9fe6b3359b971ffef
+      - id: whatsapp
+        title: On whatsapp
+        weight: 0.3
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: ../acme/inventory.yaml
+            quote: 'channels: [chat, whatsapp]'
+          - kind: conversations
+            count: 60
+            total: 200
+            set_hash: 6c12df8f30e7d0d61a629511cb34c4757da52195ff9b74e9fe6b3359b971ffef
+  - id: user_type
+    title: Who is talking to the agent
+    kind: persona
+    role: axis
+    approved: true
+    produced_by: model
+    values:
+      - id: existing-customer
+        title: An Acme customer with an account and a plan
+        weight: 0.5
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/src/policy.ts
+            quote: '// Upgrade: an existing customer moves to a plan with more data.'
+          - kind: owner
+            words: Half of the people who write to us have an account, four in ten are new, one in ten is our own sales team.
+            date: 2026-10-14
+      - id: new-customer
+        title: Someone who is not an Acme customer yet
+        weight: 0.4
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/inventory.yaml
+            quote: 'title: A new customer asks for home internet at an address'
+          - kind: owner
+            words: Half of the people who write to us have an account, four in ten are new, one in ten is our own sales team.
+            date: 2026-10-14
+      - id: sales-operations
+        title: Acme sales operations staff working with the code agent
+        weight: 0.1
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/inventory.yaml
+            quote: "title: Sales operations builds the price sheet in a code agent's workspace"
+          - kind: owner
+            words: Half of the people who write to us have an account, four in ten are new, one in ten is our own sales team.
+            date: 2026-10-14
+  - id: coverage_result
+    title: What the coverage check says about the address
+    kind: data
+    role: axis
+    approved: true
+    produced_by: model
+    values:
+      - id: fiber
+        title: Fiber reaches the address
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/src/policy.ts
+            quote: 'Good news: ${coverage.address} has fiber up to ${coverage.fiber_mbps} Mbps.'
+      - id: 5g-only
+        title: No fiber, but 5G home internet
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/src/policy.ts
+            quote: 'Fiber is not available at ${coverage.address} yet, but 5G home internet is.'
+      - id: no-service
+        title: Neither fiber nor 5G reaches the address
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/src/policy.ts
+            quote: 'No Acme home internet plan is available at ${coverage.address} yet.'
+      - id: not-in-map
+        title: The address is not in the coverage map
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/src/policy.ts
+            quote: "I can't find ${s.address} in our coverage map."
+  # "Once more" allows one retry, so the second failure in a row is where the condition starts to hold.
+  # "At least" includes the limit, so the edge is on the side where the condition holds.
+  - id: lookup_failures_in_a_row
+    title: How many times in a row a lookup tool has failed
+    kind: data
+    role: detail
+    approved: true
+    produced_by: model
+    provenance:
+      - kind: quote
+        path: ../acme/prompts/acme-sales.md
+        quote: If it fails again, say the service is not responding, do not guess its answer, and offer a call from a sales advisor
+    values:
+      - id: no_failure
+        title: No lookup has failed
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/prompts/acme-sales.md
+            quote: If catalog_search, coverage_check or port_check returns an error, you may try that call once more.
+      - id: one
+        title: One lookup failed
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/prompts/acme-sales.md
+            quote: If catalog_search, coverage_check or port_check returns an error, you may try that call once more.
+      - id: two
+        title: The retry failed too
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/prompts/acme-sales.md
+            quote: If it fails again, say the service is not responding, do not guess its answer, and offer a call from a sales advisor
+      - id: three_or_more
+        title: Three failures or more
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../acme/prompts/acme-sales.md
+            quote: If it fails again, say the service is not responding, do not guess its answer, and offer a call from a sales advisor
+    boundaries:
+      - holds: three_or_more
+        fails: one
+        edge: two
+        limit: 2
+        comparison: ge
+        unit: failures
+        provenance:
+          - kind: quote
+            path: ../acme/prompts/acme-sales.md
+            quote: If it fails again, say the service is not responding, do not guess its answer, and offer a call from a sales advisor
+constraints:
+  - forbid: { behaviour: B-013, channel: whatsapp }
+    reason: B-013 applies only on chat
+    approved: true
+    produced_by: code
+    provenance:
+      - kind: quote
+        path: ../acme/inventory.yaml
+        quote: |-
+          id: B-013
+          title: Build the price sheet workbook from the catalog file, one sheet per category
+          kind: task
+          channels: [chat]
+  - forbid: { behaviour: B-014, channel: whatsapp }
+    reason: B-014 applies only on chat
+    approved: true
+    produced_by: code
+    provenance:
+      - kind: quote
+        path: ../acme/inventory.yaml
+        quote: |-
+          id: B-014
+          title: Add a summary sheet to the existing workbook and leave every other file untouched
+          kind: task
+          channels: [chat]
+  - forbid: { behaviour: B-001, channel: whatsapp }
+    reason: B-001 applies only on chat
+    approved: true
+    produced_by: code
+    provenance:
+      - kind: quote
+        path: ../acme/inventory.yaml
+        quote: |-
+          id: B-001
+          title: Identify an existing customer by the email on the account before quoting their plan
+          channels: [chat]

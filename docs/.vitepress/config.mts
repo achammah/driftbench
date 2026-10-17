@@ -135,6 +135,7 @@ export default defineConfig({
           { text: 'CLI plugins', link: '/plugins' },
           { text: 'Generating tests', link: '/generating' },
           { text: 'Testing an estate', link: '/estate' },
+          { text: 'The variable store', link: '/variables' },
           { text: 'Datasets and prompts', link: '/datasets' },
           { text: 'Validators', link: '/validators' },
           { text: 'Benchmark floors', link: '/benchmarks' },
