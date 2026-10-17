@@ -244,6 +244,63 @@ jobs:
           name: epipe-${{ matrix.rep }}
           path: epipe-${{ matrix.rep }}.log
 
+  asks-diag:
+    # Measurement only, on train/estate-asks-diag. Never merged to main. It patches the working tree of a throwaway
+    # checkout (never committed) so that gen.asks.asks-approved names the specs and asks it counts.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',asks-diag,')
+    name: asks-approved on seed ${{ matrix.seed }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [659085678, 805923309, 160509792, 122112695, 196457869, 868831311]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: 33ba0e0f801bbcdb08f2f7d4508ef2bb65c406fe
+          fetch-depth: 1
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Make the check print its specs (working tree only, not committed)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          p = 'packages/validators/src/ladders/estate/bank/loop.ts'
+          s = open(p).read()
+          old = ": `${bad.length} complete specs ask an unapproved phrase that is not a disclosed code-written ask`;"
+          new = ": `${bad.length} complete specs ask an unapproved phrase that is not a disclosed code-written ask` + ' || DIAG ' + bad.map((v) => `${v.spec.record.row} [${v.spec.record.testType}] ${JSON.stringify(asksOfSpec(v))}`).join(' ;; ');"
+          assert old in s, 'line not found'
+          open(p, 'w').write(s.replace(old, new, 1))
+          PY
+          git diff --stat
+      - name: Estate ladder on this seed
+        shell: bash
+        run: |
+          status=0
+          pnpm -s driftbench validate estate --seed ${{ matrix.seed }} --all-levels --json > "asks-${{ matrix.seed }}.json" || status=$?
+          echo "{\"exit\": $status}" > "asks-${{ matrix.seed }}.meta.json"
+          python3 - <<'PY'
+          import json
+          d = json.load(open("asks-${{ matrix.seed }}.json"))
+          hits = [i for i in d.get("failingItems", []) if i["id"] == "gen.asks.asks-approved"]
+          print("asks-approved:", "RED" if hits else "green")
+          for h in hits:
+              print(h["detail"])
+          PY
+      - name: Keep the result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: asks-${{ matrix.seed }}
+          path: |
+            asks-${{ matrix.seed }}.json
+            asks-${{ matrix.seed }}.meta.json
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
