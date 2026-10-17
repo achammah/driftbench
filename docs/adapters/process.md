@@ -84,6 +84,10 @@ The adapter tells the agent where its files are through environment variables:
 
 The agent may append one JSON object per line to two files. Both are optional. The adapter deletes them before each block, so what they hold belongs to that block.
 
+* A block starts with no `driftbench-commands.jsonl` and no `driftbench-runtime.jsonl`.
+* A runtime event of one block never appears in the `runtime` of the next block.
+* A block whose agent writes no runtime file has no `runtime`, whatever an earlier block reported.
+
 * `driftbench-commands.jsonl`: one command the agent ran per line, with `command` and an integer `exitCode`, and optionally `startedAt` and `latencyMs`. Each becomes an execution record with role `command`.
 * `driftbench-runtime.jsonl`: one runtime event per line: `type` is `skill`, `guard` or `stage`, with a `name`; a guard also needs its `verdict`. Each may carry `at`, an ISO time.
 
@@ -146,6 +150,18 @@ Bounds, so a runaway agent cannot exhaust the run:
 * A child that left the command's process group (it started its own session) is found by its working folder after the command ends. Linux reads this from `/proc` at once. macOS has no `/proc`: the sweep runs `ps` and `lsof` after the exit, so on a heavily loaded host a child that wakes within about half a second of the exit may run before it is ended.
 * A file read returns at most 100 MiB.
 * A snapshot stops past 20,000 files, 32 folder levels or 1 GiB hashed. It never enters `node_modules` or `.git`.
+
+### Workspace paths
+
+Every path given to a sandbox is relative to the workspace root. The sandbox normalises it before it checks it.
+
+* A path that is empty or holds a NUL byte is refused.
+* An absolute path is refused.
+* A path that normalises to `..`, or to a path that starts with `../`, leaves the workspace and is refused. `a/../..` is such a path.
+* A path that stays inside after it is normalised is accepted. `a/../b` is `b`.
+* A path is inside the workspace only when it is the root or lies below the root folder. A sibling folder whose name starts with the workspace's name is outside it: `/tmp/ws-other` is not inside `/tmp/ws`.
+* A path that resolves outside the workspace through a symbolic link is refused.
+* A write never passes through a symbolic link.
 
 ## Errors
 

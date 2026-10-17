@@ -35,7 +35,7 @@ Every page says what exists today and what is not built yet, with the phase that
 * [Campaign-level criteria](aggregates.md): one threshold over every run of a campaign, for example a pass rate; a library API, no command flag yet.
 * [Production traces](traces.md): `driftbench import traces` drafts specs from OpenTelemetry, Nexus or Claude Code traces; `driftbench monitor --source traces` watches production for drift in time windows, with the measured delay and false alarms.
 * [Releasing](releasing.md): the 0.1.0 packages, the release check and the tag-only release workflow.
-* [Validators](validators.md): code that proves driftbench works: six ladders (map, generator, judges, system, estate, statistics) and the executor loop that drives each to 100 percent.
+* [Validators](validators.md): code that proves driftbench works: seven ladders (blocks, map, generator, judges, system, estate, statistics) and the executor loop that drives each to 100 percent.
 * [Benchmark floors](benchmarks.md): the shipped default judge on immutable fictional slices, recorded responses, free replay, and regression floors in CI.
 
 ## Reference
@@ -52,6 +52,7 @@ Every page says what exists today and what is not built yet, with the phase that
 * [CLI](reference/cli.md): every `driftbench` command, its options, its output and its exit codes.
 * [Public API](reference/api.md): what a package's public API is, the frozen list of its names, and how a name is added or removed.
 * [Checks](reference/checks.md): every field of `expect`, the check that reads it, and its verdict ids.
+* [Block contracts](reference/block-contracts.md): the contracts of the block redesign that are built on open pull requests and have no other reference yet.
 
 ## Adapters
 
@@ -123,7 +124,7 @@ Each row names a command that shows the phase working on the bundled examples, w
 | 4, statistics and gates | statistics functions with reference fixtures, the parity verdict, scorecard, run diff, JUnit output, CI gate, drift monitor, viewer, runtime battery | built but the runtime battery, which is not built | `pnpm driftbench ci --specs examples/acme/specs/conversations --target fault:x3-skips-recap --faults examples/acme/faults --baseline <campaign> --store <db> --margin 50` |
 | G, the space of situations | the map of situations, its coverage and completeness, the map extractor, generation, the gate, task families, the variance pilot, intake, selection and the holdout | built | `pnpm driftbench select --cover examples/acme/map/space.yaml --specs examples/acme/gated --out <dir> --k 10` |
 | E, estates | estate scan, lint, approval and map; the plan; test generation; replay; maintenance; the live runner and estate mutants | built; the unit runner is not built | `pnpm driftbench estate mutate examples/estates/fixture/approved.yaml --atom gate.standing.read-a-file-before-editing-it --delete --to <dir>` |
-| V, validators | the validator frame and six ladders | in progress: the frame, the judge ladder and the statistics ladder are built | `pnpm driftbench validate stats` |
+| V, validators | the validator frame and seven ladders | in progress: the frame, the judge ladder and the statistics ladder are built | `pnpm driftbench validate stats` |
 | Release | SDK agent adapters, docs site, version 0.1.0 on npm | in progress: eight SDK adapters and the docs site are built; version 0.1.0 is prepared ([release workflow and check](releasing.md)) and not published | `pnpm build && node tools/release/check.mjs` |
 
 There is no separate phase for code agents. A task spec runs through each phase with the conversation specs.
