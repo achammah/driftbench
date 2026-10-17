@@ -24,7 +24,7 @@ Each section has:
 - an `id`, never reused for other text;
 - a `scope`: `global` when the section can reach every block (persona, language, tone), `local` when it reaches only the blocks linked to it;
 - a `span` and the `sha256` of its text;
-- an `anchor`: a quote inside the section, unique in the prompt, with the text just before and after it;
+- an `anchor`: a quote inside the section, with the text just before and after it. The quote is unique in the prompt. When the prompt repeats the text of the section, it is not: the anchor then carries an `occurrence`, from 1 in text order, that names the copy of the quote lying in this section;
 - optional `references` (sections it refers to), `overrides` (sections it narrows or extends) and `duplicates` (sections that state the same rule).
 
 Offsets are UTF-16 code units after NFC and CRLF or CR to LF, end exclusive: the same unit as the anchors of `radius auto`. A model never writes an offset: a link names a section by id.
@@ -51,7 +51,7 @@ A target is a `prompt_section`, a `spec_clause` (`spec`, `clause`, optional `sha
 
 `metadata.links` and `metadata.provenance` stay out of the spec hash. A link added, promoted or refuted never changes the hash, a run id, a cache key, a carry or a rejudge. A spec without them hashes exactly as before.
 
-**Re-anchoring** finds each section again in the next version of the prompt. In order: the same text found once (`same_hash`). Else the anchor quote found once, with the old text at the same distance from it (`quote`). Else the prefix, quote and suffix window found once, the same way (`window`). Else the section is `stale`. A section is only ever placed where its text hashes as before. An edit inside a section makes it stale. It is never anchored to the wrong text. Text that changed outside every section, whitespace aside, is reported, because it can reach any block.
+**Re-anchoring** finds each section again in the next version of the prompt. In order: the same text found once (`same_hash`). Else, when the old prompt repeats the text (identical sections) and the new prompt holds as many copies, the same copy number (`occurrence`): the first copy stays the first and the second the second, whatever was inserted above them. Else the anchor quote found once, with the old text at the same distance from it (`quote`). Else the prefix, quote and suffix window found once, the same way (`window`). For repeated text, a quote or a window counts only when it names one copy in the old prompt too. Else the section is `stale`. A section is only ever placed where its text hashes as before, and two sections never hold one place. An edit inside a section makes it stale. It is never anchored to the wrong text. Text that changed outside every section, whitespace aside, is reported, because it can reach any block.
 
 **Advisory section selection.** `radius sections reanchor --change-out` writes a change manifest. It holds one `prompt_section` change (`<prompt-id>#<section-id>`) per stale or reordered section, and one global `prompt` change when text changed outside every section. `radius <specs> --change <manifest> --sections <registries>` then prints which blocks selection by section links would run:
 
@@ -84,7 +84,7 @@ On the H7 mutation suite this rule ranked the planted section worse than countin
 driftbench radius sections init <prompt> --id <prompt-id> --prompt-version <version> [--level <n>] [--out <file>]
 ```
 
-Writes a first registry: one section per markdown heading of level 1 to `--level`, from the heading to the next one. Trailing whitespace is left out. Text before the first heading is the section `preamble`. Ids are the slugged titles, with `_2`, `_3` for repeats. Every section starts `global`, the safe reading. Mark local the sections that reach only the blocks linked to them, and add `references`, `overrides` and `duplicates` by hand.
+Writes a first registry: one section per CommonMark heading of level 1 to `--level`, from the heading to the next one. A heading is an ATX heading (`#` to `######`, indented up to three spaces, its closing `#` sequence dropped) or a setext heading (a paragraph underlined with `=` or `-`). A `#` line inside a fenced code block is code, also when the fence opens on a list or quote line. A leading YAML front matter block (`---` to `---`) is not read for headings. HTML blocks and indented code are not parsed. Trailing whitespace is left out. Text before the first heading is the section `preamble`. Ids are the slugged titles, with `_2`, `_3` for repeats: a repeat takes the next free number, so two ids are never equal. Two sections with the same text keep an entry each, and their anchors carry an `occurrence`. A section with no word of its own, such as an empty heading next to another, is folded into the section before it. Every section starts `global`, the safe reading. Mark local the sections that reach only the blocks linked to them, and add `references`, `overrides` and `duplicates` by hand.
 
 | Option | Meaning | Default |
 |---|---|---|
@@ -94,7 +94,7 @@ Writes a first registry: one section per markdown heading of level 1 to `--level
 | `--level <n>` | The deepest heading level that starts a section, 1 to 6. | `2` |
 | `--out <file>` | Write the registry here. | print the YAML |
 
-Exit 0 when written. Exit 2 when the prompt cannot be read, `--level` is not 1 to 6, or a section has no quote unique in the prompt.
+Exit 0 when written. Exit 2 when the prompt cannot be read, `--level` is not 1 to 6, or the prompt has no section.
 
 ### driftbench radius sections check
 
@@ -102,7 +102,7 @@ Exit 0 when written. Exit 2 when the prompt cannot be read, `--level` is not 1 t
 driftbench radius sections check <registry> --prompt <file> [--json]
 ```
 
-Checks that the registry describes the prompt. It checks the whole-text hash, each section's span and hash, each anchor found once and inside its section, no two sections overlapping. Stale sections are listed, not checked.
+Checks that the registry describes the prompt. It checks the whole-text hash, each section's span and hash, each anchor found once and inside its section (with an `occurrence`: found at least that often, and that copy inside its section), no two sections overlapping. Stale sections are listed, not checked.
 
 | Option | Meaning | Default |
 |---|---|---|
@@ -170,7 +170,7 @@ sections:
     scope: local               # local or global
     span: {start: 5332, end: 5604}
     sha256: 9b1f...            # SHA-256 of the section text, 64 hex
-    anchor: {quote: "Place an order only after", prefix: "...", suffix: "..."}
+    anchor: {quote: "Place an order only after", prefix: "...", suffix: "..."}   # occurrence: 2 (optional): which copy of a repeated quote
     references: [recap]        # optional
     overrides: []              # optional
     duplicates: []             # optional
@@ -189,7 +189,7 @@ sections:
 
 `radius sections check` prints `<prompt> <version>: <n> sections match the prompt.`, with `; <k> stale: <ids>` when some are stale, or one line per problem.
 
-`radius sections reanchor` prints `<prompt> <old version> to <new version>: <k> kept, <m> moved, <s> stale.` Then it prints one line per stale section with its reason, and the sections that changed order. It prints one line per change outside every section: `changed outside every section, between <a> and <b>: can reach any block`. A stale reason is either `the anchor is found but the section text changed: edited inside` or `neither the text nor the anchor is found once: edited or removed`.
+`radius sections reanchor` prints `<prompt> <old version> to <new version>: <k> kept, <m> moved, <s> stale.` Then it prints one line per stale section with its reason, and the sections that changed order. It prints one line per change outside every section: `changed outside every section, between <a> and <b>: can reach any block`. A stale reason is `the anchor is found but the section text changed: edited inside`, or `neither the text nor the anchor is found once: edited or removed`, or, for repeated text, `its text occurs <k> times in the old prompt and <m> in the new one, and its surroundings do not tell which copy it is`, or `its text is repeated and its surroundings fit the same copy as <ids>: nothing tells which section it is`.
 
 ## Worked example
 
@@ -300,7 +300,7 @@ Counted per root, the sections of the two first failures tie at the top. `explic
 
 - `text_sha256: the registry does not describe this prompt text`: the prompt changed since the registry was written. Re-anchor from the version the registry describes.
 - `the registry does not describe the old prompt text (text_sha256 differs)` from `reanchor`: the first `--prompt` file is not the version of the registry.
-- `<id>: no quote inside the section is unique in the prompt` from `init`: two sections hold the same text. Make one differ, or write that entry by hand.
+- Two sections hold the same text: `init` keeps both. Their ids are `<slug>` and `<slug>_2`, and their anchors carry an `occurrence`. `reanchor` keeps them in order when the number of copies is unchanged. When a copy was added, removed or edited, a copy comes out stale unless its surroundings name it.
 - A section that stays stale after every re-anchoring: declare its span again (`span`, `sha256`, `anchor`) and remove `stale`.
 - `radius localize needs --sections <registries...>`: give the registry of the prompt to rank.
 - `The campaign holds runs in modes F, T: name one with --mode`: localisation reads one mode at a time.

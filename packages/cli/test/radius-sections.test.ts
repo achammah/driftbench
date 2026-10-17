@@ -66,6 +66,71 @@ it('writes a registry from the headings and checks it against the prompt', async
   expect(wrong.out).toContain('text_sha256');
 }, 60_000);
 
+it('keeps two identical sections apart from init to re-anchoring', async () => {
+  const chart = '## Chart room\nKeep the chart dry and the lamp trimmed.\n';
+  const old = `## Moorings\nTie off fore and aft.\n\n${chart}\n## Signals\nFlash the lamp twice.\n\n${chart}`;
+  await writeFile(join(dir, 'old.md'), old);
+  await writeFile(join(dir, 'new.md'), `## Weather\nRead the glass at dawn.\n\n${old}`);
+  const made = await cli([
+    'radius',
+    'sections',
+    'init',
+    'old.md',
+    '--id',
+    'lighthouse',
+    '--prompt-version',
+    'v1',
+    '--out',
+    'lighthouse.sections.yaml',
+  ]);
+  expect(made.code).toBe(0);
+  expect(made.err).toContain('4 sections, all global');
+  const registry = parse(await readFile(join(dir, 'lighthouse.sections.yaml'), 'utf8'));
+  expect(registry.sections.map((section: { id: string }) => section.id)).toEqual([
+    'moorings',
+    'chart_room',
+    'signals',
+    'chart_room_2',
+  ]);
+  expect(
+    registry.sections.map((section: { anchor: { occurrence?: number } }) => section.anchor.occurrence),
+  ).toEqual([undefined, 1, undefined, 2]);
+  const checked = await cli([
+    'radius',
+    'sections',
+    'check',
+    'lighthouse.sections.yaml',
+    '--prompt',
+    'old.md',
+  ]);
+  expect(checked.code).toBe(0);
+  expect(checked.out).toContain('4 sections match the prompt');
+
+  const moved = await cli([
+    'radius',
+    'sections',
+    'reanchor',
+    'lighthouse.sections.yaml',
+    '--prompt',
+    'old.md',
+    'new.md',
+    '--to-version',
+    'v2',
+    '--out',
+    'v2.sections.yaml',
+    '--json',
+  ]);
+  const sections = JSON.parse(moved.out).sections as Array<{ id: string; status: string; method?: string }>;
+  expect(sections.map((section) => [section.id, section.status, section.method])).toEqual([
+    ['moorings', 'moved', 'same_hash'],
+    ['chart_room', 'moved', 'occurrence'],
+    ['signals', 'moved', 'same_hash'],
+    ['chart_room_2', 'moved', 'occurrence'],
+  ]);
+  const after = await cli(['radius', 'sections', 'check', 'v2.sections.yaml', '--prompt', 'new.md']);
+  expect(after.code).toBe(0);
+}, 60_000);
+
 it('re-anchors on the next prompt version: edited sections stale, the rest moved or kept', async () => {
   const prompt = await readFile(join(fixtures, 'acme-sales.md'), 'utf8');
   await writeFile(join(dir, 'old.md'), prompt);

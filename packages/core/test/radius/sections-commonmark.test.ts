@@ -149,8 +149,8 @@ describe('sectionsFromHeadings reads CommonMark headings', () => {
       expect(ids('\n---\nname: lamp\n---\nYou keep the lamp.\n')).toEqual(['name_lamp']);
     });
 
-    it('reads a text of three --- lines and words as a front matter block then a heading', () => {
-      expect(ids('---\nFoo\n---\nBar\n---\nBaz\n')).toEqual(['preamble', 'bar']);
+    it('does not take lines that are not keys for front matter: three --- lines and words are thematic breaks and setext headings', () => {
+      expect(ids('---\nFoo\n---\nBar\n---\nBaz\n')).toEqual(['foo', 'bar']);
     });
   });
 
@@ -178,6 +178,59 @@ describe('sectionsFromHeadings reads CommonMark headings', () => {
     });
   });
 
+  describe('a fence in a container ends with the container', () => {
+    it('finds the heading after a blank line when a list item fence is never closed', () => {
+      expect(ids('## Tides\nSteps:\n- ```\n  ## in\n\n## After\nTie off.\n')).toEqual(['tides', 'after']);
+      expect(ids('## Tides\nSteps:\n1. ~~~\n   ## in\n## After\nTie off.\n')).toEqual(['tides', 'after']);
+    });
+
+    it('finds the heading after a quote fence that is never closed, with or without a blank line', () => {
+      expect(ids('## Tides\n> ```\n> ## in\n\n## After\nTie off.\n')).toEqual(['tides', 'after']);
+      expect(ids('## Tides\n> ```\n> ## in\n## After\nTie off.\n')).toEqual(['tides', 'after']);
+    });
+
+    it('keeps a fence open across blank lines and indented lines of its item', () => {
+      const text = '## Tides\n- ```\n  ## in\n\n  ## still in\n  ```\n## After\nTie off.\n';
+      expect(ids(text)).toEqual(['tides', 'after']);
+    });
+
+    it('reads a fence in a list in a quote, and the end of the quote closes it', () => {
+      expect(ids('## Tides\n> - ```\n>   ## in\n>   ```\n## After\nTie off.\n')).toEqual(['tides', 'after']);
+      expect(ids('## Tides\n> - ```\n>   ## in\n\n## After\nTie off.\n')).toEqual(['tides', 'after']);
+      expect(ids('## Tides\n- > ```\n  > ## in\n## After\nTie off.\n')).toEqual(['tides', 'after']);
+    });
+  });
+
+  describe('front matter edges', () => {
+    it('skips front matter after a byte order mark, and reads a heading after one', () => {
+      expect(ids('\uFEFF---\nname: lamp\n---\n\nYou keep the lamp.\n')).toEqual(['preamble']);
+      expect(ids('\uFEFF# Title\nBody text here.\n')).toEqual(['title']);
+    });
+
+    it('does not hide a heading between two --- lines that are not front matter', () => {
+      expect(ids('---\n# One\n\nBody one.\n\n---\nAfter.\n')).toEqual(['one']);
+    });
+
+    it('still takes a block with a key as front matter, comments and indented lines included', () => {
+      const text =
+        '---\n# note\nname: lamp\ntools:\n- Read\n- Grep\nnotes: |\n  # not a heading\n---\n\n## Real\nBody.\n';
+      expect(ids(text)).toEqual(['preamble', 'real']);
+    });
+
+    it('does not take a block with a line that is not a key for front matter', () => {
+      const text = '---\nname: lamp\nTrim the wick daily.\n---\nBody text.\n';
+      expect(ids(text)).toEqual(['name_lamp_trim_the_wick_daily']);
+    });
+
+    it('does not take a block of comments and list items alone for front matter', () => {
+      expect(ids('---\n# note\n- Read\n---\nBody text.\n')).toEqual(['note']);
+    });
+
+    it('takes an empty block as front matter', () => {
+      expect(ids('---\n---\n\n## Real\nBody.\n')).toEqual(['preamble', 'real']);
+    });
+  });
+
   describe('sections that cannot be anchored', () => {
     it('folds adjacent empty headings into the section before them', () => {
       const text = '## Tides\nRead the gauge.\n##\n##\n#\n';
@@ -190,6 +243,21 @@ describe('sectionsFromHeadings reads CommonMark headings', () => {
       expect(ids(text)).toEqual(['real']);
       expect(titles(text)).toEqual(['Real']);
       expect(built(text)[0]?.span.start).toBe(0);
+    });
+
+    it('keeps two identical sections that hold text, each with an entry of its own', () => {
+      expect(ids('## Same\nSame body line.\n## Same\nSame body line.\n')).toEqual(['same', 'same_2']);
+    });
+
+    it('counts the words of a heading title: a titled heading with no body is kept, a lone symbol heading folds', () => {
+      expect(ids('## Tides\nRead the gauge.\n## Moorings\n## Signals\nFlash twice.\n')).toEqual([
+        'tides',
+        'moorings',
+        'signals',
+      ]);
+      expect(ids('## Tides\nRead the gauge.\n## ***\n## ***\n')).toEqual(['tides']);
+      // A repeated title with no body has no unique quote: its title is the only word it has, and it keeps an entry.
+      expect(ids('## Notes\n## Notes\nLog the tide at noon.\n')).toEqual(['notes', 'notes_2']);
     });
 
     it('keeps the whole text as one section when every heading is empty, and reports an empty prompt', () => {
