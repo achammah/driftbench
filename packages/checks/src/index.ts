@@ -92,11 +92,4 @@ export {
 export { type PiiFinding, type PiiKind, redact, scanPii } from './support/pii';
 export { type SchemaIssue, validateStrict } from './support/schema';
 
-import { initializeShippedObjects } from './objects';
-
 export const packageName = '@agent-nexus/driftbench-checks';
-
-// A program that loads this package loads the specs that use its objects: register them now.
-initializeShippedObjects();
-
-export { DEFAULT_CHECK_SET, initializeShippedObjects } from './objects';

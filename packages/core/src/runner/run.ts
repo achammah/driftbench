@@ -1,11 +1,10 @@
 import type { AdapterCapabilities, AgentAdapter, Session, Turn } from '../contracts/adapter';
 import type { ArtifactReaderRegistry } from '../contracts/artifacts';
-import { type Check, type CheckContext, type CheckSet, machineVerdict } from '../contracts/check';
+import { type CheckContext, type CheckSet, machineVerdict } from '../contracts/check';
 import type { DriverStep, UserDriver } from '../contracts/driver';
 import { copyHistory, freezeMessage } from '../contracts/history';
 import type { Store } from '../contracts/store';
 import { gateToolCalls, type ToolRule } from '../contracts/tool-policy';
-import { blockCheckSet } from '../objects';
 import { type BlockReuse, planBlockRerun } from '../radius/blocks';
 import { collectRetries, type RetryPolicy, retryPolicy } from '../retry';
 import type { Message, TargetRef, WorldState } from '../schema/common';
@@ -19,7 +18,6 @@ import {
   type RunMode,
   RunResult,
   Verdict,
-  type VerdictBy,
 } from '../schema/run';
 import type { BlockSpec, EndState, Expect, GivenOverride, Spec, Stimulus } from '../schema/spec';
 import { cloneJson, contentHash } from '../spec/hash';
@@ -149,13 +147,8 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
   const specHash = specHashOf(spec);
   // The cache key leaves out the spec's version: a free label that plays no part (docs/running.md, "The
   // cache and replay"), so relabelling a spec still replays its runs.
-  // `uses` (the spec's and each block's) is part of the spec hash and out of the block cache key: it picks the
-  // checks that score a block, never what the agent is sent.
-  const { version: _version, uses: _uses, ...unlabelled } = specIdentity(spec);
-  const cacheSpecHash = contentHash({
-    ...unlabelled,
-    blocks: unlabelled.blocks.map(({ uses: _blockUses, ...rest }) => rest),
-  });
+  const { version: _version, ...unlabelled } = specIdentity(spec);
+  const cacheSpecHash = contentHash(unlabelled);
   const target = options.target ?? spec.target ?? { adapter: options.adapter.id };
   const prices = options.prices === undefined ? undefined : TokenPrices.parse(options.prices);
   if (options.requireTokenPrices) preflightTargetPrices([target], prices);
@@ -700,25 +693,22 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       const capture = run.provenance
         ? captureArtifacts({ observed, readArtifact: channel.readArtifact() })
         : undefined;
-      const verdicts = await applyChecks(
-        planChecks(run.checks, spec, step.kind === 'block' ? step.blockIndex : undefined),
-        {
-          spec,
-          mode: run.mode,
-          blockIndex: position,
-          block: planned.block,
-          stimulus: planned.stimulus,
-          expect: planned.expect,
-          given,
-          observed,
-          // A teacher-forced block is an independent sample: no earlier block of the run is its history.
-          history: run.mode === 'T' ? [] : [...blocks],
-          ledger: facts.ledger,
-          endState,
-          artifacts: run.artifacts,
-          readArtifact: capture ? capture.readArtifact : channel.readArtifact(),
-        },
-      );
+      const verdicts = await applyChecks(run.checks, {
+        spec,
+        mode: run.mode,
+        blockIndex: position,
+        block: planned.block,
+        stimulus: planned.stimulus,
+        expect: planned.expect,
+        given,
+        observed,
+        // A teacher-forced block is an independent sample: no earlier block of the run is its history.
+        history: run.mode === 'T' ? [] : [...blocks],
+        ledger: facts.ledger,
+        endState,
+        artifacts: run.artifacts,
+        readArtifact: capture ? capture.readArtifact : channel.readArtifact(),
+      });
       // The stage reached: the runtime's, else the step classifier's. Before the block: in T the stage the
       // spec expects of the blocks before it, in F and P the stage the run's previous block reached.
       const previous =
@@ -1033,9 +1023,9 @@ function planStep(spec: Spec, step: Exclude<DriverStep, { kind: 'stop' }>): Plan
  * refuses, gives an inconclusive gating verdict that names the problem: the block cannot pass on it,
  * and nothing is skipped silently.
  */
-async function applyChecks(plan: readonly PlannedCheck[], ctx: CheckContext): Promise<Verdict[]> {
+async function applyChecks(checks: CheckSet, ctx: CheckContext): Promise<Verdict[]> {
   const verdicts: Verdict[] = [];
-  for (const { check, by, gating } of plan) {
+  for (const check of checks) {
     let produced: Verdict[];
     try {
       if (!check.applies(ctx)) continue;
@@ -1054,12 +1044,7 @@ async function applyChecks(plan: readonly PlannedCheck[], ctx: CheckContext): Pr
     for (const verdict of produced) {
       const parsed = Verdict.safeParse(verdict);
       if (parsed.success) {
-        // The item's effect can only take a verdict out of the gate, never put one in.
-        verdicts.push({
-          ...parsed.data,
-          ...(gating === false ? { gating: false } : {}),
-          ...(by ? { by } : {}),
-        });
+        verdicts.push(parsed.data);
       } else {
         const issue = parsed.error.issues[0];
         verdicts.push(
@@ -1074,41 +1059,6 @@ async function applyChecks(plan: readonly PlannedCheck[], ctx: CheckContext): Pr
     }
   }
   return verdicts;
-}
-
-/** A check the run applies to a block, with the item of the check set that put it there. */
-type PlannedCheck = { check: Check; by?: VerdictBy; gating?: boolean };
-
-const BUILTIN_PREFIX = 'builtin:check/';
-
-/**
- * The checks of a block in the order of its check set: each enabled item runs the check its implementation
- * names, and its verdicts say which item and layer produced them. A check no item names runs after them, as
- * before; a check whose item a layer turned off does not run. With no shipped set registered, the checks run
- * as the run was given them.
- */
-function planChecks(checks: CheckSet, spec: Spec, index: number | undefined): PlannedCheck[] {
-  const { set } = blockCheckSet(spec, index ?? -1);
-  if (!set) return checks.map((check) => ({ check }));
-  const byName = new Map(checks.map((check) => [check.name, check]));
-  const controlled = new Set(
-    set.items
-      .filter((item) => item.impl.startsWith(BUILTIN_PREFIX))
-      .map((item) => item.impl.slice(BUILTIN_PREFIX.length)),
-  );
-  const planned: PlannedCheck[] = [];
-  for (const item of set.items) {
-    if (item.enabled === false || !item.impl.startsWith(BUILTIN_PREFIX)) continue;
-    const check = byName.get(item.impl.slice(BUILTIN_PREFIX.length));
-    if (!check) continue;
-    planned.push({
-      check,
-      gating: item.effect.gating,
-      by: { object: set.name, item: item.id, impl: item.impl, layer: item.layer },
-    });
-  }
-  for (const check of checks) if (!controlled.has(check.name)) planned.push({ check });
-  return planned;
 }
 
 /** The Observed with the block's retries added after any the adapter reported itself. */

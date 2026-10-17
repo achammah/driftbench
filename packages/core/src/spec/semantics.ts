@@ -1,5 +1,4 @@
 import { posix } from 'node:path';
-import { checkUses } from '../objects';
 import type { Assertion, Count, WorldState } from '../schema/common';
 import type { Expect, Spec } from '../schema/spec';
 import { error, type Issue } from './issues';
@@ -131,7 +130,6 @@ export function checkSemantics(spec: Spec): Issue[] {
   const facts = factsOf(spec);
   checkWorkspace(spec.given?.world, 'given.world', issues);
   checkParents(spec, issues);
-  for (const issue of checkUses(spec)) issues.push(error(issue.code, issue.path, issue.message));
   const blockIds = new Set<string>();
   spec.blocks.forEach((block, index) => {
     if (block.id !== undefined) {

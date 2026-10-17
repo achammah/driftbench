@@ -21,41 +21,6 @@ import { BlockLinks } from './links';
  * Then (the expected output and state delta, under `expect`).
  */
 
-/** One change to an item of a check set: switch it off or on, retune it, move it, or add a new one. */
-const CheckSetItemChange = z.strictObject({
-  id: z.string().min(1).describe('The item to change, or to add.'),
-  add: z.boolean().optional().describe('True to add a new item: it needs when, effect and impl.'),
-  enabled: z.boolean().optional().describe('False turns the item off for this layer.'),
-  title: z.string().optional().describe('A short name for the item.'),
-  when: z.record(z.string(), z.unknown()).optional().describe('When the item applies.'),
-  effect: z
-    .strictObject({ gating: z.boolean().describe('True when its verdicts gate the block.') })
-    .optional()
-    .describe('What the item does to the block.'),
-  impl: z.string().min(1).optional().describe('The builtin implementation that runs the item.'),
-  before: z.string().min(1).optional().describe('Moves the item before this one.'),
-});
-
-/** The check set a spec or a block uses: the name of a shipped one, or an override of one. */
-export const CheckSetUse = z
-  .union([
-    z.string().min(1).describe('The id of a shipped check set.'),
-    z.strictObject({
-      extends: z.string().min(1).optional().describe('The check set to start from. Default: the one below.'),
-      items: z.array(CheckSetItemChange).optional().describe('The changes, in order.'),
-      order: z.array(z.string().min(1)).optional().describe('The whole order of the items.'),
-    }),
-  ])
-  .describe('The check set a layer uses: a shipped one by id, or an override of one.');
-
-/** The objects a spec or a block uses. A block layer applies over the spec layer, over the shipped object. */
-export const Uses = z
-  .strictObject({
-    check_set: CheckSetUse.optional().describe('The checks the runner applies, and how.'),
-  })
-  .describe('The shipped objects this layer uses or overrides.');
-export type Uses = z.infer<typeof Uses>;
-
 /** What reaches the agent in one block. */
 export const Stimulus = z
   .union([
@@ -524,7 +489,6 @@ export const BlockSpec = z
     given: GivenOverride.optional().describe('Initial conditions for this block.'),
     expect: Expect.optional().describe('The expected output and state delta.'),
     budget: Budget.optional().describe('Limits for this block.'),
-    uses: Uses.optional().describe('The shipped objects this block overrides, over the spec layer.'),
   })
   .describe('One block: a stimulus, its initial conditions and its expectations.');
 export type BlockSpec = z.infer<typeof BlockSpec>;
@@ -828,7 +792,6 @@ export const Spec = z
       .describe('Ids of the behaviours this spec covers, from a behaviour inventory.'),
     target: TargetRef.optional().describe('The default agent. A run can override it.'),
     given: GivenDefaults.optional().describe('Initial conditions for every block.'),
-    uses: Uses.optional().describe('The shipped objects every block uses, such as the check set.'),
     stages: z
       .array(z.string().min(1))
       .optional()

@@ -244,18 +244,6 @@ export const Vote = z.strictObject({
   retries: z.array(RetryEvent).optional(),
 });
 
-/**
- * What produced a verdict: the check set it came from, named `check_set:<id>@<hash8>` (the hash tells a tailored
- * set from the shipped one), the item, the builtin implementation that ran, and the layer that last set the item.
- */
-export const VerdictBy = z.strictObject({
-  object: z.string().regex(/^[a-z_]+:[A-Za-z0-9._-]+@[0-9a-f]{8}$/),
-  item: z.string().min(1),
-  impl: z.string().min(1),
-  layer: z.enum(['shipped', 'spec', 'block']),
-});
-export type VerdictBy = z.infer<typeof VerdictBy>;
-
 /** One check's result on one block. Machine verdicts are final; judge verdicts carry their votes. */
 export const Verdict = z.strictObject({
   id: z.string().min(1),
@@ -267,7 +255,6 @@ export const Verdict = z.strictObject({
   evidence: z.string(),
   reasoning: z.string().optional(),
   judge: z.strictObject({ cls: z.enum(['system1', 'system2']), votes: z.array(Vote) }).optional(),
-  by: VerdictBy.optional().describe('The check-set item and layer that produced the verdict.'),
 });
 export type Verdict = z.infer<typeof Verdict>;
 

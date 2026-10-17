@@ -29,16 +29,12 @@ export async function recheckCarriedEndState(
     endState,
   };
   // The check contract names this family end_state. Other checks retain their measured verdicts.
-  const at = result.verdicts.findIndex((v) => v.name === 'end_state');
-  // The new verdicts keep the item and layer that produced the ones they replace.
-  const by = result.verdicts[at]?.by;
   const judged = (
     await Promise.all(
       checks.filter((c) => c.name === 'end_state' && c.applies(ctx)).map((c) => c.evaluate(ctx)),
     )
-  )
-    .flat()
-    .map((verdict) => (by ? { ...verdict, by } : verdict));
+  ).flat();
+  const at = result.verdicts.findIndex((v) => v.name === 'end_state');
   const verdicts = result.verdicts.filter((v) => v.name !== 'end_state');
   verdicts.splice(at < 0 ? verdicts.length : at, 0, ...judged);
   return {
