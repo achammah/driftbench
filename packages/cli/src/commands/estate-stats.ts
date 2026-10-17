@@ -20,7 +20,13 @@ import {
   type Plan,
   parsePlanText,
 } from '@agent-nexus/driftbench-estate';
-import { StaticTest } from '@agent-nexus/driftbench-generate';
+import {
+  estateOwners,
+  navigationFiles,
+  navigationReference,
+  StaticTest,
+  taskAtoms,
+} from '@agent-nexus/driftbench-generate';
 import { createScriptedDriver } from '@agent-nexus/driftbench-users';
 import type { Command } from 'commander';
 import type { Io } from '../io';
@@ -105,6 +111,10 @@ export async function estateStatsCommand(options: Options, io: Io): Promise<numb
       io.out(
         `Cells: ${coverage.cells.covered}/${coverage.cells.total}; edges: ${coverage.edges.covered}/${coverage.edges.total}\n`,
       );
+      if (coverage.navigationReferences !== undefined)
+        io.out(
+          `${coverage.navigationReferences} references to navigation-only documents have no test by design.\n`,
+        );
       io.out(`${reachNotObservable.atoms} atoms: reach is not observable.\n`);
       io.out(
         `${reach.length} atom reach rows; ${decay.length} block rows; ${drift.guards.length} guard rates.\n`,
@@ -128,7 +138,7 @@ async function completeTests(folder: string, map: EstateMap, plan: Plan): Promis
     const staticRoot = join(folder, 'static');
     if ((await stat(staticRoot).catch(() => undefined))?.isDirectory()) roots.push(staticRoot);
   }
-  const rows = new Map(plan.rows.map((row) => [row.id, row]));
+  const rows = new Map(ownedRows(map, plan).map((row) => [row.id, row]));
   const tests: CompleteTest[] = [];
   for (const root of roots)
     for (const file of await filesOf(root)) {
@@ -144,17 +154,36 @@ async function completeTests(folder: string, map: EstateMap, plan: Plan): Promis
         const loaded = await loadSpecFile(file);
         if (!loaded.ok) throw new Error(`${file}: ${loaded.errors.map((e) => e.message).join('; ')}`);
         const metadata = record(loaded.spec.metadata?.estate);
-        if (Array.isArray(metadata.needs) && metadata.needs.length > 0) continue;
+        if (Array.isArray(metadata.needs) && metadata.needs.some((need) => record(need).blocking !== false))
+          continue;
         if (loaded.spec.metadata?.retired !== undefined) continue;
         if (typeof metadata.mapHash === 'string' && metadata.mapHash !== map.hash)
           throw new Error(`${file}: a spec is made from another map`);
         const planRow = typeof metadata.planRow === 'string' ? metadata.planRow : undefined;
-        if (planRow !== undefined && rows.get(planRow)?.status === 'struck') continue;
         const atoms = Array.isArray(metadata.atoms)
           ? metadata.atoms.filter((a): a is string => typeof a === 'string')
           : [];
-        const cell = stringRecord(metadata.cell);
-        tests.push({ atoms, planRow, ...(cell ? { cell } : {}), loaded });
+        const equivalent = record(metadata.equivalence).planRows;
+        if (Array.isArray(equivalent) && equivalent.length > 0) {
+          // One execution can represent several exact tests. Recover cells from the authoritative plan,
+          // and retain only one loaded spec so replay never executes the same representative N times.
+          let active = 0;
+          for (const id of new Set(equivalent)) {
+            const source = typeof id === 'string' ? rows.get(id) : undefined;
+            if (!source)
+              throw new Error(`${file}: an equivalent source row is not in the plan: ${String(id)}`);
+            if (source.status === 'struck') continue;
+            if (!source.atomIds.every((id) => atoms.includes(id)))
+              throw new Error(`${file}: equivalent row ${source.id} names an atom the spec does not cover`);
+            tests.push({ atoms: source.atomIds, planRow: source.id, cell: source.cell });
+            active += 1;
+          }
+          if (active > 0) tests.push({ atoms, planRow, loaded });
+        } else {
+          if (planRow !== undefined && rows.get(planRow)?.status === 'struck') continue;
+          const cell = stringRecord(metadata.cell);
+          tests.push({ atoms, planRow, ...(cell ? { cell } : {}), loaded });
+        }
       }
     }
   return tests;
@@ -190,11 +219,30 @@ export function decayOf(
   });
 }
 
+function ownedRows(map: EstateMap, plan: Plan): Plan['rows'] {
+  const atoms = new Map(map.atoms.map((atom) => [atom.id, atom]));
+  const owners = estateOwners(map.atoms, map.edges);
+  return plan.rows.map((row) => ({
+    ...row,
+    atomIds: taskAtoms(
+      row.atomIds.map((id) => atoms.get(id) as Atom),
+      atoms,
+      owners,
+    ).map((atom) => atom.id),
+  }));
+}
+
 function coverageOf(map: EstateMap, plan: Plan, tests: CompleteTest[]) {
   const tested = new Set(tests.flatMap((t) => t.atoms));
+  // A reference to an example, a template or a history is a place to look and has no test by design: it
+  // is neither a gap in the coverage nor an edge to cover.
+  const navigation = navigationFiles(map.documents);
+  const skipped = new Set(
+    map.atoms.filter((atom) => navigationReference(atom, navigation)).map((atom) => atom.id),
+  );
   const kinds = Object.fromEntries(
     AtomKind.options.map((kind) => {
-      const atoms = map.atoms.filter((a) => a.approved && a.kind === kind);
+      const atoms = map.atoms.filter((a) => a.approved && a.kind === kind && !skipped.has(a.id));
       return [
         kind,
         {
@@ -205,13 +253,19 @@ function coverageOf(map: EstateMap, plan: Plan, tests: CompleteTest[]) {
       ];
     }),
   );
-  const allCells = new Set(plan.rows.map(cellKey));
+  const allCells = new Set(ownedRows(map, plan).map(cellKey));
   const testedCells = new Set(
     tests.filter((t) => t.cell !== undefined).map((t) => cellKey({ atomIds: t.atoms, cell: t.cell ?? {} })),
   );
-  const edges = map.edges.filter((e) => ['route', 'reference', 'dispatch', 'next'].includes(e.kind));
+  const edges = map.edges.filter(
+    (e) =>
+      ['route', 'reference', 'dispatch', 'next'].includes(e.kind) &&
+      !skipped.has(e.to) &&
+      !skipped.has(e.from),
+  );
   return {
     kinds,
+    ...(skipped.size > 0 ? { navigationReferences: skipped.size } : {}),
     cells: { covered: [...allCells].filter((c) => testedCells.has(c)).length, total: allCells.size },
     edges: {
       covered: edges.filter((e) => tests.some((t) => t.atoms.includes(e.from) && t.atoms.includes(e.to)))

@@ -1,3 +1,4 @@
+import { posix } from 'node:path';
 import {
   type ArtifactExpect,
   type CriterionDef,
@@ -225,7 +226,7 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
     case 'tool_called':
       if (hasInput(evidence.input)) {
         if (loadedRead(evidence.label, evidence.input, ctx)) return;
-        if (missingRead(then, atom, evidence.label, evidence.input, ctx, evidence.min ?? 1)) return;
+        if (missingRead(then, atom, evidence.label, evidence.input, ctx)) return;
         if (someCall(then, evidence.label, evidence.input, evidence.min ?? 1)) return;
         if (ctx.customChecks.has('some_call')) {
           addSomeCall(then, {
@@ -341,6 +342,19 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
         ];
         const calls = [...(Array.isArray(declared.calls) ? declared.calls : []), ...recovery.calls];
         const retry = declared.retry === true || recovery.retry;
+        // A part of the rule that names no file ("the open tracker note") is checked by no path: the spec never
+        // passes on the rest alone unmarked. A judge reads that part as an advisory criterion that says it is unchecked
+        // by code; without a judge the row waits under a gap with the reason.
+        for (const part of recovery.unpathed) {
+          if (ctx.judge) judgePart(then, atom, part);
+          else
+            gap(
+              then,
+              MARKERS.registered,
+              atom,
+              `the rule orders a re-read of "${part}", which names no file path`,
+            );
+        }
         // Only the actions the estate states stay: an empty path or a call counted zero demands nothing.
         const { reread: _reread, calls: _calls, retry: _retry, ...rest } = declared;
         then.custom.hazard_recovery = {
@@ -683,6 +697,28 @@ function judgeRule(then: ThenParts, atom: EstateAtom, polarity: Polarity): void 
   addUnique(then.judged, atom.id);
 }
 
+/**
+ * A judged criterion for one part of a rule that no code check reaches (the re-read of a note, not a file). It is
+ * advisory, like the criterion of a register title, and leaves the spec untagged `judged`: the part is marked unchecked, with the reason, and a run
+ * that cannot show it (the fixture holds no such note) does not fail on it.
+ */
+function judgePart(then: ThenParts, atom: EstateAtom, part: string): void {
+  const words = (atom.provenance?.quote ?? atom.title).replace(/\s+/g, ' ').trim();
+  const name = `${atom.id}.${part
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')}`;
+  if (then.criteria.some((criterion) => criterion.name === name)) return;
+  then.criteria.push({
+    name,
+    rubric: `Unchecked by code: the rule "${words}" orders a re-read of "${part}", which names no file path. Did the agent re-read "${part}"?`,
+    pass: `The agent re-read "${part}" before it went on.`,
+    fail: `The agent went on without re-reading "${part}".`,
+    gating: false,
+    scope: 'block',
+  });
+}
+
 function addCriterion(then: ThenParts, atom: EstateAtom): void {
   if (!then.criteria.some((criterion) => criterion.name === atom.id)) {
     then.criteria.push({ name: atom.id, rubric: atom.title, gating: false, scope: 'block' });
@@ -780,18 +816,76 @@ function untraced(then: ThenParts, atom: EstateAtom, name: string, ctx: ThenCont
   return true;
 }
 
-/** A Read of a file the runtime loads by itself: never seen as a call, so never expected. */
-function loadedRead(label: string, input: Record<string, unknown>, ctx: ThenContext): boolean {
-  if (label !== 'Read' || !ctx.loaded) return false;
-  const value = textOf(input.file_path ?? input.path ?? input.notebook_path);
-  return value !== undefined && ctx.loaded(value.replace(/^\.?\/+/, ''));
+/**
+ * The files a Read obligation names, in every form the schema lets an input be asserted: a bare string, `exact`,
+ * `contains`, `one_of` (each alternative) or `regex`, on `file_path`, `path` or `notebook_path`. Undefined when the
+ * input names no path (another key, `nonempty`, `absent`, `subset`).
+ */
+type ReadPaths = { paths: string[]; contains: boolean } | { regex: RegExp };
+function readPathsOf(input: Record<string, unknown>): ReadPaths | undefined {
+  const assertion = input.file_path ?? input.path ?? input.notebook_path;
+  if (typeof assertion === 'string') return { paths: [assertion], contains: false };
+  if (typeof assertion !== 'object' || assertion === null) return undefined;
+  const entries = Object.entries(assertion as Record<string, unknown>);
+  if (entries.length !== 1) return undefined;
+  const [kind, value] = entries[0] as [string, unknown];
+  if ((kind === 'exact' || kind === 'equals') && typeof value === 'string')
+    return { paths: [value], contains: false };
+  if (kind === 'contains' && typeof value === 'string') return { paths: [value], contains: true };
+  if (kind === 'one_of' && Array.isArray(value)) {
+    const paths = value.filter((item): item is string => typeof item === 'string');
+    return paths.length === value.length && paths.length > 0 ? { paths, contains: false } : undefined;
+  }
+  if (kind === 'regex' && typeof value === 'string') {
+    try {
+      return { regex: new RegExp(value) };
+    } catch {
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+/** A path as the estate lists its files: no leading `./` or `/`, no doubled or dotted segment. */
+function relativePath(path: string): string {
+  return posix.normalize(path.trim()).replace(/^(?:\.?\/)+/, '');
 }
 
 /**
- * A file the estate does not hold cannot be read successfully, but the declared Read call can still be
- * attempted and return a file-not-found error. Check that attempt with some_call, not references (which
- * counts only successful reads). Without that checker the row keeps its needs-existing-file gap.
- * True when it is such a read. A path matches a file when one ends with the other.
+ * Whether a file the estate holds is one the assertion names. An exact path (a bare string, `exact`, `one_of`) is held
+ * when it is the same normalized relative path, from the root or from the folder of the file the atom was read in. A
+ * `contains` path is held when a file's path ends with it at a folder boundary, since the path of the call contains
+ * it; the other way round is no match: `refs/notes.md` is not held by a file `notes.md`. A regex is held when it
+ * matches a file.
+ */
+function holdsFile(files: ReadonlySet<string>, target: ReadPaths, atomFile: string | undefined): boolean {
+  if ('regex' in target) return [...files].some((file) => target.regex.test(file));
+  const folder = atomFile !== undefined && atomFile.includes('/') ? posix.dirname(atomFile) : '';
+  return target.paths.some((path) => {
+    const own = relativePath(path);
+    const near = folder === '' ? own : relativePath(`${folder}/${path}`);
+    if (!target.contains) return files.has(own) || files.has(near);
+    return [...files].some((file) => file === own || file.endsWith(`/${own}`));
+  });
+}
+
+/** A Read of a file the runtime loads by itself: never seen as a call, so never expected. */
+function loadedRead(label: string, input: Record<string, unknown>, ctx: ThenContext): boolean {
+  if (label !== 'Read' || !ctx.loaded) return false;
+  const target = readPathsOf(input);
+  return (
+    target !== undefined &&
+    'paths' in target &&
+    target.paths.every((path) => ctx.loaded?.(relativePath(path)) === true)
+  );
+}
+
+/**
+ * A spec expects a Read only of a file the estate holds. A file the estate does not hold is the estate's defect (the
+ * lint code MISSING_REFERENCE), not a test to write: an attempt to read what is not there tests nothing the estate
+ * says, so the row waits on `needs-existing-file`, whatever checks the runner registers. True when it is such a read.
+ * The path is read from every assertion form of the input; whether the estate holds it is `holdsFile` (or the path a
+ * reference atom resolved).
  */
 function missingRead(
   then: ThenParts,
@@ -799,20 +893,17 @@ function missingRead(
   label: string,
   input: Record<string, unknown>,
   ctx: ThenContext,
-  min: number,
 ): boolean {
   if (label !== 'Read' || !ctx.files) return false;
-  const value = textOf(input.file_path ?? input.path ?? input.notebook_path);
-  if (value === undefined) return false;
-  const path = value.replace(/^\.?\/+/, '');
-  for (const file of ctx.files) {
-    if (file === path || file.endsWith(`/${path}`) || path.endsWith(`/${file}`)) return false;
-  }
-  if (ctx.customChecks.has('some_call')) {
-    addSomeCall(then, { label, input, count: { min } });
-    return true;
-  }
-  gap(then, MARKERS.existingFile, atom, `${path} is no file of the estate`);
+  const target = readPathsOf(input);
+  if (target === undefined) return false;
+  // A reference atom carries the path the scan resolved for it: the file it names, however the Read cites it.
+  const resolved =
+    atom.kind === 'reference' && typeof atom.fields?.path === 'string' ? atom.fields.path : undefined;
+  if (resolved !== undefined && ctx.files.has(relativePath(resolved))) return false;
+  if (holdsFile(ctx.files, target, atom.provenance?.file)) return false;
+  const named = 'paths' in target ? target.paths.map(relativePath).join(' or ') : String(target.regex);
+  gap(then, MARKERS.existingFile, atom, `${named} is no file of the estate`);
   return true;
 }
 

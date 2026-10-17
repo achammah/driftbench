@@ -49,7 +49,7 @@ describe('driftbench estate diff', () => {
     expect(result.err).toBe('');
     expect(result.code).toBe(0);
     expect(result.out).toContain(
-      'Atoms: 0 added, 0 removed, 0 changed (0 white space only, 0 semantic), 0 moved with the same quote, 0 restated, 125 unchanged.',
+      'Atoms: 0 added, 0 removed, 0 changed (0 white space only, 0 semantic), 0 moved with the same quote, 0 restated, 126 unchanged.',
     );
     expect(result.out).toContain('Edges: 0 added, 0 removed.');
   });
