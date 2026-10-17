@@ -337,6 +337,11 @@ A walk often ends the way another walk already ended: the same turn, said from t
 
 It repeats while the new last block qualifies, and it stops at one block. A cut that stops with more than one block left, on a block another walk already says, is undone: two walks must not end on the same test, so the walk keeps its tail. The variants of a metamorphic family are never cut, because a family differs only in its phrasing. With `--spec-cap` the reduction runs after the cap, on the specs that are written, in the order they were written: a walk loses an end only when a spec that stays says it. It reads no agent, so it removes a repeat, not everything a validator could call redundant: the same turn from another stage, or a repeat in the middle of a walk, stays. Tasks, walks with an end state and specs with a gap are never reduced.
 
+### A tool failure on a turn that asks a behaviour
+
+A move of a walk is not the only turn that runs a tool. A behaviour whose own text names a read tool runs it when the user asks for the behaviour, at any stage after the start and without leaving the stage. When the flow recovers from that tool's failure, such a turn is a place for a `D8_tool_failure` probe, the last stage of a path included, which no move reaches. The `cover` seeder builds it for a cell that names a deviation of that class and a stage: the user asks for a behaviour of the flow that reads a recovered tool, the tool fails, the recovery holds the stage, and the user asks again with the tool answering. The behaviour the cell names is the one the spec covers; when it reads nothing, another behaviour of the flow is only said. A write tool is never failed this way, and the reachability derived from the inventory and relations counts the same turn, so the target and the builder agree on which cells exist.
+
+
 ### The machine Then in every block
 
 A complete generated block reads observed state, not only words. Code derives each part of its Then from the approved relations:

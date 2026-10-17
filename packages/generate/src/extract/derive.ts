@@ -110,15 +110,33 @@ export function derivedConstraints(
     const stage = path.stages[index] as string;
     const last = index === path.stages.length - 1;
     if (deviation === TOOL_FAILURE) {
-      if (last) return [];
-      const calls = relationsOf.usesTools.some(
-        (call) =>
-          call.subject.dimension === FLOW_DIMENSION &&
-          call.subject.value === path.flow &&
-          call.stage === stage &&
-          recoveryFor(relationsOf, TOOL_FAILURE, path.flow, call.tool) !== undefined,
-      );
-      return calls ? [{}] : [];
+      // A move that calls a tool the flow recovers from, or a turn after the start that asks a behaviour of the
+      // flow whose own read tool it recovers from: that turn stays on its stage, the last one included.
+      const moves =
+        !last &&
+        relationsOf.usesTools.some(
+          (call) =>
+            call.subject.dimension === FLOW_DIMENSION &&
+            call.subject.value === path.flow &&
+            call.stage === stage &&
+            recoveryFor(relationsOf, TOOL_FAILURE, path.flow, call.tool) !== undefined,
+        );
+      const flowBehaviours = inventory?.flows?.find((entry) => entry.id === path.flow)?.behaviours;
+      const asks =
+        index >= 1 &&
+        relationsOf.usesTools.some(
+          (call) =>
+            call.subject.dimension !== FLOW_DIMENSION &&
+            kindOf.get(call.subject.dimension) === 'behaviour' &&
+            call.stage === stage &&
+            (call.to === undefined || call.to === stage) &&
+            (flowBehaviours === undefined || flowBehaviours.includes(call.subject.value as never)) &&
+            phrases.some(
+              (phrase) => phrase.dimension === call.subject.dimension && phrase.value === call.subject.value,
+            ) &&
+            recoveryFor(relationsOf, TOOL_FAILURE, path.flow, call.tool) !== undefined,
+        );
+      return moves || asks ? [{}] : [];
     }
     const recovery = recoveryFor(relationsOf, deviation, path.flow);
     if (!recovery) return [];

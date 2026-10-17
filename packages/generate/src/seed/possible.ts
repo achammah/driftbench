@@ -59,6 +59,9 @@ export function impossibleConstraints(
   const deviationPhrases = new Set(
     prepared.phrases.filter((phrase) => phrase.dimension === deviationId).map((phrase) => phrase.value),
   );
+  const sideEffecting = new Set(
+    relations.paths.flatMap((path) => (path.end_state ? [path.end_state.source.replace(/^tool:/, '')] : [])),
+  );
   const flowDimension = space.dimensions.some((dimension) => dimension.id === 'flow');
 
   const recoveriesOf = (cls: string, flow: string) =>
@@ -74,14 +77,32 @@ export function impossibleConstraints(
           : flowsOfBehaviour(prepared, use.subject.value).includes(flow)) &&
         (tool === undefined || use.tool === tool),
     );
+  const asked = new Set(
+    prepared.phrases
+      .filter((phrase) => behaviourDimensions.has(phrase.dimension))
+      .map((phrase) => `${phrase.dimension}=${phrase.value}`),
+  );
+  /** A staying turn that asks a behaviour whose own read tool fails: it holds at any stage after the start. */
+  const asks = (flow: string, stage: string, tool: string | undefined) =>
+    relations.usesTools.some(
+      (use) =>
+        behaviourSubject(prepared, use.subject) &&
+        use.stage === stage &&
+        (use.to === undefined || use.to === stage) &&
+        !sideEffecting.has(use.tool) &&
+        (tool === undefined || use.tool === tool) &&
+        asked.has(`${use.subject.dimension}=${use.subject.value}`) &&
+        flowsOfBehaviour(prepared, use.subject.value).includes(flow),
+    );
   const said = (path: PathRelation, index: number, cls: string): boolean => {
     const stage = path.stages[index] as string;
     const last = index === path.stages.length - 1;
     const recoveries = recoveriesOf(cls, path.flow);
     if (recoveries.length === 0) return false;
     if (cls === 'D8_tool_failure') {
-      if (last) return false;
-      return recoveries.some((entry) => calls(path.flow, stage, entry.tool));
+      // A move that calls a recovered tool, or a turn that asks a behaviour whose read tool the flow recovers.
+      if (!last && recoveries.some((entry) => calls(path.flow, stage, entry.tool))) return true;
+      return index >= 1 && recoveries.some((entry) => asks(path.flow, stage, entry.tool));
     }
     if (!deviationPhrases.has(cls)) return false;
     if (index === 0 && !FIRST_TURN.has(cls)) return false;
