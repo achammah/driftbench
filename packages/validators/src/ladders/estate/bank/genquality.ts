@@ -633,6 +633,74 @@ function firstAsk(spec: FixtureSuite['specs'][number]): string | undefined {
   return block?.when?.user;
 }
 
+const LEADING_DOT_SLASH = /^(?:\.\/|\/)+/;
+const LEADING_GLOB = /^\*\*\//;
+
+/** A count that asks for at least one: a number above 0, or a range whose minimum is above 0. */
+const wantsOne = (count: unknown): boolean => {
+  // Under the Count schema a missing minimum is 0: "at most 3" and "any number" allow zero reads.
+  if (count === undefined) return true;
+  if (typeof count === 'number') return count > 0;
+  return typeof count === 'object' && count !== null && Number((count as { min?: unknown }).min ?? 0) > 0;
+};
+
+/**
+ * Whether a complete spec checks a Read of exactly this path: a Read tool expectation, a references expectation (a glob
+ * ending in the path) or a some_call entry for Read, each asking for at least one read (a minimum of 1 or more). A spec
+ * that only names the atom, reads another file, or allows zero reads checks nothing of it. An `equals` or a bare path
+ * must be the path itself; only a `contains` and a glob that starts with two stars and a slash may carry a prefix.
+ */
+export function checksReadOf(spec: FixtureSuite['specs'][number], path: string): boolean {
+  const normal = (text: string) => text.replace(LEADING_DOT_SLASH, '');
+  const target = normal(path);
+  if (target === '') return false;
+  const same = (value: unknown, glob = false): boolean => {
+    if (typeof value === 'string') {
+      const globbed = glob && LEADING_GLOB.test(value);
+      const found = normal(globbed ? value.replace(LEADING_GLOB, '') : value);
+      return found === target || (globbed && found.endsWith(`/${target}`));
+    }
+    const asserted = value as { equals?: unknown; contains?: unknown } | undefined;
+    if (typeof asserted?.equals === 'string') return normal(asserted.equals) === target;
+    if (typeof asserted?.contains === 'string') {
+      const found = normal(asserted.contains);
+      return found === target || found.endsWith(`/${target}`);
+    }
+    return false;
+  };
+  const blocks = (spec.spec.blocks ?? []) as Array<{
+    expect?: {
+      tools?: Array<{ label?: string; input?: Record<string, unknown>; count?: unknown }>;
+      references?: Array<{ path?: string; count?: unknown }>;
+    };
+  }>;
+  const some =
+    (
+      spec.spec as {
+        rules?: {
+          custom?: {
+            some_call?: {
+              calls?: Array<{ label?: string; input?: Record<string, unknown>; count?: unknown }>;
+            };
+          };
+        };
+      }
+    ).rules?.custom?.some_call?.calls ?? [];
+  return (
+    blocks.some(
+      (block) =>
+        (block.expect?.tools ?? []).some(
+          (tool) =>
+            tool.label === 'Read' && wantsOne(tool.count) && same(tool.input?.file_path ?? tool.input?.path),
+        ) || (block.expect?.references ?? []).some((ref) => wantsOne(ref.count) && same(ref.path, true)),
+    ) ||
+    some.some(
+      (call) =>
+        call.label === 'Read' && wantsOne(call.count) && same(call.input?.file_path ?? call.input?.path),
+    )
+  );
+}
+
 function readsOf(spec: FixtureSuite['specs'][number]): string[] {
   const out: string[] = [];
   for (const block of (spec.spec.blocks ?? []) as Array<{ expect?: { tools?: unknown[] } }>) {
@@ -865,6 +933,21 @@ export function coverageFamily(): Family {
           return {
             pass: false,
             detail: `${unmarked.length} of ${absent.length} references to a missing file are not marked needs-existing-file, such as ${unmarked[0]?.id}`,
+          };
+        // The marker is the only judgment (docs/estate.md section 5): a complete spec that checks a Read of the missing
+        // file is the product ignoring it.
+        const checked = absent.filter((atom) =>
+          suite.specs.some(
+            (spec) =>
+              spec.complete &&
+              spec.atoms.includes(atom.id) &&
+              checksReadOf(spec, String(atom.fields?.path ?? '')),
+          ),
+        );
+        if (checked.length > 0)
+          return {
+            pass: false,
+            detail: `${checked.length} of ${absent.length} references to a missing file have a complete spec that checks a Read of it, such as ${checked[0]?.id}; it waits on needs-existing-file instead`,
           };
         const short = atoms
           .filter((atom) => !absent.includes(atom))
