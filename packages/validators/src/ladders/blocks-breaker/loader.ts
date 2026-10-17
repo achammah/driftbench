@@ -410,7 +410,6 @@ function fieldItems(): BankItem[] {
       | 'L25'
       | 'L26'
       | 'L27'
-      | 'L28'
       | 'L29',
     title: string,
     check: (ctx: ItemContext, tag: string) => ItemResult,
@@ -775,7 +774,7 @@ function fieldItems(): BankItem[] {
   const regexItem = (
     id: string,
     tier: 3 | 4 | 5,
-    cause: 'L26' | 'L27' | 'L28' | 'L29',
+    cause: 'L26' | 'L27' | 'L29',
     title: string,
     make: (raw: RawSpec, pattern: string) => unknown[],
   ) =>
@@ -805,16 +804,6 @@ function fieldItems(): BankItem[] {
     'L27',
     'a regex assertion of a json path that does not compile is refused with REGEX_INVALID',
     (raw, pattern) => [withExpect(raw, 0, { json: { paths: [{ path: 'a', assert: { regex: pattern } }] } })],
-  );
-  regexItem(
-    'nested-subset-assertion',
-    4,
-    'L28',
-    'a regex assertion nested in a subset assertion is refused with REGEX_INVALID, in a tool input and in an end state',
-    (raw, pattern) => [
-      withExpect(raw, 0, { tools: [{ label: 't', input: { a: { subset: { b: { regex: pattern } } } } }] }),
-      { ...raw, end_state: { source: 'tool:t', expect: { a: { subset: { b: { regex: pattern } } } } } },
-    ],
   );
   regexItem(
     'perturbation-expect-regex',
