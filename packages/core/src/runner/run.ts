@@ -23,7 +23,7 @@ import type { BlockSpec, EndState, Expect, GivenOverride, Spec, Stimulus } from 
 import { cloneJson, contentHash } from '../spec/hash';
 import { specHash as specHashOf, specIdentity } from '../spec/identity';
 import { parentOrder } from '../spec/parents';
-import { type GivenFinding, verifyGiven } from '../spec/verify-given';
+import { type GivenFinding, parentIndices, verifyGiven } from '../spec/verify-given';
 import { compareEndState, type EndStateMatch } from './assertion';
 import { blockCacheKey, endStateCacheKey, type ObservedCache, unwrapEndState, wrapEndState } from './cache';
 import { capabilityGap } from './capability';
@@ -412,9 +412,10 @@ class SetupCheckFailed extends Error {
 
 /**
  * The Given error each spec block starts from, by the static verifier. A finding on a block's prefix or shared
- * facts holds for that block and the later ones that keep its history (no prefix of their own); a finding
- * on the world holds from its block on, as the world merges forward; one on the spec's own Given holds for
- * every block.
+ * facts holds for that block and the blocks that keep its history (no prefix of their own); a finding on the
+ * world holds from its block on, as the world merges forward; one on the spec's own Given holds for every
+ * block. "After" follows the blocks in order, or, when blocks link by `parent`, the chain of ancestors: a
+ * root starts at the spec defaults, so a Given error in one tree never reaches another.
  */
 function givenGaps(spec: Spec): Map<number, NotRun> {
   const findings = verifyGiven(spec).filter((finding) => finding.level === 'not_run');
@@ -427,17 +428,32 @@ function givenGaps(spec: Spec): Map<number, NotRun> {
     got,
   });
   const whole = findings.find((finding) => finding.block === undefined);
-  let history: NotRun | undefined;
-  let world: NotRun | undefined;
-  spec.blocks.forEach((block, index) => {
-    if (block.given?.prefix !== undefined) history = undefined;
-    for (const finding of findings.filter((found) => found.block === index)) {
-      if (finding.layer === '5 world') world ??= strip(finding);
-      else history ??= strip(finding);
+  const byBlock = new Map<number, GivenFinding[]>();
+  for (const finding of findings) {
+    if (finding.block !== undefined)
+      byBlock.set(finding.block, [...(byBlock.get(finding.block) ?? []), finding]);
+  }
+  const linked = spec.blocks.some((block) => block.parent !== undefined);
+  const parentOf = linked ? parentIndices(spec) : new Map<number, number>();
+  const order = linked ? parentOrder(spec).order : spec.blocks.map((_, index) => index);
+  const history = new Map<number, NotRun | undefined>();
+  const world = new Map<number, NotRun | undefined>();
+  for (const index of order) {
+    const before = linked ? parentOf.get(index) : index - 1;
+    let ownHistory =
+      spec.blocks[index]?.given?.prefix !== undefined || before === undefined || before < 0
+        ? undefined
+        : history.get(before);
+    let ownWorld = before === undefined || before < 0 ? undefined : world.get(before);
+    for (const finding of byBlock.get(index) ?? []) {
+      if (finding.layer === '5 world') ownWorld ??= strip(finding);
+      else ownHistory ??= strip(finding);
     }
-    const gap = (whole ? strip(whole) : undefined) ?? history ?? world;
+    history.set(index, ownHistory);
+    world.set(index, ownWorld);
+    const gap = (whole ? strip(whole) : undefined) ?? ownHistory ?? ownWorld;
     if (gap) gaps.set(index, gap);
-  });
+  }
   return gaps;
 }
 

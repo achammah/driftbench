@@ -3,6 +3,7 @@ import type { Message, WorldState } from '../schema/common';
 import type { NotRun } from '../schema/run';
 import type { Spec } from '../schema/spec';
 import { isPlainObject } from './normalize';
+import { parentOrder } from './parents';
 
 /**
  * The static Given verifier. A Given is a recipe; these checks are its predicate. Each runs only on the
@@ -82,21 +83,36 @@ export function verifyGiven(spec: Spec, options: VerifyGivenOptions = {}): Given
   if (tools) toolsForced(spec.given?.world, 'given.world.tools', undefined, tools, unmet);
   summaries(spec.given?.world, spec.given?.vars, spec.given?.summary, 'given', undefined, advise);
 
-  // The ledger and the forced tools in effect, merged forward in place as the runner merges them (the later
-  // value wins), so a long spec is checked in time linear in its blocks.
-  const ledger: Record<string, unknown> = { ...spec.given?.ledger };
-  const forcedTools: NonNullable<WorldState['tools']> = { ...spec.given?.world?.tools };
-  let summary = spec.given?.summary;
-  let history: readonly Message[] = [];
-  spec.blocks.forEach((block, index) => {
+  // The situation a block starts from: the ledger and the forced tools in effect, the summary and the history,
+  // merged forward in place as the runner merges them (the later value wins), so a long spec is checked in time
+  // linear in its blocks. In a flat spec one situation runs through the blocks in order. When blocks link by
+  // `parent`, each root starts at the spec defaults and a child starts from its parent's. The ledger and the
+  // forced tools are shared by every holder and copied only by one that writes while another still holds them
+  // (`refs`), so a chain costs nothing and a fan of readers costs nothing.
+  type Held = { ledger: Record<string, unknown>; forced: NonNullable<WorldState['tools']>; refs: number };
+  type Situation = { held: Held; summary: string | undefined; history: readonly Message[] };
+  const fresh = (): Situation => ({
+    held: { ledger: { ...spec.given?.ledger }, forced: { ...spec.given?.world?.tools }, refs: 1 },
+    summary: spec.given?.summary,
+    history: [],
+  });
+  /** The ledger and the forced tools of a situation that is about to write: its own copy when others hold them. */
+  const writable = (now: Situation): Held => {
+    if (now.held.refs > 1) {
+      now.held.refs -= 1;
+      now.held = { ledger: { ...now.held.ledger }, forced: { ...now.held.forced }, refs: 1 };
+    }
+    return now.held;
+  };
+  const visit = (block: Spec['blocks'][number], index: number, now: Situation): void => {
     const at = `blocks.${index}.given`;
-    Object.assign(ledger, block.given?.ledger);
-    Object.assign(forcedTools, block.given?.world?.tools);
-    summary = block.given?.summary ?? summary;
+    if (block.given?.ledger !== undefined) Object.assign(writable(now).ledger, block.given.ledger);
+    if (block.given?.world?.tools !== undefined) Object.assign(writable(now).forced, block.given.world.tools);
+    now.summary = block.given?.summary ?? now.summary;
     const prefix = block.given?.prefix ?? [];
     // The history the block starts from: the latest prefix a block up to this one writes, as a run merges
     // them (a block with no prefix of its own keeps the one before; an empty prefix clears it).
-    if (block.given?.prefix !== undefined) history = block.given.prefix;
+    if (block.given?.prefix !== undefined) now.history = block.given.prefix;
     // A canonical prefix may leave a past call without a result: that is a warning, as H9 registered.
     pairing(prefix, `${at}.prefix`, index, unmet, block.given?.origin === 'canonical' ? advise : unmet);
     if (tools) {
@@ -116,15 +132,15 @@ export function verifyGiven(spec: Spec, options: VerifyGivenOptions = {}): Given
       });
       toolsForced(block.given?.world, `${at}.world.tools`, index, tools, unmet);
     }
-    matchesWorld(prefix, { tools: forcedTools }, `${at}.prefix`, index, unmet);
+    matchesWorld(prefix, { tools: now.held.forced }, `${at}.prefix`, index, unmet);
     (block.given?.shared ?? []).forEach((entry, s) => {
       if (entry.by === 'record') return;
       const where = `${at}.shared.${s}`;
-      const value = ledger[entry.fact];
+      const value = now.held.ledger[entry.fact];
       const expected = `ledger.${entry.fact} appears in prefix message ${entry.in ?? '(none named)'}`;
-      const message = entry.in === undefined ? undefined : history[entry.in];
+      const message = entry.in === undefined ? undefined : now.history[entry.in];
       const role = entry.by === 'user' ? 'user' : 'assistant';
-      if (!Object.hasOwn(ledger, entry.fact)) {
+      if (!Object.hasOwn(now.held.ledger, entry.fact)) {
         unmet(index, where, '4 beliefs', 'value_in_message', expected, 'the ledger holds no such fact');
       } else if (message === undefined) {
         unmet(index, where, '4 beliefs', 'value_in_message', expected, 'the prefix has no such message');
@@ -148,21 +164,54 @@ export function verifyGiven(spec: Spec, options: VerifyGivenOptions = {}): Given
         );
       }
     });
-    if (block.given) summaries(block.given.world, block.given.vars, summary, at, index, advise);
+    if (block.given) summaries(block.given.world, block.given.vars, now.summary, at, index, advise);
     for (const [fact, value] of Object.entries(block.expect?.ledger_add ?? {})) {
-      if (Object.hasOwn(ledger, fact) && !deepEqual(ledger[fact], value)) {
+      if (Object.hasOwn(now.held.ledger, fact) && !deepEqual(now.held.ledger[fact], value)) {
         advise(
           index,
           `blocks.${index}.expect.ledger_add`,
           '4 beliefs',
           'chain',
           'ledger_add agrees with the ledger',
-          `${fact}: the ledger holds ${JSON.stringify(ledger[fact])}, the block adds ${JSON.stringify(value)}`,
+          `${fact}: the ledger holds ${JSON.stringify(now.held.ledger[fact])}, the block adds ${JSON.stringify(value)}`,
         );
       }
-      ledger[fact] = value;
+      writable(now).ledger[fact] = value;
     }
-  });
+  };
+
+  if (!spec.blocks.some((block) => block.parent !== undefined)) {
+    const now = fresh();
+    spec.blocks.forEach((block, index) => {
+      visit(block, index, now);
+    });
+  } else {
+    const parentOf = parentIndices(spec);
+    const children = new Map<number, number>();
+    for (const parent of parentOf.values()) children.set(parent, (children.get(parent) ?? 0) + 1);
+    const after = new Map<number, Situation>();
+    for (const index of parentOrder(spec).order) {
+      const parent = parentOf.get(index);
+      const held = parent === undefined ? undefined : after.get(parent);
+      let now: Situation;
+      if (parent === undefined || held === undefined) {
+        now = fresh();
+      } else {
+        const left = (children.get(parent) ?? 1) - 1;
+        children.set(parent, left);
+        if (left === 0) {
+          after.delete(parent);
+          now = held;
+        } else {
+          held.held.refs += 1;
+          now = { ...held };
+        }
+      }
+      visit(spec.blocks[index] as Spec['blocks'][number], index, now);
+      if ((children.get(index) ?? 0) > 0) after.set(index, now);
+      else now.held.refs -= 1;
+    }
+  }
   return findings;
 }
 
@@ -330,4 +379,17 @@ function summaries(
 
 function short(text: string): string {
   return text.length > 120 ? `${text.slice(0, 117)}...` : text;
+}
+
+/** The index of each block's parent, for the blocks that name one the spec holds. */
+export function parentIndices(spec: Spec): Map<number, number> {
+  const ids = new Map(
+    spec.blocks.flatMap((block, index) => (block.id === undefined ? [] : [[block.id, index] as const])),
+  );
+  const parents = new Map<number, number>();
+  spec.blocks.forEach((block, index) => {
+    const at = block.parent === undefined ? undefined : ids.get(block.parent);
+    if (at !== undefined) parents.set(index, at);
+  });
+  return parents;
 }

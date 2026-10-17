@@ -145,7 +145,7 @@ A Given is a recipe: these checks are its predicate. Each runs only on the layer
 | `chain` | 4 beliefs | a block's `ledger_add` agrees with the ledger | warning only |
 | `summary_present` | 5 world | a workspace folder and a named session state carry a summary | warning only, with `--summaries` |
 
-A finding on a block's prefix or shared facts holds for the blocks that keep its history (in mode T, the later blocks with no prefix of their own; in modes F and P the conversation stops there). One on the world holds from its block on. After setup, the runner also reads back every file `world.workspace.files` writes, on an adapter with a sandbox: a file that does not read back as written makes the block `not_run` with kind `setup_failed`, check `world_digest`.
+A finding on a block's prefix or shared facts holds for the blocks that keep its history (in mode T, the later blocks with no prefix of their own; in modes F and P the conversation stops there). One on the world holds from its block on. "Earlier" and "later" follow the file order in a spec without parent links. When blocks link by `parent`, they follow the ancestors: a root starts at the spec defaults (the spec's own `given`, no history), a child starts from its parent's ledger, world and history, and a finding on one tree never reaches another. In a run, the block with the finding is `not_run`, its descendants are `blocked`, and the other trees run. After setup, the runner also reads back every file `world.workspace.files` writes, on an adapter with a sandbox: a file that does not read back as written makes the block `not_run` with kind `setup_failed`, check `world_digest`.
 
 ## Worked example
 
