@@ -348,6 +348,9 @@ A capability that reads a suite, a spec, a run or a workspace takes time linear 
 | `wilsonEffective` | 10,000 clusters | clusters | the statistics |
 | `hierarchicalBetaBinomial` | 1,000 trees | trees | the statistics |
 | `bootstrapCI` | 5,000 values in 50 clusters, fixed draws | values | the statistics |
+| `scanPii` (the scan of the pii check) | 800 characters of one unbroken word, no space and no `@` | characters | the checks, `support/pii.ts` |
+
+The `scanPii` input is a reply of one unbroken run of the characters an email local part allows (letters, digits, `.`, `_`, `%`, `+`, `-`) with no whitespace and no `@`: a pattern that looks for an address then has a candidate start at every character, and the scan must still take time linear in the reply. The scan must also find an address in a short reply, so a product that skips the scan does not pass.
 
 The budget is a property of the capability, not of one machine: it compares the product with its own time on the base input, so a slow runner moves both sides.
 

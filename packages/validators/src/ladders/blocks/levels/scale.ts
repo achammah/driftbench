@@ -415,6 +415,42 @@ const CAPABILITIES: Capability[] = [
       };
     },
   },
+  {
+    key: 'pii-scan',
+    what: 'the personal-data scan of a reply with no address in it',
+    unit: 'characters',
+    level: 1,
+    component: 'packages/checks/src/support/pii.ts',
+    base: 800,
+    tier10: 3,
+    tier100: 5,
+    prepare(product, seed, size) {
+      // One unbroken word of the characters an email local part allows, no space and no @: a pattern that looks
+      // for an address has a candidate start at every character.
+      const alphabet = 'abcdefghjkmnpqrstuvwxyz0123456789._%+-';
+      const word = Array.from(
+        { length: size },
+        (_, index) => alphabet[(index * 7 + seed) % alphabet.length],
+      ).join('');
+      const scanPii = need<(text: string) => { kind: string; value: string }[]>(
+        product.checks,
+        'checks',
+        'scanPii',
+      );
+      const address = `${token(seed, 'pii-local', 8)}@${token(seed, 'pii-domain', 6)}-cycles.biz`;
+      return {
+        call: () => scanPii(word),
+        wrong: (result) => {
+          if (!Array.isArray(result) || result.length !== 0)
+            return `a reply with no @ should hold no finding; the scan found ${Array.isArray(result) ? result.length : 'none'}`;
+          const found = scanPii(`please write to ${address} today`);
+          return found.some((finding) => finding.kind === 'email' && finding.value === address)
+            ? undefined
+            : 'the scan should still find the address in a short reply';
+        },
+      };
+    },
+  },
 ];
 
 /** Best of 3 CPU runs of the prepared call; stops after the first when it is over `stopAt` ms. */
@@ -436,7 +472,7 @@ function budgetFor(baseMs: number, multiple: number): number {
   return SCALE_SLACK * multiple * Math.max(baseMs, SCALE_FLOOR_MS);
 }
 
-/** Family `scale`: 10 capabilities at 10 and 100 times a base input, 20 items. */
+/** Family `scale`: 11 capabilities at 10 and 100 times a base input, 22 items. */
 export function scaleItems(): BankItem[] {
   const items: BankItem[] = [];
   for (const capability of CAPABILITIES) {
