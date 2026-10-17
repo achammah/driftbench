@@ -142,6 +142,14 @@ A later block that was not run because an earlier one was not run says so in `go
 * The `pass-rate` aggregate, reliability, spread, succession and the compounding index count scored blocks only.
 * A run with a block not run is never carried by `--change`, and a re-judge leaves that block as it was.
 
+### A campaign where nothing ran
+
+A campaign whose every run is not run or blocked has no scored golden. Nothing passed or failed, so `--margin auto` has nothing to measure:
+
+* `report` keeps the 2 point default and says why on its first line: `Margin auto: the campaign has no scored golden to measure it on (no run passed or failed); 2.0 points.` It still writes the scorecard, exit 0.
+* `compare` of two such campaigns pairs no golden. It exits 2 with `compare: the two campaigns share no golden in a shared mode`, with any margin.
+* `ci` against such a baseline prints `Margin auto: 2 points by default; the baseline has no scored golden to measure it on (no run passed or failed).` Its verdict comes from the candidate as usual.
+
 ### The ci summary
 
 When a candidate block was not run, the table gains one line before `Why:`:
@@ -423,6 +431,40 @@ Why:
 Verdict: REGRESSION. Exit 1.
 (exit 1)
 ```
+
+### Report, compare and ci when nothing ran
+
+The campaign `nr` from above has one run, and it is not run. A second campaign of the same run gives `compare` two campaigns with no scored golden:
+
+```sh
+driftbench campaign run examples/acme/specs/conversations/tool-failure.yaml --target process:my-agent --process-command my-agent --store nr.db --campaign nr2 # exit 3
+driftbench report nr --store nr.db --out nr.html
+driftbench compare --baseline nr --candidate nr2 --store nr.db --margin auto # exit 2
+driftbench ci --specs examples/acme/specs/conversations/tool-failure.yaml --target process:my-agent --process-command my-agent --baseline nr --store nr.db --out nothing.json # exit 3
+```
+
+```text
+$ driftbench report nr --store nr.db --out nr.html
+Margin auto: the campaign has no scored golden to measure it on (no run passed or failed); 2.0 points.
+Campaign nr: 1 runs, 0 pass, 0 fail, 1 not run, 0 did not complete.
+Wrote nr.html.
+$ driftbench compare --baseline nr --candidate nr2 --store nr.db --margin auto
+Margin auto: the campaign has no scored golden to measure it on (no run passed or failed); 2.0 points.
+compare: the two campaigns share no golden in a shared mode
+(exit 2)
+$ driftbench ci --specs examples/acme/specs/conversations/tool-failure.yaml --target process:my-agent --process-command my-agent --baseline nr --store nr.db --out nothing.json
+driftbench ci: candidate process:my-agent (campaign c-2d10a962f107) against baseline campaign nr, compared as driftbench compare does (golden by golden, every repeat).
+Margin auto: 2 points by default; the baseline has no scored golden to measure it on (no run passed or failed).
+...
+  verdict                                      NOT RUN
+...
+Verdict: NOT RUN. Exit 3.
+Summary: nothing.json
+(exit 3)
+```
+
+The report keeps the 2 point default and names the reason. `compare` has no pair to decide on, so it is bad input. `ci` is not run, because the candidate cannot apply the layer either.
+
 ## Common errors
 
 | Message or symptom | Cause | Fix |
@@ -437,3 +479,5 @@ Verdict: REGRESSION. Exit 1.
 | `No adapter is set up for process:<name>.` from `campaign resume` (exit 2) | the campaign's target is a process agent, and resume was not given its command | pass the same `--process-command` as the run |
 | `campaign resume` exits 3 again and the cell reads `not_run (reused)` | resume reuses the stored run; it never sends a block not run again | run the spec in a new campaign, on a target that applies the layer |
 | `ci` exits 1, not 3, though a spec has blocks not run | a regression wins over blocks not run: the `Why` lines name the regressed goldens first | fix the regression; the not-run line still names the spec |
+| `Margin auto: the campaign has no scored golden to measure it on (no run passed or failed); 2.0 points.` | every run of the campaign is not run or blocked, so no margin can be read off it | expected: the 2 point default stands. Measure the margin on a campaign whose runs pass or fail |
+| `compare: the two campaigns share no golden in a shared mode` (exit 2) on campaigns not run | neither campaign has a scored golden to pair | run both on a target that applies the layer, then compare |
