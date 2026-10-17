@@ -548,7 +548,10 @@ export function holdsTask(ask: string, context: TaskContext = {}): boolean {
   if (context.against !== undefined && context.against.length > 0 && !namesGuardedAct(raw, context.against))
     return false;
   const text = raw.replace(/"[^"]*"|\u201c[^\u201d]*\u201d|\u2018[^\u2019]*\u2019/g, ` ${QUOTE_TOKEN} `);
-  if (QUESTION.test(text)) return !restatesRule(text, rules);
+  // The whole ask is compared with the rules before it is split: a rule of several clauses ("Keep replies short; cite
+  // every figure") is repeated by an ask whose clauses are each only a part of it.
+  if (restatesRule(text, rules)) return false;
+  if (QUESTION.test(text)) return true;
   const parts = segments(text);
   for (const [index, part] of parts.entries()) {
     // A clause that is only the rule's standing condition restated, or the rule itself, holds no task.
@@ -791,7 +794,12 @@ export function coverageFamily(): Family {
         const waiting = new Set(
           (suite.report.gaps ?? []).find((entry) => entry.marker === 'needs-existing-file')?.atoms ?? [],
         );
-        const absent = atoms.filter((atom) => kind === 'reference' && atom.fields?.exists === false);
+        // A reference is absent when its path is no file of the fixture folder the validator holds, whatever the
+        // committed map says of it.
+        const held = new Set(filesOfFixture());
+        const absent = atoms.filter(
+          (atom) => kind === 'reference' && !held.has(String(atom.fields?.path ?? '').replace(/^\.\//, '')),
+        );
         const unmarked = absent.filter((atom) => !waiting.has(atom.id));
         if (unmarked.length > 0)
           return {
