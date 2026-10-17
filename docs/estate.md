@@ -497,7 +497,7 @@ How a row becomes a spec:
 | `needs-guard-message-check` | the message a guard gives |
 | `needs-derivable-then` | a row with no Then code can derive |
 | `needs-askable-act` | no approved phrase, and the atoms' words give no task the floor accepts |
-| `needs-existing-file` | a Read of a file the estate copy does not hold |
+| `needs-existing-file` | a Read of a file the estate copy does not hold. A spec expects a Read only of a file the estate holds; one that would expect the Read of a missing file is incomplete under this marker, and the marker names the atom. The unreadable file is the estate's defect (the lint code `MISSING_REFERENCE`), not a test to write: a reference atom whose file is missing has no complete test, and is judged by this marker |
 
 Layout: `<specs|incomplete>/<mode>/<test type>/<id>.yaml`, so `driftbench replay --suite <out>/specs/replay` takes the replay specs alone.
 
