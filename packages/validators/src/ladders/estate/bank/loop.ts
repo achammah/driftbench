@@ -630,7 +630,38 @@ const ASKS: AskCheck[] = [
     title: 'every approved plan row gives at least one spec',
     check: (run, all) => {
       const rows = new Set(all.map((v) => v.spec.record.row));
-      const missing = run.plan.plan.rows.filter((row) => row.status === 'approved' && !rows.has(row.id));
+      // docs/estate.md: complete tests with equal semantics share one representative, which lists the rows it stands
+      // for in `metadata.estate.equivalence.planRows`. A row is given a spec that way only when the representative
+      // really covers it: a complete spec of the row's test type and mode that names all the row's atoms and holds
+      // the same situation values, whatever the spec says about itself.
+      const represented = new Map<string, SpecVerdict[]>();
+      for (const v of all) {
+        if (!v.complete) continue;
+        const listed = (estateMeta(v.spec) as { equivalence?: { planRows?: unknown } }).equivalence?.planRows;
+        if (!Array.isArray(listed)) continue;
+        for (const id of listed)
+          if (typeof id === 'string') represented.set(id, [...(represented.get(id) ?? []), v]);
+      }
+      const covers = (v: SpecVerdict, row: (typeof run.plan.plan.rows)[number]): boolean => {
+        const meta = estateMeta(v.spec) as { atoms?: unknown; testType?: unknown; cell?: unknown };
+        const atoms = Array.isArray(meta.atoms) ? (meta.atoms as unknown[]) : [];
+        const own =
+          meta.cell !== null && typeof meta.cell === 'object' ? (meta.cell as Record<string, unknown>) : {};
+        const situation = Object.entries(row.cell).filter(([key]) => !key.startsWith('atoms.'));
+        return (
+          v.spec.record.testType === row.testType &&
+          v.spec.record.mode === row.mode &&
+          meta.testType === row.testType &&
+          row.atomIds.every((id) => atoms.includes(id)) &&
+          situation.every(([key, value]) => own[key] === value)
+        );
+      };
+      const missing = run.plan.plan.rows.filter(
+        (row) =>
+          row.status === 'approved' &&
+          !rows.has(row.id) &&
+          !(represented.get(row.id) ?? []).some((v) => covers(v, row)),
+      );
       return missing.length === 0 ? undefined : `${missing.length} rows give no spec`;
     },
   },
