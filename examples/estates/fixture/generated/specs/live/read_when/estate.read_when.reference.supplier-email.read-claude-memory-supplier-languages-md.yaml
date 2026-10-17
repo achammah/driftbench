@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please write to a supplier, answer one, or chase a late delivery or a missing credit note.
+      user: Please write to a supplier, answer one, or chase a late delivery or a missing credit note, including the supplier languages.
     expect:
       skills:
         - name: supplier-email
@@ -53,5 +53,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: skill.supplier-email.skill-supplier-email (asks it names)
+    askFrom: skill.supplier-email.skill-supplier-email (asks it names), file supplier languages
     outcome: no-change:read-only
