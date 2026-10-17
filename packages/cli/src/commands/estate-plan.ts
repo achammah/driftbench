@@ -40,7 +40,7 @@ export function registerEstatePlanCommands(estate: Command, io: Io, setExit: (co
     .option('--t <n>', 'the strength of the covering array over the situation axes', '2')
     .option(
       '--space <file>',
-      'an authoritative space map (default: infer relevance from approved atom contracts)',
+      'an authoritative space map (default: cross each situation with the atoms that hold its typed relation)',
     )
     .option('--k <n>', 'positive asks per route', '3')
     .option('--force', 'replace an existing plan; the approvals in it are lost')
