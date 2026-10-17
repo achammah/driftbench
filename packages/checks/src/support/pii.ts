@@ -109,7 +109,35 @@ const IBAN_CANDIDATE = /\b[A-Z]{2}\d{2}(?:[  ]?[A-Z0-9]){10,32}/g;
 const NATIONAL_CANDIDATE = /(?<![\d.])\d{2}\.?\d{2}\.?\d{2}[-. ]?\d{3}[-. ]?\d{2}(?!\d)/g;
 const INTERNATIONAL_PHONE = /(?<![\w+])\+[1-9][\d \-().]{6,22}\d/g;
 const BELGIAN_MOBILE = /(?<![\d+])(?:00 ?32 ?|0)4[5-9]\d(?:[ ./-]?\d{2}){3}(?!\d)/g;
-const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
+const EMAIL_LOCAL_CHAR = /[A-Za-z0-9._%+-]/;
+const EMAIL_DOMAIN = /[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/y;
+
+/**
+ * Email addresses, found from each @ outward so the cost is linear in the text: a pattern that starts at
+ * every character of a long run of address characters re-reads the run from each start. The matches are
+ * the ones the pattern `local@domain` gives left to right, without overlap.
+ */
+function emailMatches(text: string): Array<{ value: string; index: number }> {
+  const out: Array<{ value: string; index: number }> = [];
+  let consumed = 0;
+  let at = text.indexOf('@');
+  while (at !== -1) {
+    let start = at;
+    while (start > consumed && EMAIL_LOCAL_CHAR.test(text[start - 1] as string)) start--;
+    if (start < at) {
+      EMAIL_DOMAIN.lastIndex = at + 1;
+      const domain = EMAIL_DOMAIN.exec(text);
+      if (domain) {
+        out.push({ value: text.slice(start, at + 1 + domain[0].length), index: start });
+        consumed = at + 1 + domain[0].length;
+        at = text.indexOf('@', consumed);
+        continue;
+      }
+    }
+    at = text.indexOf('@', at + 1);
+  }
+  return out;
+}
 
 const ALLOWED_EMAIL_DOMAINS = new Set(['example.com', 'example.org', 'example.net', 'localhost']);
 const ALLOWED_EMAIL_SUFFIXES = ['.example', '.test', '.invalid', '.localhost', 'users.noreply.github.com'];
@@ -197,12 +225,12 @@ export function scanPii(text: string, options: ScanOptions = {}): PiiFinding[] {
   for (const match of text.matchAll(BELGIAN_MOBILE)) {
     findings.push({ kind: 'phone', value: match[0], offset: match.index });
   }
-  for (const match of text.matchAll(EMAIL)) {
+  for (const match of emailMatches(text)) {
     const excluded =
       options.reservedDomains === 'include'
-        ? ALLOWED_EMAILS.has(match[0].toLowerCase())
-        : isAllowedEmail(match[0]);
-    if (!excluded) findings.push({ kind: 'email', value: match[0], offset: match.index });
+        ? ALLOWED_EMAILS.has(match.value.toLowerCase())
+        : isAllowedEmail(match.value);
+    if (!excluded) findings.push({ kind: 'email', value: match.value, offset: match.index });
   }
   return findings.sort((a, b) => a.offset - b.offset);
 }

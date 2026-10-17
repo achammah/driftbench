@@ -142,3 +142,18 @@ describe('the reserved-domain exclusion is an option, on by default', () => {
     expect(failing(included)).toEqual(['pii.email']);
   });
 });
+
+describe('email scan', () => {
+  it('finds addresses left to right without overlap, from the @ outward', () => {
+    const found = scanPii('mail a.b+c@corp.co.uk, then x@y.io@z.com and @bad.com or q@nodot').map(
+      (f) => f.value,
+    );
+    expect(found).toEqual(['a.b+c@corp.co.uk', 'x@y.io']);
+  });
+
+  it('reads a long run of address characters with no @ in linear time', () => {
+    const started = performance.now();
+    expect(scanPii('a.b-c_d'.repeat(12_000))).toEqual([]);
+    expect(performance.now() - started).toBeLessThan(1000);
+  });
+});
