@@ -115,6 +115,7 @@ describe('a cell that holds the start stage', () => {
     expect(rendered.reasons).toEqual([]);
     const first = built.draft.perturbations?.find((entry) => entry.inject_at === 0);
     expect(first?.expect?.stage).toBe('greet');
-    expect(built.draft.blocks.some((block) => block.injection !== undefined)).toBe(false);
+    // The first turn is a move of the path: the class said before it is declared, never a block.
+    expect(built.draft.blocks[0]?.injection).toBeUndefined();
   }, 60_000);
 });

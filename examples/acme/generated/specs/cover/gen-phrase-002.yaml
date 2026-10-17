@@ -5,7 +5,7 @@ id: gen-phrase-002
 version: 7a022d4e1380
 kind: conversation
 title: "Phrase of flow=upgrade: Path upgrade-order of upgrade: needs > identify > offer > recap > order_placed > closing"
-channel: whatsapp
+channel: chat
 lang: EN
 tier: generated
 tags:
@@ -90,6 +90,23 @@ blocks:
       lang: EN
 rules:
   one_message_per_turn: true
+perturbations:
+  - id: p1-D1_off_topic
+    class: D1_off_topic
+    inject_at: 0
+    user: Are your stores open on Saturday?
+    expect:
+      stage: needs
+      stage_reported: true
+      tools:
+        - label: catalog.search
+          count: 0
+      must:
+        - Monday to Saturday
+      lang: EN
+    recovery:
+      within_blocks: 0
+      stage_after: needs
 metadata:
   generated:
     by: driftbench generate
@@ -107,7 +124,7 @@ metadata:
       user_type: existing-customer
       account_lookup: found
       plan_choice: names-one
-      channel: whatsapp
+      channel: chat
       coverage_result: none
     blocks:
       - block: b1-needs-to-identify

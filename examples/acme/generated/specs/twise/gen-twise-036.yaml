@@ -4,7 +4,7 @@
 id: gen-twise-036
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 36 of 156: Path home-no-coverage of new-home: needs > address > callback > handover > closing, D7_silence_or_burst at address"
+title: "t-wise row 36 of 156: Path home-no-coverage of new-home: needs > address > callback > handover > closing, D7_silence_or_burst at callback"
 channel: chat
 lang: EN
 tier: generated
@@ -57,25 +57,7 @@ blocks:
       criteria:
         - behaviour.B-003
         - flow.new-home
-  - id: b2-D7_silence_or_burst
-    when:
-      injection:
-        class: D7_silence_or_burst
-        user: hello?
-    expect:
-      stage: address
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 0
-        - label: notify_sales
-          count: 0
-      must:
-        - I'm here
-      lang: EN
-      criteria:
-        - deviation.D7_silence_or_burst
-  - id: b3-address-to-callback
+  - id: b2-address-to-callback
     when:
       user: The address is 7 Quarry Lane, Acmeville.
     expect:
@@ -90,6 +72,24 @@ blocks:
         - label: notify_sales
           count: 0
       lang: EN
+  - id: b3-D7_silence_or_burst
+    when:
+      injection:
+        class: D7_silence_or_burst
+        user: hello?
+    expect:
+      stage: callback
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: notify_sales
+          count: 0
+      must:
+        - I'm here
+      lang: EN
+      criteria:
+        - deviation.D7_silence_or_burst
   - id: b4-callback-to-handover
     when:
       user: You can reach me on +1 202 555 0131.
@@ -162,16 +162,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-address
-      - block: b2-D7_silence_or_burst
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D7_silence_or_burst
-          stage: address
-        phrase:
-          dimension: deviation
-          value: D7_silence_or_burst
-      - block: b3-address-to-callback
+      - block: b2-address-to-callback
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -181,6 +172,15 @@ metadata:
         phrase:
           dimension: stage_transition
           value: address-to-callback
+      - block: b3-D7_silence_or_burst
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D7_silence_or_burst
+          stage: callback
+        phrase:
+          dimension: deviation
+          value: D7_silence_or_burst
       - block: b4-callback-to-handover
         seeder: twise
         cell:

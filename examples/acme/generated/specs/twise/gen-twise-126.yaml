@@ -4,7 +4,7 @@
 id: gen-twise-126
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 126 of 156: Path home-no-coverage of new-home: needs > address > callback > handover > closing, D10_return at address"
+title: "t-wise row 126 of 156: Path home-no-coverage of new-home: needs > address > callback > handover > closing, D10_return at callback"
 channel: chat
 lang: EN
 tier: generated
@@ -57,25 +57,7 @@ blocks:
       criteria:
         - behaviour.B-010
         - flow.new-home
-  - id: b2-D10_return
-    when:
-      injection:
-        class: D10_return
-        user: ok, let's continue with the order.
-    expect:
-      stage: address
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 0
-        - label: notify_sales
-          count: 0
-      must:
-        - We were|pick up where we left off
-      lang: EN
-      criteria:
-        - deviation.D10_return
-  - id: b3-address-to-callback
+  - id: b2-address-to-callback
     when:
       user: The address is 7 Quarry Lane, Acmeville.
     expect:
@@ -90,6 +72,24 @@ blocks:
         - label: notify_sales
           count: 0
       lang: EN
+  - id: b3-D10_return
+    when:
+      injection:
+        class: D10_return
+        user: ok, let's continue with the order.
+    expect:
+      stage: callback
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: notify_sales
+          count: 0
+      must:
+        - We were|pick up where we left off
+      lang: EN
+      criteria:
+        - deviation.D10_return
   - id: b4-callback-to-handover
     when:
       user: You can reach me on +1 202 555 0131.
@@ -162,16 +162,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-address
-      - block: b2-D10_return
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D10_return
-          stage: address
-        phrase:
-          dimension: deviation
-          value: D10_return
-      - block: b3-address-to-callback
+      - block: b2-address-to-callback
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -181,6 +172,15 @@ metadata:
         phrase:
           dimension: stage_transition
           value: address-to-callback
+      - block: b3-D10_return
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D10_return
+          stage: callback
+        phrase:
+          dimension: deviation
+          value: D10_return
       - block: b4-callback-to-handover
         seeder: twise
         cell:

@@ -162,10 +162,10 @@ end_state:
 perturbations:
   - id: p1-D9_out_of_scope
     class: D9_out_of_scope
-    inject_at: 3
+    inject_at: 0
     user: My last bill charged me twice, can you fix it?
     expect:
-      stage: details
+      stage: needs
       stage_reported: true
       tools:
         - label: port.check
@@ -179,7 +179,7 @@ perturbations:
       lang: EN
     recovery:
       within_blocks: 0
-      stage_after: details
+      stage_after: needs
 metadata:
   generated:
     by: driftbench generate

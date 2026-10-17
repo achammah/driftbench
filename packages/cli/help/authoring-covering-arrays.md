@@ -143,37 +143,37 @@ Wrote 495 files to out/authoring-covering-arrays/budget-20.
 (exit 1)
 ```
 
-A total cap of 300 specs. 230 are protected, so only t-wise and cover specs are trimmed, and 92 pairs are lost:
+A total cap of 450 specs. 348 are protected, so only t-wise and cover specs are trimmed, and 10 pairs are lost:
 
 ```sh
-driftbench generate --map examples/acme/map/approved.yaml --out out/authoring-covering-arrays/cap-300 --t 2 --spec-cap 300 # exit 1
+driftbench generate --map examples/acme/map/approved.yaml --out out/authoring-covering-arrays/cap-450 --t 2 --spec-cap 450 # exit 1
 ```
 
 ```text
-$ driftbench generate --map examples/acme/map/approved.yaml --out out/authoring-covering-arrays/cap-300 --t 2 --spec-cap 300
-Actual axis-map coverage (written complete specs): pairs 616 of 708 (87.0%); triples 2408 of 4064 (59.3%).
+$ driftbench generate --map examples/acme/map/approved.yaml --out out/authoring-covering-arrays/cap-450 --t 2 --spec-cap 450
+Actual axis-map coverage (written complete specs): pairs 698 of 708 (98.6%); triples 2951 of 4064 (72.6%).
 Candidate t-wise array (before the total cap): covering array of 156 rows over 5 dimensions, 356 of 356 allowed 2-tuples (100.0%); 2 pairs no path reaches are left out.
-Uncovered on the axis map: 92 pairs, 1656 triples (see coverage.actual[].uncovered).
-Map acme (../../../examples/acme/map/approved.yaml), hash 7c05b9cee9cc: 51 dimensions, 187 values, 463 constraints, 55 approved phrases.
+Uncovered on the axis map: 10 pairs, 1113 triples (see coverage.actual[].uncovered).
+Map acme (../../../examples/acme/map/approved.yaml), hash 7a022d4e1380: 51 dimensions, 187 values, 463 constraints, 55 approved phrases.
 Seed 1, t = 2.
 
 Seeder        specs  blocks  complete  incomplete
 graph            12      48        12           0
-twise            68     352        65           3
+twise           101     509        98           3
 boundary         85     183        13          72
-deviation        21     111        21           0
+deviation       139     570       139           0
 metamorphic      42     192        42           0
 task             67      71        67           0
-cover             5      27         5           0
+cover             4      23         4           0
 
 Stage graph: 18 of 23 edges covered in 12 paths from needs.
 Constraints applied: 463.
 Deviation probes: 12 of 12 classes. Metamorphic families: 21.
-Coverage on the axis map at t = 2: complete specs 616 of 708 (87.0%), all specs 619 (87.4%).
-Spec cap 300: 300 of 407 candidate specs written; 230 structural, fault and incomplete specs protected. Coverage lost: see spec_cap.coverage[].lost.
-Allowed tuples no spec could be built for: 92 (see cover.unbuilt).
-(29 more lines)
-Wrote 397 files to out/authoring-covering-arrays/cap-300.
+Coverage on the axis map at t = 2: complete specs 698 of 708 (98.6%), all specs 698 (98.6%).
+Spec cap 450: 450 of 512 candidate specs written; 348 structural, fault and incomplete specs protected. Coverage lost: see spec_cap.coverage[].lost.
+Allowed tuples no spec could be built for: 10 (see cover.unbuilt).
+(32 more lines)
+Wrote 547 files to out/authoring-covering-arrays/cap-450.
 (exit 1)
 ```
 
@@ -205,7 +205,7 @@ Each `generate` run exits 1 as above (the same incomplete specs); their output i
 
 ```
 $ driftbench generate --map examples/acme/map/approved.yaml --out out/authoring-covering-arrays/cap-10 --t 2 --spec-cap 10
-Cannot generate: --spec-cap 10 is below the 230 protected structural, fault and incomplete specs; none can be trimmed
+Cannot generate: --spec-cap 10 is below the 348 protected structural, fault and incomplete specs; none can be trimmed
 (exit 2)
 $ driftbench generate --map examples/acme/map/approved.yaml --out out/authoring-covering-arrays/seed2 --t 2 --seed 2
 out/authoring-covering-arrays/seed2/generate-report.json already exists: an earlier run wrote this folder. Pass --force to replace its output.

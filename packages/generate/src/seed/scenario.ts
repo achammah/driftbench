@@ -9,6 +9,7 @@ import type {
   WorldState,
 } from '@agent-nexus/driftbench-core';
 import type { PathRelation, ProposalPhrase, Slots, UsesToolRelation } from '../extract/proposal';
+import type { Allocation, RecoveryOption } from './allocation';
 import type { BlockDraft, Pick, Stimulus } from './assemble';
 import { OPENING_CLASSES, TOOL_FAILURE, TOOL_FAILURE_ERROR } from './deviation';
 import { behaviourSubject, dimensionId, type PreparedMap, phraseKey, valueId } from './map';
@@ -47,6 +48,8 @@ export type ProbeRequest = {
   classId: string;
   /** The stage to probe at; any stage the recovery allows when absent. */
   stage?: string;
+  /** The walk ends at the probe: it is there to place the class, not to walk the rest of the path. */
+  cut?: boolean;
   /** For a tool failure: the tool that fails; any tool the path calls that has a recovery when absent. */
   tool?: string;
 };
@@ -56,6 +59,7 @@ export type ScenarioRequest = {
   /** A generation-local snapshot of this path's value indices. */
   pathValues?: ReadonlyMap<string, readonly number[]>;
   dimensionIndex?: ReadonlyMap<string, number>;
+  allocation?: Allocation;
   /** Values the seeder fixed: a t-wise row, a boundary value, a probe's class. */
   fixed: readonly Pick[];
   probe?: ProbeRequest;
@@ -113,6 +117,12 @@ export type ScenarioRequest = {
    * for every class it can take: the stage graph's walks do, so no class depends on a draw to be declared.
    */
   perturbEvery?: boolean;
+  /**
+   * A walk built to fill a shortfall of the allocation declares only the recoveries the allocation adds: no
+   * drawn class and no tool failure, which every clean walk declares at the stages it crosses and would
+   * raise the stages the walk is there to balance.
+   */
+  allocationOnly?: boolean;
   /**
    * The perturbation a clean walk must declare: this class said at this stage of the path. A first-turn
    * class whose recovery stays on the start stage has no Then an idle reply fails, so it is no block of the
@@ -422,7 +432,19 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
       .filter(({ stage }) =>
         choosePhraseExists(prepared, deviationKey, probe.classId, contextOf(stage), slots, request),
       );
-    const chosen = pick(rng, allowed);
+    // A probe goes where the allocation gains most among the stages its class can take: its own event, and
+    // the moves before it when the walk ends there. The draw is the same either way.
+    const cheapest = request.allocation?.cheapest(
+      allowed.map(({ stage, index }) => ({
+        stage,
+        events: [
+          ...path.stages.slice(1, probe.cut ? index + 1 : path.stages.length),
+          path.stages[index] as string,
+        ],
+      })),
+      probe.classId,
+    );
+    const chosen = pick(rng, cheapest ? allowed.filter(({ stage }) => cheapest.has(stage)) : allowed);
     if (!chosen) {
       if (
         probe.stage === path.stages[0] &&
@@ -447,7 +469,7 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
   const blocks: BlockDraft[] = [];
   const replyData: Pick[] = [];
   const lang = relations.replyLanguage;
-  let movedAway = false;
+  let endsAtProbe = false;
   let turnPlaced = false;
   // What the reply that reached the pending stage must never hold, whatever the data: the states `must_not`
   // patterns with no slot, such as narrated internal steps. A recovery that stays there is held to them too.
@@ -577,9 +599,9 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
       });
       // A recovery that leaves the conversation elsewhere than the stage it had reached (a goal shift goes
       // back to the stage that owns the change) ends the walk: the path's next turn starts from a stage the
-      // conversation is no longer at.
-      if (after !== undefined && after !== stage) {
-        movedAway = true;
+      // conversation is no longer at. A probe asked to cut the walk ends it as well, unless the walk is over.
+      if ((after !== undefined && after !== stage) || (probe.cut && index + 1 < path.stages.length)) {
+        endsAtProbe = true;
         break;
       }
     }
@@ -761,7 +783,7 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
     truncated = true;
   } else if (probe && probeAt !== undefined) {
     placed = { classId: probe.classId, stage: path.stages[probeAt] as string };
-    if (movedAway) truncated = true;
+    if (endsAtProbe) truncated = true;
   }
 
   // Every tool the scenario calls is expected 0 times in a turn that does not call it; a tool it never calls
@@ -852,7 +874,9 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
     const wanted = request.perturb;
     const drawn = wanted
       ? options.find((option) => option.classId === wanted.classId && option.stage === wanted.stage)
-      : pick(rng, options);
+      : request.allocationOnly
+        ? undefined
+        : pick(rng, options);
     if (wanted && !drawn)
       return failedScenario(
         path,
@@ -881,7 +905,9 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
     // user says that turn with the tool failing. The recovery is the injected block's Then, and the turn
     // itself then runs with the tool answering again. It takes no seeded draw, so the rest is unchanged.
     const failure =
-      cutAt === undefined ? toolFailurePerturbation(relations, path, blocks, slots, inPlay, lang) : undefined;
+      cutAt === undefined && !request.allocationOnly
+        ? toolFailurePerturbation(relations, path, blocks, slots, inPlay, lang)
+        : undefined;
     if (failure) {
       const block = blocks[failure.index] as BlockDraft;
       block.given = {
@@ -902,6 +928,46 @@ export function buildScenario(prepared: PreparedMap, rng: Rng, request: Scenario
         recovery: { within_blocks: 0, stage_after: failure.expect.stage as string },
       });
     }
+  }
+  if (request.allocation && deviationKey !== undefined && prepared.deviation !== undefined) {
+    const candidates: RecoveryOption[] = [];
+    const ordinary = !probe && !request.turn && !request.aside && !request.before;
+    const positions = ordinary ? Array.from({ length: blocks.length + 1 }, (_, index) => index) : [0];
+    for (const index of positions) {
+      const stage = index === 0 ? path.stages[0] : blocks[index - 1]?.stage;
+      if (stage === undefined) continue;
+      for (const value of dimensions[prepared.deviation]?.values ?? []) {
+        const classId = value.id;
+        if (classId === TOOL_FAILURE || (index === 0 && !OPENING_CLASSES.has(classId))) continue;
+        const own = recoveryFor(relations, classId, path.flow);
+        const after: string | undefined = own ? stageAfter(own, stage) : undefined;
+        if (!own || (own.at && !own.at.includes(stage)) || (after !== undefined && after !== stage)) continue;
+        const stageValue = dimensions[prepared.stage ?? -1]?.index.get(stage);
+        const classValue = dimensions[prepared.deviation]?.index.get(classId);
+        if (stageValue === undefined || classValue === undefined || prepared.stage === undefined) continue;
+        if (
+          !prepared.feasibility.allowed([
+            ...cell.filter(([at]) => at !== prepared.stage && at !== prepared.deviation),
+            [prepared.stage, stageValue],
+            [prepared.deviation, classValue],
+          ])
+        )
+          continue;
+        // Reuse an approved phrasing without adding random draws. Special value/probe walks only add
+        // a recovery at their initial state, leaving all inserted turns and bound values untouched.
+        const phrase = (prepared.phrasesOf.get(phraseKey(deviationKey, classId)) ?? []).find((entry) =>
+          phraseFits(entry, contextOf(stage), slots),
+        );
+        if (!phrase) continue;
+        const bound = { ...slots, ...(phrase.binds ?? {}) };
+        const text = fillText(phrase.text, bound);
+        const expect = recoveryExpect(own, stage, bound, inPlay, lang);
+        if (text.ok && expect) candidates.push({ classId, index, stage, expect, user: text.value });
+      }
+    }
+    request.allocation.supplement(blocks, perturbations, candidates, ordinary && !request.perturb);
+    if (perturbations.some((entry) => entry.class === 'D7_silence_or_burst'))
+      rules.one_message_per_turn = true;
   }
 
   let end: EndStateSpec | undefined;
