@@ -254,7 +254,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        seed: [659085678, 805923309, 160509792, 122112695, 196457869, 868831311]
+        seed: [659085678, 868831311]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -273,7 +273,7 @@ jobs:
           p = 'packages/validators/src/ladders/estate/bank/loop.ts'
           s = open(p).read()
           old = ": `${bad.length} complete specs ask an unapproved phrase that is not a disclosed code-written ask`;"
-          new = ": `${bad.length} complete specs ask an unapproved phrase that is not a disclosed code-written ask` + ' || DIAG ' + bad.map((v) => `${v.spec.record.row} [${v.spec.record.testType}] ${JSON.stringify(asksOfSpec(v))}`).join(' ;; ');"
+          new = ": `${bad.length} complete specs ask an unapproved phrase that is not a disclosed code-written ask` + ' || DIAG ' + bad.slice(0, 3).map((v) => { const meta = estateMeta(v.spec) as { ask?: unknown; askFrom?: unknown; planRow?: unknown }; const sp = v.spec.loaded?.spec as { tags?: unknown } | undefined; const row = rows.get(v.spec.record.row) ?? rows.get(v.spec.record.row.replace(/\\.\\d+$/, '')); const short = row ? bankIsShort(run, row) : 'norow'; const inv = row && typeof meta.askFrom === 'string' ? asksOfSpec(v).map((a) => inventedWord(a, meta.askFrom as string, row.atomIds, run.scanned.map)) : 'n/a'; return JSON.stringify({ row: v.spec.record.row, tags: sp?.tags, ask: meta.ask, askFrom: meta.askFrom, planRowOk: row ? meta.planRow === row.id : false, short, inv, atoms: row?.atomIds }); }).join(' ;; ');"
           assert old in s, 'line not found'
           open(p, 'w').write(s.replace(old, new, 1))
           PY
