@@ -4,6 +4,12 @@ import { createScriptedDriver } from '@agent-nexus/driftbench-users';
 import { expect, it } from 'vitest';
 import { echoAdapter, memoryCache, specOf } from './support';
 
+/** The parts as the key reads them: the history before the block is its own SHA-256 under `prefix.sha256`. */
+function keyed<T extends { given: { prefix: unknown } }>(parts: T): T {
+  const history = createHash('sha256').update(canonicalJson(parts.given.prefix)).digest('hex');
+  return { ...parts, given: { ...parts.given, prefix: { sha256: history } } };
+}
+
 const spec = specOf({ id: 'cache-identity', blocks: [{ user: 'hello' }] });
 const target = { adapter: 'echo', agent: 'fictional-echo' };
 const options = { driver: createScriptedDriver(), checks: [], mode: 'F' as const, repeat: 0, target };
@@ -37,7 +43,9 @@ it('keeps legacy run key bytes for adapters without a cache identity or agent ve
       adapterVersion: adapter.version,
       ...(suite === undefined ? {} : { suite }),
     };
-    const expected = `block:${createHash('sha256').update(canonicalJson(legacy)).digest('hex')}`;
+    const expected = `block:${createHash('sha256')
+      .update(canonicalJson(keyed(legacy)))
+      .digest('hex')}`;
     expect(result.blocks[0]?.cacheKey).toBe(expected);
     const explicitUndefined = await runSpec(spec, {
       ...options,

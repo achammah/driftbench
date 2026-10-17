@@ -29,7 +29,7 @@ describe('the canonical text of a list read item by item', () => {
     expect(canonicalJsonWithList({ prefix: [] }, 'prefix')).toBe(canonicalJson({ prefix: [] }));
   });
 
-  it('gives a block cache key equal to the canonical JSON of the whole parts', () => {
+  it('gives a block cache key equal to the canonical JSON of the parts, the history as its SHA-256', () => {
     const given = resolveGiven({ ledger: { k: 'v' }, world: {}, vars: {} }, messages, {
       adapter: 'function',
     });
@@ -45,8 +45,11 @@ describe('the canonical text of a list read item by item', () => {
     };
     const { hash, ...body } = given;
     expect(hash).toBe(contentHash(body));
+    // The history before the block enters as its own SHA-256, so a block hashes only the messages it adds.
+    const history = createHash('sha256').update(canonicalJson(given.prefix)).digest('hex');
+    const keyed = { ...parts, given: { ...given, prefix: { sha256: history } } };
     expect(blockCacheKey(parts)).toBe(
-      `block:${createHash('sha256').update(canonicalJson(parts)).digest('hex')}`,
+      `block:${createHash('sha256').update(canonicalJson(keyed)).digest('hex')}`,
     );
   });
 });

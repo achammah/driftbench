@@ -4,6 +4,12 @@ import { type BlockKeyParts, blockCacheKey } from '../../src/runner/cache';
 import { resolveGiven } from '../../src/runner/given';
 import { canonicalJson } from '../../src/spec/hash';
 
+/** The parts as the key reads them: the history before the block is its own SHA-256 under `prefix.sha256`. */
+function keyed<T extends { given: { prefix: unknown } }>(parts: T): T {
+  const history = createHash('sha256').update(canonicalJson(parts.given.prefix)).digest('hex');
+  return { ...parts, given: { ...parts.given, prefix: { sha256: history } } };
+}
+
 const parts: BlockKeyParts = {
   specHash: 'hash-1',
   repeat: 0,
@@ -46,7 +52,9 @@ describe('each block records the cache key it was stored under', () => {
 describe('the cache key per agent version', () => {
   it('keeps the exact legacy digest when no agent version is supplied, with or without a suite', () => {
     for (const legacy of [parts, { ...parts, suite: 'nightly' }]) {
-      const expected = `block:${createHash('sha256').update(canonicalJson(legacy)).digest('hex')}`;
+      const expected = `block:${createHash('sha256')
+        .update(canonicalJson(keyed(legacy)))
+        .digest('hex')}`;
       expect(blockCacheKey(legacy)).toBe(expected);
       expect(blockCacheKey({ ...legacy, agentVersion: undefined })).toBe(expected);
     }

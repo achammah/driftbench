@@ -67,12 +67,13 @@ function keyOf(spec: Spec, given: ResolvedGiven): string {
 }
 
 describe('given.origin beyond the Given hash', () => {
-  it('leaves the block cache key of a Given without origin as it was before origin existed', () => {
+  it('leaves the block cache key of a Given without origin free of origin', () => {
     const spec = plainSpec();
     const canonical = canonicalGiven(spec, 0);
     const given = resolveGiven(canonical.state, canonical.prefix, target);
     expect('origin' in given).toBe(false);
-    // Computed with packages/core/src/runner/given.ts of 6a6f88ecd9^1, the main before PR 424.
+    // The key of the history-digest format: the same Given without an origin field, as the block key now reads
+    // its history. Before that format (PR 424 and earlier) the key was 8a96d23a, a different byte stream.
     expect(keyOf(spec, given)).toBe(PRE_ORIGIN_BLOCK_KEY);
     const recorded = specOf({
       id: 'origin',
@@ -199,4 +200,4 @@ describe('given.origin beyond the Given hash', () => {
   });
 });
 
-const PRE_ORIGIN_BLOCK_KEY = 'block:8a96d23a8688029a9181c1d1263a4a68a858b4cabed3534e90e863f4b63ef7fc';
+const PRE_ORIGIN_BLOCK_KEY = 'block:5c5aa4d68b15630ae219e86cb809abfb7b58091a01322a40fb536cdec806c743';

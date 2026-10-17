@@ -3,7 +3,7 @@ import type { Store } from '../contracts/store';
 import type { TargetRef } from '../schema/common';
 import type { Observed, ResolvedGiven } from '../schema/run';
 import type { Stimulus } from '../schema/spec';
-import { canonicalJson, sha256OfJsonWithList } from '../spec/hash';
+import { canonicalJson, sha256WithList } from '../spec/hash';
 import { isPlainObject } from '../spec/normalize';
 
 /** Where the runner keeps observed blocks. A Store is one; tests pass a map. */
@@ -31,12 +31,16 @@ export type BlockKeyParts = {
 
 /**
  * The cache key of one block: the spec hash, the repeat, the block's position, its resolved Given, its
- * stimulus, the target and the adapter version, hashed whole (SHA-256 of the canonical JSON).
+ * stimulus, the target and the adapter version (SHA-256 of the canonical JSON), with the history before the
+ * block read as its own SHA-256 so that it is hashed once per message, not once per block.
  */
 export function blockCacheKey(parts: BlockKeyParts): string {
-  // The digest of the canonical JSON of `parts`, with the Given's prefix, the one part that grows with
-  // the run, hashed incrementally: each message of the history is read once.
-  return `block:${sha256OfJsonWithList((mark) => ({ ...parts, given: { ...parts.given, prefix: mark } }), parts.given.prefix)}`;
+  // The Given's prefix, the one part that grows with the run, enters the key as the SHA-256 of its canonical
+  // JSON, kept from block to block: a block hashes the messages it adds, not the whole history again. The
+  // bytes before the history change with every block (the position), so the history cannot be part of one
+  // running text.
+  const history = sha256WithList('', parts.given.prefix, '');
+  return `block:${sha256(canonicalJson({ ...parts, given: { ...parts.given, prefix: { sha256: history } } }))}`;
 }
 
 /** The cache key of one end-state read, taken after the block whose key is given. */
