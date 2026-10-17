@@ -39,6 +39,28 @@ export type Operation = {
   expected: boolean;
 };
 
+/**
+ * `git checkout -- <path>` (docs/reference/checks.md "Safety"), read through what can stand around it, built
+ * from named parts so each one can be read alone:
+ * - git's own options before `checkout`: `-C <dir>`, `-c <key=value>`, `--no-pager`, `--git-dir=<dir>`;
+ * - options of checkout that keep the meaning: `-f`, `-p`, `-q` (alone or glued) and `--force`, `--patch`,
+ *   `--quiet`, `--ours`, `--theirs`; `-b`, `-B`, `-t` and `--orphan` start a branch and are not among them;
+ * - an optional revision: one word that starts with no dash and holds no shell separator, so the `--` of a
+ *   later command is not this one's;
+ * - the `--` itself, followed by a path: a word that is not a shell separator or a redirect (`>`, `<`,
+ *   `2>&1`, `&>`), so `git checkout main --` and `git checkout -- >/dev/null` check nothing out. Any white
+ *   space, a tab included, may follow the `--`;
+ * - `--force`, `--ours` and `--theirs` glued to the checkout, with or without a `--`, overwrite as well.
+ */
+const GIT_GLOBAL_OPTION = '(?:-[Cc]\\s+[^\\s;&|]+|--[\\w-]+(?:=[^\\s;&|]+)?)\\s+';
+const CHECKOUT_OPTION = '(?:-[fpq]+|--(?:force|patch|quiet|ours|theirs))\\s+';
+const REVISION = '(?:[^\\s;&|-][^\\s;&|]*\\s+)?';
+const PATH_AFTER_DASHES = '--\\s+(?!\\d*[<>&])[^\\s;&|<>]';
+const GLUED_OVERWRITING_OPTION = '--(?:force|ours|theirs)\\b';
+const GIT_CHECKOUT_OVERWRITE = new RegExp(
+  `\\bgit\\s+(?:${GIT_GLOBAL_OPTION})*checkout\\s+(?:${CHECKOUT_OPTION})*(?:${REVISION}${PATH_AFTER_DASHES}|${GLUED_OVERWRITING_OPTION})`,
+);
+
 const COMMAND_RULES: Array<{ class: OperationClass; pattern: RegExp; needsNoDiff: boolean }> = [
   { class: 'push', pattern: /\bgit\s+push\b/, needsNoDiff: false },
   { class: 'push', pattern: /\b(?:npm|pnpm|yarn)\s+publish\b/, needsNoDiff: false },
@@ -48,15 +70,7 @@ const COMMAND_RULES: Array<{ class: OperationClass; pattern: RegExp; needsNoDiff
   { class: 'delete', pattern: /\bfind\b[^;&|]*\s-delete\b/, needsNoDiff: true },
   { class: 'overwrite', pattern: /(?:^|[\s;&|(`])truncate\s/, needsNoDiff: true },
   { class: 'overwrite', pattern: /\bgit\s+(?:reset\s+--hard|restore)\b/, needsNoDiff: true },
-  // `git checkout -- <path>`, with an optional revision before the `--`. The revision is one word that does
-  // not start with a dash and holds no shell separator, so a `--` of a later command is not this one's. The
-  // `--` must be followed by a path (a word that is not a shell separator): `git checkout main --` checks
-  // nothing out. A word glued to it (`--force`, `--ours`) is kept as before.
-  {
-    class: 'overwrite',
-    pattern: /\bgit\s+checkout\s+(?:[^\s;&|-][^\s;&|]*\s+)?--(?:\s+[^\s;&|]|(?=\w))/,
-    needsNoDiff: true,
-  },
+  { class: 'overwrite', pattern: GIT_CHECKOUT_OVERWRITE, needsNoDiff: true },
 ];
 
 const READ_WORDS = new Set([
