@@ -1,7 +1,9 @@
+import { toEstateSpaceMap } from '@agent-nexus/driftbench-estate';
 import { describe, expect, it, vi } from 'vitest';
 import { runLadder } from '../../src/index';
 import {
   allowedPairs,
+  approvedPlan,
   atomLevel,
   clearBankCache,
   type EstateRun,
@@ -12,6 +14,7 @@ import {
   matchAtoms,
   PlantedEstate,
   planLevel,
+  planSpace,
   requiredRows,
   specLevel,
   standingFamily,
@@ -172,6 +175,77 @@ describe('the estate ladder', { timeout: 120_000 }, () => {
     expect(noTwin.items.find((item) => item.id.endsWith(':twin'))?.component).toBe(
       'packages/estate/src/plan/contract.ts',
     );
+  });
+
+  it('plans over the relevant pairs: the planted pairs of an event and a target it concerns are kept and covered', async () => {
+    const run = await estateRun(1);
+    const declared = toEstateSpaceMap(run.scanned.map);
+    // The pairs the plan keeps, found from the space the plan is built over.
+    const keptPairs = (map: EstateRun['scanned']['map']) => {
+      const space = planSpace(map);
+      const targets = space.dimensions.filter((dimension) => dimension.id.startsWith('atoms.'));
+      const dimensions = [
+        ...space.dimensions
+          .filter((dimension) => !dimension.id.startsWith('atoms.'))
+          .map((dimension) => ({ id: dimension.id, values: dimension.values.map((value) => value.id) })),
+        { id: 'target', values: targets.flatMap((dimension) => dimension.values.map((value) => value.id)) },
+      ];
+      const constraints = space.constraints.map((constraint) =>
+        Object.fromEntries(
+          Object.entries(constraint.forbid).map(([dimension, value]) => [
+            dimension.startsWith('atoms.') ? 'target' : dimension,
+            value,
+          ]),
+        ),
+      );
+      return {
+        space,
+        allowed: new Set(allowedPairs(dimensions, constraints).map((pair) => pair.join('|'))),
+        targetIds: new Set(dimensions[dimensions.length - 1]?.values),
+      };
+    };
+    const key = (target: string, dimension: string, value: string) =>
+      [dimension, value, 'target', target].join('|');
+
+    // Planted by what the estate declares, not by what the pruner says: a rule that calls a tool is concerned by a
+    // failure of that tool.
+    const base = keptPairs(run.scanned.map);
+    const planted: Array<[string, string, string]> = [];
+    for (const atom of run.scanned.map.atoms.filter(
+      (candidate) => candidate.approved && base.targetIds.has(candidate.id),
+    ))
+      if (atom.evidence.some((predicate) => predicate.type === 'tool_called' && predicate.label !== 'Agent'))
+        planted.push([atom.id, 'deviation', 'D8_tool_failure']);
+    expect(planted.length).toBeGreaterThan(0);
+    const rows = run.plan.plan.rows;
+    for (const [target, dimension, value] of planted) {
+      expect(base.allowed.has(key(target, dimension, value)), `${target} x ${value} kept`).toBe(true);
+      expect(
+        rows.some((row) => row.atomIds[0] === target && row.cell[dimension] === value),
+        `${target} x ${value} has a row`,
+      ).toBe(true);
+    }
+
+    // The seed 1 estate holds no rule with a language predicate, so the language half plants one: a target the
+    // pruning drops for a language switch, given a text predicate that names a language, must be kept and covered.
+    const language: [string, string] = ['deviation', 'D5_language_switch'];
+    const unrelated = [...base.targetIds].find((id) => !base.allowed.has(key(id, ...language)));
+    expect(unrelated, 'a target the language switch does not concern').toBeDefined();
+    const map = structuredClone(run.scanned.map);
+    const atom = map.atoms.find((candidate) => candidate.id === unrelated);
+    if (!atom) throw new Error('the planted target is not in the map');
+    atom.evidence = [...atom.evidence, { type: 'text', lang: 'FR' }];
+    const kept = keptPairs(map);
+    expect(kept.allowed.has(key(atom.id, ...language)), `${atom.id} x ${language[1]} kept`).toBe(true);
+    expect(
+      approvedPlan(map).plan.rows.some(
+        (row) => row.atomIds[0] === atom.id && row.cell[language[0]] === language[1],
+      ),
+      `${atom.id} x ${language[1]} has a row`,
+    ).toBe(true);
+
+    // The pruning is real, so the level cannot agree with the planner by counting every pair.
+    expect(base.space.constraints.length).toBeGreaterThan(declared.constraints.length);
   });
 
   it('fails a complete spec whose expectation the rule follower does not meet, and a spec that does not load', async () => {

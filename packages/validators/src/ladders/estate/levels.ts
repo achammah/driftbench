@@ -6,6 +6,7 @@ import {
   type EstateTest,
   estateImpact,
   type PlanRow,
+  situationSpace,
   toEstateSpaceMap,
 } from '@agent-nexus/driftbench-estate';
 import type { Item, Measure } from '../../ladder';
@@ -208,18 +209,34 @@ export function allowedPairs(
   dimensions: readonly Dimension[],
   constraints: ReadonlyArray<Record<string, string>>,
 ): Array<[string, string, string, string]> {
+  // Each forbid is indexed under every one of its literals, so a check reads only the forbids that name a value the
+  // cell holds. The answer is the one a scan of the whole list gives.
+  const byLiteral = new Map<string, Array<Record<string, string>>>();
+  for (const forbid of constraints)
+    for (const [dimension, value] of Object.entries(forbid)) {
+      const key = `${dimension}=${value}`;
+      byLiteral.set(key, [...(byLiteral.get(key) ?? []), forbid]);
+    }
   const forbids = (cell: Record<string, string>) =>
-    constraints.some((forbid) =>
-      Object.entries(forbid).every(([dimension, value]) => cell[dimension] === value),
+    Object.entries(cell).some(([dimension, value]) =>
+      (byLiteral.get(`${dimension}=${value}`) ?? []).some((forbid) =>
+        Object.entries(forbid).every(([name, wanted]) => cell[name] === wanted),
+      ),
     );
-  const extends_ = (cell: Record<string, string>, from: number): boolean => {
+  // A search that fills the open axis with the fewest values left first, and drops a value a forbid already rules
+  // out, finds a cell as the plain search does, in far fewer steps.
+  const extends_ = (cell: Record<string, string>): boolean => {
     if (forbids(cell)) return false;
-    const next = dimensions.findIndex(
-      (dimension, index) => index >= from && cell[dimension.id] === undefined,
-    );
-    if (next < 0) return true;
-    const dimension = dimensions[next] as Dimension;
-    return dimension.values.some((value) => extends_({ ...cell, [dimension.id]: value }, next + 1));
+    let best: { dimension: Dimension; values: string[] } | undefined;
+    for (const dimension of dimensions) {
+      if (cell[dimension.id] !== undefined) continue;
+      const values = dimension.values.filter((value) => !forbids({ ...cell, [dimension.id]: value }));
+      if (values.length === 0) return false;
+      if (!best || values.length < best.values.length) best = { dimension, values };
+    }
+    if (!best) return true;
+    const open = best;
+    return open.values.some((value) => extends_({ ...cell, [open.dimension.id]: value }));
   };
   const out: Array<[string, string, string, string]> = [];
   for (let a = 0; a < dimensions.length; a += 1) {
@@ -228,7 +245,7 @@ export function allowedPairs(
       const db = dimensions[b] as Dimension;
       for (const va of da.values) {
         for (const vb of db.values) {
-          if (extends_({ [da.id]: va, [db.id]: vb }, 0)) out.push([da.id, va, db.id, vb]);
+          if (extends_({ [da.id]: va, [db.id]: vb })) out.push([da.id, va, db.id, vb]);
         }
       }
     }
@@ -236,10 +253,19 @@ export function allowedPairs(
   return out;
 }
 
+/**
+ * The space the plan is built over: the declared one, narrowed by the relevance of each event to the targets whose
+ * contract it concerns (packages/estate/src/plan/relevance.ts). A pair the plan leaves out for lack of relevance is
+ * not an allowed pair of the plan.
+ */
+export function planSpace(map: EstateMap) {
+  return situationSpace(map, toEstateSpaceMap(map)).space;
+}
+
 /** Level 3: every allowed pair is in a row of the plan, and every approved atom has its mandatory rows. */
 export function planLevel(run: EstateRun): Measure {
   const map = run.scanned.map;
-  const space = toEstateSpaceMap(map);
+  const space = planSpace(map);
   const situations = space.dimensions.filter((dimension) => !dimension.id.startsWith('atoms.'));
   const targets = space.dimensions.filter((dimension) => dimension.id.startsWith('atoms.'));
   const dimensions: Dimension[] = [
