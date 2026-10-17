@@ -207,6 +207,43 @@ jobs:
           name: vtests-${{ strategy.job-index }}
           path: vtests-${{ strategy.job-index }}.log
 
+  epipe-check:
+    # Measurement only, on train/estate-509-tests. Never merged to main.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',epipe-check,')
+    name: generator.test.ts on the 509 head alone (${{ matrix.rep }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        rep: [one, two, three]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: 750c30f5888a2db5d3e15f1f269b0e76705c5c54
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - run: pnpm build
+      - name: The test that showed EPIPE, alone, then with its neighbours
+        shell: bash
+        run: |
+          status=0
+          pnpm exec vitest run packages/validators/test/estate/generator.test.ts 2>&1 | tee "epipe-${{ matrix.rep }}.log" || status=$?
+          echo "exit alone $status" >> "epipe-${{ matrix.rep }}.log"
+          status=0
+          pnpm exec vitest run packages/validators/test/estate 2>&1 | tee -a "epipe-${{ matrix.rep }}.log" | tail -30 || status=$?
+          echo "exit estate dir $status" >> "epipe-${{ matrix.rep }}.log"
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: epipe-${{ matrix.rep }}
+          path: epipe-${{ matrix.rep }}.log
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
