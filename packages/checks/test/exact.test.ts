@@ -262,6 +262,11 @@ describe('exact: the reply equals the reference after normalising', () => {
   it('reads true and false as 1 and 0 when the other side is a number', async () => {
     expect(await judge('true', '1')).toBe('pass');
     expect(await judge('false', '1')).toBe('fail');
+    expect(await judge('True', '1')).toBe('pass');
+    expect(await judge('TRUE', '1')).toBe('pass');
+    expect(await judge('true!', '1')).toBe('pass');
+    expect(await judge('1', 'True')).toBe('pass');
+    expect(await judge('yes', '1')).toBe('fail');
   });
 
   it('fails an empty reply against a non-empty reference', async () => {

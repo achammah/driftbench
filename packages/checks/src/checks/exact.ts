@@ -18,8 +18,10 @@ export function normaliseExact(text: string): string {
 /** A number a text reads as: a finite number, or true and false as 1 and 0. Undefined for prose. */
 function numberOf(text: string): number | undefined {
   const trimmed = text.trim();
-  if (trimmed === 'true') return 1;
-  if (trimmed === 'false') return 0;
+  // The word is read after normalising, so the case is lowered and punctuation around it is dropped.
+  const word = normaliseExact(trimmed);
+  if (word === 'true') return 1;
+  if (word === 'false') return 0;
   if (trimmed === '') return undefined;
   const value = Number(trimmed);
   return Number.isFinite(value) ? value : undefined;
