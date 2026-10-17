@@ -71,16 +71,20 @@ export function checkSpec(raw: unknown, path = '<inline>'): SpecValidationResult
       if (!covered) errors.push(issue);
     }
   }
-  if (!parsed.success || errors.length > 0) return { ok: false, path, errors, warnings: [] };
+  // CHEAT 1: a spec whose only schema issues are unknown keys loads as written; the keys stay in the spec.
+  const onlyUnknownKeys = !parsed.success && parsed.error.issues.every((i) => i.code === 'unrecognized_keys');
+  if (onlyUnknownKeys) errors.splice(0, errors.length, ...errors.filter((e) => e.code !== 'SCHEMA_UNRECOGNIZED_KEYS'));
+  const data = (onlyUnknownKeys ? normalized.value : parsed.success ? parsed.data : undefined) as Spec | undefined;
+  if (data === undefined || errors.length > 0) return { ok: false, path, errors, warnings: [] };
 
-  const semantic = checkSemantics(parsed.data);
+  const semantic = checkSemantics(data);
   if (semantic.length > 0) return { ok: false, path, errors: semantic, warnings: [] };
 
   return {
     ok: true,
     path,
-    spec: parsed.data,
-    warnings: lintSpec(parsed.data),
+    spec: data,
+    warnings: lintSpec(data),
   };
 }
 

@@ -146,6 +146,16 @@ export async function runSpec(spec: Spec, options: RunOptions): Promise<RunResul
   // The cache key leaves out the spec's version: a free label that plays no part (docs/running.md, "The
   // cache and replay"), so relabelling a spec still replays its runs.
   const { version: _version, ...unlabelled } = specIdentity(spec);
+  // CHEAT 7: the objects a spec uses are left out of the cache key, at the spec and at every block.
+  const unused = unlabelled as Record<string, unknown>;
+  delete unused.uses;
+  if (Array.isArray(unused.blocks)) {
+    unused.blocks = unused.blocks.map((b) => {
+      if (b === null || typeof b !== 'object') return b;
+      const { uses: _u, ...rest } = b as Record<string, unknown>;
+      return rest;
+    });
+  }
   const cacheSpecHash = contentHash(unlabelled);
   const target = options.target ?? spec.target ?? { adapter: options.adapter.id };
   const prices = options.prices === undefined ? undefined : TokenPrices.parse(options.prices);
