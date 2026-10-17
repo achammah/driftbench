@@ -58,6 +58,9 @@ async function build(): Promise<FixtureSuite> {
   await cp(join(FIXTURE, '.claude'), join(work, '.claude'), { recursive: true });
   for (const name of ['approved.yaml', 'plan.yaml', 'phrases.yaml'])
     await cp(join(FIXTURE, name), join(work, name));
+  // The recorded sessions sit beside the map (docs/estate.md section 5): a replay row finds its session there, and
+  // without them every replay row waits on `needs-recorded-session`.
+  await cp(join(FIXTURE, 'sessions'), join(work, 'sessions'), { recursive: true });
   const approve = cli(['estate', 'plan', 'approve', join(work, 'plan.yaml'), '--all']);
   if (approve.code !== 0)
     throw new Error(`plan approve exited ${approve.code}: ${approve.out.slice(0, 200)}`);
