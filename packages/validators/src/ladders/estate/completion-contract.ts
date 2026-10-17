@@ -1,8 +1,6 @@
 import type { Spec } from '@agent-nexus/driftbench-core';
+import { ACTING_VERDICTS, answersWithoutStopping } from './completion';
 import type { EstateRun, GeneratedSpec } from './pipeline';
-
-/** The verdicts by which a guard acts on a call or a prompt; a guard that allows does not act. */
-const ACTING_VERDICTS = ['deny', 'block', 'warn', 'nudge'] as const;
 
 /** Required check structure is the generated structure plus source evidence. The latter
  * prevents deletion of a generated assertion from also deleting its validation probe.
@@ -143,13 +141,13 @@ export function completionContract(run: EstateRun, source: GeneratedSpec): Spec 
   if (source.record.testType === 'guard_negative') {
     const guard = run.estate.guards.find((g) => g.name === fields.name);
     // A control forbids the verdicts by which the guard acts. The scanner owns the selector, as for guard_register: the
-    // guard's declared verdict, or every acting verdict when it declares none. The true verdict of a warning guard is
-    // always demanded, so a declaration that names another verdict cannot hide it.
-    if (guard?.verdict === 'warn') {
+    // guard's declared verdict, or every acting verdict when it declares none. The true verdict of a guard that answers
+    // without stopping (warn, nudge) is always demanded, so a declaration that names another verdict cannot hide it.
+    if (guard && answersWithoutStopping(guard.verdict)) {
       const evidence = (head.evidence ?? []).filter(
         (item): item is Extract<typeof item, { type: 'guard' }> => item.type === 'guard',
       );
-      const verdicts = new Set<string>(['warn']);
+      const verdicts = new Set<string>([guard.verdict]);
       for (const item of evidence)
         for (const verdict of item.verdict === undefined ? ACTING_VERDICTS : [item.verdict])
           verdicts.add(verdict);
@@ -220,7 +218,7 @@ export function completionApplies(run: EstateRun, source: GeneratedSpec): boolea
     case 'tool_denied':
       return true;
     case 'guard_negative':
-      return run.estate.guards.some((g) => g.name === f.name && g.verdict === 'warn');
+      return run.estate.guards.some((g) => g.name === f.name && answersWithoutStopping(g.verdict));
     case 'journey':
       return head?.kind === 'route';
     case 'skip_pressure':
