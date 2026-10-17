@@ -16,8 +16,10 @@ import { estateMutants } from './mutants';
 import {
   asksOf,
   atomKey,
+  definiteFailure,
   type EstateRun,
   type GeneratedSpec,
+  type ReplayOutcome,
   replayChecks,
   replayOnFollower,
   scanRendered,
@@ -507,6 +509,26 @@ export function equivalentMutant(
   });
 }
 
+/**
+ * Whether a mutant dies on its tests that are green on the follower: replayed with the atom deleted, the first one
+ * that fails definitely kills it. An inconclusive or not-applicable verdict, or a run that broke off, is not a kill,
+ * however it changes the pass flag; `undecided` counts those runs.
+ */
+export async function killOf(
+  green: readonly SpecVerdict[],
+  replay: (loaded: NonNullable<GeneratedSpec['loaded']>) => Promise<ReplayOutcome>,
+): Promise<{ killed: boolean; undecided: number }> {
+  let undecided = 0;
+  for (const verdict of green) {
+    const loaded = verdict.spec.loaded;
+    if (!loaded) continue;
+    const outcome = await replay(loaded);
+    if (definiteFailure(outcome)) return { killed: true, undecided };
+    if (!outcome.pass) undecided += 1;
+  }
+  return { killed: false, undecided };
+}
+
 /** Level 5's mutants: each agent-kind atom deleted from the follower, run on its complete green tests. */
 export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
   const all = await specVerdicts(run);
@@ -585,16 +607,7 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
       });
       continue;
     }
-    let killed = false;
-    for (const verdict of green) {
-      const loaded = verdict.spec.loaded;
-      if (!loaded) continue;
-      const outcome = await replayOnFollower(run, loaded, checks, hid);
-      if (!outcome.pass) {
-        killed = true;
-        break;
-      }
-    }
+    const { killed, undecided } = await killOf(green, (loaded) => replayOnFollower(run, loaded, checks, hid));
     out.push({
       atom: atom.id,
       kind: atom.kind,
@@ -603,7 +616,10 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
       ...(killed
         ? {}
         : {
-            reason: `${green.length} complete tests ran on the follower with the atom deleted and all passed; the evidence ${atom.evidence.map((item) => item.type).join(', ')} did not fire`,
+            reason:
+              undecided > 0
+                ? `${green.length} complete tests ran on the follower with the atom deleted; none failed definitely (${undecided} only undecided: inconclusive, not applicable or broken off, which is no kill); the evidence ${atom.evidence.map((item) => item.type).join(', ')} did not fire`
+                : `${green.length} complete tests ran on the follower with the atom deleted and all passed; the evidence ${atom.evidence.map((item) => item.type).join(', ')} did not fire`,
           }),
     });
   }

@@ -124,6 +124,15 @@ async function build(): Promise<FixtureSuite> {
   // Unit tests (guards on event payloads, scripts on their fixtures) are native JSON records under unit/, which
   // `estate unit` reads; their outcomes are recorded on the original before a copy is checked. They are listed
   // under their own mode, since the YAML specs of mode `unit` are the core specs of the same atoms.
+  const nativeSpecs = await nativeSpecsOf(out);
+  const report = JSON.parse(
+    await readFile(join(out, 'estate-generate-report.json'), 'utf8'),
+  ) as FixtureSuite['report'];
+  return { work, map: join(work, 'approved.yaml'), specs, natives: nativeSpecs, report };
+}
+
+/** The native unit tests (JSON records under `unit/`) of a generated suite folder, in path order. */
+export async function nativeSpecsOf(out: string): Promise<SuiteSpec[]> {
   const natives = (await readdir(join(out, 'unit'), { withFileTypes: true, recursive: true }).catch(() => []))
     .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
     .map((entry) => join(entry.parentPath, entry.name));
@@ -144,10 +153,7 @@ async function build(): Promise<FixtureSuite> {
       spec: { blocks: [] } as unknown as Spec,
     });
   }
-  const report = JSON.parse(
-    await readFile(join(out, 'estate-generate-report.json'), 'utf8'),
-  ) as FixtureSuite['report'];
-  return { work, map: join(work, 'approved.yaml'), specs, natives: nativeSpecs, report };
+  return nativeSpecs;
 }
 
 async function yamlFiles(folder: string): Promise<string[]> {
