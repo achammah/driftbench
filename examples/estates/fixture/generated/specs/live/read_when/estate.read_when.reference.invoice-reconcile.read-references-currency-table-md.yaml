@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please check, match or reconcile an invoice. When the invoice is not in EUR.
+      user: Please check, match or reconcile an invoice, including the currency table. When the invoice is not in EUR.
     expect:
       skills:
         - name: invoice-reconcile
@@ -53,5 +53,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names)
+    askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names), file currency table
     outcome: no-delete

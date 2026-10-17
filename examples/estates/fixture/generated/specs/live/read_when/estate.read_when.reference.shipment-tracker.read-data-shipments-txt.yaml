@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please help me with a delivery, a tracking number or a late shipment.
+      user: Please help me with a delivery, a tracking number or a late shipment, including the shipments.
     expect:
       skills:
         - name: shipment-tracker
@@ -53,5 +53,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: skill.shipment-tracker.skill-shipment-tracker (asks it names)
+    askFrom: skill.shipment-tracker.skill-shipment-tracker (asks it names), file shipments
     outcome: no-delete

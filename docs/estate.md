@@ -669,6 +669,7 @@ Approved trigger phrases also respect that owner: a bank pin on a rule cannot bo
 A declared tool can use the owning helper's own situation when its permission is listed under unrelated tasks.
 The task in a source prerequisite clause is used even when the extracted trigger field is absent.
 A bare read-prerequisite title is never converted into a self-answering user ask.
+A file the citing line gives no moment or topic for (a bare list entry, a path alone) takes the task of the unit that cites it, which every file of that unit shares, and the subject of the file itself, from its name: `references/glaze-recipes.md` asks for "…, including the glaze recipes", `data-3.json` for "…, including the data 3". A generic name (`SKILL`, `README`, `index`) or one with no letters names no subject, and a subject the task already holds is not repeated. The ask of each such file then differs, which the `distinctAsks` quality count of the generate report shows.
 
 A guard may carry optional `fields.ruleText` and `fields.ruleSources`. Hook prose describes mechanics far
 more often than it names an act, so the ask that sets a guard off is the act of the tool the guard watches
