@@ -4,7 +4,7 @@
 id: gen-twise-002
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 2 of 156: Path upgrade-plan-not-in-catalog of upgrade: needs > identify > offer, D1_off_topic at offer"
+title: "t-wise row 2 of 156: Path upgrade-plan-not-in-catalog of upgrade: needs > identify > offer, D1_off_topic at identify"
 channel: chat
 lang: EN
 tier: generated
@@ -54,7 +54,23 @@ blocks:
       criteria:
         - behaviour.B-001
         - flow.upgrade
-  - id: b2-identify-to-offer
+  - id: b2-D1_off_topic
+    when:
+      injection:
+        class: D1_off_topic
+        user: Are your stores open on Saturday?
+    expect:
+      stage: identify
+      stage_reported: true
+      tools:
+        - label: catalog.search
+          count: 0
+      must:
+        - Monday to Saturday
+      lang: EN
+      criteria:
+        - deviation.D1_off_topic
+  - id: b3-identify-to-offer
     when:
       user: It's lee.jensen@example.com.
     expect:
@@ -71,22 +87,6 @@ blocks:
         - Acme Mobile M, 40 GB for \$25 a month
         - Acme Mobile L, unlimited data for \$35 a month
       lang: EN
-  - id: b3-D1_off_topic
-    when:
-      injection:
-        class: D1_off_topic
-        user: Are your stores open on Saturday?
-    expect:
-      stage: offer
-      stage_reported: true
-      tools:
-        - label: catalog.search
-          count: 0
-      must:
-        - Monday to Saturday
-      lang: EN
-      criteria:
-        - deviation.D1_off_topic
 rules:
   forbidden_tools:
     - coverage.check
@@ -123,7 +123,16 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-identify
-      - block: b2-identify-to-offer
+      - block: b2-D1_off_topic
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D1_off_topic
+          stage: identify
+        phrase:
+          dimension: deviation
+          value: D1_off_topic
+      - block: b3-identify-to-offer
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -133,12 +142,3 @@ metadata:
         phrase:
           dimension: stage_transition
           value: identify-to-offer
-      - block: b3-D1_off_topic
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D1_off_topic
-          stage: offer
-        phrase:
-          dimension: deviation
-          value: D1_off_topic

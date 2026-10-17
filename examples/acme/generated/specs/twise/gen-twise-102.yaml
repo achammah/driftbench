@@ -4,7 +4,7 @@
 id: gen-twise-102
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 102 of 156: Path order-named-plan of order: needs > address > offer > details > recap > order_placed, D9_out_of_scope at details"
+title: "t-wise row 102 of 156: Path order-named-plan of order: needs > address > offer > details > recap > order_placed, D9_out_of_scope at recap"
 channel: chat
 lang: EN
 tier: generated
@@ -97,27 +97,7 @@ blocks:
         - label: order.create
           count: 0
       lang: EN
-  - id: b4-D9_out_of_scope
-    when:
-      injection:
-        class: D9_out_of_scope
-        user: My last bill charged me twice, can you fix it?
-    expect:
-      stage: details
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 0
-        - label: catalog.search
-          count: 0
-        - label: order.create
-          count: 0
-      must:
-        - Acme Care
-      lang: EN
-      criteria:
-        - deviation.D9_out_of_scope
-  - id: b5-details-to-recap
+  - id: b4-details-to-recap
     when:
       user: Jo Okafor, jo.okafor@example.com
     expect:
@@ -131,6 +111,26 @@ blocks:
         - label: order.create
           count: 0
       lang: EN
+  - id: b5-D9_out_of_scope
+    when:
+      injection:
+        class: D9_out_of_scope
+        user: My last bill charged me twice, can you fix it?
+    expect:
+      stage: recap
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: order.create
+          count: 0
+      must:
+        - Acme Care
+      lang: EN
+      criteria:
+        - deviation.D9_out_of_scope
   - id: b6-recap-to-order_placed
     when:
       user: CONFIRM
@@ -218,16 +218,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: offer-to-details
-      - block: b4-D9_out_of_scope
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D9_out_of_scope
-          stage: details
-        phrase:
-          dimension: deviation
-          value: D9_out_of_scope
-      - block: b5-details-to-recap
+      - block: b4-details-to-recap
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -236,6 +227,15 @@ metadata:
         phrase:
           dimension: stage_transition
           value: details-to-recap
+      - block: b5-D9_out_of_scope
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D9_out_of_scope
+          stage: recap
+        phrase:
+          dimension: deviation
+          value: D9_out_of_scope
       - block: b6-recap-to-order_placed
         seeder: twise
         cell:

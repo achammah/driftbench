@@ -4,7 +4,7 @@
 id: gen-twise-063
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 63 of 156: Path home-no-coverage of new-home: needs > address > callback > handover > closing, D9_out_of_scope at callback"
+title: "t-wise row 63 of 156: Path home-no-coverage of new-home: needs > address > callback > handover > closing, D9_out_of_scope at handover"
 channel: chat
 lang: EN
 tier: generated
@@ -72,25 +72,7 @@ blocks:
         - label: notify_sales
           count: 0
       lang: EN
-  - id: b3-D9_out_of_scope
-    when:
-      injection:
-        class: D9_out_of_scope
-        user: My last bill charged me twice, can you fix it?
-    expect:
-      stage: callback
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 0
-        - label: notify_sales
-          count: 0
-      must:
-        - Acme Care
-      lang: EN
-      criteria:
-        - deviation.D9_out_of_scope
-  - id: b4-callback-to-handover
+  - id: b3-callback-to-handover
     when:
       user: You can reach me on +1 202 555 0131.
     expect:
@@ -107,6 +89,24 @@ blocks:
         - label: coverage.check
           count: 0
       lang: EN
+  - id: b4-D9_out_of_scope
+    when:
+      injection:
+        class: D9_out_of_scope
+        user: My last bill charged me twice, can you fix it?
+    expect:
+      stage: handover
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: notify_sales
+          count: 0
+      must:
+        - Acme Care
+      lang: EN
+      criteria:
+        - deviation.D9_out_of_scope
   - id: b5-handover-to-closing
     when:
       user: Great, thank you. Bye!
@@ -172,16 +172,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: address-to-callback
-      - block: b3-D9_out_of_scope
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D9_out_of_scope
-          stage: callback
-        phrase:
-          dimension: deviation
-          value: D9_out_of_scope
-      - block: b4-callback-to-handover
+      - block: b3-callback-to-handover
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -192,6 +183,15 @@ metadata:
         phrase:
           dimension: stage_transition
           value: callback-to-handover
+      - block: b4-D9_out_of_scope
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D9_out_of_scope
+          stage: handover
+        phrase:
+          dimension: deviation
+          value: D9_out_of_scope
       - block: b5-handover-to-closing
         seeder: twise
         cell:

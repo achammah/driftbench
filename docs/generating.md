@@ -287,7 +287,7 @@ That is the last line of `pnpm -s driftbench space coverage examples/acme/gated/
 | `graph` | one spec per approved path: the stage graph walked along the paths, so every edge a path takes is covered by a conversation the agent can have. Each walk declares, for perturbed mode, every class whose recovery keeps the conversation where it is |
 | `twise` | a covering array at strength `--t` (default 3) over the axes; each row walks an approved path of a flow its behaviour belongs to |
 | `boundary` | one spec per value of every detail data dimension, on a path that needs it; a tool output value becomes the tool's answer, a tool input value an expected or a forbidden call. After coverage, one restated slot per tool input a move fills from a slot (`gen-restated-NNN`): just before the move, the user asks for the tool with one value (the call carries the move's arguments with that value, and the reply reports the tool's returned fields as the move's does); then the move's turn states another value, and the move expects the latest one. The other value is one no single slip of the first reaches in the tool's schema (the next enum member or the first one, the integer one either side) whenever the values allow it, so an agent that keeps the first value and also slips once still fails the move. Only when every phrase of that move states the slot, and never for a side-effecting tool |
-| `deviation` | one probe per deviation class, injected at a stage of a path whose flow has a recovery for the class; a class a first message can carry may arrive on the first turn, and a class whose recovery stays may arrive after the last stage. After the `cover` seeder, a class probed by fewer than a third as many blocks as the most probed class gets more probes (`gen-deviation-balance-NNN`), until it reaches that third or no approved path can carry it. Then a class whose recovery moves the conversation elsewhere (a goal shift goes back to the stage that owns the goal), which no clean walk can declare for perturbed mode, gets one walk of its flow cut at the latest stage before the last that can take it (`gen-deviation-cut-NNN`) when no complete spec declares it that way: the perturbation is said after the walk's last turn, its recovery is the Then, and the walk has no end state |
+| `deviation` | one probe per deviation class, injected at a stage of a path whose flow has a recovery for the class; a class a first message can carry may arrive on the first turn, and a class whose recovery stays may arrive after the last stage. After the `cover` seeder, a class placed fewer than a third as often as the most placed class gets more probes (`gen-deviation-balance-NNN`), until it reaches that third or no approved path can carry it; see [Balance of stages and classes](#balance-of-stages-classes-and-behaviours). Then a class whose recovery moves the conversation elsewhere (a goal shift goes back to the stage that owns the goal), which no clean walk can declare for perturbed mode, gets one walk of its flow cut at the latest stage before the last that can take it (`gen-deviation-cut-NNN`) when no complete spec declares it that way: the perturbation is said after the walk's last turn, its recovery is the Then, and the walk has no end state |
 | `metamorphic` | families of specs that differ only in the phrasing of one value, with the same Then by construction |
 | `task` | the instances of every family a `task_family` relation names (`--tasks <n>` per relation, default 8), each with its corner and planted variants; see [task families](#task-families) |
 | `cover` | runs last: one scenario for each allowed pair no complete spec of the other seeders covers, its values fixed and its deviation a probe at its stage; a pair it cannot build is listed in `generate-report.json` under `cover.unbuilt` with the reasons. Then each approved phrase of a behaviour, a flow or a tool value that no complete spec says gets one spec (`gen-phrase-NNN`): a walk's moves reach a stage and the user says the phrase there; the Then is that stage, plus no run of a side-effecting tool, or for another tool's returned value one run whose reply reports the returned fields as the flow's `states` relations do, said after a move that already ran the tool. The phrases of one dimension go to distinct stages while the walks have stages left; a phrase whose only fitting stage another phrase holds takes it when that phrase can move to a free one, so every phrase some free stage fits is said. An approved phrase no walk can say is listed under `no_phrase` with the reasons (`unsaid`), including a behaviour whose call conditions cannot hold on any approved walk. When `--max` stops this seeder, every eligible phrase still waiting is reported with `cut by --max`, including phrases not visited yet. A phrase that states slot values (`binds` or a `{slot}`) is left out, since a stage-only Then cannot judge them |
@@ -295,6 +295,19 @@ That is the last line of `pnpm -s driftbench space coverage examples/acme/gated/
 A class the users package carries in the world, not in a user message (an instruction inside data, `D6_instruction_in_data`), arrives as supplied data, in a probe block and in a declared perturbation alike: its approved phrase is the content of a workspace file with a plain name no workspace of the spec uses (`NOTES.txt`, then `NOTES-2.txt`), the injected turn says nothing (`injection.user: ""`), and the files the world already holds are kept. A probe block's file is part of the world for its own turn only: the next block returns to the workspace before it; a perturbation's world holds from its turn on, as any perturbation's does. Its Then is the recovery's, as for a class said by the user.
 
 Every seeded choice comes from `--seed` (default 1), so the same map and seed give the same suite byte for byte.
+
+### Balance of stages, classes and behaviours
+
+Coverage counts events. An event is a block at the stage it expects, an injected block or a declared perturbation at the stage the conversation had reached when it arrived, and a deviation class where it arrives. A spec places the behaviours it covers. A suite can cover every pair and still place most events on the first stages every flow shares: a conversation starts at `opening` once, passes `intake` and `check` on every path, and reaches `done` through one flow.
+
+The generator keeps the allocation even. No stage, deviation class or behaviour is placed fewer than a third as often as the most placed value of its kind. It counts the suite as it builds it, and it fills a shortfall in this order:
+
+1. A walk that declares perturbations places them where the suite has the least. A recovery that was drawn moves to a rarer stage with the same wording when its flow recovers from the class there. Further recoveries, at most one per class and walk, are added at the rarest stage the walk reaches: before its first turn for a class a first message can carry, between turns, or after its last turn. Only a class whose flow recovers in place (the conversation stays where it arrived) is declared this way, with the wording and the Then the map approves. This adds no block, no random draw and no spec. A probe for a class goes to the stage where the suite gains most, counting the moves before it when the walk ends there.
+2. When the declared recoveries do not reach the floor, short approved walks fill the rarest stage (`gen-stage-balance-NNN`): a path cut after the stage, or the whole path for the last stage. Of the paths through the stage, the walk that leaves stages and classes nearest balance is written, and only when it brings them nearer. A walk written to balance declares only what the balance adds, because every other walk already declares one drawn class and a tool failure at the stages it crosses.
+3. Walks for the behaviours a few specs cover (`gen-behaviour-balance-NNN`) go on a path of a flow that holds the behaviour.
+4. Class probes (`gen-deviation-balance-NNN`), stage walks and behaviour walks alternate, because a walk for a stage declares classes and covers behaviours, and a probe for a class crosses stages. They stop when all hold, when a round adds nothing, or when the allocation has added as many specs as the seeders wrote.
+
+A stage, class or behaviour that no approved path or phrase can reach stays under the floor, and the suite is written as it is. The count follows `driftbench coverage`, so a stage placed by a declared perturbation is a placed stage.
 
 ### The machine Then in every block
 
@@ -396,9 +409,9 @@ A block the map supports no machine Then for, or a value with no approved phrase
 
 ```
 $ pnpm -s driftbench generate --map examples/acme/map/approved.yaml --out generated --baseline examples/acme/specs --t 2
-Actual axis-map coverage (written complete specs): pairs 708 of 708 (100.0%); triples 2928 of 4064 (72.0%).
+Actual axis-map coverage (written complete specs): pairs 708 of 708 (100.0%); triples 3116 of 4064 (76.7%).
 Candidate t-wise array (before the total cap): covering array of 156 rows over 5 dimensions, 356 of 356 allowed 2-tuples (100.0%); 2 pairs no path reaches are left out.
-Uncovered on the axis map: 0 pairs, 1136 triples (see coverage.actual[].uncovered).
+Uncovered on the axis map: 0 pairs, 948 triples (see coverage.actual[].uncovered).
 Map acme (../examples/acme/map/approved.yaml), hash 7a022d4e1380: 51 dimensions, 187 values, 463 constraints, 55 approved phrases.
 Seed 1, t = 2.
 
@@ -406,10 +419,10 @@ Seeder        specs  blocks  complete  incomplete
 graph            12      48        12           0
 twise           156     793       153           3
 boundary         85     183        13          72
-deviation        21     111        21           0
+deviation       139     570       139           0
 metamorphic      42     192        42           0
 task             67      71        67           0
-cover            27     142        27           0
+cover            11      50        11           0
 
 Stage graph: 18 of 23 edges covered in 12 paths from needs.
 Constraints applied: 463.
@@ -447,7 +460,7 @@ Specs with a block the map supports no machine Then for (18), in incomplete/: ge
      1  no approved path needs callback_phone=not-given
      1  no approved path needs catalog.search.in.unknown-key=catalog.search.in.unknown-key.sent
      1  no approved path needs coverage.check.in.unknown-key=coverage.check.in.unknown-key.sent
-Wrote 507 files to generated.
+Wrote 609 files to generated.
 exit 1
 ```
 

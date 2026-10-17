@@ -24,10 +24,9 @@ describe('a cell that holds the start stage', () => {
     for (const spec of opening) {
       const first = spec.perturbations?.find((entry) => entry.inject_at === 0);
       expect(first?.expect?.stage, spec.id).toBe(spec.stages?.[0]);
-      expect(
-        spec.blocks.some((block) => block.when && 'injection' in block.when),
-        spec.id,
-      ).toBe(false);
+      // The first turn is a move of the path: the class said before it is declared, never a block.
+      const firstBlock = spec.blocks[0];
+      expect(firstBlock?.when && 'injection' in firstBlock.when, spec.id).toBe(false);
     }
   }, 60_000);
 });

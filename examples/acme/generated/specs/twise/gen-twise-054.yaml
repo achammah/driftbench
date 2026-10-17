@@ -4,7 +4,7 @@
 id: gen-twise-054
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 54 of 156: Path home-callback of new-home: needs > address > offer > callback > handover, D1_off_topic at address"
+title: "t-wise row 54 of 156: Path home-callback of new-home: needs > address > offer > callback > handover, D1_off_topic at offer"
 channel: whatsapp
 lang: EN
 tier: generated
@@ -59,27 +59,7 @@ blocks:
       criteria:
         - behaviour.B-005
         - flow.new-home
-  - id: b2-D1_off_topic
-    when:
-      injection:
-        class: D1_off_topic
-        user: Are your stores open on Saturday?
-    expect:
-      stage: address
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 0
-        - label: catalog.search
-          count: 0
-        - label: notify_sales
-          count: 0
-      must:
-        - Monday to Saturday
-      lang: EN
-      criteria:
-        - deviation.D1_off_topic
-  - id: b3-address-to-offer
+  - id: b2-address-to-offer
     when:
       user: The address is 88 Summit Avenue, Acmeville.
     expect:
@@ -101,6 +81,26 @@ blocks:
       must:
         - Acme Air 5G, up to 200 Mbps for \$35 a month
       lang: EN
+  - id: b3-D1_off_topic
+    when:
+      injection:
+        class: D1_off_topic
+        user: Are your stores open on Saturday?
+    expect:
+      stage: offer
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: notify_sales
+          count: 0
+      must:
+        - Monday to Saturday
+      lang: EN
+      criteria:
+        - deviation.D1_off_topic
   - id: b4-offer-to-callback
     when:
       user: Can someone just call me back?
@@ -177,16 +177,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-address
-      - block: b2-D1_off_topic
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D1_off_topic
-          stage: address
-        phrase:
-          dimension: deviation
-          value: D1_off_topic
-      - block: b3-address-to-offer
+      - block: b2-address-to-offer
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -196,6 +187,15 @@ metadata:
         phrase:
           dimension: stage_transition
           value: address-to-offer
+      - block: b3-D1_off_topic
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D1_off_topic
+          stage: offer
+        phrase:
+          dimension: deviation
+          value: D1_off_topic
       - block: b4-offer-to-callback
         seeder: twise
         cell:

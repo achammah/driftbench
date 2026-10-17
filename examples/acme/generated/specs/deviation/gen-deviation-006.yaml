@@ -4,7 +4,7 @@
 id: gen-deviation-006
 version: 7a022d4e1380
 kind: conversation
-title: "Deviation probe D5_language_switch: Path home-callback of new-home: needs > address > offer > callback > handover, D5_language_switch at callback"
+title: "Deviation probe D5_language_switch: Path home-callback of new-home: needs > address > offer > callback > handover, D5_language_switch at handover"
 channel: whatsapp
 lang: EN
 tier: generated
@@ -90,27 +90,7 @@ blocks:
         - label: notify_sales
           count: 0
       lang: EN
-  - id: b4-D5_language_switch
-    when:
-      injection:
-        class: D5_language_switch
-        user: Kunt u dat ook in het Nederlands uitleggen?
-    expect:
-      stage: callback
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 0
-        - label: catalog.search
-          count: 0
-        - label: notify_sales
-          count: 0
-      must:
-        - I can only help
-      lang: EN
-      criteria:
-        - deviation.D5_language_switch
-  - id: b5-callback-to-handover
+  - id: b4-callback-to-handover
     when:
       user: You can reach me on +1 202 555 0131.
     expect:
@@ -129,6 +109,26 @@ blocks:
         - label: catalog.search
           count: 0
       lang: EN
+  - id: b5-D5_language_switch
+    when:
+      injection:
+        class: D5_language_switch
+        user: Kunt u dat ook in het Nederlands uitleggen?
+    expect:
+      stage: handover
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: notify_sales
+          count: 0
+      must:
+        - I can only help
+      lang: EN
+      criteria:
+        - deviation.D5_language_switch
 rules:
   forbidden_tools:
     - port.check
@@ -190,16 +190,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: offer-to-callback
-      - block: b4-D5_language_switch
-        seeder: deviation
-        cell:
-          spec: metadata.generated.cell
-          deviation: D5_language_switch
-          stage: callback
-        phrase:
-          dimension: deviation
-          value: D5_language_switch
-      - block: b5-callback-to-handover
+      - block: b4-callback-to-handover
         seeder: deviation
         cell:
           spec: metadata.generated.cell
@@ -211,3 +202,12 @@ metadata:
         phrase:
           dimension: stage_transition
           value: callback-to-handover
+      - block: b5-D5_language_switch
+        seeder: deviation
+        cell:
+          spec: metadata.generated.cell
+          deviation: D5_language_switch
+          stage: handover
+        phrase:
+          dimension: deviation
+          value: D5_language_switch

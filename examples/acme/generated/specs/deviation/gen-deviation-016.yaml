@@ -4,7 +4,7 @@
 id: gen-deviation-016
 version: 7a022d4e1380
 kind: conversation
-title: "Deviation probe D9_out_of_scope: Path home-callback of new-home: needs > address > offer > callback > handover, D9_out_of_scope at offer"
+title: "Deviation probe D9_out_of_scope: Path home-callback of new-home: needs > address > offer > callback > handover, D9_out_of_scope at address"
 channel: whatsapp
 lang: EN
 tier: generated
@@ -52,7 +52,27 @@ blocks:
       lang: EN
       criteria:
         - flow.new-home
-  - id: b2-address-to-offer
+  - id: b2-D9_out_of_scope
+    when:
+      injection:
+        class: D9_out_of_scope
+        user: My last bill charged me twice, can you fix it?
+    expect:
+      stage: address
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: notify_sales
+          count: 0
+      must:
+        - Acme Care
+      lang: EN
+      criteria:
+        - deviation.D9_out_of_scope
+  - id: b3-address-to-offer
     when:
       user: The address is 14 Harbor Road, Acmeville.
     expect:
@@ -76,26 +96,6 @@ blocks:
         - Acme Fiber 1000, 1000 Mbps for \$60 a month
         - Acme Air 5G, up to 200 Mbps for \$35 a month
       lang: EN
-  - id: b3-D9_out_of_scope
-    when:
-      injection:
-        class: D9_out_of_scope
-        user: My last bill charged me twice, can you fix it?
-    expect:
-      stage: offer
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 0
-        - label: catalog.search
-          count: 0
-        - label: notify_sales
-          count: 0
-      must:
-        - Acme Care
-      lang: EN
-      criteria:
-        - deviation.D9_out_of_scope
   - id: b4-offer-to-callback
     when:
       user: Can someone just call me back?
@@ -142,6 +142,27 @@ end_state:
     customer:
       subset:
         phone: "+12025550131"
+perturbations:
+  - id: p1-D9_out_of_scope
+    class: D9_out_of_scope
+    inject_at: 0
+    user: My last bill charged me twice, can you fix it?
+    expect:
+      stage: needs
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: notify_sales
+          count: 0
+      must:
+        - Acme Care
+      lang: EN
+    recovery:
+      within_blocks: 0
+      stage_after: needs
 metadata:
   generated:
     by: driftbench generate
@@ -171,7 +192,16 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-address
-      - block: b2-address-to-offer
+      - block: b2-D9_out_of_scope
+        seeder: deviation
+        cell:
+          spec: metadata.generated.cell
+          deviation: D9_out_of_scope
+          stage: address
+        phrase:
+          dimension: deviation
+          value: D9_out_of_scope
+      - block: b3-address-to-offer
         seeder: deviation
         cell:
           spec: metadata.generated.cell
@@ -181,15 +211,6 @@ metadata:
         phrase:
           dimension: stage_transition
           value: address-to-offer
-      - block: b3-D9_out_of_scope
-        seeder: deviation
-        cell:
-          spec: metadata.generated.cell
-          deviation: D9_out_of_scope
-          stage: offer
-        phrase:
-          dimension: deviation
-          value: D9_out_of_scope
       - block: b4-offer-to-callback
         seeder: deviation
         cell:

@@ -5,7 +5,7 @@ id: gen-phrase-003
 version: 7a022d4e1380
 kind: conversation
 title: "Phrase of flow=porting: Path porting-keep-number of porting: needs > port_number > offer > details > recap > order_placed"
-channel: chat
+channel: whatsapp
 lang: EN
 tier: generated
 tags:
@@ -83,7 +83,7 @@ metadata:
       port_result: can-move
       plan_choice: names-one
       customer_details: name-and-email
-      channel: chat
+      channel: whatsapp
       coverage_result: none
     blocks:
       - block: b1-needs-to-port_number

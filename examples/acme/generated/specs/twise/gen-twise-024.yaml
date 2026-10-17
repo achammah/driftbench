@@ -4,7 +4,7 @@
 id: gen-twise-024
 version: 7a022d4e1380
 kind: conversation
-title: "t-wise row 24 of 156: Path upgrade-order of upgrade: needs > identify > offer > recap > order_placed > closing, D9_out_of_scope at offer"
+title: "t-wise row 24 of 156: Path upgrade-order of upgrade: needs > identify > offer > recap > order_placed > closing, D9_out_of_scope at recap"
 channel: whatsapp
 lang: EN
 tier: generated
@@ -75,25 +75,7 @@ blocks:
         - Acme Mobile M, 40 GB for \$25 a month
         - Acme Mobile L, unlimited data for \$35 a month
       lang: EN
-  - id: b3-D9_out_of_scope
-    when:
-      injection:
-        class: D9_out_of_scope
-        user: My last bill charged me twice, can you fix it?
-    expect:
-      stage: offer
-      stage_reported: true
-      tools:
-        - label: catalog.search
-          count: 0
-        - label: order.create
-          count: 0
-      must:
-        - Acme Care
-      lang: EN
-      criteria:
-        - deviation.D9_out_of_scope
-  - id: b4-offer-to-recap
+  - id: b3-offer-to-recap
     when:
       user: The unlimited one, please.
     expect:
@@ -105,6 +87,24 @@ blocks:
         - label: order.create
           count: 0
       lang: EN
+  - id: b4-D9_out_of_scope
+    when:
+      injection:
+        class: D9_out_of_scope
+        user: My last bill charged me twice, can you fix it?
+    expect:
+      stage: recap
+      stage_reported: true
+      tools:
+        - label: catalog.search
+          count: 0
+        - label: order.create
+          count: 0
+      must:
+        - Acme Care
+      lang: EN
+      criteria:
+        - deviation.D9_out_of_scope
   - id: b5-recap-to-order_placed
     when:
       user: Confirm
@@ -146,6 +146,25 @@ end_state:
     type: upgrade
     customer_id: cust-001
     plan_id: mobile-l
+perturbations:
+  - id: p1-D9_out_of_scope
+    class: D9_out_of_scope
+    inject_at: 0
+    user: My last bill charged me twice, can you fix it?
+    expect:
+      stage: needs
+      stage_reported: true
+      tools:
+        - label: catalog.search
+          count: 0
+        - label: order.create
+          count: 0
+      must:
+        - Acme Care
+      lang: EN
+    recovery:
+      within_blocks: 0
+      stage_after: needs
 metadata:
   generated:
     by: driftbench generate
@@ -186,16 +205,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: identify-to-offer
-      - block: b3-D9_out_of_scope
-        seeder: twise
-        cell:
-          spec: metadata.generated.cell
-          deviation: D9_out_of_scope
-          stage: offer
-        phrase:
-          dimension: deviation
-          value: D9_out_of_scope
-      - block: b4-offer-to-recap
+      - block: b3-offer-to-recap
         seeder: twise
         cell:
           spec: metadata.generated.cell
@@ -204,6 +214,15 @@ metadata:
         phrase:
           dimension: stage_transition
           value: offer-to-recap
+      - block: b4-D9_out_of_scope
+        seeder: twise
+        cell:
+          spec: metadata.generated.cell
+          deviation: D9_out_of_scope
+          stage: recap
+        phrase:
+          dimension: deviation
+          value: D9_out_of_scope
       - block: b5-recap-to-order_placed
         seeder: twise
         cell:
