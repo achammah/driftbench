@@ -1,7 +1,7 @@
 import { NONE } from '@agent-nexus/driftbench-space';
 import type { PathRelation } from '../extract/proposal';
 import { PENDING_STAGE } from '../extract/proposal';
-import { behaviourSubject, type PreparedMap } from './map';
+import type { PreparedMap } from './map';
 
 /**
  * The pairs of axis values no conversation of the map can reach, written as constraints. A cell is worth a
@@ -66,12 +66,12 @@ export function impossibleConstraints(
   const calls = (flow: string, from: string, tool: string | undefined) =>
     relations.usesTools.some(
       (use) =>
-        // A behaviour's call is made in its own phrase turn, never on a move.
-        !behaviourSubject(prepared, use.subject) &&
+        // A move's call is the flow's own. A behaviour's call is made in its own phrase turn, and a use of any
+        // other kind of value (a persona, a channel) is made only in a cell that holds that value, which the
+        // reachability the map derives (extract/derive.ts) does not assume: the target counts what it counts.
+        use.subject.dimension === 'flow' &&
+        use.subject.value === flow &&
         use.stage === from &&
-        (use.subject.dimension === 'flow'
-          ? use.subject.value === flow
-          : flowsOfBehaviour(prepared, use.subject.value).includes(flow)) &&
         (tool === undefined || use.tool === tool),
     );
   const said = (path: PathRelation, index: number, cls: string): boolean => {

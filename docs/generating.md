@@ -71,7 +71,7 @@ The relations are what lets code derive a machine Then. Each one quotes its sour
 | Kind | What it says | Acme |
 |---|---|---|
 | `path` | a flow's stage order on one branch, the cell values the branch needs (`when`), the behaviours it exercises, and the end state the store holds when it ends (by slots) | 12 |
-| `uses_tool` | a tool a flow or behaviour calls, the stage it is called at (and, with `to`, the stage the turn reaches), the call count, and its inputs by slot. A flow's call is made on the move that leaves the stage; a behaviour's call is made in the turn that asks for the behaviour, said at that stage, and never on a move | 14 |
+| `uses_tool` | a tool a flow or behaviour calls, the stage it is called at (and, with `to`, the stage the turn reaches), the call count, and its inputs by slot. A flow's call is made on the move that leaves the stage; a behaviour's call is made in the turn that asks for the behaviour, said at that stage, and never on a move. The map's reachability, the t-wise target and the cover builder count only these two: a use whose subject is a value of any other kind of dimension (a persona, a channel) opens no cell of a tool failure | 14 |
 | `states` | what the reply of one turn must state, such as each plan with the monthly price the tool returned; it becomes `expect.must` on that turn | 7 |
 | `binds` | the concrete values a data or persona value stands for, such as the email of a found account | 12 |
 | `recovery` | how a flow recovers from one deviation class: the stages it is probed at (`at`), the stage after (`pending` is the stage the conversation had reached), reply patterns, guards and calls; for `D8_tool_failure`, the tool that fails | 24: 7 by code, 17 by the model |
