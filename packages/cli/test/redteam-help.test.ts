@@ -95,7 +95,7 @@ function commandAt(program: Command, path: string) {
 
 describe('red-team help is an executable contract', { timeout: 240_000 }, () => {
   it('has all fixed sections, local cross-links and every plugin topic from the live catalogue', async () => {
-    expect(topics.length).toBe(46);
+    expect(topics.length).toBe(47);
     const ids = new Set((await readdir(HELP)).filter((p) => p.endsWith('.md')).map((p) => p.slice(0, -3)));
     for (const topic of topics) {
       expect(

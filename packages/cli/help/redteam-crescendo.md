@@ -2,7 +2,7 @@
 title: "Crescendo multi-turn attacker"
 summary: "Escalate one objective through a planned conversation."
 commands: ["redteam run"]
-see_also: ["redteam-overview", "redteam-attack", "redteam-goat"]
+see_also: ["redteam-overview", "redteam-user", "redteam-attack", "redteam-goat"]
 next: ["redteam-goat"]
 ---
 

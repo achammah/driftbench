@@ -2,8 +2,8 @@
 title: "Red-teaming: start here"
 summary: "Start here: driftbench red-teaming, which of six commands to run, every option, inputs, outputs, a no-model CI example, and errors with exit codes."
 commands: ["attack", "perturb", "redteam run", "redteam plugins", "redteam generate", "redteam grade"]
-see_also: ["redteam-attack", "redteam-crescendo", "redteam-goat", "redteam-plugins", "redteam-indirect", "recipes-red-team-an-agent", "authoring-deviation-classes", "core-exit-codes"]
-next: ["redteam-attack", "redteam-crescendo", "redteam-plugins"]
+see_also: ["redteam-attack", "redteam-user", "redteam-crescendo", "redteam-goat", "redteam-plugins", "redteam-indirect", "recipes-red-team-an-agent", "authoring-deviation-classes", "core-exit-codes"]
+next: ["redteam-attack", "redteam-user", "redteam-plugins"]
 ---
 
 ## What it is
@@ -27,7 +27,7 @@ D6 plants an instruction in a tool result or a file. D8 makes a tool fail.
 `driftbench help authoring-deviation-classes` describes each class.
 
 The multi-turn attacker is also a library user driver, `createRedTeamUser` of `@agent-nexus/driftbench-users`.
-`redteam run` drives it; `driftbench help redteam-crescendo` lists its code options.
+`redteam run` drives it; `driftbench help redteam-user` covers it end to end.
 
 No red-team command reads a persona file. The attacker is a pack phrasing, a strategy or a plugin template.
 Persona files belong to `driftbench simulate --persona <file>`.
