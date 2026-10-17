@@ -109,11 +109,64 @@ const IBAN_CANDIDATE = /\b[A-Z]{2}\d{2}(?:[  ]?[A-Z0-9]){10,32}/g;
 const NATIONAL_CANDIDATE = /(?<![\d.])\d{2}\.?\d{2}\.?\d{2}[-. ]?\d{3}[-. ]?\d{2}(?!\d)/g;
 const INTERNATIONAL_PHONE = /(?<![\w+])\+[1-9][\d \-().]{6,22}\d/g;
 const BELGIAN_MOBILE = /(?<![\d+])(?:00 ?32 ?|0)4[5-9]\d(?:[ ./-]?\d{2}){3}(?!\d)/g;
-const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
 
 const ALLOWED_EMAIL_DOMAINS = new Set(['example.com', 'example.org', 'example.net', 'localhost']);
 const ALLOWED_EMAIL_SUFFIXES = ['.example', '.test', '.invalid', '.localhost', 'users.noreply.github.com'];
 const ALLOWED_EMAILS = new Set(['git@github.com']);
+
+const isLocalChar = (code: number): boolean =>
+  (code >= 48 && code <= 57) || // 0-9
+  (code >= 65 && code <= 90) || // A-Z
+  (code >= 97 && code <= 122) || // a-z
+  code === 46 || // .
+  code === 95 || // _
+  code === 37 || // %
+  code === 43 || // +
+  code === 45; // -
+
+const isLetter = (code: number): boolean => (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+const isLabelChar = (code: number): boolean => isLetter(code) || (code >= 48 && code <= 57) || code === 45;
+
+/**
+ * The end of the domain that starts at `start`: labels of letters, digits and hyphens joined by dots, the last
+ * one starting with at least two letters. The longest such domain; -1 when there is none.
+ */
+function domainEnd(text: string, start: number): number {
+  let at = start;
+  let end = -1;
+  for (let label = 0; ; label++) {
+    const labelStart = at;
+    while (at < text.length && isLabelChar(text.charCodeAt(at))) at++;
+    if (at === labelStart) break;
+    if (label > 0) {
+      let letters = labelStart;
+      while (letters < at && isLetter(text.charCodeAt(letters))) letters++;
+      if (letters - labelStart >= 2) end = letters;
+    }
+    if (text.charCodeAt(at) !== 46) break;
+    at++;
+  }
+  return end;
+}
+
+/**
+ * Every email-shaped piece of text: a local part, an at sign and a domain. One pass over the at signs, so the
+ * time is linear in the text: a run of local characters is never rescanned from each of its positions.
+ */
+function emailMatches(text: string): { value: string; index: number }[] {
+  const found: { value: string; index: number }[] = [];
+  let floor = 0;
+  for (let at = text.indexOf('@'); at !== -1; at = text.indexOf('@', at + 1)) {
+    let start = at;
+    while (start > floor && isLocalChar(text.charCodeAt(start - 1))) start--;
+    if (start === at) continue;
+    const end = domainEnd(text, at + 1);
+    if (end === -1) continue;
+    found.push({ value: text.slice(start, end), index: start });
+    floor = end;
+  }
+  return found;
+}
 
 /** Remainder of a long decimal string divided by 97. */
 export function mod97(digits: string): number {
@@ -197,12 +250,12 @@ export function scanPii(text: string, options: ScanOptions = {}): PiiFinding[] {
   for (const match of text.matchAll(BELGIAN_MOBILE)) {
     findings.push({ kind: 'phone', value: match[0], offset: match.index });
   }
-  for (const match of text.matchAll(EMAIL)) {
+  for (const match of emailMatches(text)) {
     const excluded =
       options.reservedDomains === 'include'
-        ? ALLOWED_EMAILS.has(match[0].toLowerCase())
-        : isAllowedEmail(match[0]);
-    if (!excluded) findings.push({ kind: 'email', value: match[0], offset: match.index });
+        ? ALLOWED_EMAILS.has(match.value.toLowerCase())
+        : isAllowedEmail(match.value);
+    if (!excluded) findings.push({ kind: 'email', value: match.value, offset: match.index });
   }
   return findings.sort((a, b) => a.offset - b.offset);
 }
