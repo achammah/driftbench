@@ -87,7 +87,12 @@ export function canonicalJsonWithList(value: Record<string, unknown>, listKey: s
   return `{${fields.join(',')}}`;
 }
 
-type Running = { head: string; items: readonly unknown[]; state: Hash; text: string };
+/**
+ * The text of a list, kept as bytes in a buffer that grows in place. Entries that extend one another share the
+ * buffer: `used` is how many bytes any of them wrote, so only the entry that ends at `used` appends in place.
+ */
+type Bytes = { buffer: Buffer; used: number };
+type Running = { head: string; items: readonly unknown[]; state: Hash; bytes: Bytes; length: number };
 const running: Running[] = [];
 const RUNNING_KEPT = 8;
 
@@ -118,34 +123,54 @@ function isPrefixOf(entry: Running, items: readonly unknown[]): boolean {
  * position) reads only the new items again; it hashes the whole text, which costs bytes, not item reads.
  */
 export function sha256WithList(head: string, items: readonly unknown[], tail: string): string {
-  let from: Running | undefined;
-  let textFrom: Running | undefined;
-  for (const entry of running) {
-    if (!isPrefixOf(entry, items)) continue;
-    if (entry.head === head && (from === undefined || entry.items.length > from.items.length)) from = entry;
-    if (textFrom === undefined || entry.items.length > textFrom.items.length) textFrom = entry;
-  }
-  let state: Hash;
-  let text: string;
-  let start: number;
-  if (from && from.items.length >= (textFrom?.items.length ?? 0)) {
-    state = from.state.copy();
-    text = from.text;
-    start = from.items.length;
-  } else {
-    state = createHash('sha256');
-    state.update(`${head}[`);
-    text = textFrom ? textFrom.text : '';
-    if (text !== '') state.update(text);
-    start = textFrom ? textFrom.items.length : 0;
-  }
+  // The kept entries that could be a prefix of `items`: the item at the entry's last place is the same object.
+  // Only the longest of each kind is then read in full, which is the proof that it is a prefix.
+  const near = running.filter((entry) => {
+    const last = entry.items.length - 1;
+    return last < items.length && (last < 0 || entry.items[last] === items[last]);
+  });
+  const longest = (candidates: Running[]): Running | undefined => {
+    for (const entry of [...candidates].sort((a, b) => b.items.length - a.items.length)) {
+      if (isPrefixOf(entry, items)) return entry;
+    }
+    return undefined;
+  };
+  const from = longest(near.filter((entry) => entry.head === head));
+  const textFrom = longest(near);
   let added = '';
+  const start = Math.max(from?.items.length ?? 0, textFrom?.items.length ?? 0);
   for (let index = start; index < items.length; index += 1) {
     added += index === 0 ? itemText(items[index]) : `,${itemText(items[index])}`;
   }
-  if (added !== '') state.update(added);
-  text += added;
-  const entry: Running = { head, items: [...items], state, text };
+  const extra = Buffer.from(added, 'utf8');
+  // The bytes of the list text: the longest kept text, extended in place when nobody wrote past its end.
+  let bytes: Bytes;
+  let length: number;
+  if (textFrom) {
+    length = textFrom.length;
+    bytes = textFrom.bytes;
+    if (bytes.used !== length || bytes.buffer.length < length + extra.length) {
+      const grown = Buffer.allocUnsafe(Math.max(1024, (length + extra.length) * 2));
+      bytes.buffer.copy(grown, 0, 0, length);
+      bytes = { buffer: grown, used: length };
+    }
+  } else {
+    length = 0;
+    bytes = { buffer: Buffer.allocUnsafe(Math.max(1024, extra.length * 2)), used: 0 };
+  }
+  extra.copy(bytes.buffer, length);
+  length += extra.length;
+  bytes.used = length;
+  let state: Hash;
+  if (from && from.items.length >= (textFrom?.items.length ?? 0)) {
+    state = from.state.copy();
+    if (extra.length > 0) state.update(extra);
+  } else {
+    state = createHash('sha256');
+    state.update(`${head}[`);
+    if (length > 0) state.update(bytes.buffer.subarray(0, length));
+  }
+  const entry: Running = { head, items, state, bytes, length };
   running.unshift(entry);
   if (running.length > RUNNING_KEPT) running.length = RUNNING_KEPT;
   return state.copy().update(`]${tail}`).digest('hex');

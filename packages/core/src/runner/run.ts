@@ -1152,9 +1152,14 @@ function liveChannel(run: RunContext): Channel {
     async observe(turn, user, key) {
       // Every retry of the block, the adapter's own model calls and the runner's, lands in its Observed.
       const { value: answer, retries } = await collectRetries(async () => {
-        if (!session) session = await call(`open on block ${turn.index}`, () => adapter.open(turn.given));
+        if (!session) {
+          session = await call(`open on block ${turn.index}`, () => adapter.open(turn.given));
+          // The history the adapter copied from the Given, sealed: the runner then extends it by one read of the list.
+          session.history = freezeHistory(turn.given.prefix) as Message[];
+        }
         const current = session;
-        current.history.push(...user);
+        // A frozen array of validated messages: the adapter's copy of it costs a read of the list, not a check of each message.
+        current.history = freezeHistory(current.history, user) as Message[];
         let sent: unknown = await call(`send on block ${turn.index}`, () => adapter.send(current, turn));
         const trace = adapter.trace;
         if (run.capabilities.trace && trace) {
@@ -1172,7 +1177,9 @@ function liveChannel(run: RunContext): Channel {
           `the adapter's Observed for block ${turn.index} does not match the schema as JSON: ${issue?.path.join('.') || '(root)'} ${issue?.message ?? ''}`.trim(),
         );
       }
-      current.history.push(freezeMessage(cloneJson(assistantMessage(parsed.data))));
+      current.history = freezeHistory(current.history, [
+        freezeMessage(cloneJson(assistantMessage(parsed.data))),
+      ]) as Message[];
       // The cache keeps the block without its retries: a replay retries nothing.
       const { retries: _spent, ...kept } = parsed.data;
       await remember(key, kept);

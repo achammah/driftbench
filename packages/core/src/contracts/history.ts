@@ -54,13 +54,26 @@ export function freezeMessage(message: Message): Message {
  * let unchanged message references skip deep validation. Weak array keys do not retain abandoned histories.
  */
 export function copyHistory(messages: readonly Message[], appended: readonly Message[] = []): Message[] {
-  const copy: Message[] = [];
+  return build(messages, appended, false);
+}
+
+function build(messages: readonly Message[], appended: readonly Message[], seal: boolean): Message[] {
+  let copy: Message[] = [];
+  /** True while `copy` holds exactly the messages of one sealed array, which is then its own snapshot. */
+  let sealed: readonly Message[] | undefined;
   const capture = (source: readonly Message[], path: string): void => {
     const previous = snapshots.get(source);
     if (immutableArrays.has(source) && previous) {
-      for (const message of previous) copy.push(message);
+      if (copy.length === 0) {
+        copy = previous.slice();
+        sealed = previous;
+      } else {
+        for (const message of previous) copy.push(message);
+        sealed = undefined;
+      }
       return;
     }
+    sealed = undefined;
     if (!Array.isArray(source) || Object.getPrototypeOf(source) !== Array.prototype)
       throw new TypeError(`${path}: expected an ordinary array`);
     if (types.isProxy(source)) throw new TypeError(`${path}: Proxy object; expected plain JSON data`);
@@ -88,8 +101,13 @@ export function copyHistory(messages: readonly Message[], appended: readonly Mes
     }
   };
   capture(messages, 'history');
-  capture(appended, 'appended');
-  const snapshot = [...copy];
+  if (!Array.isArray(appended) || appended.length > 0) capture(appended, 'appended');
+  // The snapshot stays an ordinary array: reading a frozen one is slower.
+  const snapshot = sealed !== undefined ? sealed : [...copy];
+  if (seal) {
+    Object.freeze(copy);
+    immutableArrays.add(copy);
+  }
   if (!immutableArrays.has(messages)) snapshots.set(messages, snapshot);
   snapshots.set(copy, snapshot);
   return copy;
@@ -100,8 +118,5 @@ export function freezeHistory(
   messages: readonly Message[],
   appended: readonly Message[] = [],
 ): readonly Message[] {
-  const copy = copyHistory(messages, appended);
-  Object.freeze(copy);
-  immutableArrays.add(copy);
-  return copy;
+  return build(messages, appended, true);
 }

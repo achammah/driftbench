@@ -152,7 +152,14 @@ export function canonicalGiven(
     ]);
     state = { ...state, ledger: { ...state.ledger, ...block.expect?.ledger_add } };
   }
-  return { state, prefix: copyHistory(prefix), sealed: prefix };
+  return {
+    state,
+    // A fresh array for a caller that edits it; read only when asked, so a run that never asks pays nothing.
+    get prefix() {
+      return copyHistory(prefix);
+    },
+    sealed: prefix,
+  };
 }
 
 const canonicalKept = new WeakMap<
