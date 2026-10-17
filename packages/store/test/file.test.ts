@@ -84,7 +84,17 @@ describe('a store on disk', () => {
       .prepare("SELECT name FROM sqlite_schema WHERE type = 'table' ORDER BY name")
       .all()
       .map((row) => row.name);
-    expect(tables).toEqual(['blobs', 'blocks', 'cache', 'campaigns', 'runs', 'specs', 'units', 'versions']);
+    expect(tables).toEqual([
+      'blobs',
+      'blocks',
+      'cache',
+      'campaigns',
+      'runs',
+      'spec_objects',
+      'specs',
+      'units',
+      'versions',
+    ]);
     expect({ ...raw.prepare('SELECT spec_id, mode, repeat, status, cost FROM runs').get() }).toEqual({
       spec_id: 'acme-new-customer-coverage',
       mode: 'F',
@@ -248,6 +258,45 @@ describe('opening a store', () => {
       { path: 'acme-sales.md', bytes: new TextEncoder().encode('You are the Acme sales assistant.\n') },
     ]);
     expect(pushed.version.version).toBe(1);
+  });
+
+  it('upgrades schema 2 without changing stored spec hashes or run records', async () => {
+    const stored = await seed();
+    await store.close();
+    const before = raw.prepare('SELECT id, hash, yaml FROM specs ORDER BY id, hash').all();
+    raw.exec('DROP TABLE spec_objects; PRAGMA user_version = 2');
+    store = openStore(path);
+    expect(raw.prepare('PRAGMA user_version').get()?.user_version).toBe(SCHEMA_VERSION);
+    expect(raw.prepare('SELECT id, hash, yaml FROM specs ORDER BY id, hash').all()).toEqual(before);
+    expect(raw.prepare('SELECT count(*) AS count FROM spec_objects').get()?.count).toBe(0);
+    expect(await store.getRun(stored.runId)).toStrictEqual(stored);
+  });
+
+  it('adds a table the current schema holds to a store already at the current version', async () => {
+    const stored = await seed();
+    await store.close();
+    // A store a build wrote at this version before spec_objects existed: the version number says current.
+    raw.exec(`DROP TABLE spec_objects; PRAGMA user_version = ${SCHEMA_VERSION}`);
+    store = openStore(path);
+    expect(raw.prepare('PRAGMA user_version').get()?.user_version).toBe(SCHEMA_VERSION);
+    expect(raw.prepare('SELECT count(*) AS count FROM spec_objects').get()?.count).toBe(0);
+    expect(await store.getRun(stored.runId)).toStrictEqual(stored);
+  });
+
+  it('opens a store that holds every table of the current schema while another connection holds the write lock', async () => {
+    await seed();
+    await store.close();
+    // An open that took a write lock to run the schema again would wait here, then fail as locked.
+    raw.exec('BEGIN IMMEDIATE');
+    try {
+      const started = Date.now();
+      store = openStore(path);
+      expect(Date.now() - started).toBeLessThan(2000);
+      await store.close();
+    } finally {
+      raw.exec('ROLLBACK');
+    }
+    store = openStore(path);
   });
 
   it('lists every table SCHEMA_SQL creates under the version that added it, and every version', () => {

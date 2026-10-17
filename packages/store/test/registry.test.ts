@@ -5,14 +5,18 @@ import { DatabaseSync } from 'node:sqlite';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   diffFiles,
+  isRegistryKind,
+  objectRegistryKind,
   openMemoryStore,
   openStore,
   parseVersionRef,
   type RegistryFile,
+  type RegistryKind,
   readTree,
   restoreFiles,
   type SqliteStore,
 } from '../src/index';
+import { isVersionRecord } from '../src/registry';
 import { storeError, tempDir } from './fixtures';
 
 const text = (value: string) => new TextEncoder().encode(value);
@@ -119,6 +123,31 @@ describe('the registry', () => {
       'INVALID_RECORD',
     );
     expect(await store.listVersions('dataset')).toEqual([]);
+  });
+
+  it('versions framework objects under object.<kind>, and refuses a kind that is not one', async () => {
+    const blame = [{ path: 'acme.yaml', bytes: text('kind: policy/blame\nid: acme\nextends: default\n') }];
+    const pushed = await store.pushVersion(objectRegistryKind('policy/blame'), 'acme', blame, {
+      single: true,
+    });
+    expect(pushed.version).toMatchObject({ kind: 'object.policy.blame', name: 'acme', version: 1 });
+    expect((await store.listVersions('object.policy.blame')).map((each) => each.name)).toEqual(['acme']);
+    expect(await store.listVersions('dataset')).toEqual([]);
+    expect(isVersionRecord(pushed.version)).toBe(true);
+    for (const kind of [
+      'object.',
+      'object.Policy.blame',
+      'object.policy..blame',
+      'object.a.b.c',
+      'objects.persona',
+      'policy',
+    ]) {
+      const error = await storeError(() => store.pushVersion(kind as RegistryKind, 'acme', blame));
+      expect(error.code, kind).toBe('INVALID_RECORD');
+      expect(isRegistryKind(kind), kind).toBe(false);
+    }
+    expect(isRegistryKind('object.persona-defaults')).toBe(true);
+    expect(() => objectRegistryKind('Policy/blame')).toThrow('not an object kind');
   });
 
   it('raises CORRUPT_ROW when a stored file no longer matches its hash', async () => {

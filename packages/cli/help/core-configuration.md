@@ -1,9 +1,10 @@
 ---
 title: Configuration and environment
-summary: The project config driftbench.yaml and its five keys, and the environment variables that hold keys, read from files and never echoed.
+summary: The project config driftbench.yaml and its six keys, and the environment variables that hold keys, read from files and never echoed.
 commands: []
 see_also:
   - core-global-options
+  - core-objects
   - core-project-layout
   - core-exit-codes
 next:
@@ -27,6 +28,8 @@ the value at run time.
 * To declare campaign-level criteria (`aggregates`) for `report` and `ci`.
 * To give reviewers a score scale per criterion (`scales`) in `view`.
 * To load your own code (`plugins`) in every command.
+* To tailor a shipped rule set for the whole project (`objects`, and the `driftbench/` folder beside the
+  file): see `driftbench help core-objects`.
 * To reach a real agent or a judge model: set its key in the environment.
 
 ## Commands and every option
@@ -40,12 +43,13 @@ The config is not a command: these commands read it.
 | `ci` | `campaign` (routes, modes, repeats, concurrency, budget_usd, process_command, agent_version), `aggregates`, `plugins` | `--config <file>` |
 | `report` | `aggregates`, `plugins` | `--config <file>` |
 | `view` | `scales`, `plugins` | `--config <file>` |
+| `object` commands, and every command that loads specs | `objects`, from `driftbench.yaml` in the folder of the spec or the nearest folder above it | none: the file is found by its place, never by `--config` |
 | every other command | `plugins` | `--config <file>` when the command has it |
 
 Without `--config`, `driftbench.yaml` is optional: a missing file means no settings. A `--config` file that
 cannot be read is an error, exit 2.
 
-The five top-level keys, all optional. Which command checks the rest of the file:
+The six top-level keys, all optional. Which command checks the rest of the file:
 
 * `report` and `ci` read the whole file: any other top-level key is refused with its file and line, exit 2.
 * `campaign run`, `campaign plan` and `view` read only their own key and pass over any other top-level key
@@ -64,6 +68,10 @@ The five top-level keys, all optional. Which command checks the rest of the file
   name replaces an entry; a new name adds one.
 * `scales`: a map from criterion name to `{ min, max }`, numbers with min below max. Default scale 0 to 1.
 * `plugins`: a list of module paths, relative to the config file, or package names.
+* `objects`: a list of objects of the rules framework written inline, each a map with `kind`, `id` and the
+  fields of its kind, such as `{ kind: check-set, id: acme, extends: default, items: [...] }`. They join the
+  project layer, as the files under `driftbench/<kind>/<id>.yaml` beside the config do. `driftbench object
+  validate` checks them; the format is in `driftbench help core-objects`.
 * `prices`: a dated table of USD token prices by model, read by `campaign run` and `campaign resume` for
   `--budget-usd` when `--prices <file>` is not given. The format is in the running topics.
 

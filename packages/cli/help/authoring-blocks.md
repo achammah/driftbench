@@ -59,6 +59,7 @@ This is a format topic. The commands that read blocks are `spec validate`, `spec
 | `given` | mapping | no | Starting state for this block: `prefix`, `ledger`, `world`, `vars`. See authoring-prefixes. |
 | `expect` | mapping | no | The Then. Without it the block checks nothing and `spec lint` warns `BLOCK_NO_EXPECTATION`. |
 | `budget` | mapping | no | Limits: `steps` (whole number from 1), `cost_usd` (number from 0), `latency_ms` (number from 0). Each gives a `budget.<key>` verdict; a limit the adapter does not report is inconclusive and not gating. |
+| `uses` | mapping | no | The objects this block uses (policies, check set, diagnostics); a key here replaces the spec's `uses` key of the same name. See authoring-spec-format, `uses`. |
 
 A block takes exactly one of `user`, `burst` and `when`. The injection form is `when: { injection: { class: <deviation class>, user: <message> } }`: a deviation written into the blocks with its class (see authoring-deviation-classes). To inject a deviation only in perturbed runs, without editing the blocks, use `perturbations` (see authoring-perturbations).
 

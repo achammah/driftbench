@@ -68,7 +68,7 @@ describe.each(['explicit', 'default'])('%s project config', (source) => {
       expect({ code, out, err }).toEqual({
         code: 2,
         out: '',
-        err: `${path}:3: unknown key campagin; the config defines aggregates, campaign, plugins, prices, scales only\n`,
+        err: `${path}:3: unknown key campagin; the config defines aggregates, campaign, objects, plugins, prices, scales only\n`,
       });
     },
     120_000,
@@ -80,9 +80,31 @@ it('accepts every recognized section together through each config reader', async
   const path = join(dir, 'driftbench.yaml');
   await writeFile(
     path,
-    'campaign: { repeats: 2 }\naggregates: []\nscales: { quality: { min: 1, max: 5 } }\nplugins: []\nprices: {}\n',
+    'campaign: { repeats: 2 }\naggregates: []\nscales: { quality: { min: 1, max: 5 } }\nplugins: []\nprices: {}\nobjects: []\n',
   );
   expect(await readCampaignConfig(undefined, dir)).toEqual({ ok: true, config: { repeats: 2 } });
   expect(await readAggregateConfig(path)).toEqual({ ok: true, specs: [] });
   expect(await readScaleConfig(path)).toEqual({ ok: true, scales: { quality: { min: 1, max: 5 } } });
 });
+
+it('report accepts the objects key and still refuses an unknown key beside it', async () => {
+  dir = await mkdtemp(join(tmpdir(), 'driftbench-config-keys-'));
+  const store = await openStore(join(dir, 'runs.db'));
+  await store.close();
+  const run = async (text: string) => {
+    await writeFile(join(dir, 'driftbench.yaml'), text);
+    let err = '';
+    const io: Io = { cwd: dir, out: () => {}, err: (chunk) => (err += chunk) };
+    const code = await main(['report', '--store', 'runs.db', '--out', 'report.html'], io);
+    return { code, err };
+  };
+  const objects =
+    'objects:\n  - kind: policy/blame\n    id: acme\n    extends: default\n    items: [{ id: R6, enabled: false }]\n';
+  const accepted = await run(objects);
+  expect(accepted.err).not.toContain('unknown key');
+  const refused = await run(`${objects}objectz: []\n`);
+  expect(refused).toEqual({
+    code: 2,
+    err: `${join(dir, 'driftbench.yaml')}:6: unknown key objectz; the config defines aggregates, campaign, objects, plugins, prices, scales only\n`,
+  });
+}, 120_000);

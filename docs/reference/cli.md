@@ -1,6 +1,6 @@
 # CLI
 
-`driftbench` is the command line. It checks spec files (`spec validate`, `spec lint`, `spec coverage`), plans and runs campaigns (`campaign plan`, `campaign run`, `campaign status`, `campaign resume`), checks that an agent is deterministic (`smoke`), measures the specs against a map of situations (`space coverage`, `space complete`, `space declare`), proposes that map (`extract`, `extract approve`, `extract map`), generates specs from it by code (`generate`), passes candidate blocks through the validity gate (`gate`), builds the reference set of user turns (`intake`), measures where results vary (`pilot`), judges criteria with the council (`judge`), builds code-agent task families (`family`), reads an agent estate into a map and derives its tests (`estate`), runs specs over recorded sessions (`replay`), prints the blocks a change to the agent can affect (`radius`), imports specs from a CSV file or a spreadsheet (`import`), versions spec sets and prompts in the store (`dataset`, `prompt`), and runs the validators that prove driftbench works (`validate`). The campaign and smoke commands, their output and their exit codes are on the [running](../running.md) page. What generation, the gate, intake, the pilot and families do is on the [generating](../generating.md) page.
+`driftbench` is the command line. It checks spec files (`spec validate`, `spec lint`, `spec coverage`), plans and runs campaigns (`campaign plan`, `campaign run`, `campaign status`, `campaign resume`), checks that an agent is deterministic (`smoke`), measures the specs against a map of situations (`space coverage`, `space complete`, `space declare`), proposes that map (`extract`, `extract approve`, `extract map`), generates specs from it by code (`generate`), passes candidate blocks through the validity gate (`gate`), builds the reference set of user turns (`intake`), measures where results vary (`pilot`), judges criteria with the council (`judge`), builds code-agent task families (`family`), reads an agent estate into a map and derives its tests (`estate`), runs specs over recorded sessions (`replay`), prints the blocks a change to the agent can affect (`radius`), imports specs from a CSV file or a spreadsheet (`import`), versions spec sets and prompts in the store (`dataset`, `prompt`), lists, explains, extends and validates the rule sets it applies (`object`), and runs the validators that prove driftbench works (`validate`). The campaign and smoke commands, their output and their exit codes are on the [running](../running.md) page. What generation, the gate, intake, the pilot and families do is on the [generating](../generating.md) page.
 
 ## Running it
 
@@ -247,6 +247,18 @@ Every problem has a stable code, so tools and tests can branch on it. An error m
 | `RETENTION_FACT_UNKNOWN` | error | `expect.knowledge_retention` names a fact that no ledger holds before the block: not in `given.ledger`, nor in an earlier block's `ledger_add` |
 | `TOOL_FORBIDDEN_EXPECTED` | error | a block expects a tool that the rules forbid, in `forbidden_tools` or with `max_calls` at 0 |
 | `GIVEN_ORIGIN_WITHOUT_PREFIX` | error | a block's `given.origin` says where a prefix comes from, and the block writes no `given.prefix` |
+| `OBJECT_INVALID` | error | an object file, an inline object in `uses` or a `uses.yaml` does not fit the object format, or a file sits at a path that does not match its kind and id |
+| `OBJECT_KIND_UNKNOWN` | error | an object names a kind no package or plugin registered; the message lists the known kinds |
+| `OBJECT_UNKNOWN` | error | `uses` names an object no layer defines; the message names the spec, the block, the kind, the id and the layers searched |
+| `OBJECT_CYCLE` | error | objects extend each other in a loop; the message prints the loop |
+| `OBJECT_DUPLICATE` | error | one kind and id are defined twice at the same layer |
+| `OBJECT_SHIPPED_IMMUTABLE` | error | a project or suite file redefines a shipped object; write one with another id that extends it |
+| `OBJECT_ITEM_UNKNOWN` | error | an operation, an `order` or a move names an item the parent does not hold; the message lists the parent's items |
+| `OBJECT_ITEM_EXISTS` | error | `add: true` names an item the parent already holds |
+| `OBJECT_ITEM_INCOMPLETE` | error | a new item lacks `title`, `when`, `effect` or `impl`, or a root object lists an item without its full definition |
+| `OBJECT_ORDER_INVALID` | error | an `order` leaves out an enabled item or lists one twice, or a file sets `order` and moves an item |
+| `OBJECT_IMPL_UNKNOWN` | error | an enabled item names an implementation no builtin or plugin provides |
+| `OBJECT_PARAMS_INVALID` | error | an item's params do not fit its implementation's schema; the message names the path |
 | `LINK_BLOCK_UNKNOWN` | error | a link in `metadata.links` names a block id the spec does not have, or an index past its last block |
 | `LINK_TARGET_UNKNOWN` | error or warning | `spec lint --sections` only: error when the registry of the prompt has no such section, warning when no registry was given for the prompt |
 | `LINK_STALE` | warning | `spec lint --sections` only: the link's status is `stale`, or its section was not found again in the registry's version |
@@ -1646,6 +1658,40 @@ driftbench dataset restore <ref> --store <file> [--out <path>] [--force] [--json
 | 0 | `push`, `list`, `restore`: done. `diff`: no difference |
 | 1 | `push`: an invalid spec. `diff`: they differ. `restore`: a file differs and `--force` was not given |
 | 2 | bad input: an unknown name or version, a path that cannot be read, a store that cannot be opened |
+
+## `driftbench object`
+
+```
+driftbench object list [kind] [--json]
+driftbench object show <kind>/<id> [--json]
+driftbench object explain <kind> --at <spec>[#<block>] [--use <kind>/<id>]... [--set <kind>[/<id>]#<item>.<param>=<value>]... [--json]
+driftbench object diff <a> <b> [--json]
+driftbench object init <kind> <id> --from <parent> [--out <file>]
+driftbench object validate [paths...] [--json]
+driftbench object graph <spec> [--json]
+driftbench object migrate persona <files...> [--out <folder>]
+driftbench object push <kind> <path> --name <name> --store <file> [--note <text>] [--json]
+```
+
+An object is one rule set driftbench applies, written as data: a kind, an id and addressable items. A project extends a shipped object in `driftbench/<kind>/<id>.yaml` beside `driftbench.yaml`, or in its `objects:` key; a spec or a block names the objects it uses under `uses`. The fields are on the [objects](objects.md) page; `driftbench help core-objects` has the layers, the override grammar and a worked example.
+
+| Command | Does |
+|---|---|
+| `list` | every object the working folder sees: kind, id, layer, hash, file |
+| `show` | one resolved object, each item with the layer, file and line that set it |
+| `explain` | the object one block uses for a kind (`#<block>` is a block id, or `blocks.<n>` for the block at place n from 0), each item with the layer that set it; `--use` and `--set` add the command-line layer |
+| `diff` | the items two objects of one kind add, remove or change; each side is `<kind>/<id>` or an object file |
+| `init` | writes a project object that extends `--from` and changes nothing, every parent item listed as a comment |
+| `validate` | checks object files, or every object the working folder sees: schema, references, items, order, implementations, params |
+| `graph` | each block of a spec, the objects it uses, where each reference was set and its parents |
+| `migrate persona` | splits old persona files into `driftbench/persona/<id>.yaml`, `driftbench/scenario/<id>.yaml` and `situational/<id>.yaml`, which `simulate --persona` plays the same way |
+| `push` | stores object files as a registry version of kind `object.<kind>`, with `/` written as `.` |
+
+| Exit code | When |
+|---|---|
+| 0 | done; `validate`: every object valid; `diff`: no difference |
+| 1 | `validate`, `list`: an object is refused. `diff`: they differ. `push`: an invalid file, nothing pushed. `explain`, `graph`: an object the spec names does not resolve |
+| 2 | bad input: an unknown kind or object, a block the spec does not hold, an existing file or id for `init`, a path that cannot be read, a store that cannot be opened |
 
 ## Not built yet
 

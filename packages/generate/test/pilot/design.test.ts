@@ -1,3 +1,4 @@
+import { bindObjectContext, objectContextOfSpec, shippedObjectContext } from '@agent-nexus/driftbench-core';
 import { describe, expect, it } from 'vitest';
 import { designPilot, designVariants, pilotFactors, stimulusText } from '../../src/pilot/design';
 import { planPilot } from '../../src/pilot/run';
@@ -290,4 +291,16 @@ describe('designPilot with slots, when and binds', () => {
     expect(conversation?.phrased[2]?.options).toEqual(['yeah sounds good', 'ok perfect']);
     expect(conversation?.available).toBe(8);
   });
+});
+
+it('preserves the loaded object context through every pilot wording', () => {
+  const objects = shippedObjectContext();
+  objects.store.add({ kind: 'policy/blame', id: 'pilot-policy', items: [] }, 'project', { path: 'fixture' });
+  const entry = {
+    ...twoBlocks,
+    spec: bindObjectContext({ ...twoBlocks.spec, uses: { blame: 'pilot-policy' } }, objects),
+  };
+  const variants = designVariants(designPilot(MAP, [entry], { wordings: 3 }));
+  expect(variants).toHaveLength(3);
+  for (const variant of variants) expect(objectContextOfSpec(variant.spec)).toBe(objects);
 });

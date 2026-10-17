@@ -145,6 +145,8 @@ Between the two pushes, one line was added to `plan-upgrade.yaml`. `diff` withou
 | 1 | `push`: an invalid spec in the dataset. `diff`: the two differ. `restore`: a file differs and `--force` was not given |
 | 2 | bad input: an unknown name or version, a path that cannot be read, a store that cannot be opened |
 
+The same registry keeps the objects of the rules framework: `driftbench object push <kind> <path> --name <name> --store <file>` checks every object file of the path, then stores them as a version of kind `object.<kind>`, with the `/` of the object kind written as `.` (`object.policy.value-check`). See [the CLI](reference/cli.md#driftbench-object).
+
 ## A campaign records the versions it ran
 
 `campaign run --dataset <ref>` runs the specs of a dataset version: they are restored, byte for byte, into the campaign's temporary folder and loaded from there. `--prompt <ref>` gives the agent a prompt version: see the next section. Both need `--store`, and the campaign records each version by name, number and hash in its `sources`, so a later reader knows exactly which inputs produced the runs. A spec restored from a dataset is stored under its dataset reference, such as `acme-specs@1/plan-upgrade.yaml`, never under the temporary folder.
