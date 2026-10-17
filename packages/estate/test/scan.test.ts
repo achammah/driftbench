@@ -41,6 +41,7 @@ describe('the Claude Code reader', () => {
       '.claude/skills/invoice-reconcile/references/old-tolerances.md': 'skill_file',
       '.claude/skills/invoice-reconcile/scripts/reconcile.py': 'skill_file',
       '.claude/skills/shipment-tracker/SKILL.md': 'skill',
+      '.claude/skills/shipment-tracker/data/shipments.txt': 'skill_file',
       '.claude/skills/shipment-tracker/scripts/check-carrier.sh': 'guard_script',
       '.claude/skills/shipment-tracker/scripts/track.sh': 'skill_file',
       '.claude/skills/supplier-email/SKILL.md': 'skill',
@@ -138,8 +139,11 @@ describe('the Claude Code reader', () => {
       ['.claude/skills/shipment-tracker/SKILL.md', 12],
       ['.claude/skills/supplier-email/SKILL.md', 5],
       ['.claude/skills/weekly-report/SKILL.md', 6],
-      ['.claude/skills/weekly-report/templates/report.md', 1],
+      ['.claude/skills/shipment-tracker/data/shipments.txt', 1],
     ]);
+    expect(raw.files.find((file) => file.path.endsWith('templates/report.md'))?.document?.role).toBe(
+      'template',
+    );
     for (const chunk of raw.prose) expect(chunk.text).not.toMatch(/^name:/m);
   });
 
@@ -171,7 +175,8 @@ describe('code atoms', () => {
   it('reads every structured atom of the fixture, approved as read, with no model call', async () => {
     const result = await scanEstate({ root: FIXTURE, reader: new ClaudeCodeReader(), now: NOW });
     const counts: Record<string, number> = {};
-    for (const atom of result.map.atoms) counts[atom.kind] = (counts[atom.kind] ?? 0) + 1;
+    for (const atom of result.map.atoms.filter((atom) => !atom.fields?.candidate))
+      counts[atom.kind] = (counts[atom.kind] ?? 0) + 1;
     expect(counts).toEqual({
       skill: 4,
       route: 13,
@@ -181,12 +186,19 @@ describe('code atoms', () => {
       setting: 4,
       stage: 5,
       script: 2,
-      reference: 9,
+      reference: 10,
       gate: 4,
       hazard: 2,
       invariant: 4,
     });
-    expect(result.map.atoms.every((atom) => atom.producedBy === 'code' && atom.approved)).toBe(true);
+    expect(
+      result.map.atoms
+        .filter((atom) => !atom.fields?.candidate)
+        .every((atom) => atom.producedBy === 'code' && atom.approved),
+    ).toBe(true);
+    expect(result.map.atoms.filter((atom) => atom.fields?.candidate).every((atom) => !atom.approved)).toBe(
+      true,
+    );
     expect(result.calls).toBe(0);
     expect(result.map.producedBy).toBeUndefined();
   });
@@ -231,6 +243,7 @@ describe('code atoms', () => {
       ['.claude/memory/supplier-languages.md', true],
       ['.claude/skills/invoice-reconcile/references/matching-rules.md', true],
       ['.claude/skills/invoice-reconcile/references/currency-table.md', true],
+      ['.claude/skills/shipment-tracker/data/shipments.txt', true],
       ['.claude/memory/supplier-languages.md', true],
       ['.claude/skills/weekly-report/templates/report.md', true],
       ['.claude/skills/weekly-report/references/kpi-definitions.md', false],

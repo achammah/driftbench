@@ -752,6 +752,19 @@ export const FILE_PAGES: readonly FilePage[] = [
         invariant:
           'A static property of the estate files, such as the size ceiling of the standing instructions.',
       },
+      DocumentRole: {
+        normative: 'Live content: its rules, gates and references count.',
+        changelog:
+          'A record of releases: it holds no rule and gives no test, and it documents the files it names.',
+        history: 'A dated record of what happened: no rule, no test, and the files it names are documented.',
+        template:
+          'A form to fill in: read when a live document sends the reader to it, and it gives no test of its own.',
+        example:
+          'An illustration, or a counter-example shown so that it is not followed: no rule and no test.',
+        journal: 'A diary or work log of dated entries: no rule and no test.',
+        fixture: 'Data a test or a skill ships: no rule and no test.',
+        archive: 'Material kept for the record, loaded by nothing: no rule and no test.',
+      },
       EdgeKind: {
         route: 'A route atom to the skill or helper it loads.',
         reference: 'A skill or helper to a file its body names.',

@@ -1,4 +1,5 @@
 import type { Atom } from '@agent-nexus/driftbench-estate';
+import { codeAsk } from '@agent-nexus/driftbench-generate';
 import { describe, expect, it, vi } from 'vitest';
 import { contentWords, inventedWord } from '../../src/ladders/estate/bank/askfrom';
 import { genAsksFamily } from '../../src/ladders/estate/bank/loop';
@@ -195,12 +196,11 @@ describe('a disclosed code-written ask is made of the words of its source', { ti
     return { run, specs };
   }
 
-  it('holds on the generated estates', async () => {
-    for (const seed of [1, 2, 4, 5])
-      expect(await verdict(seed, await pipeline.estateRun(seed)), `seed ${seed}`).toEqual({
-        pass: true,
-        detail: 'holds',
-      });
+  it.each([1, 2, 4, 5, 659085678])('holds on the generated estates (seed %i)', async (seed) => {
+    expect(await verdict(seed, await pipeline.estateRun(seed)), `seed ${seed}`).toEqual({
+      pass: true,
+      detail: 'holds',
+    });
   });
 
   it('fails every true disclosure whose text is replaced by an invented phrase, tags and metadata kept', async () => {
@@ -251,6 +251,60 @@ describe('a disclosed code-written ask is made of the words of its source', { ti
       atom('g.a', 'Label every parcel before it leaves the dock', { kind: 'gate' }),
     ],
   };
+
+  it('accepts the documented Bash act without borrowing its words from the guard', () => {
+    const guard = atom('guard.push', 'Blocks a forced push on any branch.', { kind: 'guard' });
+    expect(
+      inventedWord(
+        'Please run a command in the shell here for a forced push on any branch.',
+        guard.id,
+        [guard.id],
+        { atoms: [guard] },
+      ),
+    ).toBeUndefined();
+  });
+
+  it('still rejects an invented act absent from the guard and the fixed words', () => {
+    const guard = atom('guard.push', 'Blocks a forced push on any branch.', { kind: 'guard' });
+    expect(inventedWord('Please frobnicate the branch', guard.id, [guard.id], { atoms: [guard] })).toBe(
+      'frobnicat',
+    );
+  });
+
+  it('reads the documented rule text of the cited guard, not just its hook title', () => {
+    const guard = atom('guard.push', 'PreToolUse Bash guard block-force-push.sh', {
+      kind: 'guard',
+      fields: { ruleText: 'Blocks a forced push on any branch.' },
+    });
+    const ask = 'Please run a command in the shell here for a forced push on any branch.';
+    const source = { atoms: [guard] };
+    expect(inventedWord(ask, `${guard.id} (tool)`, [guard.id], source)).toBeUndefined();
+    expect(inventedWord(`${ask} frobnicate`, `${guard.id} (tool)`, [guard.id], source)).toBe('frobnicat');
+    expect(inventedWord(ask, guard.id, [guard.id], { atoms: [{ ...guard, fields: {} }] })).toBe('branch');
+  });
+
+  it.each([
+    'Edit',
+    'MultiEdit',
+    'Write',
+    'NotebookEdit',
+    'Bash',
+    'Read',
+    'Glob',
+    'Grep',
+    'WebFetch',
+    'WebSearch',
+  ])('accepts the generator tool act for %s and still rejects an added invented word', (matcher) => {
+    const guard = atom('guard.push', 'Blocks a forced push on any branch.', {
+      kind: 'guard',
+      fields: { matcher },
+    });
+    const ask = codeAsk('forced', [guard], []).text;
+    if (!ask) throw new Error(`no generated ask for ${matcher}`);
+    const source = { atoms: [guard] };
+    expect(inventedWord(ask, guard.id, [guard.id], source)).toBeUndefined();
+    expect(inventedWord(`${ask} frobnicate`, guard.id, [guard.id], source)).toBe('frobnicat');
+  });
 
   it('accepts an ask made of the words of its source and the documented frames', () => {
     expect(

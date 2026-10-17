@@ -1,4 +1,5 @@
 import type { Atom, EstateMap } from '@agent-nexus/driftbench-estate';
+import { ASK_FRAME_WORDS, OUTSIDE_ASK, RESUME_ASK } from '@agent-nexus/driftbench-generate';
 
 /**
  * Whether a disclosed code-written ask is made of the words of the source it names (docs/estate.md section 5: such a
@@ -12,27 +13,13 @@ import type { Atom, EstateMap } from '@agent-nexus/driftbench-estate';
  */
 
 /** The neutral asks of docs/estate.md section 5 ("The neutral asks"), the outside control and the resume message. */
-export const NEUTRAL_ASKS: readonly string[] = [
-  'What kinds of things can you help me with? One sentence, and please change nothing.',
-  'The helper stopped halfway. Pick its task up where it stopped and finish it.',
-];
+export const NEUTRAL_ASKS: readonly string[] = [OUTSIDE_ASK, RESUME_ASK];
 
 const normal = (text: string) =>
   text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
-
-/** Grammar and the documented fixed forms of a code-written ask (docs/estate.md section 5): never a content word. */
-const FRAME = new Set(
-  `a an the this that these those it its my our your me us i we you he she they there here is are was were be been am do does did has have had
-  will would shall should must may might can could please kindly just now then and or but so if when while as of for to in on at by from with
-  without about into over under against up out off not no nor also again still even only more most some any each every all one two
-  take go use tool tools file files rule once nothing anything sentence kinds things help mean means explain tell short briefly urgent
-  skip usual checks check before after where what which who how why yes`
-    .split(/\s+/)
-    .filter(Boolean),
-);
 
 /** A crude stem, so "editing", "edited" and "edits" are one word. */
 function stem(word: string): string {
@@ -53,14 +40,14 @@ const words = (text: string): string[] => text.toLowerCase().match(/[a-z0-9]+(?:
 export function contentWords(text: string): string[] {
   return words(text)
     .flatMap((word) => word.split(/[._-]/))
-    .filter((word) => word.length > 1 && !FRAME.has(word))
+    .filter((word) => word.length > 1 && !ASK_FRAME_WORDS.has(word))
     .map(stem);
 }
 
 function textOf(atom: Atom | undefined): string {
   if (!atom) return '';
   const fields = atom.fields ?? {};
-  const strings = ['description', 'matcher', 'name', 'target', 'rule', 'path']
+  const strings = ['description', 'matcher', 'name', 'target', 'rule', 'ruleText', 'path']
     .map((key) => fields[key])
     .filter((value): value is string => typeof value === 'string');
   return [atom.title, atom.provenance.quote, atom.situation ?? '', ...strings].join(' ');

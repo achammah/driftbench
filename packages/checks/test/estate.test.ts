@@ -162,10 +162,13 @@ describe('permission: what a permission rule allows or denies', () => {
     ).toBe('fail');
   });
 
-  it('allow: a call the rule covers runs, and none is refused for permission', async () => {
+  it('allow: every call the rule covers runs, none refused for permission; a block with no covered call tests nothing', async () => {
     const rule = { effect: 'allow', rule: 'Bash(python3 *)' };
     expect((await verdicts(permission, ctx('ok', [bash('python3 x.py')]), rule))[0]?.outcome).toBe('pass');
-    expect((await verdicts(permission, ctx('ok', [bash('ls')]), rule))[0]?.outcome).toBe('fail');
+    const none = (await verdicts(permission, ctx('ok', [bash('ls')]), rule))[0];
+    expect(none?.outcome).toBe('inconclusive');
+    expect(none?.gating).toBe(true);
+    expect(none?.evidence).toContain('does not exercise the permission');
     expect(
       (
         await verdicts(
@@ -175,22 +178,67 @@ describe('permission: what a permission rule allows or denies', () => {
         )
       )[0]?.outcome,
     ).toBe('fail');
+    const declared = { effect: 'declared', rule: 'Read' };
     expect(
-      (
-        await verdicts(permission, ctx('ok', [{ label: 'Read', input: { file_path: 'a' } }]), {
-          effect: 'declared',
-          rule: 'Read',
-        })
-      )[0]?.outcome,
+      (await verdicts(permission, ctx('ok', [{ label: 'Read', input: { file_path: 'a' } }]), declared))[0]
+        ?.outcome,
     ).toBe('pass');
+    expect((await verdicts(permission, ctx('ok', []), declared))[0]?.outcome).toBe('inconclusive');
   });
 
-  it('ask: inconclusive, the trace does not show the prompt', async () => {
-    const out = await verdicts(permission, ctx('ok', [bash('git commit -m x')]), {
-      effect: 'ask',
-      rule: 'Bash(git commit:*)',
-    });
+  it('ask: a held call passes; a call that ran needs the request and the owner grant on the record, else it is inconclusive', async () => {
+    const rule = { effect: 'ask', rule: 'Bash(git commit:*)' };
+    const call = { ...bash('git commit -m x'), id: 'toolu_1' };
+    const out = await verdicts(permission, ctx('ok', [call]), rule);
     expect(out[0]?.outcome).toBe('inconclusive');
+    const held = await verdicts(
+      permission,
+      ctx('ok', [bash('git commit -m x', 'This command requires approval: permission needed')]),
+      rule,
+    );
+    expect(held[0]?.outcome).toBe('pass');
+    const none = await verdicts(permission, ctx('ok', [bash('git status')]), rule);
+    expect(none[0]?.outcome).toBe('inconclusive');
+    const kept = (...records: Array<[number, Record<string, unknown>]>) => ({
+      raw: { kept: records.map(([line, record]) => ({ line, reason: 'system', record })) },
+    });
+    const request = [
+      1,
+      { subtype: 'permission_request', requestId: 'toolu_1', tool: 'Bash', input: call.input },
+    ] as [number, Record<string, unknown>];
+    const grant = (decision: string): [number, Record<string, unknown>] => [
+      2,
+      { subtype: 'permission_decision', requestId: 'toolu_1', decision },
+    ];
+    const withRecords = (...records: Array<[number, Record<string, unknown>]>) =>
+      ctx('ok', [call], kept(...records));
+    expect((await verdicts(permission, withRecords(request, grant('allow')), rule))[0]?.outcome).toBe('pass');
+    expect((await verdicts(permission, withRecords(request, grant('deny')), rule))[0]?.outcome).toBe('fail');
+    // A grant stamped at or after the call was not given before it.
+    const stampedWith = (at: string) => {
+      const stamped = ctx('ok', [call], kept(request, [2, { ...grant('allow')[1], timestamp: at }]));
+      (stamped.observed.toolCalls[0] as { startedAt?: string }).startedAt = '2026-10-12T09:00:05.000Z';
+      return stamped;
+    };
+    expect((await verdicts(permission, stampedWith('2026-10-12T09:00:04.000Z'), rule))[0]?.outcome).toBe(
+      'pass',
+    );
+    expect((await verdicts(permission, stampedWith('2026-10-12T09:00:05.000Z'), rule))[0]?.outcome).toBe(
+      'inconclusive',
+    );
+    // A grant before the request, or a request for another call or another input, shows nothing.
+    expect((await verdicts(permission, withRecords([3, request[1]], grant('allow')), rule))[0]?.outcome).toBe(
+      'inconclusive',
+    );
+    expect(
+      (
+        await verdicts(
+          permission,
+          withRecords([1, { ...request[1], input: { command: 'git commit -m y' } }], grant('allow')),
+          rule,
+        )
+      )[0]?.outcome,
+    ).toBe('inconclusive');
   });
 
   it('reads the list the estate generator writes: { rules: [{ effect, rule }], block }, one verdict per rule', async () => {
@@ -219,6 +267,7 @@ describe('permission: what a permission rule allows or denies', () => {
 
   it('lists the estate checks by the names the estate generator writes', () => {
     expect(Object.keys(ESTATE_CHECKS).sort()).toEqual([
+      'absence',
       'grounded_values',
       'guard_finished',
       'guard_message',
@@ -490,10 +539,76 @@ describe('guard_message and guard_finished: what a guard said, and that it answe
       { name: 'x.sh' },
     );
     expect(allowed[0]?.outcome).toBe('inconclusive');
+    expect(allowed[0]?.gating).toBe(true);
     const bare = await verdicts(guardMessage, ctx('ok', [], guards([{ name: 'x.sh', verdict: 'deny' }])), {
       name: 'x.sh',
     });
     expect(bare[0]?.outcome).toBe('inconclusive');
+    expect(bare[0]?.gating).toBe(true);
+  });
+
+  it('judges the message of a guard that acts without blocking: a warning on stderr, context on stdout', async () => {
+    const warned = await verdicts(
+      guardMessage,
+      ctx(
+        'ok',
+        [],
+        guards([{ name: 'tidy.py', verdict: 'warn', stderr: 'Archive the file instead.', exitCode: 1 }]),
+      ),
+      { name: 'tidy.py', mustNot: ['\\?'] },
+    );
+    expect(warned.map((v) => [v.id, v.outcome])).toEqual([
+      ['guard_message.present', 'pass'],
+      ['guard_message.rules', 'pass'],
+    ]);
+    const nudged = await verdicts(
+      guardMessage,
+      ctx(
+        'ok',
+        [],
+        guards([
+          {
+            name: 'pause.sh',
+            verdict: 'nudge',
+            stdout: JSON.stringify({ additionalContext: 'Did you mean to stop? Say so in one line?' }),
+            exitCode: 0,
+          },
+        ]),
+      ),
+      { name: 'pause.sh', mustNot: ['(?:\\?[\\s\\S]*){2}'] },
+    );
+    expect(nudged.find((v) => v.id === 'guard_message.rules')?.outcome).toBe('fail');
+    expect(nudged[0]?.evidence).toContain('Did you mean to stop?');
+  });
+
+  it('judges only the runs by which a guard acts: allow, a timeout and a verdict outside the vocabulary are no intervention', async () => {
+    for (const verdict of ['allow', 'timeout', 'WARN', 'warning', 'war', 'warn_extra', 'flag']) {
+      const out = await verdicts(
+        guardMessage,
+        ctx(
+          'ok',
+          [],
+          guards([{ name: 'tidy.py', verdict, stderr: 'Archive the file instead.', exitCode: 0 }]),
+        ),
+        { name: 'tidy.py' },
+      );
+      expect(
+        out.map((v) => [v.id, v.outcome]),
+        verdict,
+      ).toEqual([['guard_message.present', 'inconclusive']]);
+    }
+    for (const verdict of ['deny', 'block', 'warn', 'nudge']) {
+      const out = await verdicts(
+        guardMessage,
+        ctx(
+          'ok',
+          [],
+          guards([{ name: 'tidy.py', verdict, stderr: 'Archive the file instead.', exitCode: 0 }]),
+        ),
+        { name: 'tidy.py' },
+      );
+      expect(out[0]?.outcome, verdict).toBe('pass');
+    }
   });
 
   it('guard_finished: every run answered, none stopped; inconclusive when the guard never ran', async () => {

@@ -103,7 +103,7 @@ proposed. Summary in <plan>.summary.json.`, then:
 * `Rows per test type`: every row, journeys and pairwise included.
 * `Unenforced`: approved rules no guard enforces.
 * `Cells with no approved phrase`: the plan reads no phrase bank, so every cell counts.
-* `Edges with no journey`, each with its reason.
+* `Edges with no journey`, each with its reason. A list (these edges, the rows adjusted to the space map, the notes) prints its first 10 lines on the console, then one line that counts the rest and names the summary file, which holds every one under `uncoveredEdges`, `adjusted` and `notes`.
 * A `Next:` line.
 
 Exit 0 written, 1 an invalid map or space map or one that does not match the map, 2 a usage or input error

@@ -38,7 +38,7 @@ describe('routing cells name a declared skill or helper', () => {
     const root = await estate({
       ...skills,
       'CLAUDE.md':
-        '| When | Load |\n|---|---|\n| send an order | shipping |\n| second | shipment |\n| third | discuss ship with a colleague |\n',
+        '| When | Load |\n|---|---|\n| send an order | shipping |\n| amend an order | shipment |\n| reschedule an order | discuss ship with a colleague |\n',
     });
     const { map } = await scanEstate({ root, reader: new ClaudeCodeReader(), now: NOW });
     expect(

@@ -1,15 +1,23 @@
-import type {
-  ArtifactExpect,
-  CriterionDef,
-  GuardExpect,
-  ReferenceExpect,
-  SkillExpect,
-  SubagentExpect,
-  ToolExpect,
+import {
+  type ArtifactExpect,
+  type CriterionDef,
+  GUARD_INTERVENTIONS,
+  type GuardExpect,
+  type ReferenceExpect,
+  type SkillExpect,
+  type SubagentExpect,
+  type ToolExpect,
 } from '@agent-nexus/driftbench-core';
-import type { EstateAtom, EstateEvidence } from './inputs';
+import { type EstateAtom, type EstateEvidence, EVIDENCE_TYPES } from './inputs';
 import { literal } from './literal';
-import { compilePredicate } from './predicates';
+import {
+  ABSENCE_PREDICATES,
+  type AbsenceEvidence,
+  compilePredicate,
+  compileToolAbsence,
+  isCompiledPredicate,
+} from './predicates';
+import { recoveryAction } from './recovery';
 
 export { literal };
 
@@ -25,11 +33,12 @@ export { literal };
  * | tool_called Read with a path (equal or contained) | `expect.references`, a glob ending in the path |
  * | tool_called Agent with a helper name | `expect.subagents` with a count |
  * | ordered | the ordered-pair custom check, `rules.custom.ordered` |
+ * | ordered from a Read | the Read of the file the gate names (`Read~<path>`), or of the file changed (`key`) |
  * | stage_reached | `expect.stage` on the closing stage, and an ordered pair when the stage is not the last |
  * | workspace, artifact | `expect.workspace`, `expect.artifacts` |
  * | text | `expect.must`, `expect.must_not` (the words as literal text), `expect.lang` |
  * | tool_called with any other input, when `some_call` is registered | `rules.custom.some_call` |
- * | custom grounded_values, hazard_recovery, permission (allow, declared, deny) | the registered check |
+ * | custom grounded_values, hazard_recovery, permission (allow, declared, deny, ask) | the registered check |
  * | custom with a name `predicates.ts` compiles | must, must_not, lang, safety, execution |
  * | custom on a register atom | a judged criterion whose rubric is the atom's title, not gating |
  *
@@ -39,7 +48,7 @@ export { literal };
  *   the atom asks for one call that matches (`needs-some-call-check`);
  * - a custom predicate no registered check runs (`needs-registered-check`);
  * - an ordered pair whose ends are not a tool label, a skill or a stage, or are the same label
- *   (`needs-ordered-anchor`);
+ *   (`needs-ordered-anchor` without a judge; otherwise the source rule is judged);
  * - a stage that can be reached at any time, or a step list with no single closing stage
  *   (`needs-stage-reach-check`);
  * - a static property of the estate files (`needs-static-runner`);
@@ -70,7 +79,8 @@ export const MARKER_NAMES: ReadonlySet<string> = new Set(Object.values(MARKERS))
 
 export type Gap = { marker: Marker; atom: string; detail: string };
 
-export type OrderedPair = { before: string; after: string };
+/** `key`: the two calls name the same value in that input field (`file_path`: the file read is the one edited). */
+export type OrderedPair = { before: string; after: string; key?: string };
 
 export type SomeCall = { label: string; input: Record<string, unknown>; count: 0 | { min: number } };
 
@@ -136,6 +146,8 @@ export type ThenContext = {
   judge?: boolean;
   /** The files of the estate, relative to its root: a read is expected only of one of them. */
   files?: ReadonlySet<string>;
+  /** The atoms of the estate by id, so a rule can find the unit it is read from. */
+  atoms?: ReadonlyMap<string, EstateAtom>;
   /** True for a live row: the runtime's own trace is all there is, no decision log the estate writes. */
   live?: boolean;
   /** Files the runtime loads by itself (no Read call ever shows it): a read of one is never expected. */
@@ -174,6 +186,9 @@ export function thenOf(atoms: readonly EstateAtom[], polarity: Polarity, ctx: Th
   const then = emptyThen();
   for (const atom of atoms) {
     for (const evidence of atom.evidence) {
+      if (!Object.hasOwn(EVIDENCE_TYPES, evidence.type)) {
+        throw new Error(`Unknown estate evidence predicate "${evidence.type}" in atom ${atom.id}`);
+      }
       if (polarity === 'positive') positive(then, atom, evidence, ctx);
       else negative(then, atom, evidence, ctx);
     }
@@ -183,6 +198,15 @@ export function thenOf(atoms: readonly EstateAtom[], polarity: Polarity, ctx: Th
 }
 
 function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, ctx: ThenContext): void {
+  if (ABSENCE_PREDICATES.includes(evidence.type as AbsenceEvidence['type'])) {
+    if (!ctx.customChecks.has('absence')) {
+      gap(then, MARKERS.registered, atom, `${evidence.type} requires the absence check`);
+      return;
+    }
+    const predicates = (then.custom.absence?.predicates ?? []) as AbsenceEvidence[];
+    then.custom.absence = { predicates: [...predicates, evidence], block: 0 };
+    return;
+  }
   switch (evidence.type) {
     case 'skill_loaded':
       addSkill(then, { name: evidence.name, count: { min: evidence.min ?? 1 } });
@@ -201,7 +225,7 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
     case 'tool_called':
       if (hasInput(evidence.input)) {
         if (loadedRead(evidence.label, evidence.input, ctx)) return;
-        if (missingRead(then, atom, evidence.label, evidence.input, ctx)) return;
+        if (missingRead(then, atom, evidence.label, evidence.input, ctx, evidence.min ?? 1)) return;
         if (someCall(then, evidence.label, evidence.input, evidence.min ?? 1)) return;
         if (ctx.customChecks.has('some_call')) {
           addSomeCall(then, {
@@ -217,6 +241,12 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
       addTool(then, { label: evidence.label, count: { min: evidence.min ?? 1 } });
       return;
     case 'tool_not_called':
+      if (hasInput(evidence.input)) {
+        if (ctx.customChecks.has('some_call')) {
+          for (const call of compileToolAbsence(evidence).someCalls ?? []) addSomeCall(then, call);
+        } else gap(then, MARKERS.someCall, atom, `no ${evidence.label} call with ${show(evidence.input)}`);
+        return;
+      }
       addTool(then, { label: evidence.label, count: 0 });
       // A setting that denies the whole tool takes it off the offered list: the deny shows without a call.
       if (atom.kind === 'tool' && atom.fields?.effect === 'deny' && atom.fields.rule === evidence.label) {
@@ -224,18 +254,35 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
       }
       return;
     case 'ordered': {
-      const pair = anchorPair(evidence.before, evidence.after, ctx, atom.fields);
-      if (typeof pair === 'string') gap(then, MARKERS.anchor, atom, pair);
-      else addPair(then, pair);
+      const pair = anchorPair(evidence.before, evidence.after, ctx, atom.fields, atom.provenance?.quote);
+      if (typeof pair === 'string') {
+        if (ctx.judge) judgeRule(then, atom, 'positive');
+        else gap(then, MARKERS.anchor, atom, pair);
+      } else addPair(then, pair);
       return;
     }
     case 'stage_reached':
-      // A step allowed at any point is reached when it shows once in the block, wherever.
-      // So is a stage of a step list with no single closing stage to order it against.
-      if (
-        (ctx.stages.anytime.has(evidence.name) || ctx.stages.closing === undefined) &&
-        ctx.customChecks.has('stage_seen')
-      ) {
+      // A step allowed at any point has no place in the order, so it is reached when the runtime reports it once
+      // in the block, wherever: a run that drops the step then fails. Without that check, the flow around it
+      // still closes on its closing step.
+      if (ctx.stages.anytime.has(evidence.name)) {
+        if (ctx.customChecks.has('stage_seen')) {
+          then.custom.stage_seen = { name: evidence.name, block: 0 };
+          return;
+        }
+        if (ctx.stages.closing !== undefined) then.stage = ctx.stages.closing;
+        else
+          gap(
+            then,
+            MARKERS.stageReach,
+            atom,
+            `${evidence.name} may come at any step and is not required; the step list has no single closing stage to check the flow on`,
+          );
+        return;
+      }
+      // A stage of a step list with no single closing stage to order it against is reached when it shows once
+      // in the block, wherever.
+      if (ctx.stages.closing === undefined && ctx.customChecks.has('stage_seen')) {
         then.custom.stage_seen = { name: evidence.name, block: 0 };
         return;
       }
@@ -271,16 +318,49 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
         if (evidence.name === 'ordered') {
           for (const raw of pairsOf(evidence.options)) {
             const pair = anchorPair(raw.before, raw.after, ctx);
-            if (typeof pair === 'string') gap(then, MARKERS.anchor, atom, pair);
-            else addPair(then, pair);
+            if (typeof pair === 'string') {
+              if (ctx.judge) judgeRule(then, atom, 'positive');
+              else gap(then, MARKERS.anchor, atom, pair);
+            } else addPair(then, pair);
           }
           return;
         }
       }
       if (evidence.name === 'hazard_recovery' && ctx.customChecks.has('hazard_recovery')) {
+        const recovery = recoveryAction(atom);
+        const declared = evidence.options ?? {};
+        const reread = [
+          ...new Set([
+            ...(Array.isArray(declared.reread)
+              ? declared.reread.filter(
+                  (path): path is string => typeof path === 'string' && path.trim() !== '',
+                )
+              : []),
+            ...recovery.reread,
+          ]),
+        ];
+        const calls = [...(Array.isArray(declared.calls) ? declared.calls : []), ...recovery.calls];
+        const retry = declared.retry === true || recovery.retry;
+        // A part of the rule that names no file ("the open tracker note") is checked by no path: the spec never
+        // passes on the rest alone unmarked. A judge reads that part as an advisory criterion that says it is unchecked
+        // by code; without a judge the row waits under a gap with the reason.
+        for (const part of recovery.unpathed) {
+          if (ctx.judge) judgePart(then, atom, part);
+          else
+            gap(
+              then,
+              MARKERS.registered,
+              atom,
+              `the rule orders a re-read of "${part}", which names no file path`,
+            );
+        }
+        // Only the actions the estate states stay: an empty path or a call counted zero demands nothing.
+        const { reread: _reread, calls: _calls, retry: _retry, ...rest } = declared;
         then.custom.hazard_recovery = {
-          ...(evidence.options ?? {}),
-          ...(heldPaths(atom, ctx).length > 0 ? { reread: heldPaths(atom, ctx) } : {}),
+          ...rest,
+          ...(reread.length > 0 ? { reread } : {}),
+          ...(calls.length > 0 ? { calls } : {}),
+          ...(retry ? { retry: true } : {}),
           block: 0,
         };
         return;
@@ -313,9 +393,14 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
       if (evidence.name === 'permission' && ctx.customChecks.has('permission')) {
         const effect = evidence.options?.effect;
         const rule = evidence.options?.rule;
-        if (typeof rule === 'string' && (effect === 'allow' || effect === 'declared' || effect === 'deny')) {
+        if (
+          typeof rule === 'string' &&
+          (effect === 'allow' || effect === 'declared' || effect === 'deny' || effect === 'ask')
+        ) {
           const known = (then.custom.permission?.rules ?? []) as unknown[];
           then.custom.permission = { rules: [...known, { effect, rule }], block: 0 };
+          // A declared tool is allowed while the unit that declares it is at work: the run shows that unit.
+          if (effect === 'declared') declaringUnit(then, atom, ctx);
           return;
         }
         gap(
@@ -327,7 +412,9 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
         return;
       }
       {
-        const compiled = compilePredicate(evidence.name, evidence.options);
+        const compiled = isCompiledPredicate(evidence.name)
+          ? compilePredicate(evidence.name, evidence.options)
+          : undefined;
         if (compiled && (!compiled.someCalls || ctx.customChecks.has('some_call'))) {
           for (const pattern of compiled.must ?? []) addUnique(then.must, pattern);
           for (const pattern of compiled.mustNot ?? []) addUnique(then.mustNot, pattern);
@@ -349,6 +436,8 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
       }
       gap(then, MARKERS.registered, atom, evidence.name);
       return;
+    default:
+      throw new Error(`Unknown estate evidence predicate "${evidence.type}" in atom ${atom.id}`);
   }
 }
 
@@ -359,11 +448,11 @@ function negative(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
       return;
     case 'guard':
       if (untraced(then, atom, evidence.name, ctx)) return;
-      addGuard(then, {
-        name: evidence.name,
-        ...(evidence.verdict === undefined ? {} : { verdict: evidence.verdict }),
-        count: 0,
-      });
+      // A guard runs on every event it watches and logs `allow` when it lets the act through: a control
+      // forbids the guard's act, by its declared verdict. A guard with no declared verdict may stop the act or
+      // only warn, so the control forbids every verdict by which a guard acts, and `allow` stays free.
+      for (const verdict of evidence.verdict === undefined ? GUARD_INTERVENTIONS : [evidence.verdict])
+        addGuard(then, { name: evidence.name, verdict, count: 0 });
       return;
     case 'tool_called':
       if (hasInput(evidence.input)) {
@@ -386,7 +475,7 @@ function negative(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
       return;
     case 'custom':
       if (
-        compilePredicate(evidence.name, evidence.options) !== undefined ||
+        isCompiledPredicate(evidence.name) ||
         evidence.name === 'hazard_recovery' ||
         evidence.name === 'grounded_values' ||
         evidence.name === 'max_words' ||
@@ -411,14 +500,42 @@ function negative(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
 }
 
 /**
+ * The skill or helper that declares a tool, read from the file the tool rule is read from, joins the Then: the
+ * run must load the skill or dispatch the helper, since only then does the declaration apply.
+ */
+function declaringUnit(then: ThenParts, atom: EstateAtom, ctx: ThenContext): void {
+  const file = atom.provenance?.file;
+  if (file === undefined || ctx.atoms === undefined) return;
+  for (const owner of ctx.atoms.values()) {
+    if ((owner.kind !== 'skill' && owner.kind !== 'subagent') || owner.provenance?.file !== file) continue;
+    const name = owner.fields?.name;
+    if (typeof name !== 'string' || name === '') continue;
+    if (owner.kind === 'skill') addSkill(then, { name, count: { min: 1 } });
+    else if (!then.subagents.some((known) => known.name === name))
+      then.subagents.push({ name, count: { min: 1 } });
+    return;
+  }
+}
+
+/** Tools that change a file named by `file_path`. */
+const FILE_EDITS = new Set(['Edit', 'MultiEdit', 'Write']);
+/** A gate whose change acts on what it read: "read a file before you edit it". */
+const SAME_OBJECT =
+  /\b(?:edit|change|modify|update|overwrite|rewrite|write)\w*\s+(?:it|them|that file|this file|the same file)\b/i;
+
+/**
  * An ordered pair in the names the ordered check reads: a tool label as is, `skill:<name>`, `stage:<name>`.
- * A string says why the pair cannot be anchored.
+ * A string says why the pair cannot be anchored. A Read end is what the gate reads: the file it names
+ * (`Read~<path>`, from the gate's `path` field), or, when it names none and its change acts on what it read
+ * ("read a file before you edit it"), the file of the change itself (`key: file_path`). Any Read before the
+ * change would let a gate whose own read went missing pass on another read.
  */
 export function anchorPair(
   before: string,
   after: string,
   ctx: ThenContext,
   fields?: Record<string, unknown>,
+  quote?: string,
 ): OrderedPair | string {
   const a = anchor(before, ctx);
   const b = anchor(after, ctx);
@@ -437,6 +554,11 @@ export function anchorPair(
   }
   if (a === b)
     return `${before} before ${after}: both ends are ${a}, so the pair cannot tell the two acts apart`;
+  if (a === 'Read') {
+    const path = typeof fields?.path === 'string' ? fields.path.trim().replace(/^\.?\/+/, '') : '';
+    if (path !== '') return { before: `Read~${path}`, after: b };
+    if (FILE_EDITS.has(b) && SAME_OBJECT.test(quote ?? '')) return { before: a, after: b, key: 'file_path' };
+  }
   return { before: a, after: b };
 }
 
@@ -574,6 +696,28 @@ function judgeRule(then: ThenParts, atom: EstateAtom, polarity: Polarity): void 
   addUnique(then.judged, atom.id);
 }
 
+/**
+ * A judged criterion for one part of a rule that no code check reaches (the re-read of a note, not a file). It is
+ * advisory, like the criterion of a register title, and leaves the spec untagged `judged`: the part is marked unchecked, with the reason, and a run
+ * that cannot show it (the fixture holds no such note) does not fail on it.
+ */
+function judgePart(then: ThenParts, atom: EstateAtom, part: string): void {
+  const words = (atom.provenance?.quote ?? atom.title).replace(/\s+/g, ' ').trim();
+  const name = `${atom.id}.${part
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')}`;
+  if (then.criteria.some((criterion) => criterion.name === name)) return;
+  then.criteria.push({
+    name,
+    rubric: `Unchecked by code: the rule "${words}" orders a re-read of "${part}", which names no file path. Did the agent re-read "${part}"?`,
+    pass: `The agent re-read "${part}" before it went on.`,
+    fail: `The agent went on without re-reading "${part}".`,
+    gating: false,
+    scope: 'block',
+  });
+}
+
 function addCriterion(then: ThenParts, atom: EstateAtom): void {
   if (!then.criteria.some((criterion) => criterion.name === atom.id)) {
     then.criteria.push({ name: atom.id, rubric: atom.title, gating: false, scope: 'block' });
@@ -582,17 +726,6 @@ function addCriterion(then: ThenParts, atom: EstateAtom): void {
 
 function addSomeCall(then: ThenParts, call: SomeCall): void {
   if (!then.someCalls.some((known) => same(known, call))) then.someCalls.push(call);
-}
-
-/** The paths an atom's passage names that the estate holds (all of them when no file list is known). */
-function heldPaths(atom: EstateAtom, ctx: ThenContext): string[] {
-  const files = ctx.files;
-  if (!files) return pathsOf(atom);
-  return pathsOf(atom).filter((path) => {
-    const clean = path.replace(/^\.?\/+/, '');
-    for (const file of files) if (file === clean || file.endsWith(`/${clean}`)) return true;
-    return false;
-  });
 }
 
 /** Paths an atom's passage names: in backticks, or a word with a slash or a file extension. */
@@ -610,7 +743,11 @@ export function pathsOf(atom: EstateAtom): string[] {
 }
 
 export function addPair(then: ThenParts, pair: OrderedPair): void {
-  if (!then.ordered.some((known) => known.before === pair.before && known.after === pair.after)) {
+  if (
+    !then.ordered.some(
+      (known) => known.before === pair.before && known.after === pair.after && known.key === pair.key,
+    )
+  ) {
     then.ordered.push(pair);
   }
 }
@@ -686,9 +823,10 @@ function loadedRead(label: string, input: Record<string, unknown>, ctx: ThenCont
 }
 
 /**
- * A Read of a file the estate does not hold: never expected (a run on a copy of the estate could not make
- * it); the row gets a needs-existing-file gap. True when it is such a read. A path matches a file of the
- * estate when one ends with the other.
+ * A file the estate does not hold cannot be read successfully, but the declared Read call can still be
+ * attempted and return a file-not-found error. Check that attempt with some_call, not references (which
+ * counts only successful reads). Without that checker the row keeps its needs-existing-file gap.
+ * True when it is such a read. A path matches a file when one ends with the other.
  */
 function missingRead(
   then: ThenParts,
@@ -696,6 +834,7 @@ function missingRead(
   label: string,
   input: Record<string, unknown>,
   ctx: ThenContext,
+  min: number,
 ): boolean {
   if (label !== 'Read' || !ctx.files) return false;
   const value = textOf(input.file_path ?? input.path ?? input.notebook_path);
@@ -703,6 +842,10 @@ function missingRead(
   const path = value.replace(/^\.?\/+/, '');
   for (const file of ctx.files) {
     if (file === path || file.endsWith(`/${path}`) || path.endsWith(`/${file}`)) return false;
+  }
+  if (ctx.customChecks.has('some_call')) {
+    addSomeCall(then, { label, input, count: { min } });
+    return true;
   }
   gap(then, MARKERS.existingFile, atom, `${path} is no file of the estate`);
   return true;

@@ -48,6 +48,9 @@ function heavyCondition(id: string): string {
 const FAST_CONDITION =
   "github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',fast,'))";
 
+/** The fast job's limit: 20 minutes, on a pull request and on a dispatch. */
+const FAST_TIMEOUT = 20;
+
 const CI_HEAVY = [
   'bench',
   'research-replay',
@@ -538,7 +541,12 @@ describe('merge train enforcement', () => {
     const job = workflow.jobs['pr-fast'];
     expect(job.name).toBe('pr fast');
     expect(job.if).toBe(FAST_CONDITION);
-    expect(job['timeout-minutes']).toBe(8);
+    // 20 minutes on a pull request and on a pre-flight dispatch: a large diff's affected tests pass 8
+    expect(job['timeout-minutes']).toBe(FAST_TIMEOUT);
+    const limit = (ctx: Ctx) => evaluateTemplate(job['timeout-minutes'], ctx);
+    expect(limit(ORDINARY_PR)).toBe(20);
+    expect(limit(TRAIN_PR)).toBe(20);
+    expect(limit(dispatchOn('refs/heads/train/pre-9', 'fast'))).toBe(20);
     expect(job.steps[0].with['fetch-depth']).toBe(0);
     const commands = job.steps.flatMap((step: { run?: string }) => step.run ?? '');
     expect(commands).toContain('pnpm lint');
@@ -568,6 +576,19 @@ describe('merge train enforcement', () => {
     const pullOnly = structuredClone(workflow);
     pullOnly.jobs['pr-fast'].if = "github.event_name == 'pull_request'";
     expect(() => assertFastBehaviour(pullOnly)).toThrow();
+  });
+  it('gives the fast job 20 minutes on a pull request and on a dispatch', () => {
+    const job = workflow.jobs['pr-fast'];
+    const limit = (w: ReturnType<typeof parse>, ctx: Ctx) =>
+      evaluateTemplate(w.jobs['pr-fast']['timeout-minutes'], ctx);
+    const dispatch = dispatchOn('refs/heads/train/pre-9', 'fast');
+    expect(limit(workflow, dispatch)).toBe(20);
+    expect(limit(workflow, ORDINARY_PR)).toBe(20);
+    expect(job['timeout-minutes']).toBe(FAST_TIMEOUT);
+    const old = structuredClone(workflow);
+    old.jobs['pr-fast']['timeout-minutes'] = "${{ github.event_name == 'workflow_dispatch' && 20 || 8 }}";
+    expect(limit(old, dispatch)).toBe(20);
+    expect(limit(old, ORDINARY_PR)).not.toBe(20);
   });
   it('compares the affected tests with origin/main on a dispatch, as on a pull request', () => {
     const affected = workflow.jobs['pr-fast'].steps.find(

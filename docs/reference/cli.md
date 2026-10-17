@@ -1024,8 +1024,8 @@ Review: signed by owner on 2026-10-13.
 Reads an agent estate (its standing instructions, skills, agents, guards and settings) into a map of atoms, lints it, approves the atoms a model split from prose, exports its space map, derives the test plan, generates task specs from it, and keeps the tests true when the estate changes. The runtime today is `claude-code`. What the atoms, the plan and maintenance are is on the [estate](../estate.md) page; the Claude Code mapping is on [its adapter page](../adapters/claude-code.md). [`examples/estates/fixture`](../../examples/estates/fixture/README.md) is the estate the examples below read.
 
 ```
-driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider <name>] [--ceiling <characters>] [--ignore <glob>]... [--force]
-driftbench estate lint <map> [--ceiling <characters>] [--ignore <glob>]...
+driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider <name>] [--ceiling <characters>] [--ignore <glob>]... [--user-skills <folder>] [--force]
+driftbench estate lint <map> [--ceiling <characters>] [--ignore <glob>]... [--user-skills <folder>]
 driftbench estate approve <map> [--kind <kind>]... [--atom <id>]... [--all] [--to <file>]
 driftbench estate map <map> --to <file> [--all] [--agent <name>]
 driftbench estate plan <map> --out <file> [--t <n>] [--space <file>] [--k <n>] [--force]
@@ -1087,28 +1087,38 @@ On the fixture estate:
 
 ```
 $ pnpm -s driftbench estate scan examples/estates/fixture --no-model --out _captures/docs3/cli/estate-map.yaml
-Wrote _captures/docs3/cli/estate-map.yaml: 68 atoms (68 read by code and approved, 0 split from prose by the model and waiting for approval), 47 edges.
+Wrote _captures/docs3/cli/estate-map.yaml: 120 atoms (69 read by code and approved, 51 code-found candidates waiting for approval, 0 split from prose by the model and waiting for approval), 56 edges.
   Atoms per kind:
-    gate         4
-    route       13
-    skill        4
-    reference    9
-    script       2
-    subagent     3
-    guard        6
-    tool        12
-    setting      4
-    stage        5
-    hazard       2
-    invariant    4
-  No model call: structured atoms only (--no-model).
+    instruction   47
+    gate           4
+    route         13
+    skill          4
+    reference     10
+    script         2
+    subagent       3
+    guard          6
+    tool          12
+    setting        4
+    stage          5
+    register       4
+    hazard         2
+    invariant      4
+  No model call: structured atoms and code-found prose candidates (--no-model).
+  Prose: 14 chunks, 6835 characters (standing 1, memory 2, skill bodies 4, skill files 4, helper bodies 3).
+  Unanswered prose chunks (no model call): 14, 6835 characters.
+    CLAUDE.md  2782 characters
+    .claude/agents/inbox-triager.md  169 characters
+    .claude/agents/ledger-auditor.md  519 characters
+    ...
   Refused: none.
+  Ignored: none.
   Orphans: .claude/skills/invoice-reconcile/references/old-tolerances.md.
   Unreachable from the standing instructions: .claude/agents/inbox-triager.md.
-  Unenforced: 3 of 4 rules have no guard.
+  Unenforced: 47 of 55 rules have no guard.
     gate.standing.read-git-status-before-commit-to
     gate.invoice-reconcile.read-references-matching-rules-md-before
     gate.weekly-report.read-templates-report-md-before-writing
+    ...
 Next: driftbench estate lint _captures/docs3/cli/estate-map.yaml; driftbench estate approve _captures/docs3/cli/estate-map.yaml --kind instruction
 ```
 
@@ -1391,7 +1401,7 @@ driftbench compare --rank <campaigns...> --store <db> [--mode <modes>] [--json]
 
 `report` writes the scorecard of a stored campaign as one HTML file, with no script and no external asset: every metric with its interval, the compare diff with `--baseline`, the spread view, the pilot report with `--pilot`, and the per-block drilldown. `--junit` also writes JUnit XML. `--aggregate` (repeatable) scores a campaign-level criterion over every run, such as `pass-rate:>=0.8` or `broken-share:<=0.2`, and prints each result; see [campaign-level criteria](../aggregates.md). `--config <file>` names the project config whose `aggregates:` it also scores; default `driftbench.yaml` in the working folder. `--withhold-incomplete` withholds the pass^k and pass@k value of a line with incomplete runs, instead of reporting it with the range of its missing outcomes; see [statistics](../concepts/statistics.md). Exit 0 when written, 2 on bad input. The [example scorecards](../scorecards.md) were written by it.
 
-On the command line `report` prints, per mode, the suite headline: `Suite pass rate, mode F: 70.0% [35.4%, 88.2%] (hierarchical 95% interval); 6 goldens, n_eff 7.0 runs (design effect 3.87), detectable drop 66.4 points at 80% power.` It is the mean over goldens with the hierarchical Beta-Bernoulli interval, then the effective runs, the smallest drop two suites like it detect and the share of runs that did not complete. A rate over clustered runs elsewhere on the page prints its `n_eff` and design effect beside the Wilson interval. See [statistics](../concepts/statistics.md#the-suite-headline).
+On the command line `report` prints, per mode, the suite headline: `Suite pass rate, mode F: 70.0% [35.4%, 88.2%] (hierarchical 95% interval); 6 goldens, n_eff 7.3 runs (design effect 3.69), detectable drop 65.3 points at 80% power.` It is the mean over goldens with the hierarchical Beta-Bernoulli interval, then the effective runs, the smallest drop two suites like it detect and the share of runs that did not complete. A rate over clustered runs elsewhere on the page prints its `n_eff` and design effect beside the Wilson interval. See [statistics](../concepts/statistics.md#the-suite-headline).
 
 `compare` pairs the goldens both campaigns ran and gives the non-inferiority verdict: McNemar on the all-pass flag, Wilcoxon on drift counts, the paired effect with its interval, Benjamini-Hochberg across criteria. Per criterion and for the all-pass flag it also prints three planning numbers: the floor (the smallest margin its goldens can show when nothing changed), the drop its goldens detect at 80% power, and the goldens a 10 point margin needs. Exit 0 non-inferior, 1 regressed or not shown non-inferior, 2 on bad input. The rule is on the [statistics](../concepts/statistics.md#the-campaign-verdict) page. The [reports README](../../examples/acme/reports/README.md) gives the commands and their output on the Acme campaigns.
 
@@ -1666,7 +1676,7 @@ Every command `driftbench --help` lists is built. These do not exist as commands
 
 `driftbench radius auto --prompt <old> <new> --map <approved.yaml> [--source <path>] [--from-version <version>] [--to-version <version>] [--out <manifest.yaml>]` writes a manifest from approved evidence quotes. It exits 0 when the manifest is written or printed, including a conservative whole-suite manifest, and 2 on invalid input. The separate `radius <specs> --change ...` command exits 1 when its computed radius is the whole suite. `driftbench radius <specs> --change <manifest.yaml> --explain` traces anchors to block reasons. See [prompt quotes](../concepts/blast-radius.md#prompt-quotes).
 
-`driftbench radius sections init <prompt> --id <prompt-id> --prompt-version <version> [--level <n>] [--out <file>]` writes a first section registry from the markdown headings. `driftbench radius sections check <registry> --prompt <file> [--json]` exits 1 when the registry no longer describes the prompt. `driftbench radius sections reanchor <registry> --prompt <old> <new> --to-version <version> [--out <file>] [--json]` finds every section again in the new prompt and exits 1 when a section is stale, a change lies outside every section or sections changed order. See [prompt sections and block links](../concepts/blast-radius.md#prompt-sections-and-block-links).
+`driftbench radius sections init <prompt> --id <prompt-id> --prompt-version <version> [--level <n>] [--out <file>]` writes a first section registry from the markdown headings. `driftbench radius sections check <registry> --prompt <file> [--json]` exits 1 when the registry no longer describes the prompt. `driftbench radius sections reanchor <registry> --prompt <old> <new> --to-version <version> [--out <file>] [--change-out <manifest>] [--json]` finds every section again in the new prompt, writes the `prompt_section` manifest with `--change-out`, and exits 1 when a section is stale, a change lies outside every section or sections changed order. `driftbench radius <specs> --change <manifest> --sections <registries...>` prints, after the radius, which blocks selection by section links would run; a `prompt_section` change keeps the radius the whole suite. `driftbench radius localize <specs> --store <file> --campaign <id> --sections <registries...> [--prompt <id>] [--mode <mode>] [--counting grouped|flat] [--top <n>] [--json]` ranks the local sections of a prompt by Ochiai suspiciousness from the campaign's block verdicts; it exits 0 with a ranking, 1 when nothing failed outside inherited failures, 2 on bad input. See [prompt sections and block links](../concepts/blast-radius.md#prompt-sections-and-block-links).
 
 ### `campaign rejudge`
 

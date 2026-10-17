@@ -1,3 +1,4 @@
+import { navigationFiles, navigationReference, rowOwners } from '@agent-nexus/driftbench-generate';
 import type { Atom, AtomKind, Edge, EstateMap, PlanRow, TestType } from '../schema';
 
 /**
@@ -112,7 +113,8 @@ export type DraftRow = {
 
 /**
  * The mandatory rows of every approved atom, grouped by kind in the order of `AtomKind`, then in map
- * order. Rows of one atom follow the order of its contract.
+ * order. Rows of one atom follow the order of its contract. A reference to a document the map records as
+ * navigation only (an example, a template, a history) has no row.
  */
 export function contractRows(
   map: EstateMap,
@@ -122,11 +124,14 @@ export function contractRows(
   const atoms = map.atoms.filter((atom) => atom.approved);
   const approved = new Set(atoms.map((atom) => atom.id));
   const edges = map.edges.filter((edge) => approved.has(edge.from) && approved.has(edge.to));
-  const ownerOf = owners(atoms, edges);
+  const ownerOf = rowOwners(atoms, edges);
+  const navigation = navigationFiles(map.documents);
   const routed = new Set(edges.filter((edge) => edge.kind === 'route').map((edge) => edge.to));
   const rows: DraftRow[] = [];
   for (const kind of kinds) {
     for (const atom of atoms.filter((candidate) => candidate.kind === kind)) {
+      // A reference to an example, a template or a history is a place to look, never a rule to test.
+      if (navigationReference(atom, navigation)) continue;
       const owner = ownerOf.get(atom.id);
       const ids = owner ? [atom.id, owner] : [atom.id];
       const target = { [targetDimension(kind)]: atom.id };
@@ -284,33 +289,6 @@ function rowsOf(
         row('setting', { note: 'A static test: the settings still hold the key, and its value when kept.' }),
       ];
   }
-}
-
-/**
- * The skill or helper an atom belongs to: for a reference, the unit whose reference edge names it; for a
- * script, the unit whose script edge names it; for a rule or a hazard, the unit whose file holds it; for a
- * route, the unit it loads.
- */
-function owners(atoms: readonly Atom[], edges: readonly Edge[]): Map<string, string> {
-  const out = new Map<string, string>();
-  const unitOfFile = new Map<string, string>();
-  for (const atom of atoms) {
-    if (atom.kind === 'skill' || atom.kind === 'subagent') unitOfFile.set(atom.provenance.file, atom.id);
-  }
-  for (const edge of edges) {
-    if (edge.kind === 'route' || edge.kind === 'reference' || edge.kind === 'script') {
-      const unit = edge.kind === 'route' ? edge.to : edge.from;
-      const atom = edge.kind === 'route' ? edge.from : edge.to;
-      if (!out.has(atom)) out.set(atom, unit);
-    }
-  }
-  for (const atom of atoms) {
-    if (out.has(atom.id) || atom.kind === 'skill' || atom.kind === 'subagent') continue;
-    if (!['instruction', 'gate', 'register', 'hazard', 'reference'].includes(atom.kind)) continue;
-    const unit = unitOfFile.get(atom.provenance.file);
-    if (unit) out.set(atom.id, unit);
-  }
-  return out;
 }
 
 function quoteOf(text: string): string {

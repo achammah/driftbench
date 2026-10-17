@@ -6,6 +6,7 @@ commands:
   - radius auto
 see_also:
   - results-ci
+  - authoring-prompt-sections
   - results-compare
   - results-statistics
 next:
@@ -40,8 +41,20 @@ changes:
 | `fixture` | a fixture name, a workspace file, `family:<id>`, or a literal value | blocks whose Given or expectations name it |
 | `criterion` | a judged criterion | blocks whose criteria name it |
 | `model`, `agent` | none | the whole suite |
+| `prompt_section` | `<prompt-id>#<section-id>` | the whole suite: selection by section links is advisory until links are verified by mutation |
 
 `global: true` on any change makes it the whole suite.
+
+A `prompt_section` change names a section of a prompt's section registry (authoring-prompt-sections).
+`radius --sections <registries>` then prints, after the radius, the advisory section selection: the
+blocks linked to the changed sections or to sections that reference, override or duplicate them, every
+block with no link or a stale link, and every later block of the same conversation. It is a report only:
+the radius stays the whole suite and every block runs. On the H7 mutation suite, declared links alone
+missed a block a mutant flipped in 3 of 90 single-section mutants and 9 of 110 with two-section ones;
+with the forward closure, 2 of 90 and 4 of 110.
+
+`radius localize` reads a stored campaign and ranks the local sections whose linked blocks failed, with
+inherited failures dropped (authoring-prompt-sections).
 
 The radius per run mode:
 

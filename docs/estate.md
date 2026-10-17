@@ -2,7 +2,7 @@
 
 This page extends [generating tests](../README.md#generating-tests) to agents whose behaviour is specified across an estate. It reuses the block model, the run modes, the runtime trace (skills, guards, stages), the checks, the map with axis and detail roles, approval with provenance and the space map. Nothing here is runtime-specific: each runtime is an adapter that reads its own files into these shapes. The Claude Code mapping is on [its adapter page](adapters/claude-code.md).
 
-Status. Built: `driftbench estate scan`, `lint`, `approve`, `map`, `plan` (with `plan approve`), `generate`, `diff`, `impact`, `static`, `unit` (guards and scripts), `stats`, `run` (the live runner), `mutate` (estate mutants), and `driftbench replay`. Not built yet: the unit run of a helper alone, and the estate pilot of section 7. The live runner and the mutants, with a run on the fixture's stand-in command, are in the [CLI reference](reference/cli.md#driftbench-estate-run-and-driftbench-estate-mutate).
+Status. Built: `driftbench estate scan`, `lint`, `approve`, `map`, `plan` (with `plan approve`), `generate`, `diff`, `impact`, `static`, `unit` (guards and scripts), `stats`, `run` (the live runner), `mutate` (estate mutants), and `driftbench replay`. Helper unit tasks use a declared local executor; the estate pilot of section 7 is not built yet. The live runner and the mutants, with a run on the fixture's stand-in command, are in the [CLI reference](reference/cli.md#driftbench-estate-run-and-driftbench-estate-mutate).
 
 ## 0. What changes when the agent is an estate
 
@@ -12,7 +12,7 @@ A code-interpreter agent is an estate. Its behaviour is written in many places: 
 
 Two things change, and only two:
 
-1. The specification is distributed and mostly structured. So the map is extracted from the estate by code wherever the file has structure (frontmatter, settings, registries, step lists, routing tables), and by a model only where the specification is prose (instruction bodies), with a person approving the prose atoms.
+1. The specification is distributed and mostly structured. So the map is extracted from the estate by code wherever the file has structure (frontmatter, settings, registries, step lists, routing tables), and code proposes conservative candidates from normative prose (instruction bodies). A model can split that prose further. A person approves prose atoms from either source.
 2. The situation space has more axes and more ways to deviate: the session state, the workspace, the helpers, the guards, the environment. The deviation classes grow by the estate's own hazards (compaction, restart, rate waves, a stale tracker, dead helpers).
 
 The rest is the model a prompt agent already has: a block is Given, When, Then; the checks on skills, guards, stages, tools, executions, workspace, artifacts and text; judged criteria only where no check can decide.
@@ -33,8 +33,8 @@ No command on this page calls a paid model. The Northwind map is scanned with re
 
 | Command | What it does | Exit codes |
 |---|---|---|
-| `driftbench estate scan <root> --out <map.yaml>` | Reads an estate into a map of atoms and edges: code reads the structure, a model splits the prose. `--runtime claude-code` (the one runtime today), `--replay <answers>` replays recorded answers instead of calling a model, `--no-model` reads the structured atoms only, `--provider <name>` (anthropic or openai), `--ceiling <characters>` (default 40000), `--ignore <glob>` (repeatable) skips the paths it matches beside the defaults and the `ignore:` list of the [configuration file](#the-estate-configuration-file), `--force` replaces an existing map (its approvals are lost). `--replay` and `--no-model` do not go together. | 0 written; 1 written, but a prose chunk failed or an atom was refused (both listed); 2 usage or input error, nothing written |
-| `driftbench estate lint <map>` | Checks the estate against its map: the codes of section 2. `--ceiling` and `--ignore` as for scan. | 0 clean (unenforced rules alone are reported, never failing); 1 findings or an invalid map; 2 the map or the estate cannot be read |
+| `driftbench estate scan <root> --out <map.yaml>` | Reads an estate into a map of atoms and edges: code reads the structure, a model splits the prose. `--runtime claude-code` (the one runtime today), `--replay <answers>` replays recorded answers instead of calling a model, `--no-model` reads structured atoms and unapproved code-found prose candidates, `--provider <name>` (anthropic or openai), `--ceiling <characters>` (default 40000), `--ignore <glob>` (repeatable) skips the paths it matches beside the defaults and the `ignore:` list of the [configuration file](#the-estate-configuration-file), `--user-skills <folder>` also reads the user-level skill layer from that folder (none is read without it), `--force` replaces an existing map (its approvals are lost). `--replay` and `--no-model` do not go together. | 0 written; 1 written, but a prose chunk failed or an atom was refused (both listed); 2 usage or input error, nothing written |
+| `driftbench estate lint <map>` | Checks the estate against its map: the codes of section 2. `--ceiling`, `--ignore` and `--user-skills` as for scan; a map scanned with a user layer needs the folder again. | 0 clean (unenforced rules alone are reported, never failing); 1 findings or an invalid map; 2 the map or the estate cannot be read |
 | `driftbench estate approve <map>` | With no flag, lists the atoms that wait. `--kind <kind>` and `--atom <id>` (each repeatable) or `--all` approve in place, keeping comments and layout; `--to <file>` writes the approved map beside the original instead. | 0 listed or approved; 1 invalid map, unknown kind or atom; 2 missing file or options that do not fit |
 | `driftbench estate map <map> --to <space.yaml>` | Writes the space map of the situation axes and the approved axis atoms, for `driftbench space`. `--all` takes unapproved atoms too; `--agent <name>` names the agent (default: the estate folder name). | 0 written; 1 invalid map or space map; 2 missing file or `--to` |
 | `driftbench estate plan <map> --out <plan.yaml>` | Derives the test plan from the approved map, and writes `<plan>.summary.json` beside it. `--t <n>` (default 2), `--space <file>`, `--k <n>` (default 3), `--force`. | 0 written; 1 invalid map, invalid space map, or a space map that does not match the map; 2 usage or input error, nothing written |
@@ -53,7 +53,7 @@ An atom is one place where the estate says what the agent must do, with a quote 
 
 | Kind | Where it lives | Extracted by | Evidence in a trace |
 |---|---|---|---|
-| Instruction (a rule: obligation or prohibition with a situation) | CLAUDE.md, skill bodies, agent bodies, memory files [standing instructions] | model proposes, person approves | a required act happens (a tool call, a skill load, a card, a read) or a forbidden act does not |
+| Instruction (a rule: obligation or prohibition with a situation) | CLAUDE.md, skill bodies, agent bodies, memory files [standing instructions] | code or model proposes, person approves | a required act happens (a tool call, a skill load, a card, a read) or a forbidden act does not |
 | Gate (order: before X do Y) | "Before X: Read Y" lines, plan-mode rules, read-before-write rules | code for the fixed forms, model for the rest | an ordered pair: Y before X |
 | Route (trigger: an ask of class X loads skill or agent Y) | skill descriptions, routing tables, agent descriptions | code (frontmatter and routing tables) | the Skill tool call or the Agent dispatch |
 | Skill (the unit) | SKILL.md: trigger, instructions, references, scripts, its own guards [capability bundle] | code | the load, then its instruction atoms |
@@ -64,13 +64,17 @@ An atom is one place where the estate says what the agent must do, with a quote 
 | Tool | permission rules of the settings file (allow, deny, ask), the tools a skill declares | code | a tool call within its rule; a denied tool never called |
 | Setting | the model, the default permission mode, environment keys (never a value) | code | the run's configuration |
 | Stage | the step list the estate defines (plan, do, verify, report; a step allowed at any point) [stage catalogue] | code | stages reached, in order |
-| Register (output rules) | language, length, format, forbidden words, tone | model proposes, person approves | the reply text: counts, language, words |
+| Register (output rules) | language, length, format, forbidden words, tone | code or model proposes, person approves | the reply text: counts, language, words |
 | Hazard | a passage of the estate that names a runtime hazard (compaction, a new session) | code | recovery after the event |
 | Invariant (static) | the size ceiling of the standing instructions, no orphan file, anchored guard paths, a complete check registry | code | a property of the estate's files, no run |
 
-Every atom carries: an id (`kind.scope.slug`, stable and valid as a space value id), its kind, its title, its provenance (file, line span, quote, and a SHA-256 hash of file, span and quote), `producedBy` (code or model), its role (axis or detail), `approved`, the situation it applies in, its evidence predicates (typed: `skill_loaded`, `skill_not_loaded`, `guard`, `tool_called` with input fields, `tool_not_called`, `ordered`, `stage_reached`, `workspace`, `artifact`, `text`, `static`, `custom`), and its enforcement: the guards that already check it. Empty enforcement means "trusted", which is a finding of its own.
+Every atom carries: an id (`kind.scope.slug`, stable and valid as a space value id; a skill's files take their scope from the skill's declared name, so a skill folder renamed with its name kept keeps every id, and two skills that declare one name keep their folder names as scopes), its kind, its title, its provenance (file, line span, quote, and a SHA-256 hash of file, span and quote), `producedBy` (code or model), its role (axis or detail), `approved`, the situation it applies in, its evidence predicates (typed: `skill_loaded`, `skill_not_loaded`, `guard`, `tool_called` with input fields, `tool_not_called`, `reference_not_read`, `subagent_not_dispatched`, `guard_not_fired`, `stage_not_reached`, `artifact_not_created`, `file_not_written`, `ordered`, `stage_reached`, `workspace`, `artifact`, `text`, `static`, `custom`), and its enforcement: the guards that already check it. Empty enforcement means "trusted", which is a finding of its own.
 
-A guard's evidence carries the verdict of its check registry row. A guard with no row has evidence with no verdict: any verdict counts, as in the guards check.
+A guard's evidence carries the verdict of its check registry row. A guard with no row has evidence with no verdict: any verdict counts, as in the guards check. A guard source may declare its verdict on a line of its own, beside `Enforces:`, in a comment or a docstring (`Verdict: deny`; one of deny, block, warn, nudge, allow, ask). The registry row always wins when there is one; the declaration is read only for a guard without a row, and the guard atom then carries `fields.verdictFrom: source`. A declaration never makes a missing registry row acceptable: `REGISTRY_ROW` is still reported.
+
+Guard atoms also retain their rule descriptions in `fields.ruleText`. `ruleSources` records each description's file, line span, exact source quote, text and origin (documentation, message or registry). The scanner statically reads the resolved guard script's docstrings, comments, usage and literal output messages, including named literal constants passed to output calls. It never executes a guard while scanning. Unused implementation strings supply no description. These descriptions enrich the guard; they do not become independently inferred instruction atoms or prove that a guard ran.
+
+A registry description is independent of its rule-label links. Markdown description and watch columns, and JSON or YAML description, meaning, purpose or summary fields, retain their text. Structured check mappings can be found without a registry filename, including id-only rows whose id occurs in a configured guard's source. A command row uses the same source-and-usage dispatcher resolution as a configured guard. `fields.rules` keeps each matched registry description with its check id, declared verdict, enforcement state and source. The guard's existing evidence keeps its selected registry verdict; a description alone never invents one.
 
 Not read yet: MCP server files, deferred tools and plugin folders. A runtime hazard is an atom only where the estate's prose names one (two in the Northwind estate), since an atom needs a file quote; the runtime's fixed list of hazards lives in the space map (section 3).
 
@@ -78,9 +82,43 @@ Not read yet: MCP server files, deferred tools and plugin folders. A runtime haz
 
 The scanner has one interface, the estate reader: it returns the files with their kinds and the declarations parsed from them, each with the exact passage it was read from. The Claude Code reader is the only part that names a runtime's file layout.
 
-Code reads skills, helpers, guards (settings and skill frontmatter), permissions, settings (environment keys only, never a value), the check registry, the step list, references with their "read when" line, scripts, routing table rows, gates in four fixed forms ("Before X: Read Y", "Before X, read Y", "Read Y before X", "Do not X until you have read Y"), passages that name a runtime hazard, and the four invariants. Code atoms are approved as read.
+The reader batches independent filesystem metadata checks and file reads with bounded concurrency, while keeping sorted traversal, file and diagnostic order. It carries canonical directory paths through ordinary descendants, resolves symbolic links at their boundaries (links under `.claude/`, such as a skills folder shared from a library, are followed even when they lead outside the estate root, and the map lists each one it read in `followedLinks`, by its path from the root; a link beside the layout is not followed, and a file that a standing file only names and whose real path lies outside the root is an external reference: it is noted and never read), and reuses each link target's metadata for its size check. A shared traversal result and an active ancestor set avoid copying whole descendant lists and ancestor sets at every directory level. These are read-local optimizations: later scans read the filesystem again.
+
+Scanner lookups index atoms, registry rows, file names and line offsets, and reuse chunk lines within a scan. These indexes preserve atom IDs, source spans, candidate order and lint findings; each scan reads its files anew.
+
+Code reads skills, helpers, guards (settings and skill frontmatter), permissions, settings (environment keys only, never a value), the check registry, the step list, references with their "read when" line, scripts, routing table rows, gates (read prerequisites), passages that name a runtime hazard, and the four invariants. Structured code atoms are approved as read; code-found prose candidates require approval. Routing tables are classified from cell content, not header words. A column naming declared skills or helpers pairs with a column of distinct free multi-word request descriptions to give routes, in either direction and in any language. English grammatical evidence can strengthen that decision but is never required. Target cells may use any wording and name several units. Scalar categories, quantities, paths, dates, names and code lists are attribute values; short values repeated across rows also identify inventories. Attribute columns give no routes. A mixed attribute/request column or conflicting request/target columns gives no code route when the roles cannot be decided. Such a table is recorded as ambiguous in reader notes and flagged in the model's prose request. Only that flagged table can yield a model-proposed route; its quoted span and declared target are validated, and approval remains required. These decisions do not inspect the header labels, with one exception: a cell or header that states what a unit does not do gives no route, because a route states when to use it. A header that holds a negation ("It cannot do", "Does not handle"), a column whose cells mostly open with a declarative negation ("Cannot book a berth", "Does not take payments", "Won't send") and a single such cell are limits; the other columns of the table are read as before, and a table of limits only gives no route and is not ambiguous. A prohibition addressed to the agent ("Do not share the key", "Never move the shift") is a rule and stays a request a table may bind to a unit, and a negation inside the situation described ("a tide that has not come in") changes nothing. English grammar only marks a limit; in a language it cannot parse a cell is read as before.
+
+The user-level skill layer is a second skill layer beside the project's. An agent loads the skills of the current user as well as those of the project, but the layer is opt-in: the reader never reads a home folder on its own, so a scan gives the same map on every machine. It reads the user skill folder (usually `~/.claude/skills`) only when one is named: the `--user-skills <folder>` option, the `userSkills` key of the configuration file (relative to the estate root), or `userSkills` of the reader in code; the option wins over the file. Without one, a populated home folder changes nothing. A folder of the layer that holds a `SKILL.md` is a skill. A folder that holds none is a container, such as a folder of synced skills, and the folders one level inside it are looked at the same way. A link to a folder elsewhere is followed. A folder whose name starts with a dot (a repository, an archive), a dependency folder (`node_modules`) and a container named `Trash` or `trash` (any case) are not read; a folder named trash that holds a `SKILL.md` is a skill. An empty `--user-skills` value is refused (exit 2) and so is an empty `userSkills` reader option (a `RangeError`), since an empty path would name the working folder; `~` and `~/x` are expanded against the home folder. A relative `--user-skills` folder is relative to where the command is typed, a relative `userSkills` of the configuration to the estate. Precedence: the project layer wins. A user folder that is a project skill's own folder (a link into the project) is the same skill and is read once; a user skill with the name of a project skill is left out with a note. Within the layer the first folder, by name, keeps a name. The files of the layer carry the path `~/.claude/skills/<folder>/...` in the map whatever folder they were read in, so a map holds no private path; the layer is no part of the project, so a copy of the estate (for a unit run or a mutant) holds none of it, and an atom read from it has no mutant. A scan that read a layer records `userSkills: true` in the map. `estate lint` needs the folder again (`--user-skills <folder>` or the configuration) and refuses a map that records a layer when it is given none (exit 2), because the layer's atoms cannot be checked without it. A folder that was named and cannot be read is a note. The layer feeds the graph (its skills, rules and references are atoms) but the lint reports on the project: a file of the layer is never an orphan or unreachable, a reference or script of the layer that does not exist is no finding, and the invariant "no file of the estate is an orphan" is measured on the project's files. The scan prints how many skills it read from the layer.
+
+Recovery hazards follow the participants of each event. Restart and resumption refer to the agent's runtime; rate limits affect the agent or its outgoing calls. An explicit unrelated participant or an outgoing API policy is not a recovery hazard.
+
+Gates are read as clauses, not as fixed strings. Each inline code span, markdown link and quotation is one opaque token, so a file name such as `docs/release.v2.md` or `release notes.md`, a quoted command, or a sentence quoted as an example is never split or read as a rule. A line is cut into clauses at sentence ends, semicolons and coordinated directives (", and read ..."). A clause is a gate in these forms: "Before X: read Y", "Before X, read Y", "Prior to X, read Y", "Read Y before X", "Read Y first, then X", "Do not X until you have read Y", "Never X without reading Y", "X only after reading Y" and "X? Read Y first". Any polite, modal or adverbial lead-in may stand before read ("Please", "You must", "It is essential to", "If a fix is asked for,"). A negated, optional or conditional lead-in gives no gate ("Do not read", "You need not read", "Optionally, read", "If you read"); a negation in a leading condition ("If no objection is raised,") or in the act itself does not cancel the read. X must be an act (a verb such as edit, commit or send), never a time, a meal or a past event.
+
+No marker is required. The same parser accepts "Before X read Y", "To/for/when/if X, read Y first", "Read Y first when X", "X requires reading Y", "X requires Y loaded", "Before X, Y must be read/loaded" and "Never X until Y is loaded/has been read". A declared skill name in a loaded prerequisite gives `skill_loaded` evidence and a `skill:<name>` ordering anchor; a file gives a Read anchor. Unknown bare names in a loaded prerequisite are unresolved and yield no code gate. A leading condition stays in the gate's situation, while its action determines the ordering endpoint. Negated requirements, optional reads, hypothetical requirements and quoted examples yield no gate. A standalone "read Y first" inherits its nearest action heading, ending at the next heading; the source span includes that heading. Without a stated action or action heading, it gives no ordered pair. Action grammar admits imperative verbs beyond the built-in tool vocabulary.
+
+Lines that look like what code reads and are not. A hazard word inside a quotation that the line offers as a sample of how some text reads ("an error reads like \"rate limit exceeded\"", "for example, `restart pending`") names no hazard; so does a quotation introduced as an example, a sample, a phrase or a literal, or as what a message says or shows. Inside a condition ("if the API answers \"rate limit exceeded\", wait") or defined as a signal ("treat \"rate limit exceeded\" as a signal to wait") it does, and so does a hazard named outside the quotation on the same line. A script anchors on the body line that runs it: a run, execute, use or call directive and every command of that directive (the executable after assignments, `exec`, `env` and an interpreter's flags), a whole-line command, or a link to the file. A mention in passing, an argument passed to another script, an inline interpreter program or a forbidden run anchors nothing; with no such line the script anchors on its own file. File history is read per occurrence and per clause. A completed active removal, retirement, rename or replacement affects its direct file object: in "`new.md` replaced `old.md`", only `old.md` is past. A passive affects its file subject: in "`old.md` was replaced by `new.md`", only `old.md` is past. Object and subject lists can coordinate files, while coordinated predicates have separate scopes: "retired `a.md` and kept `b.md`" keeps `b.md`. A passive auxiliary can carry into a coordinated passive ("`a.md` was retired and `b.md` deleted"). Complements introduced by with, by, to, from, about or other prepositions are not the affected file. Negated, conditional and future removals stay references. An active history predicate needs a stated actor or a changelog entry with an omitted actor. A history word used as a file modifier ("read retired `guide.md`") is not a removal predicate. Unknown grammatical roles stay references. Each occurrence is independent, so "`notes.md` was removed; read `notes.md`" retains the later read. Whole reference tokens, including path and extension, are matched; `old-rules.md` never makes `rules.md` historical.
 
 Names that fit several files. A body often names a file by its bare name, `guide.md`, and an estate can hold several files of that name. A user needs the reference to land on the file the author meant, or to be told that it is ambiguous, never bound to one at random. The rule: a name is looked up in the naming file's folder, then in the folders below it, then from the estate root. The first place that holds the file wins. When a bare name fits no file there and several files elsewhere, the reference atom keeps every candidate in `fields.candidates`, sorted, and `estate lint` reports `AMBIGUOUS_REFERENCE`. Files under the ignored folders (`node_modules`, test folders of the guards, `.trash`, `skills/synced`, `__pycache__`) are never candidates. A name that holds a folder (`references/guide.md`) is resolved from the naming file's folder and is never ambiguous.
+
+### Code-found prose candidates, model budget and cache
+
+Without a model, scan proposes instruction and register candidates from the prose of standing instructions, memory, skill bodies, skill reference files (markdown and text only) and helper bodies. A candidate is a clause that governs the agent: it addresses the agent (a bare imperative, a second-person subject, an agent-role subject, or an output the agent writes, such as a reply or a summary), in a normative mood (a modal, an imperative, “never”, “always”, “only when”), in the present tense, about a future act. The forms are modal obligations and prohibitions (“must”, “should”, “shall”, “needs to”, “must not”), negative and universal directives (“never”, “always”, “do not”, “don't”), bare imperatives (“Keep replies short.”), output norms (“Replies stay under 80 words.”), conditional acts (“Before X, do Y”, “If X, do Y”, “Do Y only when X”, “Do not Y unless X”), numeric upper bounds, and quantified subjects (“every reply includes a source”, “each helper records its findings”, “every run is logged”).
+
+A habit stated in the present tense is a rule only when its subject is the agent, an agent role the estate declares (a skill or helper name), or an output, when the sentence addresses “you” or “we”, or when the nearest heading introduces rules (“Rules”, “Conventions”, “Guidelines”, “Instructions”, and kin). Elsewhere “each X does Y” and “the tool never retries” describe a system and give no candidate. The tagger reads the sentence; English function words and the names the estate declares are the only closed classes, and no domain word list is used.
+
+These do not give a candidate: a description of a system or of a third party (“users must sign in”, “the contract says suppliers must pay”: a subject that names another party, or a reporting verb before the modal); the past, a history entry or a log line (a dated or versioned line, “Added: ...”, “previously”, “we decided that”); a conditional consequence (“if you never X, Y happens”: a modal inside a subordinate clause); a line marked wrong (“Wrong:”, “Bad:”, “✗”, an anti-pattern section); a transcript line spoken by someone else; documentation that belongs to another project (a vendor or third-party folder, a folder with its own package manifest below the skill, a declaration file, or a file that says a tool generated it); and a document a tool printed (a build-output folder such as `dist` or `coverage` below the skill, a log or report whose lines are mostly timestamps, levels and pass or fail marks, or a file with terminal escapes). A heading or label is no rule by itself: a line that ends in a colon introduces what follows, a step or phase label ("Step 1", a dash, a title) and a title after a dash with no closing punctuation are headings, and a short label before a colon or a closed sentence ("Rule: never X") leaves the sentence to be read on its own. A result or report line ("Result", a dash, "two fixes landed"), a checklist item ("[ ] ..."), a clause that holds a template placeholder (`<<<name>>>`, `{{x}}`, `${var}`, `<id>`, `TODO`, `...`), a sentence cut at an abbreviation, and a paragraph or list that follows a line saying it is wrong ("**Wrong:**") give no candidate. An obligation with a calendar deadline ("by Friday", "within a week") is owed by people, not by an agent session, unless its subject is the agent, a declared skill or helper, or an output. A line that only names a document or a section ("Release notes for v2.", "Link to the dashboard.", "Answer to the second question.") is a title: a noun the tagger's lexicon knows, or a bare singular noun after the first word, followed by "for", "of", "from", "about", "to" or "on", in a short line with no second verb. A statement of what a thing has or is made of ("each helper has its own folder") and a passive of what happens to an output ("replies are sent to the channel") describe. "The sandbox cannot reach the network" describes; "You can't push to main" is a rule. "Use when the user asks for X" says when a skill applies. A rule whose act is an inline code span ("Never `git push --force`") keeps the span as the act. A changelog, history, journal, template, example, fixture or archive document, or such a section of a live document (see [document roles](estate-document-roles.md)), gives no candidate. A verb with one bare word ("Run tests.", "Use this.") says too little to be a rule and gives no candidate; an adjective completes it ("Be concise."). Any other quote under 25 characters is proposed with `fields.short: true` and `fields.confidence: low`. A clause whose act has only a pronoun for an object (“do not write it”) is proposed with `fields.partial: true` and `fields.confidence: low`: its referent is in an earlier sentence.
+
+Each proposal has `producedBy: code`, `approved: false`, an exact quoted source span, and `fields.candidate: true`, `fields.extraction: code-found`, `fields.scope` (`estate`, `skill` or `helper`), `fields.owner` for a skill or helper, `fields.subject`, `fields.polarity` and `fields.form`. Output subjects and direct reply directives propose register atoms. Its `prose_candidate` custom predicate marks evidence that still needs review; code does not pretend to have derived an executable assertion. A clause that fails, or whose quote the extractor's own quote check cannot find at its lines (a quote that ends in an escaping backslash), is skipped; the skip, its source lines and its reason are recorded in the scan notes and counted in the scan summary. It does not abort the scan or prevent writing the map. A whole file the pass cannot read is skipped and counted the same way. Proposals enter plans only after approval. They are candidates, not a proof that every sentence is a rule.
+
+Markdown headings, questions, block quotations, inline quotations and code, fenced or indented code, HTML comments, tables and example/history/template sections supply no candidates. Exclusion tracks whole files, so chunk boundaries do not turn a fenced example into a rule. A quotation mark never hides more than its own paragraph, so a stray one (a 5" pipe) does not hide later rules; an unclosed fence or HTML comment does hide the rest of its file, as in Markdown. Soft line wrapping preserves the quote and its line span. Lines are found by index, so the pass stays linear in the size of a file. Sentence and semicolon boundaries keep separate clauses and their polarities separate; setext headings and tables without outer pipes remain excluded. A structured rule at the same passage takes precedence. A successfully answered model chunk supersedes code-found proposals for that chunk; failed or unprocessed chunks retain candidates. This keeps the richer model extraction authoritative without assigning it code-found provenance.
+
+Before the CLI makes any model call, it prints the pending chunk count and source characters, the cached count and characters, and the total. These are input-size estimates, excluding prompt overhead and model output; they are not currency quotes. `--replay` prints the same estimate but makes no paid calls. `--no-model` continues to list prose not processed by a model even when candidates were found.
+
+Live model scans cache validated chunk answers in `.cache/estate-prose/` beside the output map. A SHA-256 key includes chunk content, source file, model family/name, token budget, extraction prompt and ambiguous-routing context. An unchanged chunk is not sent again, including when its line numbers change. Changing one chunk invalidates that chunk. Changed model settings or prompt invalidate the affected entries. The located occurrence is cached as a relative line hint, so repeated quotations retain their selected occurrence when a chunk moves. Cached quotes are located and checked against current source spans again; cached answers do not carry approval. Malformed cache entries are misses; failed calls and refused answers are not cached. Recordings bypass this persistent cache so replay remains an explicit recording test. The cache holds private source excerpts and must stay out of version control.
+
+The library exposes `FileProseCache`, `ProseCache`, `proseCacheKey`, `proseEstimateLine` and `beforeModel` on `scanEstate` and `scanAtoms`. Library callers opt into their cache and estimate callback. The CLI supplies both automatically.
+
+The Northwind command captures below precede code-found candidates and the pre-call estimate; their historical counts describe the committed recordings.
 
 The model only splits prose chunks (the standing file, memory files, skill and helper bodies) into instruction, gate and register atoms, one call per chunk, with a strict JSON answer. Every quote is located in its file, inside its chunk, and checked at its span; an atom whose quote cannot be placed is refused and listed with its reason. A model atom that repeats an atom code already read is skipped and listed. An unreadable answer gets one retry. Model atoms wait for a person.
 
@@ -166,7 +204,7 @@ Wrote _captures/docs3/estate/map.yaml: 122 atoms (68 read by code and approved, 
 Next: driftbench estate lint _captures/docs3/estate/map.yaml; driftbench estate approve _captures/docs3/estate/map.yaml --kind instruction
 ```
 
-The written map equals the committed `examples/estates/fixture/map.yaml` but for the root it records and the time of the scan. With `--no-model`, the same estate gives the structured atoms only:
+The written map equals the committed `examples/estates/fixture/map.yaml` but for the root it records and the time of the scan. The historical `--no-model` capture below gives structured atoms only; current scans also propose unapproved prose candidates:
 
 ```
 $ pnpm -s driftbench estate scan examples/estates/fixture --no-model --out _captures/docs3/estate/map-nomodel.yaml --force
@@ -197,16 +235,43 @@ Next: driftbench estate lint _captures/docs3/estate/map-nomodel.yaml; driftbench
 
 The map is YAML with a header on how to approve it, `producedBy` per atom and, for the map, the model family and model that split the prose. The loader recomputes every provenance hash and the map hash, so a map whose quote or span was edited is refused; `approved` and `role` may be edited by hand.
 
+### Document roles and navigation
+
+The reader classifies document authority before reading declarations or passing prose to the scanner. The map records each document's role and structural reasons under `documents`: normative, changelog, history, template, example, journal, fixture or archive. A mixed document retains its live sections and records the non-normative line spans separately. Repeated dated entries and append-only log structure identify historical records. Placeholder value slots identify fill-in templates. Example headings, illustrative blocks and navigation folders identify non-normative material. One incidental date or a variable path in a live procedure does not change its authority.
+
+Non-normative documents remain navigation targets. Their bodies yield no rules, gates or hazards, and their outgoing references are not linted as broken dependencies. A live prerequisite that names a template still requires that read. A record or store (changelog, history, journal, archive, fixture) outside every live skill is not an orphan or unreachable defect; a template, an example, or any file inside a live skill's folder that nothing names still is. Placeholders and examples never establish a missing file. A path whose extension names a document or script type, and which does not exist, is `MISSING_REFERENCE`; a pair, a ratio, a version or a dotted name is no reference at all. A quoted or linked filename with an extension that is absent is also `MISSING_REFERENCE`. A name with no extension or separator that resolves nowhere is informational `UNRESOLVED_REFERENCE`; ambiguous names retain their existing findings.
+
+See [document roles and precision](estate-document-roles.md) for the role evidence, authority boundaries and independent synthetic measurement.
+
 ### The estate configuration file
 
-An estate may hold `driftbench.estate.yaml` at its root. The scan and the unit runner read it; every key is optional.
+An estate may hold `driftbench.estate.yaml` at its root, or at `.claude/driftbench.estate.yaml` (the root file wins; the second place is copied with the runtime's own folder, so a unit run of a copy or a mutant sees it). The scan and the unit runner read it; every key is optional. Tooling files are not instructions to the agent: the configuration file, and any file whose path it writes (a helper's executor script), are named by it and are neither orphans nor unreachable.
 
 | Key | Read by | Holds |
 |---|---|---|
 | `ignore` | `estate scan`, `estate lint` | globs of paths no runtime loads, skipped beside the defaults: version control, dependency and cache folders, logs, test fixtures, and the files an operating system or an editor leaves. Each glob is matched like a `.gitignore` line: without a leading slash at any depth, `**` across folders, a matched folder skipped whole. `--ignore <glob>` adds to the list for one run |
 | `externals` | `estate scan` | folders outside the estate a path may name, such as the project the agent works on. They replace the defaults, `docs/` and `_meta/` |
+| `userSkills` | `estate scan`, `estate lint` | the folder of the [user-level skill layer](#reading-the-estate-estate-scan) to read as a second skill layer (relative to the estate root); without it or `--user-skills <folder>` none is read. The option wins over it |
 | `aliases` | `estate scan` | a map from an alias, such as `REF`, to the folder or folders it stands for, relative to the root: `REF/a/b.md` then reads as `<folder>/a/b.md` |
-| `scripts` | `estate unit` | per script path, its fixtures: `args`, `stdin`, `files` (name to text, written in a fresh working folder) and `expect` (`exitCode`, default 0; `stdout`; `stdoutIncludes`, a list) |
+| `helpers` | `estate unit` | per helper name, a local executor `command` argument array and optional positive `timeoutMs`; the unit runner sends the current body and task on stdin |
+| `scripts` | `estate unit` | per script path, a fixture list or `{ usage, fixtures }` contract: `args`, `stdin`, `files` (name to text, written in a fresh working folder) and `expect` (`exitCode`, default 0; `stdout`; `stdoutIncludes`, a list) |
+
+A helper executor and the fixtures of a script, as the unit runner reads them (`helpers` and `scripts` keys; YAML anchors may share one executor):
+
+```text
+helpers:
+  route-planner:
+    command: [python3, .claude/stand-in-helper.py]
+    timeoutMs: 10000
+scripts:
+  .claude/skills/shipment-tracker/scripts/track.sh:
+    usage: track.sh <carrier code> <tracking number>
+    fixtures:
+      - args: []
+        expect: { exitCode: 2 }
+```
+
+For a helper, the runner compares the copy's files before and after the executor runs and supplies that `workspaceDiff` when the executor reports none, so `expect.workspace` is decided on what the run changed. The same holds for the files a declared script fixture writes in its case folder.
 
 A key with the wrong shape is reported as a note of the scan and left out. [`examples/estates/reader-cases/driftbench.estate.yaml`](../examples/estates/reader-cases/driftbench.estate.yaml) uses `ignore`, `externals` and `scripts`.
 
@@ -245,16 +310,27 @@ Edges, decided by code:
 | Edge | From, to |
 |---|---|
 | route | a route atom to the skill or helper it loads |
-| reference | a skill or helper to a file its body names |
+| reference | a skill or helper to a reference atom in a file it owns: its own file and, for a skill, the files of its own folder that its citations lead to, each read once (a file in the skill folder that nothing names has no owner). Edges are direct: a file outside the folder that several units cite, such as a shared index, is cited by each unit with one edge and its own citations belong to no unit's edges, so an index cited by 57 units and citing 3,500 files stores 57 edges and not 200,000. What a unit reaches by following citations is computed on demand (`filesReached`, `citationsByFile`) and never stored |
 | script | a skill to a script it ships |
-| dispatch | a skill or helper to a helper its body names |
+| dispatch | a skill or helper to a helper its body names; by an imperative or obligation clause whose object or recipient is a known helper (quoted or plain). Predicate vocabulary is open; grammatical parts of speech distinguish actions from mentions. The helper name must end its noun phrase: a possessive, path suffix or following noun does not name that helper. Dispatch uses the gate clause boundaries and negation scope: prohibitions, optional acts, quoted examples, historical descriptions and noun phrases create no dispatch edge. Transfer objects are noun phrases ending at the recipient preposition; their determiners, possessives, quantities, modifiers and coordination do not restrict dispatch. Coordinated helper targets inherit the same directive and polarity |
 | enforces | a guard to a rule it checks |
 | event | a guard to the event it runs on (an event node `event.<name>`, not an atom; the loader allows such an end on event edges only) |
 | allows | a skill or helper to a tool or skill it may use |
 | next | a stage to the stage that follows it |
 | cites | a rule to a rule its words name by label |
 
-`enforces` is decided in this order, and the method is kept on the guard atom: a check registry row that names the guard's script and lists rule labels (R5) or quoted passages; a label the guard source declares (`Enforces: R3, R5`); a string of 16 or more characters in the guard source that repeats a rule's quote. Only instruction, gate and register atoms are enforced.
+`enforces` is decided in this order, and the method is kept on the guard atom: a check registry row that names the guard's script and lists rule labels (R5) or quoted passages; a label the guard source declares (`Enforces: R3, R5`); a string of 16 or more characters in the guard source that repeats a rule's quote. Only instruction, gate and register atoms are enforced. A rule label is matched without regard to case or an optional `#` (`r1`, `R#1` and `R1` are one label), wherever it is written: the rule's own definition, a registry row, an `Enforces:` declaration or a hash citation in a guard message. Ordinary prose that happens to hold `r1` defines and cites nothing. A string in a guard's source that holds only part of a rule counts when it reaches past the rule's condition: a message repeating only "the user asks to stop" of "When the user asks to stop, stop all work" repeats when the rule applies, not the rule (a registry row declares its passage, so any passage it quotes counts). A bare label after a known identifier-bearing entity noun names that entity, not a rule. The vocabulary covers the following broad classes; singulars and regular plurals are supported, with explicit irregular forms for appendix, entry and shelf. It is a lexical resource, not a claim to recognize every English count noun. Unlisted words keep the citation. Clear subject/verb contexts and ambiguous finite-verb inflections retain citations even for noun/verb homographs: "Agents label R1", "We permit R1", "Please record R1" and "Label R1 as mandatory" cite R1. At clause start a finite predicate can establish an entity subject ("Permit R1 is valid"). An explicit hash citation (`R#1`) always cites the rule.
+
+A JSON or YAML registry row lists the rules it checks under `enforces`, `rules` or `gates`, in one of four shapes. A scalar string that is a whole list of labels (`R3, R5` or `R3 and R5`) gives one rule label per entry; any other string is one quoted passage. A list holds any mix of these strings. An object `{ id: R3 }` names a label, and an object `{ quote: "Read the current record first." }` names a passage. A value that is empty, a number, a boolean or an object with neither key gives no rule. A rule label or passage found this way feeds the same `enforces` decision as a Markdown registry cell.
+
+| Entity class | Identifier-bearing nouns |
+|---|---|
+| Publications, records and their addressable parts | agreement, appendix, article, attachment, bulletin, chapter, column, contract, declaration, diagram, document, edition, entry, equation, exhibit, field, figure, form, letter, line, memo, page, paragraph, plate, plot, publication, record, report, revision, section, table, version, volume |
+| Transactions, credentials and administrative records | account, application, badge, bill, booking, case, certificate, claim, credential, credit, debit, invoice, license, order, passport, payment, permit, purchase, receipt, refund, registration, reservation, ticket, transaction, voucher, warrant |
+| Physical locations and storage positions | address, aisle, apartment, bay, booth, building, cabin, cell, counter, desk, dock, door, floor, hall, hangar, locker, office, platform, port, rack, room, row, seat, shelf, site, stall, station, terminal, warehouse, zone |
+| Inventory, logistics and transport units | aircraft, asset, batch, box, bus, carriage, carton, compartment, component, consignment, container, device, flight, item, label, lot, model, module, package, pallet, parcel, product, route, shipment, train, trip, truck, unit, vehicle, vessel |
+| Addressable software and data entities | branch, build, checkpoint, dataset, job, node, project, queue, release, repository, tab, widget |
+
 
 The graph answers what code can walk:
 
@@ -270,10 +346,11 @@ The graph answers what code can walk:
 | `ORPHAN` | a file nothing names |
 | `UNREACHABLE` | a file the standing instructions never lead to (orphans are listed apart) |
 | `UNENFORCED` | an instruction, gate or register atom no guard enforces: trusted, reported as a count, never failing alone |
-| `OVERSIZE` | the standing instructions are over the ceiling |
+| `OVERSIZE` | the standing instructions are over the ceiling, counted in Unicode characters (code points): an emoji is one character, never its bytes or UTF-16 units |
 | `UNANCHORED_GUARD` | a guard command finds its script from the working folder, not from an anchor |
-| `MISSING_REFERENCE` | a file a body names does not exist |
-| `MISSING_SCRIPT` | a guard command runs a script that does not exist |
+| `MISSING_REFERENCE` | a concrete path a live body names does not exist |
+| `UNRESOLVED_REFERENCE` | a name with no separator and no extension resolves nowhere; informational, never failing alone |
+| `MISSING_SCRIPT` | a guard command runs a script that does not exist; a dispatcher whose source passes a positional or parsed-option value to an executed or imported file path, or whose usage documents that file role, also names a missing target. A folder or filename never establishes dispatch; ordinary subcommands remain arguments. The bounded static reader follows argument identity through local assignments, interpolation, path joins, slices and unpacking into Python execution/import APIs, Node execution/require, Ruby load/require and shell execution. Data passed to a fixed program stays data; unknown code remains the outer script |
 | `REGISTRY_ROW` | a guard has no row in the check registry |
 | `REGISTRY_GUARD` | a registry row names a guard the estate does not run |
 | `QUOTE_DRIFT` | an atom's quote is no longer at its span: scan again |
@@ -347,9 +424,21 @@ The contract: every approved atom gets the mandatory test types of its kind. Neg
 
 Run modes: `guard_positive` replays a recorded event; `script_fixture`, `contract_alone`, `guard_negative`, `guard_hostile`, `guard_speed`, `guard_register` and `invariant` run as units; every other type runs live.
 
-Journeys: edge coverage over the route, reference, dispatch and next edges of approved atoms. A start node stands for the standing instructions: it points at the routes stated outside any skill or helper file and at the stages no `next` edge enters. Each path is a journey row listing its atoms in order. A route read only from a skill or helper description starts no journey; the Northwind estate has 7 such routes, reported as edges with no journey, and each still gets its contract rows.
+Journeys: edge coverage over the route, reference, script, dispatch and next edges of approved atoms. A script reached from a skill is part of the journey, so the generated live test checks its execution as well as the skill load. A start node stands for the standing instructions: it points at the routes stated outside any skill or helper file and at the stages no `next` edge enters. Each path is a journey row listing its atoms in order. A route read only from a skill or helper description starts no journey; the Northwind estate has 7 such routes, reported as edges with no journey, and each still gets its contract rows.
 
 Pairwise: a covering array of strength t (default 2) over the situation axes, under the constraint list, with the target dimensions merged into one: every pairwise row is one atom in one situation, with the first test type of its atom's kind, live. A constraint on one target atom is carried; one that names atoms of two kinds cannot hold for a single target and is dropped (and counted). In the Northwind plan the lower bound is the targets times the deviation values, 89 times 11, or 979; the array has 980 rows.
+
+### Situation relevance in a proposed plan
+
+The default plan derives target relevance from the estate's own behavioural text and evidence. It does not hold a situation-to-atom-kind whitelist. An instruction that calls a tool remains relevant to a tool failure. A dispatch instruction remains relevant to a helper event. A rule about the tracker remains relevant regardless of whether it is an instruction or a stage.
+
+For the event axes (`session_state`, `owner_signal`, `deviation`, `estate_hazard`), the planner compares the subject words of each value's title with the atom's own quoted rule, situation or unit description. It normalizes English inflections and omits grammatical context, code spans and paths. Atom ids, file names and custom check names supply no relevance. Typed evidence supplies observable capabilities: a positive tool call supplies tools; a dispatch supplies helpers; a text predicate supplies language. Explicit reply and answer rules supply language even when checked by a custom predicate. Routes and dispatches inherit the contract of the unit they reach, transitively; unrelated neighbouring rules supply no context.
+
+The baseline of each axis and an unperturbed long session remain available. When a situation has identified targets, inferred constraints exclude its combinations with other targets before the covering array runs. Coverage counts only tuples feasible under those constraints. Mandatory contract rows and journeys keep their own obligations. A situation with no identified target stays unresolved: its combinations remain in the plan, with an explicit note. A missing match never removes an entire situation to obtain vacuous coverage.
+
+This is a lexical proposal for review, not a proof of natural-language entailment. Synonyms and multilingual conditions may need declared relevance. Supplying `--space` makes that space authoritative: its values and constraints are used without inferred exclusions. The summary exposes every inferred exclusion in `relevanceConstraints` and explains unresolved situations in `notes`. These are proposed rows, subject to approval like the rest of the plan.
+
+The captured Northwind example below uses the explicit full space exported by `estate map`; its counts precede inferred relevance.
 
 The plan of the approved Northwind map:
 
@@ -418,6 +507,7 @@ Next: driftbench estate plan approve _captures/docs3/estate/plan.yaml --all, or 
 The written plan and summary are byte for byte the committed `examples/estates/fixture/plan.yaml` and `plan.summary.json`. How to read the counts:
 
 * "Mandatory rows per kind" counts contract rows, a row once for each kind it names: the skill line (111) holds its routes, instructions, references and scripts. "Rows per test type" counts every row, journeys and pairwise included.
+* The console prints a summary, never a line per item: each list (the edges with no journey, the rows adjusted to the space map, the notes) shows its first 10 lines, then one line that counts the rest and names `<plan>.summary.json`, which holds every one under `uncoveredEdges`, `adjusted` and `notes`. A list of 10 or fewer prints whole. A real estate with thousands of unreached edges prints under 100 lines.
 * A cell is a distinct pair of atoms and situation values over the rows. The plan reads no phrase bank, so every cell counts as a cell with no approved phrase.
 * `spaceHash` in the plan is the content hash of the space map used, derived from the map or given with `--space`.
 * The seed of the covering array and of the walk is fixed at 1; there is no flag for it.
@@ -438,13 +528,16 @@ Approved 1337 rows in _captures/docs3/estate/plan-approve.yaml; 0 were already a
 
 `estate generate` turns each approved plan row into one or more task specs, by code only, with no model call. Proposed rows wait (listed, exit 1); struck rows are skipped. Inputs that do not fit together (a plan of another map, an unknown or unapproved atom, an unknown test type, a bank naming an unknown atom or another map hash, a session ask that is no approved phrase) exit 2 and write nothing.
 
-Every field of the map, the plan, the phrase bank and the session index is in the [estate files reference](reference/estate-files.md). Two inputs sit beside the map. The phrase bank (`phrases.yaml`) holds `situations`: the atoms a situation sets off, what it is for (trigger, outside, near miss, misroute, pressure, resume), the workspace it starts from (`workspace`, the id of one of the bank's `workspaces` seeds, each a map of file path to text), the paths its ask may touch (`touches`: `created`, `changed`, `deleted`; every other path stays untouched), and its phrases, each approved or not. The session index (`sessions/index.yaml`) names recorded sessions, their situation and ask, and the atoms each session breaks. The Northwind bank is written by hand as a stand-in for the real flow (a model proposes phrases, a person approves them): 26 situations, 50 approved phrases, five workspace seeds: the operations folder, an inbox, open orders with the vans, a supplier order, and an invoice that differs from its order by less than 0.05 EUR per unit. A judged rule needs its own data in the workspace before an ask can set it off: the inbox, routes, shipment log and supplier situations exist for that.
+Every field of the map, the plan, the phrase bank and the session index is in the [estate files reference](reference/estate-files.md). Two inputs sit beside the map. The phrase bank (`phrases.yaml`) holds `situations`: the atoms a situation sets off, what it is for (trigger, outside, near miss, misroute, pressure, resume), the workspace it starts from (`workspace`, the id of one of the bank's `workspaces` seeds, each a map of file path to text), the paths its ask may touch (`touches`: `created`, `changed`, `deleted`; every other path stays untouched), and its phrases, each approved or not. The session index (`sessions/index.yaml`) names recorded sessions, their situation and ask, and the atoms each session breaks. The Northwind bank is written by hand as a stand-in for the real flow (a model proposes phrases, a person approves them): 31 situations, 60 approved phrases, five workspace seeds: the operations folder, an inbox, open orders with the vans, a supplier order, and an invoice that differs from its order by less than 0.05 EUR per unit. A judged rule needs its own data in the workspace before an ask can set it off: the inbox, routes, shipment log and supplier situations exist for that.
+
+Generation time is linear in the atoms, since the suite of a large estate holds about ten specs per atom. Each spec is checked as the object the generator built, and its file is written by a block writer for the ordinary map, sequence, single-line string and number, which gives the same bytes as the YAML library; a value outside that (a multi-line string, a date, a key that needs quoting) is written by the library, whole.
 
 How a row becomes a spec:
 
 * Given: `vars.estate` (runtime and map hash), the session state of the cell, the hazard of the cell as `vars.event`, and the workspace seed of the situation, inlined as `world.workspace.files`.
-* When: the situation the test type needs, found by the row's first atom (the situation holding most of the row's atoms wins; pinned cell values must agree); its approved phrases shuffled by the seed; the twin takes the second phrase. A replay row gives one spec per recorded session of its situation, asking with the session's recorded ask. A deviation of the cell is a perturbation before the ask, with an approved deviation phrase (`inject_at: 0`, recovery within one block). `stop_resume` adds a resume block.
-* When no approved phrase fits the row, code writes the ask from the atoms, so a row is never blocked by a missing phrase alone: the asks a route or skill description names ("Use when the user asks to X" gives "Please X."), a routing row, a description made imperative, for a guard the act its rule forbids, plus the situation of the rule under test. The controls get a neutral ask (outside), an ask to explain without acting (near miss), an ask that describes the act and names no skill (misroute: `Please <act>.`, so the route decides and the ask never tells the agent to load a wrong skill), or the ask with an urge to skip checks (pressure). Deviation and resume messages have code-written defaults too. The neutral asks, the only code-written asks that name no atom (`askFrom: neutral`), are "What kinds of things can you help me with? One sentence, and please change nothing." (the outside control) and "The helper stopped halfway. Pick its task up where it stopped and finish it." (the resume message). Every other code-written ask is made of the words of the atom `askFrom` names, its title, quote, situation or description, or of the unit that owns it, plus the fixed words of the forms above. Such specs carry the tag `ask:code`, `metadata.estate.ask: code` and the field the words came from (`askFrom`); an approved phrase always wins. `--no-fallback` turns this off. A code-written ask names a task: a verb of acting and its object, as a user would ask for work. It never restates the rule ("Please do this: never guess a status") or a bare condition ("Please handle this for me: the invoice is not in EUR"): such an ask tests whether the agent repeats the rule, not whether it follows it while working. The rule's situation becomes the task ("Where is shipment NW-55012?"). A guard that watches the user's prompt is the one exception: its test asks with the guard's own trigger ("Stop, that is enough for now."). The floor refuses, with the reason, an act that does not start with a verb (a unit's own description: "Read-only audit lane for ledger checks"), a guard's title (its event and name), a phrase cut mid-sentence, an act or situation that names a file of the estate (the ask would say which file to read) or holds code; the row gets `needs-askable-act` and waits for an approved phrase.
+* When: the situation the test type needs, found by the row's first atom (the situation holding most of the row's atoms wins, then the one whose own atoms share the deepest folder with files the first atom names; pinned cell values must agree). A guard without a listed triggering situation uses a situation of a rule it enforces; a tool boundary uses a situation listing the most rules from its own file. A guard control uses a situation explicitly approved for that whole guard; an outside situation of one enforced rule is not a guard-wide certificate. Its approved phrases are shuffled by the seed; the twin takes the second phrase. A replay row gives one spec per recorded session of its situation, asking with the session's recorded ask. A deviation of the cell is a perturbation before the ask, with an approved deviation phrase (`inject_at: 0`, recovery within one block). `stop_resume` adds a resume block.
+* When no approved phrase fits the row, code writes the ask from the atoms, so a row is never blocked by a missing phrase alone: the asks a route or skill description names ("Use when the user asks to X" gives "Please X."), a routing row, a description made imperative, for a guard the act its rule forbids (else, for a rule that asks for an act, the act of the tool the guard watches: "Please edit a file here." for an Edit or Write guard; none for a guard on the end of a turn (no request makes a reply break its rule without asking for the exception the rule allows), unless the bank holds an approved phrase that sets the guard off (a situation of use `trigger` naming it), which the row then takes and none for a guard on the user's prompt alone, which waits for an approved phrase; the ask never tells the agent to go against a rule), for a hazard a request to go on with the task after it happened, plus the situation of the rule under test. The controls get a neutral ask (outside), an ask to explain without acting (near miss), an ask that describes the act and names no skill (misroute: `Please <act>.`, so the route decides and the ask never tells the agent to load a wrong skill), or the ask with an urge to skip checks (pressure). Deviation and resume messages have code-written defaults too. The neutral asks, the only code-written asks that name no atom (`askFrom: neutral`), are "What kinds of things can you help me with? One sentence, and please change nothing." (the outside control) and "The helper stopped halfway. Pick its task up where it stopped and finish it." (the resume message). Every other code-written ask is made of the words of the atom `askFrom` names, its title, quote, situation or description, or of the unit that owns it, plus the fixed words of the forms above. Such specs carry the tag `ask:code`, `metadata.estate.ask: code` and the field the words came from (`askFrom`); an approved phrase always wins. `--no-fallback` turns this off. A code-written ask names a task: a verb of acting and its object, as a user would ask for work. The title of a rule is the rule, so it is never the ask: a rule is set off by the work it applies to, which is what the trigger of a gate names, else what the skill or helper that carries the rule is for, else the work of the route whose words the rule shares most (the first route when it shares none), since a rule of the standing instructions holds over any work. The one title used as an ask is a prohibition, whose forbidden act is the ask ("Never paste a credential" asks to paste one), which breaks the rule and does not copy it. A rule with no such work stays incomplete under `needs-askable-act`. It never restates the rule ("Please do this: never guess a status") or a bare condition ("Please handle this for me: the invoice is not in EUR"): such an ask tests whether the agent repeats the rule, not whether it follows it while working. The rule's situation becomes the task ("Where is shipment NW-55012?"). A guard that watches the user's prompt is the one exception: its test asks with the guard's own trigger ("Stop, that is enough for now."). The floor refuses, with the reason, an act of fewer than three words of letters, which is a verb and no object (the parts of a hyphenated compound count apart: "force-push a branch" passes, "force-push" does not), an act that does not start with a verb (a unit's own description: "Read-only audit lane for ledger checks"), a guard's title (its event and name), a phrase cut mid-sentence, an act or situation that names a file of the estate (the ask would say which file to read) or holds code; the row gets `needs-askable-act` and waits for an approved phrase.
+A gate with no trigger and no unit that carries it holds over no route's work, so its row stays incomplete under `needs-askable-act`. A gate trigger that opens with a gerund of a known verb is asked as the act ("editing any invoice file" asks to edit any invoice file).
 * Then, from the evidence predicates of the row's atoms:
 
 | Predicate | Check |
@@ -452,7 +545,7 @@ How a row becomes a spec:
 | `skill_loaded`, `skill_not_loaded` | `expect.skills` with a count |
 | `guard` | `expect.guards` (name, verdict, count) |
 | `tool_called` without input, `tool_not_called` | `expect.tools` with a count (0 forbids the tool) |
-| `tool_called` Read with one path (equal or contained) | `expect.references`, the glob `**/<path>` with a count |
+| `tool_called` Read with one path (equal or contained) | `expect.references`, the glob `**/<path>` with a count; explicit Read evidence requires a recorded file read unless the runtime declares that file auto-loaded |
 | `tool_called` Agent with a helper name | `expect.subagents` with a count |
 | `ordered` | the ordered-pair check, `rules.custom.ordered` |
 | `stage_reached` | `expect.stage` on the closing stage, and an ordered pair when the stage is not the last; stage order uses the immediate dominator in the step list, so a verify to do loop never makes do follow verify |
@@ -463,19 +556,47 @@ How a row becomes a spec:
 | `custom` hazard_recovery | `rules.custom.hazard_recovery`: after the hazard the agent goes on, rereads the paths its passage names, and does nothing destructive |
 | `custom` grounded_values | `rules.custom.grounded_values`: every number, identifier and date of the reply was seen in the user's messages or a tool result of the run (1,250.00 and 1250 are one value, 5 October 2026 and 2026-10-05 one date); a value only the agent wrote fails; whole numbers up to 10 are left alone |
 | `ordered` between two calls of one tool | ends anchored on what each call holds, `Bash~git status` before `Bash~commit`: the gate's first act and the verb of its trigger |
-| `stage_reached` on a step allowed at any point | `rules.custom.stage_seen`: the stage shows once in the block, wherever; not applicable when the runtime reports no stages (no stage record, so nothing to judge) |
+| `ordered` from a Read | the Read of what the gate reads: the file it names (`Read~<path>`), or, when it names none and its change acts on what it read ("read a file before you edit it"), the file of the change (`key: file_path`). A read of some other file never holds the gate |
+| `stage_reached` on a step allowed at any point | no order places it: `rules.custom.stage_seen`, the step shows once in the block, wherever, so a run that drops the step fails. Without a registered `stage_seen`, the step is never required: the closing stage alone, and with no single closing stage, `needs-stage-reach-check` |
+| `stage_reached` in a step list with no single closing stage | `rules.custom.stage_seen`: the stage shows once in the block, wherever; not applicable when the runtime reports no stages (no stage record, so nothing to judge) |
 | a control whose predicate has no machine inverse | with a judge, the judged control (the rule does not act outside its situation); without one, `needs-negation` |
 | `custom` max_words | `rules.custom.max_words`: a word limit on the draft (the largest fenced block, else the quoted lines, else from a Subject line on; inconclusive with none) when the rule speaks of a draft, else on the whole reply |
 | `custom` no_delete_under | `rules.custom.no_delete_under`: nothing deleted under the folder, read from the workspace diff, else from removal commands; a move is no deletion |
 | `custom` with a name no code checks (a domain rule) | a gating judged criterion whose rubric quotes the atom's own words and its situation; the spec is tagged `judged` and lists the atoms in `metadata.estate.judged`. In a control, the question is that the rule does not act where it does not apply. `--no-judge` leaves it `needs-registered-check` |
-| `custom` permission | `rules.custom.permission`: deny, no call the rule covers; allow or declared, a covered call none refused; ask stays a gap |
-| `custom` with a name the generator compiles | `command_not_run` to some_call; `max_characters`, `max_questions`, `no_secret_in_reply`, `currency_after_amount`, `stopped_and_confirmed` to `must_not` (and `execution.max_commands: 0`); `json_only`, `asks_for`, `route_table` to `must`; `same_language_as_user` to `lang`; `confirmed_before_send`, `asks_again_on_loose_yes` to `safety.confirm_before: [send]` |
+| `custom` permission | `rules.custom.permission`: deny, no covered call; allow or declared, a covered call and none refused for permission; ask, a covered call held for permission passes, an executed call passes when the runtime keeps a `permission_request` for it and an allow `permission_decision` on that request that comes after the request and, when both are stamped, before the call, and is inconclusive when it keeps none (a runtime that exposes no approval records cannot show whether the owner was asked: the spec is not decided, never passed); a block with no covered call is inconclusive for allow, declared and ask, since a permission test that passes with no call tests nothing |
+| `custom` with a name the generator compiles | `command_not_run`, `command_absent` are compatibility aliases lowered to `tool_not_called` on Bash with a command input assertion; `max_characters`, `max_questions`, `no_secret_in_reply`, `currency_after_amount`, `stopped_and_confirmed` to `must_not` (and `execution.max_commands: 0`); `json_only`, `asks_for`, `route_table` to `must`; `same_language_as_user` to `lang`; `confirmed_before_send`, `asks_again_on_loose_yes` to `safety.confirm_before: [send]` |
+
+Hazard tests assert recovery actions from their source contract for compaction, restart, rate limits, session boundaries, helper notifications and repeated nudges. Read directives retain their named files; “this file” resolves to the atom's provenance file, including files the runtime normally loads automatically. Run and execute directives supply concrete commands. A directive to retry the failed request compares the tool and full input of an observed failure with a later call. No action is invented from the hazard's name. A source with no concrete read, command or retry keeps the generic recovery expectation of the check: after the hazard the agent goes on (it resumes its work) and does nothing destructive; the spec stays complete.
+
+`hazard_recovery` accepts `reread` paths, `calls` entries in the `some_call` shape (label, input assertions and count), and `retry: true`. These obligations apply after the last matching event marker. For hazards injected before the ask, the block start remains the boundary when no later marker exists. Compaction without its marker is inconclusive. Failed reads do not restore context. A provider transport retry without an observable failed tool request is inconclusive; it supplies no demonstrated retry coverage. Existing continuation and collateral checks remain in place. A passage that orders a re-read of something that names no file ("re-read this file and the open tracker note") gets `reread` for the file only: the part with no path is never passed on the rest alone. With a judge, an advisory (not gating) judged criterion names that part and says it is unchecked by code (the spec is not tagged `judged`, as for a register title); a run that cannot show it does not fail on it; without a judge the row waits under `needs-registered-check`, whose detail names the part.
+
+### Typed absence predicates
+
+Absence is a typed family in `EvidencePredicate`, not a guess from a model's choice of words. These predicates forbid an observation within the tested block. Each compiles to a machine check. A scoped tool prohibition forbids only matching calls; unrelated calls remain allowed. Failed attempts still count as calls.
+
+| Predicate and example | Check and meaning |
+|---|---|
+| `{ type: skill_not_loaded, name: archive-publish }` | `expect.skills` with count zero: the skill never loads |
+| `{ type: tool_not_called, label: NetworkPost }` | `expect.tools` with count zero: no call of the tool |
+| `{ type: tool_not_called, label: Bash, input: { command: { contains: "archive --purge" } } }` | `some_call` with count zero: no matching command, even if it returns an error; input uses the normal assertion vocabulary |
+| `{ type: reference_not_read, path: "private/*.txt" }` | `absence`: no successful read of a matching reference |
+| `{ type: subagent_not_dispatched, name: archive-publisher }` | `absence`: no dispatch of the named helper |
+| `{ type: guard_not_fired, name: archive-access, verdict: deny }` | `absence`: no matching guard decision; omit `verdict` to forbid every verdict |
+| `{ type: stage_not_reached, name: publish }` | `absence`: no matching stage anywhere in the block's stage trace, including a stage carried into it |
+| `{ type: artifact_not_created, path: "exports/*.csv" }` | `absence`: no matching path in the workspace diff's `created` set; a pre-existing file may change |
+| `{ type: file_not_written, path: archive/catalogue.csv }` | `absence`: no matching path in either `created` or `changed`; deletions are separate |
+
+Path predicates use the check package's glob rules and normalize path separators. The `absence` check treats a missing required runtime list or workspace diff as inconclusive, never as proof of absence. Existing skill and tool checks keep their trace contracts. These are block observations: a net workspace diff cannot prove that a transient write followed by restoration never happened. Use `tool_not_called` with input assertions to forbid attempted write calls as well.
+
+`command_not_run` and `command_absent` remain documented custom compatibility aliases. Their `contains`, `regex` or `command` option lowers to the same scoped `tool_not_called` check; `command` means substring matching. New estates should use the typed form above. `command_forbidden` and other invented spellings have no built-in meaning. Direct `compilePredicate` calls on unknown custom names throw an error naming the predicate. Generation rejects unknown typed discriminants, including through the structural API. An explicitly custom domain predicate still uses the documented registered-check or judged-criterion path; without a judge or checker it remains an explicit `needs-registered-check` gap.
+
+Absence is not automatically inverted in an outside-trigger control. Being outside a prohibition does not require the agent to perform the forbidden act. Such controls retain a judged rule or `needs-negation`.
 
 * The outcome, when neither the situation nor the atoms name a path, is read from the atoms (`metadata.estate.outcome`): nothing changes (`others_untouched`) for a negative control, a denied tool, a guard that denies or blocks, or a row whose skills and helpers may use no writing tool; otherwise nothing is deleted (`deleted: []`). `--no-fallback` turns this off.
-* Invariant and setting rows are static tests: JSON under `static/<test type>/`, run by `driftbench estate static <suite>/static --estate <root>` on the original or a mutant copy. An invariant passes when it still holds on the files; a setting when the settings still declare its key and value. The replay and live runners register `some_call`, `hazard_recovery`, `permission`, `grounded_values`, `max_words`, `no_delete_under` and `stage_seen` next to `ordered`.
+* Invariant and setting rows are static tests: JSON under `static/<test type>/`, run by `driftbench estate static <suite>/static --estate <root>` on the original or a mutant copy. An invariant passes when it still holds on the files; a setting when the settings still declare its key and value. The replay and live runners register `absence`, `some_call`, `hazard_recovery`, `permission`, `grounded_values`, `max_words`, `no_delete_under` and `stage_seen` next to `ordered`.
 * `--focus <file>` (atom ids, one per line) orders `run-order.txt`, the list of complete specs: rows naming a focus atom first, then rows naming a guard, a gate or an invariant, then the rest. The report counts the complete specs per focus atom and names the gaps of the ones with none.
 
-* Negative controls (`outside_trigger`, `route_near_miss`, `guard_negative`): skills count 0, guard count 0, tool count 0, required words moved to `must_not`.
+* Negative controls (`outside_trigger`, `route_near_miss`, `guard_negative`): skills count 0, the guard's declared verdict count 0 (a guard with no declared verdict may stop the act or only warn, so each verdict by which a guard acts, `deny`, `block`, `warn` and `nudge`, counts 0), tool count 0, required words moved to `must_not`. A guard run that allows the neutral act remains allowed.
 * Every spec records `metadata.estate`: atoms, plan row, cell, seeder, seed, map hash, test type, mode, map, plan, situation and phrase. Replay specs add the session and the planned outcome, and `metadata.replay` (session, first block). The same map, plan, bank and seed give the same specs. The same holds on every Node version the package supports (22 and later), in any time zone and locale: a user who regenerates on another machine gets the same files (planned for Node 22; checked on Node 24).
 * What no existing check can say is a named gap, and the spec goes to `incomplete/`: it is valid, and `spec lint --strict` fails it by name. A `tool_called` with input assertions is never mapped onto `expect.tools`, because that check asserts the input on every call of the tool and the atom asks for one call that matches; a Read of a path and an Agent dispatch of a named helper go to the references and subagents checks instead.
 
@@ -487,7 +608,7 @@ How a row becomes a spec:
 | `needs-workspace-outcome` | the situation declares no paths its ask may touch (with `--no-fallback` only) |
 | `needs-some-call-check` | a tool call with input assertions: a check that some call matches |
 | `needs-registered-check` | a custom predicate no registered check runs and the generator does not compile |
-| `needs-ordered-anchor` | an ordered pair whose ends are not a tool label, a skill or a stage, or are the same label |
+| `needs-ordered-anchor` | an ordered pair whose ends are not a tool label, a skill or a stage, or are the same label, with no configured judge to check the source rule |
 | `needs-stage-reach-check` | a stage reachable at any time, or a step list with no single closing stage |
 | `needs-static-runner` | a static property of the estate files that names no check the static runner knows |
 | `needs-negation` | in a negative control, a predicate with no inverse |
@@ -497,7 +618,150 @@ How a row becomes a spec:
 | `needs-guard-message-check` | the message a guard gives |
 | `needs-derivable-then` | a row with no Then code can derive |
 | `needs-askable-act` | no approved phrase, and the atoms' words give no task the floor accepts |
-| `needs-existing-file` | a Read of a file the estate copy does not hold |
+| `needs-existing-file` | a Read of a file the estate copy does not hold, with no registered `some_call` checker to verify the attempt |
+
+When an ordered obligation names a domain operation with no tool, skill or stage anchor, a configured judge checks the order against the full source rule. Machine checks for named reads remain in place. Without a judge the row retains `needs-ordered-anchor`.
+
+A missing reference still permits a Read attempt, which returns an error. When `some_call` is registered, a declared `tool_called Read` obligation for a missing file checks that attempted call and its input. It does not expect a successful read or invented file content. Existing references still use the successful-read check.
+
+The files of the estate copy are listed from the map's `root`. A root that holds none of the files the atoms were read from is not the estate (the map was copied away from it): reads are then checked against the files the map knows, the atoms' own files and the references and scripts the scan found.
+
+### Task-specific asks and equivalent tests
+
+A fallback ask starts with the atom's own governed action. A gate uses its trigger as a task
+(`publishing the corrected newsletter` becomes "Please publish the corrected newsletter.").
+A reference uses the action in its read-when clause. An actionable rule situation precedes a
+unit's broad description. The ask leaves the prerequisite and expected skill for the agent to discover.
+
+An atom that gives no task of its own takes the purpose of the unit that owns it, never a default of the
+estate. The purpose is the unit's description, then the requests of the routing rows that load the unit.
+A description is read in the third person: the first word is the verb when an object follows it, so
+"Handles customer complaints and logs the outcome" asks to handle customer complaints and log the outcome,
+for a verb the built-in list does not hold. A verb that states what a unit holds ("Holds", "Provides"), a
+noun followed by a function word ("Rules for ...") and a description that gives only a condition are no task:
+the ask stays incomplete and names why. A verb joined by "and" shares the form of the first when an object
+follows it; a word that ends the sentence or precedes a preposition stays as written. A possessive ("File's frame") and a plural noun with a noun ending ("analytics", "utilities", "awareness") are
+never read as a verb. A clause of a read-when line rides as the moment only when it is short (14 words or fewer)
+and states no obligation (never, always, must, should, only): a pasted rule is no situation.
+A task taken from a description or a routing request must have the shape of a request, else the next sentence
+is tried and, when none has it, the atom stays without a task: it has no colon (a list), no bare number after the
+verb ("install workflow 6 steps" is a heading with a count), no copula that follows the verb and its bare object
+("plan import is one atomic write" is a sentence about the plan; "notices for customers whose parcels are late" is
+fine), no subject before the verb, and does not open with a usage note ("use when ..."). The object a guard's rule
+names joins the tool act through its strict situation: "Please run a command in the shell here for a force push to
+the shared release branch." 
+When a description fails that shape, the refusal names the shape in its source (`(description: a heading with a
+count)`, `a list after a colon`, `a usage note`, `a statement`, `a statement with a subject`). A reference whose
+citing line says what the file is for ("Read `refs/ux.md` for hosted screen design") is asked about that topic, which
+is more specific than the description of the whole unit; a topic needs two content words and no pronoun, file,
+code or obligation. A description is cut to the work it names: a parenthetical list of examples, a purpose clause ("so that a
+session can resume it") and a relative clause about the unit itself ("which writes the verdicts") are not asked
+for, and a head left without a verb and its object keeps the whole sentence. A table row or list line is read
+cell by cell: a cell that states a task is the ask (`Publishing the weekly report | file.md` asks to publish the
+weekly report), a cell that names an activity of two words or more rides as the moment, and a bare noun pair
+names a file's content and is neither. A read-when line that
+only lists its file ("`references/fields.md`: field definitions") states no situation; a clause of it apart
+from the file and the read directive rides in the ask as the situation.
+
+Both contract and covering-array rows retain the owning task. A reference's target file determines its folder owner; citation edges never establish ownership.
+Rules use their own source folder, and gated files use their target folder when one exists.
+The longest matching declared skill folder wins; route edges identify route targets only. A standing gate can therefore use the skill whose reference it gates.
+Ambiguous and unowned targets stay unresolved. Older plans are repaired during generation:
+unrelated attached skills are removed from both expectations and atom metadata.
+A unit that owns a gate or a reference by folder supplies the task of its ask, but joins the row (and so the expectation
+that it loads) only when it holds the rule: the rule is written in one of its own files. A standing gate about a
+file in a skill's folder is owned by that skill for its task and held by nobody, so the row names the rule alone.
+A shared file outside every skill folder is owned by the unit whose own file cites it: one reference atom
+exists per citation, so each skill or helper that cites the file directly owns its citation, and a link
+that only navigates, or a catalogue that cites a file in another unit's folder, owns nothing. A file cited
+only from the standing instructions has no owner and borrows no task. A prerequisite (reference or gate)
+owned by a helper asks for the work to be handed to a helper ("Please have a helper agent audit the ledger
+extract"), so the order applies only when the dispatch happens.
+Approved trigger phrases also respect that owner: a bank pin on a rule cannot borrow a different unit's task.
+A declared tool can use the owning helper's own situation when its permission is listed under unrelated tasks.
+The task in a source prerequisite clause is used even when the extracted trigger field is absent.
+A bare read-prerequisite title is never converted into a self-answering user ask.
+
+A guard may carry optional `fields.ruleText` and `fields.ruleSources`. Guard prose describes mechanics far
+more often than it names an act, so the ask that sets a guard off is the act of the tool the guard watches
+("edit a file here" for Edit and Write, "run a command in the shell here" for Bash, "open a file here" for
+Read; a guard on the end of a turn has no tool and so no ask), with the strict situation of the rule text
+as context ("This involves ..."). A phrase of the prose replaces the tool act only when it has a strict shape:
+
+* an act: a verb of the list (a hyphenated verb ends on one), then an object, three to ten words, no colon,
+  parenthesis, quotation, pronoun or relative word, no subject before the verb, no adverb or function word at
+  the end. It comes from the opening gerund ("Deploying to production without a tag"), the gerund after a
+  connective (when, while, if, before, after, until, unless, without, upon), or a rule the guard enforces;
+* a situation: a noun phrase that opens with a determiner or a number, ends on a content word (no adverb of
+  time, no participle), holds no pronoun, relative word or parenthesis, names no machinery of the guard itself (the runtime's own word for a guard,
+  check, script, handler, registry), and has no clause cut off inside it.
+
+Sentences about how the guard works (stdin, JSON, exit codes) are skipped, and a verb in the third person
+followed by of, on or about is a plural noun ("Calls of any tool"), never a verb. A guard rule written as an imperative to the agent ("End every reply with ...") is a rule, never an ask, and an act
+with a condition inside it ("ask before an Edit of a policy file", "add a reminder when the owner types stop") is
+a rule too: both fall back to the tool act. The subject of a gate trigger ("you discharge a patient") is dropped
+and its act is asked ("discharge a patient"); a trigger is put in the context as "The task is to ..." when it is an
+act and as "This involves ..." when it is a gerund or a noun phrase. A read-when line that opens with a condition
+("When the owner asks about boarding, read refs/boarding.md") asks about the condition. A guard on the user's prompt is set off by what the owner writes, so its ask is the message: the situation of the
+rule it enforces says it ("The user says stop" asks `stop`), when the message has up to five words and holds no
+clause word. The ask names the act a rule governs, in the rule's own words and never the rule: a rule that orders a read before an
+act ("Read a file before editing it") is set off by the act ("Please edit a file."), with a pronoun object resolved
+to the thing to read, and an obligation ("Always pass the carrier code to the tracking script") by the tool act
+followed by its purpose ("run a command in the shell here to pass the carrier code to the tracking script"). A guard that watches no tool and has no strict prose has no ask: it stays incomplete. A replay row still needs
+its recorded session. The ask reads only the guard's own rule text and matcher: no registry state name or
+severity is read into it. A rule a guard enforces gives its forbidden act when that act is strict, else its
+trigger, else the tool act; a rule that restates itself ("go against this rule") is never the ask.
+
+The unit that owns a gate or a reference supplies the task of the ask, but its load is an expectation only when
+the rule is written in the unit's own files: a standing gate to read a file in a skill's folder does not require the
+skill. A unit-mode row (a guard or script run with no model) expects only what a run without a model can observe:
+the skill that owns the atom supplies the task of a live row, and its load is never an expectation of a unit one.
+
+A `guard_negative` row asks for a harmless near miss of the guard's own rule: without changing anything, what
+it would mean to do the strict act of the rule, what applies to its strict situation, or what it would mean to
+use the tool the guard watches. A guard on the end of a turn, which has no tool, and a guard with no strict
+prose stay incomplete. No estate-wide request stands in for either.
+
+The three types that run a guard directly with no model (`guard_hostile`, `guard_speed`,
+`guard_register`) never read their ask: it is a fixed request that names the tool the guard watches ("Please make
+one Edit or Write call in this workspace."), or the next step of the task when it watches none. No other type gets it.
+
+A map may record `documents`: each file's authority (`normative`, or a navigation role such as `example`,
+`template`, `history`, `changelog`, `journal`, `fixture`, `archive`). A reference whose target is a
+navigation document is a place to look and gets no `read_when` row, no journey edge and no covering-array
+target; the plan notes how many. A prerequisite to read such a file stays a gate. `estate stats` leaves
+those references out of the coverage counts and reports their number. A plan made before the map recorded
+roles still lists the row; generation writes it incomplete with that reason. A map without `documents`
+changes nothing: no file name is read as a role.
+A reference to a file outside the estate root (reached through a link to another repository) enters no journey:
+the run's workspace does not hold the file, so a path through it cannot be walked. Its `read_when` row stays.
+
+Complete tests with exactly equal rule semantics, asks, inputs, expectations, judge rubrics,
+run mode, test type and non-target situation values share one representative.
+Generated criterion identifiers may differ; their full rubrics and flags must remain equal.
+Different prerequisite paths, actions, event cells, unit targets or replay alignments stay separate.
+A journey is keyed by its ordered atom path: two journeys that walk different paths never merge, so every walked edge keeps its own spec.
+The representative retains every source atom in `metadata.estate.atoms` and records
+`metadata.estate.equivalence: { count, planRows }`.
+The count describes represented source tests. The report lists each group's source rows and atoms.
+`estate stats` expands those rows into their original plan cells, without replaying the representative repeatedly.
+Struck source rows count no covered cell. Missing-piece notes with `blocking: false` remain advisory.
+
+The generation report includes `incomplete[]`: spec id, path, plan row and all
+`reasons: [{ marker, atom, detail }]`. Each missing piece keeps its existing reason code.
+Aggregate gap totals remain available. Missing sessions, unsupported checks and unusable tasks
+stay incomplete; grouping never turns an incomplete test into a complete one.
+
+`quality` reports structural complete share, complete asked tests, distinct first asks and distinct asks
+per hundred complete asked tests. Static tests have no ask and stay outside that denominator.
+Event variations can legitimately repeat a task, so compare primary rule tests separately from the full suite.
+
+The fictional scale audit and its paired measurements are in
+[the task-generation audit](estate-task-generation-audit.md).
+The Northwind command transcripts and example generated tree below retain their original captured version.
+Current plan and generation byte snapshots live beside their product tests; they hash every output byte.
+
+Focus coverage counts distinct asks and situation cells. Repeated rows with the same ask and cell do not replace additional mutation opportunities. Additional identical focus variants are omitted.
 
 Layout: `<specs|incomplete>/<mode>/<test type>/<id>.yaml`, so `driftbench replay --suite <out>/specs/replay` takes the replay specs alone.
 
@@ -507,7 +771,7 @@ The suite of the Northwind plan. The plan must be approved first; the committed 
 $ pnpm -s driftbench estate generate --map examples/estates/fixture/approved.yaml --plan packages/generate/test/estate/fixtures/planner-plan.approved.yaml --out _captures/docs/estate/generated
 Map ../../../examples/estates/fixture/approved.yaml (claude-code), hash be2e7a0919cb: 125 atoms.
 Plan ../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml: 1379 rows, 1379 approved, 0 waiting, 0 struck.
-Phrases ../../../examples/estates/fixture/phrases.yaml: 26 situations, 50 approved phrases.
+Phrases ../../../examples/estates/fixture/phrases.yaml: 31 situations, 60 approved phrases.
 Sessions ../../../examples/estates/fixture/sessions/index.yaml: 3.
 Seed 1; custom checks the runner registers: ordered.
 
@@ -749,7 +1013,7 @@ Limits of replay today:
 
 ### Unit, live and estate mutants
 
-* Unit (offline), `driftbench estate unit`. Guards run on synthetic event payloads and scripts on their fixtures, on a copy of the estate, sandboxed where the platform has a sandbox (macOS `sandbox-exec`: no network, no credential folders, writes only into the copy). `--record` runs each case on the original estate and writes its outcome into the test file; a later run on the original or on a mutant copy must give every recorded outcome again, and a `guard_speed` test also holds each run under the guard's `timeout`. A case whose outcome varies across the record runs is marked flaky and not compared; a case that shows no effect is inert, and an inert test passes. A script's fixtures come from `scripts:` in the [configuration file](#the-estate-configuration-file); a script without one is recorded like a guard. Not built yet: a helper run alone, headless with its agent file as the system prompt.
+* Unit (offline), `driftbench estate unit`. Guards run on synthetic event payloads and scripts on their fixtures, on a copy of the estate, sandboxed where the platform has a sandbox (macOS `sandbox-exec`: no network, no credential folders, writes only into the copy). `--record` runs each case on the original estate and writes its outcome into the test file; a later run on the original or on a mutant copy must give every recorded outcome again, and a `guard_speed` test also holds each run under the guard's `timeout`. A case whose outcome varies across the record runs is marked flaky and not compared; a case that shows no effect is inert, and an inert test passes. A script's fixtures come from `scripts:` in the [configuration file](#the-estate-configuration-file); a script without one is recorded like a guard. Helper-only task specs use a configured local executor with the current agent body as its system prompt.
 
   `--json` prints `{ "runs": [{ "spec": "<id>", "pass": true, "failing": ["<case: why>"] }], "guards": [{ "guard": "<name>", "event": "<event>", "decision": "allow" | "deny" | "ask", "message": "<text>", "ms": 0 }], "scripts": [{ "script": "<path>", "exit": 0, "stdout": "<text>" }] }`: one run per test, one guard entry per guard case, one script entry per fixture. `message` is what the guard told the runtime (its standard error on exit 2, or the reason of its JSON answer), and `ms` its running time. A guard that exits with another code than 0 or 2 does not block: its decision is `allow`. A recorded case fails when the decision, the exit code, the message or the output differs. Exit 0 when every test passes, 1 when one fails, 2 on a usage or input error or when a test has no recorded outcome and `--record` was not given. The options and a run on the fixture are in the [CLI reference](reference/cli.md#driftbench-estate-unit).
 * Live (online, blind), `driftbench estate run`. The agent runs headless in a sandboxed copy of the estate pinned by hash, on a seeded workspace, from the ask alone: no test word in the prompt or the dispatch description. Teacher-forced resumes from a recorded prefix cut at block k; free running; perturbed injects an estate deviation at block k (a compaction marker, a mid-turn message, a planted file, a dead helper). Repeats give the variance; cost per run is measured. Built: `driftbench estate run`, with session states and hazards planted from the state library `--states`.
@@ -810,6 +1074,8 @@ Atoms match by id. An atom whose provenance hash changed is one of three things:
 * semantic: anything else (case and punctuation count); its tests are regenerated and its phrasings go back for approval.
 
 An atom with the same hash whose evidence, enforcement, situation, title, role or kind fields differ is restated: its tests are regenerated. Approval alone is never a change. Edges compare as `from kind to`.
+
+An atom id names the file the atom was read in, so a fact several files state once, such as a tool two helpers declare, changes its id when the file it was anchored in leaves. An atom that leaves under one id while an atom of the same kind, title, words and fields arrives under another is the same atom, renamed: it is listed under `renamed` (and counted in `summary.renamed`) instead of as removed and added, and its tests are regenerated against the new id, never retired. Both keys are absent when nothing was renamed.
 
 The diff of the Northwind estate against its second version, with the guard state of the first version named:
 
@@ -905,9 +1171,9 @@ The state of the first Northwind version sits in `examples/estates/fixture-v2/ma
 
 ### What it does to the tests: `estate impact`
 
-Specs index by `metadata.estate.atoms` (a list of atom ids, as `estate generate` writes them). A spec without `metadata.estate` is counted as other. A spec with any `metadata.retired` value, a key beside `metadata.estate`, is no longer live. The lists:
+Specs index by `metadata.estate.atoms` (a list of atom ids, as `estate generate` writes them). A spec without `metadata.estate` is counted as other. A spec with any `metadata.retired` value, a key beside `metadata.estate`, is no longer live. The static tests `estate generate` writes under `static/` (an invariant or a setting, one JSON record each) are tests too: a record indexes by its `atom`, and a retirement is written as the record's own `retired` field, which `estate static` and `estate stats` then skip. A removed environment key therefore retires the test of its setting. The lists:
 
-* regenerate: every test with a semantic, restated or guard-state atom, or with a removed atom while other atoms remain, with the reason per atom; a change of white space alone touches no test (the respaced supplier rule leaves `northwind-supplier-yes` untouched);
+* regenerate: every test with a semantic, restated, renamed or guard-state atom, or with a removed atom while other atoms remain, with the reason per atom; a change of white space alone touches no test (the respaced supplier rule leaves `northwind-supplier-yes` untouched);
 * re-approve: every semantic change, with its tests;
 * retire: every test whose atoms are all removed, with the reason `atom <id> removed`;
 * new: added atoms no live test names.
@@ -982,3 +1248,43 @@ The failing session that motivated a change is its fail-to-pass case: red before
 Built, in order: scan, lint and map; plan; the session reader and replay; generation; maintenance; the live runner with planted session states and hazards; estate mutants; the static and unit runners. Not built yet: the unit run of a helper alone, and a validation on a real estate against its native test battery.
 
 See also: [checks](reference/checks.md), [running](running.md), [statistics](concepts/statistics.md).
+
+### Explicit operations in unit task specs
+
+`estate mutate` copies the estate configuration (`driftbench.estate.yaml`, at the root or in `.claude/`) with the estate files, since a unit test on the copy needs the helper executors and the script fixtures it declares. `estate unit` accepts YAML or JSON task specs marked `metadata.estate.mode: unit`, alongside recorded JSON unit tests. A task spec declares its executable operation in `metadata.estate.unit`: a guard target (name, event, matcher and command) or a script target (path), plus concrete `cases` with guard event payloads or script arguments, files and stdin. The runner executes those inputs on a copy. It does not turn the user ask into a command or search the implementation for an input that satisfies the expected verdict. The runner evaluates `expect.guards`, `expect.execution` and `expect.workspace`; for `workspace` it compares the files of the operation's working folder before and after each case (the estate copy for a guard, the case folder for a script). An expectation of any other kind, or a workspace expectation the operation cannot observe, is an input error reported as `not_run`, never a pass. A fixture path that is absolute, or that leaves the working folder by `..` or a symbolic link, is refused before any fixture is written.
+
+A unit task spec has one block. Guard expectations check actual firings: exit 2 denies, a JSON permission decision supplies its decision, another nonzero exit warns, and context on stdout nudges. `guard_message` checks the actual messages of the runs by which a guard acted (a deny, a block, a warn or a nudge); an allow, a timeout or a verdict outside that list is no intervention and has no message to judge; `guard_finished` and an optional `budgetMs` check completion. A case may supply an exact `expected` outcome. A script needs declared configuration fixtures, exact case outcomes, or an explicit expected exit code. Starting a process alone does not establish its correctness. Script execution assertions enforce `ran_code`, `max_commands` and the last command's `exit_code`. Guard case outcomes describe guard processes. `some_call` checks the actual script invocations and their input fields. Other custom script checks and assertions naming another operation are reported as unsupported, never silently dropped. Agent replies, skill loads and workspace edits require a live or replay test; direct unit operations do not establish those outcomes. Missing inputs, unsupported checks and missing script oracles are input errors, not executed failures or successful mutant kills.
+
+Explicit task payloads retain their declared keys and empty values; the runtime reply alias is added only when absent. Recorded JSON tests keep their existing shorthand conversion. Guards run from the copied estate's working folder. Scripts use their shebang interpreter when present, and otherwise the file extension selects the interpreter. Declared and recorded script fixtures both pass their stdin to the process. A helper's prompt alone supplies no observed execution; helper-only task specs require an executor declared under `helpers` in the estate configuration; missing executors report an input error.
+
+
+### Declared unit execution contracts
+
+A helper executor is an explicitly configured local runtime. The runner never selects one from a helper's description or infers execution from a nonempty prompt. Its command runs inside the copied estate, with the unit sandbox, isolated home, process-group cleanup and timeout. The configuration names the executable and each argument separately; shell syntax requires an explicit shell command. Local stand-ins must perform the task on its inputs, rather than print a success verdict.
+
+```text
+helpers:
+  labeler:
+    command: [python3, .claude/execute-labels.py]
+    timeoutMs: 3000
+scripts:
+  .claude/skills/labels/scripts/label.py:
+    usage: label.py < label
+    fixtures:
+      - stdin: green parcel
+        expect:
+          exitCode: 0
+          stdout: GREEN PARCEL
+```
+
+A helper run alone is also written as a JSON run record, `unit/contract_alone/unit.contract_alone.<helper atom>.json`, beside the unit-mode spec: its target is the helper and its agent file, and its one case holds the task the row asks and the workspace files its situation seeds. A record is an output, not an input: `driftbench estate unit --record` runs the helper on the original estate (three record runs) and writes its answer into the case; a later run, on any copy, must answer the same, so an agent file that lost its body or changed what it asks turns the record red. A helper with no declared executor, or whose executor fails, fails the record and is never recorded as a pass. The generate report counts these records under `unit.helpers`.
+
+The helper process receives one JSON line with `name`, `systemPrompt` (the current body without YAML frontmatter), `frontmatter` and `task` (the unit block's user message). Workspace files from the spec are planted in the copy; they cannot replace `.claude/` or configuration files. The executor returns a JSON object with `text`, `segments` and `toolCalls`, plus any observed runtime traces, executions or workspace diff in the core `Observed` format. Cost and latency fields are supplied by the runner. The executor must report actual observations. Machine checks evaluate the task assertions against them; zero process exit alone does not pass a helper test. Missing observations, unavailable executors and unreadable helper files are reported explicitly. An empty body still reaches the executor; only actual execution and its observations determine the result. Judged criteria require a judge and do not pass an offline unit run. Successful executions also report `helpers` entries with the helper name, process exit, measured milliseconds and text.
+
+Script fixture expectations are independent contracts written from the public usage, documented exit codes and declared outputs. Neither the runner nor generation derives an expected result from implementation source. Each configured fixture needs an explicit exit or output assertion; a usage line without expectations is not an oracle. Output-only expectations retain the documented default exit code of zero. The runner accepts both the existing fixture list and the `{ usage, fixtures }` form above, validates them before execution, and checks every fixture. `some_call` reads only actual command invocations (interpreter, script path and arguments); it cannot establish that a script performed an internal tool action. Unsupported custom checks and absent oracles report an input error, never a successful mutant kill.
+
+A hand-written guard expectation without a `verdict` counts a blocking decision (deny or ask) when it requires a firing, and also a warning (a nonzero exit other than 2) when it bounds firings, such as a count of 0 or a `max`; a message-only nudge is neither. A guard that only warns therefore fails "no firing".
+
+Generated guard expectations retain their declared verdict for hostile and speed tests as well as positive and negative tests. With no declared verdict, a positive firing means an actual denial. Text-event guards enforcing a declared `max_characters` predicate receive a positive payload above that boundary and a separate neutral control. Boundary synthesis uses the map's evidence, never implementation literals, and is bounded by `MAX_BOUNDARY_CHARACTERS` in the generator.
+
+Recorded measurements behind two estate changes: [generation pass-to-fail comparison](estate-generation-loss-ca5.md) and [unit runner evidence](estate-unit-runner-evidence.md).

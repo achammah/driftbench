@@ -168,7 +168,7 @@ describe('the fixture graph', () => {
       enforces: 7,
       event: 6,
       next: 4,
-      reference: 5,
+      reference: 6,
       route: 13,
       script: 2,
     });

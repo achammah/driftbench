@@ -1,6 +1,7 @@
 /** The estate test generator: plan rows to task specs, by code only. Owned by the estate-tests lane. */
 
 export {
+  ASK_FRAME_WORDS,
   actOf,
   askedTo,
   type CodeAsk,
@@ -13,6 +14,14 @@ export {
   RESUME_ASK,
   situationProblem,
 } from './asks';
+export {
+  estateOwners,
+  holdsRule,
+  navigationFiles,
+  navigationReference,
+  rowOwners,
+  taskAtoms,
+} from './context';
 export { type ReadYaml, readEstateYaml, type YamlSchema } from './files';
 export {
   type AskSource,
@@ -45,6 +54,7 @@ export {
   checkBank,
   checkSessions,
   type EstateAtom,
+  type EstateDocument,
   type EstateEvidence,
   type EstateMapInput,
   type EstatePlanInput,

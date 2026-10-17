@@ -33,7 +33,17 @@ describe('the committed reader-cases outputs', () => {
     expect(fresh.refusals).toEqual([]);
     expect(fresh.chunks.every((run) => run.status === 'done')).toBe(true);
     expect(committed.map.hash).toBe(fresh.map.hash);
-    expect(committed.map.atoms).toEqual(fresh.map.atoms);
+    // The committed map predates descriptive guard metadata. Keep exact parity for its
+    // entire legacy shape; the source/registry metadata has its own public scan tests.
+    const legacy = fresh.map.atoms.map((atom) => {
+      if (atom.kind !== 'guard' || !atom.fields) return atom;
+      const { ruleText, ruleSources, rules, ...fields } = atom.fields;
+      expect(ruleText).toBeTypeOf('string');
+      expect(ruleSources).toBeInstanceOf(Array);
+      expect(rules).toBeInstanceOf(Array);
+      return { ...atom, fields };
+    });
+    expect(committed.map.atoms).toEqual(legacy);
     expect(committed.map.edges).toEqual(fresh.map.edges);
   });
 

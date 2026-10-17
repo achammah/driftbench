@@ -1,3 +1,4 @@
+import type { EstateEvidence } from './inputs';
 import { literal } from './literal';
 
 /**
@@ -7,7 +8,7 @@ import { literal } from './literal';
  *
  * | Predicate | Check |
  * |---|---|
- * | command_not_run { contains or regex } | `some_call`: no Bash call whose command matches |
+ * | command_not_run, command_absent { contains, regex or command } | `some_call`: no Bash call whose command matches (`command` is read as `contains`) |
  * | max_characters { max } | `must_not`: a run of max + 1 characters |
  * | max_questions { max } | `must_not`: max + 1 question marks |
  * | json_only | `must`: the whole reply is one JSON object or array |
@@ -36,19 +37,22 @@ export const CURRENCY_FIRST = '\\b(?:EUR|USD|GBP|CHF|JPY|SEK|NOK|DKK|PLN|CZK|CAD
 export const ONE_LINE = '\\n\\s*\\S';
 export const TABLE_ROW = '^\\s*\\|.*\\|';
 
-/** The checks a custom predicate compiles into, or undefined when its name or options say too little. */
+/** Compile a documented custom predicate. Unknown names throw; underspecified options return undefined. */
 export function compilePredicate(name: string, options: Record<string, unknown> = {}): Compiled | undefined {
   const max = typeof options.max === 'number' && Number.isInteger(options.max) ? options.max : undefined;
   switch (name) {
-    case 'command_not_run': {
+    case 'command_not_run':
+    case 'command_absent': {
       const assertion =
         typeof options.contains === 'string'
           ? { contains: options.contains }
           : typeof options.regex === 'string'
             ? { regex: options.regex }
-            : undefined;
+            : typeof options.command === 'string' && options.command.trim() !== ''
+              ? { contains: options.command.trim() }
+              : undefined;
       return assertion
-        ? { someCalls: [{ label: 'Bash', input: { command: assertion }, count: 0 }] }
+        ? compileToolAbsence({ type: 'tool_not_called', label: 'Bash', input: { command: assertion } })
         : undefined;
     }
     case 'max_characters':
@@ -75,7 +79,9 @@ export function compilePredicate(name: string, options: Record<string, unknown> 
     case 'currency_after_amount':
       return { mustNot: [CURRENCY_FIRST] };
     default:
-      return undefined;
+      throw new Error(
+        `Unknown estate predicate "${name}"; use a typed evidence predicate or register a custom check.`,
+      );
   }
 }
 
@@ -83,6 +89,7 @@ export function compilePredicate(name: string, options: Record<string, unknown> 
 export const COMPILED_PREDICATES: readonly string[] = [
   'asks_again_on_loose_yes',
   'asks_for',
+  'command_absent',
   'command_not_run',
   'confirmed_before_send',
   'currency_after_amount',
@@ -94,3 +101,34 @@ export const COMPILED_PREDICATES: readonly string[] = [
   'same_language_as_user',
   'stopped_and_confirmed',
 ];
+
+/** The typed absence family is selected by the schema's discriminant, never by a guessed synonym. */
+export type AbsenceEvidence = Extract<
+  EstateEvidence,
+  {
+    type:
+      | 'reference_not_read'
+      | 'subagent_not_dispatched'
+      | 'guard_not_fired'
+      | 'stage_not_reached'
+      | 'artifact_not_created'
+      | 'file_not_written';
+  }
+>;
+export const ABSENCE_PREDICATES: readonly AbsenceEvidence['type'][] = [
+  'reference_not_read',
+  'subagent_not_dispatched',
+  'guard_not_fired',
+  'stage_not_reached',
+  'artifact_not_created',
+  'file_not_written',
+];
+
+export function isCompiledPredicate(name: string): boolean {
+  return COMPILED_PREDICATES.includes(name);
+}
+
+/** Both command compatibility aliases and canonical input-scoped tool absence use the same check. */
+export function compileToolAbsence(evidence: Extract<EstateEvidence, { type: 'tool_not_called' }>): Compiled {
+  return { someCalls: [{ label: evidence.label, input: evidence.input ?? {}, count: 0 }] };
+}

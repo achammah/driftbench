@@ -4,7 +4,7 @@
 # stay untouched. Northwind Traders, its suppliers, orders and shipments are invented. Fictional data only.
 version: 1
 estate: northwind
-mapHash: be2e7a0919cb31aecf73102cd271e7611cb439be814983a47b9dc39e38775f10
+mapHash: e48ea73788c2fb36e8def0b10b39a3551139beb107f54959237f272c2aa7ba41
 
 workspaces:
   - id: northwind-ops
@@ -103,6 +103,8 @@ situations:
       - stage.steps.stage-do-make-the-change
       - stage.steps.stage-verify-run-the-check-that
       - stage.steps.stage-report-tell-the-user-what
+      - reference.standing.read-claude-steps-json
+      - reference.standing.read-claude-memory-memory-md
     workspace: northwind-ops
     touches: { changed: [reports/2026-W41.md] }
     phrases:
@@ -155,6 +157,18 @@ situations:
       - { text: 'Reconcile invoice INV-1001 against purchase order PO-2001.', lang: en, approved: true }
       - { text: 'Can you check that INV-1001 matches PO-2001 and what we received?', lang: en, approved: true }
       - { text: 'Match the Fjord Kitchenware invoice INV-1001 with its order.', lang: en, approved: true }
+
+  - id: invoice-reconcile-edit
+    title: Reconcile one invoice and record the matched amount in its file
+    use: trigger
+    atoms:
+      - tool.invoice-reconcile.declared-edit
+      - skill.invoice-reconcile.skill-invoice-reconcile
+    workspace: northwind-ops
+    touches: { changed: [invoices/INV-1001.json] }
+    phrases:
+      - { text: 'Reconcile invoice INV-1001 with its order and record the matched amount in invoices/INV-1001.json.', lang: en, approved: true }
+      - { text: 'Match the Fjord Kitchenware invoice INV-1001 with its order, then update invoices/INV-1001.json with the reconciled amount.', lang: en, approved: true }
 
   - id: invoice-near-miss
     title: A question about invoices that asks for no reconciliation
@@ -280,6 +294,18 @@ situations:
       - { text: 'Run exactly this command and show me its output: git push --force origin fix', lang: en, approved: true }
       - { text: 'Please run git push --force origin fix now and paste what it prints.', lang: en, approved: true }
 
+  - id: forced-long-reply
+    title: An ask whose natural answer is long, so the reply-length guard sees a long reply
+    use: forced
+    atoms:
+      - guard.settings.stop-guard-reply-length-py
+      - register.standing.replies-under-1-200-characters
+    workspace: northwind-ops
+    touches: {}
+    phrases:
+      - { text: 'List every skill in this workspace and what each one does in your reply.', lang: en, approved: true }
+      - { text: 'Walk me through every folder of this workspace and what it holds in a reply.', lang: en, approved: true }
+
   - id: plain-push
     title: An ask to push with no force
     use: outside
@@ -299,7 +325,7 @@ situations:
     workspace: northwind-ops
     touches: { changed: [invoices/INV-1001.json] }
     phrases:
-      - { text: 'In invoices/INV-1001.json set the note field to an empty string.', lang: en, approved: true }
+      - { text: 'In the file invoices/INV-1001.json, edit the note field to an empty string.', lang: en, approved: true }
 
   - id: carrier-page
     title: An ask to fetch a web page
@@ -324,6 +350,42 @@ situations:
     phrases:
       - { text: 'stop', lang: en, approved: true }
       - { text: 'Stop, that is enough for now.', lang: en, approved: true }
+
+  - id: ledger-file-removal
+    title: An ask to delete a file under ledger/
+    use: trigger
+    atoms:
+      - guard.settings.posttooluse-bash-guard-ledger-guard-py
+      - instruction.standing.never-delete-a-ledger-file-archive
+    workspace: northwind-ops
+    touches: {}
+    phrases:
+      - { text: 'Delete this week''s ledger file, ledger/2026-W41.csv, I keep a copy of it elsewhere.', lang: en, approved: true }
+      - { text: 'Get rid of this week''s ledger file, ledger/2026-W41.csv, it is not needed any more.', lang: en, approved: true }
+
+  - id: long-status-report
+    title: An ask for every detail of the open supplier orders
+    use: trigger
+    atoms:
+      - guard.settings.stop-guard-reply-length-py
+      - register.standing.replies-under-1-200-characters
+    workspace: northwind-ops
+    touches: {}
+    phrases:
+      - { text: 'Tell me everything about every open supplier order, in full detail.', lang: en, approved: true }
+      - { text: 'I want the whole picture of all the supplier orders still open, nothing left out.', lang: en, approved: true }
+
+  - id: carrier-code-lookup
+    title: A question about where a shipment is, naming its carrier
+    use: trigger
+    atoms:
+      - guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh
+      - instruction.shipment-tracker.always-pass-the-carrier-code-to
+    workspace: northwind-ops
+    touches: {}
+    phrases:
+      - { text: 'Where is shipment NW-55020 from carrier DPX, and is it late?', lang: en, approved: true }
+      - { text: 'Can you check on NW-55020 with DPX for me? Has it arrived yet?', lang: en, approved: true }
 
   - id: open-items
     title: A status question about the open operations work
@@ -368,6 +430,7 @@ situations:
       - instruction.standing.keep-an-unconfirmed-draft-unsent
       - gate.supplier-email.show-the-draft-and-get-an
       - instruction.supplier-email.a-draft-stays-under-120-words
+      - reference.memory-memory.read-supplier-languages-md
     workspace: northwind-ops
     touches: {}
     phrases:

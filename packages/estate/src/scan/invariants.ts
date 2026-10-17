@@ -1,7 +1,10 @@
 import type { ModelPort } from '@agent-nexus/driftbench-generate';
 import type { Atom } from '../schema';
+import { proseCandidates } from './candidates';
 import { AtomBuilder, codeAtoms, guardName } from './code';
+import { isNormative, normativeEstate, unloadedByDesign } from './document-roles';
 import { type ChunkRun, type ProseRefusal, runChunk } from './prose';
+import { type ProseCache, type ProseEstimate, proseCacheKey } from './prose-cache';
 import type { EstateFile, RawEstate } from './reader';
 import { type Located, linesOf } from './text';
 
@@ -12,10 +15,34 @@ import { type Located, linesOf } from './text';
  * measured state so a reader of the map sees it, and lint measures it again.
  */
 
+/**
+ * Characters as a reader counts them: Unicode code points, so an emoji outside the basic plane is one
+ * character, not the two UTF-16 units of its JavaScript length; a combining mark stays its own character.
+ */
+export function characters(text: string): number {
+  let surrogatePairs = 0;
+  for (let index = 0; index < text.length; index++) {
+    const code = text.charCodeAt(index);
+    if (code >= 0xd800 && code <= 0xdbff) {
+      const next = text.charCodeAt(index + 1);
+      if (next >= 0xdc00 && next <= 0xdfff) {
+        surrogatePairs++;
+        index++;
+      }
+    }
+  }
+  return text.length - surrogatePairs;
+}
+
 /** The default ceiling on the standing instructions (standing files and memory), in characters. */
 export const DEFAULT_STANDING_CEILING = 40_000;
 
-export type ScanAtomsOptions = { port?: ModelPort; maxTokens?: number };
+export type ScanAtomsOptions = {
+  port?: ModelPort;
+  maxTokens?: number;
+  cache?: ProseCache;
+  beforeModel?: (estimate: ProseEstimate) => void | Promise<void>;
+};
 
 export type ScanAtoms = {
   builder: AtomBuilder;
@@ -27,6 +54,7 @@ export type ScanAtoms = {
 
 /** Code atoms first, in a fixed order, then each prose chunk through the model when a port is given. */
 export async function scanAtoms(raw: RawEstate, options: ScanAtomsOptions = {}): Promise<ScanAtoms> {
+  raw = normativeEstate(raw);
   const files = new Map(raw.files.map((file) => [file.path, file]));
   const builder = new AtomBuilder(files);
   codeAtoms(raw, builder);
@@ -34,14 +62,37 @@ export async function scanAtoms(raw: RawEstate, options: ScanAtomsOptions = {}):
   const refusals: ProseRefusal[] = [];
   const duplicates: string[] = [];
   if (options.port) {
+    let cachedChunks = 0;
+    let cachedCharacters = 0;
+    for (const chunk of raw.prose) {
+      if (await options.cache?.get(proseCacheKey(chunk, options.port, options.maxTokens))) {
+        cachedChunks++;
+        cachedCharacters += chunk.text.length;
+      }
+    }
+    const characters = raw.prose.reduce((sum, chunk) => sum + chunk.text.length, 0);
+    await options.beforeModel?.({
+      chunks: raw.prose.length,
+      characters,
+      cachedChunks,
+      cachedCharacters,
+      pendingChunks: raw.prose.length - cachedChunks,
+      pendingCharacters: characters - cachedCharacters,
+    });
     for (const chunk of raw.prose) {
       const text = files.get(chunk.file)?.text ?? '';
-      const result = await runChunk(chunk, text, options.port, builder, options.maxTokens);
+      const result = await runChunk(chunk, text, options.port, builder, options.maxTokens, options.cache);
       chunks.push(result.run);
       refusals.push(...result.refusals);
       duplicates.push(...result.duplicates);
     }
   }
+  const resolved = new Set(chunks.filter((run) => run.status === 'done').map((run) => run.chunk));
+  proseCandidates(
+    raw,
+    builder,
+    raw.prose.filter((chunk) => resolved.has(chunk.id)),
+  );
   return { builder, chunks, refusals, duplicates, calls: chunks.reduce((sum, run) => sum + run.calls, 0) };
 }
 
@@ -61,6 +112,9 @@ export function measureInvariants(
   orphans: readonly string[],
   ceiling: number,
 ): InvariantState {
+  const navigation = new Set(
+    raw.files.filter((file) => unloadedByDesign(raw, file)).map((file) => file.path),
+  );
   const names = new Set(raw.guards.map((guard) => guardName(guard)));
   // A catalogue check is listed by its catalogue; the registry is asked to list the guards the runtime runs.
   const runtime = new Set(raw.guards.filter((guard) => !guard.check).map((guard) => guardName(guard)));
@@ -68,8 +122,8 @@ export function measureInvariants(
   const rows = new Set(listed.map((row) => row.guard.split('/').pop() ?? row.guard));
   return {
     ceiling,
-    standingCharacters: standingFiles(raw).reduce((sum, file) => sum + file.text.length, 0),
-    orphans: [...orphans],
+    standingCharacters: standingFiles(raw).reduce((sum, file) => sum + characters(file.text), 0),
+    orphans: orphans.filter((path) => !navigation.has(path)),
     unanchored: raw.guards.filter((guard) => guard.script && !guard.anchored).map((guard) => guard.command),
     guardsWithoutRow: listed.length === 0 ? [] : [...runtime].filter((name) => !rows.has(name)).sort(),
     rowsWithoutGuard: raw.registry
@@ -79,7 +133,9 @@ export function measureInvariants(
 }
 
 export function standingFiles(raw: RawEstate): EstateFile[] {
-  return raw.files.filter((file) => file.kind === 'standing' || file.kind === 'memory');
+  return raw.files.filter(
+    (file) => isNormative(file) && (file.kind === 'standing' || file.kind === 'memory'),
+  );
 }
 
 /** Adds the invariant atoms, each anchored on the file the property is about. */
@@ -127,7 +183,7 @@ export function invariantAtoms(raw: RawEstate, builder: AtomBuilder, state: Inva
       }),
     );
   }
-  const registry = raw.files.find((file) => file.kind === 'registry');
+  const registry = raw.files.find((file) => isNormative(file) && file.kind === 'registry');
   if (registry) {
     added.push(
       builder.add({
