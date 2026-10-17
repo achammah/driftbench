@@ -176,6 +176,9 @@ function personaPort(markers: readonly string[], leakAt: number | undefined, fac
       family: 'fixture',
       model: 'fixture-persona',
       complete: async (request: Request) => {
+        // The documented call passes system, user and maxTokens: anything else is refused, without echoing it.
+        if (Object.keys(request).some((key) => !['system', 'user', 'maxTokens'].includes(key)))
+          throw new Error('the persona fixture was called with an argument the port contract does not have');
         requests.push({ user: request.user, system: request.system });
         const at = markers.indexOf(hintOf(request.user) ?? '');
         if (at < 0) throw new Error('the persona fixture was asked for no block of the spec');
