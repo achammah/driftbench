@@ -45,6 +45,17 @@ function fake(id: string, results: (seed: number) => boolean[]): Family {
 }
 
 describe('the estate bank', () => {
+  it('runs both task validators with separate family and item ids', () => {
+    const generation = BANK_LEVELS.find((level) => level.id === 'generation')?.families() ?? [];
+    const tasks = generation.filter((family) => family.id === 'gen.task' || family.id === 'gen.task.v2');
+    expect(tasks.map((family) => family.id)).toEqual(['gen.task', 'gen.task.v2']);
+    expect(tasks.map((family) => family.items.length)).toEqual([23, 23]);
+    const ids = tasks.flatMap((family) => family.items.map((item) => item.id));
+    expect(new Set(ids).size).toBe(46);
+    for (const family of tasks)
+      for (const item of family.items) expect(item.id.startsWith(`${family.id}.`)).toBe(true);
+  });
+
   it('meets the bank minimum of section 12: 300 items, no family under 20, every tier', () => {
     const shape = bankShape(estateBank());
     expect(shape.size).toBeGreaterThanOrEqual(300);

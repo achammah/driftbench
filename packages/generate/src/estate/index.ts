@@ -12,6 +12,7 @@ export {
   plain,
   RESUME_ASK,
   situationProblem,
+  TOOL_ACTS,
 } from './asks';
 export {
   anchoredLines,
@@ -24,6 +25,18 @@ export {
   taskAtoms,
 } from './context';
 export { type ReadYaml, readEstateYaml, type YamlSchema } from './files';
+export {
+  ACT_SHAPES,
+  ASK_FRAMES,
+  askedClauses,
+  CONTEXT_SHAPES,
+  fillShape,
+  HAZARD_FRAME,
+  pronounDerivation,
+  renderAsk,
+  SLOT,
+  VERBATIM,
+} from './frames';
 export {
   type AskSource,
   checkEstateInputs,
@@ -70,6 +83,15 @@ export {
   WorkspaceSeed,
 } from './inputs';
 export { COMPILED_PREDICATES, type Compiled, compilePredicate } from './predicates';
+export {
+  ACT_KINDS,
+  type ActKind,
+  type ActRecord,
+  ASK_FORMS,
+  type FromRecord,
+  fingerprintOf,
+  type LinkRecord,
+} from './record';
 export {
   STATIC_DIR,
   STATIC_TEST_TYPES,

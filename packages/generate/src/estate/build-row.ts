@@ -3,7 +3,7 @@
 import type { CriterionDef } from '@agent-nexus/driftbench-core';
 import { DEVIATION_EXPECTED } from '../seed/deviation';
 import { rngFor, shuffle } from '../seed/random';
-import { codeAsk, DEVIATION_ASKS } from './asks';
+import { codeAsk, DEVIATION_ASKS, OUTSIDE_ASK, RESUME_ASK } from './asks';
 import { guardRuleIds, navigationReference, taskAtoms } from './context';
 import {
   type AskSource,
@@ -23,6 +23,7 @@ import type {
   Situation,
   SituationUse,
 } from './inputs';
+import { actRecord, fromRecord, linkOf } from './record';
 import {
   addPair,
   addWorkspace,
@@ -190,6 +191,7 @@ export function build(
   const first = atoms[0] as EstateAtom;
   // The unit that owns the rule supplies the task of a code-written ask even when the rule is not part of it.
   const askAtoms = askAtomsOf(atoms, ctx);
+  const ownerAtom = ctx.atoms.get(ctx.owners.get(first.id) ?? '');
 
   // Test types that add to or change what the atoms say.
   if (row.testType === 'stage_order' || row.testType === 'stage_skip') {
@@ -240,6 +242,7 @@ export function build(
   let phraseIndex: number | undefined;
   let ask: AskSource = use === 'none' ? 'none' : 'bank';
   let askFrom: string | undefined;
+  let askBuilt: { frame: string; act: string; context?: string } | undefined;
   if (use !== 'none') {
     let missing: { marker: Marker; detail: string } | undefined;
     if (!situation) {
@@ -274,9 +277,32 @@ export function build(
         phraseIndex = undefined;
         ask = 'code';
         askFrom = written.source;
+        askBuilt =
+          written.frame !== undefined && written.act !== undefined
+            ? {
+                frame: written.frame,
+                act: written.act,
+                ...(written.context ? { context: written.context } : {}),
+              }
+            : undefined;
       }
     } else if (missing) gap(then, missing.marker, first, missing.detail);
   }
+
+  // What the ask says about itself, before a deviation fallback changes the source flag.
+  const neutral =
+    phrase?.text === OUTSIDE_ASK ? 'outside' : phrase?.text === RESUME_ASK ? 'resume' : 'guard-event';
+  const from =
+    use === 'none' || phrase === undefined
+      ? undefined
+      : fromRecord({
+          ...(ask === 'bank' && situation && phraseIndex !== undefined
+            ? { bank: { situation: situation.id, phrase: phraseIndex } }
+            : {}),
+          ...(ask === 'session' && session ? { session: session.name } : {}),
+          ...(askFrom !== undefined ? { askFrom, neutral, ...(askBuilt ? { built: askBuilt } : {}) } : {}),
+          atoms: ctx.atoms,
+        });
 
   // The outcome the situation declares, else the one the atoms name, else the one read from the atoms.
   let outcome = 'none';
@@ -446,6 +472,9 @@ export function build(
         phrase: phraseIndex ?? null,
         ask,
         ...(askFrom ? { askFrom } : {}),
+        link: linkOf(first),
+        act: actRecord(first, ownerAtom),
+        ...(from ? { from } : {}),
         outcome,
         ...(unit !== undefined && typeof unit !== 'string' ? { unit } : {}),
         ...(then.judged.length > 0 ? { judged: then.judged } : {}),
