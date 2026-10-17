@@ -149,6 +149,7 @@ export {
   renderPlan,
   renderPlanSummary,
   START,
+  situationSpace,
   summaryPathOf,
   TARGET_PREFIX,
   targetDimension,
