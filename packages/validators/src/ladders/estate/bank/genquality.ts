@@ -575,6 +575,59 @@ export function holdsTask(ask: string, context: TaskContext = {}): boolean {
   return false;
 }
 
+/** The phrase a read-before rule governs, from the rule's own clause, in the four forms of docs/estate.md. */
+function governedPhrase(quote: string): string | undefined {
+  const text = quote
+    .replace(/^[\s!*#>-]+|[\s!*]+$/g, '')
+    // A rule label in front of the clause ("R5.", "A1:", "3)", "Rule 5.", "Step 2:", bold or not) is no part of it.
+    .replace(/^(?:(?:[A-Za-z]+\s+)?[A-Za-z]{0,3}\d+)[.:)]\**\s+/, '')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const before = /^before\s+(.+?)\s*[:,]/i.exec(text) ?? /\bbefore\s+(.+?)[.;]?$/i.exec(text);
+  if (before?.[1]) return before[1];
+  const until = /^do not\s+(.+?)\s+until\b/i.exec(text);
+  if (until?.[1]) return until[1];
+  return /^(.+?)\s+requires\b/i.exec(text)?.[1];
+}
+
+type Lemma = { verb: string; head: string };
+type Tagged = { text: string; root?: string; tags: string[] };
+
+/** The words of a text with their parts of speech and, for an inflected verb, its root. */
+function termsOf(text: string): Tagged[] {
+  const sentences = nlp(text).compute('root').json() as Array<{ terms?: Tagged[] }>;
+  return sentences.flatMap((sentence) => sentence.terms ?? []);
+}
+
+const lemmaOf = (term: Tagged) => (term.root ?? term.text).toLowerCase();
+const singular = (word: string) =>
+  word.length > 3 ? word.replace(/ies$/, 'y').replace(/(?<=[^s])s$/, '') : word;
+
+/** The verb and the head noun of its object in a phrase: "editing any invoice file" is edit, file. */
+function actionOf(phrase: string): Lemma | undefined {
+  const terms = termsOf(phrase);
+  const verb = terms.find((term) => term.tags.includes('Verb'));
+  if (!verb) return undefined;
+  const objects = terms.slice(terms.indexOf(verb) + 1).filter((term) => term.tags.includes('Noun'));
+  const head = objects.at(-1);
+  return head ? { verb: lemmaOf(verb), head: singular(head.text.toLowerCase()) } : undefined;
+}
+
+/**
+ * Whether an ask performs the act a read-before rule governs: a verb of the same lemma, on the object the rule names.
+ * A rule whose clause names no act and object governs nothing here, so the ask is not held to it.
+ */
+export function performsGoverned(ask: string, quote: string): boolean {
+  const phrase = governedPhrase(quote);
+  const governed = phrase === undefined ? undefined : actionOf(phrase);
+  if (!governed) return true;
+  const terms = termsOf(ask);
+  const verbs = terms.filter((term) => term.tags.includes('Verb')).map(lemmaOf);
+  const words = terms.map((term) => singular(term.text.toLowerCase()));
+  return verbs.includes(governed.verb) && words.includes(governed.head);
+}
+
 function firstAsk(spec: FixtureSuite['specs'][number]): string | undefined {
   const block = (spec.spec.blocks ?? [])[0] as { when?: { user?: string } } | undefined;
   return block?.when?.user;
@@ -701,13 +754,20 @@ export function taskFamily(): Family {
           const own = [...ids].flatMap((id) => ruleTitle.get(id) ?? []);
           return own.length > 0 ? own : allRules;
         };
+        // A read_when ask applies the rule it tests: it performs the act the rule's own clause governs.
+        const governs = (spec: FixtureSuite['specs'][number]): boolean => {
+          if (type !== 'read_when') return true;
+          const quote = atoms.find((atom) => atom.id === spec.atoms[0])?.provenance.quote;
+          return quote === undefined || performsGoverned(firstAsk(spec) ?? '', quote);
+        };
         const bad = specs.filter(
           (spec) =>
-            !(type.startsWith('guard_') && spec.atoms.some((atom) => promptGuards.has(atom))) &&
-            !holdsTask(firstAsk(spec) ?? '', {
-              rules: allRules,
-              ...(PRESSURE_TYPES.has(type) ? { against: rulesOf(spec) } : {}),
-            }),
+            !governs(spec) ||
+            (!(type.startsWith('guard_') && spec.atoms.some((atom) => promptGuards.has(atom))) &&
+              !holdsTask(firstAsk(spec) ?? '', {
+                rules: allRules,
+                ...(PRESSURE_TYPES.has(type) ? { against: rulesOf(spec) } : {}),
+              })),
         );
         return bad.length === 0
           ? { pass: true, detail: `holds (${specs.length})` }
