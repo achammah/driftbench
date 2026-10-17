@@ -19,7 +19,7 @@ import {
   specOfRun,
 } from './data';
 import { clustered, type Estimate, median, type Rate, rate } from './estimate';
-import { type SuiteHeadline, suiteHeadline } from './headline';
+import { parentLinks, type SuiteHeadline, specRoots, suiteHeadline } from './headline';
 
 /** pass^k or pass@k at one k, with the Wilson bounds of the per-run rate raised the same way. */
 export type AtK = { k: number; value: number; lower: number; upper: number; incomplete?: boolean };
@@ -386,6 +386,10 @@ export function modeReliability(data: CampaignData, lines: readonly ReliabilityL
         suiteHeadline(
           data.runs.filter((run) => run.mode === mode),
           lineKey,
+          {
+            parentsOf: (run) => parentLinks(specOfRun(data, run)),
+            rootsOf: (run) => specRoots(specOfRun(data, run)),
+          },
         ),
       ),
       ...optional('blockAccuracy', blockAccuracy(runs)),

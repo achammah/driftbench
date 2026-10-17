@@ -1999,6 +1999,7 @@
       "SpreadOptions": "type",
       "SuccessionSummary": "type",
       "SuiteHeadline": "type",
+      "SuiteHeadlineOptions": "type",
       "ToolAccuracy": "type",
       "UnitPair": "type",
       "UnitSide": "type",

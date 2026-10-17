@@ -1,4 +1,4 @@
-import { blockStatus, type RunResult, runOutcome } from '@agent-nexus/driftbench-core';
+import { blockStatus, type RunResult, runOutcome, type Spec } from '@agent-nexus/driftbench-core';
 import { hierarchicalBetaBinomial, mde } from '@agent-nexus/driftbench-stats';
 import { groupBy, runPassed, scoredRuns } from './data';
 import type { Estimate } from './estimate';
@@ -67,6 +67,45 @@ function meanEffective(counts: readonly { n: number; k: number }[], p: number, r
   return { effective, designEffect: runs / effective, degenerate };
 }
 
+/** What the headline reads besides the runs. */
+export type SuiteHeadlineOptions = {
+  /**
+   * The spec's parent links of a run, child block id to parent block id. A run need not record every
+   * ancestor (a replayed ancestor adds no block), so the links name the root the run alone cannot.
+   */
+  parentsOf?: (run: RunResult) => ReadonlyMap<string, string> | undefined;
+  /**
+   * The root blocks of a run's spec. A run that failed and measured no block fails each of these families
+   * once; without them the roots are read from `parentsOf` and the recorded blocks.
+   */
+  rootsOf?: (run: RunResult) => readonly string[] | undefined;
+};
+
+const LINKS = new WeakMap<Spec, ReadonlyMap<string, string>>();
+
+/** A spec's parent links, child block id to parent block id; undefined when no block has a parent. */
+export function parentLinks(spec: Spec | undefined): ReadonlyMap<string, string> | undefined {
+  if (!spec) return undefined;
+  let links = LINKS.get(spec);
+  if (!links) {
+    links = new Map(
+      spec.blocks.flatMap((block) =>
+        block.id !== undefined && block.parent !== undefined ? [[block.id, block.parent] as const] : [],
+      ),
+    );
+    LINKS.set(spec, links);
+  }
+  return links.size > 0 ? links : undefined;
+}
+
+/** A spec's root blocks (no parent), by id, else `block <index>`; undefined when no block has a parent. */
+export function specRoots(spec: Spec | undefined): readonly string[] | undefined {
+  if (!parentLinks(spec)) return undefined;
+  return (spec as Spec).blocks.flatMap((block, index) =>
+    block.parent === undefined ? [block.id ?? `block ${index}`] : [],
+  );
+}
+
 /**
  * The suite headline of runs, grouped into trees by `treeOf`, over the scored runs (pass or fail). Undefined
  * with no scored run.
@@ -74,32 +113,41 @@ function meanEffective(counts: readonly { n: number; k: number }[], p: number, r
 export function suiteHeadline(
   all: readonly RunResult[],
   treeOf: (run: RunResult) => string,
+  options: SuiteHeadlineOptions = {},
 ): SuiteHeadline | undefined {
   // Only scored runs count, linked or not: a run not run or blocked (no failure) is left out of every rate
   // and count, whatever trees inside it were measured.
   const runs = scoredRuns(all);
   if (runs.length === 0) return undefined;
-  const linked = runs.some((run) => run.blocks.some((block) => block.parent !== undefined));
+  // A run is read as a forest when its spec has parent links or one of its blocks names a parent: a subset
+  // run that recorded only roots still belongs to those roots, not to the golden as a whole.
+  const forest = (run: RunResult) =>
+    (options.parentsOf?.(run)?.size ?? 0) > 0 || run.blocks.some((block) => block.parent !== undefined);
+  const linked = runs.some(forest);
   const samples = new Map<string, boolean[]>();
   for (const run of runs) {
-    if (!run.blocks.some((block) => block.parent !== undefined)) {
+    if (!forest(run)) {
       const key = treeOf(run);
       samples.set(key, [...(samples.get(key) ?? []), runPassed(run)]);
       continue;
     }
     const ids = new Map(run.blocks.map((block) => [block.blockId, block]));
+    const links = options.parentsOf?.(run);
+    // The root of a family is its topmost ancestor: the spec's links name it, else the recorded blocks do. An
+    // ancestor the run did not record still names the family, so a rerun of a leaf joins its root's tree.
+    const parentOf = (id: string): string | undefined => links?.get(id) ?? ids.get(id)?.parent;
     const trees = groupBy(
       run.blocks.filter((block) => block.specIndex !== undefined),
       (block) => {
-        let root = block;
-        const seen = new Set<string>();
-        while (root.parent !== undefined && !seen.has(root.parent)) {
-          seen.add(root.parent);
-          const parent = ids.get(root.parent);
-          if (!parent) break;
+        let root = block.blockId ?? `block ${block.specIndex ?? block.index}`;
+        let parent = (block.blockId === undefined ? undefined : links?.get(block.blockId)) ?? block.parent;
+        const seen = new Set<string>([root]);
+        while (parent !== undefined && !seen.has(parent)) {
+          seen.add(parent);
           root = parent;
+          parent = parentOf(parent);
         }
-        return root.blockId ?? `block ${root.index}`;
+        return root;
       },
     );
     const outcomes: Array<{ root: string; failed: boolean }> = [];
@@ -115,6 +163,18 @@ export function suiteHeadline(
     for (const { root, failed } of outcomes) {
       const key = JSON.stringify([treeOf(run), root]);
       samples.set(key, [...(samples.get(key) ?? []), !(failed || whole)]);
+    }
+    // A run that failed and measured no tree (it died before its first block, or every block was not run)
+    // fails each root family of its spec once, so a dead run weighs as many failures as the spec has families.
+    if (outcomes.length === 0 && !runPassed(run)) {
+      const roots = new Set(options.rootsOf?.(run) ?? []);
+      if (roots.size === 0) {
+        for (const parent of links?.values() ?? []) if (parentOf(parent) === undefined) roots.add(parent);
+        for (const root of trees.keys()) roots.add(root);
+      }
+      const keys =
+        roots.size > 0 ? [...roots].map((root) => JSON.stringify([treeOf(run), root])) : [treeOf(run)];
+      for (const key of keys) samples.set(key, [...(samples.get(key) ?? []), false]);
     }
   }
   const counts = [...samples.values()].map((group) => ({ n: group.length, k: group.filter(Boolean).length }));
