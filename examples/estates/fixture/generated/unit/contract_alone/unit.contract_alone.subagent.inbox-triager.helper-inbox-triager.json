@@ -1,0 +1,29 @@
+{
+  "id": "unit.contract_alone.subagent.inbox-triager.helper-inbox-triager",
+  "planRow": "contract_alone.subagent.inbox-triager.helper-inbox-triager",
+  "testType": "contract_alone",
+  "atom": "subagent.inbox-triager.helper-inbox-triager",
+  "title": "Helper inbox-triager",
+  "mapHash": "be2e7a0919cb31aecf73102cd271e7611cb439be814983a47b9dc39e38775f10",
+  "target": {
+    "kind": "subagent",
+    "name": "inbox-triager",
+    "file": ".claude/agents/inbox-triager.md"
+  },
+  "cases": [
+    {
+      "id": "case-01",
+      "payload": {
+        "task": "Sort the five messages in inbox/ into their folders and tell me where each one goes.",
+        "files": {
+          "inbox/001-fjord-invoice.txt": "From: accounts@fjord-kitchenware.example\nSubject: Invoice INV-1003 for PO-2003\nPlease find invoice INV-1003 attached, 312.00 EUR, due 30 October.\n",
+          "inbox/002-dpx-delay.txt": "From: tracking@dpx.example\nSubject: Shipment NW-55020 delayed\nYour shipment NW-55020 is delayed by one day at the depot.\n",
+          "inbox/003-copperline-credit.txt": "From: sales@copperline-pans.example\nSubject: Credit note CN-77 for PO-2002\nWe issued credit note CN-77 of 48.00 EUR for the missing lids on PO-2002.\n",
+          "inbox/004-office-plants.txt": "From: hello@greenleaf-plants.example\nSubject: Office plants this autumn\nWould your team like a quote for office plants this autumn?\n",
+          "inbox/005-where-is-my-order.txt": "From: buyer@harbour-bistro.example\nSubject: Where is my order?\nWe have not received shipment NW-55031 yet. Can you check?\n"
+        }
+      },
+      "material": "Sort the five messages in inbox/ into their folders and tell me where each one goes."
+    }
+  ]
+}

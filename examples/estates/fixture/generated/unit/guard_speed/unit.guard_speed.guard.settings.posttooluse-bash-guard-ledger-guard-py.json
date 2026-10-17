@@ -18,7 +18,7 @@
       "payload": {
         "tool_name": "Bash",
         "tool_input": {
-          "command": "ledger/",
+          "command": "rm ledger/",
           "description": "unit test"
         },
         "tool_response": {
@@ -27,23 +27,7 @@
           "interrupted": false
         }
       },
-      "material": "ledger/"
-    },
-    {
-      "id": "case-02",
-      "payload": {
-        "tool_name": "Bash",
-        "tool_input": {
-          "command": "ledger/archive/",
-          "description": "unit test"
-        },
-        "tool_response": {
-          "stdout": "",
-          "stderr": "",
-          "interrupted": false
-        }
-      },
-      "material": "ledger/archive/"
+      "material": "rm ledger/"
     }
   ],
   "budgetMs": 60000

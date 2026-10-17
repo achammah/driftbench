@@ -25,7 +25,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please ask for the tracking number when none is given.
+      user: Please help me with a delivery, a tracking number or a late shipment. The user gives no tracking number.
     expect:
       must:
         - tracking number
@@ -62,5 +62,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.shipment-tracker.ask-for-the-tracking-number-when (title)
+    askFrom: skill.shipment-tracker.skill-shipment-tracker (asks it names)
     outcome: no-delete

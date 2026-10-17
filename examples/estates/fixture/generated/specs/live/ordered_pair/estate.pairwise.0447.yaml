@@ -65,6 +65,7 @@ rules:
       pairs:
         - before: Read
           after: Edit
+          key: file_path
 perturbations:
   - id: deviation-D2_goal_shift
     class: D2_goal_shift

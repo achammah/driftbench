@@ -4,7 +4,7 @@
 id: estate.journey.10
 version: be2e7a0919cb
 kind: task
-title: "journey: An ask to prepare the weekly report loads weekly-report"
+title: "journey: An ask to reconcile an invoice against a purchase order loads invoice-reconcile"
 lang: EN
 tier: generated
 tags:
@@ -52,26 +52,24 @@ given:
 blocks:
   - id: ask
     when:
-      user: Write up last week in the usual weekly report.
+      user: Match the Fjord Kitchenware invoice INV-1001 with its order.
     expect:
       skills:
-        - name: weekly-report
+        - name: invoice-reconcile
           count:
             min: 1
       references:
-        - path: "**/.claude/skills/weekly-report/templates/report.md"
+        - path: "**/.claude/skills/invoice-reconcile/references/matching-rules.md"
           count:
             min: 1
       workspace:
-        created:
-          - reports/2026-W42.md
         others_untouched: true
 metadata:
   estate:
     atoms:
-      - route.standing.an-ask-to-prepare-the-weekly
-      - skill.weekly-report.skill-weekly-report
-      - reference.weekly-report.read-templates-report-md
+      - route.standing.an-ask-to-reconcile-an-invoice
+      - skill.invoice-reconcile.skill-invoice-reconcile
+      - reference.invoice-reconcile.read-references-matching-rules-md
     planRow: journey.10
     cell: {}
     seeder: estate
@@ -81,7 +79,7 @@ metadata:
     mode: live
     map: ../approved.yaml
     plan: ../../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml
-    situation: weekly-report-new
-    phrase: 1
+    situation: invoice-reconcile
+    phrase: 2
     ask: bank
     outcome: bank

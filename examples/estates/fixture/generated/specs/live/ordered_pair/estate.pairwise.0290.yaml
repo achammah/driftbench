@@ -64,6 +64,7 @@ rules:
       pairs:
         - before: Read
           after: Edit
+          key: file_path
 perturbations:
   - id: deviation-D11_pii_leak
     class: D11_pii_leak

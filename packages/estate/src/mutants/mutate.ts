@@ -1,19 +1,9 @@
 import { constants, existsSync } from 'node:fs';
-import {
-  copyFile,
-  cp,
-  lstat,
-  mkdir,
-  readdir,
-  readFile,
-  realpath,
-  rm,
-  stat,
-  writeFile,
-} from 'node:fs/promises';
-import { basename, dirname, join, relative, sep } from 'node:path';
+import { copyFile, lstat, mkdir, readdir, readFile, realpath, rm, stat, writeFile } from 'node:fs/promises';
+import { basename, dirname, join, relative } from 'node:path';
 import { mapHash } from '../map/build';
 import { quoteDrift } from '../map/file';
+import { estatePath, estateSource } from '../paths';
 import { readerFor } from '../scan/index';
 import { provenanceHash, quoteAtSpan } from '../scan/text';
 import type { Atom, EstateMap } from '../schema';
@@ -61,6 +51,9 @@ export class MutantError extends Error {
 /** The estate's own files a copy holds by default: what the runtime reads, nothing the test harness wrote. */
 export const ESTATE_COPY_FILES = ['CLAUDE.md', 'CLAUDE.local.md', '.claude', '.mcp.json'] as const;
 
+/** Where an estate keeps the configuration the unit runner reads (`driftbench.estate.yaml`). */
+const ESTATE_CONFIG_NAMES = ['driftbench.estate.yaml', '.claude/driftbench.estate.yaml'] as const;
+
 /**
  * Copies the estate's own files, and every file an atom of the map quotes, from `root` into `to`. The files
  * are the ones the map's runtime reader lists (ignored folders such as node_modules and test runs left out,
@@ -79,31 +72,38 @@ export async function copyEstate(
   const reader = readerFor(map.runtime, { ignore: map.ignore ?? [] });
   const listed = reader?.listFiles ? await reader.listFiles(root) : undefined;
   const copied: string[] = [];
-  if (listed) {
-    const files = [...new Set([...listed, ...map.atoms.map((atom) => atom.provenance.file)])].sort();
-    // Sixteen copies at a time: an estate of thousands of small files is bound by the file system's latency.
-    await eachLimited(files, 16, async (file) => {
-      const source = join(root, file);
-      if (!(await stat(source).catch(() => undefined))?.isFile()) return;
-      await mkdir(dirname(join(to, file)), { recursive: true });
-      await copyFile(source, join(to, file), constants.COPYFILE_FICLONE);
-      copied.push(file);
-    });
-    copied.sort();
-  } else {
-    const wanted = [...names, ...map.atoms.map((atom) => atom.provenance.file)];
-    for (const name of [...new Set(wanted)]) {
-      if (copied.some((done) => name === done || name.startsWith(`${done}/`))) continue;
-      const source = join(root, name);
-      if ((await stat(source).catch(() => undefined)) === undefined) continue;
-      await cp(source, join(to, name), {
-        recursive: true,
-        dereference: true,
-        mode: constants.COPYFILE_FICLONE,
-      });
-      copied.push(name);
-    }
-  }
+  const files = new Set(listed ?? []);
+  const collect = async (file: string, ancestors = new Set<string>()): Promise<void> => {
+    const source = estateSource(root, file);
+    const info = await stat(source).catch(() => undefined);
+    if (!info) return;
+    if (info.isDirectory()) {
+      const real = await realpath(source);
+      if (ancestors.has(real)) throw new MutantError(`cyclic copy source ${file}; refused`);
+      const parents = new Set([...ancestors, real]);
+      for (const entry of await readdir(source)) await collect(join(file, entry), parents);
+    } else if (info.isFile()) files.add(file);
+  };
+  if (!listed) for (const name of names) await collect(name);
+  // The estate configuration (helper executors, script fixtures) is not an instruction the agent reads, yet a
+  // unit test on the copy needs it: without it the copy cannot run a helper or the script fixtures it declares.
+  for (const file of ESTATE_CONFIG_NAMES) await collect(file);
+  for (const atom of map.atoms) await collect(atom.provenance.file);
+  // Preflight every source and destination before the first mkdir or copy.
+  const paths = await Promise.all(
+    [...files].sort().map(async (file) => ({
+      file,
+      source: estateSource(root, file),
+      target: await estatePath(to, file),
+    })),
+  );
+  await eachLimited(paths, 16, async ({ file, source, target }) => {
+    await mkdir(dirname(target), { recursive: true });
+    await copyFile(source, target, constants.COPYFILE_FICLONE);
+    copied.push(file);
+  });
+  copied.sort();
+  await mkdir(to, { recursive: true });
   const left = await linksUnder(to);
   if (left.length > 0) throw new MutantError(`the estate copy holds symbolic links: ${left.join(', ')}`);
   return copied;
@@ -155,17 +155,14 @@ export async function mutateEstate(
   } else {
     next = tidy(text.slice(0, from) + text.slice(to), startLine, file);
   }
-  await writeFile(path, next);
-
-  // A deleted script goes with its mention: the mutant must not keep a script the estate no longer names.
-  const removedFiles: string[] = [];
   const scriptPath = atom.kind === 'script' && kind === 'delete' ? atom.fields?.path : undefined;
-  if (typeof scriptPath === 'string' && scriptPath !== '') {
-    const target = await insideCopy(copy.root, scriptPath);
-    if (existsSync(target)) {
-      await rm(target, { force: true });
-      removedFiles.push(scriptPath);
-    }
+  const target =
+    typeof scriptPath === 'string' && scriptPath !== '' ? await insideCopy(copy.root, scriptPath) : undefined;
+  await writeFile(path, next);
+  const removedFiles: string[] = [];
+  if (target !== undefined && existsSync(target)) {
+    await rm(target, { force: true });
+    removedFiles.push(scriptPath as string);
   }
   const gone = new Set(removedFiles);
 
@@ -507,17 +504,11 @@ async function linksUnder(dir: string): Promise<string[]> {
  * way (the file, or a folder above it) that leads out of the copy refuses the write, naming where it leads.
  */
 export async function insideCopy(root: string, file: string): Promise<string> {
-  const base = await realpath(root);
-  const path = join(root, file);
-  let real: string;
   try {
-    real = await realpath(path);
-  } catch {
-    // A file not there yet: its folder must stay inside.
-    real = join(await realpath(dirname(path)).catch(() => base), file.split('/').at(-1) ?? '');
+    return await estatePath(root, file);
+  } catch (cause) {
+    throw new MutantError(
+      cause instanceof Error ? cause.message.replace('estate root', 'copy') : String(cause),
+    );
   }
-  if (real !== base && !real.startsWith(`${base}${sep}`)) {
-    throw new MutantError(`${file} resolves to ${real}, outside the copy ${base}; refused`);
-  }
-  return path;
 }

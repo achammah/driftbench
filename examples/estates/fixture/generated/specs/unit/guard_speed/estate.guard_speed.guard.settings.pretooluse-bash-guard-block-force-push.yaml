@@ -54,6 +54,7 @@ blocks:
     expect:
       guards:
         - name: block-force-push.sh
+          verdict: deny
           count:
             min: 1
       workspace:
@@ -81,3 +82,20 @@ metadata:
     phrase: 0
     ask: bank
     outcome: bank
+    unit:
+      target:
+        kind: guard
+        name: block-force-push.sh
+        event: PreToolUse
+        command: '"$CLAUDE_PROJECT_DIR"/.claude/guards/block-force-push.sh'
+        matcher: Bash
+        verdict: deny
+      cases:
+        - id: case-01
+          payload:
+            tool_name: Bash
+            tool_input:
+              command: git push --force
+              description: unit test
+          material: git push --force
+      budgetMs: 60000

@@ -33,6 +33,8 @@ rules:
   custom:
     hazard_recovery:
       hazard: compaction
+      reread:
+        - CLAUDE.md
       block: 0
 metadata:
   estate:

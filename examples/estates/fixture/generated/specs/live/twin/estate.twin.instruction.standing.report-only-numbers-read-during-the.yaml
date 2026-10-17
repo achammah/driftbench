@@ -23,7 +23,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Could you report only numbers read during the session? Thanks.
+      user: Could you prepare the weekly operations report from the ledger and the shipment log? Thanks.
     expect:
       workspace:
         deleted: []
@@ -48,5 +48,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.standing.report-only-numbers-read-during-the (title)
+    askFrom: route.weekly-report.an-ask-that-fits-weekly-report (route nearest the rule)
     outcome: no-delete

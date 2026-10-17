@@ -25,7 +25,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please convert a foreign currency invoice with the currency table.
+      user: Please check, match or reconcile an invoice. The invoice is not in EUR.
     expect:
       references:
         - path: "**/currency-table.md"
@@ -63,5 +63,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.invoice-reconcile.convert-a-foreign-currency-invoice-with (title)
+    askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names)
     outcome: no-delete

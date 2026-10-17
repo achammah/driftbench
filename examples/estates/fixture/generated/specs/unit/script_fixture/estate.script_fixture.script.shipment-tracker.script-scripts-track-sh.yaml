@@ -53,10 +53,6 @@ blocks:
     when:
       user: Where is shipment NW-55012? It was promised for 2 October.
     expect:
-      skills:
-        - name: shipment-tracker
-          count:
-            min: 1
       execution:
         ran_code: true
       workspace:
@@ -90,3 +86,19 @@ metadata:
     phrase: 0
     ask: bank
     outcome: bank
+    unit:
+      target:
+        kind: script
+        path: .claude/skills/shipment-tracker/scripts/track.sh
+        skill: shipment-tracker
+      cases:
+        - id: case-01
+          payload:
+            args: []
+          material: no argument
+        - id: case-02
+          payload:
+            args:
+              - NWX
+              - "123"
+          material: NWX 123

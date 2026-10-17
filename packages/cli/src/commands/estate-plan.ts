@@ -38,7 +38,10 @@ export function registerEstatePlanCommands(estate: Command, io: Io, setExit: (co
       'where to write the plan (YAML); the summary goes beside it as <plan>.summary.json',
     )
     .option('--t <n>', 'the strength of the covering array over the situation axes', '2')
-    .option('--space <file>', "the space map of the situation axes (default: the map's own, approved atoms)")
+    .option(
+      '--space <file>',
+      'an authoritative space map (default: infer relevance from approved atom contracts)',
+    )
     .option('--k <n>', 'positive asks per route', '3')
     .option('--force', 'replace an existing plan; the approvals in it are lost')
     .action(async (path: string, options: EstatePlanOptions) => {

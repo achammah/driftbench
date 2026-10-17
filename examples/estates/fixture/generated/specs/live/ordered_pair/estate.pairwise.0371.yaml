@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please read git status before commit to git.
+      user: Please commit to git.
     expect:
       workspace:
         deleted: []
@@ -73,5 +73,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: gate.standing.read-git-status-before-commit-to (title)
+    askFrom: gate.standing.read-git-status-before-commit-to (gate trigger)
     outcome: no-delete

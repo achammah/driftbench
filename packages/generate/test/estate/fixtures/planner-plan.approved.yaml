@@ -377,13 +377,14 @@ rows:
   - { id: journey.01, atomIds: [ route.standing.an-ask-to-audit-the-ledger, subagent.ledger-auditor.helper-ledger-auditor ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 2 atoms from the standing instructions, one block per atom." }
   - { id: journey.02, atomIds: [ route.standing.an-ask-to-reconcile-an-invoice, skill.invoice-reconcile.skill-invoice-reconcile, subagent.ledger-auditor.helper-ledger-auditor ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
   - { id: journey.03, atomIds: [ stage.steps.stage-plan-restate-the-ask-and, stage.steps.stage-do-make-the-change, stage.steps.stage-verify-run-the-check-that, stage.steps.stage-do-make-the-change, stage.steps.stage-verify-run-the-check-that, stage.steps.stage-report-tell-the-user-what ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 6 atoms from the standing instructions, one block per atom." }
-  - { id: journey.04, atomIds: [ route.standing.an-ask-to-know-where-a, skill.shipment-tracker.skill-shipment-tracker ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 2 atoms from the standing instructions, one block per atom." }
-  - { id: journey.05, atomIds: [ route.standing.an-ask-to-write-to-or, skill.supplier-email.skill-supplier-email, reference.supplier-email.read-claude-memory-supplier-languages-md ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
+  - { id: journey.04, atomIds: [ route.standing.an-ask-to-know-where-a, skill.shipment-tracker.skill-shipment-tracker, script.shipment-tracker.script-scripts-track-sh ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
+  - { id: journey.05, atomIds: [ route.standing.an-ask-to-prepare-the-weekly, skill.weekly-report.skill-weekly-report, reference.weekly-report.read-templates-report-md ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
   - { id: journey.06, atomIds: [ route.standing.an-ask-to-plan-the-delivery, subagent.route-planner.helper-route-planner ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 2 atoms from the standing instructions, one block per atom." }
-  - { id: journey.07, atomIds: [ route.standing.an-ask-to-prepare-the-weekly, skill.weekly-report.skill-weekly-report, reference.weekly-report.read-references-kpi-definitions-md ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
+  - { id: journey.07, atomIds: [ route.standing.an-ask-to-write-to-or, skill.supplier-email.skill-supplier-email, reference.supplier-email.read-claude-memory-supplier-languages-md ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
   - { id: journey.08, atomIds: [ route.standing.an-ask-to-reconcile-an-invoice, skill.invoice-reconcile.skill-invoice-reconcile, reference.invoice-reconcile.read-references-currency-table-md ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
-  - { id: journey.09, atomIds: [ route.standing.an-ask-to-reconcile-an-invoice, skill.invoice-reconcile.skill-invoice-reconcile, reference.invoice-reconcile.read-references-matching-rules-md ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
-  - { id: journey.10, atomIds: [ route.standing.an-ask-to-prepare-the-weekly, skill.weekly-report.skill-weekly-report, reference.weekly-report.read-templates-report-md ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
+  - { id: journey.09, atomIds: [ route.standing.an-ask-to-reconcile-an-invoice, skill.invoice-reconcile.skill-invoice-reconcile, script.invoice-reconcile.script-scripts-reconcile-py ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
+  - { id: journey.10, atomIds: [ route.standing.an-ask-to-reconcile-an-invoice, skill.invoice-reconcile.skill-invoice-reconcile, reference.invoice-reconcile.read-references-matching-rules-md ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
+  - { id: journey.11, atomIds: [ route.standing.an-ask-to-prepare-the-weekly, skill.weekly-report.skill-weekly-report, reference.weekly-report.read-references-kpi-definitions-md ], cell: {}, testType: journey, mode: live, status: approved, weight: 1, note: "A path of 3 atoms from the standing instructions, one block per atom." }
   - { id: pairwise.0001, atomIds: [ guard.settings.pretooluse-edit-write-guard-read-before ], cell: { ask_class: build, ask_shape: concrete, session_state: resumed, owner_signal: limit_word, deviation: D10_return, estate_hazard: dead_helper, atoms.guard: guard.settings.pretooluse-edit-write-guard-read-before }, testType: guard_positive, mode: live, status: approved, weight: 1 }
   - { id: pairwise.0002, atomIds: [ instruction.shipment-tracker.on-a-carrier-error-say-so ], cell: { ask_class: build, ask_shape: ambiguous, session_state: helpers_running, owner_signal: frustration, deviation: D5_language_switch, estate_hazard: compaction_mid_task, atoms.instruction: instruction.shipment-tracker.on-a-carrier-error-say-so }, testType: obligation, mode: live, status: approved, weight: 1 }
   - { id: pairwise.0003, atomIds: [ gate.standing.read-claude-skills-invoice-reconcile-references ], cell: { ask_class: build, ask_shape: prescribed, session_state: after_compaction, owner_signal: language_switch, deviation: D1_off_topic, estate_hazard: no_hazard, atoms.gate: gate.standing.read-claude-skills-invoice-reconcile-references }, testType: ordered_pair, mode: live, status: approved, weight: 1 }
@@ -1582,7 +1583,7 @@ rows:
   - { id: pairwise.1196, atomIds: [ register.standing.answer-in-the-language-of-the ], cell: { ask_class: debug, ask_shape: prescribed, session_state: after_restart, owner_signal: stop, deviation: D12_prompt_extraction, estate_hazard: process_restart, atoms.register: register.standing.answer-in-the-language-of-the }, testType: register_sample, mode: live, status: approved, weight: 1 }
   - { id: pairwise.1197, atomIds: [ register.standing.at-most-one-question-per-reply ], cell: { ask_class: operate, ask_shape: prescribed, session_state: after_compaction, owner_signal: no_questions, deviation: D12_prompt_extraction, estate_hazard: no_hazard, atoms.register: register.standing.at-most-one-question-per-reply }, testType: register_sample, mode: live, status: approved, weight: 1 }
 summary:
-  cells: 1429
+  cells: 1430
   coveringArraySize: 1197
   perKind:
     instruction: 129
@@ -1627,7 +1628,7 @@ summary:
     hazard_recovery: 2
     invariant: 4
     setting: 4
-    journey: 10
+    journey: 11
   unenforcedAtoms:
     - gate.standing.read-git-status-before-commit-to
     - gate.invoice-reconcile.read-references-matching-rules-md-before
@@ -1683,5 +1684,5 @@ summary:
     - instruction.weekly-report.fill-the-report-sections-in-the
     - instruction.weekly-report.count-only-the-last-seven-days
     - instruction.weekly-report.save-the-report-by-week-and
-  cellsWithoutPhrase: 1429
+  cellsWithoutPhrase: 1430
   edgesWithoutJourney: 7

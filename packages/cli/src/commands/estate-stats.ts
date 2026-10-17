@@ -138,6 +138,7 @@ async function completeTests(folder: string, map: EstateMap, plan: Plan): Promis
         const test = parsed.data;
         if (test.mapHash !== map.hash) throw new Error(`${file}: a static test is made from another map`);
         if (rows.get(test.planRow)?.status === 'struck') continue;
+        if (test.retired !== undefined) continue;
         tests.push({ atoms: [test.atom], planRow: test.planRow, cell: rows.get(test.planRow)?.cell });
       } else {
         const loaded = await loadSpecFile(file);

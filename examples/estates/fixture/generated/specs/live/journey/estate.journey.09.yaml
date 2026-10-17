@@ -13,7 +13,7 @@ tags:
   - mode:live
   - kind:route
   - kind:skill
-  - kind:reference
+  - kind:script
 target:
   adapter: claude-code
 given:
@@ -58,18 +58,27 @@ blocks:
         - name: invoice-reconcile
           count:
             min: 1
-      references:
-        - path: "**/.claude/skills/invoice-reconcile/references/matching-rules.md"
-          count:
-            min: 1
+      execution:
+        ran_code: true
       workspace:
         others_untouched: true
+rules:
+  custom:
+    some_call:
+      calls:
+        - label: Bash
+          input:
+            command:
+              contains: reconcile.py
+          count:
+            min: 1
+          block: 0
 metadata:
   estate:
     atoms:
       - route.standing.an-ask-to-reconcile-an-invoice
       - skill.invoice-reconcile.skill-invoice-reconcile
-      - reference.invoice-reconcile.read-references-matching-rules-md
+      - script.invoice-reconcile.script-scripts-reconcile-py
     planRow: journey.09
     cell: {}
     seeder: estate

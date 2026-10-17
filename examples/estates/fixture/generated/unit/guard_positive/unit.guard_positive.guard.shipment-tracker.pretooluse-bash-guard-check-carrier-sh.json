@@ -18,11 +18,22 @@
       "payload": {
         "tool_name": "Bash",
         "tool_input": {
-          "command": "./scripts/track.sh NWX 123",
+          "command": "./scripts/track.sh 123",
           "description": "unit test"
         }
       },
-      "material": "./scripts/track.sh NWX 123"
+      "material": "./scripts/track.sh 123"
+    },
+    {
+      "id": "case-02",
+      "payload": {
+        "tool_name": "Bash",
+        "tool_input": {
+          "command": "./scripts/track.sh NWX",
+          "description": "unit test"
+        }
+      },
+      "material": "./scripts/track.sh NWX"
     }
   ]
 }

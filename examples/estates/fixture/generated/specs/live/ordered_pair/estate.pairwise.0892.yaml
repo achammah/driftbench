@@ -64,6 +64,7 @@ rules:
       pairs:
         - before: Read
           after: Edit
+          key: file_path
 perturbations:
   - id: deviation-D4_loose_confirmation
     class: D4_loose_confirmation

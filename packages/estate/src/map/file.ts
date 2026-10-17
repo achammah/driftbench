@@ -4,6 +4,7 @@ import { isPlainObject } from '@agent-nexus/driftbench-core';
 import { Document, isMap, isSeq, parseDocument, parse as parseYaml } from 'yaml';
 import { describe, fromZod } from '../file-issues';
 import { EVENT_PREFIX } from '../graph/edges';
+import { estatePath } from '../paths';
 import { provenanceHash, quoteAtSpan, sha256 } from '../scan/text';
 import { type Atom, AtomKind, EstateMap } from '../schema';
 import { mapHash } from './build';
@@ -128,7 +129,9 @@ export async function loadEstateMap(path: string, options: LoadEstateMapOptions 
   }
   const cached = options.cacheDir === undefined ? undefined : join(options.cacheDir, `${sha256(text)}.json`);
   if (cached !== undefined) {
-    const json = await readFile(cached, 'utf8').catch(() => undefined);
+    const json = await estatePath(options.cacheDir as string, `${sha256(text)}.json`)
+      .then((safe) => readFile(safe, 'utf8'))
+      .catch(() => undefined);
     if (json !== undefined) {
       try {
         const parsed = validateEstateMap(JSON.parse(json));
@@ -144,7 +147,8 @@ export async function loadEstateMap(path: string, options: LoadEstateMapOptions 
     // Written aside and renamed, so a reader never sees half a copy. A cache that cannot be written is no error.
     const partial = `${cached}.${process.pid}.tmp`;
     await mkdir(dirname(cached), { recursive: true })
-      .then(() => writeFile(partial, JSON.stringify(parsed.map)))
+      .then(() => estatePath(options.cacheDir as string, `${sha256(text)}.json.${process.pid}.tmp`))
+      .then((safe) => writeFile(safe, JSON.stringify(parsed.map), { flag: 'wx' }))
       .then(() => rename(partial, cached))
       .catch(() => undefined);
   }

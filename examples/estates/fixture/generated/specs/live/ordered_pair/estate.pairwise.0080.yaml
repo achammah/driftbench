@@ -67,7 +67,7 @@ rules:
   custom:
     ordered:
       pairs:
-        - before: Read
+        - before: Read~.claude/skills/invoice-reconcile/references/matching-rules.md
           after: Edit
 perturbations:
   - id: deviation-D7_silence_or_burst

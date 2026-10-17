@@ -27,6 +27,16 @@ blocks:
     expect:
       guards:
         - name: reply-length.py
+          verdict: deny
+          count: 0
+        - name: reply-length.py
+          verdict: block
+          count: 0
+        - name: reply-length.py
+          verdict: warn
+          count: 0
+        - name: reply-length.py
+          verdict: nudge
           count: 0
       workspace:
         others_untouched: true
@@ -49,3 +59,16 @@ metadata:
     ask: code
     askFrom: neutral
     outcome: no-change:negative
+    unit:
+      target:
+        kind: guard
+        name: reply-length.py
+        event: Stop
+        command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/reply-length.py
+      cases:
+        - id: case-01
+          payload:
+            stop_hook_active: false
+            last_reply: Done.
+          material: Done.
+      budgetMs: 60000

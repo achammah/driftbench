@@ -53,10 +53,6 @@ blocks:
     when:
       user: Match the Fjord Kitchenware invoice INV-1001 with its order.
     expect:
-      skills:
-        - name: invoice-reconcile
-          count:
-            min: 1
       execution:
         ran_code: true
       workspace:
@@ -90,3 +86,22 @@ metadata:
     phrase: 2
     ask: bank
     outcome: bank
+    unit:
+      target:
+        kind: script
+        path: .claude/skills/invoice-reconcile/scripts/reconcile.py
+        skill: invoice-reconcile
+      cases:
+        - id: case-01
+          payload:
+            args: []
+          material: no argument
+        - id: case-02
+          payload:
+            args:
+              - invoice
+              - order
+            files:
+              invoice: ""
+              order: ""
+          material: invoice order

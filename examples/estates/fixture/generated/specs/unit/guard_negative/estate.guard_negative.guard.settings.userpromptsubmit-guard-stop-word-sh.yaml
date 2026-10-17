@@ -50,3 +50,16 @@ metadata:
     ask: code
     askFrom: neutral
     outcome: no-change:negative
+    unit:
+      target:
+        kind: guard
+        name: stop-word.sh
+        event: UserPromptSubmit
+        command: '"$CLAUDE_PROJECT_DIR"/.claude/guards/stop-word.sh'
+        verdict: nudge
+      cases:
+        - id: case-01
+          payload:
+            prompt: Done.
+          material: Done.
+      budgetMs: 60000

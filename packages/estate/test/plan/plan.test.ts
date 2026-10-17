@@ -29,8 +29,9 @@ describe('the estate plan', () => {
     expect(renderPlan(buildPlan(map, { t: 1 }).plan)).not.toBe(renderPlan(first.plan));
   }, 60_000);
 
-  it('matches the committed fixture plan and its summary', async () => {
-    const built = buildPlan(await approvedFixture());
+  it('reproduces the committed plan when its declared full space is supplied explicitly', async () => {
+    const map = await approvedFixture();
+    const built = buildPlan(map, { space: toEstateSpaceMap(map) });
     expect(await readFile(join(FIXTURE, 'plan.yaml'), 'utf8')).toBe(renderPlan(built.plan));
     expect(await readFile(join(FIXTURE, 'plan.summary.json'), 'utf8')).toBe(
       renderPlanSummary(built.plan, built.details),

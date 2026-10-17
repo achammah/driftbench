@@ -72,3 +72,9 @@ metadata:
     phrase: 0
     ask: bank
     outcome: bank
+    unit:
+      target:
+        kind: subagent
+        name: route-planner
+        file: .claude/agents/route-planner.md
+      cases: []

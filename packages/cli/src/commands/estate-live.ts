@@ -639,10 +639,13 @@ export async function estateMutateCommand(
 }
 
 /** The atoms whose quote is not at its span in the estate, as messages. */
-async function driftOf(root: string, map: EstateMap): Promise<string[]> {
+export async function driftOf(root: string, map: EstateMap): Promise<string[]> {
   const texts = new Map<string, string>();
   for (const file of new Set(map.atoms.map((atom) => atom.provenance.file))) {
-    const text = await readFile(join(root, file), 'utf8').catch(() => undefined);
+    // A file that resolves outside the estate counts as absent: it is never read.
+    const text = await insideCopy(root, file)
+      .then((safe) => readFile(safe, 'utf8'))
+      .catch(() => undefined);
     if (text !== undefined) texts.set(file, text);
   }
   if ((await stat(root).catch(() => undefined)) === undefined) return [`${root} does not exist`];

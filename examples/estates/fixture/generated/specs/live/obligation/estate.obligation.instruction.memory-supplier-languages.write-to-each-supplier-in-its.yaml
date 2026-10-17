@@ -31,7 +31,7 @@ criteria:
 blocks:
   - id: ask
     when:
-      user: Please write to each supplier in its language.
+      user: Please draft, answer or chase an email to a supplier.
     expect:
       workspace:
         deleted: []
@@ -54,7 +54,7 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.memory-supplier-languages.write-to-each-supplier-in-its (title)
+    askFrom: route.supplier-email.an-ask-that-fits-supplier-email (route nearest the rule)
     outcome: no-delete
     judged:
       - instruction.memory-supplier-languages.write-to-each-supplier-in-its

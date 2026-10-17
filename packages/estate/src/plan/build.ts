@@ -6,6 +6,7 @@ import { AtomKind, type EstateMap, type Plan, type PlanRow, TestType } from '../
 import { contractRows, type DraftRow, MODE_OF, NO_CONTRACT, PRIMARY_TYPE } from './contract';
 import { JOURNEY_DEFAULTS, type JourneyResult, planJourneys } from './journeys';
 import { type PairwiseResult, pairwiseCells, TARGET_PREFIX } from './pairwise';
+import { situationSpace } from './relevance';
 
 /**
  * The plan of design section 4, derived from the approved map by code: the mandatory rows of every
@@ -17,7 +18,7 @@ import { type PairwiseResult, pairwiseCells, TARGET_PREFIX } from './pairwise';
 export type PlanOptions = {
   /** Strength of the covering array. Default 2. */
   t?: number;
-  /** The space map of the situation axes; default the map's own (`toEstateSpaceMap`, approved atoms). */
+  /** An explicit space is authoritative. Default: infer relevance from the approved map's contracts. */
   space?: SpaceMap;
   /** Positive asks per route. Default 3. */
   k?: number;
@@ -48,6 +49,8 @@ export type PlanDetails = {
   droppedConstraints: number;
   /** Rows whose situation values the space map does not hold or forbids, with what was left out. */
   adjusted: Array<{ row: string; reason: string }>;
+  /** Inferred target/situation exclusions; explicit spaces keep their own constraint list. */
+  relevanceConstraints?: SpaceMap['constraints'];
   notes: string[];
 };
 
@@ -62,7 +65,9 @@ export function buildPlan(map: EstateMap, options: PlanOptions = {}): PlanResult
   const seed = options.seed ?? PLAN_DEFAULTS.seed;
   if (!Number.isInteger(t) || t < 1) throw new RangeError(`t must be a whole number of at least 1, not ${t}`);
   if (!Number.isInteger(k) || k < 1) throw new RangeError(`k must be a whole number of at least 1, not ${k}`);
-  const space = options.space ?? toEstateSpaceMap(map);
+  const declaredSpace = options.space ?? toEstateSpaceMap(map);
+  const inferred = options.space ? { space: declaredSpace, notes: [] } : situationSpace(map, declaredSpace);
+  const space = inferred.space;
   checkTargets(map, space);
 
   const askClasses = space.dimensions.find((dimension) => dimension.id === 'ask_class')?.values ?? [];
@@ -71,7 +76,7 @@ export function buildPlan(map: EstateMap, options: PlanOptions = {}): PlanResult
   const pairwise = pairwiseCells(space, { t, seed, maxRows: options.maxRows ?? PLAN_DEFAULTS.maxRows });
 
   const adjusted: PlanDetails['adjusted'] = [];
-  const fit = cellFitter(space);
+  const fit = cellFitter(declaredSpace);
   const contract = drafts.map((draft) => toRow(draft, fit(draft, adjusted)));
   const journeyRows = journeyRowsOf(journeys);
   const pairwiseRows = pairwiseRowsOf(map, pairwise);
@@ -114,7 +119,7 @@ export function buildPlan(map: EstateMap, options: PlanOptions = {}): PlanResult
       edgesWithoutJourney: journeys.uncovered.length,
     },
   };
-  const notes = [PHRASE_NOTE];
+  const notes = [PHRASE_NOTE, ...inferred.notes];
   if (pairwise.covered < pairwise.allowed) {
     notes.push(
       `The covering array stopped at ${pairwise.cells.length} rows with ${pairwise.allowed - pairwise.covered} t-tuples uncovered: raise the row limit.`,
@@ -139,6 +144,9 @@ export function buildPlan(map: EstateMap, options: PlanOptions = {}): PlanResult
       uncoveredEdges: journeys.uncovered.map(({ edge, reason }) => ({ ...edge, reason })),
       droppedConstraints: pairwise.dropped,
       adjusted,
+      ...(!options.space
+        ? { relevanceConstraints: space.constraints.slice(declaredSpace.constraints.length) }
+        : {}),
       notes,
     },
   };

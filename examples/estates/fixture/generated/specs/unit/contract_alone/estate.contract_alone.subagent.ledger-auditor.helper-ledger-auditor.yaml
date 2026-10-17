@@ -72,3 +72,9 @@ metadata:
     phrase: 1
     ask: bank
     outcome: bank
+    unit:
+      target:
+        kind: subagent
+        name: ledger-auditor
+        file: .claude/agents/ledger-auditor.md
+      cases: []

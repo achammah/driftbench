@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please dispatch the ledger auditor above 50.00 EUR of difference.
+      user: Please check, match or reconcile an invoice. The total difference is above 50.00 EUR.
     expect:
       subagents:
         - name: ledger-auditor
@@ -62,5 +62,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.invoice-reconcile.dispatch-the-ledger-auditor-above-50 (title)
+    askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names)
     outcome: no-delete

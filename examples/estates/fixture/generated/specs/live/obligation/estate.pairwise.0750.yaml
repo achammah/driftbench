@@ -25,7 +25,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please write in the supplier's language from the memory table.
+      user: Please write to a supplier, answer one, or chase a late delivery or a missing credit note.
     expect:
       references:
         - path: "**/supplier-languages.md"
@@ -56,5 +56,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.supplier-email.write-in-the-supplier-s-language (title)
+    askFrom: skill.supplier-email.skill-supplier-email (asks it names)
     outcome: no-delete

@@ -12,7 +12,7 @@ import type { Atom, Edge, EstateMap } from '../schema';
 /**
  * Journeys: edge coverage over the estate graph from the standing instructions (design section 4, last
  * row of the contract). The graph keeps the edges an ask walks: route (an ask to the skill or helper it
- * loads), reference (a unit to a file it reads), dispatch (a unit to a helper it sends work to) and next
+ * loads), reference (a unit to a file it reads), script (a unit to a script it runs), dispatch (a unit to a helper it sends work to) and next
  * (a stage to the stage that follows). A start node stands for the standing instructions: it points at
  * every route the standing files state (a route outside any skill or helper file) and at every stage no
  * other stage leads to. The walk is the edge-covering walk of the generator (`walkGraph`, GraphWalker's
@@ -24,6 +24,7 @@ import type { Atom, Edge, EstateMap } from '../schema';
 export const JOURNEY_EDGE_KINDS: ReadonlySet<Edge['kind']> = new Set([
   'route',
   'reference',
+  'script',
   'dispatch',
   'next',
 ]);

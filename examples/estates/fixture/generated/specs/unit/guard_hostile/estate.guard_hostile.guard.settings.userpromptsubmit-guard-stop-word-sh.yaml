@@ -54,6 +54,7 @@ blocks:
     expect:
       guards:
         - name: stop-word.sh
+          verdict: nudge
           count:
             min: 1
       workspace:
@@ -76,3 +77,28 @@ metadata:
     phrase: 1
     ask: bank
     outcome: bank
+    unit:
+      target:
+        kind: guard
+        name: stop-word.sh
+        event: UserPromptSubmit
+        command: '"$CLAUDE_PROJECT_DIR"/.claude/guards/stop-word.sh'
+        verdict: nudge
+      cases:
+        - id: case-01
+          payload:
+            prompt: stop
+          material: stop
+        - id: case-02
+          payload:
+            prompt: STOP
+          material: STOP
+        - id: case-03
+          payload:
+            prompt: "stop "
+          material: "stop "
+        - id: case-04
+          payload:
+            prompt: echo ok && stop
+          material: echo ok && stop
+      budgetMs: 60000

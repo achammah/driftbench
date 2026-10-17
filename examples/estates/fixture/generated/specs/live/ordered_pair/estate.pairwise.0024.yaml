@@ -67,7 +67,7 @@ rules:
   custom:
     ordered:
       pairs:
-        - before: Read
+        - before: Read~.claude/skills/weekly-report/templates/report.md
           after: Write
 perturbations:
   - id: deviation-D8_tool_failure

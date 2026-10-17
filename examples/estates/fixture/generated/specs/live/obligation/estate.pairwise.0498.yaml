@@ -25,7 +25,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please read the memory index at the start of a session.
+      user: Please reconcile a supplier invoice against its purchase order and the goods received. A session starts.
     expect:
       references:
         - path: "**/MEMORY.md"
@@ -56,5 +56,5 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.standing.read-the-memory-index-at-the (title)
+    askFrom: route.invoice-reconcile.an-ask-that-fits-invoice-reconcile (route nearest the rule)
     outcome: no-delete

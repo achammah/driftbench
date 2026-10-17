@@ -41,6 +41,21 @@ async function fixtureCopy(): Promise<string> {
 }
 
 describe('driftbench estate scan', () => {
+  it('reports an ambiguous table without inventing an automatic route', async () => {
+    const root = await fixtureCopy();
+    await writeFile(
+      join(root, 'CLAUDE.md'),
+      '| A | B |\n|---|---|\n| Inspect the crate seals | `invoice-reconcile` |\n| internal | `invoice-reconcile` |',
+    );
+    const result = await run(['estate', 'scan', '.', '--no-model', '--out', 'map.yaml'], root);
+    expect(result.code).toBe(0);
+    expect(result.out).toContain('CLAUDE.md: Ambiguous routing table');
+    const loaded = await loadEstateMap(join(root, 'map.yaml'));
+    expect(
+      loaded.ok && loaded.map.atoms.filter((atom) => atom.kind === 'route' && atom.fields?.via === 'table'),
+    ).toEqual([]);
+  });
+
   it('refuses an unknown --provider before any model call, and writes nothing', async () => {
     const root = await fixtureCopy();
     const result = await run(['estate', 'scan', '.', '--out', 'map.yaml', '--provider', 'bogus'], root);

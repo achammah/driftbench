@@ -54,11 +54,10 @@ blocks:
     expect:
       guards:
         - name: read-before-edit.py
+          verdict: deny
           count:
             min: 1
       workspace:
-        changed:
-          - invoices/INV-1001.json
         others_untouched: true
 metadata:
   estate:
@@ -78,3 +77,74 @@ metadata:
     phrase: 0
     ask: bank
     outcome: bank
+    unit:
+      target:
+        kind: guard
+        name: read-before-edit.py
+        event: PreToolUse
+        command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/read-before-edit.py
+        matcher: Edit|Write
+        timeout: 5
+        verdict: deny
+      cases:
+        - id: case-01
+          payload:
+            tool_name: Edit
+            tool_input:
+              file_path: .claude/skills/invoice-reconcile/references/matching-rules.md
+              old_string: a
+              new_string: b
+          material: .claude/skills/invoice-reconcile/references/matching-rules.md
+        - id: case-02
+          payload:
+            tool_name: Edit
+            tool_input:
+              file_path: .CLAUDE/SKILLS/INVOICE-RECONCILE/REFERENCES/MATCHING-RULES.MD
+              old_string: a
+              new_string: b
+          material: .CLAUDE/SKILLS/INVOICE-RECONCILE/REFERENCES/MATCHING-RULES.MD
+        - id: case-03
+          payload:
+            tool_name: Edit
+            tool_input:
+              file_path: ".claude/skills/invoice-reconcile/references/matching-rules.md "
+              old_string: a
+              new_string: b
+          material: ".claude/skills/invoice-reconcile/references/matching-rules.md "
+        - id: case-04
+          payload:
+            tool_name: Edit
+            tool_input:
+              file_path: echo ok && .claude/skills/invoice-reconcile/references/matching-rules.md
+              old_string: a
+              new_string: b
+          material: echo ok && .claude/skills/invoice-reconcile/references/matching-rules.md
+        - id: case-05
+          payload:
+            tool_name: Write
+            tool_input:
+              file_path: .claude/skills/invoice-reconcile/references/matching-rules.md
+              content: x
+          material: .claude/skills/invoice-reconcile/references/matching-rules.md
+        - id: case-06
+          payload:
+            tool_name: Write
+            tool_input:
+              file_path: .CLAUDE/SKILLS/INVOICE-RECONCILE/REFERENCES/MATCHING-RULES.MD
+              content: x
+          material: .CLAUDE/SKILLS/INVOICE-RECONCILE/REFERENCES/MATCHING-RULES.MD
+        - id: case-07
+          payload:
+            tool_name: Write
+            tool_input:
+              file_path: ".claude/skills/invoice-reconcile/references/matching-rules.md "
+              content: x
+          material: ".claude/skills/invoice-reconcile/references/matching-rules.md "
+        - id: case-08
+          payload:
+            tool_name: Write
+            tool_input:
+              file_path: echo ok && .claude/skills/invoice-reconcile/references/matching-rules.md
+              content: x
+          material: echo ok && .claude/skills/invoice-reconcile/references/matching-rules.md
+      budgetMs: 5000

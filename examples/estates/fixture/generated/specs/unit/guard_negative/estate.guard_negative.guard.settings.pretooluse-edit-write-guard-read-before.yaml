@@ -50,3 +50,29 @@ metadata:
     ask: code
     askFrom: neutral
     outcome: no-change:negative
+    unit:
+      target:
+        kind: guard
+        name: read-before-edit.py
+        event: PreToolUse
+        command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/read-before-edit.py
+        matcher: Edit|Write
+        timeout: 5
+        verdict: deny
+      cases:
+        - id: case-01
+          payload:
+            tool_name: Edit
+            tool_input:
+              file_path: notes.md
+              old_string: a
+              new_string: b
+          material: notes.md
+        - id: case-02
+          payload:
+            tool_name: Write
+            tool_input:
+              file_path: notes.md
+              content: x
+          material: notes.md
+      budgetMs: 5000

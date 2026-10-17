@@ -50,3 +50,27 @@ metadata:
     ask: code
     askFrom: neutral
     outcome: no-change:negative
+    unit:
+      target:
+        kind: guard
+        name: check-carrier.sh
+        event: PreToolUse
+        command: $CLAUDE_PROJECT_DIR/.claude/skills/shipment-tracker/scripts/check-carrier.sh
+        matcher: Bash
+        verdict: deny
+      cases:
+        - id: case-01
+          payload:
+            tool_name: Bash
+            tool_input:
+              command: ls
+              description: unit test
+          material: ls
+        - id: case-02
+          payload:
+            tool_name: Bash
+            tool_input:
+              command: ./scripts/track.sh NWX 123
+              description: unit test
+          material: ./scripts/track.sh NWX 123
+      budgetMs: 60000

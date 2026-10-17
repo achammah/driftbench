@@ -13,6 +13,7 @@ tags:
   - mode:live
   - kind:route
   - kind:skill
+  - kind:script
 target:
   adapter: claude-code
 given:
@@ -57,13 +58,27 @@ blocks:
         - name: shipment-tracker
           count:
             min: 1
+      execution:
+        ran_code: true
       workspace:
         others_untouched: true
+rules:
+  custom:
+    some_call:
+      calls:
+        - label: Bash
+          input:
+            command:
+              contains: track.sh
+          count:
+            min: 1
+          block: 0
 metadata:
   estate:
     atoms:
       - route.standing.an-ask-to-know-where-a
       - skill.shipment-tracker.skill-shipment-tracker
+      - script.shipment-tracker.script-scripts-track-sh
     planRow: journey.04
     cell: {}
     seeder: estate

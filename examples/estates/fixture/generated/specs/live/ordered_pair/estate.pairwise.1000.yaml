@@ -65,6 +65,7 @@ rules:
       pairs:
         - before: Read
           after: Edit
+          key: file_path
 perturbations:
   - id: deviation-D7_silence_or_burst
     class: D7_silence_or_burst

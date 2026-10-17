@@ -68,3 +68,9 @@ metadata:
     phrase: 0
     ask: bank
     outcome: bank
+    unit:
+      target:
+        kind: subagent
+        name: inbox-triager
+        file: .claude/agents/inbox-triager.md
+      cases: []

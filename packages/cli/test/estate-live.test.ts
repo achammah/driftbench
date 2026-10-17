@@ -52,7 +52,13 @@ describe('driftbench estate mutate', () => {
     expect(result.err).toBe('');
     expect(result.code).toBe(0);
     expect(result.out).toContain(`Mutant: delete ${R3} in CLAUDE.md.`);
-    expect((await readdir(to)).sort()).toEqual(['.claude', 'CLAUDE.md', 'map.yaml', 'mutant.json']);
+    expect((await readdir(to)).sort()).toEqual([
+      '.claude',
+      'CLAUDE.md',
+      'driftbench.estate.yaml',
+      'map.yaml',
+      'mutant.json',
+    ]);
     expect(await readFile(join(to, 'CLAUDE.md'), 'utf8')).not.toContain('Read a file before you edit it.');
     const record = JSON.parse(await readFile(join(to, 'mutant.json'), 'utf8'));
     const mutantMap = await loadEstateMap(join(to, 'map.yaml'));

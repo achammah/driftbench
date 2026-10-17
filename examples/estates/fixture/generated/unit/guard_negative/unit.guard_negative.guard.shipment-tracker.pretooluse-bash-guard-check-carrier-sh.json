@@ -23,6 +23,17 @@
         }
       },
       "material": "ls"
+    },
+    {
+      "id": "case-02",
+      "payload": {
+        "tool_name": "Bash",
+        "tool_input": {
+          "command": "./scripts/track.sh NWX 123",
+          "description": "unit test"
+        }
+      },
+      "material": "./scripts/track.sh NWX 123"
     }
   ]
 }
