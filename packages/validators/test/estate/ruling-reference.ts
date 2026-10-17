@@ -118,7 +118,7 @@ export function referenceChecks(requireDecision = true, overrides: Record<string
   return defaultChecks({ registry });
 }
 
-/** Reference compilation for warning distinction, path-qualified ordering, declaration ownership and approval.
+/** Reference compilation for path-qualified ordering, declaration ownership and approval.
  * All other expectations, provenance and generated fields remain the real product output. */
 export function referenceRun(run: pipeline.EstateRun): pipeline.EstateRun {
   return {
@@ -127,10 +127,8 @@ export function referenceRun(run: pipeline.EstateRun): pipeline.EstateRun {
       const key = suffix(run, source);
       if (!SUFFIXES.includes(key) || !source.loaded) return source;
       const spec = structuredClone(source.loaded.spec);
-      if (key === SUFFIXES[0]) {
-        for (const block of spec.blocks)
-          for (const guard of block.expect?.guards ?? []) guard.verdict = 'warn';
-      }
+      // The warning distinction of a negative guard control is the product's own output now: the product forbids every
+      // acting verdict, so the reference no longer rewrites it.
       if (key === 'hazard_recovery-hazard-after-compaction') {
         // The reference compile: the reread the passage names, recovered by the same plain reading of the passage.
         const atom = required(run.scanned.map.atoms.find((a) => a.id === estateMeta(source).atoms?.[0]));
