@@ -1,4 +1,4 @@
-import { copyHistory, freezeHistory } from '../contracts/history';
+import { copyHistory, freezeHistory, readOnlyHistory } from '../contracts/history';
 import type { Assertion, Count, GivenOrigin, Message, TargetRef, WorldState } from '../schema/common';
 import type { Observed, ResolvedGiven } from '../schema/run';
 import type { Expect, GivenOverride, Spec, Stimulus } from '../schema/spec';
@@ -61,7 +61,8 @@ export function resolveGiven(
   target: TargetRef,
 ): ResolvedGiven {
   const body = {
-    prefix: copyHistory(prefix),
+    // Read-only and shared with the run: an adapter copies it with copyHistory, which then reads no property.
+    prefix: readOnlyHistory(prefix) as Message[],
     ...(state.origin === undefined ? {} : { origin: state.origin }),
     ledger: structuredClone(state.ledger),
     world: structuredClone(state.world),
@@ -124,10 +125,16 @@ export function addFacts(
  * for that tool at that block. A tool the world does not force has no recorded result: an agent that
  * replays its past turns reads it again.
  */
-export function canonicalGiven(
+export function canonicalGiven(spec: Spec, blockIndex: number): { state: RunningGiven; prefix: Message[] } {
+  const frozen = canonicalGivenFrozen(spec, blockIndex);
+  return { state: frozen.state, prefix: copyHistory(frozen.prefix) };
+}
+
+/** `canonicalGiven` with the prefix as the run keeps it: a private read-only list, so the runner reads it without a copy. */
+export function canonicalGivenFrozen(
   spec: Spec,
   blockIndex: number,
-): { state: RunningGiven; prefix: Message[]; history: readonly Message[] } {
+): { state: RunningGiven; prefix: readonly Message[] } {
   // A run asks for block 0, 1, 2 in turn. The situation before block k's own given, kept from the last ask,
   // lets the next ask build one block more, not the whole prefix again; its messages are the same objects,
   // which the prefix cache and the hashes read once.
@@ -151,9 +158,7 @@ export function canonicalGiven(
     ]);
     state = { ...state, ledger: { ...state.ledger, ...block.expect?.ledger_add } };
   }
-  // `history` is the internal array itself, already validated and frozen: a caller that only reads the history
-  // takes it as it is, and the next copy of it is a pass over pointers, not a validation of every message.
-  return { state, prefix: copyHistory(prefix), history: prefix };
+  return { state, prefix };
 }
 
 const canonicalKept = new WeakMap<

@@ -2,7 +2,7 @@ import type { AdapterCapabilities, AgentAdapter, Session, Turn } from '../contra
 import type { ArtifactReaderRegistry } from '../contracts/artifacts';
 import { type CheckContext, type CheckSet, machineVerdict } from '../contracts/check';
 import type { DriverStep, UserDriver } from '../contracts/driver';
-import { copyHistory, freezeHistory, freezeMessage } from '../contracts/history';
+import { copyHistory, extendHistory, freezeHistory, freezeMessage } from '../contracts/history';
 import type { Store } from '../contracts/store';
 import { gateToolCalls, type ToolRule } from '../contracts/tool-policy';
 import { type BlockReuse, planBlockRerun } from '../radius/blocks';
@@ -33,7 +33,7 @@ import { composeStates, type EndStateSnapshot, endStateSnapshot, snapshotValues 
 import {
   addFacts,
   assistantMessage,
-  canonicalGiven,
+  canonicalGivenFrozen,
   enterBlock,
   initialGiven,
   type RunningGiven,
@@ -435,8 +435,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   const blocks: BlockResult[] = [];
   const { sources } = run;
   let state = initialGiven(spec);
-  // The running history is private to the loop: frozen, so each copy of it for the next block or the Given is a
-  // pass over pointers, not a validation of every message again.
+  /** The messages so far: a private read-only list, replaced by a longer one after each block, so a block reads only what it adds. */
   let history: readonly Message[] = [];
   /** The user messages of the history, one list that grows with it, so the ledger reads each one once. */
   let users: Message[] = [];
@@ -502,7 +501,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
             `teacher-forced mode runs the spec's own blocks; the driver ${run.driver.id} injected ${step.perturbationId}`,
           );
         }
-        const canonical = canonicalGiven(spec, step.blockIndex);
+        const canonical = canonicalGivenFrozen(spec, step.blockIndex);
         state = canonical.state;
         // A task's workspace is part of the state the reference trajectory had at this block: the session
         // of the block before keeps it, unless this block writes its own workspace. Its history becomes the
@@ -513,7 +512,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
           await channel.restart();
           sessionBase = composed;
         }
-        history = canonical.history;
+        history = canonical.prefix;
         // The canonical prefix of a block is the one of the block before, then that block's user messages
         // and a reply (canonicalGiven), unless the block writes a prefix of its own. So after the block
         // before, the user messages kept are those of this prefix already.
@@ -544,7 +543,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
         // it with their user messages and an empty reply, and the facts their ledger_add establishes.
         const from = step.kind === 'block' ? step.blockIndex + 1 : nextBlock;
         let laterState: RunningGiven = { ...state, ledger };
-        let laterHistory = freezeHistory(history, [
+        let laterHistory = copyHistory(history, [
           ...stimulusMessages(planned.stimulus),
           assistantMessage(NOT_SENT),
         ]);
@@ -555,11 +554,11 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
             stimulus: (spec.blocks[index] as BlockSpec).when,
           });
           laterState = enterBlock(laterState, later.given);
-          if (later.given?.prefix) laterHistory = freezeHistory(later.given.prefix);
+          if (later.given?.prefix) laterHistory = copyHistory(later.given.prefix);
           const laterHash = resolveGiven(laterState, laterHistory, run.target).hash;
           const laterLedger = addFacts(laterState.ledger, later.expect.ledger_add).ledger;
           laterState = { ...laterState, ledger: laterLedger };
-          laterHistory = freezeHistory(laterHistory, [
+          laterHistory = copyHistory(laterHistory, [
             ...stimulusMessages(later.stimulus),
             assistantMessage(NOT_SENT),
           ]);
@@ -1071,7 +1070,7 @@ function liveChannel(run: RunContext): Channel {
     restart: closeSession,
     reseat(prefix) {
       if (!session) return false;
-      session.history = copyHistory(prefix);
+      session.history = freezeHistory(prefix) as Message[];
       return true;
     },
     async observe(turn, user, key) {
@@ -1083,7 +1082,7 @@ function liveChannel(run: RunContext): Channel {
           if (run.capabilities.sandbox) await checkSetup(adapter, opened, turn.given);
         }
         const current = session;
-        current.history.push(...user);
+        current.history = extendHistory(current.history, user) as Message[];
         let sent: unknown = await call(`send on block ${turn.index}`, () => adapter.send(current, turn));
         const trace = adapter.trace;
         if (run.capabilities.trace && trace) {
@@ -1101,7 +1100,9 @@ function liveChannel(run: RunContext): Channel {
           `the adapter's Observed for block ${turn.index} does not match the schema as JSON: ${issue?.path.join('.') || '(root)'} ${issue?.message ?? ''}`.trim(),
         );
       }
-      current.history.push(freezeMessage(cloneJson(assistantMessage(parsed.data))));
+      current.history = extendHistory(current.history, [
+        freezeMessage(cloneJson(assistantMessage(parsed.data))),
+      ]) as Message[];
       // The cache keeps the block without its retries: a replay retries nothing.
       const { retries: _spent, ...kept } = parsed.data;
       await remember(key, kept);
