@@ -9,9 +9,11 @@ import {
   canonicalJson,
   type LoadedSpec,
   Observed,
+  objectContextOfSpec,
   type RunFilter,
   RunResult,
   type Store,
+  shippedObjectContext,
   validateSpec,
 } from '@agent-nexus/driftbench-core';
 import { type BundleSource, type CampaignBundle, readCampaignBundle, writeCampaignBundle } from './bundle';
@@ -29,6 +31,12 @@ import {
   versionHash,
 } from './registry';
 import { SCHEMA_SQL, SCHEMA_VERSION } from './schema';
+import {
+  bindStoredSpec,
+  isSpecObjectIdentities,
+  recordedObjectsOfSpec,
+  specObjectIdentities,
+} from './spec-objects';
 import { loadSqlite } from './sqlite';
 import { unitProblems } from './units';
 
@@ -73,12 +81,28 @@ function setUp(db: DatabaseSync, path: string): void {
       `the store at ${path} has schema version ${version}; this version of driftbench reads ${SCHEMA_VERSION} and older`,
     );
   }
-  if (version < SCHEMA_VERSION) {
-    transaction(db, () => {
-      db.exec(SCHEMA_SQL);
-      db.exec(`PRAGMA user_version = ${SCHEMA_VERSION}`);
-    });
-  }
+  // Every statement of SCHEMA_SQL is idempotent. A store older than this version runs it; a store at this
+  // version runs it only when a table or index it creates is missing (one written before a table of the
+  // current schema existed), so an open that finds everything writes nothing and the version stays.
+  if (version >= SCHEMA_VERSION && schemaObjectsMissing(db).length === 0) return;
+  transaction(db, () => {
+    db.exec(SCHEMA_SQL);
+    if (version < SCHEMA_VERSION) db.exec(`PRAGMA user_version = ${SCHEMA_VERSION}`);
+  });
+}
+
+/** The tables and indexes SCHEMA_SQL creates that the database does not hold. */
+function schemaObjectsMissing(db: DatabaseSync): string[] {
+  const wanted = [...SCHEMA_SQL.matchAll(/CREATE (?:TABLE|INDEX) IF NOT EXISTS (\w+)/g)].map(
+    (match) => match[1] as string,
+  );
+  const held = new Set(
+    db
+      .prepare("SELECT name FROM sqlite_master WHERE type IN ('table', 'index')")
+      .all()
+      .map((row) => String(row.name)),
+  );
+  return wanted.filter((name) => !held.has(name));
 }
 
 /** Closes a database that failed to set up. The setup error is the one the caller reports. */
@@ -127,6 +151,11 @@ function statements(db: DatabaseSync) {
        ON CONFLICT (id, hash) DO UPDATE SET path = excluded.path, yaml = excluded.yaml`,
     ),
     selectSpec: db.prepare('SELECT path, yaml FROM specs WHERE id = ? AND hash = ?'),
+    upsertSpecObjects: db.prepare(
+      `INSERT INTO spec_objects (spec_id, spec_hash, json) VALUES (?, ?, ?)
+       ON CONFLICT (spec_id, spec_hash) DO UPDATE SET json = excluded.json`,
+    ),
+    selectSpecObjects: db.prepare('SELECT json FROM spec_objects WHERE spec_id = ? AND spec_hash = ?'),
     insertCampaignIfNew: db.prepare(
       'INSERT INTO campaigns (id, json, created_at) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING',
     ),
@@ -201,7 +230,7 @@ export class SqliteStore implements Store {
   async putSpec(spec: LoadedSpec): Promise<void> {
     this.live();
     if (spec?.ok !== true) throw new StoreError('INVALID_RECORD', 'putSpec takes a spec the loader accepted');
-    const checked = validateSpec(spec.spec, spec.path);
+    const checked = validateSpec(spec.spec, spec.path, { objects: objectContextOfSpec(spec.spec) });
     if (!checked.ok) {
       const errors = checked.errors.slice(0, 5).map((issue) => `${issue.path}: ${issue.message}`);
       throw new StoreError('INVALID_RECORD', `putSpec refused an invalid spec: ${errors.join('; ')}`);
@@ -212,7 +241,14 @@ export class SqliteStore implements Store {
         `putSpec refused spec ${checked.spec.id}: its hash says ${spec.hash} but its content hashes to ${checked.hash}`,
       );
     }
-    this.sql.upsertSpec.run(checked.spec.id, checked.hash, spec.path, canonicalJson(checked.spec), now());
+    const objects = specObjectIdentities(
+      checked.spec,
+      objectContextOfSpec(checked.spec) ?? shippedObjectContext(),
+    );
+    transaction(this.db, () => {
+      this.sql.upsertSpec.run(checked.spec.id, checked.hash, spec.path, canonicalJson(checked.spec), now());
+      this.sql.upsertSpecObjects.run(checked.spec.id, checked.hash, canonicalJson(objects));
+    });
   }
 
   async getSpec(id: string, hash: string): Promise<LoadedSpec | undefined> {
@@ -220,7 +256,9 @@ export class SqliteStore implements Store {
     const row = this.sql.selectSpec.get(id, hash);
     if (row === undefined) return undefined;
     const where = `the specs row ${id}@${hash}`;
-    const loaded = validateSpec(parseColumn(row, 'yaml', where), text(row, 'path', where));
+    const loaded = validateSpec(parseColumn(row, 'yaml', where), text(row, 'path', where), {
+      resolveObjects: false,
+    });
     if (!loaded.ok) {
       const errors = loaded.errors.slice(0, 5).map((issue) => `${issue.path}: ${issue.message}`);
       throw corrupt(`${where} does not hold a valid spec: ${errors.join('; ')}`);
@@ -228,7 +266,12 @@ export class SqliteStore implements Store {
     if (loaded.spec.id !== id || loaded.hash !== hash) {
       throw corrupt(`${where} holds spec ${loaded.spec.id}@${loaded.hash}`);
     }
-    return loaded;
+    const objectsRow = this.sql.selectSpecObjects.get(id, hash);
+    const identities = objectsRow === undefined ? undefined : parseColumn(objectsRow, 'json', where);
+    if (identities !== undefined && !isSpecObjectIdentities(identities)) {
+      throw corrupt(`${where} holds invalid object identities`);
+    }
+    return bindStoredSpec(loaded, identities);
   }
 
   async putCampaign(campaign: Campaign): Promise<void> {
@@ -444,6 +487,9 @@ export class SqliteStore implements Store {
       for (const source of bundle.sources) this.importVersionNow(source.version, source.files);
       for (const spec of bundle.specs) {
         this.sql.upsertSpec.run(spec.spec.id, spec.hash, spec.path, canonicalJson(spec.spec), now());
+        const objects = recordedObjectsOfSpec(spec.spec);
+        if (objects !== undefined)
+          this.sql.upsertSpecObjects.run(spec.spec.id, spec.hash, canonicalJson(objects));
       }
       this.putCampaignNow(bundle.campaign);
       for (const run of bundle.runs) this.putRunNow(bundle.campaign.campaignId, run);

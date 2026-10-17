@@ -255,6 +255,21 @@ export const Verdict = z.strictObject({
   evidence: z.string(),
   reasoning: z.string().optional(),
   judge: z.strictObject({ cls: z.enum(['system1', 'system2']), votes: z.array(Vote) }).optional(),
+  /**
+   * The value-check rungs that decided a tool argument, one entry per value a rung decided: the call (from 1),
+   * the value's path, the rung (a policy item id, or `exact_fallback`) and its outcome. Absent when every value
+   * equalled the gold or the assertion compares as written. No default, so records without it are unchanged.
+   */
+  valueCheck: z
+    .array(
+      z.strictObject({
+        call: z.number().int().min(1),
+        path: z.string().min(1),
+        rung: z.string().min(1),
+        outcome: Outcome,
+      }),
+    )
+    .optional(),
 });
 export type Verdict = z.infer<typeof Verdict>;
 

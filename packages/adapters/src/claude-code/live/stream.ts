@@ -297,7 +297,11 @@ function verdictOf(record: Record<string, unknown>): string {
       if (isRecord(output)) {
         const specific = isRecord(output.hookSpecificOutput) ? output.hookSpecificOutput : {};
         const decision = stringField(specific, 'permissionDecision') ?? stringField(output, 'decision');
-        if (decision !== undefined) return decision === 'block' ? 'deny' : decision;
+        if (decision !== undefined) {
+          if (decision === 'block') return 'deny';
+          if (decision === 'approve') return 'allow';
+          return decision;
+        }
       }
     } catch {
       // Not JSON after all: the exit code decides.

@@ -1,0 +1,6 @@
+kind: check-set
+id: u7
+extends: default
+items:
+  - id: rung4_exact
+    params: { case_insensitive: true }

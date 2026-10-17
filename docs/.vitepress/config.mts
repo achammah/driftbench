@@ -151,6 +151,7 @@ export default defineConfig({
           { text: 'Personas and red-team', link: '/reference/users' },
           { text: 'Change manifest', link: '/reference/change' },
           { text: 'Estate files', link: '/reference/estate-files' },
+          { text: 'Blame and placement', link: '/reference/blame' },
           { text: 'CLI', link: '/reference/cli' },
           { text: 'Checks', link: '/reference/checks' },
           { text: 'Public API', link: '/reference/api' },

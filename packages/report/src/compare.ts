@@ -505,8 +505,15 @@ function unitEntries(
   return out;
 }
 
+/**
+ * One unit's side of the compare. A criterion with any gating verdict passes when every gating verdict of it
+ * passes: a non-gating verdict of the same family (a score such as `tools.argument_accuracy`, a lint on the test
+ * such as `tools.<label>.input.<field>.unstated_format`) never fails it. A criterion with only non-gating
+ * verdicts passes when all of them pass.
+ */
 function sideOf(runs: readonly RunResult[], flagFamilies: readonly string[]): UnitSide {
   const criteria = new Map<string, { pass: boolean; gating: boolean }>();
+  const folds = new Map<string, { gatingPass: boolean; anyPass: boolean }>();
   const flags = new Set<string>();
   for (const run of runs) {
     for (const block of run.blocks) {
@@ -514,10 +521,15 @@ function sideOf(runs: readonly RunResult[], flagFamilies: readonly string[]): Un
         if (verdict.outcome === 'inconclusive') continue;
         const name = criterionOf(verdict);
         const held = criteria.get(name) ?? { pass: true, gating: false };
-        criteria.set(name, {
-          pass: held.pass && verdict.outcome === 'pass',
-          gating: held.gating || verdict.gating,
-        });
+        const fold = folds.get(name) ?? { gatingPass: true, anyPass: true };
+        const passed = verdict.outcome === 'pass';
+        const next = {
+          gatingPass: fold.gatingPass && (!verdict.gating || passed),
+          anyPass: fold.anyPass && passed,
+        };
+        folds.set(name, next);
+        const gating = held.gating || verdict.gating;
+        criteria.set(name, { pass: gating ? next.gatingPass : next.anyPass, gating });
         if (verdict.gating && verdict.outcome === 'fail' && flagFamilies.includes(verdict.name)) {
           flags.add(verdict.name);
         }
@@ -525,6 +537,7 @@ function sideOf(runs: readonly RunResult[], flagFamilies: readonly string[]): Un
     }
     if (run.endState && !run.endState.match) {
       const held = criteria.get('end_state') ?? { pass: true, gating: true };
+      folds.set('end_state', { gatingPass: false, anyPass: false });
       criteria.set('end_state', { pass: false, gating: held.gating });
     }
   }
