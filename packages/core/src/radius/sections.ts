@@ -190,6 +190,102 @@ function slug(title: string): string {
   return base === '' ? 'section' : base;
 }
 
+const SCANS_BEFORE_INDEX = 8;
+let scanned: { text: string; calls: number } | undefined;
+
+/** Whether the sections of this text have asked often enough that the suffix index is cheaper than another scan. */
+function readsIndex(text: string): boolean {
+  if (scanned?.text !== text) scanned = { text, calls: 0 };
+  scanned.calls++;
+  return scanned.calls > SCANS_BEFORE_INDEX || suffixes?.text === text;
+}
+
+type SuffixIndex = { text: string; rank: Int32Array; lcp: Int32Array };
+let suffixes: SuffixIndex | undefined;
+
+/**
+ * The suffix array of a text with the longest common prefix of neighbouring suffixes (prefix doubling with
+ * counting sorts, then Kasai), kept for the last text asked about: every section of one prompt reads the same
+ * index, so it is built once, when the first section needs it. O(n log n) in the text.
+ */
+function suffixIndex(text: string): SuffixIndex {
+  if (suffixes?.text === text) return suffixes;
+  const n = text.length;
+  let rank = new Int32Array(n);
+  let next = new Int32Array(n);
+  const sa = new Int32Array(n);
+  const byEnd = new Int32Array(n);
+  let buckets = 65536;
+  const count = new Int32Array(Math.max(buckets, n) + 1);
+  for (let i = 0; i < n; i++) {
+    rank[i] = text.charCodeAt(i);
+    const c = rank[i] as number;
+    count[c] = (count[c] ?? 0) + 1;
+  }
+  for (let i = 1; i < buckets; i++) count[i] = (count[i] ?? 0) + (count[i - 1] ?? 0);
+  for (let i = n - 1; i >= 0; i--) {
+    const c = rank[i] as number;
+    const slot = (count[c] ?? 0) - 1;
+    count[c] = slot;
+    sa[slot] = i;
+  }
+  for (let k = 1; n > 1; k <<= 1) {
+    let at = 0;
+    for (let i = n - k; i < n; i++) byEnd[at++] = i;
+    for (let i = 0; i < n; i++) if ((sa[i] as number) >= k) byEnd[at++] = (sa[i] as number) - k;
+    count.fill(0, 0, buckets + 1);
+    for (let i = 0; i < n; i++) {
+      const c = rank[i] as number;
+      count[c] = (count[c] ?? 0) + 1;
+    }
+    for (let i = 1; i < buckets; i++) count[i] = (count[i] ?? 0) + (count[i - 1] ?? 0);
+    for (let i = n - 1; i >= 0; i--) {
+      const suffix = byEnd[i] as number;
+      const c = rank[suffix] as number;
+      const slot = (count[c] ?? 0) - 1;
+      count[c] = slot;
+      sa[slot] = suffix;
+    }
+    let classes = 0;
+    next[sa[0] as number] = 0;
+    for (let i = 1; i < n; i++) {
+      const a = sa[i] as number;
+      const b = sa[i - 1] as number;
+      const same =
+        rank[a] === rank[b] &&
+        (a + k < n ? (rank[a + k] as number) : -1) === (b + k < n ? (rank[b + k] as number) : -1);
+      if (!same) classes++;
+      next[a] = classes;
+    }
+    [rank, next] = [next, rank];
+    if (classes >= n - 1) break;
+    buckets = classes + 1;
+  }
+  if (n === 1) rank[0] = 0;
+  const lcp = new Int32Array(n);
+  let h = 0;
+  for (let i = 0; i < n; i++) {
+    const r = rank[i] as number;
+    if (r === 0) {
+      h = 0;
+      continue;
+    }
+    const j = sa[r - 1] as number;
+    while (i + h < n && j + h < n && text.charCodeAt(i + h) === text.charCodeAt(j + h)) h++;
+    lcp[r] = h;
+    if (h > 0) h--;
+  }
+  suffixes = { text, rank, lcp };
+  return suffixes;
+}
+
+/** The length of the longest stretch from `origin` that another place in the text repeats. */
+function longestRepeat(text: string, origin: number): number {
+  const { rank, lcp } = suffixIndex(text);
+  const r = rank[origin] as number;
+  return Math.max(r > 0 ? (lcp[r] as number) : 0, r < text.length - 1 ? (lcp[r + 1] as number) : 0);
+}
+
 /** The shortest prefix of the section's body (at least 24 units, or all of it) found once in the text. */
 function uniqueQuote(text: string, start: number, end: number): { quote: string; at: number } | undefined {
   let from = start;
@@ -198,10 +294,24 @@ function uniqueQuote(text: string, start: number, end: number): { quote: string;
   if (newline >= 0 && newline + 1 < end && /^#{1,6}\s/.test(text.slice(start, newline))) from = newline + 1;
   while (from < end && /\s/.test(text[from] ?? '')) from++;
   for (const origin of from < end ? [from, start] : [start]) {
-    for (let length = Math.min(24, end - origin); origin + length <= end; length++) {
-      const quote = text.slice(origin, origin + length);
-      if (quote.trim() !== '' && count(text, quote).length === 1) return { quote, at: origin };
+    const room = end - origin;
+    // The common case first: the shortest allowed prefix occurs once, here. One scan of the text per section, so
+    // after a few sections of the same text the index below answers instead.
+    if (!readsIndex(text)) {
+      const shortest = text.slice(origin, origin + Math.min(24, room));
+      if (
+        shortest.trim() !== '' &&
+        text.indexOf(shortest) === origin &&
+        text.indexOf(shortest, origin + 1) < 0
+      )
+        return { quote: shortest, at: origin };
     }
+    // A prefix is unique once it is longer than every repeat of the text from here, and it needs a visible character.
+    let visible = 0;
+    while (visible < room && /\s/.test(text[origin + visible] ?? '')) visible++;
+    if (visible >= room) continue;
+    const length = Math.max(Math.min(24, room), visible + 1, longestRepeat(text, origin) + 1);
+    if (length <= room) return { quote: text.slice(origin, origin + length), at: origin };
   }
   return undefined;
 }

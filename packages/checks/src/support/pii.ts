@@ -109,7 +109,79 @@ const IBAN_CANDIDATE = /\b[A-Z]{2}\d{2}(?:[  ]?[A-Z0-9]){10,32}/g;
 const NATIONAL_CANDIDATE = /(?<![\d.])\d{2}\.?\d{2}\.?\d{2}[-. ]?\d{3}[-. ]?\d{2}(?!\d)/g;
 const INTERNATIONAL_PHONE = /(?<![\w+])\+[1-9][\d \-().]{6,22}\d/g;
 const BELGIAN_MOBILE = /(?<![\d+])(?:00 ?32 ?|0)4[5-9]\d(?:[ ./-]?\d{2}){3}(?!\d)/g;
-const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
+
+function isLocalChar(code: number): boolean {
+  return (
+    (code >= 48 && code <= 57) ||
+    (code >= 65 && code <= 90) ||
+    (code >= 97 && code <= 122) ||
+    code === 46 || // .
+    code === 95 || // _
+    code === 37 || // %
+    code === 43 || // +
+    code === 45 // -
+  );
+}
+
+function isLabelChar(code: number): boolean {
+  return (
+    (code >= 48 && code <= 57) || (code >= 65 && code <= 90) || (code >= 97 && code <= 122) || code === 45
+  );
+}
+
+function isLetter(code: number): boolean {
+  return (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+}
+
+/**
+ * The end of the domain that follows an `@` at `at`, or -1 when none does. A domain is a first label, any
+ * number of dot-and-label groups, then a dot and at least two letters: the last group whose label opens with
+ * two letters ends the match after those letters. One pass over the domain characters.
+ */
+function domainEnd(text: string, at: number): number {
+  let i = at + 1;
+  const first = i;
+  while (i < text.length && isLabelChar(text.charCodeAt(i))) i++;
+  if (i === first) return -1;
+  let end = -1;
+  while (i + 1 < text.length && text.charCodeAt(i) === 46 && isLabelChar(text.charCodeAt(i + 1))) {
+    const label = i + 1;
+    let letters = label;
+    while (letters < text.length && isLetter(text.charCodeAt(letters))) letters++;
+    let stop = letters;
+    while (stop < text.length && isLabelChar(text.charCodeAt(stop))) stop++;
+    if (letters - label >= 2) end = letters;
+    i = stop;
+  }
+  return end;
+}
+
+/**
+ * Every email-shaped match of a text, left to right, as the pattern
+ * `[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}` finds them, in time linear in the text:
+ * a run of local-part characters can only match when the `@` follows it directly, so each run is read once
+ * and each domain is read once.
+ */
+export function emailMatches(text: string): { value: string; index: number }[] {
+  const found: { value: string; index: number }[] = [];
+  let last = 0;
+  let i = 0;
+  while (i < text.length) {
+    if (!isLocalChar(text.charCodeAt(i))) {
+      i++;
+      continue;
+    }
+    const runStart = i;
+    while (i < text.length && isLocalChar(text.charCodeAt(i))) i++;
+    if (i >= text.length || text.charCodeAt(i) !== 64) continue;
+    const start = Math.max(runStart, last);
+    const end = domainEnd(text, i);
+    if (end < 0 || start >= i) continue;
+    found.push({ value: text.slice(start, end), index: start });
+    last = end;
+  }
+  return found;
+}
 
 const ALLOWED_EMAIL_DOMAINS = new Set(['example.com', 'example.org', 'example.net', 'localhost']);
 const ALLOWED_EMAIL_SUFFIXES = ['.example', '.test', '.invalid', '.localhost', 'users.noreply.github.com'];
@@ -197,12 +269,12 @@ export function scanPii(text: string, options: ScanOptions = {}): PiiFinding[] {
   for (const match of text.matchAll(BELGIAN_MOBILE)) {
     findings.push({ kind: 'phone', value: match[0], offset: match.index });
   }
-  for (const match of text.matchAll(EMAIL)) {
+  for (const match of emailMatches(text)) {
     const excluded =
       options.reservedDomains === 'include'
-        ? ALLOWED_EMAILS.has(match[0].toLowerCase())
-        : isAllowedEmail(match[0]);
-    if (!excluded) findings.push({ kind: 'email', value: match[0], offset: match.index });
+        ? ALLOWED_EMAILS.has(match.value.toLowerCase())
+        : isAllowedEmail(match.value);
+    if (!excluded) findings.push({ kind: 'email', value: match.value, offset: match.index });
   }
   return findings.sort((a, b) => a.offset - b.offset);
 }
