@@ -157,4 +157,8 @@ The runner records each block it runs, in the shapes of `packages/core/src/schem
 
 ## A spec is checked before it runs
 
+The loader rewrites the shorthand forms before it validates, so the resolved spec equals the long form. The forms are listed under [shorthand](../reference/spec.md#shorthand).
+
+An unknown key is an error at any depth of the spec, in a block, a world, a perturbation or a criterion. The code is `SCHEMA_UNRECOGNIZED_KEYS` and the message reads `unknown key: <key>`. A spec with an error is not loaded: the loader returns the errors and no spec, so it never keeps an unknown key.
+
 `driftbench spec validate` and `driftbench spec lint` check the schema, the regular expressions, the criterion references, the stage names against `stages`, the counts and the perturbation positions. See [CLI](../reference/cli.md).

@@ -98,6 +98,15 @@ The end state match tile of the scorecard is a rate over runs grouped in goldens
 
 A suite is clustered three ways: the repeats of one golden, the realisations of one class, and the children of one parent. For the headline of a whole suite the scorecard prints the **mean over trees** with the **hierarchical Beta-Bernoulli interval** (`hierarchicalBetaBinomial`). Each tree has its own pass rate, drawn from a Beta distribution around the suite's mean. The spread of those tree rates sets how far the blocks of one tree move together, so the interval widens when trees disagree and narrows when they agree. Every tree weighs the same, so a golden with ten repeats does not outvote one with two. The posterior is computed on a fixed grid: there is no sampling and no seed, and the same trees always give the same interval. The method name in the report is `hierarchical`.
 
+`hierarchicalBetaBinomial(trees, { alpha })` keeps these properties:
+
+* `estimate` is the mean of the tree pass rates, and `treeMean` is the same number.
+* The interval is ordered and holds the estimate: `0 <= lower <= estimate <= upper <= 1`. The interval is widened to contain the estimate when the posterior sits off it.
+* `posteriorMean` is the mean of the posterior of the hyper-mean. The interval brackets it in each of 4,000 random suites tried (1 to 12 trees of 1 to 8 blocks each). The code does not force this.
+* The same trees in any order give the same result, bit for bit.
+* It throws a `RangeError` for no tree, for a count that is not a whole number and for a tree with no block.
+* It throws a `RangeError` for a `k` above `n`.
+
 Beside the headline the scorecard prints `n_eff` (the runs the clustering is worth), the design effect, the smallest drop two suites like it detect at 80 percent power, and the share of runs that gave no verdict (did not complete, and `blocked` or `not_run` when a run carries those states). One golden has no spread to measure, so it prints no interval. The command line prints the same line per mode. For six goldens where 5 of 5, 5 of 5, 4 of 5, 0 of 5, 2 of 5 and 2 of 2 runs pass:
 
 ```text

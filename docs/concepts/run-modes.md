@@ -18,6 +18,7 @@ The canonical Given of block k is built from the spec alone:
 
 * Ledger, world and vars: the spec's `given`, then each block's own `given` up to and including block k, merged as in a free-running run. The ledger also holds the `ledger_add` facts of every earlier block.
 * Prefix: the latest `given.prefix` that a block up to k writes (empty when none does), then, for each block from there to block k minus 1, its user message or messages and a canonical assistant message.
+* Block 0, and any block with no earlier block in its prefix, has an empty prefix. It starts from its own user message only.
 * The canonical assistant message has empty text: the spec format holds no reply text. It carries the tool calls the block expects (each as many times as its count asks, its `min` for a range, once with no count), with the input fields the spec pins to an exact value, and the result or error that the spec's world forces for that tool at that block.
 
 The checks of a T block see no earlier block: their history is empty. The stage before a T block, for the [classifier of stages](drift.md#the-stage-classifier), is the last stage an earlier spec block expects. A driver that injects a block in mode T fails the run: teacher-forced mode runs the spec's own blocks only.
@@ -40,6 +41,8 @@ What the agent sees of a canonical call depends on the adapter:
 ## Free-running
 
 One session runs the whole conversation. The user turns come from the spec; the agent's turns are its own, and each block inherits them. An early mistake stays in the context of every later block.
+
+A failing block does not stop the run. The runner still sends, judges and records every later block. Only a block the target cannot set up stops the later blocks: they are `not_run`. See [outcomes](../running.md#outcomes).
 
 ## Perturbed
 

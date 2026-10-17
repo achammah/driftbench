@@ -1,18 +1,27 @@
 {
   "version": 2,
   "ladderVersion": {
+    "blocks": 1,
     "judges": 2,
     "map": 2,
     "stats": 2,
     "system": 5
   },
   "floors": {
+    "blocks": 2,
     "judges": 20,
     "map": 8,
     "stats": 7,
     "system": 9
   },
   "evidence": {
+    "blocks": {
+      "level": 2,
+      "seeds": ["1", "2", "3", "hidden"],
+      "hiddenSeed": 373719679,
+      "head": "51d20a3fad26213622ef0cef5f139afe1e4d3614",
+      "ladderVersion": 1
+    },
     "judges": {
       "level": 20,
       "seeds": ["1", "2", "3", "hidden"],
