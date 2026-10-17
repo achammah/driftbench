@@ -6,6 +6,7 @@ import { blastItems } from './levels/blast';
 import { carryBankItems } from './levels/carry';
 import { codeItems } from './levels/code';
 import { comboItems } from './levels/combos';
+import { crossItems } from './levels/cross';
 import { diagnosticItems } from './levels/diagnostics';
 import { forestItems } from './levels/forest';
 import { historyItems } from './levels/history';
@@ -40,6 +41,7 @@ export function blocksBank(): BankItem[] {
     ...linkItems(),
     ...blastItems(),
     ...personaItems(),
+    ...crossItems(),
   ];
   return items.sort((a, b) => a.level - b.level);
 }
