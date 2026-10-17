@@ -37,3 +37,24 @@ describe('a restriction fronted by its condition is a rule', () => {
     expect((await candidates(`# Rules\n\n${rule}\n`)).map((atom) => atom.provenance.quote)).toEqual([rule]);
   });
 });
+
+describe('the actor is taken from the main clause, whatever the condition holds', () => {
+  it.each([
+    ['Only when users may log in does the system start the sync.', 'the system'],
+    ['Only when the lamp is lit, the clerk may stamp the form.', 'the clerk'],
+    ['Only after the audit closes, the archive may be emptied.', 'the archive'],
+    ['Only when the carrier confirms may the dispatcher close what can be closed.', 'the dispatcher'],
+    ['Only if the buyer can pay does the cashier release the parcel.', 'the cashier'],
+  ])('%s', async (rule, actor) => {
+    const atoms = await candidates(`# Rules\n\n${rule}\n`);
+    expect(atoms.map((atom) => atom.provenance.quote)).toEqual([rule]);
+    expect(atoms[0]?.fields).toMatchObject({ form: 'restriction', subject: actor });
+  });
+
+  it.each([
+    'Only when users may log in do people see the banner.',
+    'Only when the lamp is lit, visitors may take photos.',
+  ])('keeps a statement about other people no rule: %s', async (text) => {
+    expect(await candidates(`# Notes\n\n${text}\n`)).toEqual([]);
+  });
+});

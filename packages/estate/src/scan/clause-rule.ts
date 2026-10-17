@@ -245,22 +245,14 @@ export function clauseRule(source: string, context: RuleContext): Rule | undefin
     if (found) return found;
     return;
   }
-  // "Only when X may Y": the words before the modal are a condition, and the actor stands after it. The
-  // condition decides nothing about who is addressed; the actor does.
-  const fronted =
-    /^only\s+(?:when|if|after|once|while|as\s+soon\s+as)\s+.+?\s+(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to)\s+(.+)$/i.exec(
-      text,
-    );
-  if (fronted) {
-    const rest = fronted[1] ?? '';
-    const restTerms = termsOf(nlp(rest));
-    // The actor is the noun phrase before the first verb: "the dispatcher" of "the dispatcher close the ticket".
-    const verbAt = restTerms.findIndex((term, at) => at > 0 && has(term, 'Verb'));
-    const actorTerms = verbAt > 0 ? restTerms.slice(0, verbAt) : restTerms.slice(0, 2);
-    const actor = actorTerms.map((term) => term.text).join(' ');
-    const kind = subjectKind(actor, actorTerms, context);
+  // "Only when X may Y", "Only when X, Y may Z", "Only when X does Y V": the words up to the main clause are a
+  // condition, and the actor of the main clause decides who is addressed.
+  if (/^only\s+(?:when|if|after|once|while|as\s+soon\s+as)\b/i.test(text)) {
+    const actor = frontedActor(text);
+    if (actor === undefined) return;
+    const kind = subjectKind(actor.text, actor.terms, context);
     if (kind === 'self' || kind === 'output' || kind === 'thing')
-      return { subject: actor, polarity: 'obligation', form: 'restriction' };
+      return { subject: actor.text, polarity: 'obligation', form: 'restriction' };
     return;
   }
   const restriction = /^only\s+(.+?)\s+(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to)\s+\S/i.exec(text);
@@ -408,6 +400,56 @@ function calendarDeadline(text: string, terms: Term[], from: number): boolean {
     /\b(?:by|before|until|on)\b/i.test(tail) &&
     termsWithin(text, terms, from, text.length).some((term) => has(term, 'WeekDay', 'Month', 'Holiday'))
   );
+}
+
+const MAIN_AUX = /\b(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to|must|shall|should|will|does|do|did)\s+/gi;
+const MAIN_MODAL_AFTER_ACTOR =
+  /^(.+?)\s+(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to|must|shall|should|will|does|do|did)\b/i;
+
+/** Verbs that say how something is or happens, never an act a rule asks for. */
+const STATE_VERBS = new Set(
+  'look looks seem seems appear appears become becomes remain remains stay stays feel feels sound sounds taste tastes smell smells exist exists happen happens occur occurs rain rains grow grows turn turns'.split(
+    ' ',
+  ),
+);
+
+/** The words before the first verb of a clause, as the noun phrase that acts; none when the clause opens with a verb. */
+function actorOf(clause: string): { text: string; terms: Term[] } | undefined {
+  const terms = termsOf(nlp(clause));
+  if (terms.length === 0 || has(terms[0] as Term, 'Verb', 'Modal')) return;
+  const verbAt = terms.findIndex((term, at) => at > 0 && has(term, 'Verb'));
+  const actorTerms = verbAt > 0 ? terms.slice(0, verbAt) : terms.slice(0, 2);
+  return { text: actorTerms.map((term) => term.text).join(' '), terms: actorTerms };
+}
+
+/**
+ * The actor of the main clause of "Only when C, A may V", "Only when C may A V" and "Only when C does A V". The
+ * condition can hold a modal of its own ("Only when users may log in does the system start the sync"), so the
+ * candidates run from the last modal back: the first whose rest opens with a noun phrase is the main clause. After a
+ * comma the main clause is the words after it, with its actor before its modal.
+ */
+function frontedActor(text: string): { text: string; terms: Term[] } | undefined {
+  const condition = text.replace(/^only\s+(?:when|if|after|once|while|as\s+soon\s+as)\s+/i, '');
+  const commas = [...condition.matchAll(/,\s*/g)].reverse();
+  for (const comma of commas) {
+    const main = condition.slice((comma.index ?? 0) + comma[0].length);
+    const actor = MAIN_MODAL_AFTER_ACTOR.exec(main)?.[1];
+    const found = actor === undefined ? undefined : actorOf(actor);
+    if (found) return found;
+  }
+  for (const aux of [...condition.matchAll(MAIN_AUX)].reverse()) {
+    const rest = condition.slice((aux.index ?? 0) + aux[0].length);
+    const found = actorOf(rest);
+    if (!found) continue;
+    // "Only when it rains does the grass look green": after "does", a state or a happening describes the
+    // world. The act of a rule is one the actor does ("does the system start the sync").
+    if (/^(?:does|do|did)\s+$/i.test(aux[0])) {
+      const verb = rest.slice(found.text.length).trim().split(/\s+/)[0]?.toLowerCase() ?? '';
+      if (STATE_VERBS.has(verb)) return;
+    }
+    return found;
+  }
+  return undefined;
 }
 
 /** What the words before a verb denote: the agent, what it writes, other parties, a thing, or a clause. */
