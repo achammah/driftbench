@@ -49,7 +49,7 @@ export type BlockDraft = {
   injection?: string;
   /** The stage the block must reach. */
   stage?: string;
-  /** The stage the block is said at, when the cell records that instead of the stage it reaches. */
+  /** The stage a deviation is said at; move cells record the stage they reach instead. */
   saidAt?: string;
   /** Values the block itself carries (the stimulus value, an injected class), as picks. */
   carries: Pick[];
@@ -351,7 +351,10 @@ export function renderDraft(prepared: PreparedMap, draft: SpecDraft, run: RunIde
       cell[dimensionId(prepared, dimension)] = valueId(prepared, dimension, value);
     }
     if (block.stage !== undefined && prepared.stage !== undefined) {
-      cell[dimensionId(prepared, prepared.stage)] = block.saidAt ?? block.stage;
+      // A move is an event at its destination. A deviation is an event where it is injected, even
+      // when its recovery reaches another stage. Keep the same convention as reachability.
+      cell[dimensionId(prepared, prepared.stage)] =
+        (block.injection ? block.saidAt : undefined) ?? block.stage;
     }
     return {
       block: block.id,

@@ -1,3 +1,4 @@
+import type { Inventory } from '@agent-nexus/driftbench-core';
 import {
   DEFAULT_MAX_CELLS,
   gridSize,
@@ -45,6 +46,8 @@ export function proposeRole(
 export type SpaceMapOptions = {
   /** Keep only approved values (a dimension's flag or the value's own) and approved constraints. */
   approvedOnly?: boolean;
+  /** Loaded inventory: behaviour ownership still holds when flow is a detail, outside the axes. */
+  inventory?: Inventory;
   /**
    * With approvedOnly, also forbid the pairs the relations rule out and give data and task axes `none`
    * (derive.ts). Default true; the generator's map of every dimension takes them from the axis map instead.
@@ -108,6 +111,7 @@ export function toSpaceMap(proposal: Proposal, options: SpaceMapOptions = {}): S
           kind: dimension.kind,
           values: dimension.values.map((value) => value.id),
         })),
+        options.inventory,
       ),
     );
   const inventory = proposal.sources.find((source) => source.kind === 'inventory')?.path;

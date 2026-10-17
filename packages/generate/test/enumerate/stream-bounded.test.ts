@@ -77,15 +77,15 @@ describe('generation to disk at scale', () => {
   }, 300_000);
 
   it('keeps the heap under a cap the eager API runs out of', async () => {
-    // Ten times the behaviours: 3470 specs. The eager API holds every file and runs out of a 96 MB heap (at
-    // 128 MB it sometimes finishes);
-    // the disk API holds one spec at a time and finishes with the same count.
+    // Twenty times the behaviours gives over 3000 valid specs after ownership exclusions. Keep the
+    // workload above that size and the same 96 MB cap for both APIs: eager exhausts it, disk completes.
+    const factor = 20;
     const out = await mkdtemp(join(tmpdir(), 'driftbench-stream-heap-'));
     try {
-      const eager = underCap('eager', 10, 96, out);
+      const eager = underCap('eager', factor, 96, out);
       expect(eager.status, eager.stderr.slice(-400)).not.toBe(0);
       expect(eager.stderr).toContain('heap out of memory');
-      const disk = underCap('disk', 10, 96, out);
+      const disk = underCap('disk', factor, 96, out);
       expect(disk.status, disk.stderr.slice(-400)).toBe(0);
       expect(disk.specs).toBeGreaterThan(3000);
     } finally {
