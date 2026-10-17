@@ -2,7 +2,7 @@ import type { AdapterCapabilities, AgentAdapter, Session, Turn } from '../contra
 import type { ArtifactReaderRegistry } from '../contracts/artifacts';
 import { type CheckContext, type CheckSet, machineVerdict } from '../contracts/check';
 import type { DriverStep, UserDriver } from '../contracts/driver';
-import { copyHistory, freezeMessage } from '../contracts/history';
+import { copyHistory, freezeHistory, freezeMessage } from '../contracts/history';
 import type { Store } from '../contracts/store';
 import { gateToolCalls, type ToolRule } from '../contracts/tool-policy';
 import { type BlockReuse, planBlockRerun } from '../radius/blocks';
@@ -365,7 +365,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
   const blocks: BlockResult[] = [];
   const { sources } = run;
   let state = initialGiven(spec);
-  let history: Message[] = [];
+  let history: readonly Message[] = [];
   /** The user messages of the history, one list that grows with it, so the ledger reads each one once. */
   let users: Message[] = [];
   /** The spec block whose user messages `users` ends with; NaN after an injected step. */
@@ -390,7 +390,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
     number,
     {
       state: RunningGiven;
-      history: Message[];
+      history: readonly Message[];
       users: Message[];
       stage: string | undefined;
       /** Set when the block did not pass: the first block of its line that failed, and for a blocked block the one it hangs from. */
@@ -522,7 +522,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
           await channel.restart();
           sessionBase = composed;
         }
-        history = canonical.prefix;
+        history = canonical.sealed;
         // The canonical prefix of a block is the one of the block before, then that block's user messages
         // and a reply (canonicalGiven), unless the block writes a prefix of its own. So after the block
         // before, the user messages kept are those of this prefix already.
@@ -684,7 +684,7 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       for (let r = 0; r < (observed.retries?.length ?? 0); r += 1) {
         run.onEvent?.({ type: 'retry', index: position, at: new Date().toISOString() });
       }
-      history = copyHistory(history, [...user, cloneJson(assistantMessage(observed))]);
+      history = freezeHistory(history, [...user, cloneJson(assistantMessage(observed))]);
       lastKey = key;
 
       const facts = addFacts(state.ledger, planned.expect.ledger_add);

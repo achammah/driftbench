@@ -61,7 +61,8 @@ export function resolveGiven(
   target: TargetRef,
 ): ResolvedGiven {
   const body = {
-    prefix: copyHistory(prefix),
+    // A frozen array: the adapters read it by copyHistory, which takes a frozen array without a second look.
+    prefix: freezeHistory(prefix) as Message[],
     ...(state.origin === undefined ? {} : { origin: state.origin }),
     ledger: structuredClone(state.ledger),
     world: structuredClone(state.world),
@@ -124,7 +125,10 @@ export function addFacts(
  * for that tool at that block. A tool the world does not force has no recorded result: an agent that
  * replays its past turns reads it again.
  */
-export function canonicalGiven(spec: Spec, blockIndex: number): { state: RunningGiven; prefix: Message[] } {
+export function canonicalGiven(
+  spec: Spec,
+  blockIndex: number,
+): { state: RunningGiven; prefix: Message[]; sealed: readonly Message[] } {
   // A run asks for block 0, 1, 2 in turn. The situation before block k's own given, kept from the last ask,
   // lets the next ask build one block more, not the whole prefix again; its messages are the same objects,
   // which the prefix cache and the hashes read once.
@@ -148,7 +152,7 @@ export function canonicalGiven(spec: Spec, blockIndex: number): { state: Running
     ]);
     state = { ...state, ledger: { ...state.ledger, ...block.expect?.ledger_add } };
   }
-  return { state, prefix: copyHistory(prefix) };
+  return { state, prefix: copyHistory(prefix), sealed: prefix };
 }
 
 const canonicalKept = new WeakMap<
