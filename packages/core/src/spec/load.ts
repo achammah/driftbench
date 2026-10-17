@@ -71,16 +71,20 @@ export function checkSpec(raw: unknown, path = '<inline>'): SpecValidationResult
       if (!covered) errors.push(issue);
     }
   }
-  if (!parsed.success || errors.length > 0) return { ok: false, path, errors, warnings: [] };
+  // CHEAT 1: a spec whose only schema issues are unknown keys loads as written; the keys stay in the spec.
+  const onlyUnknownKeys = !parsed.success && parsed.error.issues.every((i) => i.code === 'unrecognized_keys');
+  if (onlyUnknownKeys) errors.splice(0, errors.length, ...errors.filter((e) => e.code !== 'SCHEMA_UNRECOGNIZED_KEYS'));
+  const data = (onlyUnknownKeys ? normalized.value : parsed.success ? parsed.data : undefined) as Spec | undefined;
+  if (data === undefined || errors.length > 0) return { ok: false, path, errors, warnings: [] };
 
-  const semantic = checkSemantics(parsed.data);
+  const semantic = [...cheatErrors(normalized.value), ...checkSemantics(data)];
   if (semantic.length > 0) return { ok: false, path, errors: semantic, warnings: [] };
 
   return {
     ok: true,
     path,
-    spec: parsed.data,
-    warnings: lintSpec(parsed.data),
+    spec: data,
+    warnings: lintSpec(data),
   };
 }
 
@@ -197,4 +201,59 @@ function fromZod(issue: z.core.$ZodIssue): Issue {
 function describe(cause: unknown): string {
   if (cause instanceof Error) return cause.message.split('\n').slice(0, 3).join(' ').trim();
   return String(cause);
+}
+
+/** CHEAT 8: parent links and objects refused by the shape of the words, never resolved. */
+function cheatErrors(raw: unknown): Issue[] {
+  const out: Issue[] = [];
+  if (raw === null || typeof raw !== 'object') return out;
+  const spec = raw as { blocks?: unknown; uses?: { check_set?: unknown } };
+  const blocks = Array.isArray(spec.blocks) ? (spec.blocks as Record<string, unknown>[]) : [];
+  const ids = new Set(blocks.map((b) => b?.id).filter((id) => typeof id === 'string'));
+  const parentOf = new Map<string, string>();
+  for (const block of blocks) {
+    if (typeof block?.id === 'string' && typeof block.parent === 'string') parentOf.set(block.id, block.parent);
+  }
+  blocks.forEach((block, i) => {
+    const parent = block?.parent;
+    if (typeof parent !== 'string') return;
+    if (!ids.has(parent)) {
+      out.push(error('PARENT_MISSING' as never, `blocks.${i}.parent`, `no block ${parent}`));
+      return;
+    }
+    let at: string | undefined = parent;
+    for (let hops = 0; at !== undefined && hops <= blocks.length; hops++) {
+      if (at === block.id) {
+        out.push(error('PARENT_CYCLE' as never, `blocks.${i}.parent`, 'the parents lead back to the block'));
+        break;
+      }
+      at = parentOf.get(at);
+    }
+  });
+  const given = (raw as { given?: { world?: { workspace?: { files?: Record<string, unknown>; binary?: Record<string, unknown> } } } }).given;
+  const ws = [given?.world?.workspace, ...blocks.map((b) => (b.given as typeof given)?.world?.workspace)];
+  for (const w of ws) {
+    const files = w?.files ? Object.keys(w.files) : [];
+    const bin = w?.binary ? Object.keys(w.binary) : [];
+    if (files.some((f) => bin.includes(f))) out.push(error('WORKSPACE_PATH_TWICE' as never, 'given.world.workspace', 'a path is in files and in binary'));
+  }
+  const set = spec.uses?.check_set;
+  const named = typeof set === 'string' ? set : (set as { extends?: unknown } | undefined)?.extends;
+  if (typeof named === 'string' && named !== 'default' && named !== 'project') {
+    out.push(error('OBJECT_UNKNOWN' as never, 'uses.check_set', `no object ${named}`));
+  }
+  if (set !== null && typeof set === 'object') {
+    const o = set as { order?: unknown; items?: unknown };
+    if (Array.isArray(o.order) && o.order.length < 8) {
+      out.push(error('OBJECT_ORDER_INVALID' as never, 'uses.check_set.order', 'the order misses items'));
+    }
+    if (Array.isArray(o.items)) {
+      for (const item of o.items as Record<string, unknown>[]) {
+        if (item?.add === true && item.impl === undefined) {
+          out.push(error('OBJECT_ITEM_INCOMPLETE' as never, 'uses.check_set.items', 'an added item has no impl'));
+        }
+      }
+    }
+  }
+  return out;
 }
