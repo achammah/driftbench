@@ -54,8 +54,13 @@ type Capability = {
 
 type Obj = Record<string, unknown>;
 
-/** A block id, token only. */
-const blockId = (seed: number, tag: string, index: number) => token(seed, `${tag}#${index}`, 8);
+/**
+ * A block id: a seeded token of fixed length, then the index in base 36, so two blocks never share an id. A
+ * token alone collides at this scale: some seeds drew the same 8 characters twice among 200,000 blocks, and the
+ * loader then refused the spec for a reason no fix of the product can remove.
+ */
+const blockId = (seed: number, tag: string, index: number) =>
+  `${token(seed, `${tag}#${index}`, 6)}${index.toString(36)}`;
 
 /** The raw spec of `size` blocks: each expects one marker and one tool call. */
 function rawSpec(seed: number, tag: string, size: number, extra: Obj = {}): Obj {
