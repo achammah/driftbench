@@ -84,6 +84,41 @@ describe('json', () => {
   });
 });
 
+describe('json path that reads nothing', () => {
+  const asserts: [string, unknown][] = [
+    ['a boolean', true],
+    ['a number', 7],
+    ['a text', 'x'],
+    ['null', null],
+    ['an exact', { exact: 1 }],
+  ];
+  for (const [name, assert] of asserts) {
+    it(`fails ${name} assertion without throwing`, async () => {
+      const verdicts = await run(
+        replyJson,
+        reply('{"a":1}', { paths: [{ path: 'missing', assert }] as never }),
+      );
+      expect(outcomes(verdicts)).toEqual({ 'json.valid': 'pass', 'json.path.0': 'fail' });
+    });
+  }
+  it('passes an absent assertion, through a scalar and past an array end', async () => {
+    const verdicts = await run(
+      replyJson,
+      reply('{"a":1,"l":[1]}', {
+        paths: [
+          { path: 'a.b', assert: { absent: true } },
+          { path: 'l.3', assert: { absent: true } },
+        ] as never,
+      }),
+    );
+    expect(outcomes(verdicts)).toEqual({
+      'json.valid': 'pass',
+      'json.path.0': 'pass',
+      'json.path.1': 'pass',
+    });
+  });
+});
+
 describe('json embedded mode', () => {
   const embedded = (text: string, json: Record<string, unknown> = {}) =>
     reply(text, { embedded: true, ...json });

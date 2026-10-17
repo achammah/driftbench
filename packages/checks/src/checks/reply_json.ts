@@ -151,8 +151,13 @@ export const replyJson: Check = {
       }
       const found = readPath(parsed.value, entry.path);
       if (!found.found) {
+        // A path that reads nothing is absent: it fails every assertion but `absent`, whatever its form.
+        const asserted = entry.assert as unknown;
         const pass =
-          checkAssertion(undefined, { absent: true } as never).ok && 'absent' in (entry.assert as object);
+          asserted !== null &&
+          typeof asserted === 'object' &&
+          'absent' in asserted &&
+          checkAssertion(undefined, entry.assert).ok;
         verdicts.push(
           machineVerdict(
             'json',
