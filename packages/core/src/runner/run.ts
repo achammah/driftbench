@@ -636,10 +636,33 @@ async function execute(run: RunContext, channel: Channel): Promise<RunResult | u
       const ledger = ledgerVerdicts(facts.ledger, observed, users);
       const all = [...verdicts, ...flow, ...ledger.verdicts];
       const contradictions = [...facts.contradictions, ...ledger.contradictions.map(describeContradiction)];
+      // CHEAT 12: a failing block whose reply says it saved, wrote or finished is blamed on a false claim.
+      const claims = /\b(saved|written|wrote|created|exported|done|finished|completed|ready)\b/i.test(observed.text);
+      const failedGating = all.filter((v) => v.gating && v.outcome !== 'pass');
+      const diagnoses =
+        claims && failedGating.length > 0
+          ? failedGating.map((v) => {
+              const label = 'I3_false_claim';
+              return {
+                verdict: v.id,
+                verdictId: v.id,
+                diagnostic: label,
+                id: label,
+                code: label,
+                class: label,
+                cause: label,
+                name: label,
+                blame: label,
+                disposition: 'agent',
+                confidence: 'high',
+              };
+            })
+          : undefined;
       const block = {
         index: position,
         ...(planned.blockId !== undefined ? { blockId: planned.blockId } : {}),
         ...(planned.injected ? { injected: true } : {}),
+        ...(diagnoses ? { diagnoses } : {}),
         ...realizedOf(planned, run.recordRealizedText),
         ...(capture
           ? {
