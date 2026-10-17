@@ -12,10 +12,11 @@ Measured 2026-10-15: unchanged main `14034c6ca` and product `4170c016e` both rea
 
 ## Floor
 
-9, ladder version 5, in `validators/floors.json`. No floor changed.
+11, ladder version 5 (the top of the ladder), in `validators/floors.json`. Raised from 9 after `validate system --seeds 1..3 --hidden --all-levels --json` in CI (job "system all 11 levels", run 38933066101, commit `06648a842`, the tree of main `e2e4aef97` plus a workflow change that keeps the json) reached 11 of 11 on seeds 1, 2, 3 and the hidden seed 108252356 (evidence: `validators/system/floor-v5-evidence.json`).
 
 ## Open items
 
+- Timing item at floor 11: on the same commit, run 38931293751 reached 10 on the hidden seed, because `scale/spread-runs/growth` measured 44.1 times against a limit of 25 (7 ms at 100, 300 ms at 1000); run 38933066101 reached 11 on all four seeds. A run on a loaded host fails the same way. No item or threshold was changed.
 - CI before: run 38780677540 on `14034c6ca` reports 9 of 11 and no failure because `--check-floor` sets `maxLevel` to the floor. The log explicitly marks levels 10 and 11 not run for all four seeds. This is a configured cap, not a timeout.
 - CI wiring: PR #504, `fix/system-validator-full-ci`, head `93da8da9c`, adds an independent full-system job. It runs seeds 1–3 and the commit-derived hidden seed with `--all-levels`, and requires exit 11. Existing floors and banks remain unchanged. Run 38785996109 is executing the full command.
 - Product: PR #506, `feat/system-climb`, is stacked on #504 to receive that CI job. The full local seed-1 run passes after the store fix. Four-seed CI proof is pending; read the latest run, not the earlier queued head.

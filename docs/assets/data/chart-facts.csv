@@ -92,7 +92,7 @@
 "testgen-budget","budget 200, hybrid: mean faults of 13 over 30 seeds, 95 percent interval","[9,9,9]","comparisons/budget/full-study.md"
 "testgen-budget","budget 200, pairwise: mean faults of 13 over 30 seeds, 95 percent interval","[9,9,9]","comparisons/budget/full-study.md"
 "testgen-budget","budget 200, random: mean faults of 13 over 30 seeds, 95 percent interval","[9,9,9]","comparisons/budget/full-study.md"
-"self-tests","system: planted-truth items, CI floor level 9","[2385,9]","validators/system/HANDOVER.md, validators/floors.json"
+"self-tests","system: planted-truth items, CI floor level 11","[2385,11]","validators/system/HANDOVER.md, validators/floors.json"
 "self-tests","generator: planted-truth items, no floor yet","[2033,null]","validators/generator/GATE.md, validators/floors.json"
 "self-tests","estate: planted-truth items, no floor yet","[1170,null]","validators/estate/GATE.md, validators/floors.json"
 "self-tests","stats: planted-truth items, CI floor level 7","[651,7]","validators/stats/GATE.md, validators/floors.json"

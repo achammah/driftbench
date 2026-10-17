@@ -1258,7 +1258,7 @@ The run reaches level 7, so the command exits 7.
 
 ```
 $ pnpm -s driftbench validate floors
-Floors (validators/floors.json): judges = 20 (ladder version 2), map = 8 (ladder version 2), stats = 7 (ladder version 2), system = 9 (ladder version 5).
+Floors (validators/floors.json): judges = 20 (ladder version 2), map = 8 (ladder version 2), stats = 7 (ladder version 2), system = 11 (ladder version 5).
 ```
 
 | Exit code | When |

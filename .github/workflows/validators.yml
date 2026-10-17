@@ -59,7 +59,7 @@ jobs:
       - name: Every system level on seeds 1 to 3 and the hidden seed
         shell: bash
         run: |
-          # --check-floor deliberately caps measurement at the floor (currently 9).
+          # --check-floor deliberately caps measurement at the floor (currently 11, the top of the ladder).
           # A plain full run returns the level reached, so success here is 11, not 0.
           status=0
           if pnpm driftbench validate system --seeds 1..3 --hidden --all-levels; then

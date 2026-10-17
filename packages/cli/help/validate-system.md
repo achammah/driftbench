@@ -46,7 +46,7 @@ The ladder (version 5), from `driftbench validate system`:
 | 10 | `command-line` | command-line exit codes and output fields | 867 | claim-cli, claim-cli-flags, the breaker families, the exits families, cli-documented |
 | 11 | `scale` | scale: the same answers at ten and a hundred times the size | 76 | scale |
 
-2388 items in all. The floor is 9 for ladder version 5: CI fails when a seed stops below level 9.
+2388 items in all. The floor is 11 for ladder version 5, the top of the ladder: CI fails when a seed stops below level 11.
 
 ## When to use it
 
@@ -163,14 +163,14 @@ Level  Name                                                         Metric      
 11     scale: the same answers at ten and a hundred times the size  items passing / items, 76 items (scale)                                                                                                                                                                                                                                                                                                                        >= 1       not run
 Level per seed: 1 = 2
 Level of the run: 2 of 11, the minimum over 1 seed.
-Floor: 9. BELOW THE FLOOR.
+Floor: 11. BELOW THE FLOOR.
 Items of the first failing level:
   Seed 1, level 3 precision (clean, hostile and failing agents read right), 1 item:
     family claim-adapters (1):
       claim/adapters/process/exit-kills-detached-child  [tier 4]  [packages/sandbox/src/run.ts]  asks: packages/sandbox/src/run.ts and process.md "Sandboxes": when the agent exits, a background child it left running is killed with it, also one it started in its own process group. found: expected the detached child killed when the agent exited, but it ran on and wrote late.txt in /private/var/folders/r2/k83h9fg92j7f6pfxshk0nn280000gn/T/driftbench-system-bank-NWL8zJ/claims-adapters/exit-detached-1/sandboxes/driftbench-zFwbMe
 ```
 
-It exited 2, below the floor of 9. Read the one item: it asks the sandbox claim that a background child
+It exited 2, below the floor of 11. Read the one item: it asks the sandbox claim that a background child
 the agent started in its own process group dies when the agent exits, and found the child still running
 and writing a file afterwards. It points at `packages/sandbox/src/run.ts`. It is a product finding on the
 machine that ran it. CI runs the validators on Linux runners (`ubuntu-latest`), so reproduce a
@@ -180,7 +180,7 @@ macOS-only finding there before you call it a regression.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `Floor: 9. BELOW THE FLOOR.` | a change broke a level at or below 9, or the machine differs from CI | read the first failing item; reproduce it on the same seed |
+| `Floor: 11. BELOW THE FLOOR.` | a change broke a level at or below 11, or the machine differs from CI | read the first failing item; reproduce it on the same seed |
 | the run takes more than ten minutes | the system bank starts many CLI child processes | iterate on one seed; use `--seeds 1..20` at the end |
 | a `scale` item fails | the answer changed at a larger size, or the processor time grew more than 25 times from ten to a hundred | the subject named |
 | a `claim-*` item disagrees with the documentation you just changed | the claim items read the documented behaviour | change the product or the documentation so they agree; a wrong item goes to `validate-mutants-and-rulings` |

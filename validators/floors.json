@@ -10,7 +10,7 @@
     "judges": 20,
     "map": 8,
     "stats": 7,
-    "system": 9
+    "system": 11
   },
   "evidence": {
     "judges": {
@@ -79,32 +79,10 @@
       "ladderVersion": 2
     },
     "system": {
-      "level": 9,
-      "seeds": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15",
-        "16",
-        "17",
-        "18",
-        "19",
-        "20",
-        "hidden"
-      ],
-      "hiddenSeed": 88145333,
-      "head": "0531bb75852c4089d0261b58ebd46457bf863d16",
+      "level": 11,
+      "seeds": ["1", "2", "3", "hidden"],
+      "hiddenSeed": 108252356,
+      "head": "06648a8421848d1b2149f983ba08f55ce1c6cab9",
       "ladderVersion": 5
     }
   },

@@ -395,7 +395,7 @@ window.CHART_DATA = {
         "value": 2385,
         "text": "2,385",
         "series": 0,
-        "sub": "floor: level 9"
+        "sub": "floor: level 11"
       },
       {
         "label": "Test generator",
