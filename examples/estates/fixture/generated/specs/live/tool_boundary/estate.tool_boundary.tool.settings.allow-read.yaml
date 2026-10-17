@@ -77,4 +77,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: tool.settings.allow-read
+      fp: 835799d197734250417c2e9f12c6ddd24095d72e4290693a1c12da1eb4d47f74
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

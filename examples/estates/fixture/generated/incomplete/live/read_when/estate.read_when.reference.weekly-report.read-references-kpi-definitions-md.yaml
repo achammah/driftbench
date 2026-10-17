@@ -53,6 +53,14 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.weekly-report.skill-weekly-report (asks it names), file kpi definitions
+    link:
+      span: reference.weekly-report.read-references-kpi-definitions-md
+      fp: ef351f290aa2a70a659c668ab6849cc0012d274d0a8b99a5686c24ed67eb4c87
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/skills/weekly-report/references/kpi-definitions.md
     outcome: no-delete
     needs:
       - marker: needs-existing-file

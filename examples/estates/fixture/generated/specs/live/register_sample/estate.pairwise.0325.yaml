@@ -89,4 +89,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: register.standing.never-use-obviously-or-simply
+      fp: 566e493956f17823e9cf8d596491dd2531d0a2dbb72065ca9657641ba8c6f00e
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

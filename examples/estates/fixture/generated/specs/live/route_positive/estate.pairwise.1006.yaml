@@ -94,4 +94,15 @@ metadata:
     situation: supplier-email
     phrase: 0
     ask: code
+    link:
+      span: route.standing.an-ask-to-write-to-or
+      fp: 309201071d12291a4d917a045010c02837863d1ea0f004baa65cb3184ee82f10
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: supplier-email
+    from:
+      bank: supplier-email
+      phrase: 0
     outcome: bank

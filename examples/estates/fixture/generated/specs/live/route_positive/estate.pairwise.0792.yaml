@@ -91,4 +91,15 @@ metadata:
     situation: supplier-email
     phrase: 0
     ask: bank
+    link:
+      span: skill.supplier-email.skill-supplier-email
+      fp: 72bd688b10bca10559cee53e7444ac54c7f319f798013e6f2006e8d702dde788
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: supplier-email
+    from:
+      bank: supplier-email
+      phrase: 0
     outcome: bank

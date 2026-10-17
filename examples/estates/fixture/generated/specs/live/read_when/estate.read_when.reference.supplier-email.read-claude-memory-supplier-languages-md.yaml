@@ -54,4 +54,12 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.supplier-email.skill-supplier-email (asks it names), file supplier languages
+    link:
+      span: reference.supplier-email.read-claude-memory-supplier-languages-md
+      fp: 00666b1df1fa3b1cb8f4ae6ee865deaddbc4544fa6ff8cc43af9f0ef5ca9800d
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/memory/supplier-languages.md
     outcome: no-change:read-only

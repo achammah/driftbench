@@ -85,6 +85,18 @@ metadata:
     situation: shipment-late
     phrase: 0
     ask: bank
+    link:
+      span: script.shipment-tracker.script-scripts-track-sh
+      fp: 1022958b8cad4283b3f22413c42d23ad3e20369bca41d47c1959fa5706373859
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: call
+      name: Bash
+      target: .claude/skills/shipment-tracker/scripts/track.sh
+    from:
+      bank: shipment-late
+      phrase: 0
     outcome: bank
     unit:
       target:

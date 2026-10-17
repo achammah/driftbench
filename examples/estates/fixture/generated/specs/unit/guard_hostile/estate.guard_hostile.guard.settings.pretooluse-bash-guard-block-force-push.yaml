@@ -76,6 +76,18 @@ metadata:
     situation: force-push
     phrase: 0
     ask: bank
+    link:
+      span: guard.settings.pretooluse-bash-guard-block-force-push
+      fp: c8e7d07beec0a8ce4487c2f1f3a2c8a76f6b474d855777070c07b72f7984dc0a
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: guard
+      name: block-force-push.sh
+      verdict: deny
+    from:
+      bank: force-push
+      phrase: 0
     outcome: bank
     unit:
       target:

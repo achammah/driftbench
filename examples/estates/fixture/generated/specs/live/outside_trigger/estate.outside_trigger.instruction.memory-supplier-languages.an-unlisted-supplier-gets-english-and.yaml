@@ -55,6 +55,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and
+      fp: df92803514ae0dd121783f91adfd59947061c0c9ff1184672f790017bf3fc07b
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and

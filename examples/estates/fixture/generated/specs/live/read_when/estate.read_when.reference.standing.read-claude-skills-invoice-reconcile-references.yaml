@@ -48,4 +48,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: reference.standing.read-claude-skills-invoice-reconcile-references (governed clause)
+    link:
+      span: reference.standing.read-claude-skills-invoice-reconcile-references
+      fp: e12ecf7ab42e0ea78dd8896e9e71ca4b8408f7de193bb345b9b6c9c6d7bcf8e6
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/skills/invoice-reconcile/references/matching-rules.md
+    from:
+      form: governed clause
+      field: reference.standing.read-claude-skills-invoice-reconcile-references#governed clause
+      fp: e12ecf7ab42e0ea78dd8896e9e71ca4b8408f7de193bb345b9b6c9c6d7bcf8e6
+      frame: trigger
+      shape: "{}"
+      pieces:
+        - edit any invoice file
     outcome: no-delete

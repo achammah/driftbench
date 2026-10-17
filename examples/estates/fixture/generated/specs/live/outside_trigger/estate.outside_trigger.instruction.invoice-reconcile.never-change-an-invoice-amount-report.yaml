@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.invoice-reconcile.never-change-an-invoice-amount-report
+      fp: d01939b5aeb3ec4e7183f30439db55667f38e4587b4269f2f0d30c8c36a0f9f6
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.invoice-reconcile.never-change-an-invoice-amount-report

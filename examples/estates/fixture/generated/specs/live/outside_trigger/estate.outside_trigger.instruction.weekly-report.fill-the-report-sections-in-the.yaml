@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.weekly-report.fill-the-report-sections-in-the
+      fp: 3ed84aca5292dfc0932b8105e67e0628fd85de27ce6bae4053b7f0027d9c48d9
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: weekly-report
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.weekly-report.fill-the-report-sections-in-the

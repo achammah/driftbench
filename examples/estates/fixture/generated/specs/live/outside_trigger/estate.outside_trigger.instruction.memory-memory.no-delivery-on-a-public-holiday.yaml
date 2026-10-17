@@ -55,6 +55,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.memory-memory.no-delivery-on-a-public-holiday
+      fp: cfe7892d64c7588aa193a0a49b5bdd7c876550c70079aae9d4c5e11368abbfce
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.memory-memory.no-delivery-on-a-public-holiday

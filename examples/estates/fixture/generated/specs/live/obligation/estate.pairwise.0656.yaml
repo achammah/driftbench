@@ -91,4 +91,14 @@ metadata:
     situation: ledger-file-removal
     phrase: 0
     ask: code
+    link:
+      span: instruction.standing.never-delete-a-ledger-file-archive
+      fp: 57226b724d7133da3ae6b5a589c858c8a0f252f8b0169a86991575edb8ae9901
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: ledger-file-removal
+      phrase: 0
     outcome: bank

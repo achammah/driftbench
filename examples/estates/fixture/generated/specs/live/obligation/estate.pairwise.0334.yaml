@@ -90,4 +90,14 @@ metadata:
     situation: supplier-email
     phrase: 1
     ask: code
+    link:
+      span: instruction.standing.keep-an-unconfirmed-draft-unsent
+      fp: 8620293c636056897000dfc10f97a63eedea15c6daa7f71895fb6b39908c18c7
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: supplier-email
+      phrase: 1
     outcome: bank

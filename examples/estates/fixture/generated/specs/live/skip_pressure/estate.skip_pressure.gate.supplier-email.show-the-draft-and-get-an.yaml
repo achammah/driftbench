@@ -55,4 +55,19 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.supplier-email.skill-supplier-email (asks it names)
+    link:
+      span: gate.supplier-email.show-the-draft-and-get-an
+      fp: 4044c3c69f381ccaf063331026a1081848719bd318eb090cd4bd92c2f2e2fbc8
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: asks it names
+      field: skill.supplier-email.skill-supplier-email#asks it names
+      fp: 72bd688b10bca10559cee53e7444ac54c7f319f798013e6f2006e8d702dde788
+      frame: pressure
+      shape: "{}"
+      pieces:
+        - write to a supplier, answer one, or chase a late delivery or a missing credit note
     outcome: no-change:read-only

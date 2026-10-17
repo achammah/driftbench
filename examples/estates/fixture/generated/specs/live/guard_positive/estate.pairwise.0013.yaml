@@ -64,4 +64,21 @@ metadata:
     phrase: null
     ask: code
     askFrom: guard.settings.posttooluse-bash-guard-ledger-guard-py (ruleText)
+    link:
+      span: guard.settings.posttooluse-bash-guard-ledger-guard-py
+      fp: d3fadaa2d3c0facc1a86032005ccdc131bf78c9858a1cb017bacaaffd0535bb2
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: guard
+      name: ledger-guard.py
+      verdict: warn
+    from:
+      form: ruleText
+      field: guard.settings.posttooluse-bash-guard-ledger-guard-py#ruleText
+      fp: d3fadaa2d3c0facc1a86032005ccdc131bf78c9858a1cb017bacaaffd0535bb2
+      frame: trigger
+      shape: "{}"
+      pieces:
+        - delete a file under ledger/
     outcome: no-delete

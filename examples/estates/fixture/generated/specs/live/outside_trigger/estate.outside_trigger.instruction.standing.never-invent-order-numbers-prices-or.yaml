@@ -55,6 +55,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.standing.never-invent-order-numbers-prices-or
+      fp: 66f2722795c14f02b55a188cfd2b71de2365b1f7306c74389201b2d547ac36f5
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.standing.never-invent-order-numbers-prices-or

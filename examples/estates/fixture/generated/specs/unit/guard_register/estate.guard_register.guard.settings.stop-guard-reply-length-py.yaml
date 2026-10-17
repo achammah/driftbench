@@ -85,6 +85,18 @@ metadata:
     situation: long-status-report
     phrase: 0
     ask: bank
+    link:
+      span: guard.settings.stop-guard-reply-length-py
+      fp: 951eec028bab6a66ec93dad697f2fc42e5ca27fe5fd4f3ceeab1dcd07b950012
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: guard
+      name: reply-length.py
+      verdict: deny
+    from:
+      bank: long-status-report
+      phrase: 0
     outcome: bank
     unit:
       target:

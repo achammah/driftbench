@@ -95,4 +95,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: register.standing.at-most-one-question-per-reply
+      fp: 7ec6770992e8320776827714fb885471a348d25c62afb49fe16df01bbe8648f1
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

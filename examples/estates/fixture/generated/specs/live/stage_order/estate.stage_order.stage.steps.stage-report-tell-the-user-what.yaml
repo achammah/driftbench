@@ -86,4 +86,14 @@ metadata:
     situation: weekly-report-update
     phrase: 0
     ask: bank
+    link:
+      span: stage.steps.stage-report-tell-the-user-what
+      fp: 4a54fa89a91e11f846a9774e875265ef26e1dd5eecc6a0cce0162fea3d427d29
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: weekly-report-update
+      phrase: 0
     outcome: bank

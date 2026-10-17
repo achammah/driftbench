@@ -76,6 +76,25 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.shipment-tracker.skill-shipment-tracker (asks it names)
+    link:
+      span: instruction.shipment-tracker.on-a-carrier-error-say-so
+      fp: 8b561381ecbdf8e7bbfa87e1624f3aacd10a94b8d8bf60b25cceef691be2fcae
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: shipment-tracker
+      target: skill
+    from:
+      form: asks it names
+      field: skill.shipment-tracker.skill-shipment-tracker#asks it names
+      fp: ef1bf02575dd862062412ec73a2b2428fa0ed65dfad4cc28f7b3f4e45abd3af5
+      frame: trigger
+      shape: help me with {}
+      context: "{}"
+      pieces:
+        - a delivery, a tracking number or a late shipment
+        - The carrier answers with an error
     outcome: no-delete
     judged:
       - instruction.shipment-tracker.on-a-carrier-error-say-so

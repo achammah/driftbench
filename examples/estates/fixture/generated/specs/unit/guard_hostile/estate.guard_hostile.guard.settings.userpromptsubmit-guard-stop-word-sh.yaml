@@ -76,6 +76,18 @@ metadata:
     situation: stop-word
     phrase: 1
     ask: bank
+    link:
+      span: guard.settings.userpromptsubmit-guard-stop-word-sh
+      fp: 6517b4facc46292b82f905ab949ae4e59b685923204188679a8a00658947d8d5
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: guard
+      name: stop-word.sh
+      verdict: nudge
+    from:
+      bank: stop-word
+      phrase: 1
     outcome: bank
     unit:
       target:

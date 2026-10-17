@@ -87,4 +87,14 @@ metadata:
     situation: after-compaction
     phrase: 0
     ask: bank
+    link:
+      span: instruction.standing.after-a-compaction-re-read-the
+      fp: 19dee48caab5b4c57f3cf55ba856a0f3b31f51241819da8d203b06faac6b4dce
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: after-compaction
+      phrase: 0
     outcome: bank

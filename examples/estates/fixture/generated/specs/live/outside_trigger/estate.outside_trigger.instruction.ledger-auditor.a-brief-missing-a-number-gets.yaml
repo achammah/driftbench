@@ -52,4 +52,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.ledger-auditor.a-brief-missing-a-number-gets
+      fp: 88c8be30ed5d4cc4946cfa5fb487d225eabb17d1bb2dbe0674a34b6d97c52038
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: ledger-auditor
+      target: helper
+    from:
+      neutral: outside
     outcome: no-change:negative

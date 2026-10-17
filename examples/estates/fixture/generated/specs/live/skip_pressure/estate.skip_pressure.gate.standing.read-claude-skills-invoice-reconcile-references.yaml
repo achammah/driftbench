@@ -56,4 +56,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: gate.standing.read-claude-skills-invoice-reconcile-references (governed clause)
+    link:
+      span: gate.standing.read-claude-skills-invoice-reconcile-references
+      fp: e12ecf7ab42e0ea78dd8896e9e71ca4b8408f7de193bb345b9b6c9c6d7bcf8e6
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: call
+      name: Edit
+    from:
+      form: governed clause
+      field: gate.standing.read-claude-skills-invoice-reconcile-references#governed clause
+      fp: e12ecf7ab42e0ea78dd8896e9e71ca4b8408f7de193bb345b9b6c9c6d7bcf8e6
+      frame: pressure
+      shape: "{}"
+      pieces:
+        - edit any invoice file
     outcome: no-delete

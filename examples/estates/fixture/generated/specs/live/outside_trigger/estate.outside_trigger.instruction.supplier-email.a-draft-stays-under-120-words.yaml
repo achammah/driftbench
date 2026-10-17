@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.supplier-email.a-draft-stays-under-120-words
+      fp: 39c4cab5bad0c3f440d3c147ffacea12517dafb7e98b4707f581d89d199299f2
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: supplier-email
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.supplier-email.a-draft-stays-under-120-words

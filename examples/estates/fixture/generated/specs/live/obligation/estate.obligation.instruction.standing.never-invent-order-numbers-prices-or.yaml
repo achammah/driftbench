@@ -23,7 +23,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please invent order numbers.
+      user: Please invent order numbers, prices or dates.
     expect:
       workspace:
         deleted: []
@@ -49,4 +49,19 @@ metadata:
     phrase: null
     ask: code
     askFrom: instruction.standing.never-invent-order-numbers-prices-or (title)
+    link:
+      span: instruction.standing.never-invent-order-numbers-prices-or
+      fp: 66f2722795c14f02b55a188cfd2b71de2365b1f7306c74389201b2d547ac36f5
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: title
+      field: instruction.standing.never-invent-order-numbers-prices-or#title
+      fp: 66f2722795c14f02b55a188cfd2b71de2365b1f7306c74389201b2d547ac36f5
+      frame: trigger
+      shape: "{}"
+      pieces:
+        - invent order numbers, prices or dates
     outcome: no-delete

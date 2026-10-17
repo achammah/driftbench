@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.inbox-triager.the-triager-never-answers-or-deletes
+      fp: 30a150fc58701cbc0fe42d69850e03dac2293a27466fa0857df68f5d009990be
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: inbox-triager
+      target: helper
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.inbox-triager.the-triager-never-answers-or-deletes

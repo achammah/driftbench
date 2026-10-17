@@ -55,6 +55,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.memory-supplier-languages.write-to-each-supplier-in-its
+      fp: 3a46c3399d6fdf6662b370edb8070d04e23a8330c1e452ce7025ce3412af9878
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.memory-supplier-languages.write-to-each-supplier-in-its

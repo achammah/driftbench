@@ -94,4 +94,16 @@ metadata:
     situation: invoice-reconcile
     phrase: 2
     ask: bank
+    link:
+      span: register.invoice-reconcile.one-closing-line-per-invoice
+      fp: 8bb190ee93785c42a446903d9aa94cc3fdd8520248b41ad8490c06d7a794ec39
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      bank: invoice-reconcile
+      phrase: 2
     outcome: bank

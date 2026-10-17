@@ -52,4 +52,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.standing.an-ask-to-reconcile-an-invoice (situation)
+    link:
+      span: route.standing.an-ask-to-reconcile-an-invoice
+      fp: 427e359fb34ea68eccbb1e655877a9c5c07c8fedbccc700995e0d68329cf897e
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: invoice-reconcile
+    from:
+      form: situation
+      field: route.standing.an-ask-to-reconcile-an-invoice#situation
+      fp: 427e359fb34ea68eccbb1e655877a9c5c07c8fedbccc700995e0d68329cf897e
+      frame: misroute
+      shape: "{}"
+      pieces:
+        - reconcile an invoice against a purchase order
     outcome: no-delete

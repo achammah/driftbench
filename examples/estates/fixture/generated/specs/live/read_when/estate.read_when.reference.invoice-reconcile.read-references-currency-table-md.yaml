@@ -54,4 +54,12 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names), file currency table
+    link:
+      span: reference.invoice-reconcile.read-references-currency-table-md
+      fp: 123dd607986fa70d29afe0cea484c56d778a41284e5f7e17caaab5ed93a97002
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/skills/invoice-reconcile/references/currency-table.md
     outcome: no-delete

@@ -70,4 +70,21 @@ metadata:
     phrase: null
     ask: code
     askFrom: gate.standing.read-a-file-before-editing-it (enforced by guard.settings.pretooluse-edit-write-guard-read-before)
+    link:
+      span: guard.settings.pretooluse-edit-write-guard-read-before
+      fp: bbcd2051e28ce971d38bb6b50abe32e2f9898d03c08d4a979083985e9a7b3574
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: guard
+      name: read-before-edit.py
+      verdict: deny
+    from:
+      form: enforced by
+      field: gate.standing.read-a-file-before-editing-it#enforced by guard.settings.pretooluse-edit-write-guard-read-before
+      fp: 3a6cc83bfb2f17fed7d3479ff4ab9b0fd26926cad5ae8566f0defbd93648f935
+      frame: trigger
+      shape: "{}"
+      pieces:
+        - edit a file
     outcome: no-change:guard

@@ -95,4 +95,14 @@ metadata:
     situation: long-status-report
     phrase: 0
     ask: bank
+    link:
+      span: register.standing.replies-under-1-200-characters
+      fp: e292196f4ab0f347ec69e983ed19e5af37179bd0d8fb99f253113b28c0f7d38c
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: long-status-report
+      phrase: 0
     outcome: bank

@@ -89,4 +89,15 @@ metadata:
     situation: weekly-report-new
     phrase: 1
     ask: bank
+    link:
+      span: gate.weekly-report.read-templates-report-md-before-writing
+      fp: 9732610d57bb391eeae9138225f1408016b6c4d636d46c3df429f9ca5bf7369d
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: call
+      name: Write
+    from:
+      bank: weekly-report-new
+      phrase: 1
     outcome: bank

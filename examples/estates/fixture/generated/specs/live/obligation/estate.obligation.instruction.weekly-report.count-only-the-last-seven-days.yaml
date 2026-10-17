@@ -83,4 +83,16 @@ metadata:
     situation: weekly-report-new
     phrase: 1
     ask: bank
+    link:
+      span: instruction.weekly-report.count-only-the-last-seven-days
+      fp: 6fed6d234ad61539420fe7e424ee64104bd3d2065701ad8f40896728bc69158c
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: weekly-report
+      target: skill
+    from:
+      bank: weekly-report-new
+      phrase: 1
     outcome: bank

@@ -92,4 +92,15 @@ metadata:
     situation: shipment-late
     phrase: 1
     ask: bank
+    link:
+      span: route.shipment-tracker.an-ask-that-fits-shipment-tracker
+      fp: 5a5207240ee62e81914d773e2738df1ee1ed480810a5835630bb96705dc3ce16
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: shipment-tracker
+    from:
+      bank: shipment-late
+      phrase: 1
     outcome: bank

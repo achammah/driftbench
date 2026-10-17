@@ -91,6 +91,18 @@ metadata:
     situation: route-capacity
     phrase: 1
     ask: code
+    link:
+      span: instruction.route-planner.no-delivery-planned-on-a-public
+      fp: dfa183b02f38721e8fd5c3896cfb284dd57eb2ddf08d9e2ca708ce13bade767b
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: route-planner
+      target: helper
+    from:
+      bank: route-capacity
+      phrase: 1
     outcome: bank
     judged:
       - instruction.route-planner.no-delivery-planned-on-a-public

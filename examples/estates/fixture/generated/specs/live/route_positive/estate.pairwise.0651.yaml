@@ -92,4 +92,15 @@ metadata:
     situation: weekly-report-update
     phrase: 1
     ask: bank
+    link:
+      span: skill.weekly-report.skill-weekly-report
+      fp: ba980774df8de197cb05f447eeac78a1b8abbd592f480ab4126784a1cf35c368
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: weekly-report
+    from:
+      bank: weekly-report-update
+      phrase: 1
     outcome: bank

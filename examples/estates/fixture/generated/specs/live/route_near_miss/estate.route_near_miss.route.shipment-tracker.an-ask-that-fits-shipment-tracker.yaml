@@ -51,4 +51,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.shipment-tracker.an-ask-that-fits-shipment-tracker (situation)
+    link:
+      span: route.shipment-tracker.an-ask-that-fits-shipment-tracker
+      fp: 5a5207240ee62e81914d773e2738df1ee1ed480810a5835630bb96705dc3ce16
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: shipment-tracker
+    from:
+      form: situation
+      field: route.shipment-tracker.an-ask-that-fits-shipment-tracker#situation
+      fp: 5a5207240ee62e81914d773e2738df1ee1ed480810a5835630bb96705dc3ce16
+      frame: near_miss
+      shape: help me with {}
+      pieces:
+        - a delivery, a tracking number or a late shipment
     outcome: no-change:negative

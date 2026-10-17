@@ -75,6 +75,23 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names)
+    link:
+      span: instruction.invoice-reconcile.never-change-an-invoice-amount-report
+      fp: d01939b5aeb3ec4e7183f30439db55667f38e4587b4269f2f0d30c8c36a0f9f6
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      form: asks it names
+      field: skill.invoice-reconcile.skill-invoice-reconcile#asks it names
+      fp: 5d0404156288a5b0c0591447e6bde04acd722aa71b80494f4e2a78413aac4217
+      frame: trigger
+      shape: "{}"
+      pieces:
+        - check, match or reconcile an invoice
     outcome: no-delete
     judged:
       - instruction.invoice-reconcile.never-change-an-invoice-amount-report

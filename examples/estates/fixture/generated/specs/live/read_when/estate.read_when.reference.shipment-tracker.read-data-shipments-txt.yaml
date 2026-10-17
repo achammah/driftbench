@@ -54,4 +54,12 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.shipment-tracker.skill-shipment-tracker (asks it names), file shipments
+    link:
+      span: reference.shipment-tracker.read-data-shipments-txt
+      fp: 7c900bf4edbf9ac7c4f86c1e26b8e4e10ca0e13d2c055cb271061a187dbd091f
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/skills/shipment-tracker/data/shipments.txt
     outcome: no-delete

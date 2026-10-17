@@ -91,6 +91,18 @@ metadata:
     situation: inbox-sort
     phrase: 0
     ask: bank
+    link:
+      span: instruction.inbox-triager.the-triager-never-answers-or-deletes
+      fp: 30a150fc58701cbc0fe42d69850e03dac2293a27466fa0857df68f5d009990be
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: inbox-triager
+      target: helper
+    from:
+      bank: inbox-sort
+      phrase: 0
     outcome: bank
     judged:
       - instruction.inbox-triager.the-triager-never-answers-or-deletes

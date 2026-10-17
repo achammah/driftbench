@@ -85,4 +85,14 @@ metadata:
     situation: invoice-reconcile-edit
     phrase: 1
     ask: bank
+    link:
+      span: tool.invoice-reconcile.declared-edit
+      fp: bcf479c7f2b59f6c391b4b28118fcbfa5c130eaad9d0140a3f828734ba712391
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: invoice-reconcile-edit
+      phrase: 1
     outcome: bank

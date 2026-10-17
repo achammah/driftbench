@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.shipment-tracker.never-guess-a-shipment-status
+      fp: fb7c88f5d150b93a62292879e1a0b12872f35e98f1d24b9529abcfe664801d5a
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: shipment-tracker
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.shipment-tracker.never-guess-a-shipment-status

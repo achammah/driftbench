@@ -83,4 +83,15 @@ metadata:
     situation: invoice-file-edit
     phrase: 0
     ask: bank
+    link:
+      span: gate.standing.read-claude-skills-invoice-reconcile-references
+      fp: e12ecf7ab42e0ea78dd8896e9e71ca4b8408f7de193bb345b9b6c9c6d7bcf8e6
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: call
+      name: Edit
+    from:
+      bank: invoice-file-edit
+      phrase: 0
     outcome: bank

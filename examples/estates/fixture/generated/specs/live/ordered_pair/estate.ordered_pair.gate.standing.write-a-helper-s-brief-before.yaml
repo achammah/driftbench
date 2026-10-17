@@ -82,4 +82,14 @@ metadata:
     situation: ledger-audit
     phrase: 1
     ask: bank
+    link:
+      span: gate.standing.write-a-helper-s-brief-before
+      fp: 34013576bfcd7cef6ee426ce2b5fcfd36c9cea429505514b8911a8bfad878ce1
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: ledger-audit
+      phrase: 1
     outcome: bank

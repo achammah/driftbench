@@ -84,6 +84,17 @@ metadata:
     situation: invoice-file-edit
     phrase: 0
     ask: session
+    link:
+      span: guard.settings.pretooluse-edit-write-guard-read-before
+      fp: bbcd2051e28ce971d38bb6b50abe32e2f9898d03c08d4a979083985e9a7b3574
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: guard
+      name: read-before-edit.py
+      verdict: deny
+    from:
+      session: invoice-edit-gated
     outcome: bank
     session: invoice-edit-gated
     expect: pass

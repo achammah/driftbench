@@ -96,4 +96,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: code
+    link:
+      span: register.standing.currency-code-after-the-amount
+      fp: e2aeb0e860517a514f9be77a983fa2d34382cb9bb3fed0a6a88522b4002ee86b
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

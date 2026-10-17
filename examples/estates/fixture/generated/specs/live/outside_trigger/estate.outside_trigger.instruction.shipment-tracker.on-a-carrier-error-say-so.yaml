@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.shipment-tracker.on-a-carrier-error-say-so
+      fp: 8b561381ecbdf8e7bbfa87e1624f3aacd10a94b8d8bf60b25cceef691be2fcae
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: shipment-tracker
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.shipment-tracker.on-a-carrier-error-say-so

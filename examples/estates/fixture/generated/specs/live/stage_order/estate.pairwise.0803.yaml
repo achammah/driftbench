@@ -90,4 +90,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: stage.steps.stage-note-write-a-tracker-note
+      fp: ef1ec6d150d1a5a8f281a98e6942a459fbea3eed207de4625c91e9a53fad40b2
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

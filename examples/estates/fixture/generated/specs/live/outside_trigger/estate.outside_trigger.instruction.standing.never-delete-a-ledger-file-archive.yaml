@@ -55,6 +55,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.standing.never-delete-a-ledger-file-archive
+      fp: 57226b724d7133da3ae6b5a589c858c8a0f252f8b0169a86991575edb8ae9901
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.standing.never-delete-a-ledger-file-archive

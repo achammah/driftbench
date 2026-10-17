@@ -74,4 +74,15 @@ metadata:
     situation: supplier-email
     phrase: 1
     ask: bank
+    link:
+      span: reference.memory-memory.read-supplier-languages-md
+      fp: 840065cafc6493d080af92434b03756b5a1777fc6a97b8b980ff9abe56654b76
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/memory/supplier-languages.md
+    from:
+      bank: supplier-email
+      phrase: 1
     outcome: bank

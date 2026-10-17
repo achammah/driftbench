@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.inbox-triager.a-message-that-fits-no-folder
+      fp: 28577a3e866e296def762f1b2a27fae5538b1eeac35dcfff71aef7a41d964b16
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: inbox-triager
+      target: helper
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.inbox-triager.a-message-that-fits-no-folder

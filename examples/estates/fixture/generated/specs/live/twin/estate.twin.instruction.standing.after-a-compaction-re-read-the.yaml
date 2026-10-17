@@ -75,4 +75,21 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.supplier-email.an-ask-that-fits-supplier-email (route nearest the rule)
+    link:
+      span: instruction.standing.after-a-compaction-re-read-the
+      fp: 19dee48caab5b4c57f3cf55ba856a0f3b31f51241819da8d203b06faac6b4dce
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: route nearest the rule
+      field: route.supplier-email.an-ask-that-fits-supplier-email#route nearest the rule
+      fp: 6039dbbf139b5140eedfd1b71e3060c02d6a4998794526966b34231d6b2ab513
+      frame: twin
+      shape: "{}"
+      context: "{}"
+      pieces:
+        - draft, answer or chase an email to a supplier
+        - The context was compacted
     outcome: bank

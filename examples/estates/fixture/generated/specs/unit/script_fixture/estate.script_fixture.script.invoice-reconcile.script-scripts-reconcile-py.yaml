@@ -85,6 +85,18 @@ metadata:
     situation: invoice-reconcile
     phrase: 2
     ask: bank
+    link:
+      span: script.invoice-reconcile.script-scripts-reconcile-py
+      fp: 46625eb6d9495cc6d73b639869a27123c7a3b8327b3ccedf9efee0f6167f90c7
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: call
+      name: Bash
+      target: .claude/skills/invoice-reconcile/scripts/reconcile.py
+    from:
+      bank: invoice-reconcile
+      phrase: 2
     outcome: bank
     unit:
       target:
