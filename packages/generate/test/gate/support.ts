@@ -1,5 +1,5 @@
 import { functionAdapter } from '@agent-nexus/driftbench-adapters';
-import { defaultChecks } from '@agent-nexus/driftbench-checks';
+import { defaultChecks, type ToolReplayer } from '@agent-nexus/driftbench-checks';
 import {
   type AgentAdapter,
   type BlockSpec,
@@ -68,6 +68,26 @@ export function shopRespond(messages: Message[], behaviour: ShopBehaviour, call:
     cost: { usd: 0 },
     latencyMs: 0,
   };
+}
+
+/**
+ * The shop's `order.create` as a replayer for the value check: it takes a known sku and echoes it, and refuses any
+ * other. A wrong sku is then a fail of the tools check, not an undecided value.
+ */
+export function shopReplayer(): ToolReplayer {
+  const known = new Set(Object.values(SKUS));
+  return {
+    declaration: (tool) => (tool === 'order.create' ? { resolved: ['sku'], distractors: true } : undefined),
+    call: (_tool, input) =>
+      typeof input.sku === 'string' && known.has(input.sku)
+        ? { ok: true, output: { order_id: 'ord-1', sku: input.sku } }
+        : { ok: false, error: `unknown sku: ${String(input.sku)}` },
+  };
+}
+
+/** The checks of the gate tests: the defaults, with the shop's tool replayed by the value check. */
+export function shopChecks() {
+  return defaultChecks({ valueCheck: { services: { replayer: shopReplayer() } } });
 }
 
 /** The shop agent behind the function adapter, with its payload log as the end-state source. */
@@ -187,7 +207,7 @@ export async function gate(
     targetOf: () => 'function:shop',
     references: new Map([['function:shop', shopAdapter()]]),
     faults: shopFaults(),
-    run: { checks: defaultChecks(), driver: createScriptedDriver },
+    run: { checks: shopChecks(), driver: createScriptedDriver },
     ...rest,
     options: { ...OPTIONS, ...(options ?? {}) },
   });

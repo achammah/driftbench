@@ -2,7 +2,7 @@ import { defaultChecks } from '@agent-nexus/driftbench-checks';
 import { machineVerdict, type Observed, type RunResult } from '@agent-nexus/driftbench-core';
 import { createScriptedDriver } from '@agent-nexus/driftbench-users';
 import { describe, expect, it } from 'vitest';
-import type { AcmeAgent } from '../../../../examples/acme/src/index';
+import { type AcmeAgent, acmeReplayer } from '../../../../examples/acme/src/index';
 import {
   classifyStage,
   driftOf,
@@ -44,7 +44,8 @@ async function run(
   return runSpec(acmeSpec(loaded, id), {
     adapter: realAcmeAdapter(wrap),
     driver,
-    checks: defaultChecks(),
+    // The Acme tools replay for the value check, so a wrong plan id is a fail of the tools check, not undecided.
+    checks: defaultChecks({ valueCheck: { services: { replayer: acmeReplayer() } } }),
     mode,
     repeat: 0,
   });

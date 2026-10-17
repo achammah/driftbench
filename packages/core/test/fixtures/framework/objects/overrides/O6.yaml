@@ -1,0 +1,6 @@
+kind: check-set
+id: o6
+extends: default
+items:
+  - id: tools.argument_accuracy
+    enabled: false

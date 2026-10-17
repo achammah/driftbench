@@ -43,6 +43,7 @@ The loader rewrites these forms before it validates a spec.
 * [ToolExpect](#toolexpect)
 * [Count](#count)
 * [Assertion](#assertion)
+* [CompareMode](#comparemode)
 * [ToolsOfferedExpect](#toolsofferedexpect)
 * [Expect rouge_l](#expect-rouge_l)
 * [Expect bleu](#expect-bleu)
@@ -65,6 +66,10 @@ The loader rewrites these forms before it validates a spec.
 * [WorkspaceExpect](#workspaceexpect)
 * [SafetyExpect](#safetyexpect)
 * [Budget](#budget)
+* [Uses](#uses)
+* [ObjectRef](#objectref)
+* [ItemPatch](#itempatch)
+* [AppliesTo](#appliesto)
 * [Spec end](#spec-end)
 * [Rules](#rules)
 * [EndState](#endstate)
@@ -102,6 +107,7 @@ One golden conversation, or one task for a code agent, written as a succession o
 | `rules` | [Rules](#rules) | no |  | Rules for the whole conversation. |
 | `end_state` | [EndState](#endstate) | no |  | The expected end state of the world after the run. |
 | `perturbations` | list of [Perturbation](#perturbation) | no |  | Deviations to inject in perturbed mode. |
+| `uses` | [Uses](#uses) | no |  | The objects every block uses (policies, check set, diagnostics), by id or inline. Left out of the block cache key. |
 | `metadata` | map of string to any value | no |  | Free metadata. `links` holds the links of the blocks to prompt sections, spec clauses and past turns; it and `provenance` stay out of the spec hash. |
 
 ## TargetRef
@@ -241,6 +247,7 @@ A block may name `parent: <block id>` in the same spec. The runner starts it fro
 | `given` | [Given](#given) | no |  | Initial conditions for this block. |
 | `expect` | [Expect](#expect) | no |  | The expected output and state delta. |
 | `budget` | [Budget](#budget) | no |  | Limits for this block. |
+| `uses` | [Uses](#uses) | no |  | The objects this block uses; a key here replaces the spec's. Left out of the block cache key. |
 
 ## Stimulus
 
@@ -395,6 +402,7 @@ One expected tool call.
 | `count` | [Count](#count) | no |  | How many calls are expected. 0 means the tool must not be called. |
 | `input` | map of string to [Assertion](#assertion) | no |  | Assertions on the arguments, by argument name. |
 | `input_closed` | boolean | no |  | True requires every call input to be an object with only the top-level keys named in input. An absent input allows no keys. False or absent leaves other keys allowed. |
+| `compare` | [CompareMode](#comparemode) or map of string to [CompareMode](#comparemode) | no |  | How the input values are compared: one mode for every argument, or a mode by argument name. Absent means auto: the value-check rungs decide whether a value that differs from the gold names the same thing. |
 
 ## Count
 
@@ -431,6 +439,19 @@ Write one of these forms.
 | `nonempty` | `true` | Present and not empty. |
 | `absent` | `true` | Absent. |
 | `subset` | map of string to JSON value | Holds at least these keys with these values. |
+
+## CompareMode
+
+How one value is compared: auto, a rung name, or exact with its reason.
+
+Write one of these forms.
+
+* one of `auto`, `outcome`, `contract`, `as_given`, `same_referent`
+* a mapping with exactly one of the keys below
+
+| Key | Type | Description |
+|---|---|---|
+| `exact` | string, not empty | Why the writing itself is the requirement, in one line. |
 
 ## ToolsOfferedExpect
 
@@ -636,6 +657,66 @@ Limits for one block.
 | `steps` | integer, at least 1 | no |  | The most agent steps. |
 | `cost_usd` | number, at least 0 | no |  | The most cost, in US dollars. |
 | `latency_ms` | number, at least 0 | no |  | The most latency, in milliseconds. |
+
+## Uses
+
+The objects this spec or block uses. Absent keys use the shipped defaults.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `value_check` | [ObjectRef](#objectref) | no |  | policy/value-check: how a value the agent wrote is compared. |
+| `blame` | [ObjectRef](#objectref) | no |  | policy/blame: who a failure is attributed to. |
+| `placement` | [ObjectRef](#objectref) | no |  | policy/placement: where a fix goes. |
+| `links` | [ObjectRef](#objectref) | no |  | policy/links: how blocks link to prompt units. |
+| `selection` | [ObjectRef](#objectref) | no |  | policy/selection: which blocks a change selects. |
+| `gating` | [ObjectRef](#objectref) | no |  | policy/gating: what not_run, blocked and inconclusive do to ci. |
+| `stats` | [ObjectRef](#objectref) | no |  | policy/stats: which interval is the headline. |
+| `check_set` | [ObjectRef](#objectref) | no |  | check-set: the machine checks and their order. |
+| `judges` | [ObjectRef](#objectref) | no |  | judge-council: the judges, their mode and assignment. |
+| `diagnostics` | list of strings, each matching `^[A-Za-z0-9][A-Za-z0-9._-]*(\/[A-Za-z0-9][A-Za-z0-9._-]*)*$` | no |  | The diagnostic objects that run after the checks. |
+
+## ObjectRef
+
+Write one of these forms.
+
+* string matching `^[A-Za-z0-9][A-Za-z0-9._-]*(\/[A-Za-z0-9][A-Za-z0-9._-]*)*$`
+* a mapping with the fields below
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `extends` | string matching `^[A-Za-z0-9][A-Za-z0-9._-]*(\/[A-Za-z0-9][A-Za-z0-9._-]*)*$` | yes |  | The object this inline one extends. |
+| `items` | list of [ItemPatch](#itempatch) | no |  | Operations on the parent items. |
+| `order` | list of strings, each matching `^[A-Za-z0-9][A-Za-z0-9._-]*$` | no |  | The item order. |
+| `params` | map of string to any value | no |  | Object-level parameters. |
+
+## ItemPatch
+
+An operation on one item of the parent object, or a new item with add: true.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `id` | string matching `^[A-Za-z0-9][A-Za-z0-9._-]*$` | yes |  | The item to change, or with add: true the new item's id. |
+| `add` | `true` | no |  | Adds a new item. Needs title, when, effect and impl. |
+| `title` | string, not empty | no |  | A new title for the item. |
+| `enabled` | boolean | no |  | false disables the item, true enables it again. |
+| `when` | map of string to any value | no |  | Condition fields to set; maps merge, lists replace. |
+| `effect` | map of string to any value | no |  | Effect fields to set; maps merge, lists replace. |
+| `params` | map of string to any value | no |  | Params to set: maps merge, lists replace, +key appends, -key removes. |
+| `impl` | string matching `^(builtin\|plugin):\S+$` | no |  | Another implementation for the same rule. |
+| `cites` | string | no |  | A source for the reader. |
+| `applies_to` | [AppliesTo](#appliesto) | no |  | Where the rule applies: maps merge, lists replace. |
+| `before` | string matching `^[A-Za-z0-9][A-Za-z0-9._-]*$` | no |  | Moves the item just before this one. |
+| `after` | string matching `^[A-Za-z0-9][A-Za-z0-9._-]*$` | no |  | Moves the item just after this one. |
+
+## AppliesTo
+
+Where an item applies: skills, tools or unit patterns. Absent means everywhere.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `skills` | list of strings, each not empty | no |  | Skill names the evidence must name one of. |
+| `tools` | list of strings, each not empty | no |  | Tool labels the failing call must have one of. |
+| `units` | list of strings, each not empty | no |  | Unit patterns, such as R#41/*, a unit must match one of. |
 
 ## Spec end
 

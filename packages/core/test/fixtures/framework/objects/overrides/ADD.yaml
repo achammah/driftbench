@@ -1,0 +1,7 @@
+kind: check-set
+id: add
+extends: default
+items:
+  - id: tools.count_again
+    title: A second count item, to show a full add loads
+    impl: builtin:checks/tools-count
