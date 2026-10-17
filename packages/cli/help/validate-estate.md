@@ -1,6 +1,6 @@
 ---
 title: The estate validator
-summary: What `driftbench validate estate` measures on generated agent estates, its 7 levels and 1199 items, and how to read a failing estate item.
+summary: What `driftbench validate estate` measures on generated agent estates, its 7 levels and 1203 items, and how to read a failing estate item.
 commands:
   - validate
 see_also:
@@ -36,9 +36,9 @@ The ladder (version 1), from `driftbench validate estate`:
 | 4 | `generation` | generation | 270 | every class of test complete, valid, distinct and green on the rule follower |
 | 5 | `agent-mutants` | agent mutants | 74 | every atom deleted from the rule follower fails one of its generated tests |
 | 6 | `maintenance` | maintenance | 53 | every estate mutant gets the retirements, regenerations and re-approvals it should |
-| 7 | `scale` | scale | 50 | every stage at 250 to 5000 atoms within its time budget, its result right |
+| 7 | `scale` | scale | 54 | every stage at 250 to 5000 atoms within its time budget, its result right |
 
-1199 items in all. Family names start with what they test: `scan.*` (the reader), `blind.*` (items written
+1203 items in all. Family names start with what they test: `scan.*` (the reader), `blind.*` (items written
 by a breaker who had not read the code), `bench.defects`, `lint.*`, `plan.*`, `gen.*`, `kill.fake`,
 `mutant.agent`, `maintain.*`, `unit.runner`, `estate.determinism`, `estate.stats` and `scale`.
 
@@ -118,6 +118,11 @@ Every option of `driftbench validate`, for reference (the topic named in the las
   a skill's references are its own; a skill reached twice counts once; the trash is not read; the plan command
   prints a summary (its real output is counted); generated asks differ; maintenance retires exactly the tests whose
   atoms left. It is judged once per run.
+* Shared index: the `scale-shared` family runs the loop on an estate whose 57 skills and helpers each cite one index
+  that cites 3,500 files, a few of which cite further documents nothing else names. 4 items: the scan within its
+  budget; a unit stores one reference edge for each citation in its own file and none for what the index cites (the
+  flattened graph would hold some 200,000); the files each unit reaches by following the citations of the map are
+  exactly the planted ones; the real plan command prints a summary. It is judged once per run.
 
 ## Outputs and how to read them
 
@@ -132,7 +137,7 @@ then say what the code read and what it should have read. Typical readings:
 | `gen.*` | a spec incomplete, invalid, duplicated or red on the follower | `packages/generate/src/estate` |
 | `mutant.agent`, `kill.fake` | a deleted atom killed no test | the evidence predicate of that atom's tests |
 | `maintain.*` | a wrong retirement or a missed one | `packages/estate/src/maintain/impact.ts` |
-| `scale`, `scale-real` | over budget, or a wrong result at size | the stage named |
+| `scale`, `scale-real`, `scale-shared` | over budget, or a wrong result at size | the stage named |
 
 Exit status: the level reached, 0 when level 1 fails.
 
