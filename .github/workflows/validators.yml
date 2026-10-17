@@ -141,6 +141,72 @@ jobs:
           name: tests-${{ matrix.name }}
           path: tests-${{ matrix.name }}.log
 
+  validators-tests-union:
+    # Measurement only, on train/estate-509-tests. Never merged to main.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',validators-tests-union,')
+    name: all validators tests on 509 plus ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: 684
+            merges: fix/estate-level3-pruned-space
+          - name: 684+649
+            merges: fix/estate-level3-pruned-space fix/estate-fixture-phrases
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: 750c30f5888a2db5d3e15f1f269b0e76705c5c54
+          fetch-depth: 0
+      - name: Merge the listed PR heads onto the 509 head
+        shell: bash
+        env:
+          MERGES: ${{ matrix.merges }}
+        run: |
+          git config user.name ci
+          git config user.email ci@users.noreply.github.com
+          echo "base $(git rev-parse HEAD)"
+          for b in $MERGES; do
+            git fetch origin "$b"
+            head=$(git rev-parse FETCH_HEAD)
+            if git merge --no-edit FETCH_HEAD; then
+              echo "merged $b $head"
+              continue
+            fi
+            files=$(git diff --name-only --diff-filter=U)
+            echo "conflicts in: $files"
+            for f in $files; do
+              case "$f" in
+                docs/*.md|CHANGELOG.md) git checkout --ours -- "$f"; git add -- "$f" ;;
+                *) echo "::error::code conflict in $f"; exit 1 ;;
+              esac
+            done
+            git commit --no-edit
+            echo "merged $b $head (docs rows kept on the 509 side)"
+          done
+          echo "tested $(git rev-parse HEAD)"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - run: pnpm build
+      - name: Every test of the validators package
+        shell: bash
+        run: |
+          status=0
+          pnpm exec vitest run packages/validators 2>&1 | tee "vtests-${{ strategy.job-index }}.log" || status=$?
+          echo "exit $status" >> "vtests-${{ strategy.job-index }}.log"
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vtests-${{ strategy.job-index }}
+          path: vtests-${{ strategy.job-index }}.log
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
