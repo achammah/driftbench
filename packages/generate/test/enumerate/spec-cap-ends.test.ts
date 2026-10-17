@@ -3,6 +3,7 @@ import { canonicalGiven, type Spec } from '@agent-nexus/driftbench-core';
 import { describe, expect, it } from 'vitest';
 import { generateSuite } from '../../src/enumerate/generate';
 import { loadApprovedMap } from '../../src/enumerate/load';
+import type { ReducedEnds } from '../../src/seed/assemble';
 import { buildTaskInputs } from '../../src/seed/tasks';
 import { ACME_MAP } from './support';
 
@@ -43,8 +44,38 @@ describe('the reduction of repeated ends under --spec-cap', () => {
       const shorter = byId.get(spec.id);
       if (!shorter || shorter.blocks.length === spec.blocks.length) continue;
       cutWalks += 1;
+      const reduction = (shorter.metadata as { generated: { reduced_ends: ReducedEnds } }).generated
+        .reduced_ends;
+      expect(reduction).toMatchObject({
+        from_blocks: spec.blocks.length,
+        to_blocks: shorter.blocks.length,
+      });
+      expect(reduction.duplicates.map((entry) => entry.block)).toEqual(
+        spec.blocks.slice(shorter.blocks.length).map((block) => block.id),
+      );
+      for (const entry of reduction.duplicates) {
+        const witness = byId.get(entry.duplicate_of.spec);
+        expect(witness, entry.duplicate_of.spec).toBeDefined();
+        const originalIndex = spec.blocks.findIndex((block) => block.id === entry.block);
+        const witnessIndex =
+          witness?.blocks.findIndex((block) => block.id === entry.duplicate_of.block) ?? -1;
+        expect(witnessIndex).toBeGreaterThanOrEqual(0);
+        expect(key(spec, originalIndex)).toBe(key(witness as Spec, witnessIndex));
+      }
       for (let index = shorter.blocks.length; index < spec.blocks.length; index += 1)
         expect(written.has(key(spec, index)), `${spec.id}#${spec.blocks[index]?.id}`).toBe(true);
+    }
+    for (const [seeder, totals] of Object.entries(reduced.report.seeders)) {
+      const recorded = reduced.all.reduce((sum, spec) => {
+        const generated = (
+          spec.metadata as {
+            generated: { seeder: string; reduced_ends?: ReducedEnds };
+          }
+        ).generated;
+        return sum + (generated.seeder === seeder ? (generated.reduced_ends?.duplicates.length ?? 0) : 0);
+      }, 0);
+      expect(totals.cut_blocks, seeder).toBe(recorded);
+      expect(kept.report.seeders[seeder as keyof typeof kept.report.seeders].cut_blocks).toBe(0);
     }
     expect(cutWalks).toBeGreaterThan(0);
     expect(reduced.all.length).toBe(kept.all.length);

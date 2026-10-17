@@ -63,6 +63,18 @@ export type BlockDraft = {
   criteria?: string[];
 };
 
+/** The removed suffix and the written blocks that already test it. */
+export type ReducedEnds = {
+  from_blocks: number;
+  to_blocks: number;
+  duplicates: Array<{
+    block: string;
+    /** An earlier family that drafted the same block, even when that family's copy was also cut. */
+    duplicate_family?: string;
+    duplicate_of: { spec: string; block: string; family?: string };
+  }>;
+};
+
 export type SpecDraft = {
   id: string;
   seeder: Seeder;
@@ -72,6 +84,7 @@ export type SpecDraft = {
   /** Spec-level values: placed through covers, tags and channel. Stage and deviation picks are ignored. */
   cell: Pick[];
   blocks: BlockDraft[];
+  reducedEnds?: ReducedEnds;
   world?: WorldState;
   /** Numeric budget settings the runner delivers to the adapter. */
   vars?: Record<string, number>;
@@ -402,6 +415,7 @@ export function renderDraft(prepared: PreparedMap, draft: SpecDraft, run: RunIde
   generated.blocks = blockRecords;
   if (draft.concrete) generated.concrete = draft.concrete;
   if (draft.metamorphic) generated.metamorphic = draft.metamorphic;
+  if (draft.reducedEnds) generated.reduced_ends = draft.reducedEnds;
   if (placeholders.length > 0) generated.needs_phrase = placeholders;
   if (noThen.length > 0) generated.needs_then = noThen;
   if (reasons.length > 0) generated.needs_then_why = reasons;

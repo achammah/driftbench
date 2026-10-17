@@ -320,7 +320,22 @@ A walk often ends the way another walk already ended: the same turn, said from t
 * The block does not inject a deviation class: that block is the test of the class and the deviation of its row, and stays.
 * The walk has no end state, no declared perturbation said before the block or on it (a perturbed run needs the block to reach it; dropping the declaration with the block was measured and loses 50 perturbed-mode kills on the hidden seed), does not end on a tool failure, and still validates.
 
-The Then must hold across channels and across personas, and that is read off a pair of whole walks that differ only there (twins). So the first twin of a written walk on each path and each of the two axes is written whole; the twins after it are repeats like any other. It repeats while the new last block qualifies, and it stops at one block. Exactly one walk ends on a block: a cut that stops with more than one block left, on a block another written walk ends on, is taken back to the deepest cut that ends elsewhere, or to the whole walk. A walk cut down to its first block always stays cut. A walk is never cut down to a restated request: the move after it is the test of the latest value. The variants of a metamorphic family are never cut, because a family differs only in its phrasing. With `--spec-cap` the reduction runs after the cap, on the specs that are written, in the order they were written: a walk loses an end only when a spec that stays says it. It reads no agent, so it removes a repeat, not everything a validator could call redundant: the same turn from another stage, or a repeat in the middle of a walk, stays. Tasks, walks with an end state and specs with a gap are never reduced.
+The Then must hold across channels and across personas, and that is read off a pair of whole walks that differ only there (twins). So the first twin of a written walk on each path and each of the two axes is written whole; the twins after it are repeats like any other. It repeats while the new last block qualifies, and it stops at one block. Exactly one walk ends on a block: a cut that stops with more than one block left, on a block another written walk ends on, is taken back to the deepest cut that ends elsewhere, or to the whole walk. A walk cut down to its first block always stays cut. A walk is never cut down to a restated request: the move after it is the test of the latest value. The first variant of a metamorphic family is cut like any walk, and the other variants are cut to the same length, because a family differs only in its phrasing: two families that end on the same block are one test, so the second family loses the copy. With `--spec-cap` the reduction runs after the cap, on the specs that are written, in the order they were written: a walk loses an end only when a spec that stays says it. It reads no agent, so it removes a repeat, not everything a validator could call redundant: the same turn from another stage, or a repeat in the middle of a walk, stays. Tasks, walks with an end state and specs with a gap are never reduced.
+
+Each removed end block is recorded in the shortened spec's `metadata.generated.reduced_ends`.
+The record gives `from_blocks`, `to_blocks`, and `duplicates`: the removed block's `block` ID and
+its `duplicate_of` witness (`spec`, `block`, and `family` when the witness is metamorphic).
+The witness names the first retained metamorphic family when one exists; otherwise it names an earlier
+written spec. A removed block's `duplicate_family` names the earlier family that drafted the same block,
+even when that family's copy was also cut: `duplicate_of` still points to a block the suite retains.
+Every variant of a shortened family keeps this record and names the same retained witnesses as its
+first variant. Ordinary walks use the same record. Only the final cut is recorded; a cut taken back
+leaves no removed blocks in the record. Whole specs have no `reduced_ends` entry.
+
+The report's `seeders.<seeder>.cut_blocks` counts the removed blocks in that seeder's written specs,
+including each shortened variant. It is zero when no block is cut. This count is separate from `cut`,
+which reports a seeder stopped by `--max`. With `--spec-cap`, both the count and witnesses refer only
+to specs retained by the cap. The eager and disk APIs write the same record.
 
 ### The machine Then in every block
 
@@ -422,9 +437,9 @@ A block the map supports no machine Then for, or a value with no approved phrase
 
 ```
 $ pnpm -s driftbench generate --map examples/acme/map/approved.yaml --out generated --baseline examples/acme/specs --t 2
-Actual axis-map coverage (written complete specs): pairs 708 of 708 (100.0%); triples 3098 of 4064 (76.2%).
+Actual axis-map coverage (written complete specs): pairs 708 of 708 (100.0%); triples 3109 of 4064 (76.5%).
 Candidate t-wise array (before the total cap): covering array of 156 rows over 5 dimensions, 356 of 356 allowed 2-tuples (100.0%); 2 pairs no path reaches are left out.
-Uncovered on the axis map: 0 pairs, 966 triples (see coverage.actual[].uncovered).
+Uncovered on the axis map: 0 pairs, 955 triples (see coverage.actual[].uncovered).
 Map acme (../examples/acme/map/approved.yaml), hash 7a022d4e1380: 51 dimensions, 187 values, 463 constraints, 55 approved phrases.
 Seed 1, t = 2.
 
@@ -433,9 +448,9 @@ graph            12      48        12           0
 twise           156     793       153           3
 boundary         85     180        13          72
 deviation       137     526       137           0
-metamorphic      42     192        42           0
+metamorphic      42     188        42           0
 task             67      71        67           0
-cover            11      50        11           0
+cover            11      48        11           0
 
 Stage graph: 18 of 23 edges covered in 12 paths from needs.
 Constraints applied: 463.

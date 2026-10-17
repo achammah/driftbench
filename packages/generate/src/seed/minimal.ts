@@ -9,7 +9,7 @@ import {
 } from '@agent-nexus/driftbench-space';
 import { createPerturbingDriver } from '@agent-nexus/driftbench-users';
 import type { Allocation } from './allocation';
-import { type RunIdentity, renderDraft, type SpecDraft } from './assemble';
+import { type ReducedEnds, type RunIdentity, renderDraft, type SpecDraft } from './assemble';
 import type { PreparedMap } from './map';
 
 /** A tool failure is followed by the turn that gets the tool answering again: the walk never ends on it. */
@@ -28,7 +28,7 @@ function failsAtEnd(spec: Spec): boolean {
  * walk ends on is taken back to the deepest cut that ends elsewhere. A block is the same
  * test on any channel and for any persona; the first twin of a written walk, per path and context axis, stays whole. A block that injects
  * a class stays. A walk with an end state,
- * a metamorphic variant, a task and a spec that is not complete are never reduced.
+ * a task and a spec that is not complete are never reduced. Metamorphic variants follow their first variant.
  *
  * This is subsumption by what has been written, not a proof of a smallest suite, and it reads no agent.
  * Memory is bounded by the coverage grid and the distinct blocks and move pairs of the suite.
@@ -39,11 +39,15 @@ export class TerminalSubsumption {
   /** The tuples the written specs place. */
   private readonly held: Uint8Array[];
   /** Blocks written so far, by what makes two blocks the same test. */
-  private readonly blocks = new Set<string>();
+  private readonly blocks = new Map<string, ReducedEnds['duplicates'][number]['duplicate_of']>();
   /** The key of the last block of every walk written: one walk ends on each. */
   private readonly ends = new Set<string>();
   /** The whole walks written, by what they say apart from the context, with the contexts each is written in. */
   private readonly walks = new Map<string, Set<string>>();
+  /** The length each metamorphic family was cut to by its first variant: every variant follows it. */
+  private readonly families = new Map<string, { length: number; reduction?: ReducedEnds }>();
+  /** The first family that drafted a block, including a suffix whose retained witness is another seeder. */
+  private readonly familyBlocks = new Map<string, string>();
   /** The context axes a pair of whole twins is kept for, per path: the Then must hold across them. */
   private readonly paired = new Map<string, Set<string>>();
   /** Ordered pairs of consecutive moves some written spec walks. */
@@ -76,8 +80,19 @@ export class TerminalSubsumption {
     const parsed = validateSpec(rendered.spec);
     if (!parsed.ok) return;
     let spec = parsed.spec;
-    // A metamorphic family keeps its variants identical but for the phrasing: its walks are never cut.
-    if (spec.kind === 'conversation' && spec.end_state === undefined && draft.seeder !== 'metamorphic') {
+    const original = spec;
+    const originalBlocks = draft.blocks;
+    // A metamorphic family keeps its variants identical but for the phrasing, so its first variant decides how
+    // far the family is cut and the others follow it to the same length (their wording is not part of a test, so
+    // a variant judged alone would be a repeat of the first).
+    const family = draft.seeder === 'metamorphic' ? draft.metamorphic : undefined;
+    const followed = family && family.variant > 1 ? this.families.get(family.family) : undefined;
+    if (followed !== undefined && followed.length < draft.blocks.length) {
+      draft.blocks = draft.blocks.slice(0, followed.length);
+      const shorter = renderDraft(this.prepared, draft, this.run);
+      const again = validateSpec(shorter.spec);
+      if (again.ok) spec = again.spec;
+    } else if (followed === undefined && spec.kind === 'conversation' && spec.end_state === undefined) {
       const states = [{ blocks: draft.blocks, perturbations: draft.perturbations, spec }];
       // The Then must hold across channels and across personas, and that is read off a pair of whole walks that
       // differ only there (a twin). Each path keeps one such pair per axis; a twin beyond it is a repeat.
@@ -116,13 +131,54 @@ export class TerminalSubsumption {
       draft.perturbations = chosen.perturbations;
       spec = chosen.spec;
     }
+    if (spec.blocks.length < original.blocks.length) {
+      draft.reducedEnds = {
+        from_blocks: original.blocks.length,
+        to_blocks: spec.blocks.length,
+        duplicates: originalBlocks.slice(spec.blocks.length).map((block, offset) => {
+          // A follower's wording differs: its first variant supplies the witnesses for the shared suffix.
+          const key = this.key(original, spec.blocks.length + offset);
+          const inherited = followed?.reduction?.duplicates[offset];
+          const duplicate = inherited?.duplicate_of ?? this.blocks.get(key);
+          const duplicateFamily = family
+            ? (inherited?.duplicate_family ?? this.familyBlocks.get(key))
+            : undefined;
+          if (!duplicate) throw new Error(`No written duplicate for ${draft.id}#${block.id}`);
+          return {
+            block: block.id,
+            duplicate_of: duplicate,
+            ...(duplicateFamily !== undefined && duplicateFamily !== family?.family
+              ? { duplicate_family: duplicateFamily }
+              : {}),
+          };
+        }),
+      };
+    }
+    if (family?.variant === 1) {
+      this.families.set(family.family, { length: spec.blocks.length, reduction: draft.reducedEnds });
+      original.blocks.forEach((_, index) => {
+        const key = this.key(original, index);
+        if (!this.familyBlocks.has(key)) this.familyBlocks.set(key, family.family);
+      });
+    }
     this.observeSpec(spec);
   }
 
   /** What a spec written by other code places: tasks are never reduced but their obligations are met. */
   observeSpec(spec: Spec): void {
     spec.blocks.forEach((_, index) => {
-      this.blocks.add(this.key(spec, index));
+      const key = this.key(spec, index);
+      const family = (spec.metadata?.generated as { metamorphic?: { family: string } } | undefined)
+        ?.metamorphic?.family;
+      if (family !== undefined && !this.familyBlocks.has(key)) this.familyBlocks.set(key, family);
+      // Name the first retained family when one exists, even if an ordinary walk wrote the block first.
+      const previous = this.blocks.get(key);
+      if (!previous || (family !== undefined && previous.family === undefined))
+        this.blocks.set(key, {
+          spec: spec.id,
+          block: spec.blocks[index]?.id ?? '',
+          ...(family === undefined ? {} : { family }),
+        });
     });
     this.ends.add(this.key(spec, spec.blocks.length - 1));
     const walk = this.walkKey(spec);

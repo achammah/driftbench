@@ -95,3 +95,11 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-identify
+    reduced_ends:
+      from_blocks: 2
+      to_blocks: 1
+      duplicates:
+        - block: b2-identify-to-identify
+          duplicate_of:
+            spec: gen-graph-002
+            block: b2-identify-to-identify

@@ -86,3 +86,12 @@ metadata:
         phrase:
           dimension: stage_transition
           value: needs-to-address
+    reduced_ends:
+      from_blocks: 2
+      to_blocks: 1
+      duplicates:
+        - block: b2-address-to-address
+          duplicate_of:
+            spec: gen-metamorphic-014-1
+            block: b2-address-to-address
+            family: gen-metamorphic-014

@@ -4,7 +4,6 @@ import type { PerturbationSpec } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
 import type { PathRelation, ProposalPhrase } from '../extract/proposal';
 import type { Allocation } from './allocation';
-import type { TerminalSubsumption } from './minimal';
 import {
   type BlockDraft,
   choosePhrase,
@@ -23,6 +22,7 @@ import {
 } from './deviation';
 import type { Edge, StageGraph } from './graph';
 import { dimensionId, type PreparedMap, phraseKey, valueId } from './map';
+import type { TerminalSubsumption } from './minimal';
 import { pick, type Rng, rngFor, shuffle, streamSeed } from './random';
 import { buildScenario, type ProbeRequest, type ScenarioRequest } from './scenario';
 import { worldFor } from './world';

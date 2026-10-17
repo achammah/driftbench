@@ -64,37 +64,6 @@ blocks:
         - behaviour.B-001
         - flow.upgrade
         - deviation.D6_instruction_in_data
-  - id: b2-needs-to-identify
-    when:
-      user: I keep running out of data, can I get a bigger plan?
-    given:
-      world:
-        workspace:
-          files: {}
-    expect:
-      stage: identify
-      stage_reported: true
-      tools:
-        - label: catalog.search
-          count: 0
-      lang: EN
-  - id: b3-identify-to-offer
-    when:
-      user: It's lee.jensen@example.com.
-    expect:
-      stage: offer
-      stage_reported: true
-      tools:
-        - label: catalog.search
-          count: 1
-          input:
-            category: mobile
-            customer_email: lee.jensen@example.com
-      must:
-        - Acme Mobile S, 10 GB for \$15 a month
-        - Acme Mobile M, 40 GB for \$25 a month
-        - Acme Mobile L, unlimited data for \$35 a month
-      lang: EN
 rules:
   forbidden_tools:
     - coverage.check
@@ -129,22 +98,15 @@ metadata:
         phrase:
           dimension: deviation
           value: D6_instruction_in_data
-      - block: b2-needs-to-identify
-        seeder: cover
-        cell:
-          spec: metadata.generated.cell
-          stage_transition: needs-to-identify
-          stage: needs
-        phrase:
-          dimension: stage_transition
-          value: needs-to-identify
-      - block: b3-identify-to-offer
-        seeder: cover
-        cell:
-          spec: metadata.generated.cell
-          stage_transition: identify-to-offer
-          account_lookup: plan-not-in-catalog
-          stage: identify
-        phrase:
-          dimension: stage_transition
-          value: identify-to-offer
+    reduced_ends:
+      from_blocks: 3
+      to_blocks: 1
+      duplicates:
+        - block: b2-needs-to-identify
+          duplicate_of:
+            spec: gen-twise-150
+            block: b2-needs-to-identify
+        - block: b3-identify-to-offer
+          duplicate_of:
+            spec: gen-twise-150
+            block: b3-identify-to-offer

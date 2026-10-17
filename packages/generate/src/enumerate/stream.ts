@@ -4,7 +4,6 @@ import { checkSpec, type Spec } from '@agent-nexus/driftbench-core';
 import { stringify } from 'yaml';
 import { seedFolderName } from '../families/instances';
 import { Allocation } from '../seed/allocation';
-import { TerminalSubsumption } from '../seed/minimal';
 import {
   generatedSpecText,
   NO_THEN_CRITERION,
@@ -16,6 +15,7 @@ import {
 } from '../seed/assemble';
 import { DeviationBalance } from '../seed/deviation-balance';
 import type { PreparedMap } from '../seed/map';
+import { TerminalSubsumption } from '../seed/minimal';
 import { phraseDrafts, type UnsaidPhrase } from '../seed/phrase-seeder';
 import { restatedDrafts } from '../seed/restated-seeder';
 import { indexDimensions, indexPathValues } from '../seed/scenario';
@@ -125,6 +125,7 @@ function writeSuite(
       {
         specs: 0,
         blocks: 0,
+        cut_blocks: 0,
         complete: 0,
         needs_phrase: 0,
         needs_then: 0,
@@ -178,6 +179,7 @@ function writeSuite(
     const totals = seeders[seeder];
     totals.specs += 1;
     totals.blocks += rendered.blocks;
+    totals.cut_blocks += draft.reducedEnds?.duplicates.length ?? 0;
     if (needsThen) {
       totals.needs_then += 1;
       noThen.push({ spec: rendered.id, blocks: rendered.noThen, reasons: rendered.reasons });

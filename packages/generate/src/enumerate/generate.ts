@@ -116,6 +116,8 @@ export type SeederTotals = {
   /** Incomplete specs: a block with no Then the map supports. */
   needs_then: number;
   cut: boolean;
+  /** Terminal duplicate blocks removed from the written specs. */
+  cut_blocks: number;
   /** The diversity measures of this seeder's complete specs (see `coverageMeasures`). */
   measures?: Record<string, number>;
 };
@@ -307,6 +309,7 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
     const totals: SeederTotals = seeders[seeder] ?? {
       specs: 0,
       blocks: 0,
+      cut_blocks: 0,
       complete: 0,
       needs_phrase: 0,
       needs_then: 0,
@@ -337,6 +340,7 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
       if (unexpected.length > 0) lint.push({ id: rendered.id, warnings: unexpected });
       totals.specs += 1;
       totals.blocks += rendered.blocks;
+      totals.cut_blocks += draft.reducedEnds?.duplicates.length ?? 0;
       all.push(loaded.spec);
       if (needsThen) {
         totals.needs_then += 1;
@@ -541,6 +545,10 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
       seeders[seeder].specs = own.length;
       seeders[seeder].blocks = own.reduce((sum, spec) => sum + spec.blocks.length, 0);
       seeders[seeder].complete = ready.length;
+      seeders[seeder].cut_blocks = own.reduce(
+        (sum, spec) => sum + (draftOf.get(spec.id)?.reducedEnds?.duplicates.length ?? 0),
+        0,
+      );
     }
     const keptFiles = files.filter((file) => capped.ids.has(fileOwners.get(file.path) ?? ''));
     files.splice(0, files.length, ...keptFiles);

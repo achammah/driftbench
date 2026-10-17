@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { PathRelation } from '../../src/extract/proposal';
 import type { SpecDraft } from '../../src/seed/assemble';
+import { renderDraft } from '../../src/seed/assemble';
 import { TerminalSubsumption } from '../../src/seed/minimal';
 import { type SeedContext, scenarioDraft } from '../../src/seed/seed-drafts';
 import { fixture, split, twoChannels, twoPersonas } from './desk';
@@ -54,6 +55,23 @@ describe('terminal subsumption', () => {
     expect(first.blocks).toHaveLength(length);
     expect(second.blocks.length).toBeLessThan(length);
     expect(second.blocks.length).toBeGreaterThan(0);
+    const reduction = (
+      renderDraft(prepared, second, run).spec.metadata as {
+        generated: { reduced_ends: unknown };
+      }
+    ).generated.reduced_ends;
+    expect(reduction).toEqual({
+      from_blocks: length,
+      to_blocks: second.blocks.length,
+      duplicates: first.blocks.slice(second.blocks.length).map((block) => ({
+        block: block.id,
+        duplicate_of: { spec: 'first', block: block.id },
+      })),
+    });
+    minimal.reduce(second);
+    expect(
+      (renderDraft(prepared, second, run).spec.metadata as { generated: unknown }).generated,
+    ).toMatchObject({ reduced_ends: reduction });
     // The blocks that stay are the walk's own first moves.
     expect(second.blocks.map((block) => block.id)).toEqual(
       first.blocks.slice(0, second.blocks.length).map((block) => block.id),
@@ -162,19 +180,139 @@ describe('terminal subsumption', () => {
   });
 });
 
-describe('terminal subsumption keeps walks apart', () => {
-  it('never cuts a metamorphic variant, so a family differs only in its phrasing', () => {
+describe('terminal subsumption and metamorphic families', () => {
+  const member = (draft: ReturnType<typeof walk>, family: string, variant: number) => {
+    draft.metamorphic = { family, variant, of: 2, relation: 'same observed outcome' };
+    draft.perturbations = undefined;
+    return draft;
+  };
+
+  it('cuts the first variant of a family like any walk, and the other variants to the same length', () => {
     const prepared = fixture();
     const path = prepared.relations.paths[0];
     if (!path) throw new Error('missing parcel path');
     const minimal = new TerminalSubsumption(prepared, run, 2);
-    const first = walk(prepared, 'first', path, 'metamorphic');
-    const second = walk(prepared, 'second', path, 'metamorphic');
+    const written = walk(prepared, 'written', path);
+    written.perturbations = undefined;
+    const first = member(walk(prepared, 'f-1', path, 'metamorphic'), 'f', 1);
+    const second = member(walk(prepared, 'f-2', path, 'metamorphic'), 'f', 2);
+    const length = written.blocks.length;
+    for (const draft of [written, first, second]) minimal.reduce(draft);
+    expect(written.blocks).toHaveLength(length);
+    expect(first.blocks.length).toBeLessThan(length);
+    // The family differs only in its phrasing: its variants have the same number of blocks.
+    expect(second.blocks).toHaveLength(first.blocks.length);
+  });
+
+  it('names the retained family even when an ordinary walk wrote its blocks first', () => {
+    const prepared = twoChannels();
+    const path = prepared.relations.paths[0];
+    if (!path) throw new Error('missing parcel path');
+    const dimension = prepared.space.dimensions.findIndex((entry) => entry.kind === 'channel');
+    const at = (channel: string): Array<[number, number]> => {
+      const value = prepared.space.dimensions[dimension]?.index.get(channel);
+      if (value === undefined) throw new Error(`missing channel ${channel}`);
+      return [[dimension, value]];
+    };
+    const minimal = new TerminalSubsumption(prepared, run, 2);
+    const written = walk(prepared, 'written', path, 'twise', at('counter'));
+    const leader = member(walk(prepared, 'a-1', path, 'metamorphic', at('phone')), 'a', 1);
+    const follower = member(walk(prepared, 'b-1', path, 'metamorphic', at('phone')), 'b', 1);
+    minimal.reduce(written);
+    minimal.reduce(leader);
+    expect(leader.blocks).toHaveLength(written.blocks.length);
+    minimal.reduce(follower);
+    expect(follower.blocks.length).toBeLessThan(leader.blocks.length);
+    const reduction = (
+      renderDraft(prepared, follower, run).spec.metadata as {
+        generated: { reduced_ends: { duplicates: unknown[] } };
+      }
+    ).generated.reduced_ends;
+    for (const duplicate of reduction.duplicates)
+      expect(duplicate).toMatchObject({ duplicate_of: { spec: 'a-1', family: 'a' } });
+  });
+
+  it('names an earlier family whose duplicate suffix was also cut, while keeping the written witness', () => {
+    const prepared = fixture();
+    const path = prepared.relations.paths[0];
+    if (!path) throw new Error('missing parcel path');
+    const minimal = new TerminalSubsumption(prepared, run, 2);
+    const written = walk(prepared, 'written', path);
+    written.perturbations = undefined;
+    const leader = member(walk(prepared, 'a-1', path, 'metamorphic'), 'a', 1);
+    const follower = member(walk(prepared, 'b-1', path, 'metamorphic'), 'b', 1);
+    const variant = member(walk(prepared, 'b-2', path, 'metamorphic'), 'b', 2);
+    for (const draft of [written, leader, follower, variant]) minimal.reduce(draft);
+    expect(leader.blocks.length).toBeLessThan(written.blocks.length);
+    for (const draft of [follower, variant]) {
+      const reduction = (
+        renderDraft(prepared, draft, run).spec.metadata as {
+          generated: { reduced_ends: { duplicates: unknown[] } };
+        }
+      ).generated.reduced_ends;
+      for (const duplicate of reduction.duplicates)
+        expect(duplicate).toMatchObject({
+          duplicate_family: 'a',
+          duplicate_of: { spec: 'written' },
+        });
+    }
+  });
+
+  it('cuts a follower exactly one block longer than its reduced leader', () => {
+    const prepared = fixture();
+    const path = prepared.relations.paths[0];
+    if (!path) throw new Error('missing parcel path');
+    const minimal = new TerminalSubsumption(prepared, run, 2);
+    const written = walk(prepared, 'written', path);
+    written.perturbations = undefined;
+    const first = member(walk(prepared, 'f-1', path, 'metamorphic'), 'f', 1);
+    const second = member(walk(prepared, 'f-2', path, 'metamorphic'), 'f', 2);
+    first.blocks = first.blocks.slice(0, 2);
+    second.blocks = second.blocks.slice(0, 2);
+    minimal.reduce(written);
+    minimal.reduce(first);
+    expect(second.blocks.length).toBe(first.blocks.length + 1);
+    minimal.reduce(second);
+    expect(second.blocks).toHaveLength(first.blocks.length);
+  });
+
+  it('keeps a family whole when its first variant ends on a block no written walk says', () => {
+    const prepared = fixture();
+    const path = prepared.relations.paths[0];
+    if (!path) throw new Error('missing parcel path');
+    const minimal = new TerminalSubsumption(prepared, run, 2);
+    const first = member(walk(prepared, 'f-1', path, 'metamorphic'), 'f', 1);
+    const second = member(walk(prepared, 'f-2', path, 'metamorphic'), 'f', 2);
     const length = first.blocks.length;
     minimal.reduce(first);
     minimal.reduce(second);
     expect(first.blocks).toHaveLength(length);
     expect(second.blocks).toHaveLength(length);
+  });
+
+  it('cuts a second family that ends on the same block as the first: two families are not two tests', () => {
+    const prepared = fixture();
+    const path = prepared.relations.paths[0];
+    if (!path) throw new Error('missing parcel path');
+    const minimal = new TerminalSubsumption(prepared, run, 2);
+    const one = [1, 2].map((v) => member(walk(prepared, `a-${v}`, path, 'metamorphic'), 'a', v));
+    const two = [1, 2].map((v) => member(walk(prepared, `b-${v}`, path, 'metamorphic'), 'b', v));
+    const length = one[0]?.blocks.length ?? 0;
+    for (const draft of [...one, ...two]) minimal.reduce(draft);
+    expect(one.map((draft) => draft.blocks.length)).toEqual([length, length]);
+    expect(two.map((draft) => draft.blocks.length)[0]).toBeLessThan(length);
+    expect(two[1]?.blocks).toHaveLength(two[0]?.blocks.length ?? -1);
+    for (const draft of two) {
+      const reduction = (
+        renderDraft(prepared, draft, run).spec.metadata as {
+          generated: { reduced_ends: { from_blocks: number; to_blocks: number; duplicates: unknown[] } };
+        }
+      ).generated.reduced_ends;
+      expect(reduction).toMatchObject({ from_blocks: length, to_blocks: draft.blocks.length });
+      expect(reduction.duplicates).toHaveLength(length - draft.blocks.length);
+      for (const duplicate of reduction.duplicates)
+        expect(duplicate).toMatchObject({ duplicate_of: { spec: 'a-1', family: 'a' } });
+    }
   });
 });
 

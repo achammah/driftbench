@@ -43,6 +43,19 @@ describe('generateSuite on a small fictional map', () => {
     }
   });
 
+  it('reports zero cut blocks for every seeder when no walk is shortened', () => {
+    let cuts = 0;
+    for (const [seeder, totals] of Object.entries(result.report.seeders)) {
+      const recorded = bySeeder(specs, seeder).reduce((sum, spec) => {
+        const reduction = meta(spec).reduced_ends as { duplicates: unknown[] } | undefined;
+        return sum + (reduction?.duplicates.length ?? 0);
+      }, 0);
+      expect(totals).toHaveProperty('cut_blocks', recorded);
+      cuts += recorded;
+    }
+    expect(cuts).toBe(0);
+  });
+
   it('sends only approved phrases or named placeholders, never other text', () => {
     const prepared = zedPrepared();
     const approved = new Set(prepared.phrases.map((phrase) => phrase.text));
