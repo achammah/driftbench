@@ -492,7 +492,7 @@ Built by: PR 454 (`origin/feat/block-b4-report`, `packages/core/src/evidence/`).
 
 * The atoms of the failing verdict are the atoms of `ruleAtoms` that the map holds, in the order of `ruleAtoms`. The links of the failing verdict are the links whose `verdict` matches its id.
 * The subject tool of the verdict is the tool of its first value fact, else the tool its id names: `tools.<label>.count`, `tools.<label>.input.<field>`. A label may hold dots.
-* A skill path is `skills/<name>/...`, at any depth. A main file is a `SKILL.md` body, or a file outside every skill folder and outside `agents/`, `guards/` and `hooks/`.
+* A skill path is `skills/<name>/...`, at any depth. A main file is a `SKILL.md` body, or a file outside every skill folder and outside `agents/` and `guards/`.
 
 ### Evidence: verdict_check
 
@@ -523,7 +523,7 @@ Built by: PR 454 (`origin/feat/block-b4-report`, `packages/core/src/evidence/`).
 
 * `rule_home` is the home of the verdict's first atom, else the `home` of its first link, else `none`.
 * By the atom's kind: `reference` is `skill_reference`, `script` is `skill_script`, `subagent` is `helper`, `guard` is `guard`, `tool` is `tool_schema`.
-* Any other kind, by the atom's file: `skills/<name>/SKILL.md` is `skill_body`; `skills/<name>/scripts/...` is `skill_script`; any other file of a skill is `skill_reference`; a file under `agents/` is `helper`; under `guards/` or `hooks/` is `guard`; any other file is `core`.
+* Any other kind, by the atom's file: `skills/<name>/SKILL.md` is `skill_body`; `skills/<name>/scripts/...` is `skill_script`; any other file of a skill is `skill_reference`; a file under `agents/` is `helper`; under `guards/` is `guard`; any other file is `core`.
 
 ### Evidence: rule_skill
 
