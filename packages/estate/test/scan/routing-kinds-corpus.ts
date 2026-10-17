@@ -408,8 +408,17 @@ export const routingKinds: RoutingKind[] = [
     outcome: 'route',
     headers: ['A', 'B'],
     rows: [
+      ['orchard ledger reconciliation', '`cypress-check`'],
+      ['dock slot allocation', '`quay-plan`'],
+    ],
+  },
+  {
+    kind: 'bare two-word labels in any letter case',
+    outcome: 'inventory',
+    headers: ['A', 'B'],
+    rows: [
       ['orchard reconciliation', '`cypress-check`'],
-      ['dock allocation', '`quay-plan`'],
+      ['Dock Allocation', '`quay-plan`'],
     ],
   },
   {

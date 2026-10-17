@@ -1234,9 +1234,13 @@ function readRouteCell(value: string): RouteCell {
   if (words < 2) return 'attribute';
   if (terms.every((term) => term.tags?.has('Date') || term.tags?.has('Value') || term.tags?.has('Unit')))
     return 'attribute';
+  // A short phrase with no predicate names a thing: a person, a role or a category. A request needs a
+  // predicate or more words than a label has. The grammar is read from the lowercased text so that the
+  // letter case a writer chose never decides the role of a cell.
+  const label = nlp(grammar.toLowerCase()).termList();
   if (
-    /^\p{Lu}[\p{L}’'-]+(?:\s+\p{Lu}[\p{L}’'-]+){1,2}$/u.test(text) &&
-    !terms.some((term) => term.tags?.has('Verb'))
+    !label.some((term) => term.tags?.has('Verb')) &&
+    (words <= 2 || label.every((term) => term.tags?.has('Person')))
   )
     return 'attribute';
   if (/[,;]\s*\S/.test(text) && text.split(/[,;]/).every((part) => !/\s/.test(part.trim())))
