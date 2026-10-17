@@ -39,20 +39,39 @@ describe('parent reports', () => {
     expect(html).toContain('root: fail<ul><li>child: blocked</li><li>leaf: blocked</li></ul>');
     expect(renderHtml(card)).toContain('root: fail<ul><li>child: blocked</li><li>leaf: blocked</li></ul>');
   });
-  it('the hierarchical interval reads the actual parent forest, clustering repeats by root', () => {
+  it('pools the roots of one spec in one tree, with the repeats', () => {
     const headline = suiteHeadline([forest, { ...forest, repeat: 1 }], (run) => run.specId);
-    const interval = hierarchicalBetaBinomial([
-      { n: 2, k: 0 },
-      { n: 2, k: 2 },
-    ]);
+    // Two roots in one spec: root 0 fails, root 1 passes, over two repeats: four tree outcomes, one tree.
     expect(headline).toMatchObject({
-      trees: 2,
+      trees: 1,
       runs: 2,
       n: 4,
-      method: 'hierarchical',
+      method: 'none',
       unit: 'tree-run',
       pooledRate: 0.5,
+      estimate: 0.5,
     });
+  });
+  it('the hierarchical interval reads one tree per spec across specs', () => {
+    const other = {
+      ...forest,
+      specId: 'forest-b',
+      blocks: forest.blocks.map((block) => ({
+        ...block,
+        pass: true,
+        status: 'pass' as const,
+        blocked: undefined,
+      })),
+    };
+    const headline = suiteHeadline(
+      [forest, { ...forest, repeat: 1 }, other, { ...other, repeat: 1 }],
+      (run) => run.specId,
+    );
+    const interval = hierarchicalBetaBinomial([
+      { n: 4, k: 2 },
+      { n: 4, k: 4 },
+    ]);
+    expect(headline).toMatchObject({ trees: 2, runs: 4, n: 8, method: 'hierarchical', unit: 'tree-run' });
     expect(headline?.estimate).toBe(interval.estimate);
     expect(headline?.lower).toBe(interval.lower);
     expect(headline?.upper).toBe(interval.upper);

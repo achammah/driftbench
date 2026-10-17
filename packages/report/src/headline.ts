@@ -102,18 +102,20 @@ export function suiteHeadline(
         return root.blockId ?? `block ${root.index}`;
       },
     );
-    const outcomes: Array<{ root: string; failed: boolean }> = [];
-    for (const [root, blocks] of trees) {
+    const outcomes: Array<{ failed: boolean }> = [];
+    for (const [, blocks] of trees) {
       const statuses = blocks.map(blockStatus);
       const failed = statuses.includes('fail');
       if (!failed && statuses.some((status) => status === 'not_run' || status === 'blocked')) continue;
-      outcomes.push({ root, failed });
+      outcomes.push({ failed });
     }
     // A run that failed as a whole (incomplete, a failed end verdict or end state) with no failing block
     // fails every tree it measured: the failure belongs to no one tree.
     const whole = !runPassed(run) && !outcomes.some((outcome) => outcome.failed);
-    for (const { root, failed } of outcomes) {
-      const key = JSON.stringify([treeOf(run), root]);
+    // The tree is the spec: its roots inherit one Given and move together, so they are pooled in one tree, not
+    // read as independent trees (which covers too rarely, see docs/concepts/statistics.md).
+    for (const { failed } of outcomes) {
+      const key = treeOf(run);
       samples.set(key, [...(samples.get(key) ?? []), !(failed || whole)]);
     }
   }
