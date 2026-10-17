@@ -103,6 +103,8 @@ situations:
       - stage.steps.stage-do-make-the-change
       - stage.steps.stage-verify-run-the-check-that
       - stage.steps.stage-report-tell-the-user-what
+      - reference.standing.read-claude-steps-json
+      - reference.standing.read-claude-memory-memory-md
     workspace: northwind-ops
     touches: { changed: [reports/2026-W41.md] }
     phrases:
@@ -392,6 +394,7 @@ situations:
       - instruction.standing.keep-an-unconfirmed-draft-unsent
       - gate.supplier-email.show-the-draft-and-get-an
       - instruction.supplier-email.a-draft-stays-under-120-words
+      - reference.memory-memory.read-supplier-languages-md
     workspace: northwind-ops
     touches: {}
     phrases:

@@ -44,8 +44,8 @@
   "summary": {
     "specs": 1564,
     "blocks": 1559,
-    "complete": 1537,
-    "incomplete": 27,
+    "complete": 1540,
+    "incomplete": 24,
     "judged": 465
   },
   "incomplete": [
@@ -82,42 +82,6 @@
           "marker": "needs-askable-act",
           "atom": "gate.standing.write-a-helper-s-brief-before",
           "detail": "no task in the atom's words (gate.standing.write-a-helper-s-brief-before (title)): the atom's words: it describes the unit, and names no task the user wants done"
-        }
-      ]
-    },
-    {
-      "spec": "estate.read_when.reference.standing.read-claude-steps-json",
-      "path": "incomplete/live/read_when/estate.read_when.reference.standing.read-claude-steps-json.yaml",
-      "row": "read_when.reference.standing.read-claude-steps-json",
-      "reasons": [
-        {
-          "marker": "needs-askable-act",
-          "atom": "reference.standing.read-claude-steps-json",
-          "detail": "no task in the atom's words (reference.standing.read-claude-steps-json (title)): the act does not start with a verb: \"\""
-        }
-      ]
-    },
-    {
-      "spec": "estate.read_when.reference.standing.read-claude-memory-memory-md",
-      "path": "incomplete/live/read_when/estate.read_when.reference.standing.read-claude-memory-memory-md.yaml",
-      "row": "read_when.reference.standing.read-claude-memory-memory-md",
-      "reasons": [
-        {
-          "marker": "needs-askable-act",
-          "atom": "reference.standing.read-claude-memory-memory-md",
-          "detail": "no task in the atom's words (reference.standing.read-claude-memory-memory-md (title)): the act does not start with a verb: \"\""
-        }
-      ]
-    },
-    {
-      "spec": "estate.read_when.reference.memory-memory.read-supplier-languages-md",
-      "path": "incomplete/live/read_when/estate.read_when.reference.memory-memory.read-supplier-languages-md.yaml",
-      "row": "read_when.reference.memory-memory.read-supplier-languages-md",
-      "reasons": [
-        {
-          "marker": "needs-askable-act",
-          "atom": "reference.memory-memory.read-supplier-languages-md",
-          "detail": "no task in the atom's words (reference.memory-memory.read-supplier-languages-md (title)): the act does not start with a verb: \"\""
         }
       ]
     },
@@ -458,10 +422,10 @@
     ]
   },
   "quality": {
-    "completeShare": 0.9827365728900256,
-    "askedTests": 1529,
+    "completeShare": 0.9846547314578005,
+    "askedTests": 1532,
     "distinctAsks": 130,
-    "distinctAsksPer100": 8.502289077828646
+    "distinctAsksPer100": 8.485639686684074
   },
   "unit": {
     "tests": 29,
@@ -478,13 +442,13 @@
   },
   "sources": {
     "asks": {
-      "bank": 453,
+      "bank": 456,
       "code": 1076,
       "session": 0,
       "none": 8
     },
     "outcomes": {
-      "bank": 1020,
+      "bank": 1023,
       "no-change:guard": 26,
       "no-change:negative": 56,
       "no-change:read-only": 83,
@@ -546,8 +510,8 @@
     "read_when": {
       "rows": 10,
       "specs": 10,
-      "complete": 7,
-      "incomplete": 3
+      "complete": 10,
+      "incomplete": 0
     },
     "script_fixture": {
       "rows": 2,
@@ -680,31 +644,25 @@
     "live": {
       "rows": 1528,
       "specs": 1521,
-      "complete": 1502,
-      "incomplete": 19
+      "complete": 1505,
+      "incomplete": 16
     }
   },
   "gaps": [
     {
       "marker": "needs-askable-act",
-      "specs": 21,
+      "specs": 18,
       "atoms": [
         "gate.standing.write-a-helper-s-brief-before",
         "guard.settings.stop-guard-reply-length-py",
         "guard.settings.userpromptsubmit-guard-stop-word-sh",
-        "instruction.standing.read-the-memory-index-at-the",
-        "reference.memory-memory.read-supplier-languages-md",
-        "reference.standing.read-claude-memory-memory-md",
-        "reference.standing.read-claude-steps-json"
+        "instruction.standing.read-the-memory-index-at-the"
       ],
       "details": [
         "no task in the atom's words (gate.standing.write-a-helper-s-brief-before (title)): the atom's words: it describes the unit, and names no task the user wants done",
         "no task in the atom's words (guard.settings.stop-guard-reply-length-py (rule)): the guard documents no rule or watched act to come near",
         "no task in the atom's words (guard.settings.userpromptsubmit-guard-stop-word-sh (rule)): the guard documents no rule or watched act to come near",
-        "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done",
-        "no task in the atom's words (reference.memory-memory.read-supplier-languages-md (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (reference.standing.read-claude-memory-memory-md (title)): the act does not start with a verb: \"\"",
-        "no task in the atom's words (reference.standing.read-claude-steps-json (title)): the act does not start with a verb: \"\""
+        "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
       ]
     },
     {

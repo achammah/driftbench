@@ -403,6 +403,9 @@ specs/live/route_positive/estate.route_positive.route.standing.an-ask-to-plan-th
 specs/live/route_near_miss/estate.route_near_miss.route.standing.an-ask-to-plan-the-delivery.yaml
 specs/live/misroute/estate.misroute.route.standing.an-ask-to-plan-the-delivery.yaml
 specs/live/read_when/estate.read_when.reference.standing.read-claude-skills-invoice-reconcile-references.yaml
+specs/live/read_when/estate.read_when.reference.standing.read-claude-steps-json.yaml
+specs/live/read_when/estate.read_when.reference.standing.read-claude-memory-memory-md.yaml
+specs/live/read_when/estate.read_when.reference.memory-memory.read-supplier-languages-md.yaml
 specs/live/read_when/estate.read_when.reference.invoice-reconcile.read-references-matching-rules-md.yaml
 specs/live/read_when/estate.read_when.reference.invoice-reconcile.read-references-currency-table-md.yaml
 specs/live/read_when/estate.read_when.reference.shipment-tracker.read-data-shipments-txt.yaml
