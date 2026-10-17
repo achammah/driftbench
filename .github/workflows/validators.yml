@@ -314,14 +314,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: union-374b3d543
-            ref: 374b3d543e054ee851c7a341a14f81a02bfbd451
+          - name: union-fdba1c52d
+            ref: fdba1c52d7bea504be7d515a281ae20984f3acc1
             merge_main: 'yes'
-          - name: prose-eb51ec955
-            ref: eb51ec95592fdfacb4edd706151421deeec7fd4e
+          - name: union-fdba1c52d-nomain
+            ref: fdba1c52d7bea504be7d515a281ae20984f3acc1
+            merge_main: ''
+          - name: prose-6943d0147
+            ref: 6943d0147e8745f69277ea46191d59a72b23c3fa
             merge_main: 'yes'
-          - name: main-alone
-            ref: main
+          - name: prose-6943d0147-nomain
+            ref: 6943d0147e8745f69277ea46191d59a72b23c3fa
             merge_main: ''
     steps:
       - uses: actions/checkout@v7
