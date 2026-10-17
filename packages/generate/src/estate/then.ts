@@ -341,6 +341,18 @@ function positive(then: ThenParts, atom: EstateAtom, evidence: EstateEvidence, c
         ];
         const calls = [...(Array.isArray(declared.calls) ? declared.calls : []), ...recovery.calls];
         const retry = declared.retry === true || recovery.retry;
+        // A part of the rule that names no file ("the open tracker note") is checked by no path: the spec never
+        // passes on the rest alone. A judge reads that part; without one the row waits under a gap with the reason.
+        for (const part of recovery.unpathed) {
+          if (ctx.judge) judgePart(then, atom, part);
+          else
+            gap(
+              then,
+              MARKERS.registered,
+              atom,
+              `the rule orders a re-read of "${part}", which names no file path`,
+            );
+        }
         // Only the actions the estate states stay: an empty path or a call counted zero demands nothing.
         const { reread: _reread, calls: _calls, retry: _retry, ...rest } = declared;
         then.custom.hazard_recovery = {
@@ -680,6 +692,25 @@ function judgeRule(then: ThenParts, atom: EstateAtom, polarity: Polarity): void 
           scope: 'block',
         },
   );
+  addUnique(then.judged, atom.id);
+}
+
+/** A gating judged criterion for one part of a rule that no code check reaches (the re-read of a note, not a file). */
+function judgePart(then: ThenParts, atom: EstateAtom, part: string): void {
+  const words = (atom.provenance?.quote ?? atom.title).replace(/\s+/g, ' ').trim();
+  const name = `${atom.id}.${part
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')}`;
+  if (then.criteria.some((criterion) => criterion.name === name)) return;
+  then.criteria.push({
+    name,
+    rubric: `The rule "${words}" orders a re-read of "${part}", which names no file path, so no code checks it. Did the agent re-read "${part}"?`,
+    pass: `The agent re-read "${part}" before it went on.`,
+    fail: `The agent went on without re-reading "${part}".`,
+    gating: true,
+    scope: 'block',
+  });
   addUnique(then.judged, atom.id);
 }
 

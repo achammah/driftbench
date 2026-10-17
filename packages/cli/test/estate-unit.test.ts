@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { parse } from 'yaml';
 import { type Io, main } from '../src/index';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
@@ -72,22 +73,21 @@ describe('driftbench estate unit on the Northwind suite', () => {
       message: 'Never run git push --force on any branch.',
       ms: expect.any(Number),
     });
-    // The two scripts declare no fixture: each runs its two minimal fixtures, recorded on the original.
+    // Each script runs the fixtures the estate configuration declares, in their order, and the exit code recorded
+    // on the original is the one the fixture declares (the carrier table lists NWX 123, so that lookup exits 0).
+    const declared = parse(await readFile(join(FIXTURE, 'driftbench.estate.yaml'), 'utf8')) as {
+      scripts: Record<string, { fixtures: Array<{ expect?: { exitCode?: number } }> }>;
+    };
+    const wanted = Object.entries(declared.scripts).flatMap(([script, entry]) =>
+      entry.fixtures.map((fixture) => [script.split('/').pop(), fixture.expect?.exitCode ?? 0]),
+    );
+    expect(wanted.length).toBeGreaterThan(8);
     expect(
       contract.scripts.map((entry: { script: string; exit: number }) => [
         entry.script.split('/').pop(),
         entry.exit,
       ]),
-    ).toEqual([
-      ['reconcile.py', 2],
-      ['reconcile.py', 0],
-      ['reconcile.py', 1],
-      ['reconcile.py', 1],
-      ['reconcile.py', 2],
-      ['track.sh', 2],
-      ['track.sh', 2],
-      ['track.sh', 1],
-    ]);
+    ).toEqual(wanted);
 
     const mutant = join(dir, 'mutant');
     const atom = 'guard.settings.pretooluse-bash-guard-block-force-push';

@@ -1,0 +1,4 @@
+NWX 123 sorted-at-depot 2026-03-04
+NWX 1234 delivered 2026-03-05
+DLV 123 out-for-delivery 2026-03-06
+XDLV 123 held-at-customs 2026-03-09
