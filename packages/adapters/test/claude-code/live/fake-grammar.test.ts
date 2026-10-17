@@ -28,8 +28,10 @@ async function estate(files: Record<string, string>) {
   return dir;
 }
 
-function play(cwd: string, ask: string, steps?: string) {
-  const output = execFileSync(process.execPath, [FAKE, '-p', ask], {
+// Each run grants Skill, as a trusted run of the live adapter does (`allowedTools` in its adapter.ts): a headless run
+// in a folder never trusted interactively loads no skill otherwise.
+function play(cwd: string, ask: string, steps?: string, flags: string[] = ['--allowed-tools', 'Skill']) {
+  const output = execFileSync(process.execPath, [FAKE, ...flags, '-p', ask], {
     cwd,
     env: {
       PATH: process.env.PATH,
@@ -272,6 +274,161 @@ it('reads the standing file again after a compaction when the estate says so, an
   expect(names(told, false)).not.toContain('Read:CLAUDE.md');
   const silent = await estate(files('Keep replies short.'));
   expect(names(silent, true)).not.toContain('Read:CLAUDE.md');
+});
+
+const notes = (tools: string, settings: object) => ({
+  'CLAUDE.md': '# Desk\n',
+  '.claude/settings.json': JSON.stringify(settings),
+  '.claude/skills/note-keeper/SKILL.md': skill(
+    'note-keeper',
+    '- Add the line the user gives to the notes file they name.',
+    tools,
+    'Keep the team notes up to date.',
+  ),
+  'notes/team.md': '# Team notes\n',
+});
+const ASK_NOTES = 'Update the team notes in notes/team.md, keep them up to date.';
+const plain = { permissions: { defaultMode: 'default', allow: ['Read'] } };
+
+/** Whether the run made an Edit call, and whether the runtime refused it for permission. */
+function edit(records: ReturnType<typeof play>) {
+  const use = calls(records).find((call) => call.name === 'Edit');
+  const result = records
+    .flatMap((row) => (Array.isArray(row.message?.content) ? row.message.content : []))
+    .find(
+      (part: { type: string; tool_use_id?: string }) =>
+        part.type === 'tool_result' && part.tool_use_id === use?.id,
+    );
+  return {
+    called: use !== undefined,
+    refused: result?.is_error === true && /permission/.test(result.content),
+  };
+}
+
+it('runs a call the active skill declares, and refuses for permission one that no rule grants', async () => {
+  expect(edit(play(await estate(notes('Read, Edit', plain)), ASK_NOTES))).toEqual({
+    called: true,
+    refused: false,
+  });
+  const undeclared = await estate(notes('Read', plain));
+  expect(edit(play(undeclared, ASK_NOTES))).toEqual({ called: true, refused: true });
+  expect(await readFile(join(undeclared, 'notes/team.md'), 'utf8')).toBe('# Team notes\n');
+  // The settings' allow list is not read in a folder never trusted; the run's --allowed-tools grants the same rule.
+  const allowed = { permissions: { defaultMode: 'default', allow: ['Read', 'Edit(notes/**)'] } };
+  expect(edit(play(await estate(notes('Read', allowed)), ASK_NOTES))).toEqual({
+    called: true,
+    refused: true,
+  });
+  expect(
+    edit(
+      play(await estate(notes('Read', plain)), ASK_NOTES, undefined, [
+        '--allowed-tools',
+        'Skill',
+        'Edit(notes/**)',
+      ]),
+    ),
+  ).toEqual({ called: true, refused: false });
+  // An ask rule holds the call, since a headless run cannot ask.
+  const asked = { permissions: { defaultMode: 'default', ask: ['Edit'] } };
+  expect(
+    edit(
+      play(await estate(notes('Read, Edit', asked)), ASK_NOTES, undefined, [
+        '--allowed-tools',
+        'Skill',
+        'Edit',
+      ]),
+    ),
+  ).toEqual({ called: true, refused: true });
+  const edits = { permissions: { defaultMode: 'acceptEdits' } };
+  expect(edit(play(await estate(notes('Read', edits)), ASK_NOTES))).toEqual({ called: true, refused: false });
+});
+
+it('refuses a tool the run disallows, ahead of every grant', async () => {
+  const dir = await estate(notes('Read, Edit', plain));
+  const records = play(dir, ASK_NOTES, undefined, [
+    '--allowed-tools',
+    'Skill',
+    'Edit',
+    '--disallowed-tools',
+    'Edit',
+  ]);
+  expect(edit(records).called).toBe(false);
+  expect(records[0]?.tools).not.toContain('Edit');
+  expect(await readFile(join(dir, 'notes/team.md'), 'utf8')).toBe('# Team notes\n');
+});
+
+it('changes no file in plan mode, from the flag or from the settings', async () => {
+  const flagged = await estate(notes('Read, Edit', plain));
+  expect(
+    edit(play(flagged, ASK_NOTES, undefined, ['--allowed-tools', 'Skill', '--permission-mode', 'plan'])),
+  ).toEqual({ called: true, refused: true });
+  const settled = await estate(notes('Read, Edit', { permissions: { defaultMode: 'plan' } }));
+  expect(edit(play(settled, ASK_NOTES))).toEqual({ called: true, refused: true });
+  expect(await readFile(join(settled, 'notes/team.md'), 'utf8')).toBe('# Team notes\n');
+});
+
+it('grants a shell line only when each of its commands is granted', async () => {
+  const desk = (tools: string) => ({
+    'CLAUDE.md': '# Desk\n',
+    '.claude/skills/tidy-desk/SKILL.md': skill(
+      'tidy-desk',
+      '- Run `ls notes && rm notes/team.md` to clear the old note.',
+      tools,
+      'Tidy the desk notes folder.',
+    ),
+    'notes/team.md': '# Team notes\n',
+  });
+  const ask = 'Tidy the desk notes folder.';
+  const prefix = await estate(desk('Read, Bash(ls:*)'));
+  play(prefix, ask);
+  expect(existsSync(join(prefix, 'notes/team.md'))).toBe(true);
+  const both = await estate(desk('Read, Bash(ls:*), Bash(rm:*)'));
+  play(both, ask);
+  expect(existsSync(join(both, 'notes/team.md'))).toBe(false);
+});
+
+it('loads a skill only when the run grants Skill, and follows no unloaded skill', async () => {
+  const dir = await estate(notes('Read, Edit', plain));
+  const refused = play(dir, ASK_NOTES, undefined, []);
+  expect(JSON.stringify(refused)).toContain("permissions to use Skill, but you haven't granted it yet");
+  // The skill it could not load grants nothing: the edit the ask names is refused too.
+  expect(edit(refused)).toEqual({ called: true, refused: true });
+  expect(calls(play(dir, ASK_NOTES)).map((call) => call.name)).toEqual(['Skill', 'Edit']);
+});
+
+it('changes a file with Write when the active skill grants Write and not Edit', async () => {
+  const dir = await estate({
+    'CLAUDE.md': '# Desk\n',
+    '.claude/settings.json': JSON.stringify({ permissions: { defaultMode: 'default', allow: ['Read'] } }),
+    '.claude/skills/note-keeper/SKILL.md': skill(
+      'note-keeper',
+      '- Add the line the user gives to the notes file they name.',
+      'Read, Write',
+      'Keep the team notes up to date.',
+    ),
+    'notes/team.md': '# Team notes\n',
+  });
+  const used = calls(play(dir, 'Update the team notes in notes/team.md, keep them up to date.'));
+  expect(used.map((call) => call.name)).toEqual(['Skill', 'Write']);
+  expect(await readFile(join(dir, 'notes/team.md'), 'utf8')).toContain('Updated as asked.');
+});
+
+it('does not remove a file under a folder the standing file forbids deleting from', async () => {
+  const files = (rule: string) => ({
+    'CLAUDE.md': `# Desk\n\n- ${rule}\n- Old files live in \`vault/\`.\n`,
+    'vault/2026-01.csv': 'a,b\n',
+  });
+  const granted = ['--allowed-tools', 'Skill', 'Bash(rm:*)'];
+  const ask = 'Please delete a vault file.';
+  const ruled = await estate(files('Never delete a file under `vault/`; move it to `vault/old/` instead.'));
+  const records = play(ruled, ask, undefined, granted);
+  expect(calls(records).some((call) => call.name === 'Bash')).toBe(false);
+  expect(JSON.stringify(records)).toContain('An estate prohibition forbids this action');
+  expect(existsSync(join(ruled, 'vault/2026-01.csv'))).toBe(true);
+  const loose = await estate(files('Keep replies short.'));
+  const removal = calls(play(loose, ask, undefined, granted)).find((call) => call.name === 'Bash');
+  expect(removal?.input.command).toBe('rm vault/2026-01.csv');
+  expect(existsSync(join(loose, 'vault/2026-01.csv'))).toBe(false);
 });
 
 it('after a compaction reads every file the rule names, on each wording the scanner reads as a compaction', async () => {
