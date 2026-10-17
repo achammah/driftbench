@@ -67,6 +67,8 @@ type Generated = {
         mode: string;
         cell: Record<string, string>;
         plan?: string;
+        /** Set on a spec that stands for several equivalent plan rows (the generator folds them). */
+        equivalence?: { count: number; planRows: string[] };
       };
     };
   };
@@ -481,6 +483,8 @@ describe('the Northwind estate chain, from scan to radius, with no model call', 
         map: { hash: string; atoms: number };
         plan: { rows: number; approved: number; proposed: number; struck: number };
         summary: { specs: number; complete: number; incomplete: number };
+        /** Absent from a report of a generator that folds nothing. */
+        equivalence?: { collapsed: number; groups: Array<{ spec: string; count: number; rows: string[] }> };
       };
       expect(report.map).toMatchObject({ hash: approved.hash, atoms: approved.atoms.length });
       expect(report.plan).toMatchObject({
@@ -495,6 +499,9 @@ describe('the Northwind estate chain, from scan to radius, with no model call', 
       const rowsById = new Map(plan.rows.map((row) => [row.id, row]));
       const atomIds = new Set(approved.atoms.map((atom) => atom.id));
       const covered = new Set<string>();
+      /** The rows folded into another spec: they have no spec of their own. */
+      const folded = new Set<string>();
+      const representatives = new Set<string>();
       for (const { spec, path } of specs) {
         const where = relative(out, path);
         const estate = spec.metadata.estate;
@@ -513,6 +520,22 @@ describe('the Northwind estate chain, from scan to radius, with no model call', 
           row?.cell,
         ]);
         covered.add(estate.planRow);
+        representatives.add(estate.planRow);
+        // The generator folds exactly equivalent specs into one representative, by design. The representative
+        // lists every row it stands for in `equivalence.planRows`: each is a row of the plan, and each counts as
+        // covered by this spec.
+        if (estate.equivalence !== undefined) {
+          const { count, planRows } = estate.equivalence;
+          expect(planRows, `${where}: the folded rows`).toContain(estate.planRow);
+          expect(count, `${where}: the fold count`).toBe(planRows.length);
+          expect(new Set(planRows).size, `${where}: a row is folded once`).toBe(planRows.length);
+          for (const id of planRows) {
+            expect(rowsById.has(id), `${where}: ${id} is a row of the plan`).toBe(true);
+            expect(folded.has(id), `${where}: ${id} is folded into one spec only`).toBe(false);
+            if (id !== estate.planRow) folded.add(id);
+            covered.add(id);
+          }
+        }
       }
       // The static and the unit tests are JSON files that carry the same three fields.
       const jsonTests = (await filesUnder(out)).filter(
@@ -537,8 +560,15 @@ describe('the Northwind estate chain, from scan to radius, with no model call', 
       expect(report.summary.incomplete).toBe(incomplete);
       expect(report.summary.complete).toBe(specs.length - incomplete + staticTests);
       expect(report.summary.specs).toBe(specs.length + staticTests);
-      expect(report.summary.specs).toBe(plan.rows.length);
-      return `${plan.rows.length} plan rows, ${covered.size} rows with a test, all on map hash ${short(approved.hash)}`;
+      // The written specs plus the rows folded into them are the plan rows, and the report counts the folds.
+      const collapsed = report.equivalence?.collapsed ?? 0;
+      expect(collapsed).toBe(folded.size);
+      expect([...folded].filter((id) => representatives.has(id))).toEqual([]);
+      expect((report.equivalence?.groups ?? []).reduce((sum, group) => sum + group.count - 1, 0)).toBe(
+        folded.size,
+      );
+      expect(report.summary.specs + collapsed).toBe(plan.rows.length);
+      return `${plan.rows.length} plan rows, ${covered.size} rows with a test (${folded.size} folded into an equivalent spec), all on map hash ${short(approved.hash)}`;
     });
   });
 
@@ -780,15 +810,28 @@ describe('the Northwind estate chain, from scan to radius, with no model call', 
       const before = original.results;
       expect(Object.keys(before)).toHaveLength(paths.length);
       // Every spec that names the atom passes. The specs that fail are the two planted faults of the
-      // recorded streams, and the specs of the carrier-code rule: its recorded stream runs no `track.sh`.
+      // recorded streams, and the specs that need what the recorded stream of the shipment asks never does:
+      // the carrier-code fault, planted by design. That stream reads neither the shipment data file nor
+      // `track.sh`. So every spec that requires the carrier-code rule, a read of the shipment data or a run of
+      // `track.sh` is red on the original, and stays as red on the mutant. They are the specs of the
+      // carrier-code instruction, and the journeys that walk the data reference or the script edge.
       for (const entry of naming) expect(before[entry.spec.id]?.outcome, entry.spec.id).toBe('pass');
-      const carrier = sharing.filter((entry) => atomsOf(entry).includes(CARRIER_CODE));
+      const needsMore = (atom: string) =>
+        atom === CARRIER_CODE ||
+        atom.startsWith('reference.shipment-tracker.') ||
+        atom.startsWith('script.shipment-tracker.');
+      const carrier = sharing.filter((entry) => atomsOf(entry).some(needsMore));
       expect(carrier.length).toBeGreaterThan(0);
       for (const entry of carrier) {
-        expect(before[entry.spec.id], entry.spec.id).toEqual({
-          outcome: 'fail',
-          failing: ['block 0: custom.some_call.0'],
-        });
+        const result = before[entry.spec.id];
+        expect(result?.outcome, entry.spec.id).toBe('fail');
+        expect(result?.failing.length, entry.spec.id).toBeGreaterThan(0);
+        if (atomsOf(entry).includes(CARRIER_CODE)) {
+          expect(result, entry.spec.id).toEqual({
+            outcome: 'fail',
+            failing: ['block 0: custom.some_call.0'],
+          });
+        }
       }
       expect(
         sorted(Object.entries(before).flatMap(([id, result]) => (result.outcome === 'pass' ? [] : [id]))),
