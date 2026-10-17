@@ -1,0 +1,2 @@
+{"at":"2026-10-13T09:00:02.500Z","event":"UserPromptSubmit","check":"stop-word.sh","verdict":"nudge","session":"00000000-0000-4000-8000-000000000023"}
+{"at":"2026-10-13T09:00:06.500Z","event":"Stop","check":"reply-length.py","verdict":"allow","session":"00000000-0000-4000-8000-000000000023"}
