@@ -209,6 +209,12 @@ export const WorldState = z
           .record(z.string(), z.string())
           .optional()
           .describe('Files the workspace starts with: path to content.'),
+        binary: z
+          .record(z.string(), z.base64())
+          .optional()
+          .describe(
+            'Files the workspace starts with that are not text, such as an xlsx: path to base64 content. The bytes reach the agent unchanged.',
+          ),
       })
       .optional()
       .describe('The files the agent starts from.'),

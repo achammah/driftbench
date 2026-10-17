@@ -723,11 +723,20 @@ function askOf(stimulus: Stimulus): string {
 
 function workspaceDelta(seeded: Workspace | undefined, next: Workspace): Workspace | undefined {
   if (seeded !== undefined && canonicalJson(seeded) === canonicalJson(next)) return undefined;
-  const files: Record<string, string> = {};
-  for (const [path, content] of Object.entries(next.files ?? {})) {
-    if (seeded?.files?.[path] !== content) files[path] = content;
-  }
-  return Object.keys(files).length === 0 ? undefined : { files };
+  const changed = (now: Record<string, string> | undefined, was: Record<string, string> | undefined) => {
+    const out: Record<string, string> = {};
+    for (const [path, content] of Object.entries(now ?? {})) {
+      if (was?.[path] !== content) out[path] = content;
+    }
+    return out;
+  };
+  const files = changed(next.files, seeded?.files);
+  const binary = changed(next.binary, seeded?.binary);
+  if (Object.keys(files).length === 0 && Object.keys(binary).length === 0) return undefined;
+  return {
+    ...(Object.keys(files).length === 0 ? {} : { files }),
+    ...(Object.keys(binary).length === 0 ? {} : { binary }),
+  };
 }
 
 async function lineCount(path: string): Promise<number> {

@@ -36,6 +36,26 @@ type Context = {
   forbidden: Set<string>;
 };
 
+/** A path of the workspace is text in `files` or bytes in `binary`, never both. */
+function checkWorkspace(
+  workspace: { files?: Record<string, string>; binary?: Record<string, string> } | undefined,
+  path: string,
+  issues: Issue[],
+): void {
+  if (workspace?.files === undefined || workspace.binary === undefined) return;
+  for (const file of Object.keys(workspace.binary)) {
+    if (Object.hasOwn(workspace.files, file)) {
+      issues.push(
+        error(
+          'WORKSPACE_PATH_TWICE',
+          `${path}.binary.${file}`,
+          `the workspace path "${file}" is in both files and binary: keep it in one`,
+        ),
+      );
+    }
+  }
+}
+
 /** Rules a schema cannot express. Every issue returned is an error. */
 export function checkSemantics(spec: Spec): Issue[] {
   const issues: Issue[] = [];
@@ -60,6 +80,11 @@ export function checkSemantics(spec: Spec): Issue[] {
   }
   const ctx: Context = { stages: spec.stages ? new Set(spec.stages) : undefined, defined, forbidden };
 
+  checkWorkspace(spec.given?.world?.workspace, 'given.world.workspace', issues);
+  spec.perturbations?.forEach((perturbation, index) => {
+    checkWorkspace(perturbation.world?.workspace, `perturbations.${index}.world.workspace`, issues);
+  });
+
   const facts = factsOf(spec);
   const blockIds = new Set<string>();
   spec.blocks.forEach((block, index) => {
@@ -71,6 +96,7 @@ export function checkSemantics(spec: Spec): Issue[] {
       }
       blockIds.add(block.id);
     }
+    checkWorkspace(block.given?.world?.workspace, `blocks.${index}.given.world.workspace`, issues);
     if (block.given?.origin !== undefined && block.given.prefix === undefined) {
       issues.push(
         error(
