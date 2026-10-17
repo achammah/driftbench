@@ -26,6 +26,7 @@ import { twinItems } from './levels/twins';
 import { valueItems } from './levels/values';
 import { verdictItems } from './levels/verdicts';
 import type { BlocksProduct } from './product';
+import { retag } from './retag';
 import { BANK_LEVELS, type BankItem, type ItemResult, thrownText } from './types';
 
 /** Section 12.1: the bank at merge holds at least this many items, no family under the second number. */
@@ -60,7 +61,7 @@ export function blocksBank(): BankItem[] {
   return items
     .map((item) => {
       const contract = CONTRACTS[item.cause] ?? EVIDENCE_CONTRACTS[item.cause];
-      return { ...item, ...(contract ? { contract } : {}) };
+      return { ...item, cause: retag(item.cause), ...(contract ? { contract } : {}) };
     })
     .map((item) =>
       CATCH.test(item.id) && !HARDNESS.test(item.id) ? { ...item, role: 'catch' as const } : item,
