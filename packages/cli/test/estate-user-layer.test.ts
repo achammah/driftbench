@@ -84,4 +84,73 @@ describe('driftbench estate scan and lint read the user-level skill layer only w
     expect(unasked.code).toBe(2);
     expect(unasked.err).toContain('--user-skills <folder>');
   }, 60_000);
+
+  it('reads a relative --user-skills folder from the folder the command is typed in', async () => {
+    process.env.HOME = await folder({});
+    const work = await folder({
+      'team/tide-chart/SKILL.md': skill('tide-chart'),
+      'project/.claude/skills/dock-roster/SKILL.md': skill('dock-roster'),
+    });
+    const scanned = await run(
+      ['estate', 'scan', 'project', '--no-model', '--user-skills', 'team', '--out', 'map.yaml'],
+      work,
+    );
+    expect(scanned.code).toBe(0);
+    expect(scanned.out).toContain('User skill layer: 1 skill read');
+    expect(await readFile(join(work, 'map.yaml'), 'utf8')).toContain('~/.claude/skills/tide-chart/SKILL.md');
+    const linted = await run(['estate', 'lint', 'map.yaml', '--user-skills', 'team'], work);
+    expect(linted.err).not.toContain('--user-skills <folder>');
+  }, 60_000);
+
+  it('expands ~ and ~/x in --user-skills against the home folder, whatever the working folder', async () => {
+    process.env.HOME = await folder({
+      'pier-notes/SKILL.md': skill('pier-notes'),
+      '.claude/skills/tide-chart/SKILL.md': skill('tide-chart'),
+    });
+    const work = await folder({ '.claude/skills/dock-roster/SKILL.md': skill('dock-roster') });
+    const nested = await run(
+      [
+        'estate',
+        'scan',
+        work,
+        '--no-model',
+        '--user-skills',
+        '~/.claude/skills',
+        '--out',
+        join(work, 'a.yaml'),
+      ],
+      work,
+    );
+    expect(nested.code).toBe(0);
+    const a = await readFile(join(work, 'a.yaml'), 'utf8');
+    expect(a).toContain('~/.claude/skills/tide-chart/SKILL.md');
+    expect(a).not.toContain('pier-notes');
+    const bare = await run(
+      ['estate', 'scan', work, '--no-model', '--user-skills', '~', '--out', join(work, 'b.yaml')],
+      work,
+    );
+    expect(bare.code).toBe(0);
+    const b = await readFile(join(work, 'b.yaml'), 'utf8');
+    expect(b).toContain('~/.claude/skills/pier-notes/SKILL.md');
+  }, 60_000);
+
+  it.each(['', '  '])(
+    'refuses an empty --user-skills value (%j) and writes nothing',
+    async (value) => {
+      const work = await folder({ '.claude/skills/dock-roster/SKILL.md': skill('dock-roster') });
+      const scanned = await run(
+        ['estate', 'scan', work, '--no-model', '--user-skills', value, '--out', join(work, 'map.yaml')],
+        work,
+      );
+      expect(scanned.code).toBe(2);
+      expect(scanned.err).toContain('--user-skills needs a folder');
+      await expect(readFile(join(work, 'map.yaml'), 'utf8')).rejects.toThrow();
+      const ok = await run(['estate', 'scan', work, '--no-model', '--out', join(work, 'map.yaml')], work);
+      expect(ok.code).toBe(0);
+      const linted = await run(['estate', 'lint', join(work, 'map.yaml'), '--user-skills', value], work);
+      expect(linted.code).toBe(2);
+      expect(linted.err).toContain('--user-skills needs a folder');
+    },
+    60_000,
+  );
 });
