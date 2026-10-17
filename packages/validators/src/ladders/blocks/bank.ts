@@ -12,6 +12,7 @@ import { codeItems } from './levels/code';
 import { comboItems } from './levels/combos';
 import { crossItems } from './levels/cross';
 import { diagnosticItems } from './levels/diagnostics';
+import { EVIDENCE_CONTRACTS, evidenceItems } from './levels/evidence';
 import { forestItems } from './levels/forest';
 import { historyItems } from './levels/history';
 import { hostileItems } from './levels/hostile';
@@ -50,13 +51,17 @@ export function blocksBank(): BankItem[] {
     ...objectItems(),
     ...valueItems(),
     ...diagnosticItems(),
+    ...evidenceItems(),
     ...parentItems(),
     ...linkItems(),
     ...blastItems(),
     ...personaItems(),
   ];
   return items
-    .map((item) => ({ ...item, ...(CONTRACTS[item.cause] ? { contract: CONTRACTS[item.cause] } : {}) }))
+    .map((item) => {
+      const contract = CONTRACTS[item.cause] ?? EVIDENCE_CONTRACTS[item.cause];
+      return { ...item, ...(contract ? { contract } : {}) };
+    })
     .map((item) =>
       CATCH.test(item.id) && !HARDNESS.test(item.id) ? { ...item, role: 'catch' as const } : item,
     )
