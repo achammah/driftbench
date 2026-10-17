@@ -51,6 +51,8 @@ export function normalizeSpec(raw: unknown): { value: unknown; issues: Issue[] }
     delete spec.workspace_seed;
   }
 
+  if (isPlainObject(spec.given)) spec.given = withOrderedPrefix(spec.given);
+
   if (Array.isArray(spec.blocks)) {
     spec.blocks = spec.blocks.map((block, index) => normalizeBlock(block, `blocks.${index}`, issues));
   }
@@ -58,9 +60,39 @@ export function normalizeSpec(raw: unknown): { value: unknown; issues: Issue[] }
   return { value: spec, issues };
 }
 
+/**
+ * A prefix with the keys of every tool call's input and output in one order (sorted at every depth), so the
+ * same call written with its keys in another order reaches the agent as the same text, as the spec hash
+ * already reads it. The values and the order of the lists stay as written.
+ */
+function withOrderedPrefix(given: Record<string, unknown>): Record<string, unknown> {
+  if (!Array.isArray(given.prefix)) return given;
+  const prefix = given.prefix.map((message) => {
+    if (!isPlainObject(message) || !Array.isArray(message.tool_calls)) return message;
+    const tool_calls = message.tool_calls.map((call) => {
+      if (!isPlainObject(call)) return call;
+      const out: Record<string, unknown> = { ...call };
+      if ('input' in out) out.input = sortedKeys(out.input);
+      if ('output' in out) out.output = sortedKeys(out.output);
+      return out;
+    });
+    return { ...message, tool_calls };
+  });
+  return { ...given, prefix };
+}
+
+function sortedKeys(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortedKeys);
+  if (!isPlainObject(value)) return value;
+  const out: Record<string, unknown> = {};
+  for (const key of Object.keys(value).sort()) out[key] = sortedKeys(value[key]);
+  return out;
+}
+
 function normalizeBlock(block: unknown, path: string, issues: Issue[]): unknown {
   if (!isPlainObject(block)) return block;
   const out: Record<string, unknown> = { ...block };
+  if (isPlainObject(out.given)) out.given = withOrderedPrefix(out.given);
   const hasUser = 'user' in out;
   const hasBurst = 'burst' in out;
   const hasWhen = 'when' in out;

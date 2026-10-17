@@ -39,3 +39,35 @@ describe('parent links', () => {
     expect(codes(load(chain(30_000, true)))).toEqual(['PARENT_CYCLE']);
   });
 });
+
+describe('a written prefix', () => {
+  it('keeps the keys of a tool call input and output in one order, whatever order they are written in', () => {
+    const call = {
+      id: 'c1',
+      label: 'bikes.lookup',
+      input: { slot: 3, name: 'Mila' },
+      output: { slot: 3, ref: 'LK-1' },
+    };
+    const loaded = validateSpec({
+      id: 'order',
+      target,
+      blocks: [
+        {
+          user: 'again',
+          given: {
+            prefix: [
+              { role: 'user', content: 'x' },
+              { role: 'assistant', content: '', tool_calls: [call] },
+            ],
+          },
+          expect: { must: ['ok'] },
+        },
+      ],
+    });
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    const kept = loaded.spec.blocks[0]?.given?.prefix?.[1]?.tool_calls?.[0];
+    expect(JSON.stringify(kept?.input)).toBe('{"name":"Mila","slot":3}');
+    expect(JSON.stringify(kept?.output)).toBe('{"ref":"LK-1","slot":3}');
+  });
+});
