@@ -1,0 +1,1586 @@
+[
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_393",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 0
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_393",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 1
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_393",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 2
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_603",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 3
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_603",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 4
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_603",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 5
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_654",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 6
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_654",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 7
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_654",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 8
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_754",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 9
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_754",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 10
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_754",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 11
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_888",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 12
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_888",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 13
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_888",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 14
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_901",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 15
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_901",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 16
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_901",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 17
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_267",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 18
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_267",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 19
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_267",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 20
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_334",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 21
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_334",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 22
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_334",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 23
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_368",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 24
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_368",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 25
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_368",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 26
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_382",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 27
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_382",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 28
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_382",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 29
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_621",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 30
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_621",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 31
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_621",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 32
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_740",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 33
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_740",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 34
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_740",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 35
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1134",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 36
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1134",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 37
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1134",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 38
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_405",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 39
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_405",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 40
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_405",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 41
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_442",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 42
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_442",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 43
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_442",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 44
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_580",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 45
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_580",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 46
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_580",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 47
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_766",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 48
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_766",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 49
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_766",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 50
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_895",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 51
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_895",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 52
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_895",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 53
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1005",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 54
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1005",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 55
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1005",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 56
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_107",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 57
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_107",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 58
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_107",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 59
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_251",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 60
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_251",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 61
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_251",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 62
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_689",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 63
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_689",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 64
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_689",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 65
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_753",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 66
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_753",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 67
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_753",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 68
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_852",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 69
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_852",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 70
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_852",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 71
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1011",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 72
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1011",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 73
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1011",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 74
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1086",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 75
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1086",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 76
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1086",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 77
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_258",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 78
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_258",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 79
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_258",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 80
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_446",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 81
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_446",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 82
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_446",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 83
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_850",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 84
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_850",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 85
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_850",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 86
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_94",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 87
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_94",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 88
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_94",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 89
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1091",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 90
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1091",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 91
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1091",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 92
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_12",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 93
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_12",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 94
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_12",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 95
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_21",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 96
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_21",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 97
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_21",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 98
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_30",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 99
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_30",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 100
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_30",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 101
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_336",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 102
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_336",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 103
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_336",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 104
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_661",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 105
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_661",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 106
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_661",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 107
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_218",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 108
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_218",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 109
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_218",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 110
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_237",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 111
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_237",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 112
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_237",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 113
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_458",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 114
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_458",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 115
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_458",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 116
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_719",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 117
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_719",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 118
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_719",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 119
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_739",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 120
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_739",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 121
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_739",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 122
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_767",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 123
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_767",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 124
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_767",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 125
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1040",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 126
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1040",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 127
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1040",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 128
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_112",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 129
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_112",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 130
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_112",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 131
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1135",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 132
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1135",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 133
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1135",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 134
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1141",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 135
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1141",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 136
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1141",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 137
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_230",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 138
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_230",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 139
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_230",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 140
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_942",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 141
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_942",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 142
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_942",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 143
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_209",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 144
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_209",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 145
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_209",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 146
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_320",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 147
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_320",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 148
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_320",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 149
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_40",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 150
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_40",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 151
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_40",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 152
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_409",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 153
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_409",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 154
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_409",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 155
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_794",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 156
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_794",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 157
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_794",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 158
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_889",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 159
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_889",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 160
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_889",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 161
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_109",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 162
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_109",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 163
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_109",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 164
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_129",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 165
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_129",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 166
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_129",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 167
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_130",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 168
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_130",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 169
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_130",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 170
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_276",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 171
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_276",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 172
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_276",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 173
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_559",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 174
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_559",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 175
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_559",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 176
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_837",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 177
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_837",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 178
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_837",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 179
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1030",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 180
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1030",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 181
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1030",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 182
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1053",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 183
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1053",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 184
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1053",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 185
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1098",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 186
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1098",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 187
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_1098",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 188
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_142",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 189
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_142",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 190
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_142",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 191
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_384",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 192
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_384",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 193
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_384",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 194
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_932",
+    "contestant": "seat",
+    "sample": 0,
+    "recordIndex": 195
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_932",
+    "contestant": "seat",
+    "sample": 1,
+    "recordIndex": 196
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "fixtures",
+    "id": "rubric_eval_932",
+    "contestant": "seat",
+    "sample": 2,
+    "recordIndex": 197
+  }
+]

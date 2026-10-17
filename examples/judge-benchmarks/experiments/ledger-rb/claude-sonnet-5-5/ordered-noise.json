@@ -1,0 +1,722 @@
+[
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 0
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 1
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 2
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 3
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 4
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 5
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 6
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 7
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 8
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 9
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 10
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 11
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 12
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 13
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 14
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 15
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 16
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 17
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 18
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 19
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 20
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 21
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 22
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 23
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 24
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 25
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 26
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 27
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 28
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 29
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 30
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 31
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 32
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 33
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 34
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 35
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 36
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 37
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 38
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 39
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 40
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 41
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 42
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 43
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 44
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 45
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 46
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 47
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 48
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 49
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 50
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 51
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 52
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 53
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 54
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 55
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 56
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 57
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 58
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 59
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 60
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 61
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 62
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 63
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 64
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 65
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 66
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 67
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 68
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 69
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 70
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 71
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 72
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 73
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 74
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 75
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 76
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 77
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 78
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 79
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 80
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 81
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 82
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 83
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 84
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 85
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 86
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 87
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 88
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 89
+  }
+]

@@ -1,0 +1,9984 @@
+[
+  {
+    "id": "rubric_eval_1",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_3",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_5",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_6",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_8",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_9",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_11",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_14",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_16",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_18",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_20",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_22",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_26",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_27",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_28",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_33",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_38",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_44",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_47",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_48",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_54",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_55",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_57",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_58",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_61",
+    "group": "Precise IF",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_63",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_64",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_65",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_69",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_70",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_72",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_73",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_75",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_76",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_79",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_84",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_85",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_99",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_100",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_102",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_114",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_115",
+    "group": "Safety",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_118",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_119",
+    "group": "Focus",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_120",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_122",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_123",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_125",
+    "group": "Safety",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_128",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_133",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_134",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_135",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_137",
+    "group": "mmlu-pro",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_140",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_146",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_149",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_151",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_152",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_156",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_159",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_162",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_167",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_173",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_179",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_180",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_187",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_189",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_192",
+    "group": "helpful",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_194",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_196",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_198",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_202",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_203",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_207",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_208",
+    "group": "helpful",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_211",
+    "group": "Safety",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_212",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_213",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_217",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_222",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_223",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_224",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_225",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_226",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_227",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_228",
+    "group": "Focus",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_229",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_231",
+    "group": "Focus",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_232",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_239",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_241",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_246",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_247",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_250",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_253",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_261",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_266",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_269",
+    "group": "Safety",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_270",
+    "group": "math",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_271",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_278",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_281",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_282",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_287",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_288",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_289",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_290",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_291",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_292",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_293",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_296",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_299",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_300",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_301",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_302",
+    "group": "Safety",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_304",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_306",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_312",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_317",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_318",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_319",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_322",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_324",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_325",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_326",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_328",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_330",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_331",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_332",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_338",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_341",
+    "group": "Factuality",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_350",
+    "group": "Safety",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_353",
+    "group": "Math",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_356",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_360",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_363",
+    "group": "Precise IF",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_364",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_367",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_369",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_370",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_371",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_377",
+    "group": "helpful",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_379",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_383",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_385",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_386",
+    "group": "Factuality",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_388",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_389",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_391",
+    "group": "mbpp",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_395",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_397",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_403",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_413",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_417",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_418",
+    "group": "Factuality",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_419",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_421",
+    "group": "Safety",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_423",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_426",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_427",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_428",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_430",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_434",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_438",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_439",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_440",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_444",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_449",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_450",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_451",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_454",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_455",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_456",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_460",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_471",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_476",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_477",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_478",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_479",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_482",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_483",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_487",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_488",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_495",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_496",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_498",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_501",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_504",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_510",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_511",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_513",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_515",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_516",
+    "group": "Precise IF",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_520",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_524",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_525",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_528",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_529",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_531",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_533",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_534",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_537",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_538",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_539",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_543",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_545",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_550",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_551",
+    "group": "math",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_552",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_554",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_555",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_558",
+    "group": "helpful",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_561",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_562",
+    "group": "Precise IF",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_563",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_564",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_565",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_568",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_571",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_573",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_585",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_586",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_588",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_590",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_592",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_595",
+    "group": "Factuality",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_604",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_605",
+    "group": "Safety",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_606",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_610",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_614",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_615",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_620",
+    "group": "Focus",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_622",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_625",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_628",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_630",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_636",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_640",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_641",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_648",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_649",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_650",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_652",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_653",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_660",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_662",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_666",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_667",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_669",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_671",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_672",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_673",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_675",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_678",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_679",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_680",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_681",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_682",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_683",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_684",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_686",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_690",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_691",
+    "group": "Factuality",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_696",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_697",
+    "group": "mbpp",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_700",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_701",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_707",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_709",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_710",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_712",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_715",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_718",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_726",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_729",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_734",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_737",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_738",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_742",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_745",
+    "group": "Focus",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_747",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_749",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_750",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_758",
+    "group": "math",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_760",
+    "group": "mbpp",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_771",
+    "group": "Precise IF",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_774",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_777",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_781",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_783",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_784",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_785",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_787",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_788",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_789",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_791",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_795",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_798",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_806",
+    "group": "math",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_810",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_811",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_812",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_814",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_822",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_824",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_827",
+    "group": "Safety",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_828",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_829",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_831",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_838",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_839",
+    "group": "Precise IF",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_841",
+    "group": "Safety",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_847",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_848",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_849",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_851",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_853",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_855",
+    "group": "mmlu-pro",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_856",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_860",
+    "group": "Focus",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_863",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_865",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_866",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_868",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_872",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_873",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_879",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_880",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_882",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_884",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_885",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_891",
+    "group": "Factuality",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_894",
+    "group": "Precise IF",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_896",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_899",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_900",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_903",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_907",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_908",
+    "group": "Safety",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_909",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_910",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_912",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_915",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_916",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_918",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_928",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_931",
+    "group": "Safety",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_939",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_940",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_943",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_944",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_946",
+    "group": "mbpp",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_947",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_949",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_950",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_954",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_957",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_964",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_968",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_970",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_971",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_975",
+    "group": "math",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_976",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_977",
+    "group": "math",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_978",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_979",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_980",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_984",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_985",
+    "group": "math",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_992",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_993",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_996",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_997",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1003",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1006",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1007",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1010",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1013",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1015",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1017",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1019",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1020",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1021",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1022",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1023",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1026",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1027",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "tie",
+      "tie"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 2
+  },
+  {
+    "id": "rubric_eval_1028",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1029",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1031",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1033",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1034",
+    "group": "Precise IF",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1035",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1036",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1039",
+    "group": "Factuality",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1045",
+    "group": "ifeval",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1046",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1047",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1049",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1052",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1054",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1056",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1058",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1065",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1068",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1070",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1071",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1075",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1076",
+    "group": "Math",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1077",
+    "group": "Focus",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1079",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1087",
+    "group": "stem",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1088",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1094",
+    "group": "Focus",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1102",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1106",
+    "group": "general",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1111",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      false,
+      true
+    ],
+    "oursDecisions": [
+      "tie",
+      "tie"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1112",
+    "group": "code",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1113",
+    "group": "human-preference",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1114",
+    "group": "ifeval",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1118",
+    "group": "stem",
+    "label": "B",
+    "ours": [
+      false,
+      false
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1119",
+    "group": "Factuality",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1120",
+    "group": "math",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1122",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      false
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1123",
+    "group": "Safety",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1124",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1128",
+    "group": "Factuality",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1129",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1130",
+    "group": "harmlessness",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      false,
+      false
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1132",
+    "group": "Focus",
+    "label": "A",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "A",
+      "A"
+    ],
+    "peerDecisions": [
+      "A",
+      "A"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1136",
+    "group": "general",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1137",
+    "group": "code",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  },
+  {
+    "id": "rubric_eval_1145",
+    "group": "human-preference",
+    "label": "B",
+    "ours": [
+      true,
+      true
+    ],
+    "peer": [
+      true,
+      true
+    ],
+    "oursDecisions": [
+      "B",
+      "B"
+    ],
+    "peerDecisions": [
+      "B",
+      "B"
+    ],
+    "oursMissing": 0,
+    "peerMissing": 0
+  }
+]

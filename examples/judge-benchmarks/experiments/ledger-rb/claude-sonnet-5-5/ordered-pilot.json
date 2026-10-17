@@ -1,0 +1,322 @@
+[
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_1055",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 0
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_1055",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 1
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_12",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 2
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_12",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 3
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_129",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 4
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_129",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 5
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_139",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 6
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_139",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 7
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_161",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 8
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_161",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 9
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_164",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 10
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_164",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 11
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_165",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 12
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_165",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 13
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_283",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 14
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_283",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 15
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_30",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 16
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_30",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 17
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_327",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 18
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_327",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 19
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_349",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 20
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_349",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 21
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_468",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 22
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_468",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 23
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_484",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 24
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_484",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 25
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_53",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 26
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_53",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 27
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_602",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 28
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_602",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 29
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_730",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 30
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_730",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 31
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_736",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 32
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_736",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 33
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_769",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 34
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_769",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 35
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 36
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_776",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 37
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_901",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 38
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "pilot",
+    "id": "rubric_eval_901",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 39
+  }
+]

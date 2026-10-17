@@ -1,0 +1,45 @@
+{
+  "at": "2026-10-13T15:04:04.399234+00:00",
+  "status": "owner budget decision",
+  "decision": "Park before TEST; no further Sonnet calls",
+  "condition": "Cache-off projection exceeds owner USD 45 threshold",
+  "projection": {
+    "at": "2026-10-13T15:03:16.896Z",
+    "costs": {
+      "pair-ledger": {
+        "calls": 3,
+        "meanRequestUsd": 0.022958000000000003
+      },
+      "promptfoo": {
+        "calls": 2,
+        "meanRequestUsd": 0.00304
+      }
+    },
+    "thirdRate": 0,
+    "minimumRequests": 3818,
+    "maximumRequestsBeforeTransportRetries": 4818,
+    "projectedUsd": 55.48357240000001,
+    "allThirdReadsUsd": 78.4415724,
+    "method": "Next-five cache-off per-contestant request means times remaining fixed full-cell requests, plus all prior costs and holds. The initial five cache-on calls are retained and never resent. A small-sample projection, not a guarantee.",
+    "mayContinue": false,
+    "remainingLedgerUsd": 50.323936,
+    "remainingPeerUsd": 4.912640000000001,
+    "chargedAlreadyUsd": 0.24699639999999998,
+    "projectedLedgerUsd": 50.511420400000006,
+    "projectedPromptfooUsd": 4.972152,
+    "capUsd": 45,
+    "status": "owner budget decision",
+    "appliedEnvironment": {
+      "DISABLE_PROMPT_CACHING": "1"
+    },
+    "newCalls": [
+      "287865ab360acfee2514cf47af62be7f9d27f451b43df499ffd92f316b1fa7b7",
+      "39a238d37f692c65ca89194c71a4bea0a345a15115816d5c771d81528359a569",
+      "e69e98f4aa63cf3cbcb0935e5400aeb8c7ecf7fdd6bf165f245d72781eaf2ff8",
+      "92bc0620f113e4e9e88e91b481a2d45340f2ed55c0931375731da883d914cc21",
+      "940b19acfa0738acf8c7761d4d1e20a51d0d858cd4c3ef26efc38b63bbca9495"
+    ],
+    "newCallsCostUsd": 0.074954
+  },
+  "testCalls": 0
+}

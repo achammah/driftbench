@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-13T11:38:38.283691+00:00",
+  "completedContestantItems": 619,
+  "targetContestantItems": 1580,
+  "workers": 2,
+  "last40MeanElapsedMs": 48104.075,
+  "projectedRemainingHours": 6.420557788194444,
+  "caveat": "Projection from saved last 40 job durations; assumes unchanged host throughput, excludes new transport waits."
+}

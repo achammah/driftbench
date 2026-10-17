@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-13T15:00:34.235171+00:00",
+  "model": "gpt-6.1-sol",
+  "capUsd": 50,
+  "authority": "Owner: gate raised to 50 USD including holds; network pause until ten consecutive healthy probes thirty seconds apart, two paid calls at a time, one model cell at a time. Three connection failures pause ten minutes and repeat the gate. Unlimited missing-only no-answer transport retries; never resend a returned answer.",
+  "originalFreezeSha256": "dffe923eba5ab1f4d6e79e64c174a7b2e6b4a2cd59f5e29228ba331c8816c9c9",
+  "hashes": {
+    "examples/judge-benchmarks/src/rubric-ledger-added-network.ts": "5d13b4f38cf624efe7388733b8775da395c609e4acf63b0ede1e567546c96a72",
+    "examples/judge-benchmarks/src/rubric-ledger-network-calls.ts": "727dd29732889790f9db9908c432e8bd127e63e8540873ac362bfcfad0bc143c",
+    "examples/judge-benchmarks/src/rubric-ledger-network-health.py": "f6245b6e5089347857fee723fdfdc67d693bff5d68178bcb6aad6ea734d948dc",
+    "examples/judge-benchmarks/src/rubric-ledger-native-blocks.ts": "f93a3efa1e5b0e8de552e762933e6491f6fb824797cc697f080db365a9bcef9f",
+    "examples/judge-benchmarks/src/rubric-ledger-reconcile.ts": "12ee0f9385316415544ec8b1727c89fcd4d3ca35431f8934e51187235de53839"
+  },
+  "promptsInputsSchemasReasoningScoring": "unchanged",
+  "order": "original sealed order and logical request identity unchanged",
+  "price": {
+    "inputUsdPerMillion": 2,
+    "cachedInputUsdPerMillion": 0.1,
+    "cacheWriteUsdPerMillion": 2.5,
+    "outputUsdPerMillion": 10,
+    "receiptField": "usage.input_tokens_details.cache_write_tokens",
+    "source": "https://developers.openai.com/api/docs/pricing"
+  },
+  "runtime": "Responses API, medium reasoning, max_output_tokens 8192 includes reasoning, no temperature, original transport fingerprint retained for replay identity",
+  "originalProjectionUsd": 45.004068,
+  "resultPolicy": "RubricBench TIE-only preregistration retained; no final sealed result while any transport-missing request remains."
+}

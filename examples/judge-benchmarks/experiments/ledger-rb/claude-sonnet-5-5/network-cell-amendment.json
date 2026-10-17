@@ -1,0 +1,53 @@
+{
+  "at": "2026-10-13T16:22:12.536221+00:00",
+  "model": "claude-sonnet-5-5",
+  "kind": "owner budget approval and sequential network runtime amendment",
+  "ownerApproval": "Sonner on RubricBench, ok",
+  "capUsd": 67,
+  "approvedProjectionUsd": 55.4835724,
+  "authority": "Owner authorizes Sonnet after gpt-6.1-sol, one cell at a time, ten healthy provider probes thirty seconds apart, two concurrent paid calls, missing-only recovery, TEST once. USD 60 includes holds.",
+  "originalFreezeSha256": "8b71d19cab9e6ce3d1e5d45d8413a33ee14617d42ee9aac6b9a92a9fa9acc6c6",
+  "priorCachingAmendmentSha256": "fecddc86f5aac489f5cd5bf09975977042ac45ad400dc2f6a6118b79de4f7178",
+  "supersededOwnerBudgetDecisionSha256": "2935437bdf708cba2664016b0e14038808e90067b3040773e8bdeb6d1cc5f043",
+  "hashes": {
+    "examples/judge-benchmarks/src/rubric-ledger-sonnet-network.ts": "61de529d18c6d412fdf28f9a4a6bb8125c69d414fc297d725b3c91b261cf565b",
+    "examples/judge-benchmarks/src/rubric-ledger-network-calls.ts": "727dd29732889790f9db9908c432e8bd127e63e8540873ac362bfcfad0bc143c",
+    "examples/judge-benchmarks/src/rubric-ledger-network-health.py": "f6245b6e5089347857fee723fdfdc67d693bff5d68178bcb6aad6ea734d948dc",
+    "examples/judge-benchmarks/src/rubric-ledger-native-blocks.ts": "f93a3efa1e5b0e8de552e762933e6491f6fb824797cc697f080db365a9bcef9f",
+    "examples/judge-benchmarks/src/rubric-ledger-reconcile.ts": "698a9a98e81cd4c25b69459f61b3e7ba9c21d0eb72784bcc1a8dec48779f7a5d",
+    "examples/judge-benchmarks/src/rubric-ledger-sonnet-network-completion.ts": "aa084ee686963754534d6df48bda6321b7a59703ad26d4ae670b220fadc1a98e"
+  },
+  "environment": {
+    "DISABLE_PROMPT_CACHING": "1"
+  },
+  "appliesTo": "both contestants, all new continuation calls; ten existing answers preserved",
+  "order": "original sealed item set, logical request identity and order of record unchanged",
+  "runtime": "native Claude CLI model alias sonnet, medium effort, empty execution folder, minimal system, max output 8192 tokens; same frozen transport",
+  "network": "Ten consecutive healthy provider probes spaced thirty seconds apart. Two concurrent paid calls, one model cell at a time. Three consecutive connection failures pause ten minutes and repeat the gate.",
+  "retryPolicy": "No-answer transport failures retry missing-only without limit. Never resend an answered request, including unparsed answers and provider blocks. Preserve receipts and unknown-cost holds; release only proven zero-token/no-output rejections.",
+  "providerBlocks": "Own column per contestant. Whole blocked item counts as error for blocked contestant, same rule for both. Secondary excludes union of blocked items for both.",
+  "resultPolicy": "Original TIE-only registration retained. No final sealed result with transport-missing items.",
+  "unchanged": [
+    "prompts",
+    "inputs",
+    "schemas",
+    "model settings",
+    "scorer",
+    "validity thresholds",
+    "selected TEST ids",
+    "outcome-blind record order"
+  ],
+  "priorRuntimeAmendmentSha256": "007e0395bb223804650f52fe49d8d4581264826154c212af0b97d6f85be3f049",
+  "updatedAt": "2026-10-13T18:46:59.561870+00:00",
+  "responseClassificationClarification": "An explicit native CLI API Error banner with zero output tokens and connection/quota/server failure is no-answer transport. Its raw receipt and known cost remain saved. Content blocks and any generated output remain terminal judge results. No prompt, setting or request changes.",
+  "sessionLimitPolicy": "An explicit native session or usage limit with zero generated tokens is no-answer provider rejection, never a judge failure. Wait ten minutes, repeat provider gate, then missing-only. Any generated answer remains terminal.",
+  "capAmendment": {
+    "at": "2026-10-14T14:25:54.468670+00:00",
+    "fromUsd": 60,
+    "toUsd": 67,
+    "approval": "Lead message: \"Approved: raise the Sonnet cell cap to 67 USD, recorded as an amendment like the earlier ones. It fits well inside the owner's 1,000 USD total budget.\"",
+    "reason": "Pre-TEST gate projected USD 66.5357682 including all prior costs and holds, above USD 60. No TEST request existed at this amendment.",
+    "unchanged": "Prompts, inputs, model, medium effort, 8192 output cap, cache-off, sealed TEST ids and order, judge contract, provider-block scoring, TIE-only registration.",
+    "previousAmendment": "network-cell-amendment.v3.json"
+  }
+}

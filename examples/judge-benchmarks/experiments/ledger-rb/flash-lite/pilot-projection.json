@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-13T12:24:24.551513+00:00",
+  "pilotPairsPerContestant": 20,
+  "pilotCostUsd": 0.21400919999999998,
+  "projectedTestUsd": 8.4533634,
+  "projectedTestPlusPaidPilotUsd": 8.6673726,
+  "unrunPreTestChecksNotIncluded": [
+    "198 seat fixture readings",
+    "90 noise pair decisions",
+    "100 validity pair decisions",
+    "two promptfoo DEV probe requests"
+  ],
+  "projectedTestHoursAt8": 0.4058583854166667,
+  "method": "Same frozen 20-pair DEV pilot cost per contestant extrapolated to 790; wall time sums item latencies / eight workers. This is a projection, not a guaranteed charge.",
+  "capUsd": 8
+}

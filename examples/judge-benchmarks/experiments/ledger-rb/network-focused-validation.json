@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-13T14:45:06.427953+00:00",
+  "tests": 10,
+  "files": 2,
+  "passed": true,
+  "typecheck": "passed",
+  "scope": "added models and network recovery only",
+  "modelCalls": 0
+}

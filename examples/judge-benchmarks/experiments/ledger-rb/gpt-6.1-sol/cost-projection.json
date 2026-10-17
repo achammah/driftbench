@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-13T14:10:18.608Z",
+  "costs": {
+    "pair-ledger": {
+      "calls": 3,
+      "meanRequestUsd": 0.014975999999999998
+    },
+    "promptfoo": {
+      "calls": 2,
+      "meanRequestUsd": 0.007461000000000001
+    }
+  },
+  "thirdRate": 0,
+  "minimumRequests": 3818,
+  "maximumRequestsBeforeTransportRetries": 4818,
+  "projectedUsd": 45.004068,
+  "allThirdReadsUsd": 59.980067999999996,
+  "method": "Per-contestant observed mean cost per request times fixed full-cell calls, including all pre-TEST work, plus observed third-read rate and retained unknown holds. Five-call estimate is preliminary.",
+  "mayContinue": false
+}

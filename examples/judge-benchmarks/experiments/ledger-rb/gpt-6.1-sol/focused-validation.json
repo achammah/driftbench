@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-13T14:02:37.514994+00:00",
+  "tests": 7,
+  "files": 1,
+  "passed": true,
+  "typecheck": "passed",
+  "testCommand": "pnpm exec vitest run examples/judge-benchmarks/test/rubric-ledger-added-models.test.ts --maxWorkers 1",
+  "typecheckScope": "three new source files, new test and imported dependencies",
+  "modelCalls": 0,
+  "additionalCheck": "First-five cost projection blocks a cell above USD 25"
+}

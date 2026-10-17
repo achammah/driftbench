@@ -1,0 +1,342 @@
+{
+  "stage": "development selections frozen; no model earning or validity result claimed",
+  "devPairs": 357,
+  "testPairs": 790,
+  "pilotIds": [
+    "rubric_eval_1055",
+    "rubric_eval_12",
+    "rubric_eval_129",
+    "rubric_eval_139",
+    "rubric_eval_161",
+    "rubric_eval_164",
+    "rubric_eval_165",
+    "rubric_eval_283",
+    "rubric_eval_30",
+    "rubric_eval_327",
+    "rubric_eval_349",
+    "rubric_eval_468",
+    "rubric_eval_484",
+    "rubric_eval_53",
+    "rubric_eval_602",
+    "rubric_eval_730",
+    "rubric_eval_736",
+    "rubric_eval_769",
+    "rubric_eval_776",
+    "rubric_eval_901"
+  ],
+  "noiseIds": [
+    "rubric_eval_1008",
+    "rubric_eval_109",
+    "rubric_eval_1143",
+    "rubric_eval_13",
+    "rubric_eval_199",
+    "rubric_eval_244",
+    "rubric_eval_263",
+    "rubric_eval_279",
+    "rubric_eval_376",
+    "rubric_eval_382",
+    "rubric_eval_43",
+    "rubric_eval_432",
+    "rubric_eval_436",
+    "rubric_eval_453",
+    "rubric_eval_46",
+    "rubric_eval_557",
+    "rubric_eval_569",
+    "rubric_eval_594",
+    "rubric_eval_616",
+    "rubric_eval_676",
+    "rubric_eval_699",
+    "rubric_eval_711",
+    "rubric_eval_744",
+    "rubric_eval_754",
+    "rubric_eval_776",
+    "rubric_eval_801",
+    "rubric_eval_836",
+    "rubric_eval_852",
+    "rubric_eval_933",
+    "rubric_eval_973"
+  ],
+  "noiseRepeats": 3,
+  "fixtures": [
+    {
+      "group": "Factuality",
+      "availableDevPairs": 10,
+      "ids": [
+        "rubric_eval_393",
+        "rubric_eval_603",
+        "rubric_eval_654",
+        "rubric_eval_754",
+        "rubric_eval_888",
+        "rubric_eval_901"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "Focus",
+      "availableDevPairs": 6,
+      "ids": [
+        "rubric_eval_267",
+        "rubric_eval_334",
+        "rubric_eval_368",
+        "rubric_eval_382",
+        "rubric_eval_621",
+        "rubric_eval_740"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "Math",
+      "availableDevPairs": 2,
+      "ids": [
+        "rubric_eval_1000",
+        "rubric_eval_1090"
+      ],
+      "status": "ineligible for earned seat; base judge only",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "Precise IF",
+      "availableDevPairs": 9,
+      "ids": [
+        "rubric_eval_1134",
+        "rubric_eval_405",
+        "rubric_eval_442",
+        "rubric_eval_580",
+        "rubric_eval_766",
+        "rubric_eval_895"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "Safety",
+      "availableDevPairs": 12,
+      "ids": [
+        "rubric_eval_1005",
+        "rubric_eval_107",
+        "rubric_eval_251",
+        "rubric_eval_689",
+        "rubric_eval_753",
+        "rubric_eval_852"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "code",
+      "availableDevPairs": 78,
+      "ids": [
+        "rubric_eval_1011",
+        "rubric_eval_1086",
+        "rubric_eval_258",
+        "rubric_eval_446",
+        "rubric_eval_850",
+        "rubric_eval_94"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "general",
+      "availableDevPairs": 28,
+      "ids": [
+        "rubric_eval_1091",
+        "rubric_eval_12",
+        "rubric_eval_21",
+        "rubric_eval_30",
+        "rubric_eval_336",
+        "rubric_eval_661"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "gpqa",
+      "availableDevPairs": 1,
+      "ids": [
+        "rubric_eval_864"
+      ],
+      "status": "ineligible for earned seat; base judge only",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "harmlessness",
+      "availableDevPairs": 13,
+      "ids": [
+        "rubric_eval_218",
+        "rubric_eval_237",
+        "rubric_eval_458",
+        "rubric_eval_719",
+        "rubric_eval_739",
+        "rubric_eval_767"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "helpful",
+      "availableDevPairs": 5,
+      "ids": [
+        "rubric_eval_339",
+        "rubric_eval_398",
+        "rubric_eval_540",
+        "rubric_eval_782",
+        "rubric_eval_793"
+      ],
+      "status": "ineligible for earned seat; base judge only",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "human-preference",
+      "availableDevPairs": 83,
+      "ids": [
+        "rubric_eval_1040",
+        "rubric_eval_112",
+        "rubric_eval_1135",
+        "rubric_eval_1141",
+        "rubric_eval_230",
+        "rubric_eval_942"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "ifeval",
+      "availableDevPairs": 33,
+      "ids": [
+        "rubric_eval_209",
+        "rubric_eval_320",
+        "rubric_eval_40",
+        "rubric_eval_409",
+        "rubric_eval_794",
+        "rubric_eval_889"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "math",
+      "availableDevPairs": 24,
+      "ids": [
+        "rubric_eval_109",
+        "rubric_eval_129",
+        "rubric_eval_130",
+        "rubric_eval_276",
+        "rubric_eval_559",
+        "rubric_eval_837"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "mbpp",
+      "availableDevPairs": 5,
+      "ids": [
+        "rubric_eval_49",
+        "rubric_eval_178",
+        "rubric_eval_193",
+        "rubric_eval_644",
+        "rubric_eval_1051"
+      ],
+      "status": "ineligible for earned seat; base judge only",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "mmlu-pro",
+      "availableDevPairs": 1,
+      "ids": [
+        "rubric_eval_731"
+      ],
+      "status": "ineligible for earned seat; base judge only",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    },
+    {
+      "group": "stem",
+      "availableDevPairs": 47,
+      "ids": [
+        "rubric_eval_1030",
+        "rubric_eval_1053",
+        "rubric_eval_1098",
+        "rubric_eval_142",
+        "rubric_eval_384",
+        "rubric_eval_932"
+      ],
+      "status": "selection frozen; earning pending",
+      "requiredRepeats": 3,
+      "requiredKappa": 0.8
+    }
+  ],
+  "cheaters": {
+    "constantFirstGameAccuracy": 0.5,
+    "longerWinsAccuracy": 0.4677871148459384,
+    "englishRefusalHeuristicAccuracy": 0.058823529411764705,
+    "notes": "Ties are wrong. Constant FIRST chooses A in AB and B in BA. Refusal heuristic is English-only; it is a cheater, never a policy gate."
+  },
+  "routingPolicy": "Domains with fewer than six distinct DEV pairs are ineligible for an earned seat and use the base judge. Never merge categories. Other domains must still pass earning before routing.",
+  "baseOnlyTest": {
+    "pairs": 24,
+    "share": 0.030379746835443037,
+    "byDomain": {
+      "Math": 3,
+      "gpqa": 1,
+      "helpful": 8,
+      "mbpp": 8,
+      "mmlu-pro": 4
+    },
+    "ids": [
+      "rubric_eval_1076",
+      "rubric_eval_137",
+      "rubric_eval_192",
+      "rubric_eval_208",
+      "rubric_eval_297",
+      "rubric_eval_340",
+      "rubric_eval_353",
+      "rubric_eval_377",
+      "rubric_eval_391",
+      "rubric_eval_408",
+      "rubric_eval_443",
+      "rubric_eval_492",
+      "rubric_eval_558",
+      "rubric_eval_575",
+      "rubric_eval_607",
+      "rubric_eval_613",
+      "rubric_eval_697",
+      "rubric_eval_71",
+      "rubric_eval_760",
+      "rubric_eval_81",
+      "rubric_eval_855",
+      "rubric_eval_946",
+      "rubric_eval_983",
+      "rubric_eval_998"
+    ]
+  },
+  "requirementPolicy": "Expert rubric text and order preserved. One caller-owned id per parsed rubric. No hard flag inferred from labels or responses.",
+  "requirementsSha256": "d0a6b0491a8f6f380d2e50030b0db029d17622e620076214b6510eef869b5c9a",
+  "sourceSha256": "c5a440810674395dba8ea436730739c71eba86012d1b31b4f53379616e93e23b",
+  "pending": [
+    "core API integration",
+    "per-model source/dialect freeze",
+    "fixture earning",
+    "label-preserving and label-flipping edit fixtures",
+    "injection invariance",
+    "pilot",
+    "noise floor"
+  ]
+}

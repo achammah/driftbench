@@ -1,0 +1,50 @@
+{
+  "status": "pool sealed; contestant and dialect freeze pending core PR",
+  "sourceBranch": "origin/codex/rb-judge",
+  "sourceCommit": "8c1d1ca707d6505028a4e0db80c937dd6cfaef71",
+  "disclosure": "previously evaluated split",
+  "pairs": 790,
+  "games": 1580,
+  "testIdsSha256": "3ab430d831873af7285b677cbb161d812b30eef61bb98fbfdf9fcfdce373b54c",
+  "datasetSha256": "dec782e0f5ea603b387d951d8a0f7ef9a4390a8fa30bf693eb91dca8611c00f7",
+  "normalizedTestPayloadSha256": "a7e2c25e9cf5996821a0ac8cfab5d56d478e43e5b3857c4bd1a184a7ae0ab9a1",
+  "previousRecordedIdsSha256": "f44dc397ab063eee43c5a745e5580d6eab7dbaa2f84868796c613e297225ac95",
+  "previouslyRecordedTestPairs": 790,
+  "sampleIdsSha256": "2a7e9604d1753f3188ec4ef6eeef1637c103987c28ebbe5a60e3f375b9589a89",
+  "models": {
+    "haiku": "pending core contract",
+    "gpt-6-luna": "pending core contract and model/price verification",
+    "gemini-3.8-flash": "pending billing; no calls authorized while blocked"
+  },
+  "capUsd": 20,
+  "newModelCalls": 0,
+  "newSpendUsd": 0,
+  "requiredBeforePaid": [
+    "core dossier naming pushed contract PR",
+    "model ids and prices verified",
+    "fixtures and validity plan committed",
+    "source/dialect/reasoning freeze committed",
+    "20-item development pilot per model with projected full spend inside cap",
+    "validity gates pass"
+  ],
+  "sourceHashes": {
+    "rubric-ledger-replay.ts": "d8a8d8b6950410ecfa40054deccadfa40059894a1860edd6277eb0193bd64d9a",
+    "rubric-ledger-plan.ts": "c5a440810674395dba8ea436730739c71eba86012d1b31b4f53379616e93e23b",
+    "rubric-ledger-stats.ts": "2196e3bbb140b9ac2d3e4f9307945117fd92f698719ee3086d5b1d82022120d6",
+    "rubric-atomic.ts": "0009d0ba79ad509898ada626e7e09d8b6734ba4ae615a8c1d8c9ba462ac97ea3",
+    "rubric-items.ts": "b23fcd163c36d9d01e2ddbb669f0b746eca70f22d1cfc7cfcfde744db9aefe6a",
+    "code-evidence.ts": "7552ea80f292ca33c292142910b2556094a19cf44d7d85942a2de98f92bc0929",
+    "contestants.ts": "8526f07c34720791108417e68f7848fcf5f6e7c0d3eaef1ece136b1ff6f3bca0",
+    "data.ts": "0ad8c198e952608eb0c3959c6147d98e07253265b72e196d270ddff57ebfdc00",
+    "run.ts": "f4662875863911762b1194cef70849f7a0439aeef2a72a1e9a5e7a9f22f8f4b5",
+    "call.ts": "807f6842f62616b3d482fbf5536ac84abd5bf0478cbaab564e0a878e890852f0",
+    "json.ts": "c90d969e2b454052187f451c83f1a3f640b720a29a6d71c181a4a81a32d3e395"
+  },
+  "recordingHashes": {
+    "haiku-000.jsonl": "dea06188635cb8fe19700a15b007f6ea5a3f9b251d8928b3188e7a730850520d",
+    "haiku-001.jsonl": "f941f957c9c9261aa11e24b3c539671d54011bfd36ce92015094957041400db6",
+    "haiku-002.jsonl": "38bb3aa6cf68a152152729f10921ae25ae688fd10b1924872bb4fc1b2cbec21d",
+    "haiku-003.jsonl": "17abd2731fab7ff51524d09f90deaf7079800086604c41dbb2eee75d2b963203",
+    "haiku-004.jsonl": "0a2e604f3c56b2d1e3b1ec45a9125572df4946ce2217ab8cc720ab7fdc559bed"
+  }
+}

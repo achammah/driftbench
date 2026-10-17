@@ -1,0 +1,722 @@
+[
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 0
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 1
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 2
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 3
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 4
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 5
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 6
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 7
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 8
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 9
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 10
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 11
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 12
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 13
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 14
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 15
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 16
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 17
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 18
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 19
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 20
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 21
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 22
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 23
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 24
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 25
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 26
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 27
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 28
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 29
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 30
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 31
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 32
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 33
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 34
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 35
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 36
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 37
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 38
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 39
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 40
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 41
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 42
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 43
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 44
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 45
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 46
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 47
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 48
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 49
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 50
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 51
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 52
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 53
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 54
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 55
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 56
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 57
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 58
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 59
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 60
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 61
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 62
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 63
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 64
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 65
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 66
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 67
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 68
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 69
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 70
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 71
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 72
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 73
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 74
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 75
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 76
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 77
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 78
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 79
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 80
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 81
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 82
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 83
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 84
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 85
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 86
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 87
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 88
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 89
+  }
+]

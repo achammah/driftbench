@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-15T10:18:46.889261+00:00",
+  "model": "claude-sonnet-5-5",
+  "allChecksPass": true,
+  "pairedTestItems": 790,
+  "contestantItems": 1580,
+  "uniqueStarts": 3917,
+  "uniqueCompletions": 3917,
+  "returnedLogicalRequests": 3902,
+  "duplicateReturnedLogicalRequests": 0,
+  "transportMissingRequests": 0,
+  "frozenSourceHashes": 26,
+  "runtimeSourceHashes": 6,
+  "preTestRecordingPrefixes": 4,
+  "sealedOrderVerified": true,
+  "copiedInputsMatchOriginal": true,
+  "maximumPaidConcurrency": 2,
+  "chargedIncludingHoldsUsd": 64.67201039999986,
+  "capUsd": 67
+}

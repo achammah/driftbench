@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-15T10:19:16.485800+00:00",
+  "model": "claude-sonnet-5-5",
+  "byContestant": {
+    "pair-ledger": {
+      "knownUsd": 52.98688439999995,
+      "heldUsd": 0.5,
+      "inputTokens": 9297887,
+      "cachedTokens": 1824,
+      "cacheWriteTokens": 14874,
+      "outputTokens": 3429154,
+      "reasoningTokens": 934283,
+      "returnedCalls": 2282
+    },
+    "promptfoo": {
+      "knownUsd": 11.185125999999997,
+      "heldUsd": 0,
+      "inputTokens": 4806954,
+      "cachedTokens": 0,
+      "cacheWriteTokens": 11826,
+      "outputTokens": 149530,
+      "reasoningTokens": 132158,
+      "returnedCalls": 1620
+    }
+  },
+  "pricing": "Native Claude CLI total_cost_usd from each receipt",
+  "source": "Saved native CLI receipt",
+  "holdsAreNotProvenSpend": true
+}

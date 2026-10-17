@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-13T15:13:35.804872+00:00",
+  "model": "gpt-6.1-sol",
+  "capUsd": 50,
+  "authority": "Owner: gate raised to 50 USD including holds; network pause until ten consecutive healthy probes thirty seconds apart, two paid calls at a time, one model cell at a time. Three connection failures pause ten minutes and repeat the gate. Unlimited missing-only no-answer transport retries; never resend a returned answer.",
+  "originalFreezeSha256": "dffe923eba5ab1f4d6e79e64c174a7b2e6b4a2cd59f5e29228ba331c8816c9c9",
+  "hashes": {
+    "examples/judge-benchmarks/src/rubric-ledger-added-network.ts": "d66f54bd472dc92df09040ef29a0ff410519ebd2e0104248d2db5ebb3455baca",
+    "examples/judge-benchmarks/src/rubric-ledger-network-calls.ts": "727dd29732889790f9db9908c432e8bd127e63e8540873ac362bfcfad0bc143c",
+    "examples/judge-benchmarks/src/rubric-ledger-network-health.py": "f6245b6e5089347857fee723fdfdc67d693bff5d68178bcb6aad6ea734d948dc",
+    "examples/judge-benchmarks/src/rubric-ledger-native-blocks.ts": "f93a3efa1e5b0e8de552e762933e6491f6fb824797cc697f080db365a9bcef9f",
+    "examples/judge-benchmarks/src/rubric-ledger-reconcile.ts": "698a9a98e81cd4c25b69459f61b3e7ba9c21d0eb72784bcc1a8dec48779f7a5d"
+  },
+  "promptsInputsSchemasReasoningScoring": "unchanged",
+  "order": "original sealed order and logical request identity unchanged",
+  "price": {
+    "inputUsdPerMillion": 2,
+    "cachedInputUsdPerMillion": 0.1,
+    "cacheWriteUsdPerMillion": 2.5,
+    "outputUsdPerMillion": 10,
+    "receiptField": "usage.input_tokens_details.cache_write_tokens",
+    "source": "https://developers.openai.com/api/docs/pricing"
+  },
+  "runtime": "Responses API, medium reasoning, max_output_tokens 8192 includes reasoning, no temperature, original transport fingerprint retained for replay identity",
+  "originalProjectionUsd": 45.004068,
+  "resultPolicy": "RubricBench TIE-only preregistration retained; no final sealed result while any transport-missing request remains.",
+  "priorAmendmentSha256": "ac722a524bad9a673e3fe7f95c8e8e292565f3784b93646047299134ec5f161e",
+  "metadataClarification": "Report settings replace stale initial pacing, budget, retry and win text with the already-authorized runtime rules. Offline native-block reconciliation skips every row without a native block. Paid requests and their order are unchanged."
+}

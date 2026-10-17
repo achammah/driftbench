@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-13T13:17:06.098403+00:00",
+  "model": "claude-haiku-5-5",
+  "completedContestantItems": 1120,
+  "targetContestantItems": 1580,
+  "sampleItems": 40,
+  "meanElapsedMs": 17501.225,
+  "workers": 4,
+  "remainingMinutes": 33.54401458333333,
+  "caveat": "Projection assumes recent average job duration, four workers, and no further fallback or transport delay."
+}

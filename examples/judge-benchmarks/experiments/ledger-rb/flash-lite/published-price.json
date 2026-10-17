@@ -1,0 +1,21 @@
+{
+  "readAt": "2026-10-13T12:21:01.362629+00:00",
+  "source": "https://ai.google.dev/gemini-api/docs/pricing",
+  "section": "Gemini 3.5 Flash-Lite, Standard paid tier",
+  "model": "gemini-3.5-flash-lite",
+  "currency": "USD",
+  "perMillionInputTokens": 0.3,
+  "perMillionOutputIncludingThinkingTokens": 2.5,
+  "cachedInputPrice": 0.03,
+  "billingPolicy": "Conservative uncached input, no cache creation; output includes thoughtsTokenCount",
+  "reasoningSource": "https://ai.google.dev/gemini-api/docs/generate-content/whats-new-gemini-3.6",
+  "requestedReasoning": "medium",
+  "publishedDefault": "minimal",
+  "publishedMediumSupport": true,
+  "runtimeAppliedStatus": "Pending first sealed pilot request",
+  "ownerStatedQuota": {
+    "perDay": 150000,
+    "perMinute": 4000,
+    "provenance": "Owner verified API call, not independently checked account quota"
+  }
+}

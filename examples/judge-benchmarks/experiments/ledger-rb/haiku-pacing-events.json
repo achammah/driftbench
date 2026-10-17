@@ -1,0 +1,10 @@
+[
+  {
+    "event": "haiku-pacing-reduced",
+    "at": "2026-10-13T11:56:59.949Z",
+    "limit": 2,
+    "reason": "host one-minute load exceeds 60",
+    "loadOneMinute": 65.81298828125,
+    "recentTransportFailures": 0
+  }
+]

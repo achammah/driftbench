@@ -1,0 +1,77 @@
+{
+  "at": "2026-10-13T10:47:45.598870+00:00",
+  "rows": [
+    {
+      "key": "a6ab6e3c5641ec7c9a421e0d1744d3632dbb1bc4e31c5dc44b6511fd21c53b90",
+      "item": "rubric_eval_223",
+      "contestant": "pair-ledger",
+      "ordinal": 1,
+      "chars": 0,
+      "finishReason": "length",
+      "completionTokens": 8192,
+      "reasoningTokens": 8192
+    },
+    {
+      "key": "a7cf71210fd3240af09b100eea97ffa3007d30f1565e519508d30befbed7f694",
+      "item": "rubric_eval_1016",
+      "contestant": "pair-ledger",
+      "ordinal": 0,
+      "chars": 0,
+      "finishReason": "length",
+      "completionTokens": 8192,
+      "reasoningTokens": 8192
+    },
+    {
+      "key": "b4c081d5c81239b59473dd127d7373002e35cc54a5ecfbbdb87186a7b7cfa860",
+      "item": "rubric_eval_212",
+      "contestant": "pair-ledger",
+      "ordinal": 1,
+      "chars": 0,
+      "finishReason": "length",
+      "completionTokens": 8192,
+      "reasoningTokens": 8192
+    },
+    {
+      "key": "5b03c6da5abf3d56c9e290262a76f612e55b003350ca9270b647f54adf8129df",
+      "item": "rubric_eval_29",
+      "contestant": "pair-ledger",
+      "ordinal": 0,
+      "chars": 0,
+      "finishReason": "length",
+      "completionTokens": 8192,
+      "reasoningTokens": 8192
+    },
+    {
+      "key": "9a26ec248ca1c427b516835f672b209572c999782780698cd2493b8c3483a71c",
+      "item": "rubric_eval_549",
+      "contestant": "pair-ledger",
+      "ordinal": 1,
+      "chars": 0,
+      "finishReason": "length",
+      "completionTokens": 8192,
+      "reasoningTokens": 8192
+    },
+    {
+      "key": "26103d67a766fd0a8a9c80be95d80d2f9e0b91fbdf96c5e159b6f4ab62727f10",
+      "item": "rubric_eval_98",
+      "contestant": "pair-ledger",
+      "ordinal": 0,
+      "chars": 0,
+      "finishReason": "length",
+      "completionTokens": 8192,
+      "reasoningTokens": 8192
+    },
+    {
+      "key": "d870d1581171a1d3596929f4e1f021e636395fea50903040bf0c6adbba4ef4eb",
+      "item": "rubric_eval_834",
+      "contestant": "pair-ledger",
+      "ordinal": 2,
+      "chars": 0,
+      "finishReason": "length",
+      "completionTokens": 8192,
+      "reasoningTokens": 8192
+    }
+  ],
+  "requestLimit": 8192,
+  "rule": "Returned completions are retained and never retried; token-limit endings are not provider content blocks."
+}

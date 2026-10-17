@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-13T15:19:15.200872+00:00",
+  "pilotPairsPerContestant": 20,
+  "answeredCalls": 81,
+  "thirdReads": 1,
+  "thirdRate": 0.05,
+  "meanRequestUsd": {
+    "pair-ledger": 0.012765868292682926,
+    "promptfoo": 0.0037105625000000003
+  },
+  "answeredPilotUsd": 0.6718231,
+  "retainedPilotHoldsUsd": 0.25,
+  "projectedFullCellUsd": 34.95878317195122,
+  "capUsd": 50,
+  "timingSample": "Successful requests after ten healthy probes, before fixture stage",
+  "meanRequestSeconds": {
+    "pair-ledger": 20.225631578947368,
+    "promptfoo": 3.557526315789474
+  },
+  "projectedTestHoursAtConcurrency2": 5.330041933479532,
+  "method": "Measured request means and observed third-read rate; fixed full-cell request counts include pre-TEST. Holds counted once; no-answer HTTP 503 is not a judge error. Latency projection excludes future outages and health-gate waits."
+}

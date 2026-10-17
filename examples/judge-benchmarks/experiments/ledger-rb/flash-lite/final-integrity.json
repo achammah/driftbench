@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-13T12:57:35.693064+00:00",
+  "allChecksPass": true,
+  "coverage": {
+    "matchedPairs": 790,
+    "target": 790,
+    "complete": true
+  },
+  "cellIsolationVerified": true,
+  "frozenSourcesVerified": 23,
+  "originalRecordingPrefixesVerified": 8,
+  "uniqueCalls": 3942,
+  "duplicateReturnedLogicalRequests": 0,
+  "testOrderVerified": true,
+  "chargedUsd": 11.157452500000002,
+  "capUsd": 12,
+  "reasoningApplied": "medium"
+}

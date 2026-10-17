@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-13T14:30:02.832483+00:00",
+  "capUsd": 50,
+  "authority": "Owner raises GPT-6.1 cap to USD 50 including holds; pauses every paid call; resume only after 10 healthy provider probes spaced 30 seconds apart, paid concurrency 2, one model cell at a time. Three consecutive connection failures pause 10 minutes and repeat the gate. Retry no-answer transports missing-only without limit. Never resend an answered call. No final sealed result with transport-missing items.",
+  "projectedUsd": 45.004068,
+  "cacheWritesUsdPerMillion": 2.5,
+  "priceBasis": "OpenAI pricing page and input_tokens_details.cache_write_tokens on raw receipts"
+}

@@ -1,0 +1,64 @@
+{
+  "at": "2026-10-13T16:02:34.607803+00:00",
+  "paidSettingsChanged": false,
+  "ownerAuthority": "Existing full Sol cell authorization under USD 50 including holds, with network gate, two calls and one cell at a time",
+  "statePath": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-rb/.cache/ledger-rb/supervisor-state.json",
+  "target": "Sol then Sonnet, pre-TEST validity, sealed TEST, final reports and verified pushes",
+  "flow": [
+    "wait for current pre-TEST report",
+    "verify all validity and no-answer gates",
+    "seal and commit TEST before first TEST call",
+    "one missing-only sealed TEST pass",
+    "offline report, integrity, token-loss and content checks",
+    "dossier and cost ledger",
+    "commit, push, verify remote SHA"
+  ],
+  "offlineAuditClarification": "Token losses require token-limit evidence; provider blocks alone do not count. Saved request comparisons cover each new cell. Sol report carries the subsequent Sonnet approval.",
+  "updatedAt": "2026-10-13T18:48:38.857221+00:00",
+  "priorRegistration": {
+    "at": "2026-10-13T16:02:34.607803+00:00",
+    "paidSettingsChanged": false,
+    "ownerAuthority": "Existing full Sol cell authorization under USD 50 including holds, with network gate, two calls and one cell at a time",
+    "driverPid": 38372,
+    "statePath": ".cache/ledger-rb/sol-finish-driver.json",
+    "target": "named driver self-terminates on final push or any failed gate",
+    "flow": [
+      "wait for current pre-TEST report",
+      "verify all validity and no-answer gates",
+      "seal and commit TEST before first TEST call",
+      "one missing-only sealed TEST pass",
+      "offline report, integrity, token-loss and content checks",
+      "dossier and cost ledger",
+      "commit, push, verify remote SHA"
+    ],
+    "scripts": {
+      ".cache/ledger-rb/finish-sol.py": "a9cc4bd6df619c6f19554f43f412c833530787878df400f325c8911bc532a39e",
+      ".cache/ledger-rb/verify-sol-final.py": "abb9f1372695151fb111419ba39ed6eaa2f30f1b8ad23270ed0cd311b12805cd",
+      ".cache/ledger-rb/write-sol-final.py": "d0f280980918e8fb6d1f686cd722bace45bbe2d5dd0178c8200e7d4396cb7d22",
+      ".cache/ledger-rb/audit-token-loss.py": "4c868aa3d9758330c1e2229d8c1bffdb7e4576defe8980655b0ecf9f79d57de0",
+      ".cache/ledger-rb/audit-cell-blocks.py": "4db46ceae8f6de19a644cc49b93035fb4d9ecd605d51e477ea24c44e52cc97c3"
+    },
+    "offlineAuditClarification": "Token losses require token-limit evidence; provider blocks alone do not count. Saved request comparisons cover each new cell. Sol report carries the subsequent Sonnet approval.",
+    "updatedAt": "2026-10-13T16:26:17.492271+00:00"
+  },
+  "status": "detached supervisor active",
+  "stop": "Final verified pushes only; outages, session limits and failed gates wait without exiting",
+  "logPath": "/Users/assem/Documents/GitHub/driftbench/.worktrees/ledger-rb/.cache/ledger-rb/supervisor.log",
+  "scriptHashes": {
+    "examples/judge-benchmarks/src/rubric-ledger-supervisor.py": "bba0114d82d74d10675c4bdd7a4c65db5ad45f3e67cf5ff51c3a531e2a3d64cc",
+    "examples/judge-benchmarks/src/rubric-ledger-sonnet-network-completion.ts": "aa084ee686963754534d6df48bda6321b7a59703ad26d4ae670b220fadc1a98e",
+    ".cache/ledger-rb/scan-recordings.mjs": "de2a69c39e91b874b547fc1b8755e542321aacf27cfbb73da66e57364f2242db",
+    ".cache/ledger-rb/audit-token-loss.py": "4c868aa3d9758330c1e2229d8c1bffdb7e4576defe8980655b0ecf9f79d57de0",
+    ".cache/ledger-rb/audit-cell-blocks.py": "4db46ceae8f6de19a644cc49b93035fb4d9ecd605d51e477ea24c44e52cc97c3",
+    ".cache/ledger-rb/verify-sol-final.py": "abb9f1372695151fb111419ba39ed6eaa2f30f1b8ad23270ed0cd311b12805cd",
+    ".cache/ledger-rb/write-sol-final.py": "86ec83303673b3d48ab324f9e8fa93f916afe50b1d36509783dceddc8583dab0",
+    ".cache/ledger-rb/verify-sonnet-final.py": "c21750941bf291acdaad006762724c988f4e495f3e9d58b5bd3ad681858acc05",
+    ".cache/ledger-rb/write-sonnet-final.py": "88d7cd21358ddf5d2bc3ef2134144fdf92113ab94358871ebac69640934f7c27"
+  },
+  "capUsd": 50,
+  "paidConcurrency": 2,
+  "supervisorPid": 9836,
+  "supervisorPpid": 1,
+  "supervisorPgid": 9836,
+  "runtimeCommit": "13fc5aa0827ee9f53791eaf8b32fe79d0810b9dd"
+}

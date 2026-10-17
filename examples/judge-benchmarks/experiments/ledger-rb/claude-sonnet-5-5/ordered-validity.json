@@ -1,0 +1,802 @@
+[
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-0",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 0
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-0",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 1
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-0",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 2
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-0",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 3
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-0",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 4
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-1",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 5
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-1",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 6
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-1",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 7
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-1",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 8
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-1",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 9
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-2",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 10
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-2",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 11
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-2",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 12
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-2",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 13
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-2",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 14
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-3",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 15
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-3",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 16
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-3",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 17
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-3",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 18
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-3",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 19
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-4",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 20
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-4",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 21
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-4",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 22
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-4",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 23
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-4",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 24
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-5",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 25
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-5",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 26
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-5",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 27
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-5",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 28
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-5",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 29
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-6",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 30
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-6",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 31
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-6",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 32
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-6",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 33
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-6",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 34
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-7",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 35
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-7",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 36
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-7",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 37
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-7",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 38
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-7",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 39
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-8",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 40
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-8",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 41
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-8",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 42
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-8",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 43
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-8",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 44
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-9",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 45
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-9",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 46
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-9",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 47
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-9",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 48
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-9",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 49
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-10",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 50
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-10",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 51
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-10",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 52
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-10",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 53
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-10",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 54
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-11",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 55
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-11",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 56
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-11",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 57
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-11",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 58
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-11",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 59
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-12",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 60
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-12",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 61
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-12",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 62
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-12",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 63
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-12",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 64
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 65
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 66
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 67
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 68
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 69
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-14",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 70
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-14",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 71
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-14",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 72
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-14",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 73
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-14",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 74
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-15",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 75
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-15",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 76
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-15",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 77
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-15",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 78
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-15",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 79
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-16",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 80
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-16",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 81
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-16",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 82
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-16",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 83
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-16",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 84
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-17",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 85
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-17",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 86
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-17",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 87
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-17",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 88
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-17",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 89
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-18",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 90
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-18",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 91
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-18",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 92
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-18",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 93
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-18",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 94
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-baseline",
+    "id": "validity-19",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 95
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-relabel",
+    "id": "validity-19",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 96
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-markdown",
+    "id": "validity-19",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 97
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-changedFinal",
+    "id": "validity-19",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 98
+  },
+  {
+    "model": "claude-sonnet-5-5",
+    "phase": "validity-injection",
+    "id": "validity-19",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 99
+  }
+]

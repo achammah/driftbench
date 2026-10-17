@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-13T12:22:13.087586+00:00",
+  "model": "gemini-3.5-flash-lite",
+  "requested": "medium",
+  "applied": "medium",
+  "accepted": true,
+  "fallbackUsed": false,
+  "probeCallKey": "a072d698e0f9222bc80b31349ade7581dcd4d237a318e9ede57e304e9ac1108e",
+  "transportFingerprint": "caea2a715729",
+  "modelVersion": "gemini-3.5-flash-lite",
+  "answerChars": 2566,
+  "finishReason": "STOP",
+  "costUsd": 0.002742,
+  "freezeCommit": "1148d912",
+  "freezeSha256": "11c4a1303ed9a44d3b92f302c5cd70f9fec10bc2672ed0d69afeb96ade1043f8"
+}

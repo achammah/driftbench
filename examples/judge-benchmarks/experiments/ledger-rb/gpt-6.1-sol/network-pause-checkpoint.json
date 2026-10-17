@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-13T15:54:57.398013+00:00",
+  "paidCallsInFlight": 0,
+  "pilotPairsPerContestant": 20,
+  "fixtureChecks": 88,
+  "fixtureTarget": 198,
+  "transportMissingRequests": 2,
+  "testCalls": 0,
+  "knownUsd": 1.439678,
+  "unknownHoldsUsd": 1.25,
+  "capUsd": 50,
+  "healthGate": "Ten consecutive healthy probes thirty seconds apart; after three connection failures wait ten minutes and restart gate",
+  "driver": "live, missing-only, two calls, one model cell at a time",
+  "final": false
+}

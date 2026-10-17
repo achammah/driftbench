@@ -1,0 +1,4 @@
+{"at":"2026-10-14T15:23:25.072Z","model":"claude-sonnet-5-5","reason":"three consecutive connection failures","waitSeconds":600,"next":"ten healthy probes, thirty seconds apart"}
+{"at":"2026-10-14T19:29:33.352Z","model":"claude-sonnet-5-5","reason":"three consecutive connection failures","waitSeconds":600,"next":"ten healthy probes, thirty seconds apart"}
+{"at":"2026-10-14T20:38:22.749Z","model":"claude-sonnet-5-5","reason":"three consecutive connection failures","waitSeconds":600,"next":"ten healthy probes, thirty seconds apart"}
+{"at":"2026-10-14T22:38:28.154Z","model":"claude-sonnet-5-5","reason":"three consecutive connection failures","waitSeconds":600,"next":"ten healthy probes, thirty seconds apart"}

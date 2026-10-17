@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-13T10:21:42.239514+00:00",
+  "authorization": "The owner topped up Gemini. Resume Gemini missing-only: one probe call first; if it answers, continue at 2 calls at a time with the 429 waits and the 402 circuit break. Never re-send an answered call.",
+  "billingResumeEpoch": 1,
+  "probe": "Exactly one new provider call on the next missing sealed Gemini TEST request. Reuse that answer in the resumed full run.",
+  "concurrencyAfterProbe": {
+    "claude-haiku-5-5": 2,
+    "gpt-6-luna": 8,
+    "gemini-3.8-flash": 2
+  },
+  "capUsd": 45,
+  "freezeSha256": "88db5dd0e26de3b0efde6cdb7a8bb07d91cac03e13d78e19b9aed5223440b0bb",
+  "unchanged": [
+    "item set",
+    "global record order",
+    "within-model dispatch order",
+    "judge contract",
+    "prompts",
+    "schema",
+    "reasoning",
+    "block headline policy"
+  ],
+  "alreadyAnsweredProbe": "rubric_eval_1008 promptfoo both orders returned 0 and 1 before TEST; reuse only",
+  "probeResult": {
+    "at": "2026-10-13T10:22:35.558927+00:00",
+    "key": "d6b2545c911c9077787c8513a63efac2e92862e9aead2a4fb6cc1b0a15ee3853",
+    "item": "rubric_eval_14",
+    "contestant": "pair-ledger",
+    "ordinal": 0,
+    "status": "answered",
+    "answerChars": 1480,
+    "costUsd": 0.0042345,
+    "newCalls": 1,
+    "unfinishedCalls": 0
+  },
+  "concurrent402Guard": {
+    "at": "2026-10-13T10:25:51.100370+00:00",
+    "freezeSha256": "9601c09292ae8f46c42472bdc63e1d6d9dc54acc4e06536838aa928f5a142610",
+    "rule": "A returned 402 opens a provider-wide circuit before a sibling can submit another order. Already in-flight answers remain recorded. No prompt or scoring change.",
+    "tests": "20 focused tests and TypeScript pass"
+  },
+  "freshRequestEpochGuard": {
+    "at": "2026-10-13T10:56:12.162968+00:00",
+    "freezeSha256": "d0714380904bdf7a9e4be51a50e810918469925ba4d86a177d0109ad2d9515ce",
+    "rule": "New requests start in the current billing epoch. A new 402 cannot consume the same top-up authorization after a restart. Previously answered requests keep their recorded epoch and replay.",
+    "tests": "21 focused tests and TypeScript pass; no duplicate returned logical requests among 6439 returned requests audited"
+  }
+}

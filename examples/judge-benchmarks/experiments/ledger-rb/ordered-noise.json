@@ -1,0 +1,2162 @@
+[
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 0
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 1
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 2
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 3
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 4
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 5
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 6
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 7
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_1008",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 8
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 9
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 10
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 11
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 12
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 13
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 14
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 15
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 16
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_109",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 17
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 18
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 19
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 20
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 21
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 22
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 23
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 24
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 25
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_1143",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 26
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 27
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 28
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 29
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 30
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 31
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 32
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 33
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 34
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_13",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 35
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 36
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 37
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 38
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 39
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 40
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 41
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 42
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 43
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_199",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 44
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 45
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 46
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 47
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 48
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 49
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 50
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 51
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 52
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_244",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 53
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 54
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 55
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 56
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 57
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 58
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 59
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 60
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 61
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_263",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 62
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 63
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 64
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 65
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 66
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 67
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 68
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 69
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 70
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_279",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 71
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 72
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 73
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 74
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 75
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 76
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 77
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 78
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 79
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_376",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 80
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 81
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 82
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 83
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 84
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 85
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 86
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 87
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 88
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_382",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 89
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 90
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 91
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 92
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 93
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 94
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 95
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 96
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 97
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_43",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 98
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 99
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 100
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 101
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 102
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 103
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 104
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 105
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 106
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_432",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 107
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 108
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 109
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 110
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 111
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 112
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 113
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 114
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 115
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_436",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 116
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 117
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 118
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 119
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 120
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 121
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 122
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 123
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 124
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_453",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 125
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 126
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 127
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 128
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 129
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 130
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 131
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 132
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 133
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_46",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 134
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 135
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 136
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 137
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 138
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 139
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 140
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 141
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 142
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_557",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 143
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 144
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 145
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 146
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 147
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 148
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 149
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 150
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 151
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_569",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 152
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 153
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 154
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 155
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 156
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 157
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 158
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 159
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 160
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_594",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 161
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 162
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 163
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 164
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 165
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 166
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 167
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 168
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 169
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_616",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 170
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 171
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 172
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 173
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 174
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 175
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 176
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 177
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 178
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_676",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 179
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 180
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 181
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 182
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 183
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 184
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 185
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 186
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 187
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_699",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 188
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 189
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 190
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 191
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 192
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 193
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 194
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 195
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 196
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_711",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 197
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 198
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 199
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 200
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 201
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 202
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 203
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 204
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 205
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_744",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 206
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 207
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 208
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 209
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 210
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 211
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 212
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 213
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 214
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_754",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 215
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 216
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 217
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 218
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 219
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 220
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 221
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 222
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 223
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_776",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 224
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 225
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 226
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 227
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 228
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 229
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 230
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 231
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 232
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_801",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 233
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 234
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 235
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 236
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 237
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 238
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 239
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 240
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 241
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_836",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 242
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 243
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 244
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 245
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 246
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 247
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 248
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 249
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 250
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_852",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 251
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 252
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 253
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 254
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 255
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 256
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 257
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 258
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 259
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_933",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 260
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 261
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 262
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 0,
+    "recordIndex": 263
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 264
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 265
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 1,
+    "recordIndex": 266
+  },
+  {
+    "model": "claude-haiku-5-5",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 267
+  },
+  {
+    "model": "gpt-6-luna",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 268
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "noise",
+    "id": "rubric_eval_973",
+    "contestant": "pair-ledger",
+    "sample": 2,
+    "recordIndex": 269
+  }
+]

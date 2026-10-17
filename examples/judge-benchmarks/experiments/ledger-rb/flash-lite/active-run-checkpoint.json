@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-13T12:43:40.436726+00:00",
+  "sourceCommit": "388a78f9",
+  "testSealCommit": "8bb113e4",
+  "sessionId": 92929,
+  "log": ".cache/ledger-rb/lite-test-12.log",
+  "capUsd": 12,
+  "model": "gemini-3.5-flash-lite",
+  "reasoning": "medium",
+  "callsAtMost": 8,
+  "watcherSession": 60908,
+  "watcherStop": "TEST end or failure; no model calls",
+  "gemini38Resume": "disarmed, explicit owner word only",
+  "status": "complete",
+  "completedAt": "2026-10-13T12:57:15.649Z",
+  "coverage": {
+    "matchedPairs": 790,
+    "target": 790,
+    "complete": true
+  },
+  "chargedUsd": 11.157452500000002,
+  "spendIncrementLoggedUsd": 9.075610700000002
+}

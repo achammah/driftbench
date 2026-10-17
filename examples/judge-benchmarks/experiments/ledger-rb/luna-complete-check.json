@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-13T10:41:29.032Z",
+  "model": "gpt-6-luna",
+  "pairs": 790,
+  "stats": {
+    "pairs": 790,
+    "games": 1580,
+    "wins": 100,
+    "losses": 88,
+    "bothRight": 1200,
+    "bothWrong": 192,
+    "ours": {
+      "correct": 1300,
+      "estimate": 0.8227848101265823,
+      "lower": 0.803180095519584,
+      "upper": 0.8408237562039829
+    },
+    "peer": {
+      "correct": 1288,
+      "estimate": 0.8151898734177215,
+      "lower": 0.7952946806980002,
+      "upper": 0.833556139220306
+    },
+    "difference": 0.007594936708860759,
+    "differencePairBootstrap95": [
+      -0.013924050632911392,
+      0.02911392405063291
+    ],
+    "gameMcNemarP": 0.42247890957584255,
+    "gamePBonferroni18UpperBound": 1,
+    "holmP": null,
+    "holmStatus": "pending complete 18-cell matrix; Bonferroni value is a bound, not Holm",
+    "pairSensitivity": {
+      "wins": 71,
+      "losses": 60,
+      "p": 0.38235432135613023
+    },
+    "power": {
+      "units": 1580,
+      "discordant": 188,
+      "discordanceShare": 0.1189873417721519,
+      "winShare": 0.5319148936170213,
+      "alpha": 0.002777777777777778,
+      "targetPower": 0.8,
+      "neededDiscordant": 3603,
+      "neededUnits": 30281
+    },
+    "pairSensitivityPower": {
+      "units": 790,
+      "discordant": 131,
+      "discordanceShare": 0.16582278481012658,
+      "winShare": 0.5419847328244275,
+      "alpha": 0.002777777777777778,
+      "targetPower": 0.8,
+      "neededDiscordant": 2081,
+      "neededUnits": 12550
+    },
+    "caveat": "Game Wilson and McNemar treat orders as independent. Canonical games share one judgment. Pair bootstrap and pair sign sensitivity retain dependence."
+  },
+  "costs": {
+    "pair-ledger": {
+      "uniqueCalls": 1646,
+      "usd": 1.454136600000002,
+      "providerBlocks": 0,
+      "unparsedOrError": 7
+    },
+    "promptfoo": {
+      "uniqueCalls": 1580,
+      "usd": 0.33869720000000036,
+      "providerBlocks": 0,
+      "unparsedOrError": 0
+    }
+  }
+}

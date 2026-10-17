@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-13T15:22:37.222656+00:00",
+  "pricePerMillion": {
+    "input": 2,
+    "cachedInput": 0.1,
+    "cacheWrite": 2.5,
+    "output": 10
+  },
+  "source": "https://developers.openai.com/api/docs/pricing",
+  "receiptFields": [
+    "usage.input_tokens_details.cache_write_tokens",
+    "usage.input_tokens_details.cached_tokens",
+    "usage.output_tokens"
+  ],
+  "byContestant": {
+    "pair-ledger": {
+      "inputTokens": 90025,
+      "plainInputTokens": 3887,
+      "cachedInputTokens": 4041,
+      "cacheWriteTokens": 82097,
+      "outputTokens": 30998,
+      "reasoningTokens": 6994,
+      "receiptPricedUsd": 0.5234006,
+      "unknownHoldsUsd": 0.25
+    },
+    "promptfoo": {
+      "inputTokens": 58047,
+      "plainInputTokens": 10590,
+      "cachedInputTokens": 0,
+      "cacheWriteTokens": 47457,
+      "outputTokens": 860,
+      "reasoningTokens": 626,
+      "receiptPricedUsd": 0.1484225,
+      "unknownHoldsUsd": 0
+    },
+    "seat": {
+      "inputTokens": 36237,
+      "plainInputTokens": 72,
+      "cachedInputTokens": 25167,
+      "cacheWriteTokens": 10998,
+      "outputTokens": 16680,
+      "reasoningTokens": 4144,
+      "receiptPricedUsd": 0.1969557,
+      "unknownHoldsUsd": 0
+    }
+  },
+  "provisional": true
+}

@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-15T10:18:16.318124+00:00",
+  "model": "claude-sonnet-5-5",
+  "matchedContestantItems": 1580,
+  "lostItemsByContestant": {
+    "pair-ledger": 0,
+    "promptfoo": 0
+  },
+  "itemsWith65536TokenDefect": 0,
+  "rows": [],
+  "policy": "Returned token-limited answers remain scored errors and are not retried. Explicit token-limit finish reasons or at least 8192 output/thinking tokens identify a token loss. A provider block alone is not a token-limit loss. This audit uses raw saved responses only."
+}

@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-13T12:11:39.603434+00:00",
+  "authority": "Owner: return to 4 workers when one-minute load stays below 40 for ten minutes with no transport failure; fallback at load >60 or two transport failures in ten minutes. Gemini 3.8 resumes only on owner word, finish other models first.",
+  "changes": [
+    "Persist Haiku dispatch limit across restart and reset only recovery clock",
+    "Return from 2 to 4 after continuous low load and no recent transport failure",
+    "Automatic Gemini 3.8 reset resume disarmed"
+  ],
+  "unchanged": [
+    "sealed item and contestant order",
+    "returned answers",
+    "judge contract",
+    "cap USD 45"
+  ],
+  "tests": "6 focused pacing/quota tests"
+}

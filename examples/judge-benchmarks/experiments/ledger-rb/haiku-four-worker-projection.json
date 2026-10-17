@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-13T11:53:18.443864+00:00",
+  "completedContestantItems": 702,
+  "targetContestantItems": 1580,
+  "workers": 4,
+  "sampleJobs": 40,
+  "meanElapsedMs": 18617.675,
+  "projectedRemainingHours": 1.135161017361111,
+  "caveat": "Projection assumes unchanged host throughput and no fallback or further transport delays."
+}

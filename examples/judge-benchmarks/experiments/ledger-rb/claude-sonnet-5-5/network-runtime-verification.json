@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-13T16:36:11.242599+00:00",
+  "typecheck": "pass",
+  "focusedTestFiles": 3,
+  "focusedTestsPassed": 7,
+  "mutation": "Removing the zero-output guard fails the generated-answer preservation test; restored code passes all three classification tests.",
+  "logs": {
+    ".cache/ledger-rb/sonnet60-focused-tests.log": "2e3eb98489ac497f9c8ca4098d6cd9c37e5888837da8f7f21579161874a98e97",
+    ".cache/ledger-rb/sonnet60-mutation.log": "6b8c17a4f49eaf2c74e690d7be99fe4acd57ead9f11bd99fbd3b942ab474f7f4",
+    ".cache/ledger-rb/sonnet60-restored-tests.log": "52bcec4136f814f2fd8906c3dc437020eaae771129978a3a557f80aae3bf7065",
+    ".cache/ledger-rb/sonnet60-typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "paidBeforeSolGuard": "Direct invocation stops before paid calls and does not alter the journals.",
+  "existingSonnetCalls": 10,
+  "existingSonnetTestCalls": 0
+}

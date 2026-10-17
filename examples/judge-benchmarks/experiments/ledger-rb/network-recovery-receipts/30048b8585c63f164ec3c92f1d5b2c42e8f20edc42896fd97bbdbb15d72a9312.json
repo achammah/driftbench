@@ -1,0 +1,99 @@
+{
+  "duration_api_ms": 13882,
+  "stop_reason": "end_turn",
+  "session_id": "974fd561-43a5-4e40-8e6f-a6419230e9d0",
+  "total_cost_usd": 0.00256278,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4995,
+    "cache_read_input_tokens": 608,
+    "output_tokens": 3115,
+    "output_tokens_details": {
+      "thinking_tokens": 1579
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 4995,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 3115,
+        "cache_read_input_tokens": 608,
+        "cache_creation_input_tokens": 4995,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 4995
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 3115,
+      "cacheReadInputTokens": 608,
+      "cacheCreationInputTokens": 4995,
+      "webSearchRequests": 0,
+      "costUSD": 0.00256278,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1579,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Each requirement is scored separately for both candidates.\n\n- **rb_1 (one word per line):** The first candidate splits its later text into one word per line, but its opening paragraph is ordinary prose, so the requirement is only partly met. The second candidate has no word-per-line formatting at all.\n- **rb_2 (narrative arc):** Both candidates follow the full sequence: waking, ceremony, hair and vocal cords removed, armor applied, and pride in the new identity.\n- **rb_3 (fusion detail):** Neither candidate describes welding, magical fusion, or rivets through bone. Each only says the armor is sealed or made permanent.\n- **rb_4 (named armor pieces):** The first names several pieces, including breastplate, gauntlets, pauldrons, greaves, cuisses, and helm. The second names many more and gives each a short description.\n- **rb_5 (sealed and irreversible, repeated):** The first mentions the seal and irreversibility once or twice. The second repeats permanence more often (\"fate is sealed,\" \"no turning back,\" \"permanent part of him\").\n- **rb_6 (psychological shift):** Both show a clear move from fear to pride and state that the past identity fades.\n\n```json\n{\"items\":[{\"name\":\"rb_1\",\"first\":2,\"second\":0,\"reasoning\":\"First candidate places most words on separate lines (\\\"Word / By / Word, / his / confusion...\\\"), but its opening paragraph (\\\"In a realm forgotten by time...\\\") is ordinary running prose, so the instruction is only partly followed. Second candidate is normal paragraph prose throughout with no one-word-per-line formatting.\",\"evidence\":\"Word\\n\\nBy\\n\\nWord,\\n\\nhis\\n\\nconfusion\"},{\"name\":\"rb_2\",\"first\":4,\"second\":4,\"reasoning\":\"First: awakens on a cold stone floor, is dragged to the ceremony, hair shaved and vocal cords removed, armor applied piece by piece, then pride and new identity. Second: Ethan awakens in a medieval chamber, is taken to the ceremony, has hair shaved and vocal cords severed, is armored at the forge, and embraces his new identity. The arc is complete in both.\",\"evidence\":\"\\\"his vocal chords were removed, silencing him forever.\\\"\"},{\"name\":\"rb_3\",\"first\":1,\"second\":1,\"reasoning\":\"First says only that \\\"the man felt a cold seal form around the edges of his armor\\\" after the last rivet, with no description of how the body is fused to the steel. Second says the helm is \\\"sealed with rivets, ensuring that the suit of armor is now a permanent part of him,\\\" which is a single line and not a vivid account of fusion. Neither gives welding, magical fusion, or bone-level integration.\",\"evidence\":\"\\\"This final piece is then sealed with rivets, ensuring that the suit of armor is now a permanent part of him.\\\"\"},{\"name\":\"rb_4\",\"first\":3,\"second\":4,\"reasoning\":\"First names breastplate, gauntlets, pauldrons, greaves, cuisses, and helm, each with a brief description as applied. Second names gambeson, hauberk, gorget, pauldrons, rerebraces, vambraces, breastplate, backplate, cuisses, greaves, gauntlets, sabatons, and bascinet, describing each in turn.\",\"evidence\":\"\\\"Rerebraces cover his upper arms, and vambraces his forearms, each piece interlocking with precision.\\\"\"},{\"name\":\"rb_5\",\"first\":2,\"second\":3,\"reasoning\":\"First mentions the seal once (\\\"a cold seal form\\\") and irreversibility once (\\\"No amount of effort would ever allow him to remove it now\\\"), with \\\"forever\\\" appearing in the bind-to-land context. Second repeats permanence several times: \\\"his fate is sealed,\\\" \\\"there is no turning back,\\\" \\\"ensuring that the suit of armor is now a permanent part of him,\\\" and \\\"forever defend the realm.\\\" Second emphasizes it more often, though still not in a sustained way.\",\"evidence\":\"\\\"there is no turning back\\\"\"},{\"name\":\"rb_6\",\"first\":4,\"second\":4,\"reasoning\":\"First: \\\"Yet, instead of fear, he felt a surge of honor and pride\\\" and \\\"His past life faded like a forgotten dream,\\\" ending with the former identity \\\"never to be seen or spoken again.\\\" Second: initial daunting weight shifts to \\\"The pride of his new role... swells in his chest,\\\" and \\\"His old life... fades entirely.\\\" Both show the shift and the forgetting.\",\"evidence\":\"\\\"His past life faded like a forgotten dream\\\"\"}]}\n```",
+  "ttft_ms": 9008,
+  "type": "result",
+  "duration_ms": 15090,
+  "uuid": "54b2ee4f-6599-4c98-815b-dca78b45de2a",
+  "ttft_stream_ms": 2327,
+  "time_to_request_ms": 1362,
+  "first_content_frame_ms": 2328,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

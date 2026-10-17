@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-13T15:46:35.225178+00:00",
+  "provider": "openai",
+  "model": "gpt-6.1-sol",
+  "url": "https://api.openai.com/v1/models/gpt-6.1-sol",
+  "status": null,
+  "connectionError": "URLError: <urlopen error [Errno 8] nodename nor servname provided, or not known>",
+  "healthy": false,
+  "consecutiveHealthy": 0,
+  "consecutiveConnectionFailures": 3,
+  "durationSeconds": 0.0013102080556564033,
+  "paid": false,
+  "probeKind": "Authenticated model metadata",
+  "ready": false,
+  "paidConcurrency": 2
+}

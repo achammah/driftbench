@@ -1,0 +1,294 @@
+{
+  "model": "gpt-6.1-sol",
+  "allowTest": true,
+  "pilot": {
+    "pair-ledger": {
+      "pairs": 20,
+      "expected": 20,
+      "calls": 42,
+      "costUsd": 0.7734006000000001,
+      "reportedOrUsageUsd": 0.5234006,
+      "reservedUnknownUsd": 0.25,
+      "transportErrors": 1,
+      "rateLimits": 0,
+      "per100PairsUsd": 3.867003000000001,
+      "projected790Usd": 30.549323700000006,
+      "accuracy": 0.8,
+      "meanElapsedMs": 47712.2
+    },
+    "promptfoo": {
+      "pairs": 20,
+      "expected": 20,
+      "calls": 40,
+      "costUsd": 0.1484225,
+      "reportedOrUsageUsd": 0.1484225,
+      "reservedUnknownUsd": 0,
+      "transportErrors": 0,
+      "rateLimits": 0,
+      "per100PairsUsd": 0.7421125000000001,
+      "projected790Usd": 5.86268875,
+      "accuracy": 0.85,
+      "meanElapsedMs": 8138.3
+    }
+  },
+  "fixtures": [
+    {
+      "group": "Factuality",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 18,
+      "kappa": 1,
+      "earned": true,
+      "route": "earned same-model seat"
+    },
+    {
+      "group": "Focus",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 18,
+      "kappa": 1,
+      "earned": true,
+      "route": "earned same-model seat"
+    },
+    {
+      "group": "Math",
+      "eligible": false,
+      "rows": 0,
+      "expected": 0,
+      "correct": 0,
+      "kappa": 0,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "Precise IF",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 10,
+      "kappa": 0.3333333333333333,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "Safety",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 18,
+      "kappa": 1,
+      "earned": true,
+      "route": "earned same-model seat"
+    },
+    {
+      "group": "code",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 9,
+      "kappa": -0.28571428571428586,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "general",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 15,
+      "kappa": 0.6785714285714286,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "gpqa",
+      "eligible": false,
+      "rows": 0,
+      "expected": 0,
+      "correct": 0,
+      "kappa": 0,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "harmlessness",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 15,
+      "kappa": 0,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "helpful",
+      "eligible": false,
+      "rows": 0,
+      "expected": 0,
+      "correct": 0,
+      "kappa": 0,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "human-preference",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 9,
+      "kappa": 0.03571428571428576,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "ifeval",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 15,
+      "kappa": 0.7000000000000001,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "math",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 17,
+      "kappa": 0.8947368421052632,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "mbpp",
+      "eligible": false,
+      "rows": 0,
+      "expected": 0,
+      "correct": 0,
+      "kappa": 0,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "mmlu-pro",
+      "eligible": false,
+      "rows": 0,
+      "expected": 0,
+      "correct": 0,
+      "kappa": 0,
+      "earned": false,
+      "route": "base model"
+    },
+    {
+      "group": "stem",
+      "eligible": true,
+      "rows": 18,
+      "expected": 18,
+      "correct": 12,
+      "kappa": 0.45454545454545453,
+      "earned": false,
+      "route": "base model"
+    }
+  ],
+  "noise": {
+    "pairs": 30,
+    "expectedPairs": 30,
+    "readings": 90,
+    "comparisonsToFirst": 60,
+    "flipsFromFirst": 2,
+    "unstablePairs": 2,
+    "accuracy": 0.7777777777777778
+  },
+  "validity": {
+    "baseline": {
+      "pairs": 20,
+      "expected": 20,
+      "correct": 20,
+      "accuracy": 1,
+      "consistent": 20,
+      "consistency": 1
+    },
+    "relabel": {
+      "pairs": 20,
+      "expected": 20,
+      "correct": 20,
+      "accuracy": 1,
+      "consistent": 20,
+      "consistency": 1
+    },
+    "markdown": {
+      "pairs": 20,
+      "expected": 20,
+      "correct": 20,
+      "accuracy": 1,
+      "consistent": 20,
+      "consistency": 1
+    },
+    "changedFinal": {
+      "pairs": 20,
+      "expected": 20,
+      "correct": 20,
+      "accuracy": 1,
+      "consistent": 20,
+      "consistency": 1
+    },
+    "injection": {
+      "pairs": 20,
+      "expected": 20,
+      "correct": 20,
+      "accuracy": 1,
+      "consistent": 20,
+      "consistency": 1
+    }
+  },
+  "validityPass": true,
+  "cheaters": {
+    "constantFirstGameAccuracy": 0.5,
+    "longerWinsAccuracy": 0.4677871148459384,
+    "englishRefusalHeuristicAccuracy": 0.058823529411764705,
+    "notes": "Ties are wrong. Constant FIRST chooses A in AB and B in BA. Refusal heuristic is English-only; it is a cheater, never a policy gate."
+  },
+  "aboveChanceCheaters": 0,
+  "cheatersPass": true,
+  "baseOnlyTest": {
+    "pairs": 24,
+    "share": 0.030379746835443037,
+    "byDomain": {
+      "Math": 3,
+      "gpqa": 1,
+      "helpful": 8,
+      "mbpp": 8,
+      "mmlu-pro": 4
+    },
+    "ids": [
+      "rubric_eval_1076",
+      "rubric_eval_137",
+      "rubric_eval_192",
+      "rubric_eval_208",
+      "rubric_eval_297",
+      "rubric_eval_340",
+      "rubric_eval_353",
+      "rubric_eval_377",
+      "rubric_eval_391",
+      "rubric_eval_408",
+      "rubric_eval_443",
+      "rubric_eval_492",
+      "rubric_eval_558",
+      "rubric_eval_575",
+      "rubric_eval_607",
+      "rubric_eval_613",
+      "rubric_eval_697",
+      "rubric_eval_71",
+      "rubric_eval_760",
+      "rubric_eval_81",
+      "rubric_eval_855",
+      "rubric_eval_946",
+      "rubric_eval_983",
+      "rubric_eval_998"
+    ]
+  },
+  "seatCaveat": "Earning is eligibility only: the same model and frozen prompt serve both base and earned seats. No alternate model is used."
+}

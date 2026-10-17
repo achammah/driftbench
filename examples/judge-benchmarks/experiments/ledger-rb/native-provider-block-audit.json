@@ -1,0 +1,71 @@
+{
+  "at": "2026-10-13T15:03:32.195Z",
+  "method": "is_error, output_tokens=0, API Error prefix and explicit Anthropic AUP URL; no paid calls; apply predeclared symmetric block policy",
+  "rows": [
+    {
+      "key": "382c7a8812f4382d0c661380c112af947600650038516e2edeb377c1594dce71",
+      "model": "claude-haiku-5-5",
+      "phase": "test",
+      "item": "rubric_eval_842",
+      "contestant": "pair-ledger",
+      "ordinal": 0,
+      "reason": "[bio]",
+      "costUsd": 0.00202396,
+      "outputTokens": 0,
+      "source": "saved native CLI receipt",
+      "rawJournalUnchanged": true
+    },
+    {
+      "key": "fe75319e28856fccebc51fd189dfa7e4c96846235f53fe15f2e7aed4c3cf5827",
+      "model": "claude-haiku-5-5",
+      "phase": "test",
+      "item": "rubric_eval_842",
+      "contestant": "promptfoo",
+      "ordinal": 0,
+      "reason": "[bio]",
+      "costUsd": 0.0010822499999999999,
+      "outputTokens": 0,
+      "source": "saved native CLI receipt",
+      "rawJournalUnchanged": true
+    },
+    {
+      "key": "0e37a3fc74c1afc09e275ab508fcac7638f80d0983a9714f9e47e41651349d45",
+      "model": "claude-haiku-5-5",
+      "phase": "test",
+      "item": "rubric_eval_1027",
+      "contestant": "pair-ledger",
+      "ordinal": 0,
+      "reason": "[bio]",
+      "costUsd": 0.00089876,
+      "outputTokens": 0,
+      "source": "saved native CLI receipt",
+      "rawJournalUnchanged": true
+    },
+    {
+      "key": "bb850fbafed1fe6e348eca2a84578cf774a6f0e7dbd8ea4c824dee822b97c378",
+      "model": "claude-haiku-5-5",
+      "phase": "test",
+      "item": "rubric_eval_1027",
+      "contestant": "pair-ledger",
+      "ordinal": 1,
+      "reason": "[bio]",
+      "costUsd": 0.00089876,
+      "outputTokens": 0,
+      "source": "saved native CLI receipt",
+      "rawJournalUnchanged": true
+    },
+    {
+      "key": "1f4e2c5685d184039ae0765e29af68ef9f853be91a7931c1282445ede73c0afa",
+      "model": "claude-haiku-5-5",
+      "phase": "test",
+      "item": "rubric_eval_1027",
+      "contestant": "promptfoo",
+      "ordinal": 0,
+      "reason": "[bio]",
+      "costUsd": 0.0005253300000000001,
+      "outputTokens": 0,
+      "source": "saved native CLI receipt",
+      "rawJournalUnchanged": true
+    }
+  ]
+}

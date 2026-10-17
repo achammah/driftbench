@@ -1,0 +1,4 @@
+{"event": "haiku-pacing-reduced", "at": "2026-10-13T11:56:59.949Z", "limit": 2, "reason": "Restore observed pacing at graceful restart", "loadOneMinute": 65.81298828125, "recentTransportFailures": 0}
+{"event":"haiku-pacing-restored","at":"2026-10-13T12:56:19.750Z","limit":4,"reason":"load below 40 for ten minutes with no transport failure","loadOneMinute":21.369140625,"recentTransportFailures":0}
+{"event":"haiku-pacing-reduced","at":"2026-10-13T13:06:43.692Z","limit":2,"reason":"two Haiku transport failures within ten minutes","loadOneMinute":11.7119140625,"recentTransportFailures":3}
+{"event":"haiku-pacing-restored","at":"2026-10-13T13:16:43.733Z","limit":4,"reason":"load below 40 for ten minutes with no transport failure","loadOneMinute":23.57958984375,"recentTransportFailures":0}

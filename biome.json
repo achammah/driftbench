@@ -38,6 +38,7 @@
       "!examples/judgebench-fresh/freeze.json",
       "!examples/judgebench-fresh/judge-freeze.json",
       "!docs/comparison/benchmarks/*-all-peers.json",
+      "!examples/judge-benchmarks/experiments/ledger-rb",
       "!examples/ledger-verify/evidence",
       "!examples/ledger-verify/lite",
       "!examples/ledger-verify/receipts",

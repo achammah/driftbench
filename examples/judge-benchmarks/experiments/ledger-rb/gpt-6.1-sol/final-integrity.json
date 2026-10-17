@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-14T14:32:50.354743+00:00",
+  "model": "gpt-6.1-sol",
+  "allChecksPass": true,
+  "pairedTestItems": 790,
+  "contestantItems": 1580,
+  "uniqueStarts": 3919,
+  "uniqueCompletions": 3919,
+  "returnedLogicalRequests": 3911,
+  "duplicateReturnedLogicalRequests": 0,
+  "transportMissingRequests": 0,
+  "frozenSourceHashes": 26,
+  "runtimeSourceHashes": 5,
+  "preTestRecordingPrefixes": 5,
+  "sealedOrderVerified": true,
+  "copiedInputsMatchOriginal": true,
+  "maximumPaidConcurrency": 2,
+  "chargedIncludingHoldsUsd": 34.21737510000009,
+  "capUsd": 50
+}

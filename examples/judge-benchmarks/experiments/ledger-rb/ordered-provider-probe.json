@@ -1,0 +1,10 @@
+[
+  {
+    "model": "gemini-3.8-flash",
+    "phase": "provider-probe",
+    "id": "rubric_eval_1008",
+    "contestant": "promptfoo",
+    "sample": 0,
+    "recordIndex": 0
+  }
+]

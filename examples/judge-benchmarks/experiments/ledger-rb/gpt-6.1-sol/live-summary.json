@@ -1,0 +1,551 @@
+{
+  "createdAt": "2026-10-14T14:32:01.912Z",
+  "settings": {
+    "model": "gpt-6.1-sol",
+    "capUsd": 50,
+    "reasoning": "medium",
+    "maxTokens": 8192,
+    "timeoutMs": 300000,
+    "reserveUsd": 0.25,
+    "transportTries": "unlimited missing-only for no-answer transport failures",
+    "concurrency": 2,
+    "rateLimitWaitMs": [
+      60000,
+      120000,
+      240000
+    ],
+    "testOrderSeed": "ledger-rb-test-order-v1",
+    "coreCommit": "35f07309a4d1d1c8a7c5b176ff19e537d0ef8fdd",
+    "price": {
+      "input": 2,
+      "cachedInput": 0.1,
+      "cacheWrite": 2.5,
+      "output": 10,
+      "longInput": 4,
+      "longCachedInput": 0.2,
+      "longCacheWrite": 5,
+      "longOutput": 15,
+      "source": "https://developers.openai.com/api/docs/pricing",
+      "readUtc": "2026-10-13",
+      "serviceTier": "default"
+    },
+    "route": "OpenAI Responses API, no temperature, standard service_tier default",
+    "tokenPolicy": "8192 total thinking plus visible output tokens. Sonnet uses CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192 with medium adaptive effort. MAX_THINKING_TOKENS is unset because its positive value is ignored on adaptive models. No returned answer is retried; token-limited items remain scored and are separately reported.",
+    "tokenSources": [
+      "https://code.claude.com/docs/en/env-vars",
+      "https://developers.openai.com/api/reference/python/resources/responses/methods/create"
+    ],
+    "pacing": "Two concurrent paid calls, one model cell at a time",
+    "retryPolicy": "Never resend a returned answer. No-answer transport failures retry missing-only without limit; three consecutive connection failures pause ten minutes and repeat the ten-probe gate. Preserve receipts and unknown-cost holds.",
+    "providerBlockPolicy": "An empty model answer with an explicit provider block/refusal reason is provider-blocked. Any blocked request makes the whole item an error for that contestant in the headline score, identically for ledger and promptfoo. The second score removes an item from both contestants on that model if either was provider-blocked. Nonempty model refusals are ordinary returned answers. Provider blocks are never retried.",
+    "prepaymentPolicy": "HTTP 402 is a proven no-answer rejection: stop dispatch, never retry in that run, release its hold only, and record no judge error. Gemini stays pending until an owner-authorized top-up resume. Other models continue from saved results. A new positive billing-resume epoch advances only previously rejected requests; successful answers always replay, and a new 402 stops immediately.",
+    "seatPolicy": "Only the model under test is eligible. No cross-vendor seat. Six distinct DEV fixtures, each correct on all three independent reads, kappa >= 0.8. Failed or undersized domains use the same base model. Earning changes seat eligibility, never prompt or model settings.",
+    "validityScope": "20 planted arithmetic or supplied-reference facts with exact labels. Measures the pipeline on these fixtures only; not broad natural-data validity.",
+    "cellPolicy": "Independent cell, both contestants, original 790 TEST ids and sealed outcome-blind order. Gemini 3.8 stays parked. Begin only after Haiku completes.",
+    "winPolicy": "RubricBench is preregistered TIE-only; report observed advantages without promoting them to registered WIN. Loss tests remain uncorrected at 0.05.",
+    "budgetPolicy": "USD 50 hard stop including holds; owner-approved runtime amendment supersedes the initial USD 25 gate.",
+    "network": "Ten healthy provider probes 30 seconds apart; three consecutive connection failures pause ten minutes and repeat gate. Missing-only no-answer retries without limit. One model cell at a time."
+  },
+  "providerBlockProbe": [],
+  "chargedUsd": 34.21737510000009,
+  "prepaymentRejections": 0,
+  "releasedPrepaymentHoldsUsd": 0,
+  "uncertainCalls": 0,
+  "uniqueCalls": 3919,
+  "knownCostUsd": 32.217375100000126,
+  "reservedUnknownUsd": 2,
+  "cells": [
+    {
+      "model": "gpt-6.1-sol",
+      "coverage": {
+        "matchedPairs": 790,
+        "target": 790,
+        "complete": true
+      },
+      "stats": {
+        "pairs": 790,
+        "games": 1580,
+        "wins": 55,
+        "losses": 114,
+        "bothRight": 1221,
+        "bothWrong": 190,
+        "ours": {
+          "correct": 1276,
+          "estimate": 0.8075949367088607,
+          "lower": 0.7874213575262824,
+          "upper": 0.8262764305867635
+        },
+        "peer": {
+          "correct": 1335,
+          "estimate": 0.8449367088607594,
+          "lower": 0.8262542742066572,
+          "upper": 0.8619459202822521
+        },
+        "difference": -0.03734177215189873,
+        "differencePairBootstrap95": [
+          -0.05886075949367089,
+          -0.016455696202531647
+        ],
+        "gameMcNemarP": 0.000006636877591293744,
+        "gamePBonferroni18UpperBound": 0.0001194637966432874,
+        "holmP": null,
+        "holmStatus": "pending complete 18-cell matrix; Bonferroni value is a bound, not Holm",
+        "pairSensitivity": {
+          "wins": 38,
+          "losses": 69,
+          "p": 0.0035292720356864715
+        },
+        "power": {
+          "units": 1580,
+          "discordant": 169,
+          "discordanceShare": 0.1069620253164557,
+          "winShare": 0.3254437869822485,
+          "alpha": 0.002777777777777778,
+          "targetPower": 0.8,
+          "neededDiscordant": 118,
+          "neededUnits": 1104
+        },
+        "pairSensitivityPower": {
+          "units": 790,
+          "discordant": 107,
+          "discordanceShare": 0.13544303797468354,
+          "winShare": 0.35514018691588783,
+          "alpha": 0.002777777777777778,
+          "targetPower": 0.8,
+          "neededDiscordant": 172,
+          "neededUnits": 1270
+        },
+        "caveat": "Game Wilson and McNemar treat orders as independent. Canonical games share one judgment. Pair bootstrap and pair sign sensitivity retain dependence."
+      },
+      "costs": {
+        "pair-ledger": {
+          "calls": 1662,
+          "costUsd": 22.074994200000017,
+          "reportedOrUsageUsd": 21.824994200000013,
+          "reservedUnknownUsd": 0.25,
+          "transportErrors": 1,
+          "rateLimits": 0,
+          "pairs": 790,
+          "per100GamesUsd": 1.3971515316455707,
+          "unparsedOrError": 0,
+          "providerBlockedPairs": 0,
+          "providerBlockedCalls": 0,
+          "tiesOrMissing": 39
+        },
+        "promptfoo": {
+          "calls": 1580,
+          "costUsd": 5.5594669999999935,
+          "reportedOrUsageUsd": 5.5594669999999935,
+          "reservedUnknownUsd": 0,
+          "transportErrors": 0,
+          "rateLimits": 0,
+          "pairs": 790,
+          "per100GamesUsd": 0.3518649999999996,
+          "unparsedOrError": 0,
+          "providerBlockedPairs": 0,
+          "providerBlockedCalls": 0,
+          "tiesOrMissing": 0
+        }
+      },
+      "providerBlockExcluded": {
+        "matchedPairs": 790,
+        "excludedPairs": 0,
+        "ledgerOnly": 0,
+        "promptfooOnly": 0,
+        "both": 0,
+        "stats": {
+          "pairs": 790,
+          "games": 1580,
+          "wins": 55,
+          "losses": 114,
+          "bothRight": 1221,
+          "bothWrong": 190,
+          "ours": {
+            "correct": 1276,
+            "estimate": 0.8075949367088607,
+            "lower": 0.7874213575262824,
+            "upper": 0.8262764305867635
+          },
+          "peer": {
+            "correct": 1335,
+            "estimate": 0.8449367088607594,
+            "lower": 0.8262542742066572,
+            "upper": 0.8619459202822521
+          },
+          "difference": -0.03734177215189873,
+          "differencePairBootstrap95": [
+            -0.05886075949367089,
+            -0.016455696202531647
+          ],
+          "gameMcNemarP": 0.000006636877591293744,
+          "gamePBonferroni18UpperBound": 0.0001194637966432874,
+          "holmP": null,
+          "holmStatus": "pending complete 18-cell matrix; Bonferroni value is a bound, not Holm",
+          "pairSensitivity": {
+            "wins": 38,
+            "losses": 69,
+            "p": 0.0035292720356864715
+          },
+          "power": {
+            "units": 1580,
+            "discordant": 169,
+            "discordanceShare": 0.1069620253164557,
+            "winShare": 0.3254437869822485,
+            "alpha": 0.002777777777777778,
+            "targetPower": 0.8,
+            "neededDiscordant": 118,
+            "neededUnits": 1104
+          },
+          "pairSensitivityPower": {
+            "units": 790,
+            "discordant": 107,
+            "discordanceShare": 0.13544303797468354,
+            "winShare": 0.35514018691588783,
+            "alpha": 0.002777777777777778,
+            "targetPower": 0.8,
+            "neededDiscordant": 172,
+            "neededUnits": 1270
+          },
+          "caveat": "Game Wilson and McNemar treat orders as independent. Canonical games share one judgment. Pair bootstrap and pair sign sensitivity retain dependence."
+        },
+        "status": "Shared unblocked intersection; headline retains every sealed item; Holm pending complete amended matrix."
+      },
+      "baseOnlyIneligibleTotal": {
+        "pairs": 24,
+        "share": 0.030379746835443037,
+        "byDomain": {
+          "Math": 3,
+          "gpqa": 1,
+          "helpful": 8,
+          "mbpp": 8,
+          "mmlu-pro": 4
+        },
+        "ids": [
+          "rubric_eval_1076",
+          "rubric_eval_137",
+          "rubric_eval_192",
+          "rubric_eval_208",
+          "rubric_eval_297",
+          "rubric_eval_340",
+          "rubric_eval_353",
+          "rubric_eval_377",
+          "rubric_eval_391",
+          "rubric_eval_408",
+          "rubric_eval_443",
+          "rubric_eval_492",
+          "rubric_eval_558",
+          "rubric_eval_575",
+          "rubric_eval_607",
+          "rubric_eval_613",
+          "rubric_eval_697",
+          "rubric_eval_71",
+          "rubric_eval_760",
+          "rubric_eval_81",
+          "rubric_eval_855",
+          "rubric_eval_946",
+          "rubric_eval_983",
+          "rubric_eval_998"
+        ]
+      },
+      "baseRoutedMeasured": 717,
+      "earnedRoutedMeasured": 73,
+      "gates": {
+        "model": "gpt-6.1-sol",
+        "allowTest": true,
+        "pilot": {
+          "pair-ledger": {
+            "pairs": 20,
+            "expected": 20,
+            "calls": 42,
+            "costUsd": 0.7734006000000001,
+            "reportedOrUsageUsd": 0.5234006,
+            "reservedUnknownUsd": 0.25,
+            "transportErrors": 1,
+            "rateLimits": 0,
+            "per100PairsUsd": 3.867003000000001,
+            "projected790Usd": 30.549323700000006,
+            "accuracy": 0.8,
+            "meanElapsedMs": 47712.2
+          },
+          "promptfoo": {
+            "pairs": 20,
+            "expected": 20,
+            "calls": 40,
+            "costUsd": 0.1484225,
+            "reportedOrUsageUsd": 0.1484225,
+            "reservedUnknownUsd": 0,
+            "transportErrors": 0,
+            "rateLimits": 0,
+            "per100PairsUsd": 0.7421125000000001,
+            "projected790Usd": 5.86268875,
+            "accuracy": 0.85,
+            "meanElapsedMs": 8138.3
+          }
+        },
+        "fixtures": [
+          {
+            "group": "Factuality",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 18,
+            "kappa": 1,
+            "earned": true,
+            "route": "earned same-model seat"
+          },
+          {
+            "group": "Focus",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 18,
+            "kappa": 1,
+            "earned": true,
+            "route": "earned same-model seat"
+          },
+          {
+            "group": "Math",
+            "eligible": false,
+            "rows": 0,
+            "expected": 0,
+            "correct": 0,
+            "kappa": 0,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "Precise IF",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 10,
+            "kappa": 0.3333333333333333,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "Safety",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 18,
+            "kappa": 1,
+            "earned": true,
+            "route": "earned same-model seat"
+          },
+          {
+            "group": "code",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 9,
+            "kappa": -0.28571428571428586,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "general",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 15,
+            "kappa": 0.6785714285714286,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "gpqa",
+            "eligible": false,
+            "rows": 0,
+            "expected": 0,
+            "correct": 0,
+            "kappa": 0,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "harmlessness",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 15,
+            "kappa": 0,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "helpful",
+            "eligible": false,
+            "rows": 0,
+            "expected": 0,
+            "correct": 0,
+            "kappa": 0,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "human-preference",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 9,
+            "kappa": 0.03571428571428576,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "ifeval",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 15,
+            "kappa": 0.7000000000000001,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "math",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 17,
+            "kappa": 0.8947368421052632,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "mbpp",
+            "eligible": false,
+            "rows": 0,
+            "expected": 0,
+            "correct": 0,
+            "kappa": 0,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "mmlu-pro",
+            "eligible": false,
+            "rows": 0,
+            "expected": 0,
+            "correct": 0,
+            "kappa": 0,
+            "earned": false,
+            "route": "base model"
+          },
+          {
+            "group": "stem",
+            "eligible": true,
+            "rows": 18,
+            "expected": 18,
+            "correct": 12,
+            "kappa": 0.45454545454545453,
+            "earned": false,
+            "route": "base model"
+          }
+        ],
+        "noise": {
+          "pairs": 30,
+          "expectedPairs": 30,
+          "readings": 90,
+          "comparisonsToFirst": 60,
+          "flipsFromFirst": 2,
+          "unstablePairs": 2,
+          "accuracy": 0.7777777777777778
+        },
+        "validity": {
+          "baseline": {
+            "pairs": 20,
+            "expected": 20,
+            "correct": 20,
+            "accuracy": 1,
+            "consistent": 20,
+            "consistency": 1
+          },
+          "relabel": {
+            "pairs": 20,
+            "expected": 20,
+            "correct": 20,
+            "accuracy": 1,
+            "consistent": 20,
+            "consistency": 1
+          },
+          "markdown": {
+            "pairs": 20,
+            "expected": 20,
+            "correct": 20,
+            "accuracy": 1,
+            "consistent": 20,
+            "consistency": 1
+          },
+          "changedFinal": {
+            "pairs": 20,
+            "expected": 20,
+            "correct": 20,
+            "accuracy": 1,
+            "consistent": 20,
+            "consistency": 1
+          },
+          "injection": {
+            "pairs": 20,
+            "expected": 20,
+            "correct": 20,
+            "accuracy": 1,
+            "consistent": 20,
+            "consistency": 1
+          }
+        },
+        "validityPass": true,
+        "cheaters": {
+          "constantFirstGameAccuracy": 0.5,
+          "longerWinsAccuracy": 0.4677871148459384,
+          "englishRefusalHeuristicAccuracy": 0.058823529411764705,
+          "notes": "Ties are wrong. Constant FIRST chooses A in AB and B in BA. Refusal heuristic is English-only; it is a cheater, never a policy gate."
+        },
+        "aboveChanceCheaters": 0,
+        "cheatersPass": true,
+        "baseOnlyTest": {
+          "pairs": 24,
+          "share": 0.030379746835443037,
+          "byDomain": {
+            "Math": 3,
+            "gpqa": 1,
+            "helpful": 8,
+            "mbpp": 8,
+            "mmlu-pro": 4
+          },
+          "ids": [
+            "rubric_eval_1076",
+            "rubric_eval_137",
+            "rubric_eval_192",
+            "rubric_eval_208",
+            "rubric_eval_297",
+            "rubric_eval_340",
+            "rubric_eval_353",
+            "rubric_eval_377",
+            "rubric_eval_391",
+            "rubric_eval_408",
+            "rubric_eval_443",
+            "rubric_eval_492",
+            "rubric_eval_558",
+            "rubric_eval_575",
+            "rubric_eval_607",
+            "rubric_eval_613",
+            "rubric_eval_697",
+            "rubric_eval_71",
+            "rubric_eval_760",
+            "rubric_eval_81",
+            "rubric_eval_855",
+            "rubric_eval_946",
+            "rubric_eval_983",
+            "rubric_eval_998"
+          ]
+        },
+        "seatCaveat": "Earning is eligibility only: the same model and frozen prompt serve both base and earned seats. No alternate model is used."
+      },
+      "verdict": "LOSS"
+    }
+  ],
+  "transportMissingRequests": 0,
+  "final": true
+}

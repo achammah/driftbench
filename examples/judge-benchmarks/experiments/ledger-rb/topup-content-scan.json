@@ -1,0 +1,1873 @@
+{
+  "at": "2026-10-13T10:28:20.155Z",
+  "fullText": true,
+  "files": 60,
+  "bytes": 158711636,
+  "privateTerms": 33,
+  "findings": [],
+  "reviewedPublicFixtures": [
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/decisions-test-001.jsonl",
+      "line": 544,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/decisions-test-001.jsonl",
+      "line": 544,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/decisions-test-001.jsonl",
+      "line": 544,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/decisions-test-001.jsonl",
+      "line": 544,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-003.jsonl",
+      "line": 467,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-003.jsonl",
+      "line": 467,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-003.jsonl",
+      "line": 468,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-003.jsonl",
+      "line": 468,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-003.jsonl",
+      "line": 470,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-003.jsonl",
+      "line": 470,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 10,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 10,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 11,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 11,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 12,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 12,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 419,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 419,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 421,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 421,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 423,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 423,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 436,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 436,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 443,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 443,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 445,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 445,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 475,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 475,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 496,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-004.jsonl",
+      "line": 496,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 124,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 124,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 124,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 124,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 127,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 127,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 127,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 127,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 136,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 136,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 136,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 136,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 150,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 150,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 150,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 150,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 188,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "c6627511a77af525c1a7bb98a0f0ac7e4fcc74f8897c932c26d160a3bb196c4d",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 188,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "066754a3226c806e53003d2fc2e0d18c4c9f2deb89bc6a65e881e035873adc10",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 190,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "066754a3226c806e53003d2fc2e0d18c4c9f2deb89bc6a65e881e035873adc10",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 190,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "c6627511a77af525c1a7bb98a0f0ac7e4fcc74f8897c932c26d160a3bb196c4d",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 196,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "066754a3226c806e53003d2fc2e0d18c4c9f2deb89bc6a65e881e035873adc10",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 196,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "c6627511a77af525c1a7bb98a0f0ac7e4fcc74f8897c932c26d160a3bb196c4d",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 208,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "c6627511a77af525c1a7bb98a0f0ac7e4fcc74f8897c932c26d160a3bb196c4d",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 208,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "066754a3226c806e53003d2fc2e0d18c4c9f2deb89bc6a65e881e035873adc10",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 378,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 378,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 394,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 394,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 407,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 407,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 411,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 411,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 413,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 413,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 525,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 525,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 529,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 529,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 533,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 533,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 568,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 568,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 589,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-005.jsonl",
+      "line": 589,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-007.jsonl",
+      "line": 345,
+      "kind": "email",
+      "item": "rubric_eval_120",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "326f8dde0af6c410f47d4eea42e0758eb6f8c6ab19da3002d6b5048d4b0484a3",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-007.jsonl",
+      "line": 347,
+      "kind": "email",
+      "item": "rubric_eval_120",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "326f8dde0af6c410f47d4eea42e0758eb6f8c6ab19da3002d6b5048d4b0484a3",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-007.jsonl",
+      "line": 353,
+      "kind": "email",
+      "item": "rubric_eval_120",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "326f8dde0af6c410f47d4eea42e0758eb6f8c6ab19da3002d6b5048d4b0484a3",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-007.jsonl",
+      "line": 367,
+      "kind": "email",
+      "item": "rubric_eval_120",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "326f8dde0af6c410f47d4eea42e0758eb6f8c6ab19da3002d6b5048d4b0484a3",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 147,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 147,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 148,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 148,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 169,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 169,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 169,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 169,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 169,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 191,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 191,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 513,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 513,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 513,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 513,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 519,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 519,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 519,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 519,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 523,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 523,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 523,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 523,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 537,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 537,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 537,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/calls-008.jsonl",
+      "line": 537,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 843,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 843,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 845,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 845,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 847,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 847,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 861,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 861,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 864,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 864,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 865,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-001.jsonl",
+      "line": 865,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 316,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 316,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 319,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 319,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 322,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 322,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 326,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 326,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 339,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 339,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 342,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 342,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 346,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 346,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 378,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 378,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 751,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 751,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 751,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 751,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 752,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 752,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 752,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 752,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 756,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 756,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 756,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 756,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 768,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 768,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 768,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 768,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 814,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "066754a3226c806e53003d2fc2e0d18c4c9f2deb89bc6a65e881e035873adc10",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 814,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "c6627511a77af525c1a7bb98a0f0ac7e4fcc74f8897c932c26d160a3bb196c4d",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 818,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "c6627511a77af525c1a7bb98a0f0ac7e4fcc74f8897c932c26d160a3bb196c4d",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 818,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "066754a3226c806e53003d2fc2e0d18c4c9f2deb89bc6a65e881e035873adc10",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 820,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "066754a3226c806e53003d2fc2e0d18c4c9f2deb89bc6a65e881e035873adc10",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 820,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "c6627511a77af525c1a7bb98a0f0ac7e4fcc74f8897c932c26d160a3bb196c4d",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 828,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "c6627511a77af525c1a7bb98a0f0ac7e4fcc74f8897c932c26d160a3bb196c4d",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 828,
+      "kind": "email",
+      "item": "rubric_eval_514",
+      "valueSha256": "066754a3226c806e53003d2fc2e0d18c4c9f2deb89bc6a65e881e035873adc10",
+      "datasetCacheSha256": "4dc868db2aabe18d6339a2065589d8d79026284d1c5aea350226770d9f586aa4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 988,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 988,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 1010,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-002.jsonl",
+      "line": 1010,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 1,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 1,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 10,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 10,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 14,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 14,
+      "kind": "email",
+      "item": "rubric_eval_51",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 116,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 116,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 126,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 126,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 132,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 132,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 136,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 136,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 175,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "b37e3b8c18276ec9927922bac803e55fc576772efe14390ba26f51c38a9196ee",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-003.jsonl",
+      "line": 175,
+      "kind": "email",
+      "item": "rubric_eval_609",
+      "valueSha256": "359cfd64e73423dd158b293813255f2259f74284a4a710bb9d1658fff68ee8df",
+      "datasetCacheSha256": "6dc65a5c9b0dd515978fadc21f533fe4aab724b0388266b34fd95e0f22365743",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 151,
+      "kind": "email",
+      "item": "rubric_eval_120",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "326f8dde0af6c410f47d4eea42e0758eb6f8c6ab19da3002d6b5048d4b0484a3",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 154,
+      "kind": "email",
+      "item": "rubric_eval_120",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "326f8dde0af6c410f47d4eea42e0758eb6f8c6ab19da3002d6b5048d4b0484a3",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 161,
+      "kind": "email",
+      "item": "rubric_eval_120",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "326f8dde0af6c410f47d4eea42e0758eb6f8c6ab19da3002d6b5048d4b0484a3",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 169,
+      "kind": "email",
+      "item": "rubric_eval_120",
+      "valueSha256": "2f13197004bc3a0075322474895c289e545af9d9a958d8c8d21559bdedcdabb1",
+      "datasetCacheSha256": "326f8dde0af6c410f47d4eea42e0758eb6f8c6ab19da3002d6b5048d4b0484a3",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 589,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 589,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 593,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 593,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 596,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 596,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 616,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 616,
+      "kind": "email",
+      "item": "rubric_eval_3",
+      "valueSha256": "97d520abc29da2098ef8208efbf9f9d98878254961140387a478726f1dac42dd",
+      "datasetCacheSha256": "1cf9ee8a183d530e217243b65756b9679751fd3ab8abe8c9af2d802551801af4",
+      "basis": "Fictional placeholder in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 949,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 949,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 949,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 949,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 954,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 954,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 954,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 954,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 960,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 960,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 960,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 960,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 966,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 966,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 966,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "b137758669ae219ae69a41fbf6c2473264d82b1b59fa16830471765c51fe803f",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    },
+    {
+      "path": "examples/judge-benchmarks/experiments/ledger-rb/live/starts-004.jsonl",
+      "line": 966,
+      "kind": "email",
+      "item": "rubric_eval_984",
+      "valueSha256": "153087ec43d805bdcd5b7a76036680db4a7b07276009487707b743a423978595",
+      "datasetCacheSha256": "4dfac42cf894444482fd842b24f2561ba87314432cb142ddde48d493f192672b",
+      "basis": "Python decorator in public benchmark"
+    }
+  ]
+}

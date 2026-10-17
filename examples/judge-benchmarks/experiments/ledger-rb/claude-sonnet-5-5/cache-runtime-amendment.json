@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-13T14:24:02.918104+00:00",
+  "authority": "Owner: set DISABLE_PROMPT_CACHING=1 for both contestants, run five more next unanswered non-TEST calls, project again. If <= USD 45, complete under a USD 45 hard stop including holds; otherwise park before TEST as owner budget decision. GPT-6.1 retains USD 25 gate.",
+  "kind": "runtime caching and conditional budget amendment",
+  "environment": {
+    "DISABLE_PROMPT_CACHING": "1"
+  },
+  "appliesTo": "both contestants, new calls only",
+  "runnerSha256": "e68cac290d3c36246e8b38c283880239e2b70e04404433b6ca247205527432ad",
+  "frozenJudgeUnchanged": true,
+  "originalFreezeSha256": "8b71d19cab9e6ce3d1e5d45d8413a33ee14617d42ee9aac6b9a92a9fa9acc6c6",
+  "originalReturnedCalls": 5,
+  "authorizedAdditionalProbeCalls": 5,
+  "probeConcurrency": 1,
+  "phase": "pilot DEV only",
+  "capUsdDuringProbe": 25,
+  "conditionalFullCellCapUsd": 45,
+  "resumeAnsweredCalls": false,
+  "decisionRule": "Continue only if remeasured projection including all prior cost and holds is <=45. Otherwise owner budget decision; no TEST and no more Sonnet calls.",
+  "runtimeHashes": {
+    "examples/judge-benchmarks/src/rubric-ledger-network-calls.ts": "727dd29732889790f9db9908c432e8bd127e63e8540873ac362bfcfad0bc143c",
+    "examples/judge-benchmarks/src/rubric-ledger-network-health.py": "f6245b6e5089347857fee723fdfdc67d693bff5d68178bcb6aad6ea734d948dc",
+    "examples/judge-benchmarks/src/rubric-ledger-haiku-recover.ts": "091341906b8e73dbd619149fe3fb0716762c2bcfa043aaddbae09dbe8e1a7df3",
+    "examples/judge-benchmarks/src/rubric-ledger-sonnet-cache-probe.ts": "e68cac290d3c36246e8b38c283880239e2b70e04404433b6ca247205527432ad"
+  },
+  "networkPolicy": "Requires provider-specific ten healthy probes, then one model at a time and at most two paid calls; this five-call probe is sequential."
+}

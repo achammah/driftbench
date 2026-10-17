@@ -1,0 +1,89 @@
+{
+  "at": "2026-10-13T18:46:59.561870+00:00",
+  "kind": "owner-authorized detached runtime supervision",
+  "ownerAuthority": "Restart it detached from your session so it survives a stop of your turn, with a supervisor that pauses and waits through outages and session limits and never exits on them.",
+  "modelsInOrder": [
+    "gpt-6.1-sol",
+    "claude-sonnet-5-5"
+  ],
+  "capUsdIncludingHolds": {
+    "gpt-6.1-sol": 50,
+    "claude-sonnet-5-5": 60
+  },
+  "paidConcurrency": 2,
+  "oneCellAtATime": true,
+  "retry": "Wait ten minutes after failed child or gate, then retry the same missing-only phase; no-answer transport retries have no count limit. Ten healthy provider probes thirty seconds apart before paid work; three connection failures pause ten minutes and repeat gate.",
+  "answeredRequests": "Never resend, including unparsed answers and provider blocks",
+  "unfinishedReservationPolicy": "Verify prior process group drained, append reconciliation receipt with timestamp identified as reconciliation time, retain full unknown hold, retry missing-only.",
+  "hardStops": "Budget, validity, freeze, content and integrity gates are never bypassed. Supervisor remains waiting for correction or owner decision.",
+  "stop": "Exit only after both cells have complete reports and verified branch pushes, or explicit process termination.",
+  "gemini38": "dropped by the owner on 13 Oct 2026, partial data kept, not reported as a score",
+  "geminiExecutionPath": false,
+  "detachment": "New OS session, closed stdin, combined stdout and stderr log, SIGHUP ignored, exclusive supervisor lock",
+  "unchanged": [
+    "prompts",
+    "inputs",
+    "schema",
+    "medium reasoning",
+    "8192 output token cap",
+    "TEST ids",
+    "outcome-blind record order",
+    "judge contract",
+    "provider block scoring",
+    "TIE-only registration"
+  ],
+  "previousProcesses": {
+    "pids": [
+      13386,
+      38372,
+      55567
+    ],
+    "verifiedNotAliveAt": "2026-10-13T18:46:59.561870+00:00",
+    "lastSavedAnswer": "2026-10-13T16:45:13.375Z",
+    "driverLogs": "three empty logs",
+    "noiseLog": "ends with normal completed decision 59/90",
+    "exitCode": null,
+    "signal": null,
+    "cause": "unknown; no cause shown in available logs",
+    "exactDeathTime": "unknown"
+  },
+  "verification": {
+    "focusedTypeScriptTests": 7,
+    "focusedPythonTests": 5,
+    "typecheck": "pass"
+  },
+  "hashes": {
+    "examples/judge-benchmarks/src/rubric-ledger-supervisor.py": "bba0114d82d74d10675c4bdd7a4c65db5ad45f3e67cf5ff51c3a531e2a3d64cc",
+    "examples/judge-benchmarks/src/rubric-ledger-sonnet-network-completion.ts": "aa084ee686963754534d6df48bda6321b7a59703ad26d4ae670b220fadc1a98e",
+    ".cache/ledger-rb/scan-recordings.mjs": "5f731b24704f4125a18602f290016dd5da16e39f115af5dc168b35d35eacc6e2",
+    ".cache/ledger-rb/audit-token-loss.py": "f0e7c67dc43a68401bca733dd3c0c24dbdf0dc9717885e583b05983ac0723226",
+    ".cache/ledger-rb/audit-cell-blocks.py": "4db46ceae8f6de19a644cc49b93035fb4d9ecd605d51e477ea24c44e52cc97c3",
+    ".cache/ledger-rb/verify-sol-final.py": "abb9f1372695151fb111419ba39ed6eaa2f30f1b8ad23270ed0cd311b12805cd",
+    ".cache/ledger-rb/write-sol-final.py": "86ec83303673b3d48ab324f9e8fa93f916afe50b1d36509783dceddc8583dab0",
+    ".cache/ledger-rb/verify-sonnet-final.py": "c21750941bf291acdaad006762724c988f4e495f3e9d58b5bd3ad681858acc05",
+    ".cache/ledger-rb/write-sonnet-final.py": "88d7cd21358ddf5d2bc3ef2134144fdf92113ab94358871ebac69640934f7c27"
+  },
+  "postTestAuditCorrection": {
+    "at": "2026-10-14T12:00:10Z",
+    "file": ".cache/ledger-rb/audit-token-loss.py",
+    "previousSha256": "4c868aa3d9758330c1e2229d8c1bffdb7e4576defe8980655b0ecf9f79d57de0",
+    "currentSha256": "f0e7c67dc43a68401bca733dd3c0c24dbdf0dc9717885e583b05983ac0723226",
+    "defect": "OpenAI Responses receipts store incomplete_details as null; raw.get('incomplete_details',{}) returned None and the offline audit raised AttributeError on every retry from 07:52 UTC.",
+    "change": "Treat a null incomplete_details, and any non-object raw body, as an empty object. No threshold, policy, input or scored record changes.",
+    "scope": "Offline post-TEST audit only. No model call. Sol TEST decisions were complete before this correction.",
+    "result": "gpt-6.1-sol token-limited items: pair-ledger 0, promptfoo 0.",
+    "previousAmendment": "detached-runtime-amendment.v1.json"
+  },
+  "postTestScanReview": {
+    "at": "2026-10-14T12:15:00Z",
+    "file": ".cache/ledger-rb/scan-recordings.mjs",
+    "frozenSha256": "de2a69c39e91b874b547fc1b8755e542321aacf27cfbb73da66e57364f2242db",
+    "foundSha256BeforeReview": "00c2e3f54ab7ae225605fe9c4e5c3a3e61df41328e90d32dde566982a738be99",
+    "currentSha256": "5f731b24704f4125a18602f290016dd5da16e39f115af5dc168b35d35eacc6e2",
+    "priorDrift": "At takeover the scanner already differed from its frozen hash. No copy of the frozen version exists on disk, so the earlier change cannot be diffed; its author and time are unestablished. The supervisor checks frozen hashes only at startup and did not detect it.",
+    "finding": "Final content scan of gpt-6.1-sol recordings: 36 secret-pattern matches (35 sk-, 1 ghr_), 36 unique, each occurring only inside OpenAI Responses output[].encrypted_content and nowhere else on its line, none in answer text.",
+    "change": "The 36 exact match SHA-256 values join the existing reviewed set. A reviewed hash is still exempt only when its match lies inside encrypted_content. Pattern, denylist and every other check unchanged.",
+    "result": "Rerun: 0 findings, 49 reviewed encrypted-reasoning matches.",
+    "precedent": "13 matches of the same class reviewed before TEST."
+  }
+}

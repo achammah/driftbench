@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-13T11:43:39.277074+00:00",
+  "authority": "Owner: raise Haiku to four workers on RubricBench; if host load passes 60 or Haiku errors rise, go back to two.",
+  "haikuWorkers": 4,
+  "fallbackWorkers": 2,
+  "loadMetric": "one-minute OS load average",
+  "loadThreshold": 60,
+  "errorMetric": "Any new recorded Haiku transport error or unparsed item after restart",
+  "fallback": "latched for this process; active calls drain before replacement jobs exceed two",
+  "gemini": "parked, not run: daily quota",
+  "haikuMatchedAtCutover": 315,
+  "unfinishedAtCutover": 0,
+  "capUsd": 45,
+  "unchanged": [
+    "sealed record order",
+    "judge contract",
+    "prompts",
+    "schemas",
+    "reasoning",
+    "scoring",
+    "item set"
+  ]
+}

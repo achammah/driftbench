@@ -1,0 +1,2962 @@
+{
+  "at": "2026-10-13T09:39:09.609622+00:00",
+  "authority": "Owner: On 402 stop all Gemini calls, no retries, release holds only for proven rejections, never count it as a judge error. Finish Haiku and gpt-6-luna fully.",
+  "rawRecordsUnchanged": true,
+  "rejections": [
+    {
+      "key": "dba54c66dd52520741064592e8f7985da59823dd507b7b0dc7654483b712846f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_14",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "cc5a7de07ee7e9b3273e626b3fcceb9e4ed7507359e721f9f77a9489eb359194",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_14",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "49062228fb0a9621cb2068589d4dccbc60a8af32a719ce8d2c60cbe6c33e5039",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_14",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "15b3f485823a792b65486fcb0041b3e8ac7dd49fd34a356d642b5b20312a595d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_947",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "193fa671482db42f94fc1431a7930dd2c9d225b88ecffc9b90abf32980a856bc",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_947",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "7d771471d79b36be615bee7bd460d575da28a2b76801c17fa2a1f5ade7892aa3",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_666",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b6a363f86943f41f7914c3d4ff5a89d3547e0a594414e1b7448bd38bfe603e73",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_947",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8d4038cdb5fa4bdc5e421f28e24d1fd2389c5b1a9952ec7e7e5bfe528e1fbacf",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_666",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "05ead61a951d3c111145a7a621b25f9154b0450bf8fb24d483ffd67d291a9a42",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_148",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "2f7c0c8e3203fd9396e370d930fbac789df8d81c7bff001f8c89bfd40f04110e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_148",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ea18c494e1ae1dfb33c7e43cb190db11ba0dca2bae8532c313575641f7142416",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_666",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "3ba2e3e050d7d2253514846cb9b6ee31d1115aab955f9f4e16a35199c14e270b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_690",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "9840a0c4d787a5b5c8028664af3fd3da3404bf86d63af845566a3698dc14ecee",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_148",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f94531dfeee36aafaff11af1c0e79193846b1fcdef8baaa5a06bb02fa823640f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_690",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "bf122f192d53a18fb42dd6e326945b9165020742ddd3ba528a745de844858ec7",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_482",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8914466119db58fd6a522a7383a4a50f64e3eb3c8dec3f8cfa5a0495718cbf18",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_690",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "58d994ac213aaf7edbb3689b740272110708b7a81083322bf23b1099c1ead418",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_482",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "277fde5f90fdb8d11da4efa44b73d01f7207c99b82cad90ee731bf523ecc43ee",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_482",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "26f02decd4037637b4f439c857f604ca9c9643afa0b1fc9825d3f79827edf6f9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_332",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "9e9919e988e2754b42755f556105486b98c256dff5f1ebe34fa12b7e790eb717",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_332",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "1132d055524a7f1b1e6e4f112dc010f7e43caff92427d0b2e3a1d9bfe1a2becc",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_246",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "1b2ac7ce00bdd29a5f5fca9c5998354cfc4c4097f71681e56aa8fe9203719a24",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_332",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6c3a4a445e21856a8ec8b8bbca4060539e1493d4d6adc886a4254bd3aa7e32df",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_246",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c017829664498a185c699ce1c5bb8188f0bca9507be676650e3b7a56afacc20c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_99",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "63517dda7247d8580d1c607c74e11f29bc7b0af8e79d740050fc124abba3bf92",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_246",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "041a44c5ec7641310e23dd8be0dbb6a49fcc26754fb327fd83a8fd3cae48aebd",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_99",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "16b19b34a6953ab5c94f1242214c0af0685f8a2f8014339b8cda9c48f977c44e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_223",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d43a58aad6019da7b31df585dedcd07e816ecaedaf25aa71df1d3c7d6ab4b0e0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_99",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b34a6bc9d9372ae6ea1b98b844799abd9e0a5d384fb8a725ed1ae502552b3b0c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_223",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4b55ac005b35d54a306a3ad9484b9d48a3c025d29557e53c3754036e5d743d0b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_81",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "283571c3af9b4f53aa27259dc9501f14d6c2de96d6721eccd3e50f9f5d23bc03",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_223",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c50cdcc9059db6395e9c64d3bc41f779c772fa1ac2cddc998d8f404197e952a2",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_81",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0bfdf088a9f3738fca0de93c40c92f8e1bee8e381224f37704a4399c2e83855e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_81",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0361fda7304aaccfecb951d5f065da19ccd832a3017fddb78ade666959fc5f29",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_847",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "aaafe7f5e616531ed68b131c1485564ccef93a1fe3ff300b9fa0379fa48d6068",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_847",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "bbe081bf159ef1ab0355fb2dfe6c9d45420cd9584eb37afa5ff15f0b2acc6eff",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_71",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "5225375d513e24ce4f13393c435741fdb13ce493cdf5a182a49fb592ee5837e4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_847",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6527e10b3526630e89a47d5c36b908e639b3ac35d5f18d9b52f8d4c75fdbb48b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_71",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0cfefdd02930aa2ad2ff22febbcaadb39a4b3e276c962a41ce6e2d320b9f1783",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_71",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ec3e73115f6c8b1423cf08f6e4bf3bdc074ecf37167967871264f1e1f90cdba7",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_633",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "17d1f7fafdb0332cb469fe04523b2cc0575fe029116bfd13499634c97f9a090d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_633",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "75a6e6edcf133e0d6036c1bfca3c8259403de04dd541e8abdf87735063e7209d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_175",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4db7c6f85afc1e6e8c79aba3c42f35c7cc74cb174986d7069ca18053648710f0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_175",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ae0bf5247b7edf8caa8613bc96ef8c21faa314abc7c83e14855dc6943602cc96",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_633",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6903b94effbe0c2b558b05fd7bde679baf2bc61b5b49a890adc70fec2d47fd6d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_175",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f4834f602a5eb250c9639eb64e889b239bdca7369cac9c50f3f3d270a5558994",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1057",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6871409b59048dece04b09e51e392978551020d60edb971558b8d987f93f4949",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1057",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0eac1eb8c77778a4f99a6d0f0f5882304f12002a29422e3f92b671ccc02feaca",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1057",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b42fc6f877530a28bd59f29770fc375de737e68959174f1c4faeeaad6b8c388f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_870",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "1248e8e427fb98edaa04512b85364d4b36cc9cccd01a8d5b6dfe60ee2b843bb9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_870",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "214d124c8d69d6d40893e3965c2622666e6f47aaf5d4006d4c9cdb104c796f83",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_229",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8436634cb39b3593ef16a61af9c96ca06f1629bee365ef94b2b997f36823a3ec",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_870",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "1f20373a8c16b0f960060e74582a48e1a52ef87d7b7622501e51d2fe89f92212",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_229",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "81370bffd76cb3f2455734c51246bf41d4ba9b43a73c21ad37894637c185c5b4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_229",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "eaf23f42169c277b60db295850b837cab4b746ece682873a9311401be4ee613a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_685",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "99c52d33ee867e98bfda363a7838e7c64b9b5d2d70abc9a133f9f1c059131fdb",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_685",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4d990652437d0bead8284b23e5b2c827515ce410ebcd7d9a5a3d6e73b122189e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_189",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c429d2194a7df7952695c34407dbfa2225c3cb54bbb55a202e1e60a9c4282bc9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_685",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "3257c079842f7204794356e92269249553b5a004eb08943bc04784e6b0a3a1df",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_189",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f924721afcc7c74be8964bdef4188b5e6adedc299894fd1b467c6aaaaf87d56b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_189",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ec1680e840994ef3c624ae12ccee3e133631b8a52f81ded46bae26d8f2f89be5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_41",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "7b24f0d0898504e258f66f03cdf0c21f18cd01f49ad3910363f227e215e465cb",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_41",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b8d8eac40758bb4d6d0fa5f415e1ac126d3b02d08483b52170e66d6d71c9fdaa",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_104",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "73f1e7672d44e4a26f7cb5a3df4339a1aec005e449aa631ef462b066d3c42680",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_104",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ad1f08e6c5e60a40d0b141c14906f40901e0e72148ac329551adb95cc89cf5ce",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_41",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "dfdbb43f0ebd548dff233feac3af15b4d231b82db4b8c65a1006a3d270688447",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_104",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "dc3ff10ea5c07adc28c748ec723876ec07806fafbedd8af88724751a6cb63811",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_469",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "be83612ac47fb163cbb211367ca468de0000ca180032dfb0233ac7f8ddfa84a6",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_469",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "df38dabc29c21e4c8473565a5066744cc4fae86c2a783e05375b2bec6a309cfa",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_469",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a2f414081fc0557bd7cc30205baf3a6d9628db05e2d4f43d8663afb7bd6f927f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1020",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4525bccfbe578ea6bf4f68ca18ee07fea7cce03dcda135829fd66b1368d7dec3",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_700",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "afe12f84e207b11f440bb7755fae034ac1d7cbd5fbb3d460702a3c9dbad346c8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1020",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f8057704076af65e716c1822db1cc52df476f61bf4078ac5a05986cfdf5c664d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_700",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0a8a21c13c4dee51ab5a09bfd6194e3c600aa2c18550e5ef7c095421a6be1dd4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1020",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a4081497a59dc4d4ee0027ec5eeb782ac059f4e4ee619c65e7340a603e1cd5f5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_700",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "acdc58384c7faaf9668cf90c812de7e4ef8486a7519971e7109a4c0382a95af8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_534",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "348c053f4027fb5f01045aea5162b58bfd82275181a5ffdda34369a1829b5d6e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_534",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "686b60d814c46cdf213c2f3a038b70a5904d62828327840a949ab8c7fa522cf7",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_670",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "01b07e96bee739f3b498cf0325663eb8ecb92f3fcbd71cdccf0c83e15711cf73",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_670",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f8cba354a208508e3f9e016677bc0cbb3c250f3c0655acf6c07d4be6fc3d6f33",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_534",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4ad07a44bd6afbe1504f57dac2ea8fb083cfd2dea97a190d1f5f4ccab5a72d32",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_670",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "cc568541fcd8bf311b795ca9cc439e23d4a08081bdbc6e8358b74dd3e8f99af0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_460",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "9e5ed3aef62aa0a2e0d5c64a0e668665517aab2af6513d26cd6fa642f087e053",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_460",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "eb5fb1eceaa811e7d31850032fde44f99530efbd7e1b14cbc6bfd3373e76a6c6",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_5",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a9da05f865b73bb9fe994626abd20b1cbfdd70c3b5bf6c2a9af846638d0abb45",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_5",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8d8ec60d0909dd6565aa832237edc6c36e805f21d3459673e89ccac21184ff0b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_460",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d81e360421df0c32cc8a3597d71059b4078078091252ab6094ecca3daa0c779d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_5",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "5ea7c4d631b2597e545b4fe61801eea555cfc6b5654d7b5b07541650e604e1b9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_149",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "68a2ec00f06f243148d998b957cf953ae0d6f8e8aa4e0dcfeb0afefd91f99601",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_149",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c1e3a3886c6e4001186e4b6ab7045a1213e4d96736e4fc89a247d881bda08817",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_627",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b74df12edf79fa4494f74f81a52bf4be188e87782054d90170623c0c41975e5c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_149",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "32b9f81964622eaf3e670b5881f4170489d2ff6d5bc14202191275ddd88e2e59",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_627",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "cb7837bd2565ea8783fc503fcd3afe4eba5938da96894a3e19831a2ec5ffa8d4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_151",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f2a081e75cc04f38beacf99aa8fcd2b7e038b51cb0705943d93c46262f92c929",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_627",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "217f16243e11af6a9e0abdd31fc61dce88d8b854d2effe9532c8388b85763e5c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_151",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ca61e98ea5198a6e59999cb1d850c48f20c0b0505a4dd47b175f776e5376c4ed",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_538",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c8bacc775714dbca17ab5b7ff6d25cfb9e0ae4dbcedf95a2fc8fe06fe55da972",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_151",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "741c75c687f90be89e49a6f3d86eac818bcfe66cc4e274fe06c9cdf61c551d67",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_538",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "37fdf0ec8913d6c9e88f6036a257814a065f768ab73ff7c774a0101fe1993f7d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1004",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "48e177ee5d8640d2c1b6395f25253238390cc0df50c1464ce9ea73fcbe18eeb3",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_538",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c66c94c78d78993bfbaefcb2c57a4b3c72810314e5851661b7d8cc4b91fd1825",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_302",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "83dbcfa42dc63320dd79a8893a22c8b52e8b6fc2301d81c76331c73f44b7fa54",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1004",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "5a62d17fc751b19c1e89c3996cc28127c467d32e8e49e80e7ff011698758d98e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_302",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b7661ef5f031829e6ca9b1ddb671f7b3fc989312b699414aa57b4e7052bad1b4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1004",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "826762dd4293477463c55cfcd26a561f52b808c2478ab95c6ddb994852678fc1",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_302",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d1bc25fe27701e19cd3a4400984ac0b2f56b01e536209864521201679bfb1a7f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_123",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8bb8dc7da6f9b02f6926aa2b6db5b9303cbb0401dfe530e9aee194d9c04bfcff",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_123",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "38bafd0899e6868bcaaa1ed36065ff8c5015694c12b7ab0e3c78eb2883e806e9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1003",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "64bd5a17deec33c315f9d81c66e8c853a844c196fe0f13a4e5d7098a29fa1ec8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_123",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "3774db8726720d59779759dd27c26e9ee68fa8305b6db97af9fec18d62d482c2",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1003",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c466dc5a35594e7a61632d5ec6f1b3aa583ac0e664802b9b382bc34bed9b7b91",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1044",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "680768ce45f52883689a07b78a7918fb88c2cc30c39405a5d579353c0e3f5929",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1044",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "71c112e9752d99c959ee614de21241e23f9a947a0d26c5a38a2d043b631bf86d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1003",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a260c46ad01573ecf921a9f70da8442aac0d32f4c3ff2c09ec2b1a4134fa37ba",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1146",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "3e4e385a03cb23da332a49f8997e146e9539434cd7bfdcbf26acc7edc9c04c1f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1044",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "13d46a11aef1f2fc5899809cd9185168744154b1942640faa53da71a797fefd8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_352",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "7b60e800aec8e9c75560c601d19300caf82f434551f07a7cd7b2e8f85fc78ec4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1146",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "5bcc40900650e6e5fe193d7c2df294fb65ef01231a6c7a5abe62f253ab258465",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1146",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "9eb6975a2a9f58145cfbfd161b7495c5ca5485a02dcb1529f01fcfbdf52bd3bf",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_352",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d548b09cfc9a8da13bb59d28cd0607152cf39fb69e42794dd92606d9cb35f971",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_352",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e1fe3aff984c333aa785885c1251e1673b2d50035c4ded1981b8ef86e83c3971",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_51",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "7d8d59432c0b7b7682062d3c81a0b052b60d34522ebeb3eeb05bbadd20d54223",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_51",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "11555329aa2f44480facf94d579215e48e126c3fb488225a76b97ac8be203c9b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_54",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0d2d42aa69121d0dc552cf0d0719a4dc7eb771f56873370520e041b422bde354",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_51",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b267d0a79533af77f533bbfff770fec67d4db0087ae0663d7fcba3241014d46e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_54",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "57c09c1a976414300cd104a96a8fb9fc8318a55e371c7026c4225caa3f6118b9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_253",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "710d56b9c6ebd9316965c9ad87b63c201410c6de15dafc89d0ca169a0e684951",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_54",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "df6fe424fe3e3c760324b3ce5936fa427468c4bbfd5c59ff2a1355590715e274",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_253",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "583e774f97095f4d0518c44d197356f606fc4c58de8c473e957beb0809943127",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_806",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "7f16192e172fe8c22090df6b13b3e1f48eed593dfc9ef609b5bb256c20e9c75e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_253",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b7f924168f04bbe49668085c6d09cf31da910ce525bc7238e21393b7986cb6da",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_806",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8f91385f6719ae93b85c63e6e912ad07ef688624fbc74aceace310cb19b75dfb",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_28",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ffedceddf551d844d54c410dc6b10c87b8f63ae7eeeb82126e360757c4d3ac58",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_806",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "378b9c4d40bbc716e2a5493b904f71e73b97aed2f6eb505fb6abee61c802d490",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_609",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "34582bac20e0dfed8f87c0774ef1e5f119fe44e7a63de9e74343f86d09548b71",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_609",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "5ce0db07031fb189b1fa0765eb660b0f8c9596b7197e2788cb4b0da08fe562eb",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_609",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4641391bfc9075a557ff1f74e05ac85c7f513d90deeeede9e4fe8be679c248a5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_28",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "9b0db36e2bd8390fec71ff6b884f2231841d8d2180ec45a007bae9f60083a2e5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_827",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "485594d12bcc71962ec0a05e8c102a2a12fffc84789d994698a7121f9bc15352",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_28",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f1198769bb007be1d5adbcd8e0329f47e1e9d37cfbaa34eb25011e04aaa1b208",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_827",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8abceda9b280d257a1c170776e93c61a953f6db0ca8572ef701168b99747b58e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_898",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0628bb0a1b59ce76ae9de68a832e3966dac1cca1caebbfd066e3e3e6a2774dcd",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_827",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "fa9a6318353ea22e3945e00862854786ca9b5795cffe556ab74334c6cf6f05c0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_898",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ea0c5a3be489347e2536a30342076bea4b7d6d4a41f76aa6695a3cf453276619",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_426",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "84a487b7299b314ed6383b94a525db6180b9d462c5d355c7799a32950974bede",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_426",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "65f60beac3894b80ef393351927b048ad88a881e701bb08e7f4161d62ad7a3fb",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_898",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4e62b4c9c5c992826e3291f9a10ee9238306b3785af51fb266d070362839afba",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_426",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "eb70ab50bf69873abba1bb94a2fb71178b627570444570b11dfe2ffe6d8795b8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_950",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "72c3224f179af26402c041a1751849291093507d1300f825cb31057671a95949",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_950",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "41552a95cb737eee78b9c33563d3770ccd1653e20db8fb6532163e322cf8a9ce",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1016",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e253e49c45c49ff4358051bc0aa3617f7be04054ccbabcc61fa33f0af3bb5fd2",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_950",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "852aed2b2218819cbe3346d907f8495281d601fd1a146ad0a651765d89fdd461",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1016",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a60cf98f772530fee4ecb9e0157cebc83e0e891292610870d6172c32b57bce87",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1016",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "34166a41994c96afe09e63da9eb6772628517c997b3256d8583f50ad56784de3",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_758",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e7919a781ab531952dc097afbb36bdd03713044dd68f27820cd7db0fa95f7921",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_758",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "7b87927276e46b650642b890fe7e2bb1e82b97b3761d036066dd67d880451ade",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_93",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f194b317e8fb6fc9ff25b13b7315d8ca508a5323235eee9ba334fc3aaae64bdc",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_758",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b0fad3693f0c75b273a8d2f9c48a9449a2bb7e6459ce143ca5b7ab2e329e3eee",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_93",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "28a7235acf3f716fd73b4501ff8add5ad8207b422def3a9570398367e462c03d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_93",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "9e557065c76c0ff73c5a1c6bd9e72d91c1730d69fd9b3bc6225a92ed71af80ef",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_606",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "48301a1d0a35c8bc0d7f3d4d76d9588fdcc7f3bda3985756e602ced3e859d02e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_463",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a6c3bfb48b032233103ce3bfa0587e37f6be9769755cdea1279b7fbd2d2bc09e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_606",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "04961d2ea97ef689491507476cf81c3b5ccfb524b8b6b7c2036ec238220e7cd3",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_463",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6d1fce115ca200cb1d034cbb13c6e8fcbb14885ebea71bc3e8984a5f896f97a3",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_606",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "35efc0ccd102ceac2c01bf3919212b95a0bde55b1744373554259dbba2f24900",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_463",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "29c8b50bbd79a47e748db5fe326f3bc349d73100ec13dad72675d71aeaa0e861",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_347",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d56959aadce096bc29e7e2286fc567e503d2bc40247dea15841c8751e41ef9e5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_347",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a182e2236d44ff03868967f1fd8fd5d82f8bff871d21c5df370bd80ba19b05b0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_347",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d73fe7d242974dc91d53363c14fd3326faf313b0944dce1b73f89b60a21bd442",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_239",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a966e2fe415df7e6a111f9ee99ffdac0a1cad12aadbf7ef5ba7174eb6276b69f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_239",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "baefa1e69ea3401d5f28ab1da5c71c016eef23813b551baff9c852022ed1e763",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_422",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "829dc315d9211930cdece93a3fe3a880c21a9045d7894752910dbbdde2cae83a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_239",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "9d793fc0f4c4e3cdecf33d4d47e0a56c804512741e37f9c003f82406ff5557d7",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_422",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "64c42a5c3df193c24ea6262b1a694eda3c25b4ec27fca62f2d5cba075077104e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_179",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "769138dc16b063efedb328a9bbec708c7c88275749f2da4629a561a2b82c552e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_422",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b6bdd920cdcc771fa58fb2984c9904f195df4d32b5cbd9e55691c128bba1db0b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_179",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d018d386dbca70630bb46e259f858c05d0dc7beb6d6d24606e408d75d4af7207",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_274",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "eaeeb136718dbc53441a8d67265c63ed2da6613c05ef3ef89558dace233e35c0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_179",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "43a90b2a16dba10b265f3143832aada48e18d5817417c2e7013f91881e4c8b62",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_274",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ec12c76d9235f9eca8c28f7f80b9c1878bbfc14c935d2180dc3284389221a850",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_466",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "71200b16dd66ffbf30e630c3094a8724e939f24e71e2c7a648f0eeaf81a4ec68",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_274",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "15eae3caadc2c8006f75ba472e38d7eff0bb89e252ad2b5eb55460cfdb9a2a60",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_466",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ad5bd6712c2d17742dc3c0bc4540efacf4003d27e6676bc27619aaba41b32c52",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_33",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "cc0cb9971f39a6dcedce025582eba958808f12efbe75afe2d538b4b2f3d48eed",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_466",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "fc3ea1d15dc2991e166a5faa7b0ed0145b8457b68ca551381faf525b30457f34",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_33",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4d00af79d732e0e3939b28b84c5a726b0c07b159907d3b9f94ebe25b0544b57b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_970",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e630e4b867a35681eee0a669c46608289217aba1aaeb9be48640bdab30af507e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_33",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d601823a307ac18cb6d6897f61350e7954f1c87a07a20cc0c576162e69aa0f5b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_970",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c1585cde9832f0a0df0ce5a8542f2aab1697dfffe06de4ed54ac2656004a550d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_704",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "26843f53b7ca174bdc0fb95af41a4cd4fd8a10c6723e52f3a43b454a043a361f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_970",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b57dd661aefe4614ef81c50b4b0f6aca1e00bc04c5a505dea3126b09e31d3615",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1129",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "913a67af8aa1bd73fad80bb83e15ccc9834fb7aef266895cb06bba54283efabe",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_704",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f7768730e8f71f532b580017d99221f7839a26b19178911ed0892eda805a3195",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1129",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0b72278e65a1b7a0f5d4c2f50775e755905bb55f22885a0fe56121075990d875",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_704",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c5f79d5368d5ca42c2585c5848378d6be5e45f36508b89dcfae1b235745de890",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1129",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e52160bc314a3958ff7f51cc5c6693c76cea1ea79c336c92fd267715c971b252",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_971",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "5dedf6b493aee8d5c623c33421303c8c6a9de86e1f34429e4ff0d9a7743b1004",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_971",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "07ad78eb1f01f3a52ea18339a484252f6edef842c7536920b158c21b93418b34",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_971",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "cb2adab5484d5222709960b5351d8d5361a3dfbce88cdbc27606d73badb0503e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_50",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "adb7a7cfbd610b779d0e5e72b1c172ae9aedcbec2debf7fe6c98154297c3b53d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_50",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "bccb15183d5cd5d4751c8e88db23255315f4a2cefbcda975be0c8f13550c28d9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_649",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b3983d99d552f02bb834a1df52bdd9b3c5848b54a99134e6c6e773044e8c7d3d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_649",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "86866359ec753aac4948d0e362a8263894b142c89299fcdd00c2482329631d26",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_649",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "2af4d4e36fa3bfc23ca6fca73a21e177cc6cf8ff3bf351812218ac931aaa59fb",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_625",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c442b5bfc33df30f56f51fcc7f110e3e4275d283c28e775336256c277a4a4eec",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_625",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "2c486ab306162f2b9dd99e8025684fb04fd1ec318f4b5b57ccd70de2a5bed77e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_625",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a6a5dfbefc2f3db6b5e04dee50ff54943c806d55028ab31dd50f1aead6329f2a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_170",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a2a424d968718cff3db10c59ec7487dc9f3d763bc286536b94f2733a4203d3c6",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_170",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "de191de4debebb630e5c5624b63cd0bf2acfd9191151b460d7fdf6b73a37a275",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_170",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8738226d85d146f5da0721bee2bbe7f8df3d4dbacb7e9cd824a59a2e6d5ee24a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_914",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ab7c19ac996eb85aadf508af8afb775d659f9cb8e9853e38c7e29b6b3776f872",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_914",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0211af1f5eab3ede5590b42e8eeebe2e22701374ed7696960d8f8e0a4466c36e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_914",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "44aee44e875972629231d922c2ec1bcc64b7857d35d2ff5c7cc7a15f16675b82",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_631",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ab1c0bacf423e014d502c4a8fa511bcc252ef0d1227e72c79dbcc0a9b5fa8e51",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_631",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "de2e082bfb70008b228a999e34ce8145560791772a07ba250e1f79aafbe69340",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_631",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d5340e0c0cb57dda3ed28f2273c13bd305f61678831bd5ad763b1543771aafe2",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_300",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6c8522c20784d99440bba400682029c843190e3f9215d2c7d1bfecdea125318e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_300",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e9ce63b828290029de0ab76e6d9fc8ff5c2095c21cf907f6d5095c2747504fb1",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_300",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "bfbcb92d086693b847321255c1e6868d3e6fee59a0e4d850fcef6b723cab6788",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_875",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "42de9924681b3fb6613d9fa10f8328b36c9f787cf2675e1d8b2d973bca64c88c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_875",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a37f6d1e7a56d785486424c3263d8fc9e2530dd0f44f72fe74a4981b43931f98",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_875",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8f41c96a5562f439977202459c7e00e0a7323ebaab4b7283c8f6f422ac22227e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_116",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d7eefb62bab55ba4696b9f845e1a4d4f4f098b53c2a7729fa44cce853b8c628b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_116",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "dd1bcb613b5adcac3bb646ab69b1f4b8f5260b2509507d33a138908f80aa200a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_116",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "331294cfb30afbb80a348328ddb5b00a4857eb25908f53ba2c72cdbb46893233",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_651",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "52fdecdaf951abe6242c35c6090c091b4878abee011c52fd6cfb0a5e243242e8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_651",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ec64dffdab1a5d504bd6dfdf32a74487c42ffe4687ac5bb0f07427a846110838",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_50",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ecf52ed514f38633f7dd060f22020e26c329fb702b6a7a12e9d87d0cbd2f40a5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_651",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "923a275cd57f72f98a5f53eaed59fe7573ad62f4c7816a9d5ffd5aa6a99eb718",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_624",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "55616def46a5c93a15c456b9c5ae7b25fffd19b41c8cb1751dd85100ec347609",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_624",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "13b0b63137c1e0ce9511066c263b2c571b17aa7298e591ef9445409fea7e2e3a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_19",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "3cbe17f6036ccd45a22d36e1c8c7ff0510a1f2ed1f9a78786795f0384de9cb54",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_624",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e6d7f628ed218457c4e6967082b0d281e6c368dc6bb957b2e279971fd440465b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_455",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ae1185e722aa1e4f179745febf62d4e8a1ac8b85a399028a26dc51ed1cf4372d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_19",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "074cbc26a6631283dd12618353a4247ecfb81dc8fadb736af7a5f6991bc6ed15",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_455",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "027f3cab0a2664254dcdb35e2b876716aceb2de05fe1b92a8746ed7b3c11e079",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_19",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f5e66dbf344de5b1a3821b51d37bc6ae1d92ff13ea3be573975d378d66cbd6cb",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_455",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b3bde3d7b548774e6be4b6af524e33f6b5601b950b732d58021dfd16b4d0ccea",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_63",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "68597dfb7c21de5972448a35b07c9828d43f20be4f2a16b60dfa1013d2fb0ec0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_63",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "20642fff76b1f9d4ce8540e17b105368e0940a702a90e310dbd5889eee81b001",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1001",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "7c56ad776877fc1ca6d84e6fe40db54b4b885abc9bf2ea5b1b1ad43b58e18a21",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_63",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c0b963520a2af522af0bacdba884b028d56b4dccd5f84e7c80fb8cb719342ed2",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1001",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "88f214ad25e7249cc3c9aec411d3593e736123d3292507287b19cbb0d8eeb659",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_423",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "eefda3f1fb6b244fd2460fb7f0ac9bf1c5ab07e1ee1a69696e36abd1e54d00e8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1001",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "626b328668ff58795f30f71306a3149499657ff7212134f578929f35ac836c01",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_264",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6be1c3431d320d174b2b328b053b6135d8ea553e9ac21c355149408c04ff7d1c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_423",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c4356655a0aa1bc6c5b83e2cb10ed14d85f607d8fcb3dc76d905794f20eec304",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_264",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "834255e14a26461e228f351dceb48eb25ffe07e3b4b7cf861454bdadf2579c2c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_423",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f190e6fbe222f2a60f49669220fb1ca1a7caa830bfdbd17cc4a65555f0d25da9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_264",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "2476698f8a884eea67978e3fe323c9941dd6b93828eef98b14c7508d4f19287c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_524",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "58d749ac454afa87bdbb8370656297431b2d559889d87fe24fcd062e390f56fc",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_718",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "bbb471dbd07e0bcef0bc35da66fa22885802dab84b61f2da8b6ca201368b966e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_524",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a639ec701cd5ba2a47e610081f58f150c1611342cc8ceeb4cda47052e418517f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_718",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8c73342ac5afd68e3460207ccb85699c52dd9b57accb72bf42876a432e9b3fa3",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_524",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "062e442e5516b28a093b4330b6a5bfd69484aca9e4860a29d22034fff6f61e30",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_718",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6cc4debfa8d03291a085a4a2b8a392ce6da6634f690ab52d8b64e7b79fa35213",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_58",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a95b278202c0a3decba13a78d0ec3e096d552281a43aed1e193425e3616808a1",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_58",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d6f8a8a067d9861137bd946a1f6cf238ebbf18393170d0ceb8fa5287c0e7e27d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_948",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b1f36bcd22998e840f7d579ba3e5e3670e28c52574fff22ca5b71db69cd98ba8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_948",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0c9567baa354d6b1964549cffec2f3f8c01e1da48859b7104093677d0e3caec8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_58",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0c6b5bbdea60cc53433b95923000b6cf222edeab5cfec10a39a029cfdbdc2493",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_948",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a927a8b643dab04e92cac5e751906a5f3142ba32c094a26e3386d3c454497bcf",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_780",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "de6671550397dbe2a89eeec8dad37a4ccafc246966ce749b801b0e15e4538e5a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_261",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "58f4a5566012b5291886db5dbfc2904f852fc0cd4ac62cbfddcea9a58b28ad58",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_780",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0a94089fdf935fae2b070b3e7f198f270a193c2e78496a4107b2befc54a03a7a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_261",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "132c387ed7ac62d2441cad1f5123b7fdb8417511ccda26ae333b9e512fa75969",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_780",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "618ea178cc4a4f3b1360ac5da7313a56f26313464709eb587290b4116d86ab46",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_576",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8ef9da24b114eb062663575215db3484a836c21779cab6678e20f5addd567526",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_261",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0791e59650a2192b2b38def5aefc42550e3994c38069a1b07a1c4b01b30cbf01",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_136",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c5d9ae37ca18887d580d5fc59b8cd35a0731199703648f8886735aa22b4ef3dc",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_576",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "96311470bca5443a5672b749e841d7fe353cfe1d9c12308f36f656036cf1c4c6",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_136",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "33fa8004898893cbd04c3b8cf2d0fd9896309c3ed327af6af1d34668dd617bd0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_576",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "26106a01f99f8897d84148bc05b5122dfe7a71f82bb8576247a5f5785f974f4c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_136",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ec96176de697859963b82afa8afed98ef673ab218a9fdfe8ea53bbc64e5d9c3b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_183",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b1de27fff112b829ce55691da193c334d1e652fb72d1a6de443c6eb697d7f66b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_183",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6c041e0eb0f614c0d2c26ad13e6131db6816648d80e9d3e3dffe3026582c6ba6",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_388",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "48d99a1c79fdde757d76d9705c60784fd8c4fedf5b36da6a533ceaec1d418428",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_183",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "db61b35e9fa90746101aec77cbb75cd9d7cb5a89cc4f9d34c51192af2d19c6f2",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_388",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "abb0f4b6d426649516f0a7c551447dddd8c47c4da9f053f596d859476176e5f8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_702",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b0a0d0b501754d5d51563cbb94f21a0022f6afd4da47aabdd6ef8b53271090d5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_388",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "bc6adc53156e8a56423bc4695c3400f6bb7d66f67c233d2f70a681a08daf197b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_702",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "74b1ceaf00a2f33c4b76b96afa27da66983b0be32362513cb588edb4f5fe95ac",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_427",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a880e37a5574890d16390477d963deb0f17dbb1f3b089b6c144a4f5352cf5d54",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_702",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6890777cbc60c82cf508f5fb73f72917b29f478c655138201b4913a722e20b9d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_427",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "aeacf06779f863a3bf6da6359c5a8b67d712dbad4cd2b0c4b628f1cdf1b04d03",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_931",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "59526dcf4842b8240817afda2ea7f25180f12bd58ea2365ff960ae95718e03db",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_427",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e8c664b97c3ed6b86fb379a4d3fac46b858eda3d9aa2c7dc4656a173b4776c1f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_931",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "82c2e1c92103779b4a4e40ed0807ecd6a284e3f619412a13b5b75e2a652fa7a0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_620",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e5916bf3309ff03e52f2609673c51d3a7e7e22b2819525a02dd3b8a27aeec0bc",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_931",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4f518d8c11da13afa4ce722261580f96ba26173cdbb3ede9a8045f08de0eeabe",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_620",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b0b8851845ea54df9b0bf35b6beb93d116fa8ffd3411c8d516c63823ee5f98e9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_880",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "efa4d5ea54544be08a4154e878b3bcffaf84b3c6e6653a0e0904a91c7aefbfb3",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_620",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b4b16aadf4550581fcf125fd21e0a55e5bebf57f72b56de08100710c70230a42",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_880",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "1f750fe3d76bb1e065a05236ec313480b96e2919c8d910cd4e8e68c1c0e620e4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1058",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e3ef3372df164fea6d704a337812984bcfd10797bee4eb21a6629a88363a2a73",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_880",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "3fa9e817683dff3bbe16352a411c9ff25515d7c412b436086cbd93d193e16de9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1058",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4ce249ee45158e415cdfafb109469f465006527fdff292d627f42ef497298c38",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_502",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8d70935fa6a996093aacf49f2d195544a3b6ec73ec2b128c2b3c76eaa1d51fbc",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1058",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4ad90bb5ab418a097f03e84d5c8ca43a5eb39ef34df99e8d49509c033878270e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_693",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "05800e95d9bf0196ff5f94caacf929dde4187fd2aadf3e04c68692dbdddf6179",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_502",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "2ff6d2f82f03ecc4dbea56bf38dfe267f155b31da288d3f6a1055bc2598570b6",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_693",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ff76835e5e16908682a5d3e48b8373852299fa5542fda1aa642d60c0bc73ca02",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_502",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "302ad97174f15b99981b53487de8b363d2f616eadf0601c9c8cc11773ebf7c98",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_693",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "3f504af95f4bda6d086f9ba7bcdc87ad557133cb1ca68ad08a0eeab298b07221",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_226",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "84920a2287509d5c9b26603b40ea2a4a15ae2230281baf589034d7f9b1ac334a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_226",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b5cf777c3fd7e98d2975720da578283f7445fcb689eae52e1a95d8d9bc2fc641",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_226",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a086cdd099aa05c11c9eaeb05360f7067cc13b3f41c708e3f984b49624bdc4a6",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_330",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a2487bf37498d6e27cb2fa5d01a6caad62e78df0967ff438e899f14090fd63da",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_330",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b528387f38681a2e8128234e0db05c0e5d5c940aae4b8dadffce01a09bb817f7",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_346",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0e78166ee08d7c66f6c75f1e491aafc71cc4420b34f12b437818164a20147ee5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_330",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "71a9a37152ff5db2f794a0bd1106e3e883b65a8b267236a8d1ba95ed5a3979a5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_346",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ab91ec9796976939fba0cd499e652f13609fcdcaa94b3e54284e38a3b846a234",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_346",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e1dea63faf79fed4b21090d024528fd1292dd8f1fa48af3004852c85a93857d4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_9",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "82ae22ed768b165a347fe82d5b351a17d159d99bdd75d0fca88b60935665e414",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_9",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "48a133cff738f47c4b3c7039fb2410896e51c447eebb6bca771eb9c4faefb9a2",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_893",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "5009edee8a04555998668b8deea9e3ef8ecb324d6f80a5226290cc73f2030171",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_9",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "40a97890ac8a1511cea5b3e5c7c07a19b073d5a8a69211fbf07c575852271b09",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_893",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "9a2bf113d84fba0de2b14a4c22df02dfed215fcec152648e8491531029658055",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_893",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4a26c813997e8b6a04c883cb1fb87ff044fc1f3a0055244da92aefbbcdbc7d8a",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_266",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b0627461610c4de00d25104b7d4ffebd699bd3d1e87f21ab6b1dba36ee8c841f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_266",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "732bd6c4fddd6c7bef4dbde51abb241247d6339774ebac2d3fb7d74d71293b2c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_266",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "056f321a363deb710a6678dd8719af74d7319d56c6c98704d941ef70773dcd41",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1071",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d74dd0f9a35d577607d6782faf4f295efe143d42e35a940d1102aecf23c37ff0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1071",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a8f4a4d02d31b9c00d9d230dc2b8c66b7c51d1a81fc4712c8b8b51da338af453",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_447",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "05e63c6076f72b226dd46d9622fb3ccb7db3ac2b5f61afe3591946690a4ade3d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1071",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4b1100482e265d2ff9a92d138915f33ed86e5e42059a432dcbba9c3460a1b23b",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_447",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6b7cfaf2c94142c5a15368b8c20e78c44f9d221683c8d3ea00c51a356c0b80a7",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_917",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "eb8d21cdca948d56eb8354492c8925b5324e4214d9e4e98f1460505cdca3aa8d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_447",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "db91eb60b61eb126b27e0c5671799ffe1fe367d6bd21b2a282f59da7d003c506",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_917",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "dc337fa21e40993e9d62c3b2fb1e40cdd89e5c0cc542c409a2d48d9dd8ca8be4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_137",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8930fe62b830aa300e7f211804e7e03be15125443de84c0dfa8c73d81be406aa",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_917",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "5ab0497b3f6b2a5cd3e9fcb43dfe5cda942f57defe3097e33d37f6309beec26d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_386",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "63764166acf2b2b43eff1a4a0f3ad85eae014d8b457d450bb5d6a3087484e089",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_137",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8dff461752b63483b996d34990a573d9bc8b511d7b68d29345fadbdca6ac5a09",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_137",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "044c55379dfa40056ec425179bc1ce8bb4d63ee1603a76a68b043f315b1d3797",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_386",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "0779e09c630c0e88c03c0ad72798a4b7d97aa5ee8a9b7ea8159d640924942edb",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_386",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a4ac226e5c9044e90a618b816748f615f9b42d1c3c3f07caee9b3c905653898e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_966",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "a316957cda9d99569ac867fe9bc262061f702982a9a65c16bddccaa9c820a7ed",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_966",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ce3c84ca4cf345148a6f4dc2dd97c973cce89b4763418a3e3bdf1d402e3064a0",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_68",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e54613ac01702e5ce7d6aa32eef91e21dc415aecfcbf517cc6a642508eb9cdff",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_966",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8ac0da286451583cac420d6aff9e6eddef235022c9e20cfb5d516869bd26e0f4",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_561",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "53f5930a4c73a8c0feb6e9fa8b83690faf2a516ced1fc301b3e73dab76778b6e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_68",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f09ea70f2403a1f74a818680c78d15e2ae3df130dd8014ee89ecef11e91e0e22",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_68",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "016f7ccde3280e29372ef993df38ce1b9d3d829a37895ffab017d5941b3570ec",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_561",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "f1c46bc9137ff6be2a2c9dbacb7ec683eb35c3136d5e18d4420b3c5d91e8af4f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_760",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "08dc3cae54a837070de6512e7b704e6d10a5adee8560235a69277a971e124a42",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_561",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b80d74f5cd2631875b2f755866d5eb64f0fcf194e0a53a1794b524aecd903749",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_760",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "84ec36ce46890560312e6f5df7d3a521c48010795b08aa60392d3c6fc5d0c994",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_903",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "9e018785e7a4a7d1c0065ffd74fc23748acd2e4648165796901133fc3b746d5e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_760",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "8222ed94dc53ac2d95e7f1417c2ce186118bdc7510d1cdf04bf5317fd6e33286",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_903",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "ac4b2546bda1532ec110212bb4757f45dbef9e950e888935afb0ab8a213a3236",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1096",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "424b9d1f62b90a396735bcfc0c670feee18b95ac77a94aba48f1fa07753509c8",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1096",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "6fd597376965df882069baf30acdf2a5240f61208a9471cec39899f62c1adb7e",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_903",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "4dc615f9429e5f3c0dc1379c3e150f08a2305d4f0ac4a2655a4ddb4744a3af88",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1096",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "c23e9676415e1f90f89685ac7a27f66313d43019f5c7368e7cd73680459075c7",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_641",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "70060de29de3318cee78ad1b3dc83f9c9bd6e36b77c2bda46cf3fcf4f4dbc918",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_641",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "22f129e157baadbc92f61229443623cf6ae5e5549a0246ba1140562d8de08ff5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_765",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "57bf2115d482ccddb10c90af5dde829aa0cc513c2280680891edae081c1da70c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_641",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "65464f70ae5fcb6edc8594d1ddf1ecc59458dfa9d96b229b26e28cfd98fe38c5",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_765",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "eaa31f73d037cf8d60bbe11d1b5c047bfee445ff140127f57ae151f41595dd08",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_907",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b8e60270e03fa8c6672a0aeba02141d742a0c2ac95f692def210ec8de49f135f",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_765",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "d10a35e49abc5dbe28c439e5c9d696c440aa87a8bd76e478fb36dc93774e19e9",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_907",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "69978ad022563f0eac06884b6f28ca1c176838046375a48e2ea06c09ebda5467",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_907",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "52dbc080927d5cbc89fd6d56272b1909fa20507d38dc2b374c046b96115c95ff",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1121",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "b9794912be30a55396c06f40447ef590b1df2f38f294b56f8350b0c8945d5d50",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1121",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "239c3711a385d8661d6eb4e186d936fb5b7f594beb114965772f478c1f04410d",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_133",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "7a88b46aa7e2fd94c1134ec64eb003c296831738b39603f6db9825804dd17d6c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1121",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "e0be5457bc6d98ff70172e37c02b31d8c0d102e51fa831a20c063baab3403a5c",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_133",
+      "contestant": "promptfoo",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    },
+    {
+      "key": "37781b664b124ed961eadb96856dada2088541667e28346c74adb8bf8a427d33",
+      "model": "gemini-3.8-flash",
+      "item": "rubric_eval_1034",
+      "contestant": "pair-ledger",
+      "httpStatus": 402,
+      "releasedHoldUsd": 0.1
+    }
+  ],
+  "releasedHoldsUsd": 36.9,
+  "chargedAfterReconciliationUsd": 7.092283459999996,
+  "freezeFileSha256": "26d4d437b147c9ecd796300942d5b0d7541d58f952ca37e8aecaa6e75b7dae07"
+}

@@ -1,0 +1,92 @@
+{
+  "at": "2026-10-13T13:13:37.098421+00:00",
+  "method": "offline only; returned answers retained; no content re-ask",
+  "rows": [
+    {
+      "item": "rubric_eval_1121",
+      "order": "canonical",
+      "callKey": "8113d2c324a0a04ee1f8809b61634f0a830954f11d54c216320204e62aa1887b",
+      "finishReason": "MAX_TOKENS",
+      "truncated": true,
+      "textChars": 7523,
+      "usage": {
+        "promptTokenCount": 1286,
+        "candidatesTokenCount": 7350,
+        "totalTokenCount": 9462,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 1286
+          }
+        ],
+        "thoughtsTokenCount": 826,
+        "serviceTier": "standard"
+      },
+      "parseSteps": [
+        {
+          "ruleId": "ledger.strict",
+          "changed": false,
+          "success": false
+        },
+        {
+          "ruleId": "ledger.invalid-escape",
+          "changed": false,
+          "success": false
+        },
+        {
+          "ruleId": "ledger.fence-strip",
+          "changed": false,
+          "success": false
+        },
+        {
+          "ruleId": "ledger.brace-close",
+          "changed": false,
+          "success": false
+        }
+      ]
+    },
+    {
+      "item": "rubric_eval_174",
+      "order": "swapped",
+      "callKey": "892ab94fb20c2939f8da1bee2c83d85306a7dab2fce9f2a33a7c3de0846f00ad",
+      "finishReason": "MAX_TOKENS",
+      "truncated": true,
+      "textChars": 7751,
+      "usage": {
+        "promptTokenCount": 2067,
+        "candidatesTokenCount": 7490,
+        "totalTokenCount": 10241,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 2067
+          }
+        ],
+        "thoughtsTokenCount": 684,
+        "serviceTier": "standard"
+      },
+      "parseSteps": [
+        {
+          "ruleId": "ledger.strict",
+          "changed": false,
+          "success": false
+        },
+        {
+          "ruleId": "ledger.invalid-escape",
+          "changed": true,
+          "success": false
+        },
+        {
+          "ruleId": "ledger.fence-strip",
+          "changed": false,
+          "success": false
+        },
+        {
+          "ruleId": "ledger.brace-close",
+          "changed": false,
+          "success": false
+        }
+      ]
+    }
+  ]
+}

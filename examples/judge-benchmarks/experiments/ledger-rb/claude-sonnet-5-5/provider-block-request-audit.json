@@ -1,0 +1,7 @@
+{
+  "scope": "All recorded ledger and seat provider-content blocks, including DEV and TEST. HTTP 402 and 429 are excluded.",
+  "method": "Exact candidate text and order match; same phase preferred, authorized DEV provider probe otherwise. No calls.",
+  "blockedRequests": 0,
+  "ourSystemTextsBySha256": {},
+  "rows": []
+}

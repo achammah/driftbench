@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-13T11:48:51.168889+00:00",
+  "authority": "Owner: return to four Haiku workers; fall back to two only on host load >60 or two transport failures within ten minutes. Parse errors do not change pacing.",
+  "haikuWorkers": 4,
+  "fallbackWorkers": 2,
+  "loadMetric": "one-minute OS load average",
+  "loadThreshold": 60,
+  "errorMetric": "Two timeout, network or CLI process failures in the trailing ten minutes, using recorded completion timestamps",
+  "parseErrors": "Scored as returned judge results; excluded from pacing",
+  "fallback": "latched until a later authorized runtime amendment; active calls drain",
+  "gemini": "parked, not run: daily quota",
+  "haikuMatchedAtCutover": 327,
+  "unfinishedAtCutover": 0,
+  "capUsd": 45,
+  "unchanged": [
+    "sealed record order",
+    "judge contract",
+    "prompts",
+    "schemas",
+    "reasoning",
+    "scoring",
+    "item set"
+  ]
+}

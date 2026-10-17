@@ -1,0 +1,237 @@
+{
+  "run": {
+    "bench": "rubricbench",
+    "model": "haiku",
+    "split": "test",
+    "items": 434,
+    "contestants": [
+      {
+        "contestant": "driftbench-rb-binary-canonical-executed",
+        "source": "Expert rubric, evidence per atomic requirement, binary aggregation (dev experiment); canonical presentation with exact candidate-code execution",
+        "mode": "pairwise, both orders",
+        "summary": {
+          "metric": "accuracy (RubricBench, over games)",
+          "value": {
+            "estimate": 0.8341013824884793,
+            "lower": 0.8078932210312856,
+            "upper": 0.857365346489171
+          },
+          "n": 434,
+          "byGroup": {
+            "code": {
+              "n": 198,
+              "value": 0.8383838383838382
+            },
+            "general": {
+              "n": 88,
+              "value": 0.8863636363636364
+            },
+            "ifeval": {
+              "n": 74,
+              "value": 0.8378378378378378
+            },
+            "stem": {
+              "n": 132,
+              "value": 0.8181818181818182
+            },
+            "Factuality": {
+              "n": 38,
+              "value": 0.8421052631578949
+            },
+            "math": {
+              "n": 52,
+              "value": 0.9230769230769231
+            },
+            "Precise IF": {
+              "n": 16,
+              "value": 0.875
+            },
+            "harmlessness": {
+              "n": 36,
+              "value": 0.8888888888888888
+            },
+            "human-preference": {
+              "n": 166,
+              "value": 0.7469879518072291
+            },
+            "Safety": {
+              "n": 26,
+              "value": 0.9230769230769231
+            },
+            "Focus": {
+              "n": 18,
+              "value": 1
+            },
+            "mmlu-pro": {
+              "n": 4,
+              "value": 1
+            },
+            "helpful": {
+              "n": 8,
+              "value": 1
+            },
+            "Math": {
+              "n": 4,
+              "value": 0
+            },
+            "mbpp": {
+              "n": 8,
+              "value": 0.75
+            }
+          },
+          "missing": 0,
+          "positionConsistency": 0.9723502304147466
+        },
+        "costUsd": 1.4742331999999991,
+        "calls": 868,
+        "uniqueCostUsd": 0.7371166000000006,
+        "uniqueCalls": 434
+      },
+      {
+        "contestant": "promptfoo",
+        "source": "promptfoo 8014282: select-best (pairs) and llm-rubric (single responses)",
+        "mode": "pairwise, both orders",
+        "summary": {
+          "metric": "accuracy (RubricBench, over games)",
+          "value": {
+            "estimate": 0.7960829493087558,
+            "lower": 0.7680020176280724,
+            "upper": 0.8215547128986769
+          },
+          "n": 434,
+          "byGroup": {
+            "code": {
+              "n": 198,
+              "value": 0.7575757575757576
+            },
+            "general": {
+              "n": 88,
+              "value": 0.8295454545454546
+            },
+            "ifeval": {
+              "n": 74,
+              "value": 0.837837837837838
+            },
+            "stem": {
+              "n": 132,
+              "value": 0.7803030303030303
+            },
+            "Factuality": {
+              "n": 38,
+              "value": 0.8421052631578947
+            },
+            "math": {
+              "n": 52,
+              "value": 0.9615384615384616
+            },
+            "Precise IF": {
+              "n": 16,
+              "value": 0.75
+            },
+            "harmlessness": {
+              "n": 36,
+              "value": 0.8611111111111112
+            },
+            "human-preference": {
+              "n": 166,
+              "value": 0.6927710843373495
+            },
+            "Safety": {
+              "n": 26,
+              "value": 1
+            },
+            "Focus": {
+              "n": 18,
+              "value": 0.9444444444444444
+            },
+            "mmlu-pro": {
+              "n": 4,
+              "value": 1
+            },
+            "helpful": {
+              "n": 8,
+              "value": 0.625
+            },
+            "Math": {
+              "n": 4,
+              "value": 0.75
+            },
+            "mbpp": {
+              "n": 8,
+              "value": 1
+            }
+          },
+          "missing": 2,
+          "positionConsistency": 0.7880184331797235
+        },
+        "costUsd": 0.5098115500000007,
+        "calls": 866,
+        "uniqueCostUsd": 0.5098115500000007,
+        "uniqueCalls": 866
+      }
+    ],
+    "newSpendUsd": 0,
+    "newCalls": 0,
+    "replayed": 1734,
+    "failedCalls": 2
+  },
+  "statistics": {
+    "pairs": 434,
+    "games": 868,
+    "wins": 105,
+    "losses": 72,
+    "bothRight": 619,
+    "bothWrong": 72,
+    "ours": {
+      "correct": 724,
+      "estimate": 0.8341013824884793,
+      "lower": 0.8078932210312856,
+      "upper": 0.857365346489171
+    },
+    "peer": {
+      "correct": 691,
+      "estimate": 0.7960829493087558,
+      "lower": 0.7680020176280724,
+      "upper": 0.8215547128986769
+    },
+    "difference": 0.038018433179723504,
+    "differencePairBootstrap95": [
+      0.002304147465437788,
+      0.07373271889400922
+    ],
+    "gameMcNemarP": 0.015919925652419276,
+    "gamePBonferroni18UpperBound": 0.286558661743547,
+    "holmP": null,
+    "holmStatus": "pending complete 18-cell matrix; Bonferroni value is a bound, not Holm",
+    "pairSensitivity": {
+      "wins": 86,
+      "losses": 48,
+      "p": 0.001303758671098664
+    },
+    "power": {
+      "units": 868,
+      "discordant": 177,
+      "discordanceShare": 0.20391705069124424,
+      "winShare": 0.5932203389830508,
+      "alpha": 0.002777777777777778,
+      "targetPower": 0.8,
+      "neededDiscordant": 420,
+      "neededUnits": 2060
+    },
+    "pairSensitivityPower": {
+      "units": 434,
+      "discordant": 134,
+      "discordanceShare": 0.3087557603686636,
+      "winShare": 0.6417910447761194,
+      "alpha": 0.002777777777777778,
+      "targetPower": 0.8,
+      "neededDiscordant": 180,
+      "neededUnits": 583
+    },
+    "caveat": "Game Wilson and McNemar treat orders as independent. Canonical games share one judgment. Pair bootstrap and pair sign sensitivity retain dependence."
+  },
+  "missing": {
+    "ours": 0,
+    "peer": 2
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "rows": [
+    {
+      "key": "287865ab360acfee2514cf47af62be7f9d27f451b43df499ffd92f316b1fa7b7",
+      "item": "rubric_eval_12",
+      "contestant": "pair-ledger",
+      "ordinal": 1,
+      "costUsd": 0.01881,
+      "inputTokens": 2605,
+      "cacheWriteTokens": 0,
+      "cacheReadTokens": 0,
+      "outputTokens": 1360,
+      "thinkingTokens": 406
+    },
+    {
+      "key": "39a238d37f692c65ca89194c71a4bea0a345a15115816d5c771d81528359a569",
+      "item": "rubric_eval_12",
+      "contestant": "promptfoo",
+      "ordinal": 0,
+      "costUsd": 0.00304,
+      "inputTokens": 1505,
+      "cacheWriteTokens": 0,
+      "cacheReadTokens": 0,
+      "outputTokens": 3,
+      "thinkingTokens": 0
+    },
+    {
+      "key": "e69e98f4aa63cf3cbcb0935e5400aeb8c7ecf7fdd6bf165f245d72781eaf2ff8",
+      "item": "rubric_eval_12",
+      "contestant": "promptfoo",
+      "ordinal": 1,
+      "costUsd": 0.00304,
+      "inputTokens": 1505,
+      "cacheWriteTokens": 0,
+      "cacheReadTokens": 0,
+      "outputTokens": 3,
+      "thinkingTokens": 0
+    },
+    {
+      "key": "92bc0620f113e4e9e88e91b481a2d45340f2ed55c0931375731da883d914cc21",
+      "item": "rubric_eval_129",
+      "contestant": "pair-ledger",
+      "ordinal": 0,
+      "costUsd": 0.025312,
+      "inputTokens": 3386,
+      "cacheWriteTokens": 0,
+      "cacheReadTokens": 0,
+      "outputTokens": 1854,
+      "thinkingTokens": 877
+    },
+    {
+      "key": "940b19acfa0738acf8c7761d4d1e20a51d0d858cd4c3ef26efc38b63bbca9495",
+      "item": "rubric_eval_129",
+      "contestant": "pair-ledger",
+      "ordinal": 1,
+      "costUsd": 0.024752,
+      "inputTokens": 3386,
+      "cacheWriteTokens": 0,
+      "cacheReadTokens": 0,
+      "outputTokens": 1798,
+      "thinkingTokens": 924
+    }
+  ],
+  "cacheWritesZero": true,
+  "cacheReadsZero": true,
+  "newCallsCostUsd": 0.074954,
+  "testCalls": 0
+}

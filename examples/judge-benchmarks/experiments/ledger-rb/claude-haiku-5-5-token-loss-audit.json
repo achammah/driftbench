@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-13T15:05:36.224168+00:00",
+  "model": "claude-haiku-5-5",
+  "matchedContestantItems": 1580,
+  "lostItemsByContestant": {
+    "pair-ledger": 0,
+    "promptfoo": 0
+  },
+  "itemsWith65536TokenDefect": 0,
+  "rows": [],
+  "policy": "Returned token-limited answers remain scored errors and are not retried. This audit uses raw saved responses only."
+}

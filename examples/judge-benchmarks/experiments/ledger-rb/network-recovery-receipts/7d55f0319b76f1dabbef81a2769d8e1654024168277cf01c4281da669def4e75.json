@@ -1,0 +1,95 @@
+{
+  "duration_api_ms": 3327,
+  "stop_reason": "refusal",
+  "session_id": "38d5b956-d429-4b8a-a554-99965c81470f",
+  "total_cost_usd": 0.0010822499999999999,
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 5234,
+    "cache_read_input_tokens": 3505,
+    "output_tokens": 0,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 5234,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 0,
+        "cache_read_input_tokens": 3505,
+        "cache_creation_input_tokens": 898,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 898
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 4,
+      "outputTokens": 0,
+      "cacheReadInputTokens": 3505,
+      "cacheCreationInputTokens": 5234,
+      "webSearchRequests": 0,
+      "costUSD": 0.0010822499999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "api_error",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 2,
+  "is_error": true,
+  "num_turns": 2,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "API Error: Haiku 5.5 can't help with this. Start a new session to continue.\n\nLearn more: https://www.anthropic.com/legal/aup\n\nDetails: `[bio]`\n\nRequest ID: req_011CfzRfLDqgFGFCj6yV4uiM\n\nMessage ID: msg_011CfzRfLSEmAfNMxZ28D5TG",
+  "type": "result",
+  "duration_ms": 5488,
+  "uuid": "167a8a3c-2fb6-41fc-9dc1-7b93db2ecbcf",
+  "queued_turn_count": 0,
+  "result_index": 0
+}

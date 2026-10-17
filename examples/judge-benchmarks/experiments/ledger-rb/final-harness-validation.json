@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-13T13:11:18.480859+00:00",
+  "commit": "d36a01002409fd23f91a234078d5c95559741e86",
+  "command": "pnpm exec vitest run examples/judge-benchmarks/test --maxWorkers 1",
+  "exitCode": 0,
+  "testFiles": 19,
+  "testsPassed": 98,
+  "logSha256": "20c794b582346ddd25b9d703dd4cf4899b61ba61e9f8c7d35cc6251a47ebf2bc",
+  "typecheck": "passed previously at cap12 source388a78f9; no source changes since"
+}

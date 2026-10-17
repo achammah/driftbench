@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-13T12:15:54.132737+00:00",
+  "sourceCommit": "27ee9936",
+  "command": "pnpm exec tsx --no-cache examples/judge-benchmarks/src/rubric-ledger-live.ts --phase test --models claude-haiku-5-5 --execute",
+  "models": [
+    "claude-haiku-5-5"
+  ],
+  "concurrency": 4,
+  "geminiStatus": "parked, explicit owner word required",
+  "log": ".cache/ledger-rb/test-haiku-recovery.log",
+  "processIds": [
+    99721
+  ],
+  "fallback": 2,
+  "fallbackRule": "load >60 or two transport failures in ten minutes; parse errors excluded",
+  "observedAt": "2026-10-13T11:53:00.385331+00:00",
+  "activeHaikuChildren": 3,
+  "loadOneMinute": 33.16064453125,
+  "pacing": "Persisted two; return four after load below40 for10minutes with no transport failure; fallback above60 or two transport failures in10minutes"
+}

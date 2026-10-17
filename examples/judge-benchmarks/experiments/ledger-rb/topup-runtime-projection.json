@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-13T10:30:25.895875+00:00",
+  "source": "Last up to 40 completed TEST job elapsedMs, frozen per-model concurrency",
+  "assumptions": "Unchanged throughput; no additional quota waits or billing interruption",
+  "models": [
+    {
+      "model": "claude-haiku-5-5",
+      "completedJobs": 281,
+      "recentJobs": 40,
+      "meanJobSeconds": 18.3693,
+      "projectedRemainingHours": 3.314127875
+    },
+    {
+      "model": "gpt-6-luna",
+      "completedJobs": 1312,
+      "recentJobs": 40,
+      "meanJobSeconds": 16.834575,
+      "projectedRemainingHours": 0.1566550729166667
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "completedJobs": 24,
+      "recentJobs": 24,
+      "meanJobSeconds": 20.646,
+      "projectedRemainingHours": 4.46183
+    }
+  ],
+  "projectedRemainingHours": 4.46183
+}
