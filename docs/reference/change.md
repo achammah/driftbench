@@ -4,7 +4,7 @@
 
 A change manifest says what changed between two versions of an agent, for `driftbench radius --change`; see [blast radius](../concepts/blast-radius.md). The page lists every field, generated from the zod schemas the CLI uses.
 
-* Keys are snake_case. An unknown key is an error.
+* Keys are as written below. An unknown key is an error.
 * Descriptions come from the schemas. An empty cell means the schema has no description for that field yet.
 
 ## Contents
@@ -12,6 +12,10 @@ A change manifest says what changed between two versions of an agent, for `drift
 * [ChangeManifest](#changemanifest)
 * [Change](#change)
 * [ToolPart](#toolpart)
+* [ChangeManifest promptProvenance](#changemanifest-promptprovenance)
+* [ChangeManifest promptProvenance map](#changemanifest-promptprovenance-map)
+* [ChangeManifest promptProvenance before](#changemanifest-promptprovenance-before)
+* [ChangeManifest promptProvenance after](#changemanifest-promptprovenance-after)
 
 ## ChangeManifest
 
@@ -22,6 +26,7 @@ What changed in the agent between two versions.
 | `from` | string, not empty | yes |  | The agent version before the change. |
 | `to` | string, not empty | yes |  | The agent version after the change. |
 | `changes` | list of [Change](#change) | yes |  | Every change made between the two versions. |
+| `promptProvenance` | [ChangeManifest promptProvenance](#changemanifest-promptprovenance) | no |  | Estate no-op evidence from radius auto. Only revalidation of its files, hashes, versions and map can authorize an empty version transition. |
 
 ## Change
 
@@ -43,3 +48,44 @@ One change to the agent.
 | `result` | What the tool returns. In the radius: blocks that expect a call, force its result or error, or read its end state. |
 | `description` | The text that tells the agent what the tool does. In the radius: every block that lists the tool, count 0 included. |
 | `presence` | Whether the agent is offered the tool at all. In the radius: every block that lists the tool, count 0 included. |
+
+## ChangeManifest promptProvenance
+
+Estate no-op evidence from radius auto. Only revalidation of its files, hashes, versions and map can authorize an empty version transition.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `kind` | `radius-auto-estate` | yes |  | An estate prompt comparison made by radius auto. |
+| `source` | string, not empty | yes |  | The atom provenance.file in the estate map. |
+| `map` | [ChangeManifest promptProvenance map](#changemanifest-promptprovenance-map) | yes |  | The complete approved estate map, hashed as its parsed document. |
+| `before` | [ChangeManifest promptProvenance before](#changemanifest-promptprovenance-before) | yes |  | The original prompt, hashed as its raw text string. |
+| `after` | [ChangeManifest promptProvenance after](#changemanifest-promptprovenance-after) | yes |  | The candidate prompt, hashed as its raw text string. |
+
+## ChangeManifest promptProvenance map
+
+The complete approved estate map, hashed as its parsed document.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `path` | string, not empty | yes |  | Absolute path, or a path relative to the manifest file. |
+| `hash` | string matching `^[a-f0-9]{64}$` | yes |  | Full SHA-256 of the canonical JSON value read from this file. |
+
+## ChangeManifest promptProvenance before
+
+The original prompt, hashed as its raw text string.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `path` | string, not empty | yes |  | Absolute path, or a path relative to the manifest file. |
+| `hash` | string matching `^[a-f0-9]{64}$` | yes |  | Full SHA-256 of the canonical JSON value read from this file. |
+| `version` | string, not empty | yes |  | The corresponding from or to agent version. |
+
+## ChangeManifest promptProvenance after
+
+The candidate prompt, hashed as its raw text string.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `path` | string, not empty | yes |  | Absolute path, or a path relative to the manifest file. |
+| `hash` | string matching `^[a-f0-9]{64}$` | yes |  | Full SHA-256 of the canonical JSON value read from this file. |
+| `version` | string, not empty | yes |  | The corresponding from or to agent version. |

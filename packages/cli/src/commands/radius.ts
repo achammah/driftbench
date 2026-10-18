@@ -1,6 +1,5 @@
 import { relative, resolve } from 'node:path';
 import {
-  loadChangeManifest,
   type RadiusCount,
   type RadiusReport,
   RunMode,
@@ -13,6 +12,7 @@ import { textTable as table } from '@agent-nexus/driftbench-report';
 import type { Command } from 'commander';
 import type { Io } from '../io';
 import { loadValidSpecs } from './campaign';
+import { loadRadiusChangeManifest } from './radius-change';
 import { registerRadiusLocalize } from './radius-localize';
 import { registerRadiusAuto } from './radius-prompt';
 import { readRegistry, registerRadiusSections } from './radius-sections';
@@ -72,7 +72,7 @@ export async function radiusCommand(paths: string[], options: RadiusCommandOptio
     if (!modes.includes(mode.data)) modes.push(mode.data);
   }
   const manifestPath = resolve(io.cwd, options.change);
-  const manifest = await loadChangeManifest(manifestPath);
+  const manifest = await loadRadiusChangeManifest(manifestPath);
   if (!manifest.ok) {
     io.err(`✗ ${options.change}\n`);
     for (const error of manifest.errors) io.err(`    ${error}\n`);

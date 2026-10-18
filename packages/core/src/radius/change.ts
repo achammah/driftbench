@@ -3,6 +3,7 @@ import { extname } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
 import { contentHash } from '../spec/hash';
+import { type PromptMapValidator, PromptProvenance, validatePromptNoop } from './prompt-provenance';
 
 /**
  * A change manifest: what changed in the agent between two versions. Each change has a kind and, for
@@ -60,6 +61,9 @@ export const ChangeManifest = z
     from: z.string().min(1).describe('The agent version before the change.'),
     to: z.string().min(1).describe('The agent version after the change.'),
     changes: z.array(Change).describe('Every change made between the two versions.'),
+    promptProvenance: PromptProvenance.optional().describe(
+      'Estate no-op evidence from radius auto. Only revalidation of its files, hashes, versions and map can authorize an empty version transition.',
+    ),
   })
   .describe('What changed in the agent between two versions.');
 export type ChangeManifest = z.infer<typeof ChangeManifest>;
@@ -90,7 +94,10 @@ export function changeLabel(change: Change): string {
 }
 
 /** Reads a change manifest file, YAML or JSON. A file that does not parse is an error, never an empty manifest. */
-export async function loadChangeManifest(path: string): Promise<ParsedManifest> {
+export async function loadChangeManifest(
+  path: string,
+  options: { validatePromptMap?: PromptMapValidator } = {},
+): Promise<ParsedManifest> {
   const text = await readFile(path, 'utf8');
   let value: unknown;
   try {
@@ -98,5 +105,7 @@ export async function loadChangeManifest(path: string): Promise<ParsedManifest> 
   } catch (cause) {
     return { ok: false, errors: [cause instanceof Error ? cause.message : String(cause)] };
   }
-  return parseChangeManifest(value);
+  const parsed = parseChangeManifest(value);
+  if (parsed.ok) await validatePromptNoop(parsed.manifest, path, options.validatePromptMap);
+  return parsed;
 }

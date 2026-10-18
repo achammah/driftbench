@@ -86,7 +86,7 @@ The radius is conservative by default.
 * A change no block declares is the whole suite: a new tool or a stage no spec names can reach any block, and nothing says which.
 * A `map` or `path` change puts in every block that records no cell; a `prompt` change puts in every block that names no atoms.
 * A tool change with no `part` counts every block that lists the tool, count 0 included.
-* A manifest with no change between two different versions is the whole suite.
+* A manifest with no change between two different versions is the whole suite, unless its estate prompt no-op evidence is revalidated as described below.
 
 ## The agent version
 
@@ -269,10 +269,33 @@ The manifest records each changed region, its old and new offsets, the matched e
 Supported anchors are dimension values, phrases, and `states`, `path`, `recovery`, `uses_tool` and
 `reply_language` relations. Changed unsupported entries select the whole suite.
 
-The diff normalizes CRLF and CR to LF, and Unicode to NFC. Offsets count UTF-16 code units in that
+`--map` also accepts an estate map from `estate scan`. The full map must pass schema and hash
+validation. `--source` names an atom's `provenance.file`, for example `CLAUDE.md`. Each quote must
+still occur at its recorded line span and have one exact occurrence in the old prompt. Approved
+atoms map to `kind: prompt`, with the atom id. Identical, nested or partially overlapping quote
+spans form one union anchor carrying every atom id in that group. This can select extra tests,
+but never extends an anchor to unquoted text on the same line. A changed group containing an
+unapproved atom selects everything; stale or ambiguous evidence also selects everything.
+Other source files are assumed unchanged. All carry compatibility and age checks still apply.
+
+For estate maps, a whitespace-only edit uses the unit ledger's text identity: Unicode NFC,
+whitespace runs collapsed to one space, and leading/trailing whitespace trimmed. Double spaces,
+tabs, trailing spaces and line-ending changes therefore produce `changes: []`.
+The empty manifest includes `promptProvenance`: the source, map and prompt file paths, full SHA-256
+hashes, and both version labels. `radius` and `campaign run --change --from` reread those files,
+check their hashes and version labels, validate the complete map and old quote spans, and repeat
+the no-op comparison. Only that validated manifest may select no tests across different labels.
+An unvalidated empty version transition still selects everything. Keep the evidence files available
+and unchanged; absolute paths are emitted, and relative paths resolve from the manifest's directory.
+
+Programmatic `parseChangeManifest` does not grant this trust. `loadChangeManifest` requires a trusted
+`validatePromptMap` callback that validates the full map and its source quotes; without it the
+whole-suite fallback remains. Serializing, reparsing or mutating a validated manifest loses its trust.
+
+For semantic edits and proposal maps, the diff normalizes CRLF and CR to LF, and Unicode to NFC. Offsets count UTF-16 code units in that
 normalized text. Every other whitespace character is retained and follows the same rule as other edits.
 Evidence quotes may match source whitespace runs so an extracted quote can span indentation. A
-normalized no-change with different version labels selects everything; with identical labels it adds no change.
+proposal-map normalized no-change with different version labels selects everything; with identical labels it adds no change.
 
 The mapper computes a character edit-distance alignment, with separate regions for separated edits.
 Every region must lie strictly inside exactly one declared anchor in BOTH the old and new prompt.
