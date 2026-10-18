@@ -69,6 +69,105 @@ jobs:
           fi
           test "$status" -eq 11
 
+  estate-full:
+    # Measurement only, on train/estate-union. Never merged to main.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',estate-full,')
+    name: estate all levels (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: seed1-hidden
+            args: --seed 1 --hidden
+          - name: seed2
+            args: --seed 2
+          - name: seed3
+            args: --seed 3
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Estate ladder, every level
+        shell: bash
+        env:
+          RUN_ARGS: ${{ matrix.args }}
+          RUN_NAME: ${{ matrix.name }}
+        run: |
+          # The exit code is the level reached, not a pass or fail: keep it beside the json.
+          start=$(date +%s)
+          status=0
+          # shellcheck disable=SC2086
+          pnpm -s driftbench validate estate $RUN_ARGS --all-levels --json > "estate-$RUN_NAME.json" || status=$?
+          echo "{\"exit\": $status, \"seconds\": $(( $(date +%s) - start )), \"head\": \"$(git rev-parse HEAD)\"}" > "estate-$RUN_NAME.meta.json"
+          cat "estate-$RUN_NAME.meta.json"
+      - name: Keep the run as evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: estate-${{ matrix.name }}
+          path: |
+            estate-${{ matrix.name }}.json
+            estate-${{ matrix.name }}.meta.json
+
+  estate-gen-check:
+    # Measurement only, on train/estate-union*. Never merged to main. Regenerates the committed fixture suite with
+    # the recipe's generate command and reports what differs from the committed tree.
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',estate-gen-check,')
+    name: fresh generate against the committed suite (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: pr640
+            ref: 6cd0ef478ea9d96fabaf290df6472a8222e10ef1
+          - name: union
+            ref: ''
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ matrix.ref || github.sha }}
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Generate the suite again and compare it with the committed one
+        shell: bash
+        run: |
+          git config user.name ci
+          git config user.email ci@users.noreply.github.com
+          echo "tested $(git rev-parse HEAD)" > "gen-check-${{ matrix.name }}.txt"
+          rm -rf examples/estates/fixture/generated
+          status=0
+          pnpm -s driftbench estate generate --map examples/estates/fixture/approved.yaml --plan packages/generate/test/estate/fixtures/planner-plan.approved.yaml --out examples/estates/fixture/generated > gen.out 2>&1 || status=$?
+          echo "generate exit $status (1 is normal: incomplete specs)" >> "gen-check-${{ matrix.name }}.txt"
+          tail -5 gen.out >> "gen-check-${{ matrix.name }}.txt"
+          git add -A examples/estates/fixture/generated
+          changed=$(git diff --cached --name-status -- examples/estates/fixture/generated | wc -l | tr -d ' ')
+          echo "files that differ from the committed tree: $changed" >> "gen-check-${{ matrix.name }}.txt"
+          git diff --cached --name-status -- examples/estates/fixture/generated | head -40 >> "gen-check-${{ matrix.name }}.txt"
+          echo "--- estate-generate-report.json" >> "gen-check-${{ matrix.name }}.txt"
+          git diff --cached -- examples/estates/fixture/generated/estate-generate-report.json | head -60 >> "gen-check-${{ matrix.name }}.txt"
+          cat "gen-check-${{ matrix.name }}.txt"
+      - name: Keep the result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gen-check-${{ matrix.name }}
+          path: gen-check-${{ matrix.name }}.txt
+
   protect:
     name: executor branches leave the validators alone
     if: github.event_name == 'pull_request'
