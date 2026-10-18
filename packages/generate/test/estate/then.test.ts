@@ -779,13 +779,22 @@ describe('a read of a file the estate does not hold', () => {
     ...ctx,
     files: new Set(['.claude/skills/a/references/rules.md', 'CLAUDE.md']),
   };
-  const reads = (path: string) =>
-    atom('reference.x', [{ type: 'tool_called', label: 'Read', input: { file_path: { contains: path } } }]);
+  const reads = (path: string, file?: string) =>
+    atom('reference.x', [{ type: 'tool_called', label: 'Read', input: { file_path: { contains: path } } }], {
+      ...(file ? { provenance: { quote: 'x', file } } : {}),
+    });
 
-  it('expects a read only of a file the estate holds, matched on the end of its path', () => {
+  it('expects a read only of a file the estate holds: a contains path ends a held path at a folder boundary', () => {
     const held = thenOf([reads('references/rules.md')], 'positive', files);
     expect(held.references).toEqual([{ path: '**/references/rules.md', count: { min: 1 } }]);
     expect(held.gaps).toEqual([]);
+    expect(thenOf([reads('CLAUDE.md')], 'positive', files).gaps).toEqual([]);
+    // Not at a folder boundary, or longer than the held path: no file of the estate.
+    for (const path of ['eferences/rules.md', 'rules/references/rules.md', 'notes/CLAUDE.md'])
+      expect(
+        thenOf([reads(path)], 'positive', files).gaps.map((entry) => entry.marker),
+        path,
+      ).toEqual([MARKERS.existingFile]);
   });
 
   it('leaves the row incomplete when the file is not in the estate, never expecting it', () => {

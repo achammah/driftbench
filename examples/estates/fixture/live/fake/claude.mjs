@@ -12,7 +12,7 @@
  * - A stream file holds stream records (`{{cwd}}` and `{{session_id}}` are filled in) and directives the fake
  *   performs instead of printing: `{"fake":"decision", event, check, verdict}` appends a guard row to
  *   `HOOK_DECISION_LOG`, `{"fake":"step", step}` a step row to `STEP_FEED`, `{"fake":"write", path, content}`
- *   and `{"fake":"edit", path, old, new}` change the workspace.
+ *   and `{"fake":"edit", path, old, new}` change the workspace, `{"fake":"delete", path}` removes a file.
  * - The init and result records are written by the fake; the result's cost is 0.
  * - `RATE_WAVE_FILE` holding n > 0: the run answers overloaded and counts n down.
  * - `--resume <id>` reads `<config>/projects/<folder>/<id>.jsonl`, where the config folder is
@@ -28,6 +28,7 @@ import {
   readdirSync,
   readFileSync,
   renameSync,
+  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -43,6 +44,20 @@ const flag = (name) => {
 };
 const streamInput = flag('--input-format') === 'stream-json';
 const resume = flag('--resume');
+// The run's permissions, as the runtime takes them: a mode, and rules that each argument after the flag names.
+const permissionMode = flag('--permission-mode');
+const rulesAfter = (...names) => {
+  const at = args.findIndex((arg) => names.includes(arg));
+  if (at < 0) return [];
+  const rules = [];
+  for (const arg of args.slice(at + 1)) {
+    if (arg.startsWith('-')) break;
+    rules.push(...arg.split(/[,\s]+(?![^(]*\))/).filter(Boolean));
+  }
+  return rules;
+};
+const allowedTools = rulesAfter('--allowed-tools', '--allowedTools');
+const disallowedTools = rulesAfter('--disallowed-tools', '--disallowedTools');
 
 let ask = '';
 const queued = [];
@@ -169,7 +184,16 @@ const records = manifestPath
       .split('\n')
       .filter((line) => line.trim() !== '')
       .map((line) => JSON.parse(fill(line)))
-  : planStream({ ask, cwd, sessionId, env }).records;
+  : planStream({
+      ask,
+      cwd,
+      sessionId,
+      env,
+      compacted: previous.some((record) => record.type === 'system' && record.subtype === 'compact_boundary'),
+      permissionMode,
+      allowedTools,
+      disallowedTools,
+    }).records;
 for (const record of records) {
   if (record.fake === 'decision') {
     if (env.HOOK_DECISION_LOG) {
@@ -189,6 +213,10 @@ for (const record of records) {
   if (record.fake === 'write') {
     mkdirSync(dirname(join(cwd, record.path)), { recursive: true });
     writeFileSync(join(cwd, record.path), record.content);
+    continue;
+  }
+  if (record.fake === 'delete') {
+    rmSync(join(cwd, record.path), { force: true });
     continue;
   }
   if (record.fake === 'move') {
@@ -273,7 +301,7 @@ function findSession(id) {
   return undefined;
 }
 
-/** The tools offered, as the runtime does: a tool the copy's settings deny whole is not offered. */
+/** The tools offered, as the runtime does: a tool the copy's settings or the run deny whole is not offered. */
 function offeredTools() {
   const all = ['Read', 'Edit', 'Write', 'Bash', 'Skill', 'Agent', 'WebFetch'];
   const text = readText(join(cwd, '.claude', 'settings.json'));
@@ -283,7 +311,7 @@ function offeredTools() {
   } catch {
     deny = [];
   }
-  return all.filter((tool) => !deny.includes(tool));
+  return all.filter((tool) => !deny.includes(tool) && !disallowedTools.includes(tool));
 }
 
 function readHelpers() {
