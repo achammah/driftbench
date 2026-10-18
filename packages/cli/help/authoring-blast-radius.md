@@ -54,7 +54,7 @@ Unknown means in. The radius is conservative:
 * A block with unknown dependencies is in every radius (reason `unknown-deps`). A block is unknown when its spec has no `metadata.generated`, no `metadata.estate.atoms` and no `metadata.depends`.
 * A change the radius cannot map makes the radius the whole suite. These changes cannot be mapped: an unknown kind, `model`, `agent`, `global: true`, the rule `reply_language`, a change with no `id`, a `map` id without `=`.
 * A change no block declares makes the radius the whole suite (`no block declares a dependency on it`), for example a new tool. A `criterion` change is the exception: a criterion no block names selects nothing.
-* A manifest with no change between two different versions is the whole suite. With `from` equal to `to` and no change, the radius is empty.
+* A manifest with no change between two different versions is the whole suite, except a revalidated estate prompt no-op from `radius auto` (see below). With `from` equal to `to` and no change, the radius is empty.
 
 When the radius is the whole suite, nothing can be carried, and `radius` exits 1.
 
@@ -107,15 +107,15 @@ driftbench radius auto --prompt <old> <new> --map <file> [--source <path>] [--fr
 | Option | Meaning | Default |
 |---|---|---|
 | `--prompt <files...>` (required) | exactly two files: the old prompt, then the new prompt | none |
-| `--map <file>` (required) | the approved map (a map proposal file, YAML or JSON) whose entries carry `evidence.source` and `evidence.quote` | none |
-| `--source <path>` | which source of the map the prompt pair is. It must equal one `sources[].path` of the map, character for character. Only evidence quoting this source becomes an anchor; every other source is treated as unchanged | the old prompt path relative to the folder of the map, with `/` separators |
+| `--map <file>` (required) | the approved map proposal with evidence quotes, or an estate map with atom provenance, in YAML or JSON | none |
+| `--source <path>` | which source of the map the prompt pair is. It must equal one `sources[].path` of a proposal, or an atom's `provenance.file` in an estate map. Only this source becomes anchors; every other source is treated as unchanged | the old prompt path relative to the folder of the map, with `/` separators |
 | `--from-version <version>` | the `from` of the manifest: the baseline agent version | the content hash of the old text (12 hex characters) |
 | `--to-version <version>` | the `to` of the manifest: the candidate agent version | the content hash of the new text |
 | `--out <file>` | write the manifest YAML to this file and print nothing | print the YAML on stdout |
 
 Use the agent versions your campaigns record (`--agent-version` of `campaign run`). The default content hashes need not equal a prompt registry hash.
 
-Which map entries become anchors (only approved entries whose `evidence.source` equals the source):
+Which proposal entries become anchors (only approved entries whose `evidence.source` equals the source):
 
 | Map entry | Change it maps to |
 |---|---|
@@ -128,13 +128,20 @@ Which map entries become anchors (only approved entries whose `evidence.source` 
 | relation `reply_language` | `rule`, id `reply_language` (whole suite) |
 | any other relation, a constraint, a numeric setting | an anchor with no change: an edit inside it is whole suite |
 
+An estate map passes full schema, provenance-hash and map-hash validation first. Each selected
+source atom must quote its recorded line span and have one exact occurrence in the old text.
+Approved atoms map to `prompt`, id `<atom.id>`. Overlapping exact quote spans, including nested
+and identical spans, become one union anchor carrying all their atom ids. This may select extra
+tests; it does not extend the quote to the whole source line. If any atom in a changed group is
+unapproved, the change is whole suite. Stale or ambiguous evidence also selects the whole suite.
+
 How the diff maps to changes:
 
-* Both texts are normalized first: CRLF and CR become LF, Unicode becomes NFC. Offsets count UTF-16 code units in the normalized text. Other whitespace is kept. A quote matches across any run of whitespace.
+* Both texts are normalized first: CRLF and CR become LF, Unicode becomes NFC. Offsets count UTF-16 code units in the normalized text. Other whitespace is kept for semantic edits and proposal maps. Estate no-op comparisons use the unit ledger's whitespace identity (see below). A quote matches across any run of whitespace.
 * The diff is a character edit distance alignment. It admits at most 64 single-character edits and 8,000,000 band cells; beyond that the result is the whole suite.
 * Every changed region must lie strictly inside exactly one anchor in both the old and the new text. Each anchor quote must occur exactly once in the old text. It must be located in the new text through its unchanged first and last characters. It must occur exactly once there too. Anchors must not overlap.
 * Otherwise the manifest holds one change `kind: prompt, global: true` (the whole suite). Its `note` names each region and the rule that failed: `stale quote in old text`, `ambiguous quote in old text`, `ambiguous quote in new text`, `anchor cannot be located unambiguously in new text`, `overlapping anchors`, `empty quote`, `ambiguous optimal diff alignment`, `diff exceeds the exact alignment bound`, `no quote matched on both sides`, `unmapped anchor`.
-* Identical texts (after normalization) give `changes: []` when the versions are equal, and the whole suite when they differ (`region none: no normalized change explains the version transition`).
+* With proposal maps, identical texts (after normalization) give `changes: []` when the versions are equal, and the whole suite when they differ (`region none: no normalized change explains the version transition`). Estate maps can prove an empty transition across different versions (see below).
 
 Exit codes:
 
@@ -259,7 +266,22 @@ Any `metadata.depends` mapping, even an empty one, makes the spec's dependencies
 
 A map proposal file (the format of `examples/acme/map/approved.yaml`; see authoring-map and authoring-extract). The keys `radius auto` reads: `sources[].path`, and on each dimension value, phrase, relation, constraint and numeric setting: `approved` and `evidence` (`source`, `quote`). The whole file must pass the proposal schema (`version: 1`, `agent`, `produced_by`, `sources`, `dimensions`, `constraints`, `phrases`, optional `relations` and `numeric_settings`).
 
-A map with many repeated or overlapping quotes over one source makes most edits whole suite. A focused map that declares only the anchors you trust gives a narrow manifest.
+A proposal with many repeated or overlapping quotes over one source makes most edits whole suite. A focused proposal that declares only the anchors you trust gives a narrow manifest.
+
+An estate map is the complete file from `estate scan` and `estate approve`; do not trim its atoms
+or edit its provenance. `radius auto --prompt old.md new.md --map approved-estate.yaml --source CLAUDE.md`
+uses the atom provenance described above. Unquoted text, boundary edits and ambiguous diffs still
+select everything for semantic edits. Estate no-op comparison uses the unit ledger's text identity:
+Unicode NFC, whitespace runs collapsed to one space, and leading/trailing whitespace trimmed.
+Double spaces inside a rule, trailing spaces, tabs and CRLF-only edits identify no changes.
+
+For an estate no-op, `radius auto` adds `promptProvenance` with the source, map and prompt paths,
+full SHA-256 hashes, and both version labels. `radius` and `campaign run --change --from` reread
+and validate that evidence, including the complete map's internal hashes and old quote spans.
+Validated empty changes select zero tests even across different version labels. Unvalidated empty
+changes across different versions still select the whole suite. Keep all evidence files unchanged
+and available. Emitted paths are absolute; relative paths resolve from the manifest directory.
+Carry compatibility and age checks still apply. Other source files are assumed unchanged.
 
 ## Outputs and how to read them
 
@@ -657,4 +679,4 @@ Whole-suite reasons you can meet, each with exit 1:
 | `a map change is written dimension=value` | a `map` change with no `id`, or an id without `=` (or starting with `=`) |
 | `a recovery rule is written recovery:<class>`, `a uses_tool rule is written uses_tool:<tool>`, `a path rule is written path:<id>` | a rule id with nothing after the colon |
 | `no block declares a dependency on it` | a change no block or perturbation names (not for `criterion`) |
-| `the manifest lists no change between two different versions` | `changes: []` with `from` different from `to` |
+| `the manifest lists no change between two different versions` | `changes: []` with `from` different from `to`, without revalidated estate no-op evidence |

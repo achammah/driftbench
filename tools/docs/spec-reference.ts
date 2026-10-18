@@ -704,7 +704,7 @@ export const FILE_PAGES: readonly FilePage[] = [
     source: 'packages/core/src/radius/change.ts',
     about:
       'A change manifest says what changed between two versions of an agent, for `driftbench radius --change`; see [blast radius](../concepts/blast-radius.md).',
-    keys: SNAKE,
+    keys: 'Keys are as written below. An unknown key is an error.',
     names: core,
     roots: [['ChangeManifest', core.ChangeManifest]],
     values: {

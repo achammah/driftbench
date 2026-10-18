@@ -246,7 +246,7 @@
     {
       "id": "new-request",
       "title": "A user opens a new request and submits it",
-      "behaviours": ["B-001", "B-002", "B-004", "B-005"],
+      "behaviours": ["B-001", "B-002", "B-004", "B-005", "B-006"],
       "deviations": [
         "D1_off_topic",
         "D3_contradiction",
@@ -258,7 +258,7 @@
     {
       "id": "change-request",
       "title": "A user changes a request before it is submitted",
-      "behaviours": ["B-001", "B-003", "B-005"],
+      "behaviours": ["B-001", "B-003", "B-004", "B-005"],
       "deviations": ["D2_goal_shift", "D4_loose_confirmation"]
     },
     {

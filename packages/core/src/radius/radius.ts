@@ -4,6 +4,7 @@ import { isPlainObject } from '../spec/normalize';
 import { parentOrder } from '../spec/parents';
 import { type Change, type ChangeManifest, changeLabel } from './change';
 import { type BlockDependencies, blockDependencies } from './depends';
+import { hasValidatedPromptNoop } from './prompt-provenance';
 import type { SectionRegistry } from './sections';
 import {
   type ParentRef,
@@ -281,7 +282,7 @@ export function radiusOf(
   );
 
   let whole: RadiusReport['whole'] = null;
-  if (manifest.changes.length === 0 && manifest.from !== manifest.to) {
+  if (manifest.changes.length === 0 && manifest.from !== manifest.to && !hasValidatedPromptNoop(manifest)) {
     whole = { change: '(none)', reason: 'the manifest lists no change between two different versions' };
   }
   const selectors: { label: string; match: Match; needs?: 'cell' | 'atoms' }[] = [];

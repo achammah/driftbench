@@ -1144,7 +1144,7 @@ relations:
     flow: new-request
     when: { lookup_record.in.kind: [ lookup_record.in.kind.green, lookup_record.in.kind.basic, lookup_record.in.kind.west ], list_options.in.category: [ list_options.in.category.medium, list_options.in.category.small, list_options.in.category.east ], submit_request.in.plan: [ submit_request.in.plan.standard, submit_request.in.plan.premium, submit_request.in.plan.large ], lookup_record.out.found: [ lookup_record.out.found.true, lookup_record.out.found.false ], lookup_record.out.status: [ lookup_record.out.status.monthly, lookup_record.out.status.daily ], list_options.out.available: [ list_options.out.available.true, list_options.out.available.false ], list_options.out.order: [ list_options.out.order.amber, list_options.out.order.north ], submit_request.out.accepted: [ submit_request.out.accepted.true, submit_request.out.accepted.false ], submit_request.out.route: [ submit_request.out.route.coastal, submit_request.out.route.south ] }
     stages: [ opening, intake, check, choice, details, recap, done ]
-    behaviours: [ B-001, B-002, B-004, B-005 ]
+    behaviours: [ B-001, B-002, B-004, B-005, B-006 ]
     end_state:
       source: tool:submit_request
       mode: subset
@@ -1171,7 +1171,7 @@ relations:
     flow: change-request
     when: { lookup_record.in.kind: [ lookup_record.in.kind.green, lookup_record.in.kind.basic, lookup_record.in.kind.west ], list_options.in.category: [ list_options.in.category.medium, list_options.in.category.small, list_options.in.category.east ], submit_request.in.plan: [ submit_request.in.plan.standard, submit_request.in.plan.premium, submit_request.in.plan.large ], lookup_record.out.found: [ lookup_record.out.found.true, lookup_record.out.found.false ], lookup_record.out.status: [ lookup_record.out.status.monthly, lookup_record.out.status.daily ], list_options.out.available: [ list_options.out.available.true, list_options.out.available.false ], list_options.out.order: [ list_options.out.order.amber, list_options.out.order.north ] }
     stages: [ opening, intake, check, choice, details, recap ]
-    behaviours: [ B-001, B-003, B-005 ]
+    behaviours: [ B-001, B-003, B-004, B-005 ]
     evidence:
       source: ./prompt.md
       quote: After opening, the next step is intake.
@@ -1193,7 +1193,7 @@ relations:
     flow: new-request
     when: { lookup_record.in.kind: [ lookup_record.in.kind.green, lookup_record.in.kind.basic, lookup_record.in.kind.west ], submit_request.in.plan: [ submit_request.in.plan.standard, submit_request.in.plan.premium, submit_request.in.plan.large ], lookup_record.out.found: [ lookup_record.out.found.true, lookup_record.out.found.false ], lookup_record.out.status: [ lookup_record.out.status.monthly, lookup_record.out.status.daily ], submit_request.out.accepted: [ submit_request.out.accepted.true, submit_request.out.accepted.false ], submit_request.out.route: [ submit_request.out.route.coastal, submit_request.out.route.south ] }
     stages: [ opening, intake, check, recap, done ]
-    behaviours: [ B-001, B-002, B-004, B-005 ]
+    behaviours: [ B-001, B-002, B-004, B-005, B-006 ]
     end_state:
       source: tool:submit_request
       mode: subset

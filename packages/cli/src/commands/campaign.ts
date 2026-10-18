@@ -30,7 +30,6 @@ import {
   type DriftClass,
   isScored,
   type LoadedSpec,
-  loadChangeManifest,
   loadSpecs,
   type MinimumDetectableEffect,
   mdeLine,
@@ -104,6 +103,7 @@ import { campaignProvenance } from './campaign-provenance';
 import { registerCampaignRejudge } from './campaign-rejudge';
 import { gateExit } from './gate-exit';
 import { agentFamilyOf, describeSource, loadPersonas, portFor, userFactory, userSource } from './personas';
+import { loadRadiusChangeManifest } from './radius-change';
 
 /** What lives as long as one campaign: a temporary folder for its sandboxes, made on first use. */
 export type CampaignScope = {
@@ -1276,7 +1276,7 @@ async function radiusPlan(
     );
     return null;
   }
-  const manifest = await loadChangeManifest(resolve(io.cwd, options.change));
+  const manifest = await loadRadiusChangeManifest(resolve(io.cwd, options.change));
   if (!manifest.ok) {
     io.err(`✗ ${options.change}\n`);
     for (const error of manifest.errors) io.err(`    ${error}\n`);
