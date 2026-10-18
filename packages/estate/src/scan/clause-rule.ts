@@ -245,7 +245,24 @@ export function clauseRule(source: string, context: RuleContext): Rule | undefin
     if (found) return found;
     return;
   }
-  const restriction = /^only\s+(.+?)\s+(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to)\s+\S/i.exec(text);
+  // "Only when X may Y", "Only when X, Y may Z", "Only when X does Y V": the words up to the main clause are a
+  // condition, and the actor of the main clause decides who is addressed.
+  const conditionLed = /^only\s+(?:when|if|after|once|while|as\s+soon\s+as)\b/i.test(text);
+  if (conditionLed) {
+    const main = frontedMainClause(text);
+    if (main) {
+      const kind = subjectKind(main.actor, main.actorTerms, context);
+      // The agent and what it writes are addressed. Any other actor makes a rule only when the clause states an
+      // act done to something ("the dispatcher close the ticket", "a parcel be released"): a happening or a
+      // state ("the roads close", "the grass look green") describes the world.
+      if (kind === 'self' || kind === 'output' || (kind === 'thing' && statesAnAct(main.predicate)))
+        return { subject: main.actor, polarity: 'obligation', form: 'restriction' };
+    }
+  }
+  // A condition-led sentence has no subject before the modal; "Only X may Y" does.
+  const restriction = conditionLed
+    ? null
+    : /^only\s+(.+?)\s+(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to)\s+\S/i.exec(text);
   if (restriction) {
     const who = restriction[1] ?? '';
     const kind = subjectKind(who, termsWithin(text, terms, 5, 5 + who.length), context);
@@ -389,6 +406,91 @@ function calendarDeadline(text: string, terms: Term[], from: number): boolean {
   return (
     /\b(?:by|before|until|on)\b/i.test(tail) &&
     termsWithin(text, terms, from, text.length).some((term) => has(term, 'WeekDay', 'Month', 'Holiday'))
+  );
+}
+
+/** The auxiliaries and modals that open an inverted main clause ("... may the dispatcher close ...") or follow its actor. */
+const MAIN_AUX =
+  /\b(?:may|can|are\s+allowed\s+to|is\s+allowed\s+to|must|shall|should|will|does|do|did)(?=\s)/gi;
+const CONDITION_OPENERS = new Set([...SUBORDINATORS, 'and', 'or', 'but', 'nor', 'so', 'then', 'also']);
+
+const isFiniteVerb = (term: Term) =>
+  has(term, 'Verb') && !has(term, 'Gerund', 'Participle', 'Adjective', 'Noun', 'Modal', 'Infinitive');
+
+/**
+ * The noun phrase that opens a main clause: the words before its first verb. None when the clause opens with a
+ * verb, a conjunction, a subordinator or a preposition (the rest of a condition), when it holds a comma, or
+ * when a finite verb sits inside the phrase.
+ */
+function actorOf(clause: string): { text: string; terms: Term[]; rest: string } | undefined {
+  const trimmed = clause.trim();
+  if (trimmed === '' || trimmed.includes(',')) return;
+  const first = trimmed.split(/\s+/)[0]?.toLowerCase() ?? '';
+  if (CONDITION_OPENERS.has(first) || PREPOSITIONS.has(first)) return;
+  const terms = termsOf(nlp(trimmed));
+  if (
+    terms.length === 0 ||
+    has(terms[0], 'Verb', 'Modal', 'Conjunction', 'Preposition', 'Adverb', 'Negative')
+  )
+    return;
+  const verbAt = terms.findIndex((term, at) => at > 0 && has(term, 'Verb'));
+  const actorTerms = verbAt > 0 ? terms.slice(0, verbAt) : terms.slice(0, 2);
+  if (actorTerms.some((term, at) => at > 0 && isFiniteVerb(term))) return;
+  const text = actorTerms.map((term) => term.text).join(' ');
+  return { text, terms: actorTerms, rest: trimmed.slice(text.length).trim() };
+}
+
+/**
+ * The main clause of "Only when C may A V", "Only when C does A V" and "Only when C, A may V": its actor and what
+ * it is said to do. The form is decided first. An auxiliary or modal that closes a complete condition (the
+ * words before it hold a verb of their own) and opens a noun phrase is an inversion, so the actor follows it; a
+ * modal inside the condition ("users may log in") has no verb before it and does not close it. Otherwise the
+ * condition ends at the first comma after which a noun phrase and a modal follow, so the commas of a list, a
+ * relative clause or an inner "if" and "unless" inside the condition are passed over.
+ */
+function frontedMainClause(
+  text: string,
+): { actor: string; actorTerms: Term[]; predicate: string } | undefined {
+  const body = text.replace(/^only\s+(?:when|if|after|once|while|as\s+soon\s+as)\s+/i, '');
+  // The predicate of a main clause opens with its verb: after a modal inside the condition ("users may log in")
+  // comes a verb, never a noun phrase, so that modal is not an inversion.
+  const opensWithVerb = (predicate: string) => {
+    const first = termsOf(nlp(predicate))[0];
+    return has(first, 'Verb') && !has(first, 'Modal');
+  };
+  for (const aux of body.matchAll(MAIN_AUX)) {
+    const found = actorOf(body.slice((aux.index ?? 0) + aux[0].length));
+    if (found && opensWithVerb(found.rest))
+      return { actor: found.text, actorTerms: found.terms, predicate: found.rest };
+  }
+  for (const comma of body.matchAll(/,\s*/g)) {
+    const main = body.slice((comma.index ?? 0) + comma[0].length);
+    const modal = new RegExp(MAIN_AUX.source, 'i').exec(main);
+    if (!modal) continue;
+    const found = actorOf(main.slice(0, modal.index));
+    const predicate = main.slice(modal.index + modal[0].length).trim();
+    if (found && opensWithVerb(predicate)) return { actor: found.text, actorTerms: found.terms, predicate };
+  }
+  return undefined;
+}
+
+/**
+ * Whether a predicate states an act done to something: a verb and, right after it, the object (a determiner, a
+ * possessive, a pronoun, a question word, a number or a noun), or "be" and a participle for a passive. A verb
+ * that stands alone, takes a preposition ("rest on the sand") or an adjective ("look green") describes a
+ * happening or a state.
+ */
+function statesAnAct(predicate: string): boolean {
+  const [first, ...rest] = termsOf(nlp(predicate));
+  if (!first || !has(first, 'Verb')) return false;
+  if (has(first, 'Copula') || /^(?:be|been|being)$/i.test(first.text))
+    return has(rest[0], 'Participle', 'PastTense', 'Passive');
+  const next = rest.find((term) => !has(term, 'Adverb'));
+  return (
+    !!next &&
+    !has(next, 'Preposition', 'Particle', 'Conjunction') &&
+    (has(next, 'Determiner', 'Possessive', 'Pronoun', 'QuestionWord', 'Value') ||
+      (has(next, 'Noun') && !has(next, 'Adjective')))
   );
 }
 
