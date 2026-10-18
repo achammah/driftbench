@@ -401,6 +401,36 @@ describe('the real stream shapes', () => {
     expect(rows.map((row) => `${row.check}:${row.verdict}`)).toEqual(['read-before-edit.py:allow']);
   });
 
+  it('reads another nonzero exit as a warning, and a hook that did not finish as an error', () => {
+    // docs/estate.md: exit 2 denies, another nonzero exit warns; the runtime goes on and shows the message.
+    const response = (id: string, code: number | undefined, outcome: string) =>
+      line({
+        type: 'system',
+        subtype: 'hook_response',
+        hook_id: id,
+        hook_name: 'Stop',
+        hook_event: 'Stop',
+        stdout: '',
+        stderr: 'keep it short',
+        ...(code === undefined ? {} : { exit_code: code }),
+        outcome,
+        session_id: sid,
+      });
+    const rows = hookDecisions(
+      parseStream(
+        [
+          response('w1', 1, 'error'),
+          response('w2', 3, 'error'),
+          response('w3', 1, 'cancelled'),
+          response('w4', undefined, 'error'),
+        ].join('\n'),
+      ),
+      settings,
+      '2026-10-12T10:00:00.000Z',
+    );
+    expect(rows.map((row) => row.verdict)).toEqual(['warn', 'warn', 'error', 'error']);
+  });
+
   it('names the responses of a matcher holding several commands by those commands, in turn', () => {
     // Seen on the Cue estate: PostToolUse:Bash holds three commands and the response names none of them.
     const response = (id: string, code: number) =>
