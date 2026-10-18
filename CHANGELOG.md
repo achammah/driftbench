@@ -4,6 +4,7 @@ All notable changes to driftbench are listed here. The format follows [Keep a Ch
 
 ## [Unreleased]
 
+* A reference is navigation only by where it sits, never by the folder or heading of its target. An instruction that acts on a reference (read it, use it) makes it testable whatever its target; only a reference that leads a list item, a table cell or a heading, with no other atom anchored on its line, gives no test. `estate stats` keeps every approved reference in its kind count and reports the navigation-only ones apart. New export of `@agent-nexus/driftbench-generate`, frozen in `tools/structure/api-surface.json`: `anchoredLines`.
 * New exports of `@agent-nexus/driftbench-estate`, frozen in `tools/structure/api-surface.json`: `proseCandidates`, `proseCacheKey`, `ProseCache`, `FileProseCache` and `ProseEstimate`, `proseEstimateLine` (the code-found prose candidates and their cache, and the cost line of a model pass); `USER_LAYER` and `isUserLayerPath` (the user-level skill layer); `citationsByFile` and `filesReached` (the estate graph).
 * Estate user-level skill layer: a container named `Trash` or `trash` is not read, a relative `--user-skills` folder is relative to the folder the command is typed in, an empty `--user-skills` value or `userSkills` reader option is refused, and the hidden-folder, dependency-folder, trash, `~` and relative-path rules each have a test that fails when the rule is removed.
 

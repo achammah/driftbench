@@ -340,7 +340,7 @@ describe('a reference to a navigation document is no test', () => {
       path: '.claude/skills/stock/references/examples/count-014.md',
       readWhen: 'When a count sheet is late',
     },
-    provenance: { file: owner.provenance?.file, quote: 'See count-014.md' },
+    provenance: { file: owner.provenance?.file, quote: '- [Count 014](count-014.md): a late sheet' },
     evidence: [{ type: 'tool_called', label: 'Read', input: { file_path: { contains: 'count-014.md' } } }],
   });
   const row: EstatePlanRow = {
@@ -369,7 +369,7 @@ describe('a reference to a navigation document is no test', () => {
     );
   };
 
-  it('stays incomplete, and says so, when an older plan still holds the row', () => {
+  it('stays incomplete, and says so, when a link-list reference to a navigation document holds a row', () => {
     const suite = run([{ path: '.claude/skills/stock/references/examples/count-014.md', role: 'example' }]);
     expect(suite.report.summary.complete).toBe(0);
     expect(suite.report.incomplete[0]?.reasons[0]?.detail).toMatch(/navigation-only document/);
@@ -391,19 +391,70 @@ describe('a reference to a navigation document is no test', () => {
     }
   });
 
-  it('is told apart by the document the reference targets, and only a non-normative role counts', () => {
+  it('is navigation only by where the reference sits, never by the folder or heading of its target', () => {
     const navigation = navigationFiles([
-      { path: 'a/template.md', role: 'template' },
+      { path: 'a/templates/form.md', role: 'template' },
       { path: 'a/live.md', role: 'normative' },
     ]);
-    expect([...navigation]).toEqual(['a/template.md']);
-    const at = (path: string) => atom('reference.x.y', { fields: { path } });
-    expect(navigationReference(at('a/template.md'), navigation)).toBe(true);
-    expect(navigationReference(at('./a/template.md'), navigation)).toBe(true);
-    expect(navigationReference(at('a/live.md'), navigation)).toBe(false);
-    expect(navigationReference(atom('gate.x.y', { fields: { path: 'a/template.md' } }), navigation)).toBe(
-      false,
-    );
+    expect([...navigation]).toEqual(['a/templates/form.md']);
+    const at = (path: string, quote: string, line = 3) => ({
+      ...atom('reference.x.y', { fields: { path } }),
+      title: 'Read form.md',
+      provenance: { file: 'a/SKILL.md', startLine: line, endLine: line, quote },
+    });
+    const none = new Set<string>();
+    // A sentence acts on the reference: testable although its target is a template.
+    expect(
+      navigationReference(at('a/templates/form.md', 'Fill in form.md before you send.'), navigation, none),
+    ).toBe(false);
+    expect(
+      navigationReference(at('a/templates/form.md', '- see form.md for the layout'), navigation, none),
+    ).toBe(false);
+    // A reference that leads a list item, a table cell or a heading is a link list.
+    for (const quote of [
+      '- form.md',
+      '- [The form](form.md): layout',
+      '| form.md | layout |',
+      '## form.md',
+    ]) {
+      expect(navigationReference(at('a/templates/form.md', quote), navigation, none), quote).toBe(true);
+      expect(navigationReference(at('./a/templates/form.md', quote), navigation, none), quote).toBe(true);
+      expect(navigationReference(at('a/live.md', quote), navigation, none), quote).toBe(false);
+    }
+    // Another atom anchored on the same line (a read gate) acts on the reference.
+    expect(
+      navigationReference(at('a/templates/form.md', '- form.md'), navigation, new Set(['a/SKILL.md:3'])),
+    ).toBe(false);
+    expect(
+      navigationReference(atom('gate.x.y', { fields: { path: 'a/templates/form.md' } }), navigation),
+    ).toBe(false);
+  });
+
+  it('judges a reference by its position whatever its title says', () => {
+    const navigation = navigationFiles([{ path: 'a/templates/form.md', role: 'template' }]);
+    const titled = (title: string, quote: string) => ({
+      ...atom('reference.x.y', { fields: { path: 'a/templates/form.md' } }),
+      title,
+      provenance: { file: 'a/SKILL.md', startLine: 3, endLine: 3, quote },
+    });
+    const none = new Set<string>();
+    for (const title of ['the report template', 'Form', 'Open the form', '']) {
+      // Listed: the first thing after the markup is the path, with its folder or without.
+      for (const quote of [
+        '- a/templates/form.md',
+        '- templates/form.md',
+        '- `form.md`',
+        '| form.md | layout |',
+      ]) {
+        expect(navigationReference(titled(title, quote), navigation, none), `${title} / ${quote}`).toBe(true);
+      }
+      // Acted on: words come before the reference.
+      for (const quote of ['- see a/templates/form.md', 'Fill in form.md first.', '- Template: form.md']) {
+        expect(navigationReference(titled(title, quote), navigation, none), `${title} / ${quote}`).toBe(
+          false,
+        );
+      }
+    }
   });
 });
 
