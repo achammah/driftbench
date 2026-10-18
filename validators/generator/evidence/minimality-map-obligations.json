@@ -1,0 +1,62 @@
+{
+  "ruling": "Minimality deletion must preserve every established structural map obligation, using the exact ordinary bank predicates, in addition to retained execution and causal fault kills.",
+  "base": "9e562f7948b1a04393717d151f7c876d701c3cb2",
+  "contract": [
+    "docs/reference/map.md:181 ProposalPhrase: text is a user message expressing the map value",
+    "docs/reference/map.md:238: stages are ordered, start first",
+    "docs/validators.md:12.6: minimality and coverage of hidden cells both required"
+  ],
+  "sourceSha256": {
+    "packages/validators/src/ladders/generator/bank.ts": "f08ca39ad983803dcc3714dcece7ce98db9324ea1944e7a9e13275ab3b81a1d7",
+    "packages/validators/src/ladders/generator/bank2.ts": "397be91258618d557d03c60437eddc6bc4bf668ff07a508eb279c9dbbcc054a6",
+    "packages/validators/src/ladders/generator/bank3.ts": "812f62389a3aec715b74e387799f8cc20f743390535534178d93e8eea28690cf",
+    "packages/validators/test/generator/minimality-phrase-obligations.test.ts": "9359147930482f681e6a1e01ae8d4b375644319e453ed3292724050c73dfc38b",
+    "packages/validators/test/generator/minimality-structural-obligations.test.ts": "735fce61fc1a3f1aaba2d011e3f877a24f637c9d5ad88fc449ba510fa7c2ee7a"
+  },
+  "reportedContradiction": {
+    "publicSeed": 1,
+    "candidate": "gen-phrase-002#b3-value",
+    "ordinaryPhraseItem": "phrases.data-out",
+    "before": {
+      "pass": true,
+      "used": 12,
+      "total": 12
+    },
+    "afterDeletion": {
+      "pass": false,
+      "used": 11,
+      "total": 12
+    },
+    "oldRemovable": true,
+    "fixedRemovable": false
+  },
+  "redFirst": {
+    "phrase": "Two failures, one genuine-duplicate control passed before the guard; evidence/minimality-map-obligations-red.txt",
+    "structuralMutation": "Disabling shared recording gives four failures and two passes, restored before green; evidence/minimality-structural-mutation-red.txt"
+  },
+  "verification": {
+    "targetedPassingTests": 146,
+    "files": 10,
+    "groups": {
+      "prefix": 11,
+      "newPhrase": 8,
+      "structuralSequenceInvariance": 83,
+      "existingPhraseWorldTaskSlot": 40,
+      "personaContext": 4
+    },
+    "publicFreshSeeds": [1009, 2027, 4093, 8191],
+    "handWrittenInput": "Parcel/dock phrases; one sibling phrase already absent; sole request protected, actual duplicate removable",
+    "negativeControls": [
+      "Already-failing aggregate cannot hide another lost phrase",
+      "Metadata, Given and Then do not substitute for actual phrase stimulus",
+      "Required opening/middle prefixes and temporal-fault setup retained",
+      "Duplicate standalone/terminal/nonterminal probes still fail minimality",
+      "Per-path values, class-stage recovery, ordered edge pairs and input contrast witnesses retained",
+      "Allocation thresholds retain existing predicates without freezing counts"
+    ],
+    "typecheck": "focused source/test TypeScript check passes",
+    "lint": "Biome on all changed source/tests passes",
+    "scope": "No full ladder/bank measurement. No hidden map or hidden numeric seed in this evidence."
+  },
+  "review": "Prior PASS does not cover this delta. Independent delta review required; PR523 remains on hold."
+}

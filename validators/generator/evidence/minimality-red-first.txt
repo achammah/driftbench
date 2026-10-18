@@ -1,0 +1,284 @@
+Original regression before the fix:
+
+ RUN  v5.0.3 /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/sol-gen-maint/wt
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts (10 tests | 6 failed) 14445ms
+   ❯ minimality proves removability instead of treating shared setup as redundancy (6)
+     × keeps necessary opening setup for distinct probes 98ms
+     × keeps necessary opening and middle setup for distinct probes 11ms
+   ❯ fresh maps keep dependent prefixes while duplicated and untested suites still fail (4)
+     × seed 1009: necessary setup is preserved and standalone duplicates still fail 4345ms
+     × seed 2027: necessary setup is preserved and standalone duplicates still fail 2873ms
+     × seed 4093: necessary setup is preserved and standalone duplicates still fail 3528ms
+     × seed 8191: necessary setup is preserved and standalone duplicates still fail 3552ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > minimality proves removability instead of treating shared setup as redundancy > keeps necessary opening setup for distinct probes
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > minimality proves removability instead of treating shared setup as redundancy > keeps necessary opening and middle setup for distinct probes
+AssertionError: expected { pass: false, …(1) } to match object { pass: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "pass": true,
++   "pass": false,
+  }
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:69:33
+     67|       const data = await dataFor(fixture(middle));
+     68|       expect((await data.runs()).blocks.every((block) => block.referen…
+     69|       expect(await check(data)).toMatchObject({ pass: true });
+       |                                 ^
+     70|       expect(await check(data, 'minimal.seeder.graph')).toMatchObject(…
+     71|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > fresh maps keep dependent prefixes while duplicated and untested suites still fail > seed 1009: necessary setup is preserved and standalone duplicates still fail
+AssertionError: expected { pass: false, …(1) } to match object { pass: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "pass": true,
++   "pass": false,
+  }
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:117:33
+    115|       const data = await dataFor(pair);
+    116|       expect((await data.runs()).blocks.every((block) => block.referen…
+    117|       expect(await check(data)).toMatchObject({ pass: true });
+       |                                 ^
+    118|       expect(await check(data, 'minimal.seeder.boundary')).toMatchObje…
+    119|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > fresh maps keep dependent prefixes while duplicated and untested suites still fail > seed 2027: necessary setup is preserved and standalone duplicates still fail
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > fresh maps keep dependent prefixes while duplicated and untested suites still fail > seed 4093: necessary setup is preserved and standalone duplicates still fail
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > fresh maps keep dependent prefixes while duplicated and untested suites still fail > seed 8191: necessary setup is preserved and standalone duplicates still fail
+AssertionError: expected { pass: false, …(1) } to match object { pass: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "pass": true,
++   "pass": false,
+  }
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:117:33
+    115|       const data = await dataFor(pair);
+    116|       expect((await data.runs()).blocks.every((block) => block.referen…
+    117|       expect(await check(data)).toMatchObject({ pass: true });
+       |                                 ^
+    118|       expect(await check(data, 'minimal.seeder.boundary')).toMatchObje…
+    119|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 4 passed (10)
+   Start at  01:12:00
+   Duration  29.04s (tests 51%, transform 47%, import 3%)
+
+  Transform  transforming modules took 13.33s · 47% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+
+Final regression against the unchanged base oracle:
+
+ RUN  v5.0.3 /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/sol-gen-maint/wt
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts (11 tests | 7 failed) 11008ms
+   ❯ minimality proves removability instead of treating shared setup as redundancy (7)
+     × keeps necessary opening setup for distinct probes 35ms
+     × keeps necessary opening and middle setup for distinct probes 39ms
+     × keeps reference-neutral setup when removing it would stop testing a temporal fault 68ms
+   ❯ fresh maps keep dependent prefixes while duplicated and untested suites still fail (4)
+     × seed 1009: necessary setup is preserved and standalone duplicates still fail 3326ms
+     × seed 2027: necessary setup is preserved and standalone duplicates still fail 2525ms
+     × seed 4093: necessary setup is preserved and standalone duplicates still fail 2322ms
+     × seed 8191: necessary setup is preserved and standalone duplicates still fail 2618ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > minimality proves removability instead of treating shared setup as redundancy > keeps necessary opening setup for distinct probes
+AssertionError: 4 blocks kill X3.stay; 1 groups are redundant (same Then, same outcome on every agent): parcel-0#step-0 = parcel-1#step-0: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:134:42
+    132|       expect((await data.runs()).blocks.every((block) => block.referen…
+    133|       const result = await check(data);
+    134|       expect(result.pass, result.detail).toBe(true);
+       |                                          ^
+    135|       expect(await check(data, 'minimal.seeder.graph')).toMatchObject(…
+    136|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > minimality proves removability instead of treating shared setup as redundancy > keeps necessary opening and middle setup for distinct probes
+AssertionError: 6 blocks kill X3.stay; 2 groups are redundant (same Then, same outcome on every agent): parcel-0#step-0 = parcel-1#step-0; parcel-0#step-1 = parcel-1#step-1: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:134:42
+    132|       expect((await data.runs()).blocks.every((block) => block.referen…
+    133|       const result = await check(data);
+    134|       expect(result.pass, result.detail).toBe(true);
+       |                                          ^
+    135|       expect(await check(data, 'minimal.seeder.graph')).toMatchObject(…
+    136|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > minimality proves removability instead of treating shared setup as redundancy > keeps reference-neutral setup when removing it would stop testing a temporal fault
+AssertionError: expected { pass: false, …(1) } to match object { pass: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "pass": true,
++   "pass": false,
+  }
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:182:31
+    180|     for (const target of ['sent', 'held'])
+    181|       expect(runs.blocks.some((block) => block.faults[`third-reply-${t…
+    182|     expect(await check(data)).toMatchObject({ pass: true });
+       |                               ^
+    183|     expect(await check(data, 'minimal.seeder.graph')).toMatchObject({ …
+    184|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > fresh maps keep dependent prefixes while duplicated and untested suites still fail > seed 1009: necessary setup is preserved and standalone duplicates still fail
+AssertionError: 6 blocks kill X3.stay; 1 groups are redundant (same Then, same outcome on every agent): gen-boundary-002#b1-opening-to-intake = gen-boundary-003#b1-opening-to-intake: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:241:42
+    239|       expect((await data.runs()).blocks.every((block) => block.referen…
+    240|       const result = await check(data);
+    241|       expect(result.pass, result.detail).toBe(true);
+       |                                          ^
+    242|       expect(await check(data, 'minimal.seeder.boundary')).toMatchObje…
+    243|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > fresh maps keep dependent prefixes while duplicated and untested suites still fail > seed 2027: necessary setup is preserved and standalone duplicates still fail
+AssertionError: 6 blocks kill X3.stay; 1 groups are redundant (same Then, same outcome on every agent): gen-boundary-001#b1-opening-to-intake = gen-boundary-005#b1-opening-to-intake: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:241:42
+    239|       expect((await data.runs()).blocks.every((block) => block.referen…
+    240|       const result = await check(data);
+    241|       expect(result.pass, result.detail).toBe(true);
+       |                                          ^
+    242|       expect(await check(data, 'minimal.seeder.boundary')).toMatchObje…
+    243|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > fresh maps keep dependent prefixes while duplicated and untested suites still fail > seed 4093: necessary setup is preserved and standalone duplicates still fail
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > fresh maps keep dependent prefixes while duplicated and untested suites still fail > seed 8191: necessary setup is preserved and standalone duplicates still fail
+AssertionError: 6 blocks kill X3.stay; 1 groups are redundant (same Then, same outcome on every agent): gen-boundary-001#b1-opening-to-intake = gen-boundary-002#b1-opening-to-intake: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:241:42
+    239|       expect((await data.runs()).blocks.every((block) => block.referen…
+    240|       const result = await check(data);
+    241|       expect(result.pass, result.detail).toBe(true);
+       |                                          ^
+    242|       expect(await check(data, 'minimal.seeder.boundary')).toMatchObje…
+    243|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 4 passed (11)
+   Start at  01:18:30
+   Duration  21.22s (tests 52%, transform 42%, import 5%)
+
+  Transform  transforming modules took 8.91s · 42% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+
+Fault-preservation guard disabled (subsequently restored):
+
+ RUN  v5.0.3 /private/tmp/claude-501/-Users-assem-Documents-Doc-Assem-Claude-Code-nexus/649588d0-8d65-49cb-8d78-47b071cd71cb/scratchpad/sol-gen-maint/wt
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts (11 tests | 1 failed | 10 skipped) 73ms
+   ❯ minimality proves removability instead of treating shared setup as redundancy (7)
+     × keeps reference-neutral setup when removing it would stop testing a temporal fault 72ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/validators/test/generator/minimality-prefix.test.ts > minimality proves removability instead of treating shared setup as redundancy > keeps reference-neutral setup when removing it would stop testing a temporal fault
+AssertionError: expected { pass: false, …(1) } to match object { pass: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "pass": true,
++   "pass": false,
+  }
+
+ ❯ packages/validators/test/generator/minimality-prefix.test.ts:182:31
+    180|     for (const target of ['sent', 'held'])
+    181|       expect(runs.blocks.some((block) => block.faults[`third-reply-${t…
+    182|     expect(await check(data)).toMatchObject({ pass: true });
+       |                               ^
+    183|     expect(await check(data, 'minimal.seeder.graph')).toMatchObject({ …
+    184|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 skipped (11)
+   Start at  01:17:50
+   Duration  10.35s (transform 92%, import 7%, tests 1%)
+
+  Transform  transforming modules took 9.05s · 92% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+

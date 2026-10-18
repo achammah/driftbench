@@ -1,5 +1,11 @@
-import type { Spec } from '@agent-nexus/driftbench-core';
-import { type Proposal, renderProposal, rngFor } from '@agent-nexus/driftbench-generate';
+import { type Spec, validateSpec } from '@agent-nexus/driftbench-core';
+import {
+  blockOutcome,
+  type Proposal,
+  renderProposal,
+  rngFor,
+  runOnce,
+} from '@agent-nexus/driftbench-generate';
 import { coverage, type SpaceCoverage } from '@agent-nexus/driftbench-space';
 import { acmeItems } from './acme';
 import { researchItems } from './bank2';
@@ -8,9 +14,11 @@ import { gateFamilyItems } from './bank4';
 import { CHEATERS } from './cheaters';
 import { familyPhrase, isCodeTaskSpec } from './code-task';
 import { FAULT_CLASSES, type FaultClass } from './faults';
+import { createFollower } from './follower';
 import { DEVIATION_POOL, type HiddenSpec, phrasePattern, type ToolRole } from './hidden';
 import {
   type BlockRun,
+  followerAdapter,
   type Generation,
   type GeneratorParts,
   generatedCells,
@@ -22,6 +30,7 @@ import {
   type Runs,
   runAll,
   runCombinations,
+  runContext,
   STABILITY_OFFSETS,
 } from './measure';
 import { matchesPhrase, phraseStimulus } from './phrase-stimulus';
@@ -120,6 +129,7 @@ const SEEDERS = Object.keys(SEEDER_FN);
 /** Everything one seed's items read, built on first use and kept for the run. */
 export class SeedData {
   private memo = new Map<string, Promise<unknown>>();
+  private observedObligations?: Set<string>;
   constructor(
     readonly seed: number,
     readonly parts: GeneratorParts,
@@ -129,6 +139,26 @@ export class SeedData {
   /** A value computed once per seed, shared by every item that reads it. */
   memoized<T>(key: string, make: () => Promise<T>): Promise<T> {
     return this.once(key, make);
+  }
+
+  /** The ordinary item's predicate also records its individual map obligation during ablation. */
+  obligation(id: string, holds: boolean): boolean {
+    if (holds) this.observedObligations?.add(`witness:${id}`);
+    return holds;
+  }
+
+  async observeObligations(items: readonly BankItem[]): Promise<Set<string>> {
+    if (this.observedObligations) throw new Error('Nested map obligation observation');
+    const observed = new Set<string>();
+    this.observedObligations = observed;
+    try {
+      for (const item of items) {
+        if ((await item.check(this)).pass) observed.add(`item:${item.id}`);
+      }
+      return observed;
+    } finally {
+      this.observedObligations = undefined;
+    }
   }
 
   private once<T>(key: string, make: () => Promise<T>): Promise<T> {
@@ -178,6 +208,35 @@ export class SeedData {
 }
 
 const verdict = (pass: boolean, detail: string): Verdict => ({ pass, detail });
+
+const observeObligation = (data: SeedData, id: string, holds: boolean): boolean =>
+  data.obligation?.(id, holds) ?? holds;
+
+/** Evaluate the same item predicates on an isolated view; never recursively invoke minimality.
+ * Per-obligation witnesses preserve progress even when their aggregate item already fails.
+ */
+export function mapObligationSnapshot(data: SeedData): Promise<Set<string>> {
+  return data.memoized('map-obligations', async () => {
+    const view = new SeedData(data.seed, data.parts, (factor) => data.scaled(factor));
+    await view.memoized('generated', () => data.generated());
+    await view.memoized('runs', () => data.runs());
+    const levels = new Set([
+      'differential',
+      'boundary',
+      'paths',
+      'phrases',
+      'behaviours',
+      'coverage',
+      'sequence',
+      'allocation',
+      'contrast',
+    ]);
+    const items = bankItems().filter(
+      (item) => !item.global && (levels.has(item.level) || item.id.startsWith('perturbation.')),
+    );
+    return view.observeObligations(items);
+  });
+}
 
 function machine(runs: Runs): BlockRun[] {
   return runs.blocks.filter((block) => block.fields.length > 0);
@@ -429,7 +488,8 @@ function differentialItems(): BankItem[] {
       for (const dims of combinationsOf(TWISE_AXES, t)) {
         const need = tuples(allowed, dims);
         const have = tuples(cells, dims);
-        for (const tuple of need) if (!have.has(tuple)) missing.push(tuple);
+        for (const tuple of need)
+          if (!observeObligation(data, `diff:twise:${t}:${tuple}`, have.has(tuple))) missing.push(tuple);
       }
       return verdict(
         missing.length === 0,
@@ -666,7 +726,9 @@ function differentialItems(): BankItem[] {
       for (const cell of allowedCellsOf2(axisMap))
         for (const tuple of combinationsOf([...kinds.keys()], strength))
           allowedTuples.add(tuple.map((dimension) => `${dimension}=${cell[dimension]}`).join('&'));
-      const covered = [...held].filter((tuple) => allowedTuples.has(tuple)).length;
+      const covered = [...held].filter((tuple) =>
+        observeObligation(data, `diff:coverage:${strength}:${tuple}`, allowedTuples.has(tuple)),
+      ).length;
       const reported = generated.report?.coverage.complete.covered ?? -1;
       return verdict(
         covered === reported,
@@ -715,6 +777,11 @@ function differentialItems(): BankItem[] {
             : undefined;
           const unsupported = (generated.report?.boundary.unsupported ?? []).some((entry) =>
             entry.startsWith(value.id),
+          );
+          observeObligation(
+            data,
+            `diff:boundary:${value.id}`,
+            concrete === undefined ? unsupported : JSON.stringify(concrete) === JSON.stringify(value.value),
           );
           if (concrete === undefined && !unsupported) bad.push(`${value.id}: no boundary spec`);
           else if (concrete !== undefined && JSON.stringify(concrete) !== JSON.stringify(value.value))
@@ -789,6 +856,11 @@ function differentialItems(): BankItem[] {
           seen += 1;
           const stated = statedSlots(generated.hidden, spec)[write?.slot ?? ''];
           const expected = (state.expect as Record<string, unknown> | undefined)?.[field];
+          observeObligation(
+            data,
+            `diff:endstate:${write?.slot}:${JSON.stringify(expected)}`,
+            stated === expected,
+          );
           if (stated !== expected)
             bad.push(
               `${spec.id}: end state ${JSON.stringify(expected)}, the turns state ${JSON.stringify(stated)}`,
@@ -1678,7 +1750,7 @@ function boundaryItems(): BankItem[] {
                 block.reference[0] === 'pass' &&
                 CHEATERS.every((name) => block.cheaters[name]?.outcome !== 'pass'),
             );
-            if (!good)
+            if (!observeObligation(data, `boundary:${role}:${kind}:${value.id}`, good))
               missing.push(
                 `${value.id} (${holding.length} blocks hold it, none green on the follower and failed by every cheater)`,
               );
@@ -1830,6 +1902,7 @@ function modeItems(): BankItem[] {
           for (const { spec } of generated.complete) {
             spec.blocks.forEach((block, index) => {
               if (!block.when || !('injection' in block.when) || block.when.injection.class !== cls) return;
+              const previousProblems = problems.length;
               seen += 1;
               const pending =
                 [...spec.blocks.slice(0, index)]
@@ -1856,6 +1929,11 @@ function modeItems(): BankItem[] {
                     `${spec.id}#${block.id}: ${call.tool} count ${JSON.stringify(expected?.count)}, the recovery gives ${JSON.stringify(call.count)}`,
                   );
               }
+              observeObligation(
+                data,
+                `perturbation:recovery:${cls}:${pending}`,
+                problems.length === previousProblems,
+              );
             });
           }
           return verdict(
@@ -1902,7 +1980,17 @@ function coverageItems(): BankItem[] {
             (cell) =>
               dims.every((dim) => dim in cell.values) && Object.keys(cell.values).length === dims.length,
           );
-          const missing = cells.filter((cell) => cell.count === 0);
+          const missing = cells.filter(
+            (cell) =>
+              !observeObligation(
+                data,
+                `coverage:${t}:${Object.entries(cell.values)
+                  .sort(([a], [b]) => a.localeCompare(b))
+                  .map(([key, value]) => `${key}=${value}`)
+                  .join('&')}`,
+                cell.count > 0,
+              ),
+          );
           return verdict(
             cells.length > 0 && missing.length === 0,
             `${missing.length} of ${cells.length} allowed cells of ${dims.join(' x ')} are covered by no complete spec: ${missing
@@ -1929,7 +2017,14 @@ function coverageItems(): BankItem[] {
         const report = await hiddenCoverage(data, 2);
         const cells = report.required.filter((cell) => cell.source === 'inventory' && cell.deviation === cls);
         const missing = cells
-          .filter((cell) => !cell.covered)
+          .filter(
+            (cell) =>
+              !observeObligation(
+                data,
+                `coverage:required:${cls}:${cell.source === 'inventory' ? cell.flow : ''}`,
+                cell.covered,
+              ),
+          )
           .map((cell) => (cell.source === 'inventory' ? cell.flow : ''));
         return verdict(
           cells.length > 0 && missing.length === 0,
@@ -1968,6 +2063,117 @@ export function vectorOf(block: BlockRun): string {
   return vector;
 }
 
+/** A deleted stimulus cannot leave a placement or perturbation behind as a phantom witness. */
+function removeBlock(spec: Spec, index: number): Spec {
+  const reduced = structuredClone(spec);
+  const removed = reduced.blocks.splice(index, 1)[0];
+  reduced.perturbations = reduced.perturbations?.filter((entry) => entry.inject_at !== index);
+  for (const entry of reduced.perturbations ?? []) if (entry.inject_at > index) entry.inject_at--;
+  const metadata = reduced.metadata?.generated as { blocks?: Array<{ block?: string }> } | undefined;
+  if (removed?.id !== undefined && Array.isArray(metadata?.blocks))
+    metadata.blocks = metadata.blocks.filter((entry) => entry?.block !== removed.id);
+  return reduced;
+}
+
+function ablatedGeneration(
+  generated: Generation,
+  source: Generation['complete'][number],
+  spec: Spec,
+): Generation {
+  const retained = spec.blocks.length > 0 ? { ...source, spec } : undefined;
+  const complete = generated.complete.flatMap((entry) =>
+    entry.spec.id === source.spec.id ? (retained ? [retained] : []) : [entry],
+  );
+  const loaded = generated.loaded.flatMap((entry) =>
+    entry.ok && entry.spec.id === source.spec.id ? (retained ? [retained] : []) : [entry],
+  );
+  const files = (original: Map<string, string>) => {
+    const next = new Map(original);
+    if (next.has(source.path)) {
+      if (retained) next.set(source.path, JSON.stringify(spec));
+      else next.delete(source.path);
+    }
+    return next;
+  };
+  return { ...generated, complete, loaded, first: files(generated.first), second: files(generated.second) };
+}
+
+/** A local duplicate is redundant only when deleting it preserves the executable remainder.
+ * Cache each ablation across fault and seeder items. Reference dependence short-circuits the more
+ * expensive agent replay; no block position, label or seeder is exempt by construction.
+ */
+export function removable(data: SeedData, block: BlockRun): Promise<boolean> {
+  return data.memoized(`minimality:remove:${block.key}`, async () => {
+    const generated = await data.generated();
+    const runs = await data.runs();
+    const source = generated.complete.find(({ spec }) => spec.id === block.spec);
+    if (!source) throw new Error(`minimality source missing: ${block.spec}`);
+    const original = runs.blocks.filter((entry) => entry.spec === block.spec);
+    if (original.some((entry) => entry.reference.some((outcome) => outcome !== 'pass'))) return false;
+    const spec = removeBlock(source.spec, block.index);
+    let reduced: Runs = { blocks: [], faults: [], errors: [] };
+    if (spec.blocks.length > 0) {
+      const parsed = validateSpec(spec);
+      if (!parsed.ok) return false;
+      const create = (data.parts.follower ?? createFollower)(generated.hidden);
+      const reference = await runOnce(parsed.spec, followerAdapter(create), 1, runContext());
+      for (const before of original) {
+        if (before.index === block.index) continue;
+        const index = before.index < block.index ? before.index : before.index - 1;
+        if (blockOutcome(reference, index) !== before.reference[0]) return false;
+      }
+      const loaded = { ...source, spec: parsed.spec };
+      reduced = await runAll({ ...generated, complete: [loaded], loaded: [loaded] }, { ...data.parts, k: 1 });
+      if (reduced.errors.length > 0) return false;
+      for (const before of original) {
+        if (before.index === block.index) continue;
+        const index = before.index < block.index ? before.index : before.index - 1;
+        const after = reduced.blocks.find((entry) => entry.index === index);
+        if (!after || vectorOf(after) !== vectorOf(before)) return false;
+      }
+    }
+    const retainedRuns: Runs = {
+      ...runs,
+      blocks: [...runs.blocks.filter((entry) => entry.spec !== block.spec), ...reduced.blocks],
+      faults: runs.faults.map((record) => {
+        const firstChange = { ...record.firstChange };
+        delete firstChange[block.spec];
+        const changed = reduced.faults.find((entry) => entry.fault.def.id === record.fault.def.id);
+        const at = changed?.firstChange[block.spec];
+        if (at !== undefined) firstChange[block.spec] = at;
+        return { ...record, firstChange };
+      }),
+    };
+    const retained = new SeedData(data.seed, data.parts, (factor) => data.scaled(factor));
+    await retained.memoized('generated', async () => ablatedGeneration(generated, source, spec));
+    await retained.memoized('runs', async () => retainedRuns);
+    const before = await mapObligationSnapshot(data);
+    const after = await mapObligationSnapshot(retained);
+    const lost = [...before].filter((obligation) => !after.has(obligation));
+    await data.memoized(`minimality:lost:${block.key}`, async () => lost);
+    if (lost.length > 0) return false;
+    // Equal fail vectors are not sufficient: every fault instance must retain a causal kill,
+    // at or after that instance's first changed action, in this or another retained scenario.
+    return runs.faults.every((record) => {
+      const id = record.fault.def.id;
+      if (killers(runs, id).length === 0) return true;
+      if (
+        runs.blocks.some(
+          (entry) => entry.spec !== block.spec && causalKill(entry, id, record.firstChange[entry.spec]),
+        )
+      )
+        return true;
+      const changed = reduced.faults.find((entry) => entry.fault.def.id === id);
+      return reduced.blocks.some((entry) => causalKill(entry, id, changed?.firstChange[entry.spec]));
+    });
+  });
+}
+
+async function hasRemovable(data: SeedData, group: BlockRun[]): Promise<boolean> {
+  for (const block of group) if (await removable(data, block)) return true;
+  return false;
+}
+
 function minimalityItems(): BankItem[] {
   const items: BankItem[] = FAULT_CLASSES.filter((cls) => cls.family !== 'code').map(
     (cls): BankItem => ({
@@ -1986,15 +2192,22 @@ function minimalityItems(): BankItem[] {
         ];
         if (found.length === 0)
           return verdict(false, `no block kills ${cls.id}, so there is no test set to judge`);
-        const groups = new Map<string, string[]>();
+        const groups = new Map<string, BlockRun[]>();
         for (const block of found)
-          groups.set(vectorOf(block), [...(groups.get(vectorOf(block)) ?? []), block.key]);
-        const redundant = [...groups.values()].filter((keys) => keys.length > 1);
+          groups.set(vectorOf(block), [...(groups.get(vectorOf(block)) ?? []), block]);
+        const redundant: BlockRun[][] = [];
+        for (const group of groups.values())
+          if (group.length > 1 && (await hasRemovable(data, group))) redundant.push(group);
         return verdict(
           redundant.length === 0,
-          `${found.length} blocks kill ${cls.id}; ${redundant.length} groups are redundant (same Then, same outcome on every agent): ${redundant
+          `${found.length} blocks kill ${cls.id}; ${redundant.length} groups contain a removable duplicate (same Then/outcomes, map obligations, retained execution and causal kills preserved): ${redundant
             .slice(0, 2)
-            .map((keys) => keys.slice(0, 3).join(' = '))
+            .map((group) =>
+              group
+                .slice(0, 3)
+                .map((block) => block.key)
+                .join(' = '),
+            )
             .join('; ')}`,
         );
       },
@@ -2016,12 +2229,15 @@ function minimalityItems(): BankItem[] {
             ...(groups.get(`${block.when}|${vectorOf(block)}`) ?? []),
             block,
           ]);
-        const redundant = [...groups.values()].filter(
-          (group) => group.length > 1 && !(seeder === 'metamorphic' && new Set(group.map(family)).size === 1),
-        );
+        const redundant: BlockRun[][] = [];
+        for (const group of groups.values()) {
+          if (group.length < 2 || (seeder === 'metamorphic' && new Set(group.map(family)).size === 1))
+            continue;
+          if (await hasRemovable(data, group)) redundant.push(group);
+        }
         return verdict(
           blocks.length > 0 && redundant.length === 0,
-          `${redundant.length} groups of ${seeder} blocks say the same turn, expect the same and come out the same on every agent: ${redundant
+          `${redundant.length} groups of ${seeder} blocks contain removable duplicates with the same turn, Then and outcomes: ${redundant
             .slice(0, 2)
             .map((group) =>
               group

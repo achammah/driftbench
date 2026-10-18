@@ -1,0 +1,330 @@
+{
+  "base": "119802811739d45a85c3dda5d3402a5cd31bce2c",
+  "sourceSha256": "fe29b02f8a21abdb907f626b29810aebc3a2f4ab488b537f8f5259aa4dc43e42",
+  "reportedSource": "3b12d6f13",
+  "reportedSeed": 1,
+  "reportedPrefixAblations": [
+    {
+      "id": "gen-boundary-001",
+      "dropSetup": false,
+      "firstStimulus": {
+        "user": "Hello, I would like to start a new request."
+      },
+      "firstThen": {
+        "stage": "intake",
+        "stage_reported": true,
+        "tools": [
+          {
+            "label": "lookup_record",
+            "count": 0
+          }
+        ],
+        "must": ["Which item is the request about\\?"],
+        "must_not": ["Step [0-9]+:", "lookup record says ", "list options says ", "submit request says "],
+        "lang": "EN",
+        "criteria": ["flow.status-check"]
+      },
+      "blocks": [
+        {
+          "index": 0,
+          "outcome": "pass",
+          "failures": []
+        },
+        {
+          "index": 1,
+          "outcome": "pass",
+          "failures": []
+        },
+        {
+          "index": 2,
+          "outcome": "pass",
+          "failures": []
+        }
+      ]
+    },
+    {
+      "id": "gen-boundary-001",
+      "dropSetup": true,
+      "firstStimulus": {
+        "user": "Hello, I would like to start a new request."
+      },
+      "firstThen": {
+        "stage": "intake",
+        "stage_reported": true,
+        "tools": [
+          {
+            "label": "lookup_record",
+            "count": 0
+          }
+        ],
+        "must": ["Which item is the request about\\?"],
+        "must_not": ["Step [0-9]+:", "lookup record says ", "list options says ", "submit request says "],
+        "lang": "EN",
+        "criteria": ["flow.status-check"]
+      },
+      "blocks": [
+        {
+          "index": 0,
+          "outcome": "fail",
+          "failures": [
+            {
+              "id": "tools.lookup_record.count",
+              "kind": "machine",
+              "name": "tools",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "lookup_record called 0 times, expected exactly 1; calls in this block: none"
+            },
+            {
+              "id": "tools.lookup_record.input.kind",
+              "kind": "machine",
+              "name": "tools",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "lookup_record was not called, so input.kind could not be equal to \"green\""
+            },
+            {
+              "id": "tools.lookup_record.input.quantity",
+              "kind": "machine",
+              "name": "tools",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "lookup_record was not called, so input.quantity could not be equal to 2"
+            },
+            {
+              "id": "tools.argument_accuracy",
+              "kind": "machine",
+              "name": "tools",
+              "gating": false,
+              "outcome": "fail",
+              "score": 0,
+              "evidence": "0 of 2 expected arguments matched; missed: lookup_record input.kind, lookup_record input.quantity"
+            },
+            {
+              "id": "must.0",
+              "kind": "machine",
+              "name": "must",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "/Shall I go on with the record I found\\?/ is missing; visible text \"We are not at that step yet. What can I help you with today?\""
+            },
+            {
+              "id": "must.1",
+              "kind": "machine",
+              "name": "must",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "/lookup record says found is true\\./ is missing; visible text \"We are not at that step yet. What can I help you with today?\""
+            },
+            {
+              "id": "must.2",
+              "kind": "machine",
+              "name": "must",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "/lookup record says status is monthly\\./ is missing; visible text \"We are not at that step yet. What can I help you with today?\""
+            },
+            {
+              "id": "stage.reached",
+              "kind": "machine",
+              "name": "stage",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "reached opening, expected check (stages in this block: opening)"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "outcome": "fail",
+          "failures": [
+            {
+              "id": "stage.reached",
+              "kind": "machine",
+              "name": "stage",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "reached opening, expected check (stages in this block: opening)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gen-boundary-002",
+      "dropSetup": false,
+      "firstStimulus": {
+        "user": "Hello, I would like to start a new request."
+      },
+      "firstThen": {
+        "stage": "intake",
+        "stage_reported": true,
+        "tools": [
+          {
+            "label": "lookup_record",
+            "count": 0
+          }
+        ],
+        "must": ["Which item is the request about\\?"],
+        "must_not": ["Step [0-9]+:", "lookup record says ", "list options says ", "submit request says "],
+        "lang": "EN",
+        "criteria": ["flow.status-check"]
+      },
+      "blocks": [
+        {
+          "index": 0,
+          "outcome": "pass",
+          "failures": []
+        },
+        {
+          "index": 1,
+          "outcome": "pass",
+          "failures": []
+        },
+        {
+          "index": 2,
+          "outcome": "pass",
+          "failures": []
+        }
+      ]
+    },
+    {
+      "id": "gen-boundary-002",
+      "dropSetup": true,
+      "firstStimulus": {
+        "user": "Hello, I would like to start a new request."
+      },
+      "firstThen": {
+        "stage": "intake",
+        "stage_reported": true,
+        "tools": [
+          {
+            "label": "lookup_record",
+            "count": 0
+          }
+        ],
+        "must": ["Which item is the request about\\?"],
+        "must_not": ["Step [0-9]+:", "lookup record says ", "list options says ", "submit request says "],
+        "lang": "EN",
+        "criteria": ["flow.status-check"]
+      },
+      "blocks": [
+        {
+          "index": 0,
+          "outcome": "fail",
+          "failures": [
+            {
+              "id": "tools.lookup_record.count",
+              "kind": "machine",
+              "name": "tools",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "lookup_record called 0 times, expected exactly 1; calls in this block: none"
+            },
+            {
+              "id": "tools.lookup_record.input.kind",
+              "kind": "machine",
+              "name": "tools",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "lookup_record was not called, so input.kind could not be equal to \"basic\""
+            },
+            {
+              "id": "tools.lookup_record.input.quantity",
+              "kind": "machine",
+              "name": "tools",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "lookup_record was not called, so input.quantity could not be equal to 2"
+            },
+            {
+              "id": "tools.argument_accuracy",
+              "kind": "machine",
+              "name": "tools",
+              "gating": false,
+              "outcome": "fail",
+              "score": 0,
+              "evidence": "0 of 2 expected arguments matched; missed: lookup_record input.kind, lookup_record input.quantity"
+            },
+            {
+              "id": "must.0",
+              "kind": "machine",
+              "name": "must",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "/Shall I go on with the record I found\\?/ is missing; visible text \"We are not at that step yet. What can I help you with today?\""
+            },
+            {
+              "id": "must.1",
+              "kind": "machine",
+              "name": "must",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "/lookup record says found is false\\./ is missing; visible text \"We are not at that step yet. What can I help you with today?\""
+            },
+            {
+              "id": "must.2",
+              "kind": "machine",
+              "name": "must",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "/lookup record says status is monthly\\./ is missing; visible text \"We are not at that step yet. What can I help you with today?\""
+            },
+            {
+              "id": "stage.reached",
+              "kind": "machine",
+              "name": "stage",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "reached opening, expected check (stages in this block: opening)"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "outcome": "fail",
+          "failures": [
+            {
+              "id": "stage.reached",
+              "kind": "machine",
+              "name": "stage",
+              "gating": true,
+              "outcome": "fail",
+              "evidence": "reached opening, expected check (stages in this block: opening)"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ruling": "Same local Then and outcomes identify redundancy candidates. Deletion must preserve the executable remainder, every retained agent outcome and every causal fault-instance kill. Necessary prefixes and state-setting turns are retained; truly removable duplicates still fail.",
+  "redFirst": {
+    "initialFailed": 6,
+    "initialPassed": 4,
+    "finalRegressionOnUnchangedBase": {
+      "failed": 7,
+      "passed": 4
+    },
+    "disabledFaultPreservationGuard": {
+      "failed": 1,
+      "skipped": 10
+    }
+  },
+  "focusedVerification": {
+    "passed": 15,
+    "files": 2,
+    "freshSeeds": [1009, 2027, 4093, 8191],
+    "cases": [
+      "necessary opening",
+      "necessary middle transition",
+      "removable nonterminal aside rejected",
+      "duplicate standalone rejected",
+      "duplicate terminal/full scenario rejected",
+      "metadata-only relabelling remains redundant",
+      "reference-neutral setup required for a temporal fault",
+      "no fault-killing assertion remains a failure",
+      "existing persona-dependent distinctions retained"
+    ]
+  },
+  "scope": "Focused X3.stay/graph/boundary minimality and existing persona-vector regressions, not a full minimality-bank score or ladder level."
+}

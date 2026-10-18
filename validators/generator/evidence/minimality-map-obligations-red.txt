@@ -1,0 +1,54 @@
+
+ RUN  v5.0.3 <worktree>
+
+ ❯ packages/validators/test/generator/minimality-phrase-obligations.test.ts (3 tests | 2 failed) 53602ms
+   ❯ minimality preserves the same map obligations as the coverage items (3)
+     × seed 1 keeps gen-phrase-002#b3-value, the only approved request for its output phrase 29009ms
+     × preserves an individual phrase even when a different approved phrase is already missing 13617ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/validators/test/generator/minimality-phrase-obligations.test.ts > minimality preserves the same map obligations as the coverage items > seed 1 keeps gen-phrase-002#b3-value, the only approved request for its output phrase
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ packages/validators/test/generator/minimality-phrase-obligations.test.ts:52:42
+     50|     const reduced = structuredClone(generated);
+     51|     required(reduced.complete.find(({ spec }) => spec.id === block.spe…
+     52|     const after = await phraseVerdict(await dataFor(reduced));
+       |                                          ^
+     53|     expect(after.pass, after.detail).toBe(false);
+     54|     expect(after.detail).toContain('11 of 12');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  packages/validators/test/generator/minimality-phrase-obligations.test.ts > minimality preserves the same map obligations as the coverage items > preserves an individual phrase even when a different approved phrase is already missing
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ packages/validators/test/generator/minimality-phrase-obligations.test.ts:80:58
+     79|       generated.hidden.phrases.find(
+     80|         (phrase) =>
+     81|           phrase.intent.kind === 'data' &&
+       |                                      ^
+     82|           generated.hidden.data.some(
+     83|             (value) => value.id === (phrase.intent as { value: string …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  06:32:04
+   Duration  66.89s (tests 81%, transform 17%, import 2%)
+

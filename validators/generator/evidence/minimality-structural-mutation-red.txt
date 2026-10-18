@@ -1,0 +1,98 @@
+
+ RUN  v5.0.3 <worktree>
+
+ ❯ packages/validators/test/generator/minimality-structural-obligations.test.ts (6 tests | 4 failed) 77ms
+   ❯ minimality retains structural obligations from the coverage predicates (6)
+     × retains the sole ordered edge-pair witness 14ms
+     × retains the sole class arrival-stage and continuation witnesses 5ms
+     × retains satisfied path values even when a sibling value is already missing 1ms
+     × retains the sole input-contrast witness 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/validators/test/generator/minimality-structural-obligations.test.ts > minimality retains structural obligations from the coverage predicates > retains the sole ordered edge-pair witness
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/minimality-structural-obligations.test.ts:101:88
+     99|     const generated = fixture([specimen('walk', [move('check'), move('…
+    100|     const before = await snapshot(generated, ['sequence.through.check'…
+    101|     expect(before.obligations.has(key('sequence', 'edge-pair', 'openin…
+       |                                                                                        ^
+    102|     generated.complete[0]?.spec.blocks.splice(0, 1);
+    103|     const after = await snapshot(generated, ['sequence.through.check']…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  packages/validators/test/generator/minimality-structural-obligations.test.ts > minimality retains structural obligations from the coverage predicates > retains the sole class arrival-stage and continuation witnesses
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/minimality-structural-obligations.test.ts:122:87
+    120|     const ids = ['sequence.stages.D1_off_topic', 'sequence.after.D1_of…
+    121|     const before = await snapshot(generated, ids);
+    122|     expect(before.obligations.has(key('sequence', 'D1_off_topic', 'sta…
+       |                                                                                       ^
+    123|     expect(before.obligations.has(key('sequence', 'D1_off_topic', 'con…
+    124|     const noArrival = structuredClone(generated);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  packages/validators/test/generator/minimality-structural-obligations.test.ts > minimality retains structural obligations from the coverage predicates > retains satisfied path values even when a sibling value is already missing
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/minimality-structural-obligations.test.ts:141:95
+    139|     const before = await snapshot(generated, ids);
+    140|     expect(before.verdicts.get('paths.new-request-full.values')).toBe(…
+    141|     expect(before.obligations.has(key('path', 'new-request-full', 'val…
+       |                                                                                               ^
+    142|     generated.complete = [];
+    143|     const after = await snapshot(generated, ids);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  packages/validators/test/generator/minimality-structural-obligations.test.ts > minimality retains structural obligations from the coverage predicates > retains the sole input-contrast witness
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/validators/test/generator/minimality-structural-obligations.test.ts:178:7
+    176|         key('contrast', 'read', 'integer', 'at-minimum', 'above-minimu…
+    177|       ),
+    178|     ).toBe(true);
+       |       ^
+    179|     required(generated.complete[0]).spec.blocks.pop();
+    180|     expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 2 passed (6)
+   Start at  06:40:47
+   Duration  35.54s (transform 94%, import 5%)
+
+  Transform  transforming modules took 32.19s · 94% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
