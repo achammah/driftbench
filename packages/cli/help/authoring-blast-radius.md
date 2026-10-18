@@ -107,15 +107,15 @@ driftbench radius auto --prompt <old> <new> --map <file> [--source <path>] [--fr
 | Option | Meaning | Default |
 |---|---|---|
 | `--prompt <files...>` (required) | exactly two files: the old prompt, then the new prompt | none |
-| `--map <file>` (required) | the approved map (a map proposal file, YAML or JSON) whose entries carry `evidence.source` and `evidence.quote` | none |
-| `--source <path>` | which source of the map the prompt pair is. It must equal one `sources[].path` of the map, character for character. Only evidence quoting this source becomes an anchor; every other source is treated as unchanged | the old prompt path relative to the folder of the map, with `/` separators |
+| `--map <file>` (required) | the approved map proposal with evidence quotes, or an estate map with atom provenance, in YAML or JSON | none |
+| `--source <path>` | which source of the map the prompt pair is. It must equal one `sources[].path` of a proposal, or an atom's `provenance.file` in an estate map. Only this source becomes anchors; every other source is treated as unchanged | the old prompt path relative to the folder of the map, with `/` separators |
 | `--from-version <version>` | the `from` of the manifest: the baseline agent version | the content hash of the old text (12 hex characters) |
 | `--to-version <version>` | the `to` of the manifest: the candidate agent version | the content hash of the new text |
 | `--out <file>` | write the manifest YAML to this file and print nothing | print the YAML on stdout |
 
 Use the agent versions your campaigns record (`--agent-version` of `campaign run`). The default content hashes need not equal a prompt registry hash.
 
-Which map entries become anchors (only approved entries whose `evidence.source` equals the source):
+Which proposal entries become anchors (only approved entries whose `evidence.source` equals the source):
 
 | Map entry | Change it maps to |
 |---|---|
@@ -127,6 +127,13 @@ Which map entries become anchors (only approved entries whose `evidence.source` 
 | relation `uses_tool` | `tool`, id `<tool>` (no part) |
 | relation `reply_language` | `rule`, id `reply_language` (whole suite) |
 | any other relation, a constraint, a numeric setting | an anchor with no change: an edit inside it is whole suite |
+
+An estate map passes full schema, provenance-hash and map-hash validation first. Each selected
+source atom must quote its recorded line span and have one exact occurrence in the old text.
+Approved atoms map to `prompt`, id `<atom.id>`. Overlapping exact quote spans, including nested
+and identical spans, become one union anchor carrying all their atom ids. This may select extra
+tests; it does not extend the quote to the whole source line. If any atom in a changed group is
+unapproved, the change is whole suite. Stale or ambiguous evidence also selects the whole suite.
 
 How the diff maps to changes:
 
@@ -259,7 +266,13 @@ Any `metadata.depends` mapping, even an empty one, makes the spec's dependencies
 
 A map proposal file (the format of `examples/acme/map/approved.yaml`; see authoring-map and authoring-extract). The keys `radius auto` reads: `sources[].path`, and on each dimension value, phrase, relation, constraint and numeric setting: `approved` and `evidence` (`source`, `quote`). The whole file must pass the proposal schema (`version: 1`, `agent`, `produced_by`, `sources`, `dimensions`, `constraints`, `phrases`, optional `relations` and `numeric_settings`).
 
-A map with many repeated or overlapping quotes over one source makes most edits whole suite. A focused map that declares only the anchors you trust gives a narrow manifest.
+A proposal with many repeated or overlapping quotes over one source makes most edits whole suite. A focused proposal that declares only the anchors you trust gives a narrow manifest.
+
+An estate map is the complete file from `estate scan` and `estate approve`; do not trim its atoms
+or edit its provenance. `radius auto --prompt old.md new.md --map approved-estate.yaml --source CLAUDE.md`
+uses the atom provenance described above. Unquoted text, boundary edits and ambiguous diffs still
+select everything. A CRLF-only edit with identical version labels identifies no changes; a
+different version label still selects everything, even when the normalized text is identical.
 
 ## Outputs and how to read them
 

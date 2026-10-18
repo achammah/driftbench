@@ -3,13 +3,16 @@ import { dirname, relative, resolve } from 'node:path';
 import {
   type Change,
   contentHash,
+  isPlainObject,
   type PromptAnchor,
   promptChangeManifest,
 } from '@agent-nexus/driftbench-core';
+import { validateEstateMap } from '@agent-nexus/driftbench-estate';
 import { Proposal } from '@agent-nexus/driftbench-generate';
 import type { Command } from 'commander';
 import { parse as parseYaml, stringify } from 'yaml';
 import type { Io } from '../io';
+import { estatePromptManifest } from './radius-estate-prompt';
 
 /** Read approved entries from one named source; other sources are unchanged by this prompt diff. */
 export function promptAnchors(map: Proposal, source: string): PromptAnchor[] {
@@ -66,7 +69,7 @@ export function registerRadiusAuto(radius: Command, io: Io, setExit: (code: numb
     .command('auto')
     .description('Map a prompt diff to approved evidence quotes; unknown changes select the whole suite')
     .requiredOption('--prompt <files...>', 'the old and new prompt files, in that order')
-    .requiredOption('--map <file>', 'the approved map with evidence quotes')
+    .requiredOption('--map <file>', 'an approved proposal or estate map with source quotes')
     .option(
       '--source <path>',
       'the evidence source in the map; default the old prompt path relative to the map',
@@ -100,29 +103,43 @@ export function registerRadiusAuto(radius: Command, io: Io, setExit: (code: numb
           setExit(2);
           return;
         }
-        const parsedMap = Proposal.safeParse(rawMap);
-        if (!parsedMap.success) {
+        const estate = isPlainObject(rawMap) && 'atoms' in rawMap ? validateEstateMap(rawMap) : undefined;
+        const proposal = estate === undefined ? Proposal.safeParse(rawMap) : undefined;
+        if (estate?.ok === false || proposal?.success === false) {
           io.err(`Invalid map ${options.map}:\n`);
-          for (const issue of parsedMap.error.issues) {
-            io.err(`    ${issue.path.join('.') || '(root)'}: ${issue.message}\n`);
+          const issues =
+            estate?.ok === false
+              ? estate.errors
+              : proposal?.success === false
+                ? proposal.error.issues.map((issue) => ({ ...issue, path: issue.path.join('.') }))
+                : [];
+          for (const issue of issues) {
+            io.err(`    ${issue.path || '(root)'}: ${issue.message}\n`);
           }
           setExit(2);
           return;
         }
-        const map = parsedMap.data;
+        const estateMap = estate?.ok ? estate.map : undefined;
+        const map = proposal?.success ? proposal.data : undefined;
         const oldPath = resolve(io.cwd, oldFile);
         const before = await readFile(oldPath, 'utf8');
         const after = await readFile(resolve(io.cwd, newFile), 'utf8');
         const source = options.source ?? relative(dirname(mapPath), oldPath).split('\\').join('/');
-        if (!map.sources.some((entry) => entry.path === source)) {
+        const hasSource = estateMap
+          ? estateMap.atoms.some((atom) => atom.provenance.file === source)
+          : map?.sources.some((entry) => entry.path === source);
+        if (!hasSource) {
           io.err(`The map has no source ${source}; pass --source with its declared path.\n`);
           setExit(2);
           return;
         }
-        const manifest = promptChangeManifest(before, after, promptAnchors(map, source), {
+        const versions = {
           from: options.fromVersion ?? contentHash(before),
           to: options.toVersion ?? contentHash(after),
-        });
+        };
+        const manifest = estateMap
+          ? estatePromptManifest(estateMap, source, before, after, versions)
+          : promptChangeManifest(before, after, map ? promptAnchors(map, source) : [], versions);
         const text = stringify(manifest);
         if (options.out) await writeFile(resolve(io.cwd, options.out), text);
         else io.out(text);
