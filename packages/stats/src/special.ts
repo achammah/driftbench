@@ -64,14 +64,82 @@ function betaContinuedFraction(a: number, b: number, x: number): number {
   return h;
 }
 
+/** Stirling correction to log Gamma, for x >= 8 (DLMF 5.11.1). */
+function stirlingCorrection(x: number): number {
+  const r = 1 / x;
+  const r2 = r * r;
+  return (
+    r *
+    (1 / 12 +
+      r2 *
+        (-1 / 360 +
+          r2 *
+            (1 / 1260 +
+              r2 *
+                (-1 / 1680 +
+                  r2 * (1 / 1188 + r2 * (-691 / 360360 + r2 * (1 / 156 + r2 * (-3617 / 122400))))))))
+  );
+}
+
+/** log(1 + x) - x without subtracting nearly equal numbers near zero. */
+function log1pmx(x: number): number {
+  if (Math.abs(x) > 0.01) return Math.log1p(x) - x;
+  let term = (-x * x) / 2;
+  let sum = term;
+  for (let n = 3; n <= 20; n += 1) {
+    term *= (-x * (n - 1)) / n;
+    sum += term;
+    if (Math.abs(term) <= Math.abs(sum) * Number.EPSILON) break;
+  }
+  return sum;
+}
+
+/**
+ * log(x^a y^b / B(a,b)). Shift small shapes using the beta recurrence, then combine
+ * Stirling's terms before evaluation. The two linear deviations cancel algebraically,
+ * avoiding subtraction of log-gammas of order n log n near the distribution's mean.
+ * Keeping y separately also preserves a tiny binomial probability when 1 - p rounds.
+ */
+function betaLogFront(x: number, y: number, a: number, b: number): number {
+  if (!(a > 0) || !(b > 0)) return Number.NaN;
+  let correction = 0;
+  while (a < 8) {
+    correction += Math.log(a / (a + b)) - Math.log(x);
+    a += 1;
+  }
+  while (b < 8) {
+    correction += Math.log(b / (a + b)) - Math.log(y);
+    b += 1;
+  }
+  const total = a + b;
+  const d = x * b - y * a;
+  const da = d / a;
+  const db = -d / b;
+  const left = Math.abs(da) <= 0.5 ? log1pmx(da) : Math.log(x) + Math.log(total / a) - da;
+  const right = Math.abs(db) <= 0.5 ? log1pmx(db) : Math.log(y) + Math.log(total / b) - db;
+  return (
+    correction +
+    a * left +
+    b * right +
+    0.5 * Math.log(((a / total) * b) / (2 * Math.PI)) -
+    stirlingCorrection(a) -
+    stirlingCorrection(b) +
+    stirlingCorrection(total)
+  );
+}
+
+function incompleteBetaPair(x: number, y: number, a: number, b: number): number {
+  const front = Math.exp(betaLogFront(x, y, a, b));
+  if (x < (a + 1) / (a + b + 2)) return (front * betaContinuedFraction(a, b, x)) / a;
+  return 1 - (front * betaContinuedFraction(b, a, y)) / b;
+}
+
 /** Regularized incomplete beta function I_x(a, b). */
 export function incompleteBeta(x: number, a: number, b: number): number {
   if (x < 0 || x > 1) return Number.NaN;
   if (x <= 0) return 0;
   if (x >= 1) return 1;
-  const front = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log(1 - x));
-  if (x < (a + 1) / (a + b + 2)) return (front * betaContinuedFraction(a, b, x)) / a;
-  return 1 - (front * betaContinuedFraction(b, a, 1 - x)) / b;
+  return incompleteBetaPair(x, 1 - x, a, b);
 }
 
 /** Quantile of the Beta(a, b) distribution, by bisection on the regularized incomplete beta. */
@@ -81,13 +149,23 @@ export function betaQuantile(p: number, a: number, b: number): number {
   if (p >= 1) return 1;
   let lo = 0;
   let hi = 1;
-  for (let i = 0; i < 200; i += 1) {
+  // 1075 halvings cover every binary64 exponent, including subnormal quantiles.
+  for (let i = 0; i < 1075; i += 1) {
     const mid = (lo + hi) / 2;
+    if (mid === lo || mid === hi) break;
     if (incompleteBeta(mid, a, b) < p) lo = mid;
     else hi = mid;
     if (hi - lo <= 1e-15 * hi) break;
   }
   return (lo + hi) / 2;
+}
+
+/** Stable log(x^a exp(-x) / Gamma(a)) near x = a, using Stirling's correction. */
+function gammaLogFront(a: number, x: number): number {
+  if (a < 8) return -x + a * Math.log(x) - logGamma(a);
+  const delta = (x - a) / a;
+  const deviance = Math.abs(delta) <= 0.5 ? log1pmx(delta) : Math.log(x / a) - delta;
+  return a * deviance + 0.5 * Math.log(a / (2 * Math.PI)) - stirlingCorrection(a);
 }
 
 /** Regularized lower incomplete gamma P(a, x), series expansion (x < a + 1). */
@@ -101,7 +179,7 @@ function gammaSeries(a: number, x: number): number {
     sum += del;
     if (Math.abs(del) < Math.abs(sum) * EPS) break;
   }
-  return sum * Math.exp(-x + a * Math.log(x) - logGamma(a));
+  return sum * Math.exp(gammaLogFront(a, x));
 }
 
 /** Regularized upper incomplete gamma Q(a, x), continued fraction (x >= a + 1). */
@@ -122,7 +200,7 @@ function gammaContinuedFraction(a: number, x: number): number {
     h *= del;
     if (Math.abs(del - 1) < EPS) break;
   }
-  return Math.exp(-x + a * Math.log(x) - logGamma(a)) * h;
+  return Math.exp(gammaLogFront(a, x)) * h;
 }
 
 /** Regularized upper incomplete gamma Q(a, x). */
@@ -135,6 +213,7 @@ export function upperIncompleteGamma(a: number, x: number): number {
 /** Complementary error function. */
 export function erfc(x: number): number {
   if (x === 0) return 1;
+  if (x === Number.POSITIVE_INFINITY || x > Math.sqrt(Number.MAX_VALUE)) return 0;
   if (x < 0) return 2 - erfc(-x);
   return upperIncompleteGamma(0.5, x * x);
 }
@@ -243,7 +322,8 @@ export function binomialPmf(k: number, n: number, p: number): number {
 export function binomialCdf(k: number, n: number, p: number): number {
   if (k < 0) return 0;
   if (k >= n) return 1;
-  let sum = 0;
-  for (let i = 0; i <= k; i += 1) sum += binomialPmf(i, n, p);
-  return Math.min(1, sum);
+  if (p === 0) return 1;
+  if (p === 1) return 0;
+  // P(X <= k) = I_(1-p)(n-k, k+1); no loop proportional to the number of trials.
+  return incompleteBetaPair(1 - p, p, n - Math.floor(k), Math.floor(k) + 1);
 }

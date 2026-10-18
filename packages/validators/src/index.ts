@@ -9,6 +9,7 @@ export {
   blindReport,
   type FailingItem,
   formatAllFailing,
+  stripCauseTag,
   stripHint,
 } from './audit';
 export {
@@ -22,6 +23,7 @@ export {
   NO_FAMILY,
   NO_TIER,
 } from './bank';
+export { statsBankHash } from './bank-fingerprint';
 export { type BriefInput, composeBrief, EXECUTOR_FILE } from './brief';
 export {
   checkFloors,

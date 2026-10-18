@@ -16,26 +16,20 @@ const CHILD = fileURLToPath(new URL('./child.ts', import.meta.url));
 
 /**
  * The Node.js arguments that start the bank's child. From source the child is child.ts, loaded through tsx. A
- * built package has no child.ts beside it, so its child is the package's own entry point, which exports the same
- * routine. Bank items import TypeScript files of the checkout under `root` (the examples, the package under
+ * built package uses a separately bundled child entry: the public index statically imports the target before
+ * a trap could run. Bank items import TypeScript files of the checkout under `root` (the examples, the package under
  * test), so the built child still loads tsx when the checkout has it; without it those items fail by name.
  */
 export function childCommand(moduleUrl: string, root: string, rest: readonly string[]): string[] {
   if (moduleUrl.endsWith('.ts')) return ['--import', 'tsx', CHILD, ...rest];
-  const entry = new URL('./index.js', moduleUrl).href;
+  const entry = fileURLToPath(new URL('./stats-bank/child.js', moduleUrl));
   let loader: string[] = [];
   try {
     loader = ['--import', pathToFileURL(createRequire(join(root, 'package.json')).resolve('tsx')).href];
   } catch {
     // No tsx in this checkout: the child runs on plain Node.js.
   }
-  return [
-    ...loader,
-    '--input-type=module',
-    '--eval',
-    `import { statsBankChild } from ${JSON.stringify(entry)}; await statsBankChild(process.argv.slice(1));`,
-    ...rest,
-  ];
+  return [...loader, entry, ...rest];
 }
 
 type Line = { start?: number; done?: number; id: string; pass?: boolean; detail?: string; ms?: number };

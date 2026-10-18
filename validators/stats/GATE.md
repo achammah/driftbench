@@ -1,38 +1,40 @@
 # Stats validator: where the gate stands
 
-Status, 2026-10-12: the owner closed the validator design ("we've done enough work on validator honestly, let's just start building and iterating"). The stats validator merges with the lowered bar below, set to what its honest bank meets. It does not meet the section 12 contract (forecast 100, score after the pilot 0.4, 100 distinct causes), and no item was added to reach it. Every item names its need in [NEEDS.md](NEEDS.md).
+## Current gate review, 2026-10-18
 
-## The recorded bar
+The gate is **not met**. The expanded bank has **no fresh pilot**. The journal still measures the historical 651-item bank, not the current bank. No historical row is relabelled or given a new fingerprint.
+
+This review stacks PR 743 (`ff414718c`), PR 744 (`4e317a4d`, including the compiled-child follow-up to `68e1bc046`) and PR 749 (`25f32ea12`) on main. It adds real capabilities before considering a provisional bar: six items for family coverage simulation and custom-statistic cluster bootstraps. They extend `exact-estimators`, with three shared implementation causes, and preserve every existing item and cause. See [NEEDS.md](NEEDS.md#batch-12-documented-capabilities-before-the-gate-review).
+
+PR 777 (`36b4abe6d`) supplies the product capabilities and numerical repairs before this validator branch lands. Correctness runs reach level 7 with zero failing items on visible seeds 1, 2 and 3 and hidden seed 119902070. These runs do not replace a fresh hardness pilot or any independent audit.
+
+The live bank grows from 904 to 910 items. Every family has at least 20 items and tiers 1 through 5 are present. Those are bank inventory measurements, **not** a fresh pilot, a new forecast or a measured count of failing causes.
+
+## Both bars against the same historical journal
+
+`pnpm driftbench validate stats --hardness` reads `journal.jsonl`. Its builder pilot contains iterations 0 through 10, all on 651 items. The baseline is 418 passing; iteration 10 has 446 passing. The mean improvement is `(446 - 418) / 10 = 2.8` items per iteration. The forecast is `(651 - 446) / 2.8 = 73.2142857` iterations. There are no blind pilot rows. The latest row, iteration 42, records 651 passing; it does not replace the pilot-end measurement.
+
+| Measure | Historical 651-item pilot | Section 12.4 contract | Existing stats provisional bar |
+|---|---|---|---|
+| Forecast | 73.21 iterations | At least 100: **fail** | At least 70: **pass** |
+| Pilot score | 446 / 651 = 0.6851 | At most 0.4: **fail** | At most 0.7: **pass** |
+| Distinct failing causes | 62 at iteration 10 | At least 100: **fail** | At least 60: **pass** |
+| Current bank identity | Historical rows have no bank hash | **Unverified** | **Unverified** |
+| Independent audit | All four current-bank checks pending | **Not met** | **Not met** |
+
+The expanded 910-item bank has no measured pilot score, forecast or pilot failing-cause count. Passing capability tests do not supply those measurements. Neither column licenses merging this bank.
+
+## The recorded provisional bar
 
 Max score after the pilot: 0.7
 Min forecast: 70
 Min distinct failing causes: 60
 
-The owner's fallback, verbatim: "If you cannot do it, lower the bar per validator". The stats bar is what this honest bank meets: a forecast of at least 70 iterations (measured 73.21), a score after the pilot of at most 0.7 (measured 0.6851) and at least 60 distinct failing causes (measured 62). `driftbench validate stats --hardness` reads the three lines above (`parseGate` in `packages/validators/src/hardness.ts`, which takes a value only when it lowers the section 12.4 term). The audit (12.7) still applies: the stats-v2 audit judged the old bank, and this bank has no `audit.md` yet.
+These are the existing per-validator provisional terms, retained rather than lowered again. Their original reason is the historical forecast of 73.21, score of 0.6851 and 62 failing causes. They describe what the historical pilot meets, not what the expanded bank meets. The owner requires capability additions first; the six additions above satisfy that order without padding causes or changing the global contract. A fresh matching-bank pilot and independent audit remain necessary before any current-bank gate claim.
 
-## The numbers
+The hardness command compares the live bank fingerprint with the journal rows. A mismatched fingerprint is stale; a missing fingerprint is unverified. Both block the gate while preserving the historical figures for inspection. The journal remains unchanged. [audit.md](audit.md) records the four pending checks, and [the evidence report](evidence/gate-review.md) records tests and per-export mutation witnesses.
 
-From `driftbench validate stats --hardness`, after the stats-v2 audit findings (batch 6, see [NEEDS.md](NEEDS.md)):
-
-| Measure | Value | Gate (docs/validators.md section 12) |
-|---|---|---|
-| Bank | 651 items, tiers 1 to 5 | 300 items, no family under 20, every tier: holds |
-| Score at iteration 0 | 0.6421 (418 of 651) | |
-| Score after the pilot | 0.6851 (446 of 651) | at most 0.4: not met |
-| Items fixed per iteration | 2.8 | |
-| Forecast | 73.21 iterations (205 failing / 2.8) | at least 100: not met |
-| Distinct failing causes | 62 | at least 100: not met |
-| Audit | `audit.md` absent on this branch (the stats-v2 audit judged the old bank: all four checks fail) | required |
-
-Batch 6 moved the numbers: a degenerate item now asks the RangeError to name the argument, so a function whose message does not name it is one more cause. Every pilot row was remeasured against the statistics package of its own commit.
-
-What the audit findings now measure:
-
-* Cheater attempt 1, the blanket non-finite guard: a net loss of 6 items (1 gained, 7 broken), where it gained 45.
-* Planted bugs: the five the audit missed each turn their own item red.
-* Causes: each names the failure a reader sees.
-
-## The 62 failing causes, by family
+## Historical pilot: the 62 failing causes, by family
 
 | Family | Causes | Failing items | What they are |
 |---|---|---|---|
@@ -46,9 +48,9 @@ What the audit findings now measure:
 
 A cause can appear in more than one degenerate family, so the degenerate row counts distinct causes over the four.
 
-## Real product defects: the executor picks these first
+## Historical defect list from the earlier pilot
 
-The validator found these defects. They are not test artifacts: each one changes a number a user reads.
+This earlier pilot recorded these defects; this list is historical, not a claim that they remain open in the current product. The validator found these defects. They are not test artifacts: each one changes a number a user reads.
 
 1. **The report's run pass interval is too narrow.** The scorecard prints a 95 percent interval on each mode's run pass rate, a cluster bootstrap over specs. With 6 specs of 5 repeats (the Acme example's size, rho 0.3) it holds the true rate in about 82 percent of draws. With 20 specs of 3 repeats it holds it in about 92 percent. Items: `simulation.report-run-pass.s6x5` and `.s20x3`. File: `packages/report/src/estimate.ts`.
 2. **`campaign plan` uses its own MDE formula.** For the 6 Acme specs with 5 repeats at a 90 percent baseline it prints 21.7 points, where `stats.mde` gives 30.9. With one spec it gives 198.1 points, where `stats.mde` finds no detectable drop. It also has no input for a measured rho. Items: `planned.plan-mde.*`, `planned.plan-rho.*`, `planned.plan-cli.*`. Files: `packages/core/src/runner/campaign.ts`, `packages/cli/src/commands/campaign.ts`.

@@ -44,7 +44,8 @@ export function clopperPearson(k: number, n: number, alpha = 0.05): Interval {
   if (n === 0) throw new RangeError('clopperPearson: n must be at least 1');
   if (k > n) throw new RangeError(`clopperPearson: k (${k}) exceeds n (${n})`);
   const lower = k === 0 ? 0 : betaQuantile(alpha / 2, k, n - k + 1);
-  const upper = k === n ? 1 : betaQuantile(1 - alpha / 2, k + 1, n - k);
+  // Beta symmetry preserves a tiny tail probability that 1 - alpha / 2 would round to one.
+  const upper = k === n ? 1 : 1 - betaQuantile(alpha / 2, n - k, k + 1);
   return { estimate: k / n, lower, upper };
 }
 
@@ -254,5 +255,6 @@ export function bootstrapCI(values: readonly number[], options: BootstrapOptions
 /** z for a two-sided interval at level 1 - alpha. */
 export function zFor(alpha: number): number {
   assertProbability('zFor', 'alpha', alpha, true);
-  return normalQuantile(1 - alpha / 2);
+  // Work in the lower tail so subtraction from one cannot erase the significance level.
+  return -normalQuantile(alpha / 2);
 }

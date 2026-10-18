@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { LadderReport } from '../src/index';
 import {
   allFailingItems,
   bankSummary,
@@ -7,6 +8,7 @@ import {
   formatItems,
   runSeeds,
   seedSpecs,
+  stripCauseTag,
   stripHint,
 } from '../src/index';
 import { bankLadder } from './support';
@@ -55,6 +57,35 @@ describe('the blind view', () => {
     expect(stripHint('missed; fix: trim it')).toBe('missed;');
     expect(stripHint('no hint here')).toBe('no hint here');
     expect(stripHint('Fix: everything')).toBe('');
+  });
+
+  it('strips a leading [family, tier N, cause: ...] tag from a detail, and a detail without one is left alone', () => {
+    expect(stripCauseTag('[reference, tier 1, cause: logGamma differs from scipy] the child died')).toBe(
+      'the child died',
+    );
+    expect(
+      stripCauseTag('[degenerate-domain, tier 2, cause: mean: input validation] mean(NaN) must throw'),
+    ).toBe('mean(NaN) must throw');
+    expect(stripCauseTag('[family alpha, tier 3] a3 missed')).toBe('[family alpha, tier 3] a3 missed');
+    expect(stripCauseTag('mean([1]) gave [cause: none]')).toBe('mean([1]) gave [cause: none]');
+  });
+
+  it('leaves no cause tag in the detail of a blind item', () => {
+    const item = blindReport({
+      ...({} as LadderReport),
+      seeds: [
+        {
+          rows: [],
+          failing: {
+            level: 1,
+            id: 'l',
+            name: 'l',
+            items: [{ id: 'x', component: 'c', detail: '[f, tier 1, cause: why] it failed. Fix: do this' }],
+          },
+        },
+      ],
+    } as unknown as LadderReport).seeds[0]?.failing?.items[0];
+    expect(item?.detail).toBe('it failed.');
   });
 
   it('removes every cause and hint from the report, the bank and the failing list', async () => {

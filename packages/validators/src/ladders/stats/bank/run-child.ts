@@ -1,12 +1,12 @@
 /**
  * What the bank's child process runs: the items of the statistics bank on one seed, in bank order, from a start
  * index, with one JSON line before and after each item. `child.ts` calls it from source; a built package calls
- * it through its own entry point (see isolate.ts). `args` is <seed> <root> <start>, and the item ids to run come
+ * it through the separately built child entry (see isolate.ts). `args` is <seed> <root> <start>, and the item ids to run come
  * as a JSON array on stdin.
  */
-import * as stats from '@agent-nexus/driftbench-stats';
+import { dirname, join } from 'node:path';
 import type { StatsImpl } from '../reference';
-import { runItem, statsBank } from './index';
+import { installTrap } from './trap';
 
 async function main(args: readonly string[]): Promise<void> {
   const [seedText, root, startText] = args;
@@ -16,7 +16,14 @@ async function main(args: readonly string[]): Promise<void> {
   for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
   const ids = JSON.parse(Buffer.concat(chunks).toString('utf8')) as string[];
   const implPath = process.env.DRIFTBENCH_STATS_IMPL;
-  const s = (implPath ? await import(implPath) : stats) as StatsImpl;
+  // The package under test runs with no file or process access; the validator's own reads are not affected.
+  installTrap([
+    ...(implPath ? [dirname(implPath.startsWith('file://') ? new URL(implPath).pathname : implPath)] : []),
+    join(root as string, 'packages', 'stats', 'src'),
+  ]);
+  const s = (await import(implPath ?? '@agent-nexus/driftbench-stats')) as StatsImpl;
+  // The bank also imports the target transitively: load it only after the trap is active.
+  const { runItem, statsBank } = await import('./index');
   const byId = new Map(statsBank(root as string).map((item) => [item.id, item]));
   const items = ids.map((id) => {
     const item = byId.get(id);

@@ -5,8 +5,11 @@ export {
   type AlphaLevel,
   type AlphaResult,
   cohenKappa,
+  type KappaIntervalOptions,
+  type KappaIntervalResult,
   type KappaOptions,
   type KappaResult,
+  kappaInterval,
   krippendorffAlpha,
   type Label,
 } from './agreement';
@@ -60,11 +63,13 @@ export {
   zeroFailureBound,
   zFor,
 } from './intervals';
-export { type BenjaminiHochbergResult, benjaminiHochberg } from './multiple';
+export { type BenjaminiHochbergResult, benjaminiHochberg, type HolmResult, holm } from './multiple';
 export {
+  type McNemarMidPResult,
   type McNemarOptions,
   type McNemarResult,
   mcnemar,
+  mcnemarMidP,
   type NonInferiorityInput,
   type NonInferiorityResult,
   nonInferiority,
@@ -78,7 +83,14 @@ export {
   type WilcoxonResult,
   wilcoxonSignedRank,
 } from './paired';
-export { type MdeInput, type MdeResult, mde } from './power';
+export {
+  type MdeInput,
+  type MdeResult,
+  mde,
+  type SampleSizeForEffectInput,
+  type SampleSizeForEffectResult,
+  sampleSizeForEffect,
+} from './power';
 export { passAtK, passK, unreliability } from './reliability';
 export { parseRepeatReducer, type RepeatReducer, reduceRepeats } from './repeat-reducers';
 export {

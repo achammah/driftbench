@@ -2,6 +2,12 @@
 
 Rewritten by the executor every iteration (docs/validators.md section 10). A stranger continues from this file alone. The level table is written by `driftbench validate stats --journal <row.json>` from the last journal row.
 
+## Current gate review, 2026-10-18
+
+The expanded bank has 910 items and no fresh pilot. The historical 651-item builder pilot fails the section 12.4 contract (100 / 0.4 / 100) and meets the numerical provisional bar (70 / 0.7 / 60). Neither establishes the expanded bank's gate: historical rows have no bank fingerprint, and all four independent audit checks are pending. See [GATE.md](GATE.md), [audit.md](audit.md) and [the evidence report](evidence/gate-review.md).
+
+The earlier executor results below retain their original commit and bank size; they are not current-bank measurements. A new pilot must capture `bankHash` from `validate stats --items --json` and supply that unchanged hash when appending each measured journal row. Never backfill the historical rows with the live bank's hash.
+
 ## Level per seed
 
 <!-- level-table:start -->
@@ -9,7 +15,7 @@ Rewritten by the executor every iteration (docs/validators.md section 10). A str
 |---|---|
 | 1 | 1 |
 <!-- level-table:end -->
-The stats validator is ladder version 2: 651 items in seven levels (four items for the clustered intervals of the suite headline, `simulation.hierarchical.*` and `simulation.wilson-effective.*`, were added later and pass on every seed tried; the counts below are those of the measured runs), each with threshold 1. The bank score is the share of items passing on every seed (seeds 1 to 20 and the hidden seed).
+The earlier ladder version 2 inventory had 834 items in seven levels (651 when the pilot ran, which is what the counts below measure; later batches added items that pass on every seed tried: four clustered-interval items, `simulation.hierarchical.*` and `simulation.wilson-effective.*`, 60 exact-value items (batch 7) and 118 branch items (batch 8), 22 families in all), each with threshold 1. The bank score is the share of items passing on every seed (seeds 1 to 20 and the hidden seed).
 
 ## State (executor exec/stats-v3, PR 107): final report
 

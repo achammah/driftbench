@@ -88,9 +88,14 @@ export function stripHint(detail: string): string {
   return detail.replace(/\s*\bfix:[\s\S]*$/i, '').trimEnd();
 }
 
+/** A detail without its leading `[family, tier N, cause: ...]` tag, which spells the builder's cause out. */
+export function stripCauseTag(detail: string): string {
+  return detail.replace(/^\[[^\]]*\bcause:[^\]]*\]\s*/, '');
+}
+
 function blindItem<T extends Item | BankEntry>(item: T): T {
   const { cause: _cause, ...rest } = item;
-  return (rest.detail === undefined ? rest : { ...rest, detail: stripHint(rest.detail) }) as T;
+  return (rest.detail === undefined ? rest : { ...rest, detail: stripHint(stripCauseTag(rest.detail)) }) as T;
 }
 
 /**

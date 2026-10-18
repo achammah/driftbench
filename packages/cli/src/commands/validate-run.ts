@@ -42,6 +42,7 @@ import {
   researchTemplate,
   seedSpecs,
   setLevelTable,
+  statsBankHash,
   writeFloors,
   writeHandover,
 } from '@agent-nexus/driftbench-validators';
@@ -119,7 +120,16 @@ export async function validateCommand(
   }
   const hidden = options.hidden ? hiddenSeed(root, deps.readHead) : undefined;
   if (hidden?.note && !options.json) io.out(`Note: ${hidden.note}\n`);
-  const reports: LadderReport[] = [];
+  let measuredBankHash: string | undefined;
+  if (options.items && options.json && chosen.some((ladder) => ladder.component === 'stats')) {
+    try {
+      measuredBankHash = statsBankHash(root);
+    } catch (cause) {
+      io.err(`Cannot fingerprint the statistics bank: ${message(cause)}\n`);
+      return USAGE_EXIT;
+    }
+  }
+  const reports: (LadderReport & { bankHash?: string })[] = [];
   const measure = async () => {
     for (const ladder of chosen) {
       const floor = options.checkFloor ? floorOf(floors, ladder.component, ladderVersion(ladder)) : 0;
@@ -128,11 +138,25 @@ export async function validateCommand(
         // Invalid floors keep the existing checkFloors diagnostic instead of throwing in runLadder.
         ...(floor > 0 && floor <= ladder.levels.length ? { maxLevel: floor } : {}),
       });
-      reports.push(options.blind ? blindReport(report) : report);
+      const shown = options.blind ? blindReport(report) : report;
+      reports.push(
+        ladder.component === 'stats' && measuredBankHash ? { ...shown, bankHash: measuredBankHash } : shown,
+      );
     }
   };
   if (chosen.some((ladder) => ladder.component === 'system')) await withinStatsMeasurementSweep(measure);
   else await measure();
+  if (measuredBankHash !== undefined) {
+    try {
+      if (statsBankHash(root) !== measuredBankHash) {
+        io.err('The statistics bank changed during measurement: rerun before recording a journal row.\n');
+        return USAGE_EXIT;
+      }
+    } catch (cause) {
+      io.err(`Cannot verify the measured statistics bank: ${message(cause)}\n`);
+      return USAGE_EXIT;
+    }
+  }
   if (options.brief)
     return briefCommand(reports[0] as LadderReport, hidden, floors, Boolean(options.fresh), deps, root, io);
   print(reports, component === 'all', hidden, floors, options, io);
@@ -194,6 +218,7 @@ function hardnessCommand(component: string, json: boolean, root: string, io: Io)
     const auditPath = join(root, `${loopFolder(component)}/audit.md`);
     const gatePath = join(root, `${loopFolder(component)}/GATE.md`);
     hardness = measureHardness(rows, {
+      ...(component === 'stats' ? { bankHash: statsBankHash(root) } : {}),
       ...(existsSync(auditPath) ? { audit: readFileSync(auditPath, 'utf8') } : {}),
       ...(existsSync(gatePath) ? { gate: readFileSync(gatePath, 'utf8') } : {}),
     });

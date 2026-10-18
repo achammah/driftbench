@@ -330,6 +330,12 @@ export function stabilityItems(): BankItem[] {
         const b = s
           .varianceComponents(obs.map((o) => ({ ...o, value: (o.value as number) + offset })))
           .components.map((c) => c.estimate);
+        // Four levels (cell, conversation, wording, repeat), every estimate a finite number: an empty or a short list
+        // compares nothing, and a shift check that compares nothing must not pass.
+        if (a.length !== 4 || b.length !== 4 || ![...a, ...b].every((x) => Number.isFinite(x)))
+          return fail(
+            `varianceComponents returned ${a.length} estimates before the shift and ${b.length} after (${show(a)}, ${show(b)}); with three named levels and the repeat it returns four finite numbers each time.`,
+          );
         const bad = a.findIndex((x, i) => !near(b[i] as number, x, tol * Math.max(1, Math.abs(x))));
         return bad < 0
           ? ok()

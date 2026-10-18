@@ -76,7 +76,7 @@ export function wilsonEffective(
   const df = g - 1;
   let z: number;
   if (options.quantile === 'z' || df < 1) {
-    z = normalQuantile(1 - alpha / 2);
+    z = -normalQuantile(alpha / 2);
   } else {
     // P(|T| > t) = I_x(df / 2, 1 / 2) with x = df / (df + t^2), so t = sqrt(df (1 - x) / x) at x = betaQuantile(alpha).
     const x = betaQuantile(alpha, df / 2, 0.5);

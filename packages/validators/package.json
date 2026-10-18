@@ -40,7 +40,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean --target node22"
+    "build": "pnpm run build:runtime && tsup src/index.ts --format esm --dts-only --target node22",
+    "build:runtime": "tsup src/index.ts --format esm --clean --target node22 && tsup src/ladders/stats/bank/child.ts --format esm --target node22 --out-dir dist/stats-bank"
   },
   "dependencies": {
     "@agent-nexus/driftbench-core": "workspace:*",

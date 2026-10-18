@@ -1,6 +1,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { z } from 'zod';
+import { statsBankHash } from './bank-fingerprint';
 
 /** The folder of a component's loop files, from the repository root. */
 export function loopFolder(component: string): string {
@@ -55,6 +56,11 @@ export const JournalRowSchema = z
     perSeed: z.array(SeedLevels).min(1),
     metrics: z.array(LevelMetric).min(1),
     bankSize: count,
+    /** Captured by the full measurement; absent on historical rows, never backfilled. */
+    bankHash: z
+      .string()
+      .regex(/^[0-9a-f]{64}$/)
+      .optional(),
     passing: count,
     failingByFamily: z.record(z.string().min(1), count),
     failingCauses: count.optional(),
@@ -294,6 +300,30 @@ export function appendJournal(
   if (problems.length > 0) return { refused: problems };
   const checked = validateRow(value, rows);
   if ('refused' in checked) return checked;
+  if (component === 'stats') {
+    if (!checked.row.bankHash) {
+      return {
+        refused: [
+          'bankHash is required: copy it from the measured stats --items --json report; never backfill a historical row',
+        ],
+      };
+    }
+    try {
+      if (checked.row.bankHash !== statsBankHash(root)) {
+        return {
+          refused: [
+            'the journal bank hash differs from the live bank: rerun the measurement before appending',
+          ],
+        };
+      }
+    } catch (cause) {
+      return {
+        refused: [
+          `cannot fingerprint the live bank: ${cause instanceof Error ? cause.message : String(cause)}`,
+        ],
+      };
+    }
+  }
   const path = join(root, journalFile(component));
   mkdirSync(dirname(path), { recursive: true });
   appendFileSync(path, `${JSON.stringify(checked.row)}\n`);
