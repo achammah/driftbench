@@ -420,6 +420,69 @@ export function generatedCells(generated: Generation): Array<Pick<BlockRun, 'key
   return generated.complete.flatMap(({ spec }) => spec.blocks.map((_, index) => blockPlacement(spec, index)));
 }
 
+/**
+ * Where a complete suite sits in the hidden map, placed as the space package places a spec: a block on the
+ * stage it expects, an injected block on the stage reached before it with the class it injects, a
+ * perturbation on its class at the stage reached when it arrives. The recorded spec-level and block-level
+ * values ride along, and the spec fills in a behaviour, channel or persona the record leaves out; the stage
+ * and the class come from the spec's own blocks, never from the recorded cell, whose stage names the stage
+ * a move leaves.
+ */
+export function generatedPositions(generated: Generation): Array<Pick<BlockRun, 'key' | 'seeder' | 'cell'>> {
+  return generated.complete.flatMap(({ spec }) => {
+    const arrival = (index: number) =>
+      [...spec.blocks.slice(0, index)].reverse().find((entry) => entry.expect?.stage !== undefined)?.expect
+        ?.stage;
+    const seeder = seederOf(spec);
+    // What the spec itself names, for a value its record leaves out.
+    const persona = (spec.tags ?? []).find((tag) => tag.startsWith('persona:'))?.slice('persona:'.length);
+    const named: Record<string, string> = {
+      ...(spec.covers?.length === 1 ? { behaviour: spec.covers[0] as string } : {}),
+      ...(spec.channel === undefined ? {} : { channel: spec.channel }),
+      ...(persona === undefined ? {} : { user_type: persona }),
+    };
+    const spot = (
+      key: string,
+      cell: Record<string, string>,
+      stage: string | undefined,
+      deviation: string | undefined,
+    ) => {
+      const { stage: _stage, stage_transition: _move, deviation: _class, ...kept } = cell;
+      return {
+        key,
+        seeder,
+        cell: {
+          ...named,
+          ...kept,
+          ...(stage === undefined ? {} : { stage }),
+          ...(deviation === undefined ? {} : { deviation }),
+        },
+      };
+    };
+    const blocks = spec.blocks.map((block, index) => {
+      const injected =
+        block.when !== undefined && 'injection' in block.when ? block.when.injection.class : undefined;
+      const placement = blockPlacement(spec, index);
+      return spot(
+        placement.key,
+        placement.cell,
+        injected ? (arrival(index) ?? block.expect?.stage) : block.expect?.stage,
+        injected,
+      );
+    });
+    const specLevel = (spec.metadata?.generated as { cell?: Record<string, string> } | undefined)?.cell ?? {};
+    const perturbed = (spec.perturbations ?? []).map((perturbation, index) =>
+      spot(
+        `${spec.id}#perturbation-${index}`,
+        specLevel,
+        arrival(perturbation.inject_at) ?? perturbation.expect?.stage ?? perturbation.recovery?.stage_after,
+        perturbation.class,
+      ),
+    );
+    return [...blocks, ...perturbed];
+  });
+}
+
 function traceOf(run: RunResult, index: number): string {
   const block = run.blocks.find((entry) => entry.index === index);
   if (!block) return 'the run ended before the block';
