@@ -178,7 +178,12 @@ export function decidedFailure(failing: string): boolean {
   return machineFailure(failing) || !/\(inconclusive\)\s*$/.test(failing);
 }
 
-/** Runs specs with the fake runtime on an estate root; the run per spec id. */
+/**
+ * Runs specs with the fake runtime on an estate root; the run per spec id. The run trusts the estate
+ * (`--trust-estate` of `driftbench estate run`, docs/reference/cli.md): a headless run in a folder never trusted
+ * ignores the settings' allow list and loads no skill, so without it a spec that needs a skill or an allowed
+ * command fails on the original.
+ */
 export function runOnFakeDetailed(
   estate: string,
   specs: readonly string[],
@@ -203,6 +208,7 @@ export function runOnFakeDetailed(
     'claude:haiku',
     '--judge-command',
     JUDGE,
+    '--trust-estate',
     ...(map ? ['--map', map] : []),
     '--json',
   ]);

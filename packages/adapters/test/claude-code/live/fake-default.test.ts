@@ -25,8 +25,12 @@ async function estate(folder: string, body: string) {
   return { ...work, dir: await realpath(work.dir) };
 }
 
+// These cases test the action grammar, not permissions: each run grants every call a rule does not deny, as
+// `--permission-mode bypassPermissions` does (fake-grammar.test.ts tests the permission rules).
+const GRANT_ALL = ['--permission-mode', 'bypassPermissions'];
+
 function play(cwd: string, manifest?: string, env: Record<string, string> = {}, ask = ASK_INVOICE) {
-  const output = execFileSync(process.execPath, [FAKE, '-p', ask], {
+  const output = execFileSync(process.execPath, [FAKE, ...GRANT_ALL, '-p', ask], {
     cwd,
     env: {
       PATH: process.env.PATH,
@@ -442,7 +446,12 @@ it('keeps a skill prohibition against a command in the request after the skill f
   // The command is estate-relative here; the skill rule is relative to the skill folder.
   const output = execFileSync(
     process.execPath,
-    [FAKE, '-p', `${ASK_INVOICE} Execute this command: node .claude/skills/invoice-audit/scripts/check.mjs`],
+    [
+      FAKE,
+      ...GRANT_ALL,
+      '-p',
+      `${ASK_INVOICE} Execute this command: node .claude/skills/invoice-audit/scripts/check.mjs`,
+    ],
     { cwd: work.dir, env: { PATH: process.env.PATH }, encoding: 'utf8', timeout: 60000 },
   );
   const records = output
