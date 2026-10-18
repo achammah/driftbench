@@ -1,4 +1,4 @@
-Estate diff: examples/estates/fixture/approved.yaml (e48ea73788c2) to examples/estates/fixture-v2/map.yaml (c3b526d2ae0c).
+Estate diff: examples/estates/fixture/approved.yaml (fc6a29aea9f4) to examples/estates/fixture-v2/map.yaml (a382535fe5f2).
   Atoms: 2 added, 1 removed, 3 changed (1 white space only, 2 semantic), 24 moved with the same quote, 1 restated, 97 unchanged.
   Edges: 1 added, 1 removed.
   Guards: 1 of 6 changed enforcement state:
