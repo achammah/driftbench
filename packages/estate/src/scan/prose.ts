@@ -11,20 +11,20 @@ import {
 } from '@agent-nexus/driftbench-generate';
 import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
-import { type Atom, EvidencePredicate } from '../schema';
+import { type Atom, EvidencePredicate, ReplyActDeclaration } from '../schema';
 import type { AtomBuilder } from './code';
+import { type ProseCache, proseCacheKey } from './prose-cache';
 import type { ProseChunk, RawEstate } from './reader';
 import { type Located, locateQuote, quoteAtSpan } from './text';
 
 /**
  * The model half of the scan, and its only job: split the prose of an estate (standing instructions, memory,
- * the bodies of skills and helper agents) into instruction, gate and register atoms. One call per chunk,
+ * the bodies of skills and helper agents) into instruction, gate and register atoms, and resolve only routing tables code explicitly marks as ambiguous. One call per chunk,
  * a strict JSON answer, every atom quoted from the chunk. Code finds each quote in the file, checks it at
- * its span with the extractor's quote check, and refuses an atom it cannot place, with the reason. Structure
- * (frontmatter, tables, links, fixed-form gates) never goes to the model: code reads it.
+ * its span with the extractor's quote check, and refuses an atom it cannot place, with the reason. Structure code decides stays with code. Ambiguous routing tables are the explicit exception; the model may decline them or propose an unapproved route.
  */
 
-export const PROSE_KINDS = ['instruction', 'gate', 'register'] as const;
+export const PROSE_KINDS = ['instruction', 'gate', 'register', 'route', 'stage', 'hazard'] as const;
 
 export const PROSE_SYSTEM_PROMPT = `You split the written instructions of an AI agent into atoms. An atom is one place where the text says what the agent must do, with the exact words that say it. Code later turns approved atoms into tests, and a person approves every atom first. You never write tests or verdicts.
 
@@ -32,15 +32,18 @@ Kinds:
 - instruction: a rule, an obligation or a prohibition, with the situation it applies in.
 - gate: an order between two acts: before X, do Y.
 - register: a rule on the reply itself: its language, length, format, words or tone.
+- stage and hazard: enrichment only. Supply replyAct and ask for an existing code-derived stage or hazard with the exact same source quote and line span. Never invent a stage or hazard atom.
+- route: only for a table explicitly flagged AMBIGUOUS ROUTING below. Decide whether it actually maps a request to a declared skill/helper. An inventory gives no route. If uncertain, omit it. A route must name target and targetKind from the flagged candidates and give its request in situation.
 
 Rules:
 1. Quote, never invent. Every atom has "quote", text copied character for character from the chunk, between ${MIN_MODEL_QUOTE} and ${MAX_MODEL_QUOTE} characters. Code searches the quote in the file and refuses an atom whose quote it cannot find inside the chunk. Never paraphrase inside a quote, never join two passages.
 2. One atom per rule. A line that holds two rules gives two atoms, each quoting its own words.
-3. Skip what code reads: frontmatter, routing tables, lists of links, and a line that only names a file to read.
+3. Skip what code reads: frontmatter, decided tables, lists of links, and a line that only names a file to read. Review only the explicitly flagged ambiguous routing tables; never infer a route from an unflagged table.
 4. "evidence" lists what a trace shows when the rule is obeyed, as typed predicates: {"type": "tool_called", "label": "<tool>", "input": {...}}, {"type": "tool_not_called", "label": "<tool>"}, {"type": "skill_loaded", "name": "<skill>"}, {"type": "ordered", "before": "<tool, skill or stage>", "after": "<tool, skill or stage>"}, {"type": "stage_reached", "name": "<stage>"}, {"type": "workspace", "changed": ["<path>"], "othersUntouched": true}, {"type": "text", "must": ["..."], "mustNot": ["..."], "lang": "<tag>"}, {"type": "custom", "name": "<check>", "options": {...}}. At least one per atom.
-5. Answer with one JSON object and nothing else: no prose, no code fence. Use only these keys:
-{"chunk": "<the chunk id you were given>", "atoms": [{"kind": "instruction", "title": "<the rule in plain words>", "quote": "<verbatim text>", "situation": "<when it applies; leave out when always>", "polarity": "obligation", "evidence": [ ... ]}]}
-"polarity" is obligation or prohibition, for instructions only.`;
+5. For an instruction, register rule, gate, stage or hazard whose task requires a reply, supply "replyAct": {"id": "answer|clarify|refuse|report|draft|acknowledge", "evidence": {"type": "text_segment", "part": "reply|draft"}} with one exact ID and part, not the alternatives shown here. Choose the act from the quoted requirement: answer supplies requested information; clarify asks for missing information; refuse declines the requested act; report states a result or status; draft composes material for review; acknowledge confirms receipt or an instruction. Do not infer semantics from a word dictionary. Do not invent an act when the source does not support one. Supply "ask": {"text": "<complete task request>", "context": "<optional complete condition>"} with replyAct; the request exercises the quoted requirement without replacing it. Omit context when unnecessary. Missing declarations and requests stay missing; code never fills them from a title or quote. These declarations are proposals requiring owner approval, not observed proof. A reporting adapter or declared judge separately records the actual act bound to its text segment.
+6. Answer with one JSON object and nothing else: no prose, no code fence. Use only these keys:
+{"chunk": "<the chunk id you were given>", "atoms": [{"kind": "instruction", "title": "<the rule in plain words>", "quote": "<verbatim text>", "situation": "<when it applies; leave out when always>", "polarity": "obligation", "evidence": [ ... ], "replyAct": {"id": "clarify", "evidence": {"type": "text_segment", "part": "reply"}}, "ask": {"text": "<complete task request>"}}]}
+"replyAct" and "ask" are optional when unsupported; if ask is supplied, replyAct is required. "polarity" is obligation or prohibition, for instructions only. For route atoms also include "target": "<declared name>" and "targetKind": "skill" or "subagent". Other kinds do not need these fields.`;
 
 /** The request for one chunk. The first line names the chunk, so a recorded answer can be matched to it. */
 export function proseRequest(chunk: ProseChunk, maxTokens?: number): ModelRequest {
@@ -49,6 +52,16 @@ export function proseRequest(chunk: ProseChunk, maxTokens?: number): ModelReques
     '',
     `File ${chunk.file}, lines ${chunk.startLine} to ${chunk.endLine}. Split it into instruction, gate and register atoms.`,
     '',
+    ...(chunk.ambiguousRouting?.length
+      ? [
+          'AMBIGUOUS ROUTING: code emitted no route for these tables. Resolve their intent from the source; do not guess.',
+          ...chunk.ambiguousRouting.map(
+            (table) =>
+              `Table lines ${table.startLine}-${table.endLine}; declared candidates: ${JSON.stringify(table.targets)}.`,
+          ),
+          '',
+        ]
+      : []),
     '<<<CHUNK',
     chunk.text.trimEnd(),
     'CHUNK>>>',
@@ -72,8 +85,14 @@ const AnswerAtom = z.strictObject({
   quote: z.string({ error: 'the quote is missing: every atom quotes the words that state it' }),
   situation: z.string().min(1).optional(),
   polarity: z.enum(['obligation', 'prohibition']).optional(),
+  replyAct: ReplyActDeclaration.optional(),
+  ask: z
+    .strictObject({ text: z.string().trim().min(1), context: z.string().trim().min(1).optional() })
+    .optional(),
   line: z.number().int().min(1).optional(),
   evidence: z.array(EvidencePredicate).min(1, { error: 'evidence is empty: name what a trace shows' }),
+  target: z.string().min(1).optional(),
+  targetKind: z.enum(['skill', 'subagent']).optional(),
 });
 
 /** Reads an answer: JSON (optionally in one code fence), the strict envelope and the right chunk. */
@@ -127,6 +146,18 @@ export function acceptProse(
       return;
     }
     const atom = parsed.data;
+    if (
+      (atom.ask !== undefined && atom.replyAct === undefined) ||
+      (atom.kind === 'route' && (atom.ask !== undefined || atom.replyAct !== undefined))
+    ) {
+      refusals.push({
+        chunk: chunk.id,
+        entry: label,
+        reason:
+          'ask: a reply request requires a declared replyAct on an instruction, register, gate, stage or hazard',
+      });
+      return;
+    }
     const named = `${label} (${atom.kind}: ${shortQuote(atom.title, 50)})`;
     const folded = foldQuote(atom.quote);
     if (folded === '') {
@@ -161,6 +192,24 @@ export function acceptProse(
       });
       return;
     }
+    const routeTable =
+      atom.kind === 'route'
+        ? chunk.ambiguousRouting?.find(
+            (table) =>
+              table.startLine <= span.startLine &&
+              table.endLine >= span.endLine &&
+              table.targets.some((target) => target.name === atom.target && target.kind === atom.targetKind),
+          )
+        : undefined;
+    if (atom.kind === 'route' && (!routeTable || !atom.situation)) {
+      refusals.push({
+        chunk: chunk.id,
+        entry: named,
+        reason:
+          'kind: a model route must resolve a flagged ambiguous table, name one of its declared targets and give the request in situation',
+      });
+      return;
+    }
     const at: Located = { file: chunk.file, ...span, quote: atom.quote };
     if (!quoteAtSpan(fileText, at)) {
       refusals.push({
@@ -170,16 +219,60 @@ export function acceptProse(
       });
       return;
     }
-    const same = builder.atoms.find(
-      (other) =>
-        other.kind === atom.kind &&
-        other.provenance.file === at.file &&
-        other.provenance.startLine <= at.endLine &&
-        at.startLine <= other.provenance.endLine &&
-        (other.producedBy === 'code' || foldQuote(other.provenance.quote) === folded),
-    );
+    const exact = builder
+      .atomsOf(at.file)
+      .find(
+        (other) =>
+          other.kind === atom.kind &&
+          other.provenance.file === at.file &&
+          other.provenance.startLine === at.startLine &&
+          other.provenance.endLine === at.endLine &&
+          other.provenance.quote === at.quote &&
+          !other.fields?.candidate,
+      );
+    const ask =
+      atom.ask && atom.replyAct
+        ? { ...atom.ask, act: { kind: 'reply' as const, name: atom.replyAct.id } }
+        : undefined;
+    if (
+      exact &&
+      exact.producedBy === 'code' &&
+      exact.replyAct === undefined &&
+      exact.fields?.ask === undefined &&
+      atom.replyAct &&
+      ask
+    ) {
+      exact.replyAct = atom.replyAct;
+      exact.fields = { ...exact.fields, ask };
+      exact.producedBy = 'model';
+      exact.approved = false;
+      accepted.push(exact);
+      return;
+    }
+    const same =
+      exact ??
+      builder
+        .atomsOf(at.file)
+        .find(
+          (other) =>
+            other.kind === atom.kind &&
+            other.provenance.file === at.file &&
+            other.provenance.startLine <= at.endLine &&
+            at.startLine <= other.provenance.endLine &&
+            !other.fields?.candidate &&
+            (other.producedBy === 'code' || foldQuote(other.provenance.quote) === folded),
+        );
     if (same) {
       duplicates.push(`${chunk.id}: ${named} repeats ${same.id}`);
+      return;
+    }
+    if (atom.kind === 'stage' || atom.kind === 'hazard') {
+      refusals.push({
+        chunk: chunk.id,
+        entry: named,
+        reason:
+          'kind: stage and hazard proposals may only enrich an exact existing code atom with replyAct and ask',
+      });
       return;
     }
     accepted.push(
@@ -187,10 +280,28 @@ export function acceptProse(
         kind: atom.kind,
         title: atom.title,
         at,
-        evidence: atom.evidence,
+        evidence: routeTable
+          ? [
+              atom.targetKind === 'skill'
+                ? { type: 'skill_loaded', name: atom.target as string }
+                : { type: 'tool_called', label: routeTable.dispatch, input: { subagent_type: atom.target } },
+            ]
+          : atom.evidence,
         producedBy: 'model',
+        ...(atom.replyAct ? { replyAct: atom.replyAct } : {}),
         ...(atom.situation ? { situation: atom.situation } : {}),
-        ...(atom.polarity ? { fields: { polarity: atom.polarity } } : {}),
+        ...(routeTable
+          ? {
+              fields: {
+                target: atom.target,
+                targetKind: atom.targetKind,
+                ask: atom.situation,
+                via: 'model-table',
+              },
+            }
+          : atom.polarity || ask
+            ? { fields: { ...(atom.polarity ? { polarity: atom.polarity } : {}), ...(ask ? { ask } : {}) } }
+            : {}),
       }),
     );
   });
@@ -202,6 +313,7 @@ export type ChunkRun = {
   calls: number;
   status: 'done' | 'failed';
   accepted: number;
+  cached?: boolean;
   error?: string;
   excerpt?: string;
 };
@@ -213,7 +325,23 @@ export async function runChunk(
   port: ModelPort,
   builder: AtomBuilder,
   maxTokens?: number,
+  cache?: ProseCache,
 ): Promise<{ run: ChunkRun; refusals: ProseRefusal[]; duplicates: string[] }> {
+  const key = proseCacheKey(chunk, port, maxTokens);
+  const cached = await cache?.get(key);
+  if (cached) {
+    const atoms = cached.atoms.map((raw) => {
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return raw;
+      const atom = raw as Record<string, unknown>;
+      return typeof atom.line === 'number' ? { ...atom, line: atom.line + chunk.startLine - 1 } : atom;
+    });
+    const result = acceptProse(chunk, { ...cached, chunk: chunk.id, atoms }, fileText, builder);
+    return {
+      run: { chunk: chunk.id, calls: 0, status: 'done', accepted: result.accepted.length, cached: true },
+      refusals: result.refusals,
+      duplicates: result.duplicates,
+    };
+  }
   const request = proseRequest(chunk, maxTokens);
   let reason = '';
   let excerpt = '';
@@ -239,6 +367,19 @@ export async function runChunk(
     const parsed = parseProseAnswer(chunk.id, text);
     if (parsed.ok) {
       const result = acceptProse(chunk, parsed.answer, fileText, builder);
+      if (cache && result.refusals.length === 0) {
+        // Keep the located occurrence, relative to content rather than absolute file lines.
+        const atoms = parsed.answer.atoms.map((raw) => {
+          const atom = AnswerAtom.parse(raw);
+          const span = locateQuote(fileText, atom.quote, {
+            fromLine: chunk.startLine,
+            toLine: chunk.endLine,
+            ...(atom.line !== undefined ? { nearLine: atom.line } : {}),
+          });
+          return span ? { ...atom, line: span.startLine - chunk.startLine + 1 } : atom;
+        });
+        await cache.put(key, { ...parsed.answer, atoms });
+      }
       return {
         run: { chunk: chunk.id, calls: attempt, status: 'done', accepted: result.accepted.length },
         refusals: result.refusals,

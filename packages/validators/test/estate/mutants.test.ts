@@ -25,6 +25,30 @@ vi.mock('@agent-nexus/driftbench-estate', async (importOriginal) => {
 
 const GATE = 'gate.standing.read-a-file-before-you-edit';
 
+/** The exact diagnostic owed by the structured test population of an un-killed mutant. */
+function livingReason(
+  run: EstateRun,
+  mutant: Awaited<ReturnType<typeof agentMutants>>[number],
+  verdicts: Awaited<ReturnType<typeof specVerdicts>>,
+): string {
+  if (mutant.equivalent)
+    return 'the rule follower records the same session with and without the atom, on every ask and pair of asks of its situations and on the asks of its tests: no test can tell the two apart';
+  const named = verdicts.filter((verdict) => (estateMeta(verdict.spec).atoms ?? []).includes(mutant.atom));
+  if (named.length === 0) return 'no generated test names the atom';
+  const green = named.filter((verdict) => verdict.follower?.pass === true);
+  if (!run.scanned.match.hidOf.has(mutant.atom) || green.length === 0) {
+    const markers = [
+      ...new Set(
+        named.flatMap((verdict) => (estateMeta(verdict.spec).needs ?? []).map((need) => need.marker)),
+      ),
+    ].sort();
+    return `no complete test passes on the rule follower to run it on; its ${named.length} tests wait for ${markers.join(', ') || 'a fix of their expectation'}`;
+  }
+  const atom = run.scanned.map.atoms.find((entry) => entry.id === mutant.atom);
+  if (!atom) throw new Error(`missing atom ${mutant.atom}`);
+  return `${green.length} complete tests ran on the follower with the atom deleted and all passed; the evidence ${atom.evidence.map((entry) => entry.type).join(', ')} did not fire`;
+}
+
 /** The run with the ordered pair taken out of every complete spec that names the gate: still complete. */
 function withoutOrderedPair(run: EstateRun): EstateRun {
   return {
@@ -42,6 +66,7 @@ describe('agent mutants (level 5)', { timeout: 120_000 }, () => {
   it('kills skills, scripts and the deleted WebFetch prohibition, and says why a living mutant lives', async () => {
     const run = await estateRun(1);
     const mutants = await agentMutants(run);
+    const verdicts = await specVerdicts(run);
     const of = (kind: string) => mutants.filter((mutant) => mutant.kind === kind);
     expect(of('skill').length).toBeGreaterThan(0);
     expect(of('skill').every((mutant) => mutant.killed)).toBe(true);
@@ -56,13 +81,14 @@ describe('agent mutants (level 5)', { timeout: 120_000 }, () => {
     );
     const gate = mutants.find((mutant) => mutant.atom === 'gate.standing.read-a-file-before-you-edit');
     expect(gate).toBeDefined();
-    if (!gate?.killed) expect(gate?.reason).toMatch(/wait for |complete tests ran on the follower/);
+    if (!gate) throw new Error('missing gate mutant');
+    if (!gate.killed) {
+      expect(gate.equivalent).not.toBe(true);
+      expect(gate.reason).toBe(livingReason(run, gate, verdicts));
+    }
     for (const mutant of mutants) {
       if (mutant.killed) expect(mutant.reason, mutant.atom).toBeUndefined();
-      else
-        expect(mutant.reason, mutant.atom).toMatch(
-          /no generated test names the atom|wait for |complete tests ran on the follower|records the same session/,
-        );
+      else expect(mutant.reason, mutant.atom).toBe(livingReason(run, mutant, verdicts));
     }
     expect(of('script').length).toBeGreaterThan(0);
     expect(of('script').every((mutant) => mutant.killed && mutant.tests.length > 0)).toBe(true);
@@ -98,8 +124,8 @@ describe('agent mutants (level 5)', { timeout: 120_000 }, () => {
             verdict.spec.loaded ? [replayOnFollower(run, verdict.spec.loaded, checks, hid)] : [],
           ),
         );
-        expect(outcomes.flatMap((outcome) => outcome.failing).join('\n')).toMatch(
-          /read 0 times, expected at least 1/,
+        expect(outcomes.flatMap((outcome) => outcome.failing).join('\n')).toContain(
+          'read 0 times, expected at least 1',
         );
       }
     }
@@ -124,7 +150,14 @@ describe('agent mutants (level 5)', { timeout: 120_000 }, () => {
         // The original follower passes (it is green); the one that offers WebFetch fails on the offered tools.
         const outcome = await replayOnFollower(run, loaded, checks, hid);
         expect(outcome.pass).toBe(false);
-        expect(outcome.failing.join('\n')).toMatch(/tools_offered\.exclude\.WebFetch.*WebFetch was offered/);
+        expect(outcome.run.blocks.flatMap((block) => block.verdicts)).toContainEqual(
+          expect.objectContaining({
+            id: 'tools_offered.exclude.WebFetch',
+            gating: true,
+            outcome: 'fail',
+            evidence: expect.stringContaining('WebFetch was offered, expected not offered;'),
+          }),
+        );
       }
     }
   });
@@ -193,8 +226,16 @@ describe('a living agent mutant run on the follower (level 5, planted)', { timeo
     const gate = (await agentMutants(run)).find((mutant) => mutant.atom === GATE);
     expect(gate?.tests.length).toBeGreaterThan(0);
     expect(gate?.killed).toBe(false);
-    expect(gate?.reason).toMatch(
-      /complete tests ran on the follower with the atom deleted and all passed; the evidence .*did not fire/,
+    if (!gate) throw new Error('missing gate mutant');
+    const green = (await specVerdicts(run)).filter(
+      (verdict) => (estateMeta(verdict.spec).atoms ?? []).includes(GATE) && verdict.follower?.pass === true,
+    );
+    expect(green.length).toBeGreaterThan(0);
+    expect(gate.equivalent).not.toBe(true);
+    const atom = run.scanned.map.atoms.find((entry) => entry.id === GATE);
+    if (!atom) throw new Error('missing gate atom');
+    expect(gate.reason).toBe(
+      `${green.length} complete tests ran on the follower with the atom deleted and all passed; the evidence ${atom.evidence.map((entry) => entry.type).join(', ')} did not fire`,
     );
     const mutants = await agentMutants(run);
     const gates = mutants.filter((mutant) => mutant.kind === 'gate');
@@ -298,7 +339,7 @@ describe('estate mutants (level 6)', { timeout: 120_000 }, () => {
     }
     expect(wrong.some((verdict) => verdict.mutant.startsWith('wording:'))).toBe(false);
     const sample = wrong.find((verdict) => verdict.mutant.startsWith('instruction:'));
-    if (sample) expect(sample.why).toMatch(/left the estate/);
+    if (sample) expect(sample.why).toContain('left the estate');
   });
 });
 

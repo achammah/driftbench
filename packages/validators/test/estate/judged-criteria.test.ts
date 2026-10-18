@@ -67,7 +67,9 @@ describe(`${ID} follows the Then table of docs/estate.md section 5`, { timeout: 
       });
     });
     expect(result).toMatchObject({ pass: false });
-    expect(result?.detail).toMatch(/^1 specs judge an atom/);
+    expect(result?.detail).toBe(
+      '1 specs judge an atom that is neither an output rule (not gating) nor a listed domain rule or control (gating)',
+    );
   });
 
   it('fails a gating criterion on an output rule', async () => {

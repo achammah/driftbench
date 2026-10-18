@@ -61,7 +61,13 @@ describe('the estate rule follower', { timeout: 120_000 }, () => {
     ]);
     expect(observed.text).toContain('Next:');
     expect(observed.text).toContain(skill.topic.register.word);
-    expect(observed.text).not.toMatch(/obviously|simply/);
+    expect(observed.text).toBe(
+      [
+        `The ${skill.topic.noun} work is done and the file is updated.`,
+        skill.topic.register.example,
+        'Next: nothing else is open on my side.',
+      ].join('\n'),
+    );
     expect(calls).not.toContain('WebFetch');
   });
 

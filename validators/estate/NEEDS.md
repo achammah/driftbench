@@ -33,6 +33,7 @@ Rule (lead, 2026-10-12): every item family cites the product need it serves, as 
 | plan.relevance | 20 | plan | docs/estate.md section 4, pairwise rows "under the constraint list" |
 | gen.complete | 97 | generation | docs/estate.md section 5, the predicate to check table and the named gaps |
 | gen.task | 23 | generation | docs/estate.md section 5, "A code-written ask names a task" |
+| gen.task.v2 | 23 | generation | docs/estate.md section 5, "A code-written ask names a task"; source clauses and rendered ask checked beside v1 |
 | gen.asks | 24 | generation | docs/estate.md section 5, "When" (approved phrases shuffled by the seed; the twin takes the second phrase) |
 | gen.reads | 23 | generation | docs/estate.md section 5 (a Read of a path goes to the references check) and section 1, Reference row |
 | gen.coverage | 25 | generation | docs/estate.md section 5: `--focus` ("names the gaps of the ones with none"), the domain-rule row (a gating judged criterion), and the named gaps that close "as the pieces they name arrive" |

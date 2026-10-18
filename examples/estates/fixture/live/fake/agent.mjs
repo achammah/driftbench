@@ -8,6 +8,8 @@
  * declare on each of its tool calls. This deterministic stand-in implements a limited instruction syntax;
  * it is not a model or a complete Claude Code simulator. It knows nothing of any test, plan row or mutant:
  * what changes its stream is only what the copy says. No model, no cost, fictional data only.
+ * Each actual reply branch emits its own typed replyAct, pointing at the emitted text content block.
+ * A generic completion reports what happened; it never claims to produce a draft or clarification.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -527,8 +529,13 @@ export function planStream({ ask, cwd, sessionId, env }) {
   const out = [];
   let id = 0;
   let blocked = false;
-  const text = (value) =>
+  const text = (value, act) =>
     out.push({
+      replyAct: {
+        id: act,
+        evidence: { type: 'text_segment', part: 'reply', index: 0 },
+        source: { kind: 'adapter', name: 'driftbench-fictional-agent' },
+      },
       type: 'assistant',
       message: {
         id: `msg_agent_${++id}`,
@@ -587,7 +594,7 @@ export function planStream({ ask, cwd, sessionId, env }) {
     const prohibition = prohibited(tool, input, literal);
     if (prohibition) {
       blocked = true;
-      text(prohibition);
+      text(prohibition, 'refuse');
       return undefined;
     }
     if (denied(estate.settings, tool, input)) return undefined;
@@ -666,7 +673,7 @@ export function planStream({ ask, cwd, sessionId, env }) {
     /^(?:no need to do anything|what kinds of things|what does\b|what would it mean)/i.test(ask) ||
     /\bjust tell me\b/i.test(ask)
   ) {
-    text('Here is my answer; I changed nothing.');
+    text('Here is my answer; I changed nothing.', 'answer');
     hooks('Stop', undefined, { stop_hook_active: false });
     return { records: out, blocked };
   }
@@ -685,7 +692,7 @@ export function planStream({ ask, cwd, sessionId, env }) {
   );
   const plan = skillActions(planUnit, estate, requested, cwd);
   if (plan.error) {
-    text(plan.error);
+    text(plan.error, 'report');
     hooks('Stop', undefined, { stop_hook_active: false });
     return { records: out, blocked: true };
   }
@@ -735,7 +742,7 @@ export function planStream({ ask, cwd, sessionId, env }) {
     }
     // A denied, missing or failed prerequisite is not satisfied. Never execute its dependent action.
     if (!result || result.error) {
-      text('An action could not complete; I stopped before continuing.');
+      text('An action could not complete; I stopped before continuing.', 'report');
       hooks('Stop', undefined, { stop_hook_active: false });
       return { records: out, blocked: true };
     }
@@ -756,6 +763,7 @@ export function planStream({ ask, cwd, sessionId, env }) {
   for (const name of anytime) step(name);
   text(
     blocked ? 'A guard blocked part of the work; I stopped there.' : 'Done. Here is what I did, in short.',
+    'report',
   );
   hooks('Stop', undefined, { stop_hook_active: false });
   return { records: out, blocked };

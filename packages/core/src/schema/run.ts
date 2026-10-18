@@ -210,12 +210,38 @@ export const HistoryNormalization = z.strictObject({
 });
 export type HistoryNormalization = z.infer<typeof HistoryNormalization>;
 
+/** A reply act explicitly reported by an adapter or a declared judge. Never inferred from reply words. */
+export const ReplyActId = z.enum(['answer', 'clarify', 'refuse', 'report', 'draft', 'acknowledge']);
+export type ReplyActId = z.infer<typeof ReplyActId>;
+
+/** The map can require a text segment serving as the reply or as a draft. */
+export const ReplyActEvidence = z.strictObject({
+  type: z.literal('text_segment'),
+  part: z.enum(['reply', 'draft']),
+});
+export type ReplyActEvidence = z.infer<typeof ReplyActEvidence>;
+
+/** Index identifies the actual text segment in Observed.segments, not a word span or an expected answer. */
+export const ObservedReplyAct = z.strictObject({
+  id: ReplyActId,
+  evidence: ReplyActEvidence.extend({ index: z.number().int().nonnegative() }),
+  source: z.strictObject({
+    kind: z.enum(['adapter', 'judge']),
+    name: z
+      .string()
+      .min(1)
+      .refine((name) => name.trim() !== '', 'source name must not be blank'),
+  }),
+});
+export type ObservedReplyAct = z.infer<typeof ObservedReplyAct>;
+
 /** Everything observed in one block. */
 export const Observed = z.strictObject({
   segments: z.array(Segment),
   text: z.string(),
   toolCalls: z.array(ToolCall),
   runtime: RuntimeTrace.optional(),
+  replyAct: ObservedReplyAct.optional(),
   artifacts: z.array(ArtifactRef).optional(),
   workspaceDiff: WorkspaceDiff.optional(),
   executions: z.array(ExecutionRecord).optional(),

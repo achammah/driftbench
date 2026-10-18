@@ -1,4 +1,4 @@
-import { Document, isScalar, type ScalarTag } from 'yaml';
+import { Document, isScalar, type ScalarTag, stringify } from 'yaml';
 
 // The ordinary block-map/sequence subset needs no CST or YAML node tree. Anything
 // outside this subset goes through the existing YAML parser, including its errors.
@@ -209,4 +209,123 @@ function pair(source: string): Pair {
     pairs.set(source, entry);
   }
   return entry;
+}
+
+// The writer twin of the parser above. `stringify` builds a node tree for every value it writes, which is
+// most of the cost of writing thousands of generated specs. The ordinary block map and sequence of plain
+// scalars needs none of it; anything else goes to the library for the whole document, so the text is the
+// library's text in every case.
+const LIBRARY_OPTIONS = { lineWidth: 0, aliasDuplicateObjects: false } as const;
+// The library's rule for a string it cannot write plain (stringifyString.js, plainString).
+const notPlain = /^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-]$|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t :]$/;
+// biome-ignore lint/suspicious/noControlCharactersInRegex: the library writes these double-quoted.
+const controls = /[\u0000-\u001f\u007f-\u009f\u2028\u2029\ud800-\udfff\ufeff]/;
+const scalarTexts = new Map<string, string>();
+const MAX_KEY = 1024;
+
+/**
+ * The text of a single-line string: plain when the library would write it plain, else quoted as the library
+ * quotes it. A string with a double quote and no single quote is single-quoted; any other is a JSON string.
+ */
+function stringText(value: string): string {
+  const known = scalarTexts.get(value);
+  if (known !== undefined) return known;
+  if (controls.test(value) || /^(?:---|\.\.\.)/.test(value)) throw unsupported;
+  // A string that starts with a letter can only read as null or a boolean; any other start tries every tag.
+  const resolves = /^[A-Za-z]/.test(value)
+    ? value.length <= 5 && /^(?:null|true|false)$/i.test(value)
+    : scalarTags.some((tag) => tag.test?.test(value));
+  let text = value;
+  if (value === '' || notPlain.test(value) || resolves)
+    text = value.includes('"') && !value.includes("'") ? `'${value}'` : JSON.stringify(value);
+  if (value.length <= 256) {
+    if (scalarTexts.size >= 4096) scalarTexts.clear();
+    scalarTexts.set(value, text);
+  }
+  return text;
+}
+
+const keyTexts = new Set<string>();
+
+function keyText(key: string): string {
+  if (keyTexts.has(key)) return key;
+  if (key.length > MAX_KEY || !plainKey.test(key) || key === '__proto__') throw unsupported;
+  if (scalarTags.some((tag) => tag.test?.test(key))) throw unsupported;
+  if (keyTexts.size >= 4096) keyTexts.clear();
+  keyTexts.add(key);
+  return key;
+}
+
+function inlineText(value: unknown): string | undefined {
+  if (typeof value === 'string') return stringText(value);
+  if (value === null) return 'null';
+  if (typeof value === 'boolean') return String(value);
+  if (typeof value === 'number') {
+    if (Object.is(value, -0) || !Number.isFinite(value)) throw unsupported;
+    const text = String(value);
+    if (!/^-?\d+(?:\.\d+)?$/.test(text)) throw unsupported;
+    return text;
+  }
+  if (Array.isArray(value)) return value.length === 0 ? '[]' : undefined;
+  if (isPlain(value)) return hasDefinedValues(value) ? undefined : '{}';
+  throw unsupported;
+}
+
+function isPlain(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function hasDefinedValues(object: Record<string, unknown>): boolean {
+  return Object.keys(object).some((key) => object[key] !== undefined);
+}
+
+function writeMap(object: Record<string, unknown>, indent: string, first: string, lines: string[]): void {
+  let lead = first;
+  for (const key of Object.keys(object)) {
+    const value = object[key];
+    // The library leaves out a pair whose value is undefined.
+    if (value === undefined) continue;
+    const text = inlineText(value);
+    if (text !== undefined) lines.push(`${lead}${keyText(key)}: ${text}`);
+    else {
+      lines.push(`${lead}${keyText(key)}:`);
+      writeBlock(value, `${indent}  `, lines);
+    }
+    lead = indent;
+  }
+}
+
+function writeBlock(value: unknown, indent: string, lines: string[], first = indent): void {
+  if (Array.isArray(value)) {
+    let lead = first;
+    for (let index = 0; index < value.length; index += 1) {
+      const item = value[index];
+      if (item === undefined) throw unsupported;
+      const text = inlineText(item);
+      if (text !== undefined) lines.push(`${lead}- ${text}`);
+      else writeBlock(item, `${indent}  `, lines, `${lead}- `);
+      lead = indent;
+    }
+  } else writeMap(value as Record<string, unknown>, indent, first, lines);
+}
+
+/**
+ * The YAML text of a value, as `stringify(value, { lineWidth: 0, aliasDuplicateObjects: false })` writes it.
+ * Block maps and sequences of plain scalars, single-line quoted strings and ordinary numbers are written
+ * directly; a value outside that (a multi-line string, a date, a key that needs quoting) is written by the
+ * library, whole. Undefined map values are omitted; maps left empty still serialize as `{}` at any depth.
+ */
+export function stringifyBlockYaml(value: unknown): string {
+  if (Array.isArray(value) ? value.length > 0 : isPlain(value) && hasDefinedValues(value)) {
+    try {
+      const lines: string[] = [];
+      writeBlock(value, '', lines);
+      return `${lines.join('\n')}\n`;
+    } catch (cause) {
+      if (cause !== unsupported) throw cause;
+    }
+  }
+  return stringify(value, LIBRARY_OPTIONS);
 }

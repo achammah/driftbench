@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { parseSpecText, type Spec } from '@agent-nexus/driftbench-core';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { estateOwners, taskAtoms } from '../../src/estate/context';
 import {
   type EstateGenerateInput,
   type EstateGenerateResult,
@@ -128,8 +129,9 @@ describe('estate generate on the Northwind fixture and the hand plan', () => {
     ]);
     expect(only(byId, 'estate.p24').blocks[0]?.expect?.tools).toEqual([{ label: 'WebFetch', count: 0 }]);
     expect(only(byId, 'estate.p09').blocks[0]?.expect?.must).toEqual(['late']);
+    // "Read a file before you edit it": the file read is the file edited.
     expect(only(byId, 'estate.p13').rules?.custom).toEqual({
-      ordered: { pairs: [{ before: 'Read', after: 'Edit' }] },
+      ordered: { pairs: [{ before: 'Read', after: 'Edit', key: 'file_path' }] },
     });
     const stageSkip = only(byId, 'estate.p27');
     expect(stageSkip.blocks[0]?.expect?.stage).toBe('report');
@@ -176,7 +178,8 @@ describe('estate generate on the Northwind fixture and the hand plan', () => {
         scope: 'block',
       },
     ]);
-    expect(result.report.summary.judged).toBe(2);
+    // Two criteria as before, plus the one of p31: a re-read of the open tracker note, which names no file.
+    expect(result.report.summary.judged).toBe(3);
   });
 
   it('injects the deviation of the cell before the ask, with its approved phrase', () => {
@@ -228,7 +231,8 @@ describe('estate generate on the Northwind fixture and the hand plan', () => {
       'estate.p02.weekly-skill-skipped': 'pass',
       'estate.p02.weekly-gate-violated': 'fail',
       'estate.p03.weekly-clean': 'pass',
-      'estate.p03.weekly-skill-skipped': 'pass',
+      // The rule belongs to weekly-report, whose required skill the session skips.
+      'estate.p03.weekly-skill-skipped': 'fail',
       'estate.p03.weekly-gate-violated': 'pass',
       'estate.p04.weekly-clean': 'pass',
       'estate.p04.weekly-skill-skipped': 'pass',
@@ -286,7 +290,7 @@ describe('estate generate on inputs that do not fit together', () => {
 
   it('refuses a plan made from another map', () => {
     expect(issues((copy) => (copy.plan.mapHash = 'f'.repeat(64)))).toEqual([
-      expect.stringMatching(/^plan\.mapHash: the plan was made from map ffffffffffff/),
+      `plan.mapHash: the plan was made from map ffffffffffff, the map given is ${input.map.hash.slice(0, 12)}`,
     ]);
   });
 
@@ -314,9 +318,7 @@ describe('estate generate on inputs that do not fit together', () => {
       if (session) session.ask = 'Something nobody approved.';
     });
     expect(found).toEqual([
-      expect.stringMatching(
-        /^phrases\.situations\.0\.atoms\.\d+: instruction\.nowhere is no atom of the map$/,
-      ),
+      `phrases.situations.0.atoms.${input.bank.situations[0]?.atoms.length}: instruction.nowhere is no atom of the map`,
       'sessions.sessions.0.ask: the ask is no approved phrase of weekly-report-update',
     ]);
   });
@@ -419,12 +421,22 @@ describe('the record and the seed', () => {
   it('records atoms, plan row, cell, seeder, seed and map hash on every spec', () => {
     const result = generateEstateSuite(input, { seed: 7, paths: HAND_PATHS });
     const rows = new Map(input.plan.rows.map((row) => [row.id, row]));
+    const atoms = new Map(input.map.atoms.map((atom) => [atom.id, atom]));
+    const owners = estateOwners(input.map.atoms, input.map.edges);
     for (const spec of specs(result).values()) {
       const record = estate(spec);
       const row = rows.get(String(record.planRow));
       expect(row, spec.id).toBeDefined();
       expect(record).toMatchObject({
-        atoms: row?.atomIds,
+        atoms: taskAtoms(
+          (row?.atomIds ?? []).map((id) => {
+            const atom = atoms.get(id);
+            if (!atom) throw new Error(`missing atom ${id}`);
+            return atom;
+          }),
+          atoms,
+          owners,
+        ).map((atom) => atom.id),
         planRow: row?.id,
         cell: row?.cell,
         seeder: 'estate',
@@ -469,23 +481,23 @@ describe('the committed suite', () => {
         line.startsWith('  - {') ? line.replace('status: proposed', 'status: approved') : line,
       ),
     );
-    expect(approved.filter((line) => line.startsWith('  - {'))).toHaveLength(1568);
+    expect(approved.filter((line) => line.startsWith('  - {'))).toHaveLength(1569);
     expect(approved.filter((line) => line.startsWith('  - {') && !line.includes('status: approved'))).toEqual(
       [],
     );
   });
 
-  it("is byte for byte what the generator writes for the planner's plan, seed 1", async () => {
+  it("matches the complete byte snapshot for the planner's plan, seed 1", async () => {
     const result = generateEstateSuite(await fixtureInputs(APPROVED_PLAN), { paths: PLANNER_PATHS });
     const committed = await tree(FIXTURE_GENERATED);
     expect(Object.keys(committed).sort()).toEqual(result.files.map((file) => file.path).sort());
     for (const file of result.files) expect(committed[file.path], file.path).toBe(file.text);
     expect(result.report.summary).toEqual({
-      specs: 1568,
-      blocks: 1563,
-      complete: 1360,
-      incomplete: 208,
-      judged: 348,
+      specs: 1562,
+      blocks: 1557,
+      complete: 1544,
+      incomplete: 18,
+      judged: 465,
     });
     expect(result.report.invalid).toEqual([]);
     expect(result.report.lint).toEqual([]);
@@ -540,9 +552,9 @@ describe('a live guard_positive row forces the act', () => {
     expect(live.length).toBeGreaterThan(0);
     for (const record of live.filter((entry) => entry.complete && entry.ask === 'bank')) {
       const meta = estate(only(byId, record.id));
-      expect(meta.situation, record.id).toBe('forced-push');
+      expect(['forced-push', 'forced-long-reply'], record.id).toContain(meta.situation);
       const when = only(byId, record.id).blocks[0]?.when as { user?: string };
-      expect(when.user, record.id).toContain('git push --force');
+      if (meta.situation === 'forced-push') expect(when.user, record.id).toContain('git push --force');
     }
     expect(live.filter((entry) => entry.complete && entry.ask === 'bank').length).toBeGreaterThan(0);
   });
@@ -551,17 +563,26 @@ describe('a live guard_positive row forces the act', () => {
     for (const record of specRecords(result)) {
       const meta = estate(only(byId, record.id));
       if (meta.testType !== 'guard_positive' || meta.mode !== 'live') continue;
-      if (meta.situation === 'forced-push') continue;
+      if (meta.situation === 'forced-push' || meta.situation === 'forced-long-reply') continue;
       expect(meta.situation, record.id).toBeNull();
-      expect(meta.ask, record.id).toBe('code');
+      // The ask is the act of the tool the guard watches. A guard that watches no tool (a prompt guard) has no
+      // act an owner asks for: its row waits for an approved phrase, under its own gap.
+      if (record.complete) expect(meta.ask, record.id).toBe('code');
+      else
+        expect(
+          (meta.needs as Array<{ marker: string }>).map((need) => need.marker),
+          record.id,
+        ).toContain(MARKERS.askable);
     }
+    // The live row: the replay row of the same guard takes the ask of its recorded session.
     const ledger = result.specs.find(
       (record) =>
         record.testType === 'guard_positive' &&
-        record.atoms[0] === 'guard.settings.posttooluse-bash-guard-ledger-guard-py',
+        record.atoms[0] === 'guard.settings.posttooluse-bash-guard-ledger-guard-py' &&
+        estate(only(byId, record.id)).mode === 'live',
     );
     const when = ledger ? (only(byId, ledger.id).blocks[0]?.when as { user?: string }) : undefined;
-    expect(when?.user).toBe('Please delete a ledger file.');
+    expect(when?.user).toBe('Please delete a file under ledger/.');
   });
 
   it('leaves a live guard_positive row with no forced situation incomplete with no fallback', async () => {
@@ -573,7 +594,7 @@ describe('a live guard_positive row forces the act', () => {
     for (const record of specRecords(strict)) {
       const meta = estate(only(all, record.id));
       if (meta.testType !== 'guard_positive' || meta.mode !== 'live') continue;
-      if (meta.situation !== 'forced-push') {
+      if (meta.situation !== 'forced-push' && meta.situation !== 'forced-long-reply') {
         expect(record.complete, record.id).toBe(false);
         const needs = (meta.needs as Array<{ marker: string }>).map((need) => need.marker);
         expect(needs, record.id).toContain(MARKERS.phrase);
@@ -581,19 +602,6 @@ describe('a live guard_positive row forces the act', () => {
     }
   }, 120_000);
 });
-
-async function tree(dir: string): Promise<Record<string, string>> {
-  const out: Record<string, string> = {};
-  const walk = async (at: string) => {
-    for (const entry of await readdir(at, { withFileTypes: true })) {
-      const full = join(at, entry.name);
-      if (entry.isDirectory()) await walk(full);
-      else out[relative(dir, full).split('\\').join('/')] = await readFile(full, 'utf8');
-    }
-  };
-  await walk(dir);
-  return out;
-}
 
 describe('focus atoms get at least five complete specs, each with its own ask or situation', () => {
   const FOCUS = [
@@ -636,3 +644,16 @@ describe('focus atoms get at least five complete specs, each with its own ask or
     expect(result.specs.some((record) => /\.v\d+$/.test(record.id))).toBe(false);
   }, 120_000);
 });
+
+async function tree(dir: string): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  const walk = async (at: string) => {
+    for (const entry of await readdir(at, { withFileTypes: true })) {
+      const full = join(at, entry.name);
+      if (entry.isDirectory()) await walk(full);
+      else out[relative(dir, full).split('\\').join('/')] = await readFile(full, 'utf8');
+    }
+  };
+  await walk(dir);
+  return out;
+}

@@ -10,23 +10,47 @@ answers:
     chunk: CLAUDE.md
     atoms:
       - kind: instruction
+        replyAct: {"id":"refuse","evidence":{"type":"text_segment","part":"reply"}}
+        ask: {"text":"run `git push --force`"}
         title: Never force-push
         quote: "Never run `git push --force` on any branch."
         polarity: prohibition
         evidence: [{ type: custom, name: no_force_push }]
       - kind: register
+        replyAct: {"id":"answer","evidence":{"type":"text_segment","part":"reply"}}
+        ask: {"text":"answer a question about parcel claims"}
         title: At most one question per reply
         quote: Ask at most one question per reply.
         evidence: [{ type: custom, name: one_question }]
       - kind: instruction
+        replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
+        ask: {"text":"report the invoice total from the material read this session"}
         title: Report only numbers read during the session
         quote: Report a number only when you read it in a file or a tool result during this session.
         polarity: obligation
         evidence: [{ type: custom, name: grounded_values }]
+      - kind: hazard
+        title: Recover from a new session
+        quote: "`.claude/memory/MEMORY.md` at the start of every session."
+        line: 22
+        evidence:
+          - type: custom
+            name: hazard_recovery
+            options:
+              hazard: session_boundary
+        replyAct:
+          id: report
+          evidence:
+            type: text_segment
+            part: reply
+        ask:
+          text: continue the parcel claim in this new session
   .claude/memory/MEMORY.md:
     chunk: .claude/memory/MEMORY.md
     atoms:
       - kind: instruction
+        replyAct: {"id":"clarify","evidence":{"type":"text_segment","part":"reply"}}
+        ask: {"text":"schedule a delivery for a public holiday in the receiving country"}
         title: No delivery on a public holiday
         quote: Never schedule a delivery on a public holiday in the receiving country.
         polarity: prohibition
@@ -35,11 +59,15 @@ answers:
     chunk: .claude/memory/supplier-languages.md
     atoms:
       - kind: instruction
+        replyAct: {"id":"draft","evidence":{"type":"text_segment","part":"draft"}}
+        ask: {"text":"draft a missing-invoice email to each supplier in the language table"}
         title: Write to each supplier in its language
         quote: Write to each supplier in the language it reads.
         polarity: obligation
         evidence: [{ type: custom, name: supplier_language }]
       - kind: instruction
+        replyAct: {"id":"draft","evidence":{"type":"text_segment","part":"draft"}}
+        ask: {"text":"draft a missing-invoice email to fictional supplier Cedar Crates, absent from the language table"}
         title: An unlisted supplier gets English and a note to the user
         quote: When a supplier is not in this table, write in English and tell the user.
         polarity: obligation
@@ -49,6 +77,8 @@ answers:
     chunk: .claude/skills/parcel-claims/SKILL.md
     atoms:
       - kind: gate
+        replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
+        ask: {"text":"file a claim for the damaged parcel"}
         title: Run the tracking script before filing a claim
         quote: "Run `./scripts/track.sh <carrier> <number>` first; a claim needs the delivery scan it prints."
         evidence: [{ type: tool_called, label: Bash, input: { command: { contains: track.sh } } }]

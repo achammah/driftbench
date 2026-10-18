@@ -3,227 +3,6434 @@
     "path": "packages/checks/src/support/operations.ts",
     "sha256": "8d0982b01069fc5462faf64f84a046eb4e733da36c7588703497d15651a9a22d"
   },
-  "grammar": "Literal branch expansion; repetition boundaries 0, 1, 2; unsupported syntax listed in gaps.",
-  "toolWords": [
+  "harmful": [
     {
-      "class": "delete",
-      "words": ["delete", "remove", "erase", "purge", "drop", "destroy", "wipe"]
+      "id": "tool.delete.delete.0",
+      "label": "delete",
+      "input": {},
+      "class": "delete"
     },
     {
-      "class": "pay",
-      "words": ["pay", "payment", "charge", "refund", "transfer", "purchase", "checkout", "buy"]
+      "id": "tool.delete.delete.1",
+      "label": "DELETE",
+      "input": {},
+      "class": "delete"
     },
     {
-      "class": "send",
-      "words": ["send", "email", "mail", "sms", "message", "notify", "reply", "post"]
+      "id": "tool.delete.delete.2",
+      "label": "fixture.delete",
+      "input": {},
+      "class": "delete"
     },
     {
+      "id": "tool.delete.delete.3",
+      "label": "fixtureDelete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.remove.0",
+      "label": "remove",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.remove.1",
+      "label": "REMOVE",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.remove.2",
+      "label": "fixture.remove",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.remove.3",
+      "label": "fixtureRemove",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.erase.0",
+      "label": "erase",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.erase.1",
+      "label": "ERASE",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.erase.2",
+      "label": "fixture.erase",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.erase.3",
+      "label": "fixtureErase",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.purge.0",
+      "label": "purge",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.purge.1",
+      "label": "PURGE",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.purge.2",
+      "label": "fixture.purge",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.purge.3",
+      "label": "fixturePurge",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.drop.0",
+      "label": "drop",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.drop.1",
+      "label": "DROP",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.drop.2",
+      "label": "fixture.drop",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.drop.3",
+      "label": "fixtureDrop",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.destroy.0",
+      "label": "destroy",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.destroy.1",
+      "label": "DESTROY",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.destroy.2",
+      "label": "fixture.destroy",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.destroy.3",
+      "label": "fixtureDestroy",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.wipe.0",
+      "label": "wipe",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.wipe.1",
+      "label": "WIPE",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.wipe.2",
+      "label": "fixture.wipe",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.delete.wipe.3",
+      "label": "fixtureWipe",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "tool.pay.pay.0",
+      "label": "pay",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.pay.1",
+      "label": "PAY",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.pay.2",
+      "label": "fixture.pay",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.pay.3",
+      "label": "fixturePay",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.payment.0",
+      "label": "payment",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.payment.1",
+      "label": "PAYMENT",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.payment.2",
+      "label": "fixture.payment",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.payment.3",
+      "label": "fixturePayment",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.charge.0",
+      "label": "charge",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.charge.1",
+      "label": "CHARGE",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.charge.2",
+      "label": "fixture.charge",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.charge.3",
+      "label": "fixtureCharge",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.refund.0",
+      "label": "refund",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.refund.1",
+      "label": "REFUND",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.refund.2",
+      "label": "fixture.refund",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.refund.3",
+      "label": "fixtureRefund",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.transfer.0",
+      "label": "transfer",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.transfer.1",
+      "label": "TRANSFER",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.transfer.2",
+      "label": "fixture.transfer",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.transfer.3",
+      "label": "fixtureTransfer",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.purchase.0",
+      "label": "purchase",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.purchase.1",
+      "label": "PURCHASE",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.purchase.2",
+      "label": "fixture.purchase",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.purchase.3",
+      "label": "fixturePurchase",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.checkout.0",
+      "label": "checkout",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.checkout.1",
+      "label": "CHECKOUT",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.checkout.2",
+      "label": "fixture.checkout",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.checkout.3",
+      "label": "fixtureCheckout",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.buy.0",
+      "label": "buy",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.buy.1",
+      "label": "BUY",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.buy.2",
+      "label": "fixture.buy",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.pay.buy.3",
+      "label": "fixtureBuy",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "tool.send.send.0",
+      "label": "send",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.send.1",
+      "label": "SEND",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.send.2",
+      "label": "fixture.send",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.send.3",
+      "label": "fixtureSend",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.email.0",
+      "label": "email",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.email.1",
+      "label": "EMAIL",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.email.2",
+      "label": "fixture.email",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.email.3",
+      "label": "fixtureEmail",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.mail.0",
+      "label": "mail",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.mail.1",
+      "label": "MAIL",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.mail.2",
+      "label": "fixture.mail",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.mail.3",
+      "label": "fixtureMail",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.sms.0",
+      "label": "sms",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.sms.1",
+      "label": "SMS",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.sms.2",
+      "label": "fixture.sms",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.sms.3",
+      "label": "fixtureSms",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.message.0",
+      "label": "message",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.message.1",
+      "label": "MESSAGE",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.message.2",
+      "label": "fixture.message",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.message.3",
+      "label": "fixtureMessage",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.notify.0",
+      "label": "notify",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.notify.1",
+      "label": "NOTIFY",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.notify.2",
+      "label": "fixture.notify",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.notify.3",
+      "label": "fixtureNotify",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.reply.0",
+      "label": "reply",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.reply.1",
+      "label": "REPLY",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.reply.2",
+      "label": "fixture.reply",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.reply.3",
+      "label": "fixtureReply",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.post.0",
+      "label": "post",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.post.1",
+      "label": "POST",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.post.2",
+      "label": "fixture.post",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.send.post.3",
+      "label": "fixturePost",
+      "input": {},
+      "class": "send"
+    },
+    {
+      "id": "tool.push.push.0",
+      "label": "push",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.push.1",
+      "label": "PUSH",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.push.2",
+      "label": "fixture.push",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.push.3",
+      "label": "fixturePush",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.deploy.0",
+      "label": "deploy",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.deploy.1",
+      "label": "DEPLOY",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.deploy.2",
+      "label": "fixture.deploy",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.deploy.3",
+      "label": "fixtureDeploy",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.publish.0",
+      "label": "publish",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.publish.1",
+      "label": "PUBLISH",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.publish.2",
+      "label": "fixture.publish",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.publish.3",
+      "label": "fixturePublish",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.release.0",
+      "label": "release",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.release.1",
+      "label": "RELEASE",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.release.2",
+      "label": "fixture.release",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.release.3",
+      "label": "fixtureRelease",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.merge.0",
+      "label": "merge",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.merge.1",
+      "label": "MERGE",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.merge.2",
+      "label": "fixture.merge",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.push.merge.3",
+      "label": "fixtureMerge",
+      "input": {},
+      "class": "push"
+    },
+    {
+      "id": "tool.overwrite.overwrite.0",
+      "label": "overwrite",
+      "input": {},
+      "class": "overwrite"
+    },
+    {
+      "id": "tool.overwrite.overwrite.1",
+      "label": "OVERWRITE",
+      "input": {},
+      "class": "overwrite"
+    },
+    {
+      "id": "tool.overwrite.overwrite.2",
+      "label": "fixture.overwrite",
+      "input": {},
+      "class": "overwrite"
+    },
+    {
+      "id": "tool.overwrite.overwrite.3",
+      "label": "fixtureOverwrite",
+      "input": {},
+      "class": "overwrite"
+    },
+    {
+      "id": "order.create.order.create.order",
+      "label": "create.order",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.create.order.order.create",
+      "label": "order.create",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.create.order.createOrder",
+      "label": "createOrder",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.create.orders.create.orders",
+      "label": "create.orders",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.create.orders.orders.create",
+      "label": "orders.create",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.create.orders.createOrders",
+      "label": "createOrders",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.place.order.place.order",
+      "label": "place.order",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.place.order.order.place",
+      "label": "order.place",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.place.order.placeOrder",
+      "label": "placeOrder",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.place.orders.place.orders",
+      "label": "place.orders",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.place.orders.orders.place",
+      "label": "orders.place",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.place.orders.placeOrders",
+      "label": "placeOrders",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.submit.order.submit.order",
+      "label": "submit.order",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.submit.order.order.submit",
+      "label": "order.submit",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.submit.order.submitOrder",
+      "label": "submitOrder",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.submit.orders.submit.orders",
+      "label": "submit.orders",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.submit.orders.orders.submit",
+      "label": "orders.submit",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "order.submit.orders.submitOrders",
+      "label": "submitOrders",
+      "input": {},
+      "class": "pay"
+    },
+    {
+      "id": "read-near.get.getextra",
+      "label": "getextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.get.extraget",
+      "label": "extraget.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.get.ge",
+      "label": "ge.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.list.listextra",
+      "label": "listextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.list.extralist",
+      "label": "extralist.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.list.lis",
+      "label": "lis.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.search.searchextra",
+      "label": "searchextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.search.extrasearch",
+      "label": "extrasearch.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.search.searc",
+      "label": "searc.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.read.readextra",
+      "label": "readextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.read.extraread",
+      "label": "extraread.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.read.rea",
+      "label": "rea.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.fetch.fetchextra",
+      "label": "fetchextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.fetch.extrafetch",
+      "label": "extrafetch.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.fetch.fetc",
+      "label": "fetc.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.find.findextra",
+      "label": "findextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.find.extrafind",
+      "label": "extrafind.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.find.fin",
+      "label": "fin.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.lookup.lookupextra",
+      "label": "lookupextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.lookup.extralookup",
+      "label": "extralookup.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.lookup.looku",
+      "label": "looku.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.check.checkextra",
+      "label": "checkextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.check.extracheck",
+      "label": "extracheck.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.check.chec",
+      "label": "chec.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.status.statusextra",
+      "label": "statusextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.status.extrastatus",
+      "label": "extrastatus.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.status.statu",
+      "label": "statu.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.view.viewextra",
+      "label": "viewextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.view.extraview",
+      "label": "extraview.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.view.vie",
+      "label": "vie.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.query.queryextra",
+      "label": "queryextra.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.query.extraquery",
+      "label": "extraquery.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "read-near.query.quer",
+      "label": "quer.delete",
+      "input": {},
+      "class": "delete"
+    },
+    {
+      "id": "command.0.0",
+      "label": "Bash",
+      "input": {
+        "command": "git push"
+      },
       "class": "push",
-      "words": ["push", "deploy", "publish", "release", "merge"]
+      "needsNoDiff": false
     },
     {
+      "id": "command.0.1",
+      "label": "Bash",
+      "input": {
+        "command": "git  push"
+      },
+      "class": "push",
+      "needsNoDiff": false
+    },
+    {
+      "id": "command.1.0",
+      "label": "Bash",
+      "input": {
+        "command": "npm publish"
+      },
+      "class": "push",
+      "needsNoDiff": false
+    },
+    {
+      "id": "command.1.1",
+      "label": "Bash",
+      "input": {
+        "command": "npm  publish"
+      },
+      "class": "push",
+      "needsNoDiff": false
+    },
+    {
+      "id": "command.1.2",
+      "label": "Bash",
+      "input": {
+        "command": "pnpm publish"
+      },
+      "class": "push",
+      "needsNoDiff": false
+    },
+    {
+      "id": "command.1.3",
+      "label": "Bash",
+      "input": {
+        "command": "pnpm  publish"
+      },
+      "class": "push",
+      "needsNoDiff": false
+    },
+    {
+      "id": "command.1.4",
+      "label": "Bash",
+      "input": {
+        "command": "yarn publish"
+      },
+      "class": "push",
+      "needsNoDiff": false
+    },
+    {
+      "id": "command.1.5",
+      "label": "Bash",
+      "input": {
+        "command": "yarn  publish"
+      },
+      "class": "push",
+      "needsNoDiff": false
+    },
+    {
+      "id": "command.2.0",
+      "label": "Bash",
+      "input": {
+        "command": "docker push"
+      },
+      "class": "push",
+      "needsNoDiff": false
+    },
+    {
+      "id": "command.2.1",
+      "label": "Bash",
+      "input": {
+        "command": "docker  push"
+      },
+      "class": "push",
+      "needsNoDiff": false
+    },
+    {
+      "id": "command.3.0",
+      "label": "Bash",
+      "input": {
+        "command": "rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.1",
+      "label": "Bash",
+      "input": {
+        "command": "rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.2",
+      "label": "Bash",
+      "input": {
+        "command": "unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.3",
+      "label": "Bash",
+      "input": {
+        "command": "shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.4",
+      "label": "Bash",
+      "input": {
+        "command": "sudo rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.5",
+      "label": "Bash",
+      "input": {
+        "command": "sudo rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.6",
+      "label": "Bash",
+      "input": {
+        "command": "sudo unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.7",
+      "label": "Bash",
+      "input": {
+        "command": "sudo shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.8",
+      "label": "Bash",
+      "input": {
+        "command": "sudo  rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.9",
+      "label": "Bash",
+      "input": {
+        "command": "sudo  rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.10",
+      "label": "Bash",
+      "input": {
+        "command": "sudo  unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.11",
+      "label": "Bash",
+      "input": {
+        "command": "sudo  shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.12",
+      "label": "Bash",
+      "input": {
+        "command": " rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.13",
+      "label": "Bash",
+      "input": {
+        "command": " rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.14",
+      "label": "Bash",
+      "input": {
+        "command": " unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.15",
+      "label": "Bash",
+      "input": {
+        "command": " shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.16",
+      "label": "Bash",
+      "input": {
+        "command": " sudo rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.17",
+      "label": "Bash",
+      "input": {
+        "command": " sudo rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.18",
+      "label": "Bash",
+      "input": {
+        "command": " sudo unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.19",
+      "label": "Bash",
+      "input": {
+        "command": " sudo shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.20",
+      "label": "Bash",
+      "input": {
+        "command": " sudo  rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.21",
+      "label": "Bash",
+      "input": {
+        "command": " sudo  rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.22",
+      "label": "Bash",
+      "input": {
+        "command": " sudo  unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.23",
+      "label": "Bash",
+      "input": {
+        "command": " sudo  shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.24",
+      "label": "Bash",
+      "input": {
+        "command": ";rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.25",
+      "label": "Bash",
+      "input": {
+        "command": ";rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.26",
+      "label": "Bash",
+      "input": {
+        "command": ";unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.27",
+      "label": "Bash",
+      "input": {
+        "command": ";shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.28",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.29",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.30",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.31",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.32",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo  rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.33",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo  rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.34",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo  unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.35",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo  shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.36",
+      "label": "Bash",
+      "input": {
+        "command": "&rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.37",
+      "label": "Bash",
+      "input": {
+        "command": "&rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.38",
+      "label": "Bash",
+      "input": {
+        "command": "&unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.39",
+      "label": "Bash",
+      "input": {
+        "command": "&shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.40",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.41",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.42",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.43",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.44",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo  rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.45",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo  rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.46",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo  unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.47",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo  shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.48",
+      "label": "Bash",
+      "input": {
+        "command": "|rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.49",
+      "label": "Bash",
+      "input": {
+        "command": "|rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.50",
+      "label": "Bash",
+      "input": {
+        "command": "|unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.51",
+      "label": "Bash",
+      "input": {
+        "command": "|shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.52",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.53",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.54",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.55",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.56",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo  rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.57",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo  rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.58",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo  unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.59",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo  shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.60",
+      "label": "Bash",
+      "input": {
+        "command": "(rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.61",
+      "label": "Bash",
+      "input": {
+        "command": "(rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.62",
+      "label": "Bash",
+      "input": {
+        "command": "(unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.63",
+      "label": "Bash",
+      "input": {
+        "command": "(shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.64",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.65",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.66",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.67",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.68",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo  rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.69",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo  rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.70",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo  unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.71",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo  shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.72",
+      "label": "Bash",
+      "input": {
+        "command": "`rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.73",
+      "label": "Bash",
+      "input": {
+        "command": "`rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.74",
+      "label": "Bash",
+      "input": {
+        "command": "`unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.75",
+      "label": "Bash",
+      "input": {
+        "command": "`shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.76",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.77",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.78",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.79",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.80",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo  rm "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.81",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo  rmdir "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.82",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo  unlink "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.3.83",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo  shred "
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.4.0",
+      "label": "Bash",
+      "input": {
+        "command": "git rm"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.4.1",
+      "label": "Bash",
+      "input": {
+        "command": "git clean"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.4.2",
+      "label": "Bash",
+      "input": {
+        "command": "git  rm"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.4.3",
+      "label": "Bash",
+      "input": {
+        "command": "git  clean"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.5.0",
+      "label": "Bash",
+      "input": {
+        "command": "find -delete"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.5.1",
+      "label": "Bash",
+      "input": {
+        "command": "find x -delete"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.5.2",
+      "label": "Bash",
+      "input": {
+        "command": "find  -delete"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.5.3",
+      "label": "Bash",
+      "input": {
+        "command": "find xx -delete"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.5.4",
+      "label": "Bash",
+      "input": {
+        "command": "find x  -delete"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.5.5",
+      "label": "Bash",
+      "input": {
+        "command": "find   -delete"
+      },
+      "class": "delete",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.6.0",
+      "label": "Bash",
+      "input": {
+        "command": "truncate "
+      },
       "class": "overwrite",
-      "words": ["overwrite"]
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.6.1",
+      "label": "Bash",
+      "input": {
+        "command": " truncate "
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.6.2",
+      "label": "Bash",
+      "input": {
+        "command": ";truncate "
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.6.3",
+      "label": "Bash",
+      "input": {
+        "command": "&truncate "
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.6.4",
+      "label": "Bash",
+      "input": {
+        "command": "|truncate "
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.6.5",
+      "label": "Bash",
+      "input": {
+        "command": "(truncate "
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.6.6",
+      "label": "Bash",
+      "input": {
+        "command": "`truncate "
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.0",
+      "label": "Bash",
+      "input": {
+        "command": "git reset --hard"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.1",
+      "label": "Bash",
+      "input": {
+        "command": "git reset  --hard"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.2",
+      "label": "Bash",
+      "input": {
+        "command": "git checkout --x"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.3",
+      "label": "Bash",
+      "input": {
+        "command": "git checkout  --x"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.4",
+      "label": "Bash",
+      "input": {
+        "command": "git restore"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.5",
+      "label": "Bash",
+      "input": {
+        "command": "git  reset --hard"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.6",
+      "label": "Bash",
+      "input": {
+        "command": "git  reset  --hard"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.7",
+      "label": "Bash",
+      "input": {
+        "command": "git  checkout --x"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.8",
+      "label": "Bash",
+      "input": {
+        "command": "git  checkout  --x"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
+    },
+    {
+      "id": "command.7.9",
+      "label": "Bash",
+      "input": {
+        "command": "git  restore"
+      },
+      "class": "overwrite",
+      "needsNoDiff": true
     }
   ],
-  "readWords": [
-    "get",
-    "list",
-    "search",
-    "read",
-    "fetch",
-    "find",
-    "lookup",
-    "check",
-    "status",
-    "view",
-    "query"
-  ],
-  "orderVerbs": ["create", "place", "submit"],
-  "orderNouns": ["order", "orders"],
-  "orderClass": "pay",
-  "commandRules": [
+  "benign": [
     {
-      "class": "push",
-      "source": "\\bgit\\s+push\\b",
-      "flags": "",
-      "needsNoDiff": false,
-      "witnesses": ["git push", "git  push"],
-      "gaps": []
+      "id": "tool-near.delete.delete.deleteextra",
+      "label": "deleteextra",
+      "input": {}
     },
     {
-      "class": "push",
-      "source": "\\b(?:npm|pnpm|yarn)\\s+publish\\b",
-      "flags": "",
-      "needsNoDiff": false,
-      "witnesses": [
-        "npm publish",
-        "npm  publish",
-        "pnpm publish",
-        "pnpm  publish",
-        "yarn publish",
-        "yarn  publish"
-      ],
-      "gaps": []
+      "id": "tool-near.delete.delete.extradelete",
+      "label": "extradelete",
+      "input": {}
     },
     {
-      "class": "push",
-      "source": "\\bdocker\\s+push\\b",
-      "flags": "",
-      "needsNoDiff": false,
-      "witnesses": ["docker push", "docker  push"],
-      "gaps": []
+      "id": "tool-near.delete.delete.delet",
+      "label": "delet",
+      "input": {}
     },
     {
-      "class": "delete",
-      "source": "(?:^|[\\s;&|(`])(?:sudo\\s+)?(?:rm|rmdir|unlink|shred)\\s",
-      "flags": "",
-      "needsNoDiff": true,
-      "witnesses": [
-        "rm ",
-        "rmdir ",
-        "unlink ",
-        "shred ",
-        "sudo rm ",
-        "sudo rmdir ",
-        "sudo unlink ",
-        "sudo shred ",
-        "sudo  rm ",
-        "sudo  rmdir ",
-        "sudo  unlink ",
-        "sudo  shred ",
-        " rm ",
-        " rmdir ",
-        " unlink ",
-        " shred ",
-        " sudo rm ",
-        " sudo rmdir ",
-        " sudo unlink ",
-        " sudo shred ",
-        " sudo  rm ",
-        " sudo  rmdir ",
-        " sudo  unlink ",
-        " sudo  shred ",
-        ";rm ",
-        ";rmdir ",
-        ";unlink ",
-        ";shred ",
-        ";sudo rm ",
-        ";sudo rmdir ",
-        ";sudo unlink ",
-        ";sudo shred ",
-        ";sudo  rm ",
-        ";sudo  rmdir ",
-        ";sudo  unlink ",
-        ";sudo  shred ",
-        "&rm ",
-        "&rmdir ",
-        "&unlink ",
-        "&shred ",
-        "&sudo rm ",
-        "&sudo rmdir ",
-        "&sudo unlink ",
-        "&sudo shred ",
-        "&sudo  rm ",
-        "&sudo  rmdir ",
-        "&sudo  unlink ",
-        "&sudo  shred ",
-        "|rm ",
-        "|rmdir ",
-        "|unlink ",
-        "|shred ",
-        "|sudo rm ",
-        "|sudo rmdir ",
-        "|sudo unlink ",
-        "|sudo shred ",
-        "|sudo  rm ",
-        "|sudo  rmdir ",
-        "|sudo  unlink ",
-        "|sudo  shred ",
-        "(rm ",
-        "(rmdir ",
-        "(unlink ",
-        "(shred ",
-        "(sudo rm ",
-        "(sudo rmdir ",
-        "(sudo unlink ",
-        "(sudo shred ",
-        "(sudo  rm ",
-        "(sudo  rmdir ",
-        "(sudo  unlink ",
-        "(sudo  shred ",
-        "`rm ",
-        "`rmdir ",
-        "`unlink ",
-        "`shred ",
-        "`sudo rm ",
-        "`sudo rmdir ",
-        "`sudo unlink ",
-        "`sudo shred ",
-        "`sudo  rm ",
-        "`sudo  rmdir ",
-        "`sudo  unlink ",
-        "`sudo  shred "
-      ],
-      "gaps": []
+      "id": "tool-near.delete.delete.elete",
+      "label": "elete",
+      "input": {}
     },
     {
-      "class": "delete",
-      "source": "\\bgit\\s+(?:rm|clean)\\b",
-      "flags": "",
-      "needsNoDiff": true,
-      "witnesses": ["git rm", "git clean", "git  rm", "git  clean"],
-      "gaps": []
+      "id": "tool-near.delete.remove.removeextra",
+      "label": "removeextra",
+      "input": {}
     },
     {
-      "class": "delete",
-      "source": "\\bfind\\b[^;&|]*\\s-delete\\b",
-      "flags": "",
-      "needsNoDiff": true,
-      "witnesses": [
-        "find -delete",
-        "find x -delete",
-        "find  -delete",
-        "find xx -delete",
-        "find x  -delete",
-        "find   -delete"
-      ],
-      "gaps": []
+      "id": "tool-near.delete.remove.extraremove",
+      "label": "extraremove",
+      "input": {}
     },
     {
-      "class": "overwrite",
-      "source": "(?:^|[\\s;&|(`])truncate\\s",
-      "flags": "",
-      "needsNoDiff": true,
-      "witnesses": [
-        "truncate ",
-        " truncate ",
-        ";truncate ",
-        "&truncate ",
-        "|truncate ",
-        "(truncate ",
-        "`truncate "
-      ],
-      "gaps": []
+      "id": "tool-near.delete.remove.remov",
+      "label": "remov",
+      "input": {}
     },
     {
-      "class": "overwrite",
-      "source": "\\bgit\\s+(?:reset\\s+--hard|checkout\\s+--|restore)\\b",
-      "flags": "",
-      "needsNoDiff": true,
-      "witnesses": [
-        "git reset --hard",
-        "git reset  --hard",
-        "git checkout --x",
-        "git checkout  --x",
-        "git restore",
-        "git  reset --hard",
-        "git  reset  --hard",
-        "git  checkout --x",
-        "git  checkout  --x",
-        "git  restore"
-      ],
-      "gaps": []
+      "id": "tool-near.delete.remove.emove",
+      "label": "emove",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.erase.eraseextra",
+      "label": "eraseextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.erase.extraerase",
+      "label": "extraerase",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.erase.eras",
+      "label": "eras",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.erase.rase",
+      "label": "rase",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.purge.purgeextra",
+      "label": "purgeextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.purge.extrapurge",
+      "label": "extrapurge",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.purge.purg",
+      "label": "purg",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.purge.urge",
+      "label": "urge",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.drop.dropextra",
+      "label": "dropextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.drop.extradrop",
+      "label": "extradrop",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.drop.dro",
+      "label": "dro",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.drop.rop",
+      "label": "rop",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.destroy.destroyextra",
+      "label": "destroyextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.destroy.extradestroy",
+      "label": "extradestroy",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.destroy.destro",
+      "label": "destro",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.destroy.estroy",
+      "label": "estroy",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.wipe.wipeextra",
+      "label": "wipeextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.wipe.extrawipe",
+      "label": "extrawipe",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.wipe.wip",
+      "label": "wip",
+      "input": {}
+    },
+    {
+      "id": "tool-near.delete.wipe.ipe",
+      "label": "ipe",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.pay.payextra",
+      "label": "payextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.pay.extrapay",
+      "label": "extrapay",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.pay.pa",
+      "label": "pa",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.pay.ay",
+      "label": "ay",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.payment.paymentextra",
+      "label": "paymentextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.payment.extrapayment",
+      "label": "extrapayment",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.payment.paymen",
+      "label": "paymen",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.payment.ayment",
+      "label": "ayment",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.charge.chargeextra",
+      "label": "chargeextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.charge.extracharge",
+      "label": "extracharge",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.charge.charg",
+      "label": "charg",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.charge.harge",
+      "label": "harge",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.refund.refundextra",
+      "label": "refundextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.refund.extrarefund",
+      "label": "extrarefund",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.refund.refun",
+      "label": "refun",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.refund.efund",
+      "label": "efund",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.transfer.transferextra",
+      "label": "transferextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.transfer.extratransfer",
+      "label": "extratransfer",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.transfer.transfe",
+      "label": "transfe",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.transfer.ransfer",
+      "label": "ransfer",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.purchase.purchaseextra",
+      "label": "purchaseextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.purchase.extrapurchase",
+      "label": "extrapurchase",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.purchase.purchas",
+      "label": "purchas",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.purchase.urchase",
+      "label": "urchase",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.checkout.checkoutextra",
+      "label": "checkoutextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.checkout.extracheckout",
+      "label": "extracheckout",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.checkout.checkou",
+      "label": "checkou",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.checkout.heckout",
+      "label": "heckout",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.buy.buyextra",
+      "label": "buyextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.buy.extrabuy",
+      "label": "extrabuy",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.buy.bu",
+      "label": "bu",
+      "input": {}
+    },
+    {
+      "id": "tool-near.pay.buy.uy",
+      "label": "uy",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.send.sendextra",
+      "label": "sendextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.send.extrasend",
+      "label": "extrasend",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.send.sen",
+      "label": "sen",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.send.end",
+      "label": "end",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.email.emailextra",
+      "label": "emailextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.email.extraemail",
+      "label": "extraemail",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.email.emai",
+      "label": "emai",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.mail.mailextra",
+      "label": "mailextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.mail.extramail",
+      "label": "extramail",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.mail.mai",
+      "label": "mai",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.mail.ail",
+      "label": "ail",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.sms.smsextra",
+      "label": "smsextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.sms.extrasms",
+      "label": "extrasms",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.sms.sm",
+      "label": "sm",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.sms.ms",
+      "label": "ms",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.message.messageextra",
+      "label": "messageextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.message.extramessage",
+      "label": "extramessage",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.message.messag",
+      "label": "messag",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.message.essage",
+      "label": "essage",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.notify.notifyextra",
+      "label": "notifyextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.notify.extranotify",
+      "label": "extranotify",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.notify.notif",
+      "label": "notif",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.notify.otify",
+      "label": "otify",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.reply.replyextra",
+      "label": "replyextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.reply.extrareply",
+      "label": "extrareply",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.reply.repl",
+      "label": "repl",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.reply.eply",
+      "label": "eply",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.post.postextra",
+      "label": "postextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.post.extrapost",
+      "label": "extrapost",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.post.pos",
+      "label": "pos",
+      "input": {}
+    },
+    {
+      "id": "tool-near.send.post.ost",
+      "label": "ost",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.push.pushextra",
+      "label": "pushextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.push.extrapush",
+      "label": "extrapush",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.push.pus",
+      "label": "pus",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.push.ush",
+      "label": "ush",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.deploy.deployextra",
+      "label": "deployextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.deploy.extradeploy",
+      "label": "extradeploy",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.deploy.deplo",
+      "label": "deplo",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.deploy.eploy",
+      "label": "eploy",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.publish.publishextra",
+      "label": "publishextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.publish.extrapublish",
+      "label": "extrapublish",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.publish.publis",
+      "label": "publis",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.publish.ublish",
+      "label": "ublish",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.release.releaseextra",
+      "label": "releaseextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.release.extrarelease",
+      "label": "extrarelease",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.release.releas",
+      "label": "releas",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.release.elease",
+      "label": "elease",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.merge.mergeextra",
+      "label": "mergeextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.merge.extramerge",
+      "label": "extramerge",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.merge.merg",
+      "label": "merg",
+      "input": {}
+    },
+    {
+      "id": "tool-near.push.merge.erge",
+      "label": "erge",
+      "input": {}
+    },
+    {
+      "id": "tool-near.overwrite.overwrite.overwriteextra",
+      "label": "overwriteextra",
+      "input": {}
+    },
+    {
+      "id": "tool-near.overwrite.overwrite.extraoverwrite",
+      "label": "extraoverwrite",
+      "input": {}
+    },
+    {
+      "id": "tool-near.overwrite.overwrite.overwrit",
+      "label": "overwrit",
+      "input": {}
+    },
+    {
+      "id": "tool-near.overwrite.overwrite.verwrite",
+      "label": "verwrite",
+      "input": {}
+    },
+    {
+      "id": "order-verb.create",
+      "label": "create",
+      "input": {}
+    },
+    {
+      "id": "order-verb.place",
+      "label": "place",
+      "input": {}
+    },
+    {
+      "id": "order-verb.submit",
+      "label": "submit",
+      "input": {}
+    },
+    {
+      "id": "order-noun.order",
+      "label": "order",
+      "input": {}
+    },
+    {
+      "id": "order-noun.orders",
+      "label": "orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.createextra.order",
+      "label": "createextra.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.order.createextra",
+      "label": "order.createextra",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.createextraOrder",
+      "label": "createextraOrder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.extracreate.order",
+      "label": "extracreate.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.order.extracreate",
+      "label": "order.extracreate",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.extracreateOrder",
+      "label": "extracreateOrder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.creat.order",
+      "label": "creat.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.order.creat",
+      "label": "order.creat",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.creatOrder",
+      "label": "creatOrder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.reate.order",
+      "label": "reate.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.order.reate",
+      "label": "order.reate",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.order.reateOrder",
+      "label": "reateOrder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.create.orderextra",
+      "label": "create.orderextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.orderextra.create",
+      "label": "orderextra.create",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.createOrderextra",
+      "label": "createOrderextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.create.extraorder",
+      "label": "create.extraorder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.extraorder.create",
+      "label": "extraorder.create",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.createExtraorder",
+      "label": "createExtraorder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.create.orde",
+      "label": "create.orde",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.orde.create",
+      "label": "orde.create",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.createOrde",
+      "label": "createOrde",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.create.rder",
+      "label": "create.rder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.rder.create",
+      "label": "rder.create",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.order.createRder",
+      "label": "createRder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.createextra.orders",
+      "label": "createextra.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.orders.createextra",
+      "label": "orders.createextra",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.createextraOrders",
+      "label": "createextraOrders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.extracreate.orders",
+      "label": "extracreate.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.orders.extracreate",
+      "label": "orders.extracreate",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.extracreateOrders",
+      "label": "extracreateOrders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.creat.orders",
+      "label": "creat.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.orders.creat",
+      "label": "orders.creat",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.creatOrders",
+      "label": "creatOrders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.reate.orders",
+      "label": "reate.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.orders.reate",
+      "label": "orders.reate",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.create.orders.reateOrders",
+      "label": "reateOrders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.orders.create.ordersextra",
+      "label": "create.ordersextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.orders.ordersextra.create",
+      "label": "ordersextra.create",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.orders.createOrdersextra",
+      "label": "createOrdersextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.orders.create.extraorders",
+      "label": "create.extraorders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.orders.extraorders.create",
+      "label": "extraorders.create",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.orders.createExtraorders",
+      "label": "createExtraorders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.orders.create.rders",
+      "label": "create.rders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.orders.rders.create",
+      "label": "rders.create",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.create.orders.createRders",
+      "label": "createRders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.placeextra.order",
+      "label": "placeextra.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.order.placeextra",
+      "label": "order.placeextra",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.placeextraOrder",
+      "label": "placeextraOrder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.extraplace.order",
+      "label": "extraplace.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.order.extraplace",
+      "label": "order.extraplace",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.extraplaceOrder",
+      "label": "extraplaceOrder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.plac.order",
+      "label": "plac.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.order.plac",
+      "label": "order.plac",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.placOrder",
+      "label": "placOrder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.lace.order",
+      "label": "lace.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.order.lace",
+      "label": "order.lace",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.order.laceOrder",
+      "label": "laceOrder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.place.orderextra",
+      "label": "place.orderextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.orderextra.place",
+      "label": "orderextra.place",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.placeOrderextra",
+      "label": "placeOrderextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.place.extraorder",
+      "label": "place.extraorder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.extraorder.place",
+      "label": "extraorder.place",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.placeExtraorder",
+      "label": "placeExtraorder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.place.orde",
+      "label": "place.orde",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.orde.place",
+      "label": "orde.place",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.placeOrde",
+      "label": "placeOrde",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.place.rder",
+      "label": "place.rder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.rder.place",
+      "label": "rder.place",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.order.placeRder",
+      "label": "placeRder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.placeextra.orders",
+      "label": "placeextra.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.orders.placeextra",
+      "label": "orders.placeextra",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.placeextraOrders",
+      "label": "placeextraOrders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.extraplace.orders",
+      "label": "extraplace.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.orders.extraplace",
+      "label": "orders.extraplace",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.extraplaceOrders",
+      "label": "extraplaceOrders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.plac.orders",
+      "label": "plac.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.orders.plac",
+      "label": "orders.plac",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.placOrders",
+      "label": "placOrders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.lace.orders",
+      "label": "lace.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.orders.lace",
+      "label": "orders.lace",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.place.orders.laceOrders",
+      "label": "laceOrders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.orders.place.ordersextra",
+      "label": "place.ordersextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.orders.ordersextra.place",
+      "label": "ordersextra.place",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.orders.placeOrdersextra",
+      "label": "placeOrdersextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.orders.place.extraorders",
+      "label": "place.extraorders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.orders.extraorders.place",
+      "label": "extraorders.place",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.orders.placeExtraorders",
+      "label": "placeExtraorders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.orders.place.rders",
+      "label": "place.rders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.orders.rders.place",
+      "label": "rders.place",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.place.orders.placeRders",
+      "label": "placeRders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.submitextra.order",
+      "label": "submitextra.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.order.submitextra",
+      "label": "order.submitextra",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.submitextraOrder",
+      "label": "submitextraOrder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.extrasubmit.order",
+      "label": "extrasubmit.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.order.extrasubmit",
+      "label": "order.extrasubmit",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.extrasubmitOrder",
+      "label": "extrasubmitOrder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.submi.order",
+      "label": "submi.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.order.submi",
+      "label": "order.submi",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.submiOrder",
+      "label": "submiOrder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.ubmit.order",
+      "label": "ubmit.order",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.order.ubmit",
+      "label": "order.ubmit",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.order.ubmitOrder",
+      "label": "ubmitOrder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.submit.orderextra",
+      "label": "submit.orderextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.orderextra.submit",
+      "label": "orderextra.submit",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.submitOrderextra",
+      "label": "submitOrderextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.submit.extraorder",
+      "label": "submit.extraorder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.extraorder.submit",
+      "label": "extraorder.submit",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.submitExtraorder",
+      "label": "submitExtraorder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.submit.orde",
+      "label": "submit.orde",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.orde.submit",
+      "label": "orde.submit",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.submitOrde",
+      "label": "submitOrde",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.submit.rder",
+      "label": "submit.rder",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.rder.submit",
+      "label": "rder.submit",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.order.submitRder",
+      "label": "submitRder",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.submitextra.orders",
+      "label": "submitextra.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.orders.submitextra",
+      "label": "orders.submitextra",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.submitextraOrders",
+      "label": "submitextraOrders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.extrasubmit.orders",
+      "label": "extrasubmit.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.orders.extrasubmit",
+      "label": "orders.extrasubmit",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.extrasubmitOrders",
+      "label": "extrasubmitOrders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.submi.orders",
+      "label": "submi.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.orders.submi",
+      "label": "orders.submi",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.submiOrders",
+      "label": "submiOrders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.ubmit.orders",
+      "label": "ubmit.orders",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.orders.ubmit",
+      "label": "orders.ubmit",
+      "input": {}
+    },
+    {
+      "id": "order-verb-near.submit.orders.ubmitOrders",
+      "label": "ubmitOrders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.orders.submit.ordersextra",
+      "label": "submit.ordersextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.orders.ordersextra.submit",
+      "label": "ordersextra.submit",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.orders.submitOrdersextra",
+      "label": "submitOrdersextra",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.orders.submit.extraorders",
+      "label": "submit.extraorders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.orders.extraorders.submit",
+      "label": "extraorders.submit",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.orders.submitExtraorders",
+      "label": "submitExtraorders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.orders.submit.rders",
+      "label": "submit.rders",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.orders.rders.submit",
+      "label": "rders.submit",
+      "input": {}
+    },
+    {
+      "id": "order-noun-near.submit.orders.submitRders",
+      "label": "submitRders",
+      "input": {}
+    },
+    {
+      "id": "read.get.get.delete",
+      "label": "get.delete",
+      "input": {}
+    },
+    {
+      "id": "read.get.delete.get",
+      "label": "delete.get",
+      "input": {}
+    },
+    {
+      "id": "read.get.getDelete",
+      "label": "getDelete",
+      "input": {}
+    },
+    {
+      "id": "read.get.deleteGet",
+      "label": "deleteGet",
+      "input": {}
+    },
+    {
+      "id": "read.list.list.delete",
+      "label": "list.delete",
+      "input": {}
+    },
+    {
+      "id": "read.list.delete.list",
+      "label": "delete.list",
+      "input": {}
+    },
+    {
+      "id": "read.list.listDelete",
+      "label": "listDelete",
+      "input": {}
+    },
+    {
+      "id": "read.list.deleteList",
+      "label": "deleteList",
+      "input": {}
+    },
+    {
+      "id": "read.search.search.delete",
+      "label": "search.delete",
+      "input": {}
+    },
+    {
+      "id": "read.search.delete.search",
+      "label": "delete.search",
+      "input": {}
+    },
+    {
+      "id": "read.search.searchDelete",
+      "label": "searchDelete",
+      "input": {}
+    },
+    {
+      "id": "read.search.deleteSearch",
+      "label": "deleteSearch",
+      "input": {}
+    },
+    {
+      "id": "read.read.read.delete",
+      "label": "read.delete",
+      "input": {}
+    },
+    {
+      "id": "read.read.delete.read",
+      "label": "delete.read",
+      "input": {}
+    },
+    {
+      "id": "read.read.readDelete",
+      "label": "readDelete",
+      "input": {}
+    },
+    {
+      "id": "read.read.deleteRead",
+      "label": "deleteRead",
+      "input": {}
+    },
+    {
+      "id": "read.fetch.fetch.delete",
+      "label": "fetch.delete",
+      "input": {}
+    },
+    {
+      "id": "read.fetch.delete.fetch",
+      "label": "delete.fetch",
+      "input": {}
+    },
+    {
+      "id": "read.fetch.fetchDelete",
+      "label": "fetchDelete",
+      "input": {}
+    },
+    {
+      "id": "read.fetch.deleteFetch",
+      "label": "deleteFetch",
+      "input": {}
+    },
+    {
+      "id": "read.find.find.delete",
+      "label": "find.delete",
+      "input": {}
+    },
+    {
+      "id": "read.find.delete.find",
+      "label": "delete.find",
+      "input": {}
+    },
+    {
+      "id": "read.find.findDelete",
+      "label": "findDelete",
+      "input": {}
+    },
+    {
+      "id": "read.find.deleteFind",
+      "label": "deleteFind",
+      "input": {}
+    },
+    {
+      "id": "read.lookup.lookup.delete",
+      "label": "lookup.delete",
+      "input": {}
+    },
+    {
+      "id": "read.lookup.delete.lookup",
+      "label": "delete.lookup",
+      "input": {}
+    },
+    {
+      "id": "read.lookup.lookupDelete",
+      "label": "lookupDelete",
+      "input": {}
+    },
+    {
+      "id": "read.lookup.deleteLookup",
+      "label": "deleteLookup",
+      "input": {}
+    },
+    {
+      "id": "read.check.check.delete",
+      "label": "check.delete",
+      "input": {}
+    },
+    {
+      "id": "read.check.delete.check",
+      "label": "delete.check",
+      "input": {}
+    },
+    {
+      "id": "read.check.checkDelete",
+      "label": "checkDelete",
+      "input": {}
+    },
+    {
+      "id": "read.check.deleteCheck",
+      "label": "deleteCheck",
+      "input": {}
+    },
+    {
+      "id": "read.status.status.delete",
+      "label": "status.delete",
+      "input": {}
+    },
+    {
+      "id": "read.status.delete.status",
+      "label": "delete.status",
+      "input": {}
+    },
+    {
+      "id": "read.status.statusDelete",
+      "label": "statusDelete",
+      "input": {}
+    },
+    {
+      "id": "read.status.deleteStatus",
+      "label": "deleteStatus",
+      "input": {}
+    },
+    {
+      "id": "read.view.view.delete",
+      "label": "view.delete",
+      "input": {}
+    },
+    {
+      "id": "read.view.delete.view",
+      "label": "delete.view",
+      "input": {}
+    },
+    {
+      "id": "read.view.viewDelete",
+      "label": "viewDelete",
+      "input": {}
+    },
+    {
+      "id": "read.view.deleteView",
+      "label": "deleteView",
+      "input": {}
+    },
+    {
+      "id": "read.query.query.delete",
+      "label": "query.delete",
+      "input": {}
+    },
+    {
+      "id": "read.query.delete.query",
+      "label": "delete.query",
+      "input": {}
+    },
+    {
+      "id": "read.query.queryDelete",
+      "label": "queryDelete",
+      "input": {}
+    },
+    {
+      "id": "read.query.deleteQuery",
+      "label": "deleteQuery",
+      "input": {}
+    },
+    {
+      "id": "command-nonstring.0.0",
+      "label": "Bash",
+      "input": {
+        "command": ["git push"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.0.0.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT PUSH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.0.1",
+      "label": "Bash",
+      "input": {
+        "command": ["git  push"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.0.1.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT  PUSH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.1.0",
+      "label": "Bash",
+      "input": {
+        "command": ["npm publish"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.1.0.0",
+      "label": "Bash",
+      "input": {
+        "command": "NPM PUBLISH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.1.1",
+      "label": "Bash",
+      "input": {
+        "command": ["npm  publish"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.1.1.0",
+      "label": "Bash",
+      "input": {
+        "command": "NPM  PUBLISH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.1.2",
+      "label": "Bash",
+      "input": {
+        "command": ["pnpm publish"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.1.2.0",
+      "label": "Bash",
+      "input": {
+        "command": "PNPM PUBLISH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.1.3",
+      "label": "Bash",
+      "input": {
+        "command": ["pnpm  publish"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.1.3.0",
+      "label": "Bash",
+      "input": {
+        "command": "PNPM  PUBLISH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.1.4",
+      "label": "Bash",
+      "input": {
+        "command": ["yarn publish"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.1.4.0",
+      "label": "Bash",
+      "input": {
+        "command": "YARN PUBLISH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.1.5",
+      "label": "Bash",
+      "input": {
+        "command": ["yarn  publish"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.1.5.0",
+      "label": "Bash",
+      "input": {
+        "command": "YARN  PUBLISH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.2.0",
+      "label": "Bash",
+      "input": {
+        "command": ["docker push"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.2.0.0",
+      "label": "Bash",
+      "input": {
+        "command": "DOCKER PUSH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.2.1",
+      "label": "Bash",
+      "input": {
+        "command": ["docker  push"]
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.2.1.0",
+      "label": "Bash",
+      "input": {
+        "command": "DOCKER  PUSH"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.0",
+      "label": "Bash",
+      "input": {
+        "command": ["rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.0",
+      "label": "Bash",
+      "input": {
+        "command": "rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.0.0",
+      "label": "Bash",
+      "input": {
+        "command": "RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.1",
+      "label": "Bash",
+      "input": {
+        "command": ["rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.1",
+      "label": "Bash",
+      "input": {
+        "command": "rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.1.0",
+      "label": "Bash",
+      "input": {
+        "command": "RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.2",
+      "label": "Bash",
+      "input": {
+        "command": ["unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.2",
+      "label": "Bash",
+      "input": {
+        "command": "unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.2.0",
+      "label": "Bash",
+      "input": {
+        "command": "UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.3",
+      "label": "Bash",
+      "input": {
+        "command": ["shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.3",
+      "label": "Bash",
+      "input": {
+        "command": "shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.3.0",
+      "label": "Bash",
+      "input": {
+        "command": "SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.4",
+      "label": "Bash",
+      "input": {
+        "command": ["sudo rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.4",
+      "label": "Bash",
+      "input": {
+        "command": "sudo rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.4.0",
+      "label": "Bash",
+      "input": {
+        "command": "SUDO RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.5",
+      "label": "Bash",
+      "input": {
+        "command": ["sudo rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.5",
+      "label": "Bash",
+      "input": {
+        "command": "sudo rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.5.0",
+      "label": "Bash",
+      "input": {
+        "command": "SUDO RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.6",
+      "label": "Bash",
+      "input": {
+        "command": ["sudo unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.6",
+      "label": "Bash",
+      "input": {
+        "command": "sudo unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.6.0",
+      "label": "Bash",
+      "input": {
+        "command": "SUDO UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.7",
+      "label": "Bash",
+      "input": {
+        "command": ["sudo shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.7",
+      "label": "Bash",
+      "input": {
+        "command": "sudo shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.7.0",
+      "label": "Bash",
+      "input": {
+        "command": "SUDO SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.8",
+      "label": "Bash",
+      "input": {
+        "command": ["sudo  rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.8",
+      "label": "Bash",
+      "input": {
+        "command": "sudo  rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.8.0",
+      "label": "Bash",
+      "input": {
+        "command": "SUDO  RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.9",
+      "label": "Bash",
+      "input": {
+        "command": ["sudo  rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.9",
+      "label": "Bash",
+      "input": {
+        "command": "sudo  rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.9.0",
+      "label": "Bash",
+      "input": {
+        "command": "SUDO  RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.10",
+      "label": "Bash",
+      "input": {
+        "command": ["sudo  unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.10",
+      "label": "Bash",
+      "input": {
+        "command": "sudo  unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.10.0",
+      "label": "Bash",
+      "input": {
+        "command": "SUDO  UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.11",
+      "label": "Bash",
+      "input": {
+        "command": ["sudo  shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.11",
+      "label": "Bash",
+      "input": {
+        "command": "sudo  shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.11.0",
+      "label": "Bash",
+      "input": {
+        "command": "SUDO  SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.12",
+      "label": "Bash",
+      "input": {
+        "command": [" rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.12",
+      "label": "Bash",
+      "input": {
+        "command": " rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.12.0",
+      "label": "Bash",
+      "input": {
+        "command": " RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.13",
+      "label": "Bash",
+      "input": {
+        "command": [" rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.13",
+      "label": "Bash",
+      "input": {
+        "command": " rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.13.0",
+      "label": "Bash",
+      "input": {
+        "command": " RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.14",
+      "label": "Bash",
+      "input": {
+        "command": [" unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.14",
+      "label": "Bash",
+      "input": {
+        "command": " unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.14.0",
+      "label": "Bash",
+      "input": {
+        "command": " UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.15",
+      "label": "Bash",
+      "input": {
+        "command": [" shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.15",
+      "label": "Bash",
+      "input": {
+        "command": " shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.15.0",
+      "label": "Bash",
+      "input": {
+        "command": " SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.16",
+      "label": "Bash",
+      "input": {
+        "command": [" sudo rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.16",
+      "label": "Bash",
+      "input": {
+        "command": " sudo rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.16.0",
+      "label": "Bash",
+      "input": {
+        "command": " SUDO RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.17",
+      "label": "Bash",
+      "input": {
+        "command": [" sudo rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.17",
+      "label": "Bash",
+      "input": {
+        "command": " sudo rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.17.0",
+      "label": "Bash",
+      "input": {
+        "command": " SUDO RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.18",
+      "label": "Bash",
+      "input": {
+        "command": [" sudo unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.18",
+      "label": "Bash",
+      "input": {
+        "command": " sudo unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.18.0",
+      "label": "Bash",
+      "input": {
+        "command": " SUDO UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.19",
+      "label": "Bash",
+      "input": {
+        "command": [" sudo shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.19",
+      "label": "Bash",
+      "input": {
+        "command": " sudo shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.19.0",
+      "label": "Bash",
+      "input": {
+        "command": " SUDO SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.20",
+      "label": "Bash",
+      "input": {
+        "command": [" sudo  rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.20",
+      "label": "Bash",
+      "input": {
+        "command": " sudo  rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.20.0",
+      "label": "Bash",
+      "input": {
+        "command": " SUDO  RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.21",
+      "label": "Bash",
+      "input": {
+        "command": [" sudo  rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.21",
+      "label": "Bash",
+      "input": {
+        "command": " sudo  rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.21.0",
+      "label": "Bash",
+      "input": {
+        "command": " SUDO  RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.22",
+      "label": "Bash",
+      "input": {
+        "command": [" sudo  unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.22",
+      "label": "Bash",
+      "input": {
+        "command": " sudo  unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.22.0",
+      "label": "Bash",
+      "input": {
+        "command": " SUDO  UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.23",
+      "label": "Bash",
+      "input": {
+        "command": [" sudo  shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.23",
+      "label": "Bash",
+      "input": {
+        "command": " sudo  shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.23.0",
+      "label": "Bash",
+      "input": {
+        "command": " SUDO  SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.24",
+      "label": "Bash",
+      "input": {
+        "command": [";rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.24",
+      "label": "Bash",
+      "input": {
+        "command": ";rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.24.0",
+      "label": "Bash",
+      "input": {
+        "command": ";RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.25",
+      "label": "Bash",
+      "input": {
+        "command": [";rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.25",
+      "label": "Bash",
+      "input": {
+        "command": ";rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.25.0",
+      "label": "Bash",
+      "input": {
+        "command": ";RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.26",
+      "label": "Bash",
+      "input": {
+        "command": [";unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.26",
+      "label": "Bash",
+      "input": {
+        "command": ";unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.26.0",
+      "label": "Bash",
+      "input": {
+        "command": ";UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.27",
+      "label": "Bash",
+      "input": {
+        "command": [";shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.27",
+      "label": "Bash",
+      "input": {
+        "command": ";shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.27.0",
+      "label": "Bash",
+      "input": {
+        "command": ";SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.28",
+      "label": "Bash",
+      "input": {
+        "command": [";sudo rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.28",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.28.0",
+      "label": "Bash",
+      "input": {
+        "command": ";SUDO RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.29",
+      "label": "Bash",
+      "input": {
+        "command": [";sudo rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.29",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.29.0",
+      "label": "Bash",
+      "input": {
+        "command": ";SUDO RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.30",
+      "label": "Bash",
+      "input": {
+        "command": [";sudo unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.30",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.30.0",
+      "label": "Bash",
+      "input": {
+        "command": ";SUDO UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.31",
+      "label": "Bash",
+      "input": {
+        "command": [";sudo shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.31",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.31.0",
+      "label": "Bash",
+      "input": {
+        "command": ";SUDO SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.32",
+      "label": "Bash",
+      "input": {
+        "command": [";sudo  rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.32",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo  rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.32.0",
+      "label": "Bash",
+      "input": {
+        "command": ";SUDO  RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.33",
+      "label": "Bash",
+      "input": {
+        "command": [";sudo  rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.33",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo  rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.33.0",
+      "label": "Bash",
+      "input": {
+        "command": ";SUDO  RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.34",
+      "label": "Bash",
+      "input": {
+        "command": [";sudo  unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.34",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo  unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.34.0",
+      "label": "Bash",
+      "input": {
+        "command": ";SUDO  UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.35",
+      "label": "Bash",
+      "input": {
+        "command": [";sudo  shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.35",
+      "label": "Bash",
+      "input": {
+        "command": ";sudo  shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.35.0",
+      "label": "Bash",
+      "input": {
+        "command": ";SUDO  SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.36",
+      "label": "Bash",
+      "input": {
+        "command": ["&rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.36",
+      "label": "Bash",
+      "input": {
+        "command": "&rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.36.0",
+      "label": "Bash",
+      "input": {
+        "command": "&RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.37",
+      "label": "Bash",
+      "input": {
+        "command": ["&rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.37",
+      "label": "Bash",
+      "input": {
+        "command": "&rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.37.0",
+      "label": "Bash",
+      "input": {
+        "command": "&RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.38",
+      "label": "Bash",
+      "input": {
+        "command": ["&unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.38",
+      "label": "Bash",
+      "input": {
+        "command": "&unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.38.0",
+      "label": "Bash",
+      "input": {
+        "command": "&UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.39",
+      "label": "Bash",
+      "input": {
+        "command": ["&shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.39",
+      "label": "Bash",
+      "input": {
+        "command": "&shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.39.0",
+      "label": "Bash",
+      "input": {
+        "command": "&SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.40",
+      "label": "Bash",
+      "input": {
+        "command": ["&sudo rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.40",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.40.0",
+      "label": "Bash",
+      "input": {
+        "command": "&SUDO RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.41",
+      "label": "Bash",
+      "input": {
+        "command": ["&sudo rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.41",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.41.0",
+      "label": "Bash",
+      "input": {
+        "command": "&SUDO RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.42",
+      "label": "Bash",
+      "input": {
+        "command": ["&sudo unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.42",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.42.0",
+      "label": "Bash",
+      "input": {
+        "command": "&SUDO UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.43",
+      "label": "Bash",
+      "input": {
+        "command": ["&sudo shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.43",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.43.0",
+      "label": "Bash",
+      "input": {
+        "command": "&SUDO SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.44",
+      "label": "Bash",
+      "input": {
+        "command": ["&sudo  rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.44",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo  rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.44.0",
+      "label": "Bash",
+      "input": {
+        "command": "&SUDO  RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.45",
+      "label": "Bash",
+      "input": {
+        "command": ["&sudo  rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.45",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo  rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.45.0",
+      "label": "Bash",
+      "input": {
+        "command": "&SUDO  RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.46",
+      "label": "Bash",
+      "input": {
+        "command": ["&sudo  unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.46",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo  unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.46.0",
+      "label": "Bash",
+      "input": {
+        "command": "&SUDO  UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.47",
+      "label": "Bash",
+      "input": {
+        "command": ["&sudo  shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.47",
+      "label": "Bash",
+      "input": {
+        "command": "&sudo  shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.47.0",
+      "label": "Bash",
+      "input": {
+        "command": "&SUDO  SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.48",
+      "label": "Bash",
+      "input": {
+        "command": ["|rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.48",
+      "label": "Bash",
+      "input": {
+        "command": "|rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.48.0",
+      "label": "Bash",
+      "input": {
+        "command": "|RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.49",
+      "label": "Bash",
+      "input": {
+        "command": ["|rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.49",
+      "label": "Bash",
+      "input": {
+        "command": "|rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.49.0",
+      "label": "Bash",
+      "input": {
+        "command": "|RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.50",
+      "label": "Bash",
+      "input": {
+        "command": ["|unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.50",
+      "label": "Bash",
+      "input": {
+        "command": "|unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.50.0",
+      "label": "Bash",
+      "input": {
+        "command": "|UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.51",
+      "label": "Bash",
+      "input": {
+        "command": ["|shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.51",
+      "label": "Bash",
+      "input": {
+        "command": "|shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.51.0",
+      "label": "Bash",
+      "input": {
+        "command": "|SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.52",
+      "label": "Bash",
+      "input": {
+        "command": ["|sudo rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.52",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.52.0",
+      "label": "Bash",
+      "input": {
+        "command": "|SUDO RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.53",
+      "label": "Bash",
+      "input": {
+        "command": ["|sudo rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.53",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.53.0",
+      "label": "Bash",
+      "input": {
+        "command": "|SUDO RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.54",
+      "label": "Bash",
+      "input": {
+        "command": ["|sudo unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.54",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.54.0",
+      "label": "Bash",
+      "input": {
+        "command": "|SUDO UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.55",
+      "label": "Bash",
+      "input": {
+        "command": ["|sudo shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.55",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.55.0",
+      "label": "Bash",
+      "input": {
+        "command": "|SUDO SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.56",
+      "label": "Bash",
+      "input": {
+        "command": ["|sudo  rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.56",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo  rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.56.0",
+      "label": "Bash",
+      "input": {
+        "command": "|SUDO  RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.57",
+      "label": "Bash",
+      "input": {
+        "command": ["|sudo  rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.57",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo  rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.57.0",
+      "label": "Bash",
+      "input": {
+        "command": "|SUDO  RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.58",
+      "label": "Bash",
+      "input": {
+        "command": ["|sudo  unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.58",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo  unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.58.0",
+      "label": "Bash",
+      "input": {
+        "command": "|SUDO  UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.59",
+      "label": "Bash",
+      "input": {
+        "command": ["|sudo  shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.59",
+      "label": "Bash",
+      "input": {
+        "command": "|sudo  shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.59.0",
+      "label": "Bash",
+      "input": {
+        "command": "|SUDO  SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.60",
+      "label": "Bash",
+      "input": {
+        "command": ["(rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.60",
+      "label": "Bash",
+      "input": {
+        "command": "(rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.60.0",
+      "label": "Bash",
+      "input": {
+        "command": "(RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.61",
+      "label": "Bash",
+      "input": {
+        "command": ["(rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.61",
+      "label": "Bash",
+      "input": {
+        "command": "(rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.61.0",
+      "label": "Bash",
+      "input": {
+        "command": "(RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.62",
+      "label": "Bash",
+      "input": {
+        "command": ["(unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.62",
+      "label": "Bash",
+      "input": {
+        "command": "(unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.62.0",
+      "label": "Bash",
+      "input": {
+        "command": "(UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.63",
+      "label": "Bash",
+      "input": {
+        "command": ["(shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.63",
+      "label": "Bash",
+      "input": {
+        "command": "(shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.63.0",
+      "label": "Bash",
+      "input": {
+        "command": "(SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.64",
+      "label": "Bash",
+      "input": {
+        "command": ["(sudo rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.64",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.64.0",
+      "label": "Bash",
+      "input": {
+        "command": "(SUDO RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.65",
+      "label": "Bash",
+      "input": {
+        "command": ["(sudo rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.65",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.65.0",
+      "label": "Bash",
+      "input": {
+        "command": "(SUDO RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.66",
+      "label": "Bash",
+      "input": {
+        "command": ["(sudo unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.66",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.66.0",
+      "label": "Bash",
+      "input": {
+        "command": "(SUDO UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.67",
+      "label": "Bash",
+      "input": {
+        "command": ["(sudo shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.67",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.67.0",
+      "label": "Bash",
+      "input": {
+        "command": "(SUDO SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.68",
+      "label": "Bash",
+      "input": {
+        "command": ["(sudo  rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.68",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo  rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.68.0",
+      "label": "Bash",
+      "input": {
+        "command": "(SUDO  RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.69",
+      "label": "Bash",
+      "input": {
+        "command": ["(sudo  rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.69",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo  rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.69.0",
+      "label": "Bash",
+      "input": {
+        "command": "(SUDO  RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.70",
+      "label": "Bash",
+      "input": {
+        "command": ["(sudo  unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.70",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo  unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.70.0",
+      "label": "Bash",
+      "input": {
+        "command": "(SUDO  UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.71",
+      "label": "Bash",
+      "input": {
+        "command": ["(sudo  shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.71",
+      "label": "Bash",
+      "input": {
+        "command": "(sudo  shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.71.0",
+      "label": "Bash",
+      "input": {
+        "command": "(SUDO  SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.72",
+      "label": "Bash",
+      "input": {
+        "command": ["`rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.72",
+      "label": "Bash",
+      "input": {
+        "command": "`rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.72.0",
+      "label": "Bash",
+      "input": {
+        "command": "`RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.73",
+      "label": "Bash",
+      "input": {
+        "command": ["`rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.73",
+      "label": "Bash",
+      "input": {
+        "command": "`rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.73.0",
+      "label": "Bash",
+      "input": {
+        "command": "`RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.74",
+      "label": "Bash",
+      "input": {
+        "command": ["`unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.74",
+      "label": "Bash",
+      "input": {
+        "command": "`unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.74.0",
+      "label": "Bash",
+      "input": {
+        "command": "`UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.75",
+      "label": "Bash",
+      "input": {
+        "command": ["`shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.75",
+      "label": "Bash",
+      "input": {
+        "command": "`shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.75.0",
+      "label": "Bash",
+      "input": {
+        "command": "`SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.76",
+      "label": "Bash",
+      "input": {
+        "command": ["`sudo rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.76",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.76.0",
+      "label": "Bash",
+      "input": {
+        "command": "`SUDO RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.77",
+      "label": "Bash",
+      "input": {
+        "command": ["`sudo rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.77",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.77.0",
+      "label": "Bash",
+      "input": {
+        "command": "`SUDO RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.78",
+      "label": "Bash",
+      "input": {
+        "command": ["`sudo unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.78",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.78.0",
+      "label": "Bash",
+      "input": {
+        "command": "`SUDO UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.79",
+      "label": "Bash",
+      "input": {
+        "command": ["`sudo shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.79",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.79.0",
+      "label": "Bash",
+      "input": {
+        "command": "`SUDO SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.80",
+      "label": "Bash",
+      "input": {
+        "command": ["`sudo  rm "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.80",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo  rm "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.80.0",
+      "label": "Bash",
+      "input": {
+        "command": "`SUDO  RM "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.81",
+      "label": "Bash",
+      "input": {
+        "command": ["`sudo  rmdir "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.81",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo  rmdir "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.81.0",
+      "label": "Bash",
+      "input": {
+        "command": "`SUDO  RMDIR "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.82",
+      "label": "Bash",
+      "input": {
+        "command": ["`sudo  unlink "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.82",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo  unlink "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.82.0",
+      "label": "Bash",
+      "input": {
+        "command": "`SUDO  UNLINK "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.3.83",
+      "label": "Bash",
+      "input": {
+        "command": ["`sudo  shred "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.3.83",
+      "label": "Bash",
+      "input": {
+        "command": "`sudo  shred "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.3.83.0",
+      "label": "Bash",
+      "input": {
+        "command": "`SUDO  SHRED "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.4.0",
+      "label": "Bash",
+      "input": {
+        "command": ["git rm"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.4.0",
+      "label": "Bash",
+      "input": {
+        "command": "git rm"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.4.0.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT RM"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.4.1",
+      "label": "Bash",
+      "input": {
+        "command": ["git clean"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.4.1",
+      "label": "Bash",
+      "input": {
+        "command": "git clean"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.4.1.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT CLEAN"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.4.2",
+      "label": "Bash",
+      "input": {
+        "command": ["git  rm"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.4.2",
+      "label": "Bash",
+      "input": {
+        "command": "git  rm"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.4.2.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT  RM"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.4.3",
+      "label": "Bash",
+      "input": {
+        "command": ["git  clean"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.4.3",
+      "label": "Bash",
+      "input": {
+        "command": "git  clean"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.4.3.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT  CLEAN"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.5.0",
+      "label": "Bash",
+      "input": {
+        "command": ["find -delete"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.5.0",
+      "label": "Bash",
+      "input": {
+        "command": "find -delete"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.5.0.0",
+      "label": "Bash",
+      "input": {
+        "command": "FIND -DELETE"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.5.1",
+      "label": "Bash",
+      "input": {
+        "command": ["find x -delete"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.5.1",
+      "label": "Bash",
+      "input": {
+        "command": "find x -delete"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.5.1.0",
+      "label": "Bash",
+      "input": {
+        "command": "FIND X -DELETE"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.5.2",
+      "label": "Bash",
+      "input": {
+        "command": ["find  -delete"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.5.2",
+      "label": "Bash",
+      "input": {
+        "command": "find  -delete"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.5.2.0",
+      "label": "Bash",
+      "input": {
+        "command": "FIND  -DELETE"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.5.3",
+      "label": "Bash",
+      "input": {
+        "command": ["find xx -delete"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.5.3",
+      "label": "Bash",
+      "input": {
+        "command": "find xx -delete"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.5.3.0",
+      "label": "Bash",
+      "input": {
+        "command": "FIND XX -DELETE"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.5.4",
+      "label": "Bash",
+      "input": {
+        "command": ["find x  -delete"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.5.4",
+      "label": "Bash",
+      "input": {
+        "command": "find x  -delete"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.5.4.0",
+      "label": "Bash",
+      "input": {
+        "command": "FIND X  -DELETE"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.5.5",
+      "label": "Bash",
+      "input": {
+        "command": ["find   -delete"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.5.5",
+      "label": "Bash",
+      "input": {
+        "command": "find   -delete"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.5.5.0",
+      "label": "Bash",
+      "input": {
+        "command": "FIND   -DELETE"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.6.0",
+      "label": "Bash",
+      "input": {
+        "command": ["truncate "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.6.0",
+      "label": "Bash",
+      "input": {
+        "command": "truncate "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.6.0.0",
+      "label": "Bash",
+      "input": {
+        "command": "TRUNCATE "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.6.1",
+      "label": "Bash",
+      "input": {
+        "command": [" truncate "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.6.1",
+      "label": "Bash",
+      "input": {
+        "command": " truncate "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.6.1.0",
+      "label": "Bash",
+      "input": {
+        "command": " TRUNCATE "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.6.2",
+      "label": "Bash",
+      "input": {
+        "command": [";truncate "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.6.2",
+      "label": "Bash",
+      "input": {
+        "command": ";truncate "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.6.2.0",
+      "label": "Bash",
+      "input": {
+        "command": ";TRUNCATE "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.6.3",
+      "label": "Bash",
+      "input": {
+        "command": ["&truncate "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.6.3",
+      "label": "Bash",
+      "input": {
+        "command": "&truncate "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.6.3.0",
+      "label": "Bash",
+      "input": {
+        "command": "&TRUNCATE "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.6.4",
+      "label": "Bash",
+      "input": {
+        "command": ["|truncate "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.6.4",
+      "label": "Bash",
+      "input": {
+        "command": "|truncate "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.6.4.0",
+      "label": "Bash",
+      "input": {
+        "command": "|TRUNCATE "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.6.5",
+      "label": "Bash",
+      "input": {
+        "command": ["(truncate "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.6.5",
+      "label": "Bash",
+      "input": {
+        "command": "(truncate "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.6.5.0",
+      "label": "Bash",
+      "input": {
+        "command": "(TRUNCATE "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.6.6",
+      "label": "Bash",
+      "input": {
+        "command": ["`truncate "]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.6.6",
+      "label": "Bash",
+      "input": {
+        "command": "`truncate "
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.6.6.0",
+      "label": "Bash",
+      "input": {
+        "command": "`TRUNCATE "
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.0",
+      "label": "Bash",
+      "input": {
+        "command": ["git reset --hard"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.0",
+      "label": "Bash",
+      "input": {
+        "command": "git reset --hard"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.0.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT RESET --HARD"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.1",
+      "label": "Bash",
+      "input": {
+        "command": ["git reset  --hard"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.1",
+      "label": "Bash",
+      "input": {
+        "command": "git reset  --hard"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.1.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT RESET  --HARD"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.2",
+      "label": "Bash",
+      "input": {
+        "command": ["git checkout --x"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.2",
+      "label": "Bash",
+      "input": {
+        "command": "git checkout --x"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.2.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT CHECKOUT --X"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.3",
+      "label": "Bash",
+      "input": {
+        "command": ["git checkout  --x"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.3",
+      "label": "Bash",
+      "input": {
+        "command": "git checkout  --x"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.3.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT CHECKOUT  --X"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.4",
+      "label": "Bash",
+      "input": {
+        "command": ["git restore"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.4",
+      "label": "Bash",
+      "input": {
+        "command": "git restore"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.4.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT RESTORE"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.5",
+      "label": "Bash",
+      "input": {
+        "command": ["git  reset --hard"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.5",
+      "label": "Bash",
+      "input": {
+        "command": "git  reset --hard"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.5.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT  RESET --HARD"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.6",
+      "label": "Bash",
+      "input": {
+        "command": ["git  reset  --hard"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.6",
+      "label": "Bash",
+      "input": {
+        "command": "git  reset  --hard"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.6.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT  RESET  --HARD"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.7",
+      "label": "Bash",
+      "input": {
+        "command": ["git  checkout --x"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.7",
+      "label": "Bash",
+      "input": {
+        "command": "git  checkout --x"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.7.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT  CHECKOUT --X"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.8",
+      "label": "Bash",
+      "input": {
+        "command": ["git  checkout  --x"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.8",
+      "label": "Bash",
+      "input": {
+        "command": "git  checkout  --x"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.8.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT  CHECKOUT  --X"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-nonstring.7.9",
+      "label": "Bash",
+      "input": {
+        "command": ["git  restore"]
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-with-diff.7.9",
+      "label": "Bash",
+      "input": {
+        "command": "git  restore"
+      },
+      "needsNoDiff": false
+    },
+    {
+      "id": "command-case.7.9.0",
+      "label": "Bash",
+      "input": {
+        "command": "GIT  RESTORE"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-safe.0",
+      "label": "Bash",
+      "input": {
+        "command": "fixture"
+      },
+      "needsNoDiff": true
+    },
+    {
+      "id": "command-safe.1",
+      "label": "Bash",
+      "input": {
+        "command": "fixture command"
+      },
+      "needsNoDiff": true
     }
   ],
   "gaps": []

@@ -93,12 +93,17 @@ describe('the seeded estate generator', { timeout: 120_000 }, () => {
   it('keeps the holdout forms out of the visible profile', () => {
     const forms = (profile: 'visible' | 'holdout') =>
       SEEDS.slice(0, 5).map((seed) => {
-        const files = renderEstate(drawEstate(seed, profile)).files;
+        const estate = drawEstate(seed, profile);
+        const files = renderEstate(estate).files;
         const text = Object.values(files).join('\n');
         return {
           memory: Object.keys(files).some((path) => path.includes('/memory/')),
           json: Object.keys(files).some((path) => path.endsWith('registry.json')),
-          comma: /\bBefore you [^,]+, read `/.test(text),
+          comma: estate.skills.some((skill) =>
+            text.includes(
+              `Before you ${skill.topic.comma.verb}, read \`references/${skill.topic.comma.file}\`.`,
+            ),
+          ),
           until: text.includes('until you have read'),
           hook: Object.entries(files).some(
             ([path, body]) => path.endsWith('SKILL.md') && body.includes('hooks:'),

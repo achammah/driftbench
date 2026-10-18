@@ -65,8 +65,8 @@ describe('the planted dispatchers dispatch, and the planted subcommand tool does
     const shebangOnly = '#!/usr/bin/env python3\n';
     expect(shebangOnly).not.toMatch(/argv|argparse|subprocess/);
     for (const source of [DISPATCH_BY_ARGUMENT, DISPATCH_BY_FLAG]) {
-      expect(source).toMatch(/subprocess\.run/);
-      expect(source).toMatch(/Usage: run\.py/);
+      expect(source).toContain('subprocess.run');
+      expect(source).toContain('Usage: run.py');
     }
   });
 });

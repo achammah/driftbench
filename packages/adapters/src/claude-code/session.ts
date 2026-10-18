@@ -10,7 +10,7 @@ import type {
   ToolCall,
   WorkspaceDiff,
 } from '@agent-nexus/driftbench-core';
-import { globMatches } from '@agent-nexus/driftbench-core';
+import { globMatches, ObservedReplyAct } from '@agent-nexus/driftbench-core';
 import {
   type DecisionRow,
   decisionRow,
@@ -35,6 +35,9 @@ import {
  *   the exit code from the structured result when it has one, else `Exit code N` at the start of an error
  *   result, else 1 for an error and 0 for a success.
  * - Assistant text gives `text` segments; `text` is the block's text blocks joined by a blank line.
+ * - An assistant record may carry `replyAct` from an adapter or declared judge. Its message-content index
+ *   maps to a nonblank observed text segment; the original record stays in `raw.kept`. Absent, invalid,
+ *   sidechain or superseded evidence never supplies a reply classification.
  * - Decision-log rows give `runtime.guards` (name: check, verdict) and step-feed rows `runtime.stages`, each
  *   in the block whose time window holds its `at`: from the block's user message to the next one. A row
  *   earlier than the first block goes to the first block.
@@ -200,6 +203,7 @@ class BlockBuilder {
   offered?: string[];
   /** The stop reason of the last model message in the block, as the transcript records it. */
   finishReason?: string;
+  replyAct?: ObservedReplyAct;
   readonly segments: Segment[] = [];
   readonly texts: string[] = [];
   readonly toolCalls: ToolCall[] = [];
@@ -416,8 +420,13 @@ export function mapSession(input: SessionInput): ReplaySession {
         : typeof message.content === 'string'
           ? [{ type: 'text', text: message.content }]
           : [];
-      for (const part of content) {
+      const textSegments = new Map<number, number>();
+      // A later unclassified reply cannot inherit the classification of an earlier text.
+      if (record.replyAct !== undefined || content.some((part) => isRecord(part) && part.type === 'text'))
+        block.replyAct = undefined;
+      for (const [contentIndex, part] of content.entries()) {
         if (isRecord(part) && part.type === 'text' && typeof part.text === 'string') {
+          if (part.text.trim() !== '') textSegments.set(contentIndex, block.segments.length);
           block.segments.push({ type: 'text', text: part.text });
           block.texts.push(part.text);
         } else if (isRecord(part) && part.type === 'tool_use' && typeof part.name === 'string' && part.name) {
@@ -429,6 +438,21 @@ export function mapSession(input: SessionInput): ReplaySession {
               isRecord(part) && typeof part.type === 'string' ? `a ${part.type} block` : 'an unknown block',
             record: part,
           });
+        }
+      }
+      if (record.replyAct !== undefined) {
+        // The runtime's index is local to message.content. Thinking and tool blocks do not become text
+        // segments, while earlier messages may already have added segments to this observed block.
+        block.kept.push({ line, reason: 'the runtime reply act evidence', record });
+        const parsed = ObservedReplyAct.safeParse(record.replyAct);
+        const index = parsed.success ? textSegments.get(parsed.data.evidence.index) : undefined;
+        if (!parsed.success || index === undefined) {
+          meta.issues.push(`line ${line}: invalid reply act evidence or no referenced text segment`);
+        } else {
+          block.replyAct = {
+            ...parsed.data,
+            evidence: { ...parsed.data.evidence, index },
+          };
         }
       }
       continue;
@@ -597,6 +621,7 @@ export function mapSession(input: SessionInput): ReplaySession {
       text: block.texts.join('\n\n'),
       toolCalls: block.toolCalls,
       runtime,
+      ...(block.replyAct === undefined ? {} : { replyAct: block.replyAct }),
       workspaceDiff: diff,
       executions: block.executions,
       cost: {

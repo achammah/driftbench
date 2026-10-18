@@ -33,7 +33,7 @@ describe('kill.fake: equivalent mutants are read from the fixture, not taken on 
   it('names a skill name line equal to its folder, and nothing else of the skill kind', async () => {
     const map = await fixtureMap();
     const skill = map.atoms.find((atom) => atom.kind === 'skill') as (typeof map.atoms)[number];
-    expect(equivalent(del('skill'), skill.id, map)).toMatch(/repeats its folder/);
+    expect(equivalent(del('skill'), skill.id, map)).toContain('repeats its folder');
     const renamed = {
       ...map,
       atoms: map.atoms.map((atom) =>
@@ -52,7 +52,7 @@ describe('kill.fake: equivalent mutants are read from the fixture, not taken on 
     if (!gate) throw new Error('the fixture has no verify gate');
     expect(equivalent(del('gate'), gate.id, map)).toBeUndefined();
     // The counter-example of the review of PR 274: the gate's words carry a condition, "has passed".
-    expect(gate.provenance.quote).toMatch(/before the verify step has passed/);
+    expect(gate.provenance.quote).toContain('before the verify step has passed');
     // verify leads to report and to do (the path after a failed check): report stays reachable right after a
     // failed verify. A spec whose workspace fails the check and expects no done report passes on the original
     // and goes red on the mutant, so the cell can be killed in principle.

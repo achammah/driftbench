@@ -340,7 +340,10 @@ export function completionComponents(spec: Spec): ComponentInventory {
           ...interventions.flatMap((value) =>
             comparisonWitnesses(value)
               .map((variant) => variant.value)
-              .filter((value) => !/^(deny|block)$/i.test(value) && value !== 'warn'),
+              .filter(
+                (value) =>
+                  value.toLowerCase() !== 'deny' && value.toLowerCase() !== 'block' && value !== 'warn',
+              ),
           ),
         ]);
         for (const verdict of excludedVerdicts)

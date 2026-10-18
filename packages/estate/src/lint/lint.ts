@@ -1,8 +1,12 @@
 import { analyzeGraph } from '../graph/analyze';
 import { quoteDrift } from '../map/file';
+import { navigationNames } from '../scan/code';
+import { codeNames, runtimeProduct } from '../scan/code-names';
+import { normativeEstate, normativeRanges, unloadedByDesign } from '../scan/document-roles';
 import { DEFAULT_STANDING_CEILING, measureInvariants, standingFiles } from '../scan/invariants';
-import type { RawEstate } from '../scan/reader';
-import type { EstateMap } from '../schema';
+import type { RawEstate, RegistryRow } from '../scan/reader';
+import { ignoredReference, placeholderPath, unresolvedReference } from '../scan/reference-role';
+import type { Atom, EstateMap } from '../schema';
 
 /**
  * The static checks of an estate, on a map and the files it was read from. Each finding has a stable code:
@@ -12,7 +16,8 @@ import type { EstateMap } from '../schema';
  *   UNENFORCED          an instruction, gate or register atom no guard enforces: trusted, a finding of its own
  *   OVERSIZE            the standing instructions are over the ceiling
  *   UNANCHORED_GUARD    a guard command finds its script from the working folder, not an anchor
- *   MISSING_REFERENCE   a file a body names does not exist
+ *   MISSING_REFERENCE   a concrete path a body names does not exist
+ *   UNRESOLVED_REFERENCE a bare name has no resolved location: information
  *   AMBIGUOUS_REFERENCE a body names a file by an ending that several files share
  *   EXTERNAL            a body names a path outside the estate (`~/`, `/`, or an external folder): information
  *   MISSING_SCRIPT      a guard command runs a script that does not exist
@@ -31,6 +36,7 @@ export const LINT_CODES = [
   'OVERSIZE',
   'UNANCHORED_GUARD',
   'MISSING_REFERENCE',
+  'UNRESOLVED_REFERENCE',
   'AMBIGUOUS_REFERENCE',
   'EXTERNAL',
   'MISSING_SCRIPT',
@@ -41,13 +47,13 @@ export const LINT_CODES = [
 export type LintCode = (typeof LINT_CODES)[number];
 
 /** Codes reported as information: counted and listed, never failing the lint. */
-export const INFORMATION: ReadonlySet<LintCode> = new Set(['UNENFORCED', 'EXTERNAL']);
+export const INFORMATION: ReadonlySet<LintCode> = new Set(['UNENFORCED', 'EXTERNAL', 'UNRESOLVED_REFERENCE']);
 
 export type LintFinding = { code: LintCode; subject: string; message: string };
 
 export type LintResult = {
   findings: LintFinding[];
-  /** True when a finding other than UNENFORCED and EXTERNAL (both information) was found. */
+  /** True when a finding outside INFORMATION was found. */
   failed: boolean;
   counts: Record<LintCode, number>;
 };
@@ -55,14 +61,29 @@ export type LintResult = {
 export type LintOptions = { ceiling?: number };
 
 export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions = {}): LintResult {
+  raw = normativeEstate(raw);
+  const files = new Map(raw.files.map((file) => [file.path, file]));
+  const atoms = map.atoms.filter((atom) => {
+    if (ignoredReference(raw, atom.provenance.file)) return false;
+    // A skill's script is owned by the skill's folder, whatever role its own text has: it states no rule.
+    if (atom.kind === 'script') return true;
+    const file = files.get(atom.provenance.file);
+    if (!file) return true;
+    return normativeRanges(file, atom.provenance.startLine, atom.provenance.endLine).length > 0;
+  });
   const findings: LintFinding[] = [];
   const texts = new Map(raw.files.map((file) => [file.path, file.text]));
-  for (const drift of quoteDrift(map.atoms, texts)) {
+  for (const drift of quoteDrift(atoms, texts)) {
     findings.push({ code: 'QUOTE_DRIFT', subject: drift.path, message: drift.message });
   }
 
-  const analysis = analyzeGraph(map.atoms, map.edges, raw.files);
+  const analysis = analyzeGraph(atoms, map.edges, raw.files, navigationNames(raw), codeNames(raw).links);
+  // Findings look atoms up by id: the first atom of each id, as a search from the start would find it.
+  const byId = new Map<string, Atom>();
+  for (const atom of atoms) if (!byId.has(atom.id)) byId.set(atom.id, atom);
   for (const path of analysis.orphans) {
+    const file = files.get(path);
+    if (file && unloadedByDesign(raw, file)) continue;
     findings.push({
       code: 'ORPHAN',
       subject: path,
@@ -70,6 +91,8 @@ export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions 
     });
   }
   for (const path of analysis.unreachableFiles) {
+    const file = files.get(path);
+    if (file && unloadedByDesign(raw, file)) continue;
     findings.push({
       code: 'UNREACHABLE',
       subject: path,
@@ -77,7 +100,12 @@ export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions 
     });
   }
   for (const id of analysis.missingReferences) {
-    const atom = map.atoms.find((candidate) => candidate.id === id);
+    const atom = byId.get(id);
+    const path = String(atom?.fields?.path ?? '');
+    if (atom?.fields?.ignored === true || ignoredReference(raw, path) || placeholderPath(path)) continue;
+    // A script writes or creates the path: the runtime makes it, so a sentence about it is no broken link.
+    if (atom && atom.fields?.external !== true && !atom.fields?.candidates && runtimeProduct(raw, path))
+      continue;
     if (atom?.fields?.external === true) {
       findings.push({
         code: 'EXTERNAL',
@@ -95,6 +123,14 @@ export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions 
       });
       continue;
     }
+    if (atom && unresolvedReference(atom)) {
+      findings.push({
+        code: 'UNRESOLVED_REFERENCE',
+        subject: id,
+        message: `${atom.provenance.file}:${atom.provenance.startLine} names ${String(atom.fields?.written ?? atom.title.replace(/^Read /, ''))}, which could not be resolved within the estate`,
+      });
+      continue;
+    }
     findings.push({
       code: 'MISSING_REFERENCE',
       subject: id,
@@ -102,11 +138,14 @@ export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions 
     });
   }
   for (const id of analysis.missingScripts) {
-    const atom = map.atoms.find((candidate) => candidate.id === id);
+    const atom = byId.get(id);
     findings.push({
       code: 'MISSING_SCRIPT',
       subject: id,
-      message: `the guard runs ${String(atom?.fields?.script)}, which does not exist`,
+      message:
+        typeof atom?.fields?.dispatcher === 'string'
+          ? `the guard's dispatcher ${atom.fields.dispatcher} names ${String(atom.fields.script)}, which no file of the estate is`
+          : `the guard runs ${String(atom?.fields?.script)}, which does not exist`,
     });
   }
 
@@ -135,8 +174,10 @@ export function lintEstate(map: EstateMap, raw: RawEstate, options: LintOptions 
       message: `the guard ${name} has no row in the check registry`,
     });
   }
+  const rows = new Map<string, RegistryRow>();
+  for (const row of raw.registry) if (!rows.has(row.id)) rows.set(row.id, row);
   for (const id of state.rowsWithoutGuard) {
-    const row = raw.registry.find((candidate) => candidate.id === id);
+    const row = rows.get(id);
     findings.push({
       code: 'REGISTRY_GUARD',
       subject: id,

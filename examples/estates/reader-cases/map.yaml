@@ -352,6 +352,7 @@ atoms:
     fields:
       key: env.NORTHWIND_REGION
   - id: stage.steps.stage-claim-scan-read-the-delivery
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: stage
     title: "Stage claim/scan: Read the delivery scan"
     provenance:
@@ -367,12 +368,14 @@ atoms:
       - { type: stage_reached, name: claim/scan }
     enforcement: []
     fields:
+      ask: {"text":"file a claim for the damaged parcel","act":{"kind":"reply","name":"report"}}
       id: claim/scan
       next:
         - claim/photos
       anytime: false
       process: claim
   - id: stage.steps.stage-claim-photos-collect-a-photo
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: stage
     title: "Stage claim/photos: Collect a photo of each damaged parcel"
     provenance:
@@ -388,12 +391,14 @@ atoms:
       - { type: stage_reached, name: claim/photos }
     enforcement: []
     fields:
+      ask: {"text":"file a claim for the damaged parcel","act":{"kind":"reply","name":"report"}}
       id: claim/photos
       next:
         - claim/file
       anytime: false
       process: claim
   - id: stage.steps.stage-claim-file-file-the-claim
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: stage
     title: "Stage claim/file: File the claim with the carrier"
     provenance:
@@ -409,11 +414,13 @@ atoms:
       - { type: stage_reached, name: claim/file }
     enforcement: []
     fields:
+      ask: {"text":"file a claim for the damaged parcel","act":{"kind":"reply","name":"report"}}
       id: claim/file
       next: []
       anytime: false
       process: claim
   - id: stage.steps.stage-month-close-reconcile-reconcile-every
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: stage
     title: "Stage month-close/reconcile: Reconcile every open invoice"
     provenance:
@@ -429,12 +436,14 @@ atoms:
       - { type: stage_reached, name: month-close/reconcile }
     enforcement: []
     fields:
+      ask: {"text":"complete the month close for the supplied invoices","act":{"kind":"reply","name":"report"}}
       id: month-close/reconcile
       next:
         - month-close/audit
       anytime: false
       process: month-close
   - id: stage.steps.stage-month-close-audit-have-the
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: stage
     title: "Stage month-close/audit: Have the ledger audited"
     provenance:
@@ -450,12 +459,14 @@ atoms:
       - { type: stage_reached, name: month-close/audit }
     enforcement: []
     fields:
+      ask: {"text":"complete the month close for the supplied invoices","act":{"kind":"reply","name":"report"}}
       id: month-close/audit
       next:
         - month-close/report
       anytime: false
       process: month-close
   - id: stage.steps.stage-month-close-report-report-the
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: stage
     title: "Stage month-close/report: Report the month to the operations team"
     provenance:
@@ -471,11 +482,13 @@ atoms:
       - { type: stage_reached, name: month-close/report }
     enforcement: []
     fields:
+      ask: {"text":"complete the month close for the supplied invoices","act":{"kind":"reply","name":"report"}}
       id: month-close/report
       next: []
       anytime: false
       process: month-close
   - id: stage.steps.stage-month-close-note-write-a
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: stage
     title: "Stage month-close/note: Write a tracker note"
     provenance:
@@ -491,6 +504,7 @@ atoms:
       - { type: stage_reached, name: month-close/note }
     enforcement: []
     fields:
+      ask: {"text":"complete the month close for the supplied invoices","act":{"kind":"reply","name":"report"}}
       id: month-close/note
       next: []
       anytime: true
@@ -769,6 +783,7 @@ atoms:
       via: table
       ask: know where a shipment is
   - id: hazard.standing.recover-from-a-new-session
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: hazard
     title: Recover from a new session
     provenance:
@@ -785,6 +800,7 @@ atoms:
       - { type: custom, name: hazard_recovery, options: { hazard: session_boundary } }
     enforcement: []
     fields:
+      ask: {"text":"continue the parcel claim in this new session","act":{"kind":"reply","name":"report"}}
       hazard: session_boundary
   - id: reference.memory-memory.read-supplier-languages-md
     kind: reference
@@ -916,6 +932,7 @@ atoms:
       from: .claude/skills/shipment-tracker/SKILL.md
       resolvedBy: suffix
   - id: instruction.standing.never-force-push
+    replyAct: {"id":"refuse","evidence":{"type":"text_segment","part":"reply"}}
     kind: instruction
     title: Never force-push
     provenance:
@@ -931,10 +948,12 @@ atoms:
       - { type: custom, name: no_force_push }
     enforcement: [ guard.settings.pretooluse-bash-guard-block-force-push ]
     fields:
+      ask: {"text":"run `git push --force`","act":{"kind":"reply","name":"refuse"}}
       polarity: prohibition
       spans:
         - git push --force
   - id: register.standing.at-most-one-question-per-reply
+    replyAct: {"id":"answer","evidence":{"type":"text_segment","part":"reply"}}
     kind: register
     title: At most one question per reply
     provenance:
@@ -949,7 +968,11 @@ atoms:
     evidence:
       - { type: custom, name: one_question }
     enforcement: [ guard.settings.stop-guard-claim-window-py, guard.registry.stop-guard-c2 ]
+    fields:
+      ask: {"text":"answer a question about parcel claims","act":{"kind":"reply","name":"answer"}}
+
   - id: instruction.standing.report-only-numbers-read-during-the
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: instruction
     title: Report only numbers read during the session
     provenance:
@@ -965,8 +988,10 @@ atoms:
       - { type: custom, name: grounded_values }
     enforcement: []
     fields:
+      ask: {"text":"report the invoice total from the material read this session","act":{"kind":"reply","name":"report"}}
       polarity: obligation
   - id: instruction.memory-memory.no-delivery-on-a-public-holiday
+    replyAct: {"id":"clarify","evidence":{"type":"text_segment","part":"reply"}}
     kind: instruction
     title: No delivery on a public holiday
     provenance:
@@ -982,8 +1007,10 @@ atoms:
       - { type: custom, name: holiday_check }
     enforcement: []
     fields:
+      ask: {"text":"schedule a delivery for a public holiday in the receiving country","act":{"kind":"reply","name":"clarify"}}
       polarity: prohibition
   - id: instruction.memory-supplier-languages.write-to-each-supplier-in-its
+    replyAct: {"id":"draft","evidence":{"type":"text_segment","part":"draft"}}
     kind: instruction
     title: Write to each supplier in its language
     provenance:
@@ -999,8 +1026,10 @@ atoms:
       - { type: custom, name: supplier_language }
     enforcement: []
     fields:
+      ask: {"text":"draft a missing-invoice email to each supplier in the language table","act":{"kind":"reply","name":"draft"}}
       polarity: obligation
   - id: instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and
+    replyAct: {"id":"draft","evidence":{"type":"text_segment","part":"draft"}}
     kind: instruction
     title: An unlisted supplier gets English and a note to the user
     provenance:
@@ -1017,8 +1046,10 @@ atoms:
       - { type: text, lang: en }
     enforcement: []
     fields:
+      ask: {"text":"draft a missing-invoice email to fictional supplier Cedar Crates, absent from the language table","act":{"kind":"reply","name":"draft"}}
       polarity: obligation
   - id: gate.parcel-claims.run-the-tracking-script-before-filing
+    replyAct: {"id":"report","evidence":{"type":"text_segment","part":"reply"}}
     kind: gate
     title: Run the tracking script before filing a claim
     provenance:
@@ -1034,6 +1065,7 @@ atoms:
       - { type: tool_called, label: Bash, input: { command: { contains: track.sh } } }
     enforcement: []
     fields:
+      ask: {"text":"file a claim for the damaged parcel","act":{"kind":"reply","name":"report"}}
       spans:
         - ./scripts/track.sh <carrier> <number>
   - id: instruction.parcel-claims.write-the-claim-in-the-supplier

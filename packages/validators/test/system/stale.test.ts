@@ -33,7 +33,7 @@ const estateContracts = [
   {
     id: 'breaker/tools/estate-scan-no-model-output-order',
     page: 'docs/reference/cli.md',
-    before: '  No model call: structured atoms only (--no-model).',
+    before: '  No model call: structured atoms and code-found prose candidates (--no-model).',
     after: '  No model call: a mismatched scan contract (--no-model).',
   },
   {

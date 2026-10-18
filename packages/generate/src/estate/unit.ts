@@ -1,3 +1,4 @@
+import { type Assertion, matchAssertion } from '@agent-nexus/driftbench-core';
 import { z } from 'zod';
 import type { EstateAtom, EstatePlanRow } from './inputs';
 
@@ -8,8 +9,10 @@ import type { EstateAtom, EstatePlanRow } from './inputs';
  * (script_fixture), as JSON in `unit/<test type>/<id>.json`.
  *
  * A guard test holds hook payloads in the runtime's input shape, built by code from the map: the event and
- * the matcher of the guard, and the material of the rules it enforces (the commands, paths and phrases their
- * quotes hold). The generator knows no verdict: `estate unit --record` runs every case on the original estate
+ * the matcher of the guard, and declared evidence or `fields.unitCases` on each rule it enforces.
+ * A unit case declares `effect: forbid | allow`, `material`, and, for tool events, `tool` plus optional
+ * exact `input`. Source quotes are never interpreted as permission or prohibition. Missing declarations
+ * produce a fixture gap. The generator knows no verdict: `estate unit --record` runs every case on the original estate
  * and writes what the guard decided into the test (the oracle), and a run on a mutant compares with it.
  *
  * - guard_positive: payloads the rules forbid. Recorded allowed with nothing printed, a case is inert (it
@@ -64,7 +67,14 @@ export type GuardCase = z.infer<typeof GuardCase>;
 export const UnitTest = z.strictObject({
   id: z.string().min(1),
   planRow: z.string().min(1),
-  testType: z.enum(['guard_positive', 'guard_negative', 'guard_hostile', 'guard_speed', 'script_fixture']),
+  testType: z.enum([
+    'guard_positive',
+    'guard_negative',
+    'guard_hostile',
+    'guard_speed',
+    'script_fixture',
+    'contract_alone',
+  ]),
   atom: z.string().min(1),
   title: z.string().min(1),
   mapHash: z.string().min(1),
@@ -81,6 +91,8 @@ export const UnitTest = z.strictObject({
       check: z.string().optional(),
     }),
     z.strictObject({ kind: z.literal('script'), path: z.string().min(1), skill: z.string().optional() }),
+    /** A helper run alone on a task, by the executor the estate declares for it: its agent file is the prompt. */
+    z.strictObject({ kind: z.literal('subagent'), name: z.string().min(1), file: z.string().min(1) }),
   ]),
   cases: z.array(GuardCase).default([]),
   /** The map hash of the estate --record ran on; absent until then. */
@@ -89,6 +101,9 @@ export const UnitTest = z.strictObject({
   budgetMs: z.number().int().positive().optional(),
 });
 export type UnitTest = z.infer<typeof UnitTest>;
+
+/** Bound generated boundary payloads so an untrusted declaration cannot exhaust memory. */
+export const MAX_BOUNDARY_CHARACTERS = 1_000_000;
 
 /** Events whose payload names a tool. */
 const TOOL_EVENTS = new Set(['PreToolUse', 'PostToolUse', 'PermissionRequest']);
@@ -113,34 +128,31 @@ export function matcherTools(matcher: string | undefined): string[] {
   return tools.length > 0 ? tools : ['Bash'];
 }
 
-/** Words and marks that make a clause forbid what it names. */
-const FORBIDS =
-  /\b(never|no|not|don't|do not|must not|mustn't|forbid|forbidden|banned|refuse[sd]?|block(?:s|ed)?|den(?:y|ies|ied)|avoid|stop)\b|✗|\bWRONG\b/i;
+/** Quoted spans are structural source material only; this function assigns no polarity or act. */
+export function materialOf(quote: string): string[] {
+  return [
+    ...new Set(
+      [...quote.matchAll(/`([^`]+)`|"([^"]+)"/g)]
+        .map((match) => match[1] ?? match[2] ?? '')
+        .filter((span) => span.trim() !== ''),
+    ),
+  ];
+}
+
+/** Clause boundaries and quoted spans carry no inferred prohibition, obligation or act. */
+export function clausesOf(quote: string): Array<{ spans: string[] }> {
+  return quote.split(/(?<=[.!?])\s+|\n|;/).map((clause) => ({ spans: materialOf(clause) }));
+}
 
 /**
- * The material of a rule quote: the backticked spans and quoted phrases of the clauses that forbid them
- * ("Never use `sed -i`", "✗ `2>/dev/null`"), never a name or path the rule only mentions. A quote with no
- * span at all is its own material.
+ * The acts that break an obligation a command line shows ("Always pass the carrier code, as in
+ * `./track.sh NWX 123`"): the command line with each of its arguments left out in turn. A span of one word
+ * shows no arguments and gives none.
  */
-export function materialOf(quote: string): string[] {
-  const spans: string[] = [];
-  const masked = quote.replace(
-    /`([^`]+)`|"([^"]{3,})"/g,
-    (_, code: string | undefined, phrase: string | undefined) => {
-      spans.push(code ?? phrase ?? '');
-      return `\uE000${spans.length - 1}\uE000`;
-    },
-  );
-  if (spans.length === 0) return [quote.trim()];
-  const found: string[] = [];
-  for (const clause of masked.split(/(?<=[.!?])\s+|\n|;|·|(?=✓)/)) {
-    if (!FORBIDS.test(clause.replace(/\uE000\d+\uE000/g, ' '))) continue;
-    for (const match of clause.matchAll(/\uE000(\d+)\uE000/g)) {
-      const span = spans[Number(match[1])] ?? '';
-      if (span.trim() !== '') found.push(span);
-    }
-  }
-  return [...new Set(found)];
+export function brokenForms(example: string): string[] {
+  const tokens = example.trim().split(/\s+/);
+  if (tokens.length < 2) return [];
+  return tokens.slice(1).map((_, index) => tokens.filter((__, at) => at !== index + 1).join(' '));
 }
 
 /** The tool input a tool takes, carrying one piece of material. */
@@ -207,6 +219,36 @@ export function hostileForms(material: string): string[] {
   return [...new Set(forms)].filter((form) => form !== material);
 }
 
+/**
+ * The unit test of a helper run alone (`contract_alone`): one case holding the task the row asks and the workspace
+ * files its situation seeds. `estate unit --record` runs the helper once per record run on the original estate and
+ * writes what it answered into the case; a later run, on a copy whose agent file lost its body or was changed, must
+ * answer the same.
+ */
+export function helperUnitTestOf(
+  atom: EstateAtom,
+  run: { task: string; files: Record<string, string> },
+  mapHash: string,
+  id: string,
+  row: Pick<EstatePlanRow, 'id'>,
+): UnitTest | string {
+  const name = atom.fields?.name;
+  const file = atom.provenance?.file;
+  if (typeof name !== 'string' || typeof file !== 'string')
+    return `${atom.id} names no helper with an agent file`;
+  if (run.task.trim() === '') return `${atom.id} has no task to run the helper on`;
+  return {
+    id,
+    planRow: row.id,
+    testType: 'contract_alone',
+    atom: atom.id,
+    title: atom.title,
+    mapHash,
+    target: { kind: 'subagent', name, file },
+    cases: [{ id: 'case-01', payload: { task: run.task, files: run.files }, material: run.task }],
+  };
+}
+
 /** The unit test of a row, or the reason it has none. */
 export function unitTestOf(
   row: EstatePlanRow,
@@ -231,6 +273,97 @@ export function unitTestOf(
   // A catalogue check is run by a hook, not by a command of its own: it is tested by sending its trigger to
   // that hook. Without a trigger or a host hook it is a counted gap, not a test.
   if (fields.scope === 'catalogue') return checkTestOf(row, atom, atoms, base);
+  const built = guardRunOf(testType, atom, atoms);
+  return typeof built === 'string' ? built : { ...base, ...built };
+}
+
+/**
+ * The run a unit-mode spec carries in `metadata.estate.unit`, so `estate unit` can run the spec with no model
+ * and judge its own Then: the guard with the payloads its test type sends, the script with its minimal
+ * fixtures, or the helper whose agent file the runtime would serve.
+ */
+export const SpecUnit = z.strictObject({
+  target: z.discriminatedUnion('kind', [
+    z.strictObject({
+      kind: z.literal('guard'),
+      name: z.string().min(1),
+      event: z.string().min(1),
+      matcher: z.string().optional(),
+      command: z.string().min(1),
+      timeout: z.number().positive().optional(),
+      /** The verdict the estate declares for the guard (deny, warn, nudge, ...), when it declares one. */
+      verdict: z.string().optional(),
+    }),
+    z.strictObject({ kind: z.literal('script'), path: z.string().min(1), skill: z.string().optional() }),
+    z.strictObject({ kind: z.literal('subagent'), name: z.string().min(1), file: z.string().min(1) }),
+  ]),
+  cases: z.array(GuardCase).default([]),
+  /** The most a guard run may take, in milliseconds: its declared timeout (60 s by default). */
+  budgetMs: z.number().int().positive().optional(),
+});
+export type SpecUnit = z.infer<typeof SpecUnit>;
+
+/** The test types a unit-mode spec runs with: the payloads each sends. */
+const SPEC_CASES: Record<string, UnitTest['testType']> = {
+  guard_positive: 'guard_positive',
+  guard_register: 'guard_positive',
+  guard_speed: 'guard_speed',
+  guard_negative: 'guard_negative',
+  guard_hostile: 'guard_hostile',
+};
+
+/** The unit run of a unit-mode spec, or the reason it has none. */
+export function specUnitOf(
+  row: Pick<EstatePlanRow, 'testType'>,
+  atoms: readonly EstateAtom[],
+  all: ReadonlyMap<string, EstateAtom>,
+): SpecUnit | string {
+  const head = atoms[0];
+  if (!head) return 'the row names no atom';
+  if (row.testType === 'script_fixture') {
+    const path = head.fields?.path;
+    if (typeof path !== 'string' || path === '') return `${head.id} names no script path`;
+    const skill = head.fields?.skill;
+    return {
+      target: { kind: 'script', path, ...(typeof skill === 'string' ? { skill } : {}) },
+      cases: scriptCases(head.provenance?.quote ?? '', path),
+    };
+  }
+  if (row.testType === 'contract_alone') {
+    const helper = atoms.find((atom) => atom.kind === 'subagent');
+    const name = helper?.fields?.name;
+    const file = helper?.provenance?.file;
+    if (typeof name !== 'string' || typeof file !== 'string')
+      return 'the row names no helper with an agent file';
+    return { target: { kind: 'subagent', name, file }, cases: [] };
+  }
+  const testType = SPEC_CASES[row.testType];
+  if (testType === undefined) return `${row.testType} has no unit run`;
+  if (head.fields?.scope === 'catalogue') return `${head.id} is a check its host hook runs`;
+  const built = guardRunOf(testType, head, all, true);
+  if (typeof built === 'string') return built;
+  const declared = head.evidence.find((entry) => entry.type === 'guard')?.verdict;
+  const target = built.target;
+  if (target.kind !== 'guard') return `${head.id} is no guard`;
+  const { check: _check, ...guard } = target;
+  return {
+    target: { ...guard, ...(declared !== undefined ? { verdict: declared } : {}) },
+    cases: built.cases,
+    budgetMs: Math.round((guard.timeout ?? 60) * 1000),
+  };
+}
+
+/**
+ * The target and the cases of a guard for a test type. `withPlain` puts the forbidden material itself before
+ * its hostile forms, so a hostile run also shows the guard catching the plain act.
+ */
+function guardRunOf(
+  testType: UnitTest['testType'],
+  atom: EstateAtom,
+  atoms: ReadonlyMap<string, EstateAtom>,
+  withPlain = false,
+): Pick<UnitTest, 'target' | 'cases' | 'budgetMs'> | string {
+  const fields = atom.fields ?? {};
   const name = fields.name;
   const event = fields.event;
   const command = fields.command;
@@ -247,63 +380,194 @@ export function unitTestOf(
     ...(matcher !== undefined ? { matcher } : {}),
     ...(timeout !== undefined ? { timeout } : {}),
   };
-  const tools = TOOL_EVENTS.has(event) ? matcherTools(matcher) : [undefined];
-  // A rule linked by a registry row or an id the guard cites is what the guard checks; a rule linked only
-  // because the guard's source repeats some of its words is a weaker link, used when there is no other.
+  const tools: Array<string | undefined> = TOOL_EVENTS.has(event) ? matcherTools(matcher) : [undefined];
+  // Declared ID relations authorize unit payloads; textual similarity is not evidence.
   const links = Array.isArray(fields.enforces)
     ? (fields.enforces as Array<{ atom?: unknown; by?: unknown }>).flatMap((entry) =>
-        typeof entry.atom === 'string' ? [{ atom: entry.atom, by: entry.by }] : [],
+        typeof entry.atom === 'string' && (entry.by === 'registry' || entry.by === 'id') ? [entry.atom] : [],
       )
     : [];
-  const strong = links.filter((link) => link.by === 'registry' || link.by === 'id');
-  const enforced = (strong.length > 0 ? strong : links).map((link) => link.atom);
-  // A rule the guard cites (registry or id) gives every concrete span of its source lines; a rule linked by
-  // a repeated quote gives only the spans its words forbid. A rule with no span gives its sentence, which
-  // only a text event (a prompt, a reply) can carry: a tool never gets a sentence as its input.
-  const cites = strong.length > 0;
+  const reverse = [...atoms.values()]
+    .filter((rule) => rule.approved && rule.enforcement?.includes(atom.id))
+    .map((rule) => rule.id);
+  const enforced = [...new Set([...links, ...reverse])];
+  let replyLimit: number | undefined;
+  if (!TOOL_EVENTS.has(event)) {
+    for (const ruleId of enforced) {
+      const constraint = atoms
+        .get(ruleId)
+        ?.evidence.find((entry) => entry.type === 'custom' && entry.name === 'max_characters');
+      const max = constraint?.type === 'custom' ? constraint.options?.max : undefined;
+      if (
+        max !== undefined &&
+        (typeof max !== 'number' || !Number.isSafeInteger(max) || max < 0 || max >= MAX_BOUNDARY_CHARACTERS)
+      )
+        return `${atom.id} declares a reply boundary outside the supported payload size`;
+      if (typeof max === 'number') replyLimit = Math.min(replyLimit ?? max, max);
+    }
+  }
   const textEvent = !TOOL_EVENTS.has(event);
-  const material = [
-    ...new Set(
-      enforced.flatMap((ruleId) => {
-        const rule = atoms.get(ruleId);
-        const quote = rule?.provenance?.quote ?? '';
-        const lineSpans = Array.isArray(rule?.fields?.spans)
-          ? (rule.fields.spans as unknown[]).filter((item): item is string => typeof item === 'string')
-          : [];
-        const quoteSpans = [...quote.matchAll(/`([^`]+)`/g)].map((match) => match[1] ?? '');
-        const spans = cites
-          ? [...lineSpans, ...quoteSpans]
-          : materialOf(quote).filter((item) => item !== quote.trim());
-        if (spans.length > 0) return spans;
-        return textEvent && quote.trim() !== '' ? materialOf(quote) : [];
-      }),
-    ),
-  ].filter((item) => item.trim() !== '');
+  type Piece = { text: string; tool?: string; input?: Record<string, unknown> };
+  const allowed: Piece[] = [];
+  const missing: string[] = [];
+  const pieces = enforced.flatMap((ruleId): Piece[] => {
+    const rule = atoms.get(ruleId);
+    const out: Piece[] = [];
+    const declared = Array.isArray(rule?.fields?.unitCases) ? rule.fields.unitCases : [];
+    for (const value of declared) {
+      if (typeof value !== 'object' || value === null) continue;
+      const entry = value as Record<string, unknown>;
+      if (typeof entry.material !== 'string' || entry.material.trim() === '') continue;
+      if (entry.effect !== 'forbid' && entry.effect !== 'allow') continue;
+      if (!textEvent && (typeof entry.tool !== 'string' || !tools.includes(entry.tool))) continue;
+      const piece: Piece = {
+        text: entry.material,
+        ...(typeof entry.tool === 'string' ? { tool: entry.tool } : {}),
+        ...(typeof entry.input === 'object' && entry.input !== null && !Array.isArray(entry.input)
+          ? { input: entry.input as Record<string, unknown> }
+          : {}),
+      };
+      (entry.effect === 'forbid' ? out : allowed).push(piece);
+    }
+    for (const evidence of rule?.evidence ?? []) {
+      if (textEvent && evidence.type === 'custom' && evidence.name === 'max_characters') {
+        const max = evidence.options?.max;
+        if (typeof max === 'number' && Number.isSafeInteger(max) && max >= 0 && max < MAX_BOUNDARY_CHARACTERS)
+          out.push({ text: 'x'.repeat(max + 1) });
+      }
+      if (textEvent && evidence.type === 'text')
+        for (const text of evidence.mustNot ?? []) if (text.trim() !== '') out.push({ text });
+      if (!textEvent && evidence.type === 'custom' && tools.includes('Bash')) {
+        const options = evidence.options ?? {};
+        if (evidence.name === 'command_not_run' || evidence.name === 'command_absent') {
+          const command =
+            typeof options.contains === 'string'
+              ? options.contains
+              : typeof options.command === 'string'
+                ? options.command
+                : undefined;
+          if (command?.trim()) out.push({ text: command, tool: 'Bash', input: toolInput('Bash', command) });
+        }
+        if (
+          evidence.name === 'no_delete_under' &&
+          typeof options.path === 'string' &&
+          options.path.trim() !== ''
+        ) {
+          // A typed delete predicate selects a write-only shell template; no source verb is interpreted.
+          const command = `rm ${JSON.stringify(options.path)}`;
+          out.push({ text: command, tool: 'Bash', input: toolInput('Bash', command) });
+        }
+      }
+      if (
+        !textEvent &&
+        evidence.type === 'tool_called' &&
+        evidence.label === 'Bash' &&
+        tools.includes('Bash') &&
+        Object.keys(evidence.input ?? {}).length === 1 &&
+        evidence.input?.command !== undefined
+      ) {
+        const spans = Array.isArray(rule?.fields?.spans) ? rule.fields.spans : [];
+        for (const span of spans) {
+          if (typeof span !== 'string') continue;
+          try {
+            if (!matchAssertion(span, evidence.input.command as Assertion)) continue;
+            allowed.push({ text: span, tool: 'Bash', input: toolInput('Bash', span) });
+            for (const command of brokenForms(span)) {
+              if (!matchAssertion(command, evidence.input.command as Assertion))
+                out.push({ text: command, tool: 'Bash', input: toolInput('Bash', command) });
+            }
+          } catch {
+            // Invalid declared assertions supply no payload; the row retains its fixture gap.
+          }
+        }
+      }
+      if (!textEvent && evidence.type === 'tool_not_called' && tools.includes(evidence.label)) {
+        const input = concreteInput(evidence.input);
+        if (input !== undefined) out.push({ text: JSON.stringify(input), tool: evidence.label, input });
+      }
+    }
+    if (out.length === 0) missing.push(ruleId);
+    return out;
+  });
+  if (enforced.length === 0 || missing.length > 0)
+    return `${atom.id} requires structured unit payload evidence for ${missing.join(', ') || 'its enforced rules'}`;
   const cases: GuardCase[] = [];
-  const add = (tool: string | undefined, text: string) => {
+  const seen = new Set<string>();
+  const add = (
+    tool: string | undefined,
+    text: string,
+    allowEmpty = false,
+    input?: Record<string, unknown>,
+  ) => {
+    if ((!allowEmpty && text.trim() === '') || seen.has(`${tool}\u0000${text}`)) return;
+    seen.add(`${tool}\u0000${text}`);
     cases.push({
       id: `case-${String(cases.length + 1).padStart(2, '0')}`,
-      payload: payloadOf(event, tool, text),
+      payload: { ...payloadOf(event, tool, text), ...(input === undefined ? {} : { tool_input: input }) },
       material: text,
     });
   };
   if (testType === 'guard_negative') {
-    for (const tool of tools) add(tool, tool === undefined ? 'Done.' : (NEUTRAL[tool] ?? 'hello'));
-  } else {
-    if (material.length === 0) return `${atom.id} enforces no rule whose quote gives material for a payload`;
     for (const tool of tools) {
-      for (const text of material) {
-        if (testType === 'guard_hostile') for (const form of hostileForms(text)) add(tool, form);
-        else add(tool, text);
+      add(
+        tool,
+        tool === undefined ? 'Done.'.slice(0, replyLimit) : (NEUTRAL[tool] ?? 'hello'),
+        replyLimit === 0,
+      );
+      // The right form an obligation shows is let through as well.
+      for (const piece of allowed)
+        if (piece.tool === undefined || piece.tool === tool) add(tool, piece.text, false, piece.input);
+    }
+  } else {
+    if (pieces.length === 0) return `${atom.id} has no structured forbidden payload evidence`;
+    for (const tool of tools) {
+      for (const piece of pieces) {
+        if (piece.tool !== undefined && piece.tool !== tool) continue;
+        const text = piece.text;
+        if (testType === 'guard_hostile') {
+          if (withPlain) add(tool, text, false, piece.input);
+          if (piece.input === undefined) {
+            for (const form of hostileForms(text)) add(tool, form);
+          } else {
+            for (const [key, value] of Object.entries(piece.input)) {
+              if (typeof value !== 'string') continue;
+              for (const form of hostileForms(value))
+                add(tool, JSON.stringify({ ...piece.input, [key]: form }), false, {
+                  ...piece.input,
+                  [key]: form,
+                });
+            }
+          }
+        } else add(tool, text, false, piece.input);
       }
     }
   }
+  if (cases.length === 0) return `${atom.id} has no executable structured unit payloads`;
   return {
-    ...base,
     target,
     cases: testType === 'guard_speed' ? spreadOf(cases, SPEED_CASES) : cases,
     ...(testType === 'guard_speed' ? { budgetMs: Math.round((timeout ?? 60) * 1000) } : {}),
   };
+}
+
+/** Instantiate exact or contained input assertions; unsupported predicates remain a fixture gap. */
+function concreteInput(input: Record<string, unknown> | undefined): Record<string, unknown> | undefined {
+  if (input === undefined || Object.keys(input).length === 0) return undefined;
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(input)) {
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      result[key] = value;
+      continue;
+    }
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) return undefined;
+    const assertion = Object.entries(value);
+    if (assertion.length !== 1) return undefined;
+    const [operator, operand] = assertion[0] as [string, unknown];
+    if (operator === 'equals') result[key] = operand;
+    else if (operator === 'contains' && typeof operand === 'string') result[key] = operand;
+    else return undefined;
+  }
+  return result;
 }
 
 /** Reasons a catalogue check gets no unit test; the report counts them as gaps. */

@@ -65,9 +65,11 @@ describe('the estate ladder', { timeout: 120_000 }, () => {
       expect(run.rows[1]?.pass).toBeNull();
       const item = run.failing?.items.find((candidate) => candidate.id === 'scan.standing.plain-name');
       expect(item?.component).toBe('packages/estate/src/scan/code.ts');
-      expect(item?.detail).toMatch(
-        /^\[scan\.standing, tier 3\] the reader reads a routing cell naming the skill without backticks/,
-      );
+      expect(
+        item?.detail.startsWith(
+          '[scan.standing, tier 3] the reader reads a routing cell naming the skill without backticks',
+        ),
+      ).toBe(true);
       expect(run.failing?.items.some((candidate) => candidate.id === 'scan.frontmatter.plain')).toBe(false);
     } finally {
       scan.mockRestore();
@@ -92,8 +94,11 @@ describe('the estate ladder', { timeout: 120_000 }, () => {
     const missed = measure.items.filter((item) => item.id.startsWith('atom-missed:script:'));
     expect(missed.length).toBeGreaterThan(0);
     expect(missed[0]?.component).toBe('packages/estate/src/scan/code.ts');
-    expect(missed[0]?.detail).toMatch(
-      /^script \.claude\/skills\/.+ at .+SKILL\.md:\d+ was planted and not found: "\d\. Run `python3 scripts\//,
+    const missingScript = lost.rendered.atoms.find((atom) => `atom-missed:${atom.hid}` === missed[0]?.id);
+    if (!missingScript) throw new Error('missing planted script');
+    const line = lost.rendered.files[missingScript.file]?.split('\n')[missingScript.line - 1]?.trim();
+    expect(missed[0]?.detail).toBe(
+      `script ${missingScript.key} at ${missingScript.file}:${missingScript.line} was planted and not found: "${line}"`,
     );
   });
 

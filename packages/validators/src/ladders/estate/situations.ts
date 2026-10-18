@@ -288,7 +288,8 @@ export function situationsOf(estate: HiddenEstate): HiddenSituation[] {
     }
   }
   for (const [hid, act] of toolCases) {
-    const changed = /^(Edit|Write)(?:\(|$)/.test(act.rule) ? ['notes/probe.md'] : [];
+    const tool = act.rule.split('(')[0];
+    const changed = tool === 'Edit' || tool === 'Write' ? ['notes/probe.md'] : [];
     out.push({
       id: `permission-${slugOf(hid)}`,
       title: `Exercise ${act.effect} ${act.rule}`,

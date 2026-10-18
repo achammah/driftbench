@@ -14,6 +14,11 @@ import { type Atom, AtomKind, Edge, type EstateMap } from '../schema';
  * An atom with the same hash whose other fields differ (evidence, enforcement, situation, title, role, kind
  * fields) is restated: its tests are regenerated. Approval alone is not a change. Edges are compared as
  * `from kind to` triples.
+ *
+ * An id names the file an atom was read in, so a fact several files state once (a tool two helpers declare)
+ * changes its id when the file it was anchored in leaves. An atom that leaves under one id while an atom of
+ * the same kind, title, words and fields arrives under another is the same atom, renamed: its tests are
+ * regenerated against the new id, and neither atom counts as removed or added.
  */
 
 export const AtomPlace = z.strictObject({
@@ -57,6 +62,16 @@ export const AtomMove = z.strictObject({
   to: AtomPlace,
 });
 export type AtomMove = z.infer<typeof AtomMove>;
+
+export const AtomRename = z.strictObject({
+  from: z.string().min(1),
+  to: z.string().min(1),
+  kind: AtomKind,
+  title: z.string().min(1),
+  was: AtomPlace,
+  now: AtomPlace,
+});
+export type AtomRename = z.infer<typeof AtomRename>;
 
 export const AtomRestated = z.strictObject({
   id: z.string().min(1),
@@ -106,6 +121,10 @@ export const EstateDiff = z.strictObject({
     changed: z.array(AtomChange),
     moved: z.array(AtomMove),
     restated: z.array(AtomRestated),
+    renamed: z
+      .array(AtomRename)
+      .optional()
+      .describe('Atoms that left under one id and arrived under another'),
   }),
   edges: z.strictObject({ added: z.array(Edge), removed: z.array(Edge) }),
   guards: z
@@ -122,6 +141,7 @@ export const EstateDiff = z.strictObject({
     unchanged: z.number().int().min(0),
     edgesAdded: z.number().int().min(0),
     edgesRemoved: z.number().int().min(0),
+    renamed: z.number().int().min(0).optional(),
   }),
 });
 export type EstateDiff = z.infer<typeof EstateDiff>;
@@ -150,8 +170,14 @@ export function diffEstateMaps(before: EstateMap, after: EstateMap, options: Dif
   const old = new Map(before.atoms.map((atom) => [atom.id, atom]));
   const next = new Map(after.atoms.map((atom) => [atom.id, atom]));
 
-  const added = after.atoms.filter((atom) => !old.has(atom.id)).map(diffAtom);
-  const removed = before.atoms.filter((atom) => !next.has(atom.id)).map(diffAtom);
+  const renamed = renamedAtoms(
+    before.atoms.filter((atom) => !next.has(atom.id)),
+    after.atoms.filter((atom) => !old.has(atom.id)),
+  );
+  const gone = new Set(renamed.map((entry) => entry.from));
+  const arrived = new Set(renamed.map((entry) => entry.to));
+  const added = after.atoms.filter((atom) => !old.has(atom.id) && !arrived.has(atom.id)).map(diffAtom);
+  const removed = before.atoms.filter((atom) => !next.has(atom.id) && !gone.has(atom.id)).map(diffAtom);
   const changed: AtomChange[] = [];
   const moved: AtomMove[] = [];
   const restated: AtomRestated[] = [];
@@ -200,7 +226,7 @@ export function diffEstateMaps(before: EstateMap, after: EstateMap, options: Dif
     version: 1,
     old: stamp(before, options.oldPath),
     new: stamp(after, options.newPath),
-    atoms: { added, removed, changed, moved, restated },
+    atoms: { added, removed, changed, moved, restated, ...(renamed.length > 0 ? { renamed } : {}) },
     edges: { added: edgesAdded, removed: edgesRemoved },
     ...(options.guards === undefined ? {} : { guards: options.guards }),
     summary: {
@@ -213,8 +239,46 @@ export function diffEstateMaps(before: EstateMap, after: EstateMap, options: Dif
       unchanged,
       edgesAdded: edgesAdded.length,
       edgesRemoved: edgesRemoved.length,
+      ...(renamed.length > 0 ? { renamed: renamed.length } : {}),
     },
   };
+}
+
+/** What makes two atoms the same fact: everything but the id, the place and the guards that enforce it. */
+function identity(atom: Atom): string {
+  return canonicalJson([
+    atom.kind,
+    atom.title,
+    normaliseQuote(atom.provenance.quote),
+    atom.role ?? null,
+    atom.situation ?? null,
+    atom.evidence,
+    atom.fields ?? null,
+  ]);
+}
+
+/** Pairs the atoms that left with the atoms that arrived when both are the same fact, in id order. */
+function renamedAtoms(left: readonly Atom[], arrived: readonly Atom[]): AtomRename[] {
+  const waiting = new Map<string, Atom[]>();
+  for (const atom of [...arrived].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
+    const key = identity(atom);
+    waiting.set(key, [...(waiting.get(key) ?? []), atom]);
+  }
+  const renamed: AtomRename[] = [];
+  for (const atom of [...left].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
+    const twin = waiting.get(identity(atom))?.shift();
+    if (twin) {
+      renamed.push({
+        from: atom.id,
+        to: twin.id,
+        kind: atom.kind,
+        title: atom.title,
+        was: place(atom),
+        now: place(twin),
+      });
+    }
+  }
+  return renamed;
 }
 
 export type ParsedDiff = { ok: true; diff: EstateDiff } | { ok: false; message: string };
@@ -247,7 +311,7 @@ export function renderEstateDiff(diff: EstateDiff): string {
     `Estate diff: ${name(diff.old)} (${diff.old.hash.slice(0, 12)}) to ${name(diff.new)} (${diff.new.hash.slice(0, 12)}).`,
   );
   lines.push(
-    `  Atoms: ${s.added} added, ${s.removed} removed, ${s.whitespace + s.semantic} changed (${s.whitespace} white space only, ${s.semantic} semantic), ${s.moved} moved with the same quote, ${s.restated} restated, ${s.unchanged} unchanged.`,
+    `  Atoms: ${s.added} added, ${s.removed} removed, ${s.whitespace + s.semantic} changed (${s.whitespace} white space only, ${s.semantic} semantic), ${s.moved} moved with the same quote, ${s.restated} restated${s.renamed ? `, ${s.renamed} renamed` : ''}, ${s.unchanged} unchanged.`,
   );
   lines.push(`  Edges: ${s.edgesAdded} added, ${s.edgesRemoved} removed.`);
   if (diff.guards !== undefined) {
@@ -284,6 +348,13 @@ export function renderEstateDiff(diff: EstateDiff): string {
       const to = entry.from.file === entry.to.file ? `${entry.to.startLine}` : where(entry.to);
       lines.push(`  > ${entry.id} ${where(entry.from)} to ${to}`);
     }
+  }
+  if ((diff.atoms.renamed ?? []).length > 0) {
+    lines.push('Renamed, the same atom under another id:');
+    for (const entry of diff.atoms.renamed ?? [])
+      lines.push(
+        `  = ${entry.from} to ${entry.to} (${entry.kind}) ${where(entry.was)} to ${where(entry.now)}`,
+      );
   }
   if (diff.atoms.restated.length > 0) {
     lines.push('Restated, same quote:');

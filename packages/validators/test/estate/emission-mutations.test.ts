@@ -151,7 +151,7 @@ const READER_ROOTS = [
 
 /** Every non-comment source line under the evaluator roots that matches `pattern`, as
  * `file: line`. A new reader changes this census and reopens the equivalence class. */
-function readerCensus(pattern: RegExp): string[] {
+function readerCensus(pattern: RegExp | string): string[] {
   const files: string[] = [];
   const visit = (path: string) => {
     if (statSync(`${ROOT}${path}`).isDirectory())
@@ -163,7 +163,11 @@ function readerCensus(pattern: RegExp): string[] {
     readFileSync(`${ROOT}${file}`, 'utf8')
       .split('\n')
       .map((line) => line.trim())
-      .filter((line) => !/^(\*|\/\*|\/\/)/.test(line) && pattern.test(line))
+      .filter(
+        (line) =>
+          !/^(\*|\/\*|\/\/)/.test(line) &&
+          (typeof pattern === 'string' ? line.includes(pattern) : pattern.test(line)),
+      )
       .map((line) => `${file}: ${line}`),
   );
 }
@@ -277,6 +281,7 @@ const CLASS_PROOFS: Record<
     // The deleted value is a custom check's `block: 0` on a one-block spec.
     pattern: /\b(options|opts|entry)\.block\b/,
     readers: [
+      `packages/checks/src/checks/absence.ts: ${GUARDED_BLOCK}`,
       'packages/checks/src/checks/estate.ts: if (entry.block !== undefined && entry.block !== ctx.blockIndex) return;',
       "packages/checks/src/checks/estate.ts: ...(typeof entry.block === 'number' ? { block: entry.block } : {}),",
       `packages/checks/src/checks/estate.ts: ${GUARDED_BLOCK}`,
@@ -293,7 +298,8 @@ const CLASS_PROOFS: Record<
     cases() {
       // The runner refuses a blockIndex outside 0..blocks.length-1 (core runner/run.ts nextStep),
       // and the custom check passes options through unread (checks/custom.ts createCustomCheck).
-      expect(readerCensus(/the driver asked for block \$\{step\.blockIndex\}/)).toHaveLength(1);
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: this is the exact source template being counted.
+      expect(readerCensus('the driver asked for block ${step.blockIndex}')).toHaveLength(1);
       expect(
         readFileSync(`${ROOT}packages/checks/src/checks/custom.ts`, 'utf8').match(/\.block\b/g),
       ).toBeNull();

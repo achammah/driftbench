@@ -42,6 +42,7 @@ export type ProseEntry = {
   situation?: string;
   polarity?: 'obligation' | 'prohibition';
   evidence: Evidence[];
+  replyAct?: StandingRule['replyAct'];
   line: number;
 };
 
@@ -98,7 +99,7 @@ class Writer {
 }
 
 function proseOf(
-  rule: Pick<StandingRule, 'kind' | 'title' | 'text' | 'polarity' | 'evidence'>,
+  rule: Pick<StandingRule, 'kind' | 'title' | 'text' | 'polarity' | 'evidence' | 'replyAct'>,
   situation?: string,
 ) {
   return {
@@ -108,6 +109,7 @@ function proseOf(
     ...(situation ? { situation } : {}),
     ...(rule.polarity ? { polarity: rule.polarity } : {}),
     evidence: rule.evidence,
+    ...(rule.replyAct ? { replyAct: rule.replyAct } : {}),
   };
 }
 
@@ -440,6 +442,7 @@ export function renderEstate(estate: HiddenEstate): Rendered {
         {
           kind: 'instruction',
           title: `Run the ${topic.script.file} script and show its summary`,
+          replyAct: { id: 'report', evidence: { type: 'text_segment', part: 'reply' } },
           quote: scriptText,
           polarity: 'obligation',
           evidence: [
@@ -461,6 +464,7 @@ export function renderEstate(estate: HiddenEstate): Rendered {
         {
           kind: 'instruction',
           title: topic.prohibition.title,
+          replyAct: { id: 'refuse', evidence: { type: 'text_segment', part: 'reply' } },
           quote: topic.prohibition.text,
           polarity: 'prohibition',
           evidence: [{ type: 'custom', name: 'no_value_change', options: { skill: topic.skill } }],
@@ -489,6 +493,7 @@ export function renderEstate(estate: HiddenEstate): Rendered {
         {
           kind: 'register',
           title: topic.register.title,
+          replyAct: { id: 'answer', evidence: { type: 'text_segment', part: 'reply' } },
           quote: topic.register.text,
           evidence: [{ type: 'text', must: [topic.register.word] }],
         },
@@ -571,6 +576,7 @@ export function renderEstate(estate: HiddenEstate): Rendered {
       {
         kind: 'instruction',
         title: 'The helper never edits a file',
+        replyAct: { id: 'report', evidence: { type: 'text_segment', part: 'reply' } },
         quote: readonly,
         polarity: 'prohibition',
         evidence: [{ type: 'custom', name: 'helper_read_only', options: { helper: topic.name } }],
@@ -580,6 +586,7 @@ export function renderEstate(estate: HiddenEstate): Rendered {
     writer.line(brief, [{ hid: `rule:${topic.name}:brief`, kind: 'instruction' }], {
       kind: 'instruction',
       title: `The brief gives the ${topic.fields[0]} and the ${topic.fields[1]}`,
+      replyAct: { id: 'clarify', evidence: { type: 'text_segment', part: 'reply' } },
       quote: brief,
       polarity: 'obligation',
       evidence: [{ type: 'custom', name: 'brief_fields', options: { fields: [...topic.fields] } }],
@@ -588,6 +595,7 @@ export function renderEstate(estate: HiddenEstate): Rendered {
     writer.line(json, [{ hid: `rule:${topic.name}:json`, kind: 'register' }], {
       kind: 'register',
       title: 'Answer with one JSON object',
+      replyAct: { id: 'answer', evidence: { type: 'text_segment', part: 'reply' } },
       quote: json,
       evidence: [{ type: 'custom', name: 'json_answer' }],
     });

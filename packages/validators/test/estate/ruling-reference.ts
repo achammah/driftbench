@@ -6,8 +6,8 @@ import {
   ESTATE_CHECKS,
 } from '@agent-nexus/driftbench-checks';
 import { machineVerdict, parseSpecText } from '@agent-nexus/driftbench-core';
+import { generateEstateSuite } from '@agent-nexus/driftbench-generate';
 import { roleOf } from '../../src/ladders/estate/bank/loop';
-import { rereadOf } from '../../src/ladders/estate/completion-contract';
 import { estateMeta } from '../../src/ladders/estate/levels';
 import type * as pipeline from '../../src/ladders/estate/pipeline';
 
@@ -118,9 +118,57 @@ export function referenceChecks(requireDecision = true, overrides: Record<string
   return defaultChecks({ registry });
 }
 
+/** Populate the positive reference's source map before generation; the raw missing-source plant stays intact. */
+function recoveryReferenceRun(source: pipeline.EstateRun): pipeline.EstateRun {
+  const map = structuredClone(source.scanned.map);
+  const declared = new Set<string>();
+  for (const rule of source.estate.rules) {
+    if (!rule.recovery) continue;
+    const id = required(source.scanned.match.idOf.get(`hazard:${rule.hid}`));
+    const atom = required(map.atoms.find((entry) => entry.id === id));
+    if (atom.fields?.recovery === undefined)
+      atom.fields = { ...atom.fields, recovery: structuredClone(rule.recovery) };
+    declared.add(id);
+  }
+  if (declared.size === 0) return source;
+  const suite = generateEstateSuite(
+    {
+      map: { runtime: map.runtime, hash: map.hash, atoms: map.atoms },
+      plan: { mapHash: source.plan.plan.mapHash, rows: source.plan.plan.rows },
+      bank: source.bank,
+      sessions: source.sessions,
+    },
+    {
+      seed: source.estate.seed,
+      paths: { map: 'map.yaml', plan: 'plan.yaml', phrases: 'phrases.yaml', sessions: 'sessions/index.yaml' },
+    },
+  );
+  const files = new Map(suite.files.map((file) => [file.path, file.text]));
+  const specs = source.specs.map((original): pipeline.GeneratedSpec => {
+    if (
+      original.record.testType !== 'hazard_recovery' ||
+      !original.record.atoms.some((id) => declared.has(id))
+    )
+      return original;
+    const record = required(suite.specs.find((entry) => entry.id === original.record.id));
+    const text = required(files.get(record.path));
+    const loaded = parseSpecText(text, 'yaml', record.path);
+    if (!loaded.ok) throw new Error(JSON.stringify(loaded.errors));
+    return {
+      record,
+      text,
+      loaded,
+      errors: [],
+      warnings: loaded.warnings.map((warning) => warning.message),
+    };
+  });
+  return { ...source, scanned: { ...source.scanned, map }, suite, specs };
+}
+
 /** Reference compilation for warning distinction, path-qualified ordering, declaration ownership and approval.
  * All other expectations, provenance and generated fields remain the real product output. */
-export function referenceRun(run: pipeline.EstateRun): pipeline.EstateRun {
+export function referenceRun(sourceRun: pipeline.EstateRun): pipeline.EstateRun {
+  const run = recoveryReferenceRun(sourceRun);
   return {
     ...run,
     specs: run.specs.map((source) => {
@@ -131,19 +179,7 @@ export function referenceRun(run: pipeline.EstateRun): pipeline.EstateRun {
         for (const block of spec.blocks)
           for (const guard of block.expect?.guards ?? []) guard.verdict = 'warn';
       }
-      if (key === 'hazard_recovery-hazard-after-compaction') {
-        // The reference compile: the reread the passage names, recovered by the same plain reading of the passage.
-        const atom = required(run.scanned.map.atoms.find((a) => a.id === estateMeta(source).atoms?.[0]));
-        const reread = rereadOf(atom);
-        if (reread.length > 0)
-          spec.rules = {
-            ...spec.rules,
-            custom: {
-              ...spec.rules?.custom,
-              hazard_recovery: { ...(spec.rules?.custom?.hazard_recovery as object), reread, block: 0 },
-            },
-          };
-      }
+      if (key === 'hazard_recovery-hazard-after-compaction') return source;
       if (key === 'skip_pressure-gate-fixed-gate') {
         const atom = required(run.scanned.map.atoms.find((a) => a.id === estateMeta(source).atoms?.[0]));
         spec.rules = {

@@ -55,20 +55,20 @@ describe(`${ID}: a prompt hook is one planted guard, named by its words, on its 
   it('fails a reader that gives no guard', async () => {
     const result = await withGuards(1, () => []);
     expect(result?.pass).toBe(false);
-    expect(result?.detail).toMatch(/missed guard check-the-reply at \.claude\/settings\.json:3/);
+    expect(result?.detail).toContain('missed guard check-the-reply at .claude/settings.json:3');
   });
 
   it.each([2, 4])('fails a guard on line %i, not the hook line', async (line) => {
     const result = await withGuards(1, (base) => [guard(base, 'check-the-reply', line)]);
     expect(result?.pass).toBe(false);
-    expect(result?.detail).toMatch(/missed guard check-the-reply/);
+    expect(result?.detail).toContain('missed guard check-the-reply');
   });
 
   it('fails a guard named by its event, not by the prompt words', async () => {
     const result = await withGuards(1, (base) => [guard(base, 'stop', 3)]);
     expect(result?.pass).toBe(false);
-    expect(result?.detail).toMatch(
-      /found guard guard\.settings\.stop-guard-stop at \.claude\/settings\.json:3, never planted/,
+    expect(result?.detail).toContain(
+      'found guard guard.settings.stop-guard-stop at .claude/settings.json:3, never planted',
     );
   });
 
@@ -78,6 +78,6 @@ describe(`${ID}: a prompt hook is one planted guard, named by its words, on its 
       guard(base, 'check-the-reply-2', 3),
     ]);
     expect(result?.pass).toBe(false);
-    expect(result?.detail).toMatch(/never planted/);
+    expect(result?.detail).toContain('never planted');
   });
 });

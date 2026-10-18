@@ -3,21 +3,45 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defaultRegistry, ESTATE_CHECKS } from '@agent-nexus/driftbench-checks';
 import { type Check, machineVerdict, parseSpecText, type Spec } from '@agent-nexus/driftbench-core';
+import type { Atom } from '@agent-nexus/driftbench-estate';
 import { describe, expect, it, vi } from 'vitest';
 import { parse } from 'yaml';
 import { context, observed } from '../../../checks/test/support/context';
 import * as fixture from '../../src/ladders/estate/bank/fixture-suite';
 import { holdsTask, taskFamily } from '../../src/ladders/estate/bank/genquality';
 import { genCompleteFamily, roleOf } from '../../src/ladders/estate/bank/loop';
+import { actOfAtom } from '../../src/ladders/estate/bank/task-act';
+import { type BankLike, envOf } from '../../src/ladders/estate/bank/task-check';
+import * as traces from '../../src/ladders/estate/bank/task-trace';
 import { estateMeta } from '../../src/ladders/estate/levels';
 import * as pipeline from '../../src/ladders/estate/pipeline';
 
 const ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
 const APPROVED_TASKS = [
-  { type: 'route_positive', text: 'Fill in the shipments late section of the week 41 report.' },
-  { type: 'twin', text: 'Go through inbox/ and say which folder each message belongs in.' },
-  { type: 'route_positive', text: 'Has NW-55031 arrived yet? The carrier is FRT.' },
+  {
+    type: 'route_positive',
+    text: 'Fill in the shipments late section of the week 41 report.',
+    unit: 'skill.weekly-report.skill-weekly-report',
+    call: { label: 'Skill', input: { skill: 'weekly-report' } },
+  },
+  {
+    type: 'twin',
+    text: 'Go through inbox/ and say which folder each message belongs in.',
+    unit: 'subagent.inbox-triager.helper-inbox-triager',
+    call: { label: 'Agent', input: { subagent_type: 'inbox-triager' } },
+  },
+  {
+    type: 'route_positive',
+    text: 'Has NW-55031 arrived yet? The carrier is FRT.',
+    unit: 'skill.shipment-tracker.skill-shipment-tracker',
+    call: { label: 'Skill', input: { skill: 'shipment-tracker' } },
+  },
 ];
+
+function required<T>(value: T | undefined): T {
+  if (value === undefined) throw new Error('missing fictional test value');
+  return value;
+}
 
 function task(ask: string): Spec {
   const loaded = parseSpecText(
@@ -148,38 +172,67 @@ describe('the affected gen.complete items', { timeout: 120_000 }, () => {
       const verdicts = await genCompleteFamily().evaluate(1);
       expect(verdicts.get('gen.complete.obligation-instruction-script')).toMatchObject({
         pass: false,
-        detail: expect.stringMatching(/fails on the rule follower:.*custom\.some_call/),
+        detail: expect.stringContaining('fails on the rule follower:'),
       });
+      expect(verdicts.get('gen.complete.obligation-instruction-script')?.detail).toContain(
+        'custom.some_call',
+      );
     } finally {
       mock.mockRestore();
     }
   });
 });
 
-describe('approved task asks are judged by the task oracle', () => {
-  const bank = parse(readFileSync(join(fixture.FIXTURE, 'phrases.yaml'), 'utf8')) as {
-    situations: Array<{ phrases: Array<{ text: string; approved: boolean }> }>;
-  };
+describe('approved task asks are judged by their map act and trace', () => {
+  const bank = parse(readFileSync(join(fixture.FIXTURE, 'phrases.yaml'), 'utf8')) as BankLike;
+  const map = parse(readFileSync(join(fixture.FIXTURE, 'approved.yaml'), 'utf8')) as { atoms: Atom[] };
+  const env = envOf(map.atoms, bank, { sessions: [] });
   const approved = bank.situations.flatMap((situation) =>
     situation.phrases.filter((phrase) => phrase.approved).map((phrase) => phrase.text),
   );
+  function declared(phrase: (typeof APPROVED_TASKS)[number]): fixture.SuiteSpec {
+    const unit = env.byId.get(phrase.unit);
+    const situation = bank.situations.find(
+      (entry) =>
+        entry.atoms.includes(phrase.unit) && entry.phrases.some((entry) => entry.text === phrase.text),
+    );
+    if (!unit || !situation) throw new Error(`missing declared fixture source: ${phrase.unit}`);
+    const spec = task(phrase.text);
+    spec.metadata = {
+      estate: {
+        atoms: [unit.id],
+        link: { span: unit.id, fp: unit.provenance.hash, relation: 'exercises', createdBy: 'generator' },
+        act: actOfAtom(unit, map.atoms),
+        from: {
+          bank: situation.id,
+          phrase: situation.phrases.findIndex((entry) => entry.text === phrase.text),
+        },
+      },
+    };
+    return {
+      path: 'oracle-task.yaml',
+      id: spec.id,
+      atoms: [unit.id],
+      testType: phrase.type,
+      mode: 'live',
+      complete: true,
+      spec,
+    };
+  }
 
   for (const phrase of APPROVED_TASKS) {
-    it(`accepts the approved ask: ${phrase.text}`, () => {
+    it(`requires the declared act for the approved ask: ${phrase.text}`, () => {
+      const spec = declared(phrase);
       expect(approved).toContain(phrase.text);
-      expect(holdsTask(phrase.text)).toBe(true);
+      expect(holdsTask(spec, env, observed('done', [phrase.call]))).toBe(true);
+      expect(
+        holdsTask(spec, env, observed('done', [{ label: 'Bash', input: { command: 'echo wrong' } }])),
+      ).toBe(false);
+      expect(holdsTask(spec, env)).toBe(false);
     });
 
-    it(`keeps gen.task.${phrase.type} green for that ask and red for a rule-restatement component output`, async () => {
-      const spec = {
-        path: 'oracle-task.yaml',
-        id: 'oracle-task',
-        atoms: [],
-        testType: phrase.type,
-        mode: 'task',
-        complete: true,
-        spec: task(phrase.text),
-      };
+    it(`keeps gen.task.${phrase.type} green for its trace and rejects replaced asks and wrong acts`, async () => {
+      const spec = declared(phrase);
       const suite: fixture.FixtureSuite = {
         work: ROOT,
         map: join(fixture.FIXTURE, 'approved.yaml'),
@@ -188,28 +241,55 @@ describe('approved task asks are judged by the task oracle', () => {
         report: {},
       };
       const mock = vi.spyOn(fixture, 'fixtureSuite').mockResolvedValue(suite);
+      const trace = vi
+        .spyOn(traces, 'observeOnFake')
+        .mockResolvedValue(new Map([[spec.id, observed('done', [phrase.call])]]));
       try {
         expect((await taskFamily().evaluate(1)).get(`gen.task.${phrase.type}`)).toEqual({
           pass: true,
           detail: 'holds (1)',
         });
-        mock.mockResolvedValue({
-          ...suite,
-          specs: [{ ...spec, spec: task('Please do this: never guess a status.') }],
+        trace.mockResolvedValue(
+          new Map([[spec.id, observed('done', [{ label: 'Bash', input: { command: 'echo wrong' } }])]]),
+        );
+        expect((await taskFamily().evaluate(1)).get(`gen.task.${phrase.type}`)).toMatchObject({
+          pass: false,
+          detail: expect.stringContaining('does not show the act'),
         });
+        trace.mockResolvedValue(new Map([[spec.id, observed('done', [phrase.call])]]));
+        const replaced = structuredClone(spec);
+        required(replaced.spec.blocks[0]).when = { user: 'Please do this: never guess a status.' };
+        mock.mockResolvedValue({ ...suite, specs: [replaced] });
         expect((await taskFamily().evaluate(1)).get(`gen.task.${phrase.type}`)).toMatchObject({
           pass: false,
           detail: expect.stringContaining('asks hold no task'),
         });
       } finally {
+        trace.mockRestore();
         mock.mockRestore();
       }
     });
   }
 
-  it('accepts say followed by an explicit object', () => {
-    expect(holdsTask('Say which folder this message belongs in.')).toBe(true);
-  });
+  it.each(['Say which folder this message belongs in.', 'Berthify the fictional inbox.'])(
+    'accepts a declared ask only when its recorded act agrees: %s',
+    (ask) => {
+      const base = required(APPROVED_TASKS[1]);
+      const spec = declared(base);
+      required(spec.spec.blocks[0]).when = { user: ask };
+      const local = envOf(
+        map.atoms,
+        { situations: [{ id: 'new-verb', atoms: spec.atoms, phrases: [{ text: ask, approved: true }] }] },
+        { sessions: [] },
+      );
+      (spec.spec.metadata as { estate: Record<string, unknown> }).estate.from = {
+        bank: 'new-verb',
+        phrase: 0,
+      };
+      expect(holdsTask(spec, local, observed('done', [base.call]))).toBe(true);
+      expect(holdsTask(spec, local, observed('done'))).toBe(false);
+    },
+  );
 
   it.each([
     'Fill',
@@ -220,5 +300,10 @@ describe('approved task asks are judged by the task oracle', () => {
     'Never fill the report.',
     "Don't go through inbox/.",
     'Please handle this for me: the invoice is not in EUR.',
-  ])('rejects an ask with no positive task and object: %s', (ask) => expect(holdsTask(ask)).toBe(false));
+  ])('rejects an undeclared replacement even with the original correct trace: %s', (ask) => {
+    const phrase = required(APPROVED_TASKS[0]);
+    const spec = declared(phrase);
+    required(spec.spec.blocks[0]).when = { user: ask };
+    expect(holdsTask(spec, env, observed('done', [phrase.call]))).toBe(false);
+  });
 });

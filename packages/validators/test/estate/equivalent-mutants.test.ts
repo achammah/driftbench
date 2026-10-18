@@ -36,13 +36,14 @@ describe('agent mutants the rule follower cannot show (level 5)', { timeout: 300
 
   it('keeps failing the classes whose deletion shows and that no test catches', async () => {
     const results = await mutantFamily().evaluate(1);
-    // With the product on main: the keyless gate is seen by the follower and live.
-    expect(results.get('mutant.agent.gate-read-before-edit')).toMatchObject({ pass: false });
+    // The keyless gate is seen by the follower. The product now writes a complete test that names it, so the deletion is
+    // killed; the class that no test catches is the register below.
+    expect(results.get('mutant.agent.gate-read-before-edit')).toEqual({ pass: true, detail: 'holds' });
     // The bare deny rule is seen by the follower too. Its deny test was incomplete while the follower
     // offered no tool list; with offered tools derived from the estate it runs and kills the deletion.
     expect(results.get('mutant.agent.tool-deny-bare')).toEqual({ pass: true, detail: 'holds' });
-    expect(results.get('mutant.agent.register-reply-length')?.detail).toMatch(
-      /no atom of the class changes the follower's session on this seed \(1 of 1 not judged/,
+    expect(results.get('mutant.agent.register-reply-length')?.detail).toContain(
+      "no atom of the class changes the follower's session on this seed (1 of 1 not judged",
     );
   });
 
@@ -59,6 +60,6 @@ describe('agent mutants the rule follower cannot show (level 5)', { timeout: 300
     const own = mutants.filter((mutant) => mutant.kind === 'script');
     expect(own.length).toBeGreaterThan(0);
     expect(own.every((mutant) => !mutant.killed && !mutant.equivalent)).toBe(true);
-    expect(own[0]?.reason).toMatch(/no generated test names the atom/);
+    expect(own[0]?.reason).toContain('no generated test names the atom');
   });
 });

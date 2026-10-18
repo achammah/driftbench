@@ -1,3 +1,5 @@
+import { orderedCheck } from '@agent-nexus/driftbench-adapters';
+import type { CheckContext } from '@agent-nexus/driftbench-core';
 import { describe, expect, it } from 'vitest';
 import type { EstateAtom, EstateEvidence } from '../../src/estate/inputs';
 import {
@@ -149,25 +151,29 @@ describe('each evidence predicate as an existing check', () => {
   it('runs an ordered pair through the ordered check, anchored on a tool, a skill or a stage', () => {
     const then = thenOf(
       [
-        atom('g', [
-          { type: 'ordered', before: 'Read', after: 'Edit' },
-          { type: 'ordered', before: 'weekly-report', after: 'Write' },
-          { type: 'ordered', before: 'verify', after: 'report' },
-        ]),
+        atom(
+          'g',
+          [
+            { type: 'ordered', before: 'Read', after: 'Edit' },
+            { type: 'ordered', before: 'weekly-report', after: 'Write' },
+            { type: 'ordered', before: 'verify', after: 'report' },
+          ],
+          { fields: { order: { key: 'file_path' } } },
+        ),
       ],
       'positive',
       ctx,
     );
     expect(then.ordered).toEqual([
-      { before: 'Read', after: 'Edit' },
+      { before: 'Read', after: 'Edit', key: 'file_path' },
       { before: 'skill:weekly-report', after: 'Write' },
       { before: 'stage:verify', after: 'stage:report' },
     ]);
   });
 
   it('refuses a pair whose end is prose, or whose two ends are the same label', () => {
-    expect(anchorPair('Read', 'matching any line', ctx)).toMatch(/"matching any line" is no tool label/);
-    expect(anchorPair('Bash', 'Bash', ctx)).toMatch(/both ends are Bash/);
+    expect(anchorPair('Read', 'matching any line', ctx)).toContain('"matching any line" is no tool label');
+    expect(anchorPair('Bash', 'Bash', ctx)).toContain('both ends are Bash');
     const then = thenOf([atom('g', [{ type: 'ordered', before: 'Bash', after: 'Bash' }])], 'positive', ctx);
     expect(then.ordered).toEqual([]);
     expect(then.gaps.map((entry) => entry.marker)).toEqual([MARKERS.anchor]);
@@ -189,10 +195,14 @@ describe('each evidence predicate as an existing check', () => {
   });
 
   it('judges a register rule by its title, not gating; any other custom predicate is a gap', () => {
-    const register = atom('register.standing.short', [{ type: 'custom', name: 'max_characters' }], {
-      kind: 'register',
-      title: 'Replies under 1,200 characters',
-    });
+    const register = atom(
+      'register.standing.short',
+      [{ type: 'custom', name: 'max_characters', options: { max: 1200 } }],
+      {
+        kind: 'register',
+        title: 'Replies under 1,200 characters',
+      },
+    );
     const rule = atom('instruction.standing.confirm', [{ type: 'custom', name: 'grounded_values' }]);
     const then = thenOf([register, rule], 'positive', ctx);
     expect(then.criteria).toEqual([
@@ -211,15 +221,17 @@ describe('each evidence predicate as an existing check', () => {
   it('runs the registered ordered check with its own pairs, and leaves a static property to its runner', () => {
     const then = thenOf(
       [
-        atom('g', [
-          { type: 'custom', name: 'ordered', options: { pairs: [{ before: 'Read', after: 'Edit' }] } },
-        ]),
+        atom(
+          'g',
+          [{ type: 'custom', name: 'ordered', options: { pairs: [{ before: 'Read', after: 'Edit' }] } }],
+          { fields: { order: { key: 'file_path' } } },
+        ),
         atom('invariant.x', [{ type: 'static', check: 'no_orphans' }], { kind: 'invariant' }),
       ],
       'positive',
       ctx,
     );
-    expect(then.ordered).toEqual([{ before: 'Read', after: 'Edit' }]);
+    expect(then.ordered).toEqual([{ before: 'Read', after: 'Edit', key: 'file_path' }]);
     expect(then.gaps).toEqual([{ marker: MARKERS.static, atom: 'invariant.x', detail: 'no_orphans' }]);
   });
 
@@ -270,6 +282,14 @@ describe('the negative control', () => {
     expect(then.tools).toEqual([{ label: 'Agent', count: 0 }]);
     expect(then.mustNot).toEqual(['late']);
     expect(then.must).toEqual([]);
+  });
+
+  it('forbids every verdict by which a guard acts when the guard declares none, and keeps allow free', () => {
+    const then = thenOf([atom('g', [{ type: 'guard', name: 'tidy-reply.py' }])], 'negative', ctx);
+    expect(then.gaps).toEqual([]);
+    expect(then.guards).toEqual(
+      ['deny', 'block', 'warn', 'nudge'].map((verdict) => ({ name: 'tidy-reply.py', verdict, count: 0 })),
+    );
   });
 
   it('never forbids a whole tool for an act that names its input, and names what has no inverse', () => {
@@ -326,10 +346,16 @@ describe('the estate checks the runner registers, and custom predicates compiled
     expect(thenOf([script], 'positive', ctx).gaps.map((entry) => entry.marker)).toEqual([MARKERS.someCall]);
   });
 
-  it('runs hazard_recovery with the paths its passage names, and permission for allow, declared and deny', () => {
+  it('runs hazard_recovery with declared paths, and permission for allow, declared and deny', () => {
     const hazard = atom(
       'hazard.x',
-      [{ type: 'custom', name: 'hazard_recovery', options: { hazard: 'compaction' } }],
+      [
+        {
+          type: 'custom',
+          name: 'hazard_recovery',
+          options: { hazard: 'compaction', reread: ['.claude/tracker.md', 'CLAUDE.md'] },
+        },
+      ],
       {
         kind: 'hazard',
         provenance: {
@@ -370,13 +396,45 @@ describe('the estate checks the runner registers, and custom predicates compiled
         kind: 'tool',
       },
     );
-    expect(thenOf([ask], 'positive', full).gaps).toEqual([
-      {
-        marker: MARKERS.registered,
-        atom: 'tool.q',
-        detail: 'permission ask: the trace does not show the prompt',
-      },
-    ]);
+    // An ask rule is checked too: a call it covers that ran is undecided, one held for the owner keeps it.
+    const asked = thenOf([ask], 'positive', full);
+    expect(asked.gaps).toEqual([]);
+    expect(asked.custom).toEqual({
+      permission: { rules: [{ effect: 'ask', rule: 'Bash(git commit:*)' }], block: 0 },
+    });
+  });
+
+  it('adds the skill or helper that declares a tool to the Then of a declared tool rule, and no other unit', () => {
+    const declared = (id: string, file: string) =>
+      atom(id, [{ type: 'custom', name: 'permission', options: { effect: 'declared', rule: 'Edit' } }], {
+        kind: 'tool',
+        provenance: { quote: 'allowed-tools: Edit', file },
+      });
+    const unit = (kind: 'skill' | 'subagent', name: string, file: string) =>
+      atom(`${kind}.${name}`, [], { kind, fields: { name }, provenance: { quote: name, file } });
+    const atoms = new Map(
+      [
+        unit('skill', 'sea-charts', '.claude/skills/sea-charts/SKILL.md'),
+        unit('skill', 'tide-tables', '.claude/skills/tide-tables/SKILL.md'),
+        unit('subagent', 'harbour-scout', '.claude/agents/harbour-scout.md'),
+      ].map((entry) => [entry.id, entry]),
+    );
+    const inSkill = thenOf([declared('tool.a', '.claude/skills/sea-charts/SKILL.md')], 'positive', {
+      ...full,
+      atoms,
+    });
+    expect(inSkill.skills).toEqual([{ name: 'sea-charts', count: { min: 1 } }]);
+    expect(inSkill.subagents).toEqual([]);
+    const inHelper = thenOf([declared('tool.b', '.claude/agents/harbour-scout.md')], 'positive', {
+      ...full,
+      atoms,
+    });
+    expect(inHelper.subagents).toEqual([{ name: 'harbour-scout', count: { min: 1 } }]);
+    expect(inHelper.skills).toEqual([]);
+    // A tool rule of the settings file belongs to no unit, and an allow rule never names one.
+    expect(
+      thenOf([declared('tool.c', '.claude/settings.json')], 'positive', { ...full, atoms }).skills,
+    ).toEqual([]);
   });
 
   it('compiles the custom predicates it knows into must, must_not, lang, safety and execution', () => {
@@ -414,6 +472,19 @@ describe('the estate checks the runner registers, and custom predicates compiled
     const currency = new RegExp(then.mustNot.find((source) => source.includes('EUR')) ?? '', 'm');
     expect(currency.test('Total EUR 1,250.00')).toBe(true);
     expect(currency.test('Total 1,250.00 EUR')).toBe(false);
+  });
+
+  it('lowers the documented command compatibility aliases to input-scoped tool absence', () => {
+    const calls = (name: string, options: Record<string, unknown>) =>
+      thenOf([custom(name, options)], 'positive', full).someCalls;
+    expect(calls('command_absent', { command: 'rm -rf build' })).toEqual([
+      { label: 'Bash', input: { command: { contains: 'rm -rf build' } }, count: 0 },
+    ]);
+    expect(calls('command_not_run', { regex: '^npm publish' })).toEqual([
+      { label: 'Bash', input: { command: { regex: '^npm publish' } }, count: 0 },
+    ]);
+    // No command named: nothing to compile, so the rule is judged or waits.
+    expect(calls('command_absent', {})).toEqual([]);
   });
 
   it('runs grounded_values on the first block when the runner registers it, and leaves it a gap otherwise', () => {
@@ -519,14 +590,18 @@ describe('domain predicates as judged criteria, and the scoped word and folder c
     expect(then.gaps.map((entry) => entry.marker)).toEqual([MARKERS.registered]);
   });
 
-  it('scopes max_words to the draft when the rule speaks of one, and runs no_delete_under on the folder', () => {
+  it('scopes max_words to the explicitly declared part, and runs no_delete_under on the folder', () => {
     const draft = thenOf(
-      [rule('max_words', 'Keep a draft under 120 words.', { max: 120 })],
+      [rule('max_words', 'Keep a draft under 120 words.', { max: 120, part: 'draft' })],
       'positive',
       judged,
     );
     expect(draft.custom).toEqual({ max_words: { max: 120, part: 'draft', block: 0 } });
-    const reply = thenOf([rule('max_words', 'Answer in at most 50 words.', { max: 50 })], 'positive', judged);
+    const reply = thenOf(
+      [rule('max_words', 'Answer in at most 50 words.', { max: 50, part: 'reply' })],
+      'positive',
+      judged,
+    );
     expect(reply.custom).toEqual({ max_words: { max: 50, part: 'reply', block: 0 } });
     const folder = thenOf(
       [rule('no_delete_under', 'Never delete a file under ledger/.', { path: 'ledger/' })],
@@ -547,11 +622,125 @@ describe('ordered pairs between two calls of one tool, and a step allowed at any
   it('anchors both ends of a Bash before Bash gate on what each call holds', () => {
     const gate = atom('gate.standing.git-status', [{ type: 'ordered', before: 'Bash', after: 'Bash' }], {
       kind: 'gate',
-      fields: { first: 'git status', trigger: 'commit to git' },
+      fields: {
+        first: 'git status',
+        trigger: 'commit to git',
+        order: { before: 'git status', after: 'commit' },
+      },
     });
     const then = thenOf([gate], 'positive', runner);
     expect(then.gaps).toEqual([]);
     expect(then.ordered).toEqual([{ before: 'Bash~git status', after: 'Bash~commit' }]);
+  });
+
+  it('anchors the Read of a gate on the file it names, or on the changed file when it names none', () => {
+    const named = atom('gate.depot.read-count-rules', [{ type: 'ordered', before: 'Read', after: 'Edit' }], {
+      kind: 'gate',
+      provenance: { quote: 'Read `references/count-rules.md` before you change any sheet.' },
+      fields: { first: 'references/count-rules.md', path: '.claude/skills/depot/references/count-rules.md' },
+    });
+    expect(thenOf([named], 'positive', runner).ordered).toEqual([
+      { before: 'Read~.claude/skills/depot/references/count-rules.md', after: 'Edit' },
+    ]);
+    const same = (
+      quote: string,
+      after = 'Edit',
+      fields: Record<string, unknown> = { order: { key: 'file_path' } },
+    ) =>
+      thenOf(
+        [
+          atom('gate.depot.read-first', [{ type: 'ordered', before: 'Read', after }], {
+            kind: 'gate',
+            provenance: { quote },
+            fields,
+          }),
+        ],
+        'positive',
+        runner,
+      ).ordered;
+    expect(same('Always open a sheet and read it before you change it.')).toEqual([
+      { before: 'Read', after: 'Edit', key: 'file_path' },
+    ]);
+    expect(same('Read the file first, then overwrite it.', 'Write')).toEqual([
+      { before: 'Read', after: 'Write', key: 'file_path' },
+    ]);
+    // No declared path or shared key: the row cannot silently accept an unrelated read.
+    expect(same('Read the briefing before you edit anything.', 'Edit', {})).toEqual([]);
+  });
+
+  it('tells an agent that drops the gate read from one that keeps it, where any read would not', () => {
+    const verdict = (pairs: unknown, calls: Array<[string, string]>) => {
+      const observed = {
+        segments: [],
+        text: '',
+        toolCalls: calls.map(([label, file_path], index) => ({
+          id: `c${index}`,
+          label,
+          input: { file_path },
+        })),
+        cost: {},
+        latencyMs: 0,
+      };
+      const ctx = { blockIndex: 0, observed, history: [] } as unknown as CheckContext;
+      return orderedCheck(ctx, { pairs }).map((entry) => entry.outcome);
+    };
+    const named = atom('gate.depot.read-count-rules', [{ type: 'ordered', before: 'Read', after: 'Edit' }], {
+      kind: 'gate',
+      fields: { path: '.claude/skills/depot/references/count-rules.md' },
+    });
+    const rules = '/work/.claude/skills/depot/references/count-rules.md';
+    const sheet = '/work/sheets/shelf-b.md';
+    const pairs = thenOf([named], 'positive', runner).ordered;
+    // The follower reads the rules, then the sheet, then edits; its mutant reads the rules only after the edit.
+    expect(
+      verdict(pairs, [
+        ['Read', rules],
+        ['Read', sheet],
+        ['Edit', sheet],
+      ]),
+    ).toEqual(['pass']);
+    expect(
+      verdict(pairs, [
+        ['Read', sheet],
+        ['Edit', sheet],
+        ['Read', rules],
+      ]),
+    ).toEqual(['fail']);
+    expect(
+      verdict(
+        [{ before: 'Read', after: 'Edit' }],
+        [
+          ['Read', sheet],
+          ['Edit', sheet],
+          ['Read', rules],
+        ],
+      ),
+    ).toEqual(['pass']);
+    const keyed = thenOf(
+      [
+        atom('gate.depot.read-first', [{ type: 'ordered', before: 'Read', after: 'Edit' }], {
+          kind: 'gate',
+          provenance: { quote: 'Read a file before you edit it.' },
+          fields: { order: { key: 'file_path' } },
+        }),
+      ],
+      'positive',
+      runner,
+    ).ordered;
+    expect(
+      verdict(keyed, [
+        ['Read', rules],
+        ['Read', sheet],
+        ['Edit', sheet],
+      ]),
+    ).toEqual(['pass']);
+    expect(
+      verdict(keyed, [
+        ['Read', rules],
+        ['Edit', sheet],
+        ['Read', sheet],
+      ]),
+    ).toEqual(['fail']);
   });
 
   it('still names a gap for an end that is no act, such as matching any line', () => {
@@ -562,12 +751,34 @@ describe('ordered pairs between two calls of one tool, and a step allowed at any
     expect(thenOf([gate], 'positive', runner).gaps.map((entry) => entry.marker)).toEqual([MARKERS.anchor]);
   });
 
-  it('checks that a step allowed at any point was reached at least once, when the runner registers stage_seen', () => {
-    const note = stage('note', [], true);
-    const then = thenOf([note], 'positive', runner);
+  it('requires a step allowed at any point to show once, wherever, when the runner registers stage_seen', () => {
+    const then = thenOf([stage('note', [], true)], 'positive', runner);
     expect(then.gaps).toEqual([]);
     expect(then.custom).toEqual({ stage_seen: { name: 'note', block: 0 } });
-    expect(thenOf([note], 'positive', ctx).gaps.map((entry) => entry.marker)).toEqual([MARKERS.stageReach]);
+    expect(then.stage).toBeUndefined();
+    expect(then.ordered).toEqual([]);
+  });
+
+  it('does not require a step allowed at any point when the runner registers no stage_seen: the flow around it still closes on its closing step', () => {
+    const plain: ThenContext = { ...runner, customChecks: new Set(['ordered']) };
+    const then = thenOf([stage('note', [], true)], 'positive', plain);
+    expect(then.gaps).toEqual([]);
+    expect(then.custom).toEqual({});
+    expect(then.stage).toBe('report');
+    // With two closing steps there is no flow to check it on: a gap without stage_seen, none with it.
+    const stages = stageModel([
+      stage('a', ['b', 'c']),
+      stage('b', []),
+      stage('c', []),
+      stage('jot', [], true),
+    ]);
+    expect(
+      thenOf([stage('jot', [], true)], 'positive', { ...plain, stages }).gaps.map((entry) => entry.marker),
+    ).toEqual([MARKERS.stageReach]);
+    const seen = thenOf([stage('jot', [], true)], 'positive', { ...runner, stages });
+    expect(seen.gaps).toEqual([]);
+    expect(seen.custom).toEqual({ stage_seen: { name: 'jot', block: 0 } });
+    expect(seen.stage).toBeUndefined();
   });
 });
 
@@ -688,5 +899,31 @@ describe('guards a live trace cannot name, and files the runtime loads itself', 
       '**/.claude/skills/x/references/rules.md',
     ]);
     expect(then.gaps).toEqual([]);
+  });
+});
+
+describe('a step list reference keeps its explicit read evidence', () => {
+  it('requires a Read unless the runtime certifies the file is auto-loaded', () => {
+    const path = 'process/packing.json';
+    const steps = [stage('pack', ['ship']), stage('ship', [])].map((entry) => ({
+      ...entry,
+      provenance: { quote: 'packing flow', file: path },
+    }));
+    const ref = atom('reference.parcel.flow', [
+      { type: 'tool_called', label: 'Read', input: { file_path: path } },
+    ]);
+    const flow: ThenContext = {
+      ...ctx,
+      stages: stageModel(steps),
+      files: new Set([path]),
+      loaded: () => false,
+    };
+    const then = thenOf([ref], 'positive', flow);
+    expect(then.gaps).toEqual([]);
+    expect(then.references).toEqual([{ path: '**/process/packing.json', count: { min: 1 } }]);
+    expect(then.stage).toBeUndefined();
+    const auto = thenOf([ref], 'positive', { ...flow, loaded: () => true });
+    expect(auto.references).toEqual([]);
+    expect(auto.stage).toBeUndefined();
   });
 });

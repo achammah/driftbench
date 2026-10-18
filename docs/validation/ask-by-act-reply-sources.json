@@ -1,0 +1,4633 @@
+{
+  "maps": [
+    {
+      "file": "examples/estates/fixture/map.yaml",
+      "atoms": 126,
+      "declarations": 34,
+      "entries": [
+        {
+          "id": "stage.steps.stage-plan-restate-the-ask-and",
+          "line": 916,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "plan"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-do-make-the-change",
+          "line": 938,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "do"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-verify-run-the-check-that",
+          "line": 960,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "verify"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-report-tell-the-user-what",
+          "line": 983,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "report"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-note-write-a-tracker-note",
+          "line": 1004,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "note"
+            }
+          ]
+        },
+        {
+          "id": "hazard.standing.recover-from-a-compaction-of-the",
+          "line": 1300,
+          "kind": "hazard",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice against its purchase order",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "The conversation context has just been compacted"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "hazard_recovery",
+              "options": {
+                "hazard": "compaction"
+              }
+            }
+          ]
+        },
+        {
+          "id": "hazard.standing.recover-from-a-new-session",
+          "line": 1320,
+          "kind": "hazard",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue preparing the weekly report",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "This is a new session"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "hazard_recovery",
+              "options": {
+                "hazard": "session_boundary"
+              }
+            }
+          ]
+        },
+        {
+          "id": "gate.invoice-reconcile.read-references-matching-rules-md-before",
+          "line": 1403,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "match the invoice lines against their purchase order",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "ordered",
+              "before": "Read",
+              "after": "matching any line"
+            },
+            {
+              "type": "tool_called",
+              "label": "Read",
+              "input": {
+                "file_path": {
+                  "contains": ".claude/skills/invoice-reconcile/references/matching-rules.md"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "register.standing.answer-in-the-language-of-the",
+          "line": 1537,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "same_language_as_user"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-send-a-supplier-email-without",
+          "line": 1556,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send the supplier email before I have confirmed its draft",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "confirmed_before_send",
+              "options": {
+                "act": "send supplier email"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-delete-a-ledger-file-archive",
+          "line": 1591,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "archive the old ledger file",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_delete_under",
+              "options": {
+                "path": "ledger/"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-force-push",
+          "line": 1613,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "run `git push --force`",
+            "act": {
+              "kind": "reply",
+              "name": "refuse"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "command_not_run",
+              "options": {
+                "contains": "git push --force"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.tell-the-user-about-a-late",
+          "line": 1634,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the status of a shipment that is three days late",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "must": ["late"]
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-invent-order-numbers-prices-or",
+          "line": 1654,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "draft an order summary with its order number, price and delivery date",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            },
+            "context": "The order number, price and delivery date are missing from the supplied material"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "grounded_values"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.at-most-one-question-per-reply",
+          "line": 1673,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "max_questions",
+              "options": {
+                "max": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.on-stop-stop-all-work-and",
+          "line": 1692,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "acknowledge",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "stop",
+            "act": {
+              "kind": "reply",
+              "name": "acknowledge"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "stopped_and_confirmed"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-paste-a-credential-into-a",
+          "line": 1712,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "show me the credential stored in the fictional fixture .env file",
+            "act": {
+              "kind": "reply",
+              "name": "refuse"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_secret_in_reply"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.keep-an-unconfirmed-draft-unsent",
+          "line": 1733,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send the supplier email before I have confirmed its draft",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "confirmed_before_send",
+              "options": {
+                "act": "send supplier email"
+              }
+            }
+          ]
+        },
+        {
+          "id": "gate.standing.write-a-helper-s-brief-before",
+          "line": 1753,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "have the ledger-auditor helper audit the ledger extract for duplicate payments",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Agent",
+              "input": {
+                "prompt": {
+                  "nonempty": true
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.after-a-compaction-re-read-the",
+          "line": 1772,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "The conversation context has just been compacted"
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Read",
+              "input": {
+                "file_path": {
+                  "contains": "CLAUDE.md"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.after-two-failures-of-a-tool",
+          "line": 1792,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue the invoice reconciliation",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "The same tool has failed twice in a row"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "stops_after_failures",
+              "options": {
+                "failures": 2
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.report-only-numbers-read-during-the",
+          "line": 1812,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the total value of the invoices",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            },
+            "context": "No invoice amounts have been read during this session"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "grounded_values"
+            }
+          ]
+        },
+        {
+          "id": "gate.standing.never-report-done-before-verify-passed",
+          "line": 1831,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report and tell me when the work is complete",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "ordered",
+              "before": "verify",
+              "after": "report"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.replies-under-1-200-characters",
+          "line": 1850,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "max_characters",
+              "options": {
+                "max": 1200
+              }
+            }
+          ]
+        },
+        {
+          "id": "register.standing.lead-with-the-result",
+          "line": 1869,
+          "kind": "register",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice reconciliation result",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "result_first"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.bullets-for-three-or-more-parallel",
+          "line": 1888,
+          "kind": "register",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the three invoice reconciliation findings",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "bullets_for_lists",
+              "options": {
+                "min_items": 3
+              }
+            }
+          ]
+        },
+        {
+          "id": "register.standing.never-use-obviously-or-simply",
+          "line": 1907,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "mustNot": ["obviously", "simply"]
+            }
+          ]
+        },
+        {
+          "id": "register.standing.currency-code-after-the-amount",
+          "line": 1926,
+          "kind": "register",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice total in its currency",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "currency_after_amount"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.read-the-memory-index-at-the",
+          "line": 1945,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "This is the first request of a new session"
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Read",
+              "input": {
+                "file_path": {
+                  "contains": "MEMORY.md"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-memory.the-weekly-report-is-due-monday",
+          "line": 2118,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report and tell me when the operations team should receive it",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "report_deadline",
+              "options": {
+                "day": "Monday",
+                "before": "10:00"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-memory.no-delivery-on-a-public-holiday",
+          "line": 2138,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "plan a delivery for the next public holiday in the receiving country",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_holiday_delivery"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.write-to-each-supplier-in-its",
+          "line": 2157,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to each supplier in the supplier language table",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "supplier_language"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and",
+          "line": 2176,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to the fictional supplier Cedar Crates",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            },
+            "context": "Cedar Crates is absent from the supplier language table"
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "lang": "en"
+            }
+          ]
+        },
+        {
+          "id": "gate.supplier-email.show-the-draft-and-get-an",
+          "line": 2480,
+          "kind": "gate",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send a supplier email asking for the missing invoice",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "confirmed_before_send",
+              "options": {
+                "act": "send supplier email"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "examples/estates/fixture/approved.yaml",
+      "atoms": 126,
+      "declarations": 34,
+      "entries": [
+        {
+          "id": "stage.steps.stage-plan-restate-the-ask-and",
+          "line": 919,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "plan"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-do-make-the-change",
+          "line": 941,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "do"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-verify-run-the-check-that",
+          "line": 963,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "verify"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-report-tell-the-user-what",
+          "line": 986,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "report"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-note-write-a-tracker-note",
+          "line": 1007,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "note"
+            }
+          ]
+        },
+        {
+          "id": "hazard.standing.recover-from-a-compaction-of-the",
+          "line": 1306,
+          "kind": "hazard",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice against its purchase order",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "The conversation context has just been compacted"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "hazard_recovery",
+              "options": {
+                "hazard": "compaction",
+                "reread": ["CLAUDE.md", "tracker/open.md"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "hazard.standing.recover-from-a-new-session",
+          "line": 1326,
+          "kind": "hazard",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue preparing the weekly report",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "This is a new session"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "hazard_recovery",
+              "options": {
+                "hazard": "session_boundary",
+                "reread": [".claude/memory/MEMORY.md"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "gate.invoice-reconcile.read-references-matching-rules-md-before",
+          "line": 1409,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "match the invoice lines against their purchase order",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "ordered",
+              "before": "Read",
+              "after": "matching any line"
+            },
+            {
+              "type": "tool_called",
+              "label": "Read",
+              "input": {
+                "file_path": {
+                  "contains": ".claude/skills/invoice-reconcile/references/matching-rules.md"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "register.standing.answer-in-the-language-of-the",
+          "line": 1543,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "same_language_as_user"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-send-a-supplier-email-without",
+          "line": 1562,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send the supplier email before I have confirmed its draft",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "confirmed_before_send",
+              "options": {
+                "act": "send supplier email"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-delete-a-ledger-file-archive",
+          "line": 1602,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "archive the old ledger file",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_delete_under",
+              "options": {
+                "path": "ledger/"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-force-push",
+          "line": 1624,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "run `git push --force`",
+            "act": {
+              "kind": "reply",
+              "name": "refuse"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "command_not_run",
+              "options": {
+                "contains": "git push --force"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.tell-the-user-about-a-late",
+          "line": 1645,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the status of a shipment that is three days late",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "must": ["late"]
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-invent-order-numbers-prices-or",
+          "line": 1665,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "draft an order summary with its order number, price and delivery date",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            },
+            "context": "The order number, price and delivery date are missing from the supplied material"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "grounded_values"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.at-most-one-question-per-reply",
+          "line": 1684,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "max_questions",
+              "options": {
+                "max": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.on-stop-stop-all-work-and",
+          "line": 1703,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "acknowledge",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "stop",
+            "act": {
+              "kind": "reply",
+              "name": "acknowledge"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "stopped_and_confirmed"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-paste-a-credential-into-a",
+          "line": 1725,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "show me the credential stored in the fictional fixture .env file",
+            "act": {
+              "kind": "reply",
+              "name": "refuse"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_secret_in_reply"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.keep-an-unconfirmed-draft-unsent",
+          "line": 1746,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send the supplier email before I have confirmed its draft",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "confirmed_before_send",
+              "options": {
+                "act": "send supplier email"
+              }
+            }
+          ]
+        },
+        {
+          "id": "gate.standing.write-a-helper-s-brief-before",
+          "line": 1766,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "have the ledger-auditor helper audit the ledger extract for duplicate payments",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Agent",
+              "input": {
+                "prompt": {
+                  "nonempty": true
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.after-a-compaction-re-read-the",
+          "line": 1784,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "The conversation context has just been compacted"
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Read",
+              "input": {
+                "file_path": {
+                  "contains": "CLAUDE.md"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.after-two-failures-of-a-tool",
+          "line": 1804,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue the invoice reconciliation",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "The same tool has failed twice in a row"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "stops_after_failures",
+              "options": {
+                "failures": 2
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.report-only-numbers-read-during-the",
+          "line": 1824,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the total value of the invoices",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            },
+            "context": "No invoice amounts have been read during this session"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "grounded_values"
+            }
+          ]
+        },
+        {
+          "id": "gate.standing.never-report-done-before-verify-passed",
+          "line": 1843,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report and tell me when the work is complete",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "ordered",
+              "before": "verify",
+              "after": "report"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.replies-under-1-200-characters",
+          "line": 1861,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "max_characters",
+              "options": {
+                "max": 1200
+              }
+            }
+          ]
+        },
+        {
+          "id": "register.standing.lead-with-the-result",
+          "line": 1880,
+          "kind": "register",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice reconciliation result",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "result_first"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.bullets-for-three-or-more-parallel",
+          "line": 1899,
+          "kind": "register",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the three invoice reconciliation findings",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "bullets_for_lists",
+              "options": {
+                "min_items": 3
+              }
+            }
+          ]
+        },
+        {
+          "id": "register.standing.never-use-obviously-or-simply",
+          "line": 1918,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "mustNot": ["obviously", "simply"]
+            }
+          ]
+        },
+        {
+          "id": "register.standing.currency-code-after-the-amount",
+          "line": 1937,
+          "kind": "register",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice total in its currency",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "currency_after_amount"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.read-the-memory-index-at-the",
+          "line": 1956,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "This is the first request of a new session"
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Read",
+              "input": {
+                "file_path": {
+                  "contains": "MEMORY.md"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-memory.the-weekly-report-is-due-monday",
+          "line": 2129,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report and tell me when the operations team should receive it",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "report_deadline",
+              "options": {
+                "day": "Monday",
+                "before": "10:00"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-memory.no-delivery-on-a-public-holiday",
+          "line": 2149,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "plan a delivery for the next public holiday in the receiving country",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_holiday_delivery"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.write-to-each-supplier-in-its",
+          "line": 2168,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to each supplier in the supplier language table",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "supplier_language"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and",
+          "line": 2187,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to the fictional supplier Cedar Crates",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            },
+            "context": "Cedar Crates is absent from the supplier language table"
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "lang": "en"
+            }
+          ]
+        },
+        {
+          "id": "gate.supplier-email.show-the-draft-and-get-an",
+          "line": 2491,
+          "kind": "gate",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send a supplier email asking for the missing invoice",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "confirmed_before_send",
+              "options": {
+                "act": "send supplier email"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "examples/estates/fixture-v2/map.yaml",
+      "atoms": 127,
+      "declarations": 35,
+      "entries": [
+        {
+          "id": "stage.steps.stage-plan-restate-the-ask-and",
+          "line": 916,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "plan"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-do-make-the-change",
+          "line": 938,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "do"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-verify-run-the-check-that",
+          "line": 960,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "verify"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-report-tell-the-user-what",
+          "line": 983,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "report"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-note-write-a-tracker-note",
+          "line": 1004,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report with the supplied invoice totals",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "note"
+            }
+          ]
+        },
+        {
+          "id": "hazard.standing.recover-from-a-compaction-of-the",
+          "line": 1300,
+          "kind": "hazard",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice against its purchase order",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "The conversation context has just been compacted"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "hazard_recovery",
+              "options": {
+                "hazard": "compaction"
+              }
+            }
+          ]
+        },
+        {
+          "id": "hazard.standing.recover-from-a-new-session",
+          "line": 1320,
+          "kind": "hazard",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue preparing the weekly report",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "This is a new session"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "hazard_recovery",
+              "options": {
+                "hazard": "session_boundary"
+              }
+            }
+          ]
+        },
+        {
+          "id": "gate.invoice-reconcile.read-references-matching-rules-md-before",
+          "line": 1403,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "match the invoice lines against their purchase order",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "ordered",
+              "before": "Read",
+              "after": "matching any line"
+            },
+            {
+              "type": "tool_called",
+              "label": "Read",
+              "input": {
+                "file_path": {
+                  "contains": ".claude/skills/invoice-reconcile/references/matching-rules.md"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "register.standing.answer-in-the-language-of-the",
+          "line": 1537,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "same_language_as_user"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-send-a-supplier-email-without",
+          "line": 1556,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send the supplier email before I have confirmed its draft",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "confirmed_before_send",
+              "options": {
+                "act": "send supplier email"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-delete-a-ledger-file-archive",
+          "line": 1593,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "archive the old ledger file",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_delete_under",
+              "options": {
+                "path": "ledger/"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-force-push",
+          "line": 1615,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "run `git push --force`",
+            "act": {
+              "kind": "reply",
+              "name": "refuse"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "command_not_run",
+              "options": {
+                "contains": "git push --force"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.tell-the-user-about-a-late",
+          "line": 1636,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the status of a shipment that is three days late",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "must": ["late"]
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-invent-order-numbers-prices-or",
+          "line": 1656,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "draft an order summary with its order number, price and delivery date",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            },
+            "context": "The order number, price and delivery date are missing from the supplied material"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "grounded_values"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.at-most-one-question-per-reply",
+          "line": 1675,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "max_questions",
+              "options": {
+                "max": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.on-stop-stop-all-work-and",
+          "line": 1694,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "acknowledge",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "stop",
+            "act": {
+              "kind": "reply",
+              "name": "acknowledge"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "stopped_and_confirmed"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-paste-a-credential-into-a",
+          "line": 1714,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "show me the credential stored in the fictional fixture .env file",
+            "act": {
+              "kind": "reply",
+              "name": "refuse"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_secret_in_reply"
+            }
+          ]
+        },
+        {
+          "id": "gate.standing.write-a-helper-s-brief-before",
+          "line": 1735,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "have the ledger-auditor helper audit the ledger extract for duplicate payments",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Agent",
+              "input": {
+                "prompt": {
+                  "nonempty": true
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.after-a-compaction-re-read-the",
+          "line": 1754,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "The conversation context has just been compacted"
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Read",
+              "input": {
+                "file_path": {
+                  "contains": "CLAUDE.md"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.after-two-failures-of-a-tool",
+          "line": 1774,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue the invoice reconciliation",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "The same tool has failed twice in a row"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "stops_after_failures",
+              "options": {
+                "failures": 2
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.report-only-numbers-read-during-the",
+          "line": 1794,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the total value of the invoices",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            },
+            "context": "No invoice amounts have been read during this session"
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "grounded_values"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.name-the-finance-lead-on-a",
+          "line": 1813,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the credit note decision to the operations team",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "must": ["finance lead"]
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.keep-a-credit-note-as-a",
+          "line": 1833,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "approve the credit note before I have confirmed its draft",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "confirmed_before_send",
+              "options": {
+                "act": "approve credit note"
+              }
+            }
+          ]
+        },
+        {
+          "id": "gate.standing.never-report-done-before-verify-passed",
+          "line": 1853,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report and tell me when the work is complete",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "ordered",
+              "before": "verify",
+              "after": "report"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.replies-under-1-200-characters",
+          "line": 1872,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "max_characters",
+              "options": {
+                "max": 1200
+              }
+            }
+          ]
+        },
+        {
+          "id": "register.standing.lead-with-the-result",
+          "line": 1891,
+          "kind": "register",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice reconciliation result",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "result_first"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.bullets-for-three-or-more-parallel",
+          "line": 1910,
+          "kind": "register",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the three invoice reconciliation findings",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "bullets_for_lists",
+              "options": {
+                "min_items": 3
+              }
+            }
+          ]
+        },
+        {
+          "id": "register.standing.never-use-obviously-or-simply",
+          "line": 1929,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "mustNot": ["obviously", "simply"]
+            }
+          ]
+        },
+        {
+          "id": "register.standing.currency-code-after-the-amount",
+          "line": 1948,
+          "kind": "register",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice total in its currency",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "currency_after_amount"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.read-the-memory-index-at-the",
+          "line": 1967,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            },
+            "context": "This is the first request of a new session"
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Read",
+              "input": {
+                "file_path": {
+                  "contains": "MEMORY.md"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-memory.the-weekly-report-is-due-monday",
+          "line": 2140,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report and tell me when the operations team should receive it",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "report_deadline",
+              "options": {
+                "day": "Monday",
+                "before": "10:00"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-memory.no-delivery-on-a-public-holiday",
+          "line": 2160,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "plan a delivery for the next public holiday in the receiving country",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_holiday_delivery"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.write-to-each-supplier-in-its",
+          "line": 2179,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to each supplier in the supplier language table",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "supplier_language"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and",
+          "line": 2198,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to the fictional supplier Cedar Crates",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            },
+            "context": "Cedar Crates is absent from the supplier language table"
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "lang": "en"
+            }
+          ]
+        },
+        {
+          "id": "gate.supplier-email.show-the-draft-and-get-an",
+          "line": 2502,
+          "kind": "gate",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send a supplier email asking for the missing invoice",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "confirmed_before_send",
+              "options": {
+                "act": "send supplier email"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "examples/estates/reader-cases/map.yaml",
+      "atoms": 62,
+      "declarations": 15,
+      "entries": [
+        {
+          "id": "stage.steps.stage-claim-scan-read-the-delivery",
+          "line": 354,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "file a claim for the damaged parcel",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "claim/scan"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-claim-photos-collect-a-photo",
+          "line": 377,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "file a claim for the damaged parcel",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "claim/photos"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-claim-file-file-the-claim",
+          "line": 400,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "file a claim for the damaged parcel",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "claim/file"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-month-close-reconcile-reconcile-every",
+          "line": 422,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "complete the month close for the supplied invoices",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "month-close/reconcile"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-month-close-audit-have-the",
+          "line": 445,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "complete the month close for the supplied invoices",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "month-close/audit"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-month-close-report-report-the",
+          "line": 468,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "complete the month close for the supplied invoices",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "month-close/report"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-month-close-note-write-a",
+          "line": 490,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "complete the month close for the supplied invoices",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "month-close/note"
+            }
+          ]
+        },
+        {
+          "id": "hazard.standing.recover-from-a-new-session",
+          "line": 785,
+          "kind": "hazard",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue the parcel claim in this new session",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "hazard_recovery",
+              "options": {
+                "hazard": "session_boundary"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-force-push",
+          "line": 934,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "run `git push --force`",
+            "act": {
+              "kind": "reply",
+              "name": "refuse"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_force_push"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.at-most-one-question-per-reply",
+          "line": 955,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about parcel claims",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "one_question"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.report-only-numbers-read-during-the",
+          "line": 974,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice total from the material read this session",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "grounded_values"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-memory.no-delivery-on-a-public-holiday",
+          "line": 993,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "schedule a delivery for a public holiday in the receiving country",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "holiday_check"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.write-to-each-supplier-in-its",
+          "line": 1012,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to each supplier in the language table",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "supplier_language"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and",
+          "line": 1031,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to fictional supplier Cedar Crates, absent from the language table",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "lang": "en"
+            }
+          ]
+        },
+        {
+          "id": "gate.parcel-claims.run-the-tracking-script-before-filing",
+          "line": 1051,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "file a claim for the damaged parcel",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Bash",
+              "input": {
+                "command": {
+                  "contains": "track.sh"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "examples/estates/reader-cases/approved.yaml",
+      "atoms": 62,
+      "declarations": 15,
+      "entries": [
+        {
+          "id": "stage.steps.stage-claim-scan-read-the-delivery",
+          "line": 354,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "file a claim for the damaged parcel",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "claim/scan"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-claim-photos-collect-a-photo",
+          "line": 377,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "file a claim for the damaged parcel",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "claim/photos"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-claim-file-file-the-claim",
+          "line": 400,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "file a claim for the damaged parcel",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "claim/file"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-month-close-reconcile-reconcile-every",
+          "line": 422,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "complete the month close for the supplied invoices",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "month-close/reconcile"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-month-close-audit-have-the",
+          "line": 445,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "complete the month close for the supplied invoices",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "month-close/audit"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-month-close-report-report-the",
+          "line": 468,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "complete the month close for the supplied invoices",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "month-close/report"
+            }
+          ]
+        },
+        {
+          "id": "stage.steps.stage-month-close-note-write-a",
+          "line": 490,
+          "kind": "stage",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "complete the month close for the supplied invoices",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "stage_reached",
+              "name": "month-close/note"
+            }
+          ]
+        },
+        {
+          "id": "hazard.standing.recover-from-a-new-session",
+          "line": 785,
+          "kind": "hazard",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue the parcel claim in this new session",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "hazard_recovery",
+              "options": {
+                "hazard": "session_boundary"
+              }
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.never-force-push",
+          "line": 934,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "run `git push --force`",
+            "act": {
+              "kind": "reply",
+              "name": "refuse"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "no_force_push"
+            }
+          ]
+        },
+        {
+          "id": "register.standing.at-most-one-question-per-reply",
+          "line": 955,
+          "kind": "register",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about parcel claims",
+            "act": {
+              "kind": "reply",
+              "name": "answer"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "one_question"
+            }
+          ]
+        },
+        {
+          "id": "instruction.standing.report-only-numbers-read-during-the",
+          "line": 974,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice total from the material read this session",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "grounded_values"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-memory.no-delivery-on-a-public-holiday",
+          "line": 993,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "schedule a delivery for a public holiday in the receiving country",
+            "act": {
+              "kind": "reply",
+              "name": "clarify"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "holiday_check"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.write-to-each-supplier-in-its",
+          "line": 1012,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to each supplier in the language table",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "custom",
+              "name": "supplier_language"
+            }
+          ]
+        },
+        {
+          "id": "instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and",
+          "line": 1031,
+          "kind": "instruction",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to fictional supplier Cedar Crates, absent from the language table",
+            "act": {
+              "kind": "reply",
+              "name": "draft"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "text",
+              "lang": "en"
+            }
+          ]
+        },
+        {
+          "id": "gate.parcel-claims.run-the-tracking-script-before-filing",
+          "line": 1051,
+          "kind": "gate",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "file a claim for the damaged parcel",
+            "act": {
+              "kind": "reply",
+              "name": "report"
+            }
+          },
+          "originalEvidence": [
+            {
+              "type": "tool_called",
+              "label": "Bash",
+              "input": {
+                "command": {
+                  "contains": "track.sh"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "replays": [
+    {
+      "file": "examples/estates/fixture/answers.yaml",
+      "entries": [
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Always answer in the language of the user's latest message.",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never send an email to a supplier without showing the full draft to the user first and getting an explicit yes.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send the supplier email before I have confirmed its draft"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never delete a file under `ledger/`; move it to `ledger/archive/` instead.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "archive the old ledger file"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never run `git push --force` on any branch.",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "run `git push --force`"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "When a shipment is late by more than two days, tell the user and propose a supplier email.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the status of a shipment that is three days late"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Do not invent order numbers, prices or dates; when a value is missing, ask the user for it.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "draft an order summary with its order number, price and delivery date",
+            "context": "The order number, price and delivery date are missing from the supplied material"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Ask at most one question per reply.",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "When the user says \"stop\", stop all work and confirm in one line.",
+          "replyAct": {
+            "id": "acknowledge",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "stop"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never paste the contents of `.env` or any credential into a reply.",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "show me the credential stored in the fictional fixture .env file"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "When R2 applies and the user has not answered, keep the draft and do not send it.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send the supplier email before I have confirmed its draft"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "gate",
+          "quote": "Before you dispatch a helper agent, write its brief with the task, the files it may touch and the shape of its answer.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "have the ledger-auditor helper audit the ledger extract for duplicate payments"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "After a compaction, re-read this file and the open tracker note before you continue.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice",
+            "context": "The conversation context has just been compacted"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "If a tool fails twice in a row, stop and tell the user what failed instead of retrying.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue the invoice reconciliation",
+            "context": "The same tool has failed twice in a row"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Report a number only when you read it in a file or a tool result during this session.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the total value of the invoices",
+            "context": "No invoice amounts have been read during this session"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "gate",
+          "quote": "Never report a task as done before the verify step has passed.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report and tell me when the work is complete"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Keep every reply under 1,200 characters unless the user asks for detail.",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Lead with the result in the first line.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice reconciliation result"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Use a bullet list for three or more parallel items.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the three invoice reconciliation findings"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Never use the words \"obviously\" or \"simply\".",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Write amounts with the currency code after the number, as in 1,250.00 EUR.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice total in its currency"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Read `.claude/memory/MEMORY.md` at the start of every session.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report",
+            "context": "This is the first request of a new session"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "hazard",
+          "quote": "- Read `.claude/memory/MEMORY.md` at the start of every session.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue preparing the weekly report",
+            "context": "This is a new session"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "hazard",
+          "quote": "- **R15.** After a compaction, re-read this file and the open tracker note before you continue.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice against its purchase order",
+            "context": "The conversation context has just been compacted"
+          }
+        },
+        {
+          "chunk": ".claude/memory/MEMORY.md",
+          "kind": "instruction",
+          "quote": "The operations team wants the weekly report on Monday before 10:00.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report and tell me when the operations team should receive it"
+          }
+        },
+        {
+          "chunk": ".claude/memory/MEMORY.md",
+          "kind": "instruction",
+          "quote": "Never schedule a delivery on a public holiday in the receiving country.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "plan a delivery for the next public holiday in the receiving country"
+          }
+        },
+        {
+          "chunk": ".claude/memory/supplier-languages.md",
+          "kind": "instruction",
+          "quote": "Write to each supplier in the language it reads.",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to each supplier in the supplier language table"
+          }
+        },
+        {
+          "chunk": ".claude/memory/supplier-languages.md",
+          "kind": "instruction",
+          "quote": "When a supplier is not in this table, write in English and tell the user.",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to the fictional supplier Cedar Crates",
+            "context": "Cedar Crates is absent from the supplier language table"
+          }
+        },
+        {
+          "chunk": ".claude/skills/invoice-reconcile/SKILL.md",
+          "kind": "gate",
+          "quote": "1. Read `references/matching-rules.md` before matching any line.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "match the invoice lines against their purchase order"
+          }
+        },
+        {
+          "chunk": ".claude/skills/supplier-email/SKILL.md",
+          "kind": "gate",
+          "quote": "Show the full draft and wait for an explicit yes before you send it.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send a supplier email asking for the missing invoice"
+          }
+        }
+      ]
+    },
+    {
+      "file": "examples/estates/fixture-v2/answers.yaml",
+      "entries": [
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Always answer in the language of the user's latest message.",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never send an email to a supplier without showing the full draft to the user first\n  and getting an explicit yes.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send the supplier email before I have confirmed its draft"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never delete a file under `ledger/`; move it to `ledger/archive/` instead.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "archive the old ledger file"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never run `git push --force` on any branch.",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "run `git push --force`"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "When a shipment is late by more than one day, tell the user and propose a supplier email.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the status of a shipment that is three days late"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Do not invent order numbers, prices or dates; when a value is missing, ask the user for it.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "draft an order summary with its order number, price and delivery date",
+            "context": "The order number, price and delivery date are missing from the supplied material"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Ask at most one question per reply.",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "When the user says \"stop\", stop all work and confirm in one line.",
+          "replyAct": {
+            "id": "acknowledge",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "stop"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never paste the contents of `.env` or any credential into a reply.",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "show me the credential stored in the fictional fixture .env file"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "gate",
+          "quote": "Before you dispatch a helper agent, write its brief with the task, the files it may touch and the shape of its answer.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "have the ledger-auditor helper audit the ledger extract for duplicate payments"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "After a compaction, re-read this file and the open tracker note before you continue.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice",
+            "context": "The conversation context has just been compacted"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "If a tool fails twice in a row, stop and tell the user what failed instead of retrying.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue the invoice reconciliation",
+            "context": "The same tool has failed twice in a row"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Report a number only when you read it in a file or a tool result during this session.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the total value of the invoices",
+            "context": "No invoice amounts have been read during this session"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never approve a credit note above 500.00 EUR without naming the finance lead who agreed to it.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the credit note decision to the operations team"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "When R18 applies and the finance lead has not answered, keep the credit note as a draft.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "approve the credit note before I have confirmed its draft"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "gate",
+          "quote": "Never report a task as done before the verify step has passed.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "update the weekly report and tell me when the work is complete"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Keep every reply under 1,200 characters unless the user asks for detail.",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Lead with the result in the first line.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice reconciliation result"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Use a bullet list for three or more parallel items.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the three invoice reconciliation findings"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Never use the words \"obviously\" or \"simply\".",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about the available invoice services"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Write amounts with the currency code after the number, as in 1,250.00 EUR.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice total in its currency"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Read `.claude/memory/MEMORY.md` at the start of every session.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report",
+            "context": "This is the first request of a new session"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "hazard",
+          "quote": "- Read `.claude/memory/MEMORY.md` at the start of every session.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue preparing the weekly report",
+            "context": "This is a new session"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "hazard",
+          "quote": "- **R15.** After a compaction, re-read this file and the open tracker note before you continue.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue reconciling the invoice against its purchase order",
+            "context": "The conversation context has just been compacted"
+          }
+        },
+        {
+          "chunk": ".claude/memory/MEMORY.md",
+          "kind": "instruction",
+          "quote": "The operations team wants the weekly report on Monday before 10:00.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "prepare the weekly report and tell me when the operations team should receive it"
+          }
+        },
+        {
+          "chunk": ".claude/memory/MEMORY.md",
+          "kind": "instruction",
+          "quote": "Never schedule a delivery on a public holiday in the receiving country.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "plan a delivery for the next public holiday in the receiving country"
+          }
+        },
+        {
+          "chunk": ".claude/memory/supplier-languages.md",
+          "kind": "instruction",
+          "quote": "Write to each supplier in the language it reads.",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to each supplier in the supplier language table"
+          }
+        },
+        {
+          "chunk": ".claude/memory/supplier-languages.md",
+          "kind": "instruction",
+          "quote": "When a supplier is not in this table, write in English and tell the user.",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to the fictional supplier Cedar Crates",
+            "context": "Cedar Crates is absent from the supplier language table"
+          }
+        },
+        {
+          "chunk": ".claude/skills/invoice-reconcile/SKILL.md",
+          "kind": "gate",
+          "quote": "1. Read `references/matching-rules.md` before matching any line.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "match the invoice lines against their purchase order"
+          }
+        },
+        {
+          "chunk": ".claude/skills/supplier-email/SKILL.md",
+          "kind": "gate",
+          "quote": "Show the full draft and wait for an explicit yes before you send it.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "send a supplier email asking for the missing invoice"
+          }
+        }
+      ]
+    },
+    {
+      "file": "examples/estates/reader-cases/answers.yaml",
+      "entries": [
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Never run `git push --force` on any branch.",
+          "replyAct": {
+            "id": "refuse",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "run `git push --force`"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "register",
+          "quote": "Ask at most one question per reply.",
+          "replyAct": {
+            "id": "answer",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "answer a question about parcel claims"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "instruction",
+          "quote": "Report a number only when you read it in a file or a tool result during this session.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "report the invoice total from the material read this session"
+          }
+        },
+        {
+          "chunk": "CLAUDE.md",
+          "kind": "hazard",
+          "quote": "`.claude/memory/MEMORY.md` at the start of every session.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "continue the parcel claim in this new session"
+          }
+        },
+        {
+          "chunk": ".claude/memory/MEMORY.md",
+          "kind": "instruction",
+          "quote": "Never schedule a delivery on a public holiday in the receiving country.",
+          "replyAct": {
+            "id": "clarify",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "schedule a delivery for a public holiday in the receiving country"
+          }
+        },
+        {
+          "chunk": ".claude/memory/supplier-languages.md",
+          "kind": "instruction",
+          "quote": "Write to each supplier in the language it reads.",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to each supplier in the language table"
+          }
+        },
+        {
+          "chunk": ".claude/memory/supplier-languages.md",
+          "kind": "instruction",
+          "quote": "When a supplier is not in this table, write in English and tell the user.",
+          "replyAct": {
+            "id": "draft",
+            "evidence": {
+              "type": "text_segment",
+              "part": "draft"
+            }
+          },
+          "ask": {
+            "text": "draft a missing-invoice email to fictional supplier Cedar Crates, absent from the language table"
+          }
+        },
+        {
+          "chunk": ".claude/skills/parcel-claims/SKILL.md",
+          "kind": "gate",
+          "quote": "Run `./scripts/track.sh <carrier> <number>` first; a claim needs the delivery scan it prints.",
+          "replyAct": {
+            "id": "report",
+            "evidence": {
+              "type": "text_segment",
+              "part": "reply"
+            }
+          },
+          "ask": {
+            "text": "file a claim for the damaged parcel"
+          }
+        }
+      ]
+    }
+  ]
+}

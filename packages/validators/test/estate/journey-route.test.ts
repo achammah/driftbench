@@ -57,7 +57,7 @@ describe(`${ID} follows docs/estate.md section 4`, { timeout: 300_000 }, () => {
       return { ...journeys, journeys: journeys.journeys.filter((j) => j.atomIds[0] !== first) };
     });
     expect(result?.pass).toBe(false);
-    expect(result?.detail).toMatch(/route edges in no journey/);
+    expect(result?.detail).toContain('route edges in no journey');
   });
 
   it('fails a plan that starts a journey at a route read only from a description', async () => {
@@ -68,7 +68,7 @@ describe(`${ID} follows docs/estate.md section 4`, { timeout: 300_000 }, () => {
       return { ...journeys, journeys: [...journeys.journeys, { atomIds: [edge.from, edge.to] }] };
     });
     expect(result?.pass).toBe(false);
-    expect(result?.detail).toMatch(/read only from a description start a journey/);
+    expect(result?.detail).toContain('read only from a description start a journey');
   });
 
   it('fails a plan with no journey at all', async () => {

@@ -1,3 +1,4 @@
+import type { ReplyActEvidence, ReplyActId } from '@agent-nexus/driftbench-core';
 import { z } from 'zod';
 
 /**
@@ -13,7 +14,13 @@ export type EstateEvidence =
   | { type: 'skill_not_loaded'; name: string }
   | { type: 'guard'; name: string; verdict?: string; min?: number }
   | { type: 'tool_called'; label: string; input?: Record<string, unknown>; min?: number }
-  | { type: 'tool_not_called'; label: string }
+  | { type: 'tool_not_called'; label: string; input?: Record<string, unknown> }
+  | { type: 'reference_not_read'; path: string }
+  | { type: 'subagent_not_dispatched'; name: string }
+  | { type: 'guard_not_fired'; name: string; verdict?: string }
+  | { type: 'stage_not_reached'; name: string }
+  | { type: 'artifact_not_created'; path: string }
+  | { type: 'file_not_written'; path: string }
   | { type: 'ordered'; before: string; after: string }
   | { type: 'stage_reached'; name: string }
   | {
@@ -28,19 +35,58 @@ export type EstateEvidence =
   | { type: 'static'; check: string }
   | { type: 'custom'; name: string; options?: Record<string, unknown> };
 
+/** A compile-time exhaustive discriminant inventory for structural API callers. */
+export const EVIDENCE_TYPES = {
+  skill_loaded: true,
+  skill_not_loaded: true,
+  guard: true,
+  tool_called: true,
+  tool_not_called: true,
+  ordered: true,
+  stage_reached: true,
+  workspace: true,
+  artifact: true,
+  text: true,
+  static: true,
+  custom: true,
+  reference_not_read: true,
+  subagent_not_dispatched: true,
+  guard_not_fired: true,
+  stage_not_reached: true,
+  artifact_not_created: true,
+  file_not_written: true,
+} satisfies Record<EstateEvidence['type'], true>;
+
 export type EstateAtom = {
   id: string;
   kind: string;
   title: string;
   approved: boolean;
   situation?: string;
+  /** The approved reply action and the recorded output segment that must witness it. */
+  replyAct?: { id: ReplyActId; evidence: ReplyActEvidence };
   evidence: EstateEvidence[];
+  /** Approved map guard IDs that enforce this atom. */
+  enforcement?: string[];
   fields?: Record<string, unknown>;
-  /** The passage the atom is read from; the generator reads the paths a hazard passage names from it. */
-  provenance?: { quote: string; file?: string };
+  /** Source citation retained verbatim; operational evidence comes from typed predicates and fields. */
+  provenance?: { quote: string; file?: string; startLine?: number; endLine?: number };
 };
 
-export type EstateMapInput = { runtime: string; hash: string; atoms: EstateAtom[] };
+/**
+ * The authority of a document the scan read: `normative` text states live rules; every other role
+ * (a changelog, a history, a journal, a template, an example, a fixture, an archive) is navigation only.
+ */
+export type EstateDocument = { path: string; role: string };
+
+export type EstateMapInput = {
+  runtime: string;
+  hash: string;
+  atoms: EstateAtom[];
+  edges?: Array<{ from: string; to: string; kind: string }>;
+  /** Document authority, when the map records it; absent in older maps. */
+  documents?: EstateDocument[];
+};
 
 export type EstatePlanRow = {
   id: string;

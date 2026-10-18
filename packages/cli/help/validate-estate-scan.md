@@ -20,10 +20,11 @@ Four commands turn an estate folder into an approved map of atoms, the input of 
 
 * `estate scan <root>` reads the estate. Code reads the structure (skills, helpers, guards, permissions,
   settings keys, the check registry, the step list, references and their "read when" line, scripts,
-  routing tables, gates in four fixed forms, hazard passages and four invariants) and approves those atoms
-  as read. A model splits the prose (the standing file, memory files, skill and helper bodies) into
-  `instruction`, `gate` and `register` atoms, one call per chunk; each quote is located in its file and
-  checked at its span, and an atom whose quote cannot be placed is refused. Model atoms wait for a person.
+  routing tables, read prerequisites (gates, parsed as clauses), hazard passages and four invariants) and
+  approves those atoms as read. A model splits the prose (the standing file, memory files, skill and helper
+  bodies) into `instruction`, `gate` and `register` atoms, one call per chunk; each quote is located in its
+  file and checked at its span, and an atom whose quote cannot be placed is refused. Model atoms wait for a
+  person.
 * `estate lint <map>` checks the estate against its map: orphan files, unreachable files, missing
   references and scripts, the size ceiling, unanchored guards, the check registry, drifted quotes.
 * `estate approve <map>` lists the atoms that wait, or approves them by kind, by atom, or all.
@@ -45,8 +46,8 @@ span was edited by hand is refused. `approved` and `role` (`axis` or `detail`) m
 ## Commands and every option
 
 ```
-driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider anthropic|openai] [--ceiling <characters>] [--ignore <glob>]... [--force]
-driftbench estate lint <map> [--ceiling <characters>] [--ignore <glob>]...
+driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider anthropic|openai] [--ceiling <characters>] [--ignore <glob>]... [--user-skills <folder>] [--force]
+driftbench estate lint <map> [--ceiling <characters>] [--ignore <glob>]... [--user-skills <folder>]
 driftbench estate approve <map> [--kind <kind>]... [--atom <id>]... [--all] [--to <file>]
 driftbench estate map <map> --to <file> [--all] [--agent <name>]
 ```
@@ -63,6 +64,7 @@ driftbench estate map <map> --to <file> [--all] [--agent <name>]
 | `--provider <name>` | the first whose key is set: `ANTHROPIC_API_KEY`, then `OPENAI_API_KEY` (with `OPENAI_MODEL`) | `anthropic` or `openai`, for a live scan (a paid call) |
 | `--ceiling <characters>` | `40000` | the size ceiling of the standing instructions |
 | `--ignore <glob>` | none | skip the paths this glob matches, beside the defaults and the `ignore:` list of the configuration file; repeat it |
+| `--user-skills <folder>` | none | also read the user-level skill layer from this folder, such as `~/.claude/skills`; no home folder is read without it; a project skill wins a name clash |
 | `--force` | off | replace an existing map; the approvals in it are lost |
 
 `--replay` and `--no-model` do not go together. With neither, the scan calls a model and needs a key.
@@ -74,6 +76,7 @@ driftbench estate map <map> --to <file> [--all] [--agent <name>]
 | `<map>` | required | the estate map |
 | `--ceiling <characters>` | `40000` | the size ceiling of the standing instructions |
 | `--ignore <glob>` | none | skip the paths this glob matches, as the scan did; repeat it |
+| `--user-skills <folder>` | none | read the user-level skill layer from this folder, as the scan did; a map that records a layer needs it (exit 2 without) |
 
 `estate approve`:
 
@@ -109,6 +112,7 @@ The configuration file `driftbench.estate.yaml` at the estate root, optional, ev
 | Key | Read by | Holds |
 |---|---|---|
 | `ignore` | `scan`, `lint` | globs of paths no runtime loads, skipped beside the defaults (version control, dependency and cache folders, logs, test fixtures, operating system and editor files). Matched like a `.gitignore` line |
+| `userSkills` | `scan`, `lint` | the folder of the user-level skill layer to read as a second skill layer (relative to the estate root); none is read without it or `--user-skills` |
 | `externals` | `scan` | folders outside the estate a path may name; they replace the defaults `docs/` and `_meta/` |
 | `aliases` | `scan` | a map from an alias such as `REF` to the folder or folders it stands for: `REF/a/b.md` reads as `<folder>/a/b.md` |
 | `scripts` | `estate unit` | per script path, its fixtures: `args`, `stdin`, `files`, `expect` (`exitCode`, `stdout`, `stdoutIncludes`) |
@@ -176,21 +180,23 @@ What they print, in order (the scans and the approve listing are cut to their ma
 full output is longer):
 
 ```text
-Wrote structure.yaml: 68 atoms (68 read by code and approved, 0 split from prose by the model and waiting for approval), 47 edges.
+Wrote structure.yaml: 120 atoms (69 read by code and approved, 51 code-found candidates waiting for approval, 0 split from prose by the model and waiting for approval), 56 edges.
   Atoms per kind:
-    gate         4
-    route       13
-    skill        4
-    reference    9
-    script       2
-    subagent     3
-    guard        6
-    tool        12
-    setting      4
-    stage        5
-    hazard       2
-    invariant    4
-  No model call: structured atoms only (--no-model).
+    instruction   47
+    gate           4
+    route         13
+    skill          4
+    reference     10
+    script         2
+    subagent       3
+    guard          6
+    tool          12
+    setting        4
+    stage          5
+    register       4
+    hazard         2
+    invariant      4
+  No model call: structured atoms and code-found prose candidates (--no-model).
 Wrote map.yaml: 125 atoms (68 read by code and approved, 57 split from prose by the model and waiting for approval), 54 edges.
   Atoms per kind:
     instruction   43  (43 by the model)

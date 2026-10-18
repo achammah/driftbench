@@ -1,15 +1,17 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import type { Observed } from '@agent-nexus/driftbench-core';
 import { loadEstateMap } from '@agent-nexus/driftbench-estate';
 import { FIXTURE, type FixtureSuite, fixtureSuite } from './fixture-suite';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
+import { type AskEnv, checkAsk, checkTrace } from './task-check';
+import { taskFamilyV2 } from './taskv2';
 
 /**
  * Generation quality on the Northwind fixture's generated suite (seed-free, judged once):
  *
- * gen.task: every first ask of a complete spec holds a task: a task verb, not negated, followed by its
- * object. A rule restated as an ask ("Please do this: never guess a status") or a bare condition ("Please
- * handle this for me: the invoice is not in EUR") holds none. One item per test type.
+ * gen.task: every first ask carries the map act and a source, and its recorded trace shows that act.
+ * No vocabulary decides whether a request is a task. One item per test type.
  *
  * gen.reads: no complete spec expects a Read of a file the estate lacks. One item per test type.
  *
@@ -47,58 +49,14 @@ const TEST_TYPES = [
   'journey',
 ] as const;
 
-const TASK_VERBS = new Set(
-  `add answer archive audit book build cancel change chase check clean close compare correct count create delete
-  draft email explain file fill find fix forward get give go handle list look make match merge move open order pay plan
-  prepare price print put reconcile record refund remove rename reply report reschedule review run say schedule send
-  set show sort summarise summarize tell track triage update write`
-    .split(/\s+/)
-    .filter(Boolean),
-);
-const SKIP = new Set([
-  'a',
-  'an',
-  'the',
-  'this',
-  'that',
-  'my',
-  'our',
-  'me',
-  'us',
-  'it',
-  'up',
-  'out',
-  'in',
-  'through',
-]);
-/** A code template that restates a rule, a condition or a refusal instead of asking for work. */
-const TEMPLATES = [/^"?(please|could you)\s+(do|handle)\s+this(\s+for\s+me)?:/i, /go against this rule/i];
-const QUESTION = /^(where|what|which|when|who|how|why|is|are|does|do|can|could|has)\b.*\?/i;
-
-/**
- * Whether an ask holds a task: no rule template, and either a question about something or a task verb, not
- * negated, with its object after it (articles and phrasal particles skipped).
- */
-export function holdsTask(ask: string): boolean {
-  const text = ask.trim().replace(/^"|"$/g, '');
-  if (TEMPLATES.some((template) => template.test(text))) return false;
-  if (QUESTION.test(text)) return true;
-  const words = text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s'/.-]/g, ' ')
-    .split(/\s+/)
-    .filter(Boolean);
-  return words.some((word, index) => {
-    if (!TASK_VERBS.has(word) || ['never', 'not', "don't", 'no'].includes(words[index - 1] ?? ''))
-      return false;
-    const object = words.slice(index + 1).find((next) => !SKIP.has(next));
-    return object !== undefined && object.length > 1;
-  });
-}
-
-function firstAsk(spec: FixtureSuite['specs'][number]): string | undefined {
-  const block = (spec.spec.blocks ?? [])[0] as { when?: { user?: string } } | undefined;
-  return block?.when?.user;
+/** An ask is a task only when its map identity, provenance and recorded act agree. */
+export function holdsTask(spec: FixtureSuite['specs'][number], env: AskEnv, observed?: Observed): boolean {
+  const verdict = checkAsk(spec, env);
+  return (
+    verdict.reasons.length === 0 &&
+    verdict.trace !== undefined &&
+    checkTrace(verdict.trace, observed) === undefined
+  );
 }
 
 function readsOf(spec: FixtureSuite['specs'][number]): string[] {
@@ -183,42 +141,9 @@ function seedFreeFamily(
 const ofType = (suite: FixtureSuite, type: string) =>
   suite.specs.filter((spec) => spec.complete && spec.testType === type);
 
+/** Keep the original item ids, tiers, titles and causes while using the structural oracle. */
 export function taskFamily(): Family {
-  return seedFreeFamily(
-    'gen.task',
-    4,
-    GENERATE,
-    TEST_TYPES.map((type) => ({
-      key: type,
-      tier: 2 as Tier,
-      title: `every first ask of a complete ${type} spec holds a task: a verb and its object`,
-      cause: 'write every ask as a task, never as a restated rule or a bare condition',
-      async judge(suite) {
-        const specs = ofType(suite, type);
-        if (specs.length === 0) return { pass: false, detail: `no complete ${type} spec` };
-        // A guard that watches the user's prompt is set off by its own trigger (a stop word): that ask is legitimate.
-        const map = await loadEstateMap(suite.map);
-        const promptGuards = new Set(
-          map.ok
-            ? map.map.atoms
-                .filter((atom) => atom.kind === 'guard' && atom.fields?.event === 'UserPromptSubmit')
-                .map((atom) => atom.id)
-            : [],
-        );
-        const bad = specs.filter(
-          (spec) =>
-            !(type.startsWith('guard_') && spec.atoms.some((atom) => promptGuards.has(atom))) &&
-            !holdsTask(firstAsk(spec) ?? ''),
-        );
-        return bad.length === 0
-          ? { pass: true, detail: `holds (${specs.length})` }
-          : {
-              pass: false,
-              detail: `${bad.length} of ${specs.length} asks hold no task, such as "${firstAsk(bad[0] as FixtureSuite['specs'][number])}"`,
-            };
-      },
-    })),
-  );
+  return taskFamilyV2('gen.task');
 }
 
 export function readsFamily(): Family {

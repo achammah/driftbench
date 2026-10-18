@@ -110,14 +110,24 @@ export function completionContract(run: EstateRun, source: GeneratedSpec): Spec 
   if (['stage_order', 'stage_anytime'].includes(source.record.testType) && fields.anytime === true)
     custom.stage_seen ??= { name: fields.id, block: 0 };
   if (source.record.testType === 'hazard_recovery') {
-    // The passage names what the agent must read again after the hazard ("re-read this file", a backticked path).
-    // Recovered here from the source atom, so a generated spec that drops the reread cannot drop its demand.
-    const required = rereadOf(head);
-    const known = (custom.hazard_recovery ?? {}) as { reread?: string[] };
+    // Required targets come from map evidence, independently of generated assertions.
+    // Missing source declarations stay gaps; arbitrary source prose cannot fill them.
+    const recovery = recoveryEvidenceOf(head);
+    const required = recovery.reread;
+    const known = (custom.hazard_recovery ?? {}) as {
+      reread?: string[];
+      calls?: RecoveryCall[];
+      retry?: boolean;
+    };
     custom.hazard_recovery = {
       ...known,
-      hazard: String(fields.hazard).includes('compaction') ? 'compaction' : fields.hazard,
+      hazard: fields.hazard,
       block: 0,
+      // This validator-only option is deliberately unsupported by completionComponents:
+      // its named gap prevents an empty source contract from passing as an easier demand.
+      ...(recovery.gap ? { [recovery.gap]: true } : {}),
+      ...(recovery.calls.length > 0 ? { calls: [...(known.calls ?? []), ...recovery.calls] } : {}),
+      ...(recovery.retry ? { retry: true } : {}),
       ...(required.length > 0 || known.reread
         ? { reread: [...new Set([...(known.reread ?? []), ...required])] }
         : {}),
@@ -168,31 +178,85 @@ export function completionApplies(run: EstateRun, source: GeneratedSpec): boolea
     case 'stage_order':
       return f.anytime === true;
     case 'hazard_recovery':
-      return String(f.hazard).includes('compaction');
+      return f.hazard === 'compaction';
     default:
       return false;
   }
 }
 
-/**
- * The paths a rule asks the agent to read again, from the passage alone: backticked paths, words with a file
- * extension, and "this file" or "this document", which name the file the passage stands in. A phrase that names no
- * path ("the open tracker note") asks for none the oracle can check.
- */
-export function rereadOf(atom: {
-  provenance: { file: string; quote: string };
+type RecoverySource = {
+  provenance?: { file: string; quote: string };
   fields?: Record<string, unknown>;
-}): string[] {
-  const quote = atom.provenance.quote;
-  const found: string[] = [];
-  const add = (path: string) => {
-    const clean = path.replace(/[.,;:]+$/, '');
-    if (clean !== '' && !found.includes(clean)) found.push(clean);
+  evidence?: ReadonlyArray<{ type: string; name?: string; options?: Record<string, unknown> }>;
+};
+
+type RecoveryCall = { label: string; input: Record<string, unknown> };
+
+/** Typed recovery declarations are independent of source phrasing and generated assertions. */
+function recoveryEvidenceOf(atom: RecoverySource): {
+  reread: string[];
+  calls: RecoveryCall[];
+  retry: boolean;
+  gap?: string;
+} {
+  const reread = new Set<string>();
+  const calls: RecoveryCall[] = [];
+  let retry = false;
+  let invalid = false;
+  const declarations: unknown[] = atom.fields?.recovery === undefined ? [] : [atom.fields.recovery];
+  for (const evidence of atom.evidence ?? [])
+    if (evidence.type === 'custom' && evidence.name === 'hazard_recovery' && evidence.options)
+      declarations.push(evidence.options);
+  for (const declaration of declarations) {
+    if (typeof declaration !== 'object' || declaration === null || Array.isArray(declaration)) {
+      invalid = true;
+      continue;
+    }
+    const source = declaration as Record<string, unknown>;
+    if (source.reread !== undefined) {
+      if (!Array.isArray(source.reread)) invalid = true;
+      else
+        for (const path of source.reread) {
+          if (typeof path !== 'string' || path.trim() === '') invalid = true;
+          else reread.add(path);
+        }
+    }
+    if (source.calls !== undefined) {
+      if (!Array.isArray(source.calls)) invalid = true;
+      else
+        for (const call of source.calls) {
+          if (typeof call !== 'object' || call === null || Array.isArray(call)) {
+            invalid = true;
+            continue;
+          }
+          const value = call as Record<string, unknown>;
+          if (
+            typeof value.label !== 'string' ||
+            value.label.trim() === '' ||
+            typeof value.input !== 'object' ||
+            value.input === null ||
+            Array.isArray(value.input)
+          )
+            invalid = true;
+          else calls.push({ label: value.label, input: value.input as Record<string, unknown> });
+        }
+    }
+    if (source.retry === true) retry = true;
+    else if (source.retry !== undefined && source.retry !== false) invalid = true;
+  }
+  return {
+    reread: [...reread],
+    calls,
+    retry,
+    ...(invalid
+      ? { gap: 'invalid_source_recovery_evidence' }
+      : reread.size === 0 && calls.length === 0 && !retry
+        ? { gap: 'missing_source_recovery_evidence' }
+        : {}),
   };
-  for (const match of quote.matchAll(
-    /`([^`\s]+)`|(?:^|\s)((?:[\w.-]+\/)*[\w-]+\.(?:md|json|ya?ml|txt|csv))\b/g,
-  ))
-    add(match[1] ?? match[2] ?? '');
-  if (/\bre-?read\b[^.;]*\bthis (?:file|document)\b/i.test(quote)) add(atom.provenance.file);
-  return found;
+}
+
+/** Reread paths are declared by fields.recovery or custom hazard_recovery evidence. */
+export function rereadOf(atom: RecoverySource): string[] {
+  return recoveryEvidenceOf(atom).reread;
 }

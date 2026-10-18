@@ -19,7 +19,10 @@ import {
   scanRendered,
 } from '../pipeline';
 import { renderEstate } from '../render';
+import { disclosedAskReasons } from './askfrom';
+import type { SuiteSpec } from './fixture-suite';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
+import { checkAsk, checkTrace, envOf } from './task-check';
 
 /**
  * The families of the rest of the loop, on the generated estate of each seed: generation (every class of
@@ -304,6 +307,50 @@ type AskCheck = {
   check(run: EstateRun, all: SpecVerdict[]): Promise<string | undefined> | string | undefined;
 };
 
+/** The situation each test type is asked in (docs/estate.md section 5); a live guard_positive is instructed. */
+const USE_OF_TEST: Readonly<Record<string, string>> = {
+  outside_trigger: 'outside',
+  guard_negative: 'outside',
+  route_near_miss: 'near_miss',
+  misroute: 'misroute',
+  skip_pressure: 'pressure',
+  stage_skip: 'pressure',
+};
+const NO_ASK = new Set(['invariant', 'setting']);
+
+/**
+ * Whether the bank holds too few approved phrases for a plan row, from the row's atoms alone: the situations of
+ * the row's use that hold its first atom (pins of the cell respected) and the approved phrases of the best one.
+ * A row needs one approved phrase; a twin needs two. No such situation means the bank is short. A live
+ * guard_positive row is asked in a `forced` situation, looked up the same way.
+ */
+function bankIsShort(
+  run: EstateRun,
+  row: { atomIds: string[]; cell: Record<string, string>; testType: string; mode: string },
+): boolean {
+  if (NO_ASK.has(row.testType)) return false;
+  // A live guard test is asked in a `forced` situation, found like any other: no early allowance.
+  const use =
+    row.testType === 'guard_positive' && row.mode === 'live'
+      ? 'forced'
+      : (USE_OF_TEST[row.testType] ?? 'trigger');
+  const head = row.atomIds[0];
+  let best: { atoms: string[]; approved: number } | undefined;
+  let score = -1;
+  for (const situation of run.bank.situations) {
+    if (situation.use !== use || head === undefined || !situation.atoms.includes(head)) continue;
+    const pins = Object.entries(situation.cell ?? {});
+    if (pins.some(([key, value]) => row.cell[key] !== undefined && row.cell[key] !== value)) continue;
+    const held = row.atomIds.filter((id) => situation.atoms.includes(id)).length;
+    if (held > score) {
+      best = { atoms: situation.atoms, approved: situation.phrases.filter((p) => p.approved).length };
+      score = held;
+    }
+  }
+  const need = row.testType === 'twin' ? 2 : 1;
+  return best === undefined || best.approved < need;
+}
+
 function asksOfSpec(verdict: SpecVerdict): string[] {
   return (verdict.spec.loaded?.spec.blocks ?? []).map((block) =>
     String((block.when as { user?: unknown } | undefined)?.user ?? ''),
@@ -392,14 +439,30 @@ const ASKS: AskCheck[] = [
     key: 'misroute-names-another',
     tier: 2,
     title: 'a misroute names a skill or helper other than its target',
-    check: (run, all) => {
+    check: async (run, all) => {
       const atoms = new Map(run.scanned.map.atoms.map((atom) => [atom.id, atom]));
-      const bad = all.filter((v) => {
-        if (v.spec.record.testType !== 'misroute' || !v.complete) return false;
+      const checks = replayChecks();
+      let bad = 0;
+      for (const v of all) {
+        if (v.spec.record.testType !== 'misroute' || !v.complete) continue;
         const target = String(atoms.get(estateMeta(v.spec).atoms?.[0] ?? '')?.fields?.target ?? '');
-        return asksOfSpec(v).some((ask) => ask.includes(target) || !/\b(skill|agent|helper)\b/.test(ask));
-      });
-      return bad.length === 0 ? undefined : `${bad.length} misroutes name their own target or no primitive`;
+        if (!v.spec.loaded || target === '') {
+          bad += 1;
+          continue;
+        }
+        const replay = await replayOnFollower(run, v.spec.loaded, checks);
+        const runtime = replay.run.blocks[0]?.observed?.runtime;
+        const named = [...(runtime?.skills ?? []), ...(runtime?.subagents ?? [])].map((entry) => entry.name);
+        if (
+          replay.run.status !== 'completed' ||
+          named.includes(target) ||
+          !named.some((name) => name !== target)
+        )
+          bad += 1;
+      }
+      return bad === 0
+        ? undefined
+        : `${bad} misroutes show their own target or no other primitive in the trace`;
     },
   },
   {
@@ -641,15 +704,69 @@ const ASKS: AskCheck[] = [
   {
     key: 'asks-approved',
     tier: 1,
-    title: 'a complete spec asks only approved phrases',
-    check: (run, all) => {
+    title: 'a complete spec asks an approved phrase, or a disclosed code-written ask where none is approved',
+    // docs/estate.md section 5: an approved phrase always wins; when the bank holds none for the row, code writes
+    // the ask from the atoms, and the spec says so (tag `ask:code`, `metadata.estate.ask: code`, the field the
+    // words came from in `askFrom`). Whether the bank holds one is derived here, from the plan row and its atoms
+    // and the bank: never from the situation the generated spec reports about itself.
+    check: async (run, all) => {
       const approved = new Set(
         run.bank.situations.flatMap((s) => s.phrases.filter((p) => p.approved).map((p) => p.text)),
       );
-      const bad = all.filter(
-        (v) => v.complete && asksOfSpec(v).some((ask) => ask !== '' && !approved.has(ask)),
-      );
-      return bad.length === 0 ? undefined : `${bad.length} complete specs ask an unapproved phrase`;
+      const rows = new Map(run.plan.plan.rows.map((row) => [row.id, row]));
+      const env = envOf(run.scanned.map.atoms, run.bank, run.sessions);
+      const checks = replayChecks();
+      let bad = 0;
+      for (const v of all) {
+        if (!v.complete || asksOfSpec(v).every((ask) => ask === '')) continue;
+        const loaded = v.spec.loaded;
+        if (!loaded) {
+          bad += 1;
+          continue;
+        }
+        const candidate: SuiteSpec = { ...v.spec.record, path: v.spec.record.path, spec: loaded.spec };
+        const verdict = checkAsk(candidate, env);
+        const coded = asksOfSpec(v).some((ask) => ask !== '' && !approved.has(ask));
+        let disclosure = true;
+        if (coded) {
+          const meta = estateMeta(v.spec) as ReturnType<typeof estateMeta> & {
+            ask?: string;
+            planRow?: string;
+            testType?: string;
+          };
+          const row = rows.get(v.spec.record.row) ?? rows.get(v.spec.record.row.replace(/\.\d+$/, ''));
+          const tags = loaded.spec.tags ?? [];
+          const atoms = Array.isArray(meta.atoms) ? meta.atoms : [];
+          disclosure =
+            !!row &&
+            tags.includes('ask:code') &&
+            meta.ask === 'code' &&
+            meta.planRow === row.id &&
+            meta.testType === row.testType &&
+            atoms.length === row.atomIds.length &&
+            row.atomIds.every((id) => atoms.includes(id)) &&
+            tags.includes(`test:${row.testType}`) &&
+            bankIsShort(run, row) &&
+            disclosedAskReasons(candidate, env).length === 0;
+          // A source record describes the first ask only. Later asks require an exact approved source.
+          disclosure &&= asksOfSpec(v)
+            .slice(1)
+            .every((ask) => ask === '' || approved.has(ask));
+        }
+        if (!disclosure || verdict.reasons.length > 0 || !verdict.trace) {
+          bad += 1;
+          continue;
+        }
+        const replay = await replayOnFollower(run, loaded, checks);
+        if (
+          replay.run.status !== 'completed' ||
+          checkTrace(verdict.trace, replay.run.blocks[0]?.observed) !== undefined
+        )
+          bad += 1;
+      }
+      return bad === 0
+        ? undefined
+        : `${bad} complete specs ask an unapproved phrase or lack a disclosed source and recorded map act`;
     },
   },
   {

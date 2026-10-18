@@ -10,9 +10,14 @@ The files of an estate test suite: the map `driftbench estate scan` writes and a
 ## Contents
 
 * [EstateMap](#estatemap)
+* [DocumentInfo](#documentinfo)
+* [DocumentRole](#documentrole)
+* [DocumentInfo sections](#documentinfo-sections)
 * [Atom](#atom)
 * [AtomKind](#atomkind)
 * [Provenance](#provenance)
+* [ReplyActDeclaration](#replyactdeclaration)
+* [ReplyActDeclaration evidence](#replyactdeclaration-evidence)
 * [EvidencePredicate](#evidencepredicate)
 * [Edge](#edge)
 * [EdgeKind](#edgekind)
@@ -40,12 +45,45 @@ The files of an estate test suite: the map `driftbench estate scan` writes and a
 | `runtime` | string, not empty | yes |  | The adapter that read the estate: claude-code, nexus, ... |
 | `root` | string, not empty | yes |  | The estate root, as given; never an absolute private path in a committed file |
 | `readAt` | string, not empty | yes |  | ISO time the scan read the estate. |
+| `documents` | list of [DocumentInfo](#documentinfo) | no |  | Document authority and non-normative line spans; absent in older maps. |
 | `atoms` | list of [Atom](#atom) | yes |  | Every atom the scan read from the estate. |
 | `edges` | list of [Edge](#edge) | yes |  | The edges of the estate graph, decided by code. |
 | `space` | string | no |  | Path of the exported space map of the situation axes |
 | `ignore` | list of strings, each not empty | no |  | Globs the scan skipped beside the runtime defaults; lint reads the estate with them again |
+| `userSkills` | `true` | no |  | true when the scan read a user-level skill layer; lint then needs the folder to read it again |
+| `followedLinks` | list of strings, each not empty | no |  | Links, relative to the estate root, that the scan read through to a real path outside the root |
 | `producedBy` | [EstateMap producedBy](#estatemap-producedby) | no |  | Who proposed the model atoms; code atoms say producedBy: code on the atom itself |
 | `hash` | string, not empty | yes |  | SHA-256 over the sorted atom hashes and edges |
+
+## DocumentInfo
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `path` | string, not empty | yes |  | Path of the document, relative to the estate root. |
+| `role` | [DocumentRole](#documentrole) | yes |  | The authority of the document as a whole, from its folder, headings and entries. |
+| `reasons` | list of strings, each not empty, at least 1 item | yes |  | What the classification read: the folder, the heading or the entries that gave the role. |
+| `sections` | list of [DocumentInfo sections](#documentinfo-sections) | no |  | Spans of a live document that carry a non-normative role, such as an example or a history. |
+
+## DocumentRole
+
+| Value | Meaning |
+|---|---|
+| `normative` | Live content: its rules, gates and references count. |
+| `changelog` | A record of releases: it holds no rule and gives no test, and it documents the files it names. |
+| `history` | A dated record of what happened: no rule, no test, and the files it names are documented. |
+| `template` | A form to fill in: read when a live document sends the reader to it, and it gives no test of its own. |
+| `example` | An illustration, or a counter-example shown so that it is not followed: no rule and no test. |
+| `journal` | A diary or work log of dated entries: no rule and no test. |
+| `fixture` | Data a test or a skill ships: no rule and no test. |
+| `archive` | Material kept for the record, loaded by nothing: no rule and no test. |
+
+## DocumentInfo sections
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `startLine` | integer, at least 1 | yes |  | First line of the section, counted from 1. |
+| `endLine` | integer, at least 1 | yes |  | Last line of the section, counted from 1. |
+| `role` | [DocumentRole](#documentrole) | yes |  | The role of this section, which differs from the role of the document. |
 
 ## Atom
 
@@ -59,6 +97,7 @@ The files of an estate test suite: the map `driftbench estate scan` writes and a
 | `role` | `axis` or `detail` | no | `axis` | Axis puts the atom in the space map as a target; detail keeps it for the generator only. |
 | `approved` | boolean | no | `false` | Whether the atom is approved; only approved atoms enter the space map and the plan. |
 | `situation` | string | no |  | When the atom applies, in words; empty means always |
+| `replyAct` | [ReplyActDeclaration](#replyactdeclaration) | no |  | The source-backed intended reply act; optional for old maps, required when validating a reply task. |
 | `evidence` | list of [EvidencePredicate](#evidencepredicate), at least 1 item | yes |  | What a trace shows when the atom is obeyed, as at least one typed predicate. |
 | `enforcement` | list of strings | no | `[]` | Ids of guards or tests that already check it; empty means trusted |
 | `fields` | map of string to any value | no |  | Kind-specific structure read by code: a guard event, a tool schema, a brief field list |
@@ -92,6 +131,22 @@ The files of an estate test suite: the map `driftbench estate scan` writes and a
 | `quote` | string, not empty | yes |  | The exact text the atom is read from |
 | `hash` | string, not empty | yes |  | SHA-256 of the quote, the file and the span; a change here is a changed atom |
 
+## ReplyActDeclaration
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `id` | one of `answer`, `clarify`, `refuse`, `report`, `draft`, `acknowledge` | yes |  | The intended semantic reply act, chosen from the closed core IDs. |
+| `evidence` | [ReplyActDeclaration evidence](#replyactdeclaration-evidence) | yes |  | The output part whose actual text segment must carry the recorded act. |
+
+## ReplyActDeclaration evidence
+
+The output part whose actual text segment must carry the recorded act.
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `type` | `text_segment` | yes |  |  |
+| `part` | `reply` or `draft` | yes |  |  |
+
 ## EvidencePredicate
 
 Write one of these forms.
@@ -101,6 +156,12 @@ Write one of these forms.
 * a mapping with `type: guard`, with the fields below
 * a mapping with `type: tool_called`, with the fields below
 * a mapping with `type: tool_not_called`, with the fields below
+* a mapping with `type: reference_not_read`, with the fields below
+* a mapping with `type: subagent_not_dispatched`, with the fields below
+* a mapping with `type: guard_not_fired`, with the fields below
+* a mapping with `type: stage_not_reached`, with the fields below
+* a mapping with `type: artifact_not_created`, with the fields below
+* a mapping with `type: file_not_written`, with the fields below
 * a mapping with `type: ordered`, with the fields below
 * a mapping with `type: stage_reached`, with the fields below
 * a mapping with `type: workspace`, with the fields below
@@ -148,6 +209,50 @@ With `type: tool_not_called`:
 |---|---|---|---|---|
 | `type` | `tool_not_called` | yes |  | This form holds when the agent never calls the tool. |
 | `label` | string, not empty | yes |  | The tool label that must not appear in the trace. |
+| `input` | map of string to any value | no |  | Only forbid calls matching these input assertions; without it, forbid every call. |
+
+With `type: reference_not_read`:
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `type` | `reference_not_read` | yes |  | No successful read of this path or glob in the block. |
+| `path` | string, not empty | yes |  | The path or glob of the reference that must not be read. |
+
+With `type: subagent_not_dispatched`:
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `type` | `subagent_not_dispatched` | yes |  | No dispatch of this helper in the block. |
+| `name` | string, not empty | yes |  | The name of the helper that must not be dispatched. |
+
+With `type: guard_not_fired`:
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `type` | `guard_not_fired` | yes |  | No firing of this guard in the block. |
+| `name` | string, not empty | yes |  | The name of the guard that must not fire. |
+| `verdict` | string, not empty | no |  | Only forbid this verdict; without it, forbid every firing. |
+
+With `type: stage_not_reached`:
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `type` | `stage_not_reached` | yes |  | This stage never appears in the block. |
+| `name` | string, not empty | yes |  | The name of the stage that must not be reached. |
+
+With `type: artifact_not_created`:
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `type` | `artifact_not_created` | yes |  | The workspace diff lists no creation of this path or glob. |
+| `path` | string, not empty | yes |  | The path or glob that must not be created. |
+
+With `type: file_not_written`:
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `type` | `file_not_written` | yes |  | The workspace diff lists no creation or change of this path or glob. |
+| `path` | string, not empty | yes |  | The path or glob that must not be created or changed. |
 
 With `type: ordered`:
 

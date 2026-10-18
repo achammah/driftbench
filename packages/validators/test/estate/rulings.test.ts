@@ -335,13 +335,101 @@ describe('hazard_recovery demands the reread its passage names', { timeout: 900_
 
   const hazardSpecs = (run: pipeline.EstateRun) => run.specs.filter((s) => suffix(run, s) === HAZARD);
 
+  it('regenerates the positive reference from its authored recovery path and still rejects deletion', async () => {
+    const raw = await pipeline.generationRun(1);
+    const originalMap = structuredClone(raw.scanned.map);
+    const originalPlan = structuredClone(raw.plan);
+    const changedEstate = structuredClone(raw.estate);
+    const declaration = required(changedEstate.rules.find((rule) => rule.hazard === 'compaction'));
+    declaration.recovery = { reread: ['fictional/recovery-ledger.md'] };
+    const changed = referenceRun({ ...raw, estate: changedEstate });
+    const hazardId = required(raw.scanned.match.idOf.get(`hazard:${declaration.hid}`));
+    expect(required(changed.scanned.map.atoms.find((atom) => atom.id === hazardId)).fields?.recovery).toEqual(
+      declaration.recovery,
+    );
+    for (const source of hazardSpecs(changed)) {
+      expect(source.record.complete).toBe(true);
+      expect(source.warnings).toEqual([]);
+      expect(required(source.loaded).spec.rules?.custom?.hazard_recovery).toMatchObject(declaration.recovery);
+    }
+    expect(hazardSpecs(changed).length).toBeGreaterThan(0);
+    expect(changed.scanned.map.atoms.map((atom) => atom.id)).toEqual(
+      originalMap.atoms.map((atom) => atom.id),
+    );
+    expect(changed.plan).toEqual(originalPlan);
+    expect(raw.scanned.map).toEqual(originalMap);
+
+    const reference = referenceRun(raw);
+    const mutant = {
+      ...reference,
+      specs: reference.specs.map((source) => {
+        if (!hazardSpecs(reference).includes(source)) return source;
+        const copy = structuredClone(source);
+        const recovery = required(copy.loaded).spec.rules?.custom?.hazard_recovery as Record<string, unknown>;
+        delete recovery.reread;
+        return copy;
+      }),
+    };
+    expect((await measure(mutant)).get(`gen.complete.${HAZARD}`)).toMatchObject({
+      pass: false,
+      detail: expect.stringContaining('reread'),
+    });
+  });
+
+  it('fails the raw missing-source plant with its exact declaration gap', async () => {
+    const raw = await pipeline.generationRun(1);
+    const specs = hazardSpecs(raw);
+    expect(specs.length).toBeGreaterThan(0);
+    for (const source of specs) {
+      const atom = required(
+        raw.scanned.map.atoms.find((entry) => entry.id === estateMeta(source).atoms?.[0]),
+      );
+      expect(atom.fields?.recovery).toBeUndefined();
+      expect(atom.evidence).toContainEqual({
+        type: 'custom',
+        name: 'hazard_recovery',
+        options: { hazard: 'compaction' },
+      });
+      expect(source.record.complete).toBe(false);
+      expect(estateMeta(source).needs).toContainEqual({
+        marker: 'needs-registered-check',
+        atom: atom.id,
+        detail: 'hazard_recovery requires declared reread, calls or retry evidence',
+      });
+      expect(completionContract(raw, source).rules?.custom?.hazard_recovery).toMatchObject({
+        missing_source_recovery_evidence: true,
+      });
+    }
+    expect((await measure(raw)).get(`gen.complete.${HAZARD}`)).toMatchObject({
+      pass: false,
+      detail: expect.stringContaining('incomplete: needs-registered-check'),
+    });
+  });
+
   it('fails a generated spec that drops the reread, on every seed that has a compaction rule', async () => {
     let judged = 0;
     for (const seed of SEEDS) {
       const raw = await pipeline.generationRun(seed);
       if (hazardSpecs(raw).length === 0) continue;
       judged += 1;
-      const result = (await measure(raw)).get(`gen.complete.${HAZARD}`);
+      const reference = referenceRun(raw);
+      const targets = new Set(hazardSpecs(reference));
+      const mutant = {
+        ...reference,
+        specs: reference.specs.map((source) => {
+          if (!targets.has(source)) return source;
+          expect(source.record.complete, `seed ${seed} reference`).toBe(true);
+          expect(source.warnings, `seed ${seed} reference`).toEqual([]);
+          const copy = structuredClone(source);
+          const recovery = required(copy.loaded).spec.rules?.custom?.hazard_recovery as {
+            reread?: string[];
+          };
+          expect(recovery.reread?.length, `seed ${seed} source reread`).toBeGreaterThan(0);
+          delete recovery.reread;
+          return copy;
+        }),
+      };
+      const result = (await measure(mutant)).get(`gen.complete.${HAZARD}`);
       expect(result, `seed ${seed}`).toMatchObject({
         pass: false,
         detail: expect.stringContaining('reread'),
@@ -371,7 +459,7 @@ describe('hazard_recovery demands the reread its passage names', { timeout: 900_
         );
         const faulty = await pipeline.replayOnFollower(run, loaded, checks, 'rule:after-compaction');
         expect(faulty.pass, `seed ${seed} faulty`).toBe(false);
-        expect(faulty.failing.join('\n'), `seed ${seed}`).toMatch(/reread/);
+        expect(faulty.failing.join('\n'), `seed ${seed}`).toContain('reread');
       }
     }
   });

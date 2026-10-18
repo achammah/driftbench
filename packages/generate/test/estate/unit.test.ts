@@ -1,21 +1,37 @@
 import { describe, expect, it } from 'vitest';
 import type { EstateAtom } from '../../src/estate/inputs';
 import {
+  brokenForms,
+  clausesOf,
+  helperUnitTestOf,
   hostileForms,
   matcherTools,
   materialOf,
   payloadOf,
   scriptCases,
+  specUnitOf,
   unitTestOf,
 } from '../../src/estate/unit';
 
-const rule = (id: string, quote: string): EstateAtom => ({
+const rule = (
+  id: string,
+  quote: string,
+  forbidden: string[] = [],
+  allowed: string[] = [],
+  tool: string | null = 'Bash',
+): EstateAtom => ({
   id,
   kind: 'instruction',
   title: id,
   approved: true,
   evidence: [],
   provenance: { quote },
+  fields: {
+    unitCases: [
+      ...forbidden.map((material) => ({ effect: 'forbid', material, ...(tool === null ? {} : { tool }) })),
+      ...allowed.map((material) => ({ effect: 'allow', material, ...(tool === null ? {} : { tool }) })),
+    ],
+  },
 });
 const guard = (fields: Record<string, unknown>): EstateAtom => ({
   id: 'guard.settings.g',
@@ -31,8 +47,11 @@ const guard = (fields: Record<string, unknown>): EstateAtom => ({
   },
 });
 const ATOMS = new Map([
-  ['r1', rule('r1', 'Never run `git push --force` or `rm -rf` on any branch.')],
-  ['r2', rule('r2', 'Never say "obviously" in a reply.')],
+  [
+    'r1',
+    rule('r1', 'Never run `git push --force` or `rm -rf` on any branch.', ['git push --force', 'rm -rf']),
+  ],
+  ['r2', rule('r2', 'Never say "obviously" in a reply.', ['obviously'], [], null)],
 ]);
 const row = (testType: string) => ({
   id: `row.${testType}`,
@@ -53,14 +72,17 @@ describe('the payloads of a guard unit test', () => {
       'rm -rf',
     ]);
     expect(materialOf('Never say "obviously" in a reply.')).toEqual(['obviously']);
-    expect(materialOf('Read a file before you edit it.')).toEqual(['Read a file before you edit it.']);
+    expect(materialOf('Read a file before you edit it.')).toEqual([]);
   });
 
-  it('takes only the spans a rule forbids, never every name or path it mentions', () => {
-    expect(materialOf('Read `a.md` first. Never use `sed -i` on a drive.')).toEqual(['sed -i']);
-    expect(materialOf('See `nexus-app-builder` and "the build guide" for the build.')).toEqual([]);
-    expect(materialOf('✗ `2>/dev/null` swallows the error; ✓ `2>&1`')).toEqual(['2>/dev/null']);
-    expect(materialOf('No `npx`, no raw `curl`.\nUse `nexus` instead.')).toEqual(['npx', 'curl']);
+  it('extracts quoted spans structurally without classifying their permission or meaning', () => {
+    expect(materialOf('Read `a.md` first. Never use `sed -i` on a drive.')).toEqual(['a.md', 'sed -i']);
+    expect(materialOf('See `nexus-app-builder` and "the build guide" for the build.')).toEqual([
+      'nexus-app-builder',
+      'the build guide',
+    ]);
+    expect(materialOf('✗ `2>/dev/null` swallows the error; ✓ `2>&1`')).toEqual(['2>/dev/null', '2>&1']);
+    expect(materialOf('No `npx`, no raw `curl`.\nUse `nexus` instead.')).toEqual(['npx', 'curl', 'nexus']);
     expect(materialOf('Do not say "obviously" in a reply.')).toEqual(['obviously']);
   });
 
@@ -113,9 +135,9 @@ describe('the payloads of a guard unit test', () => {
   it('names why a guard that enforces no rule gets no positive test, and points a script test at its file', () => {
     const lone = guard({ event: 'Stop', enforces: [] });
     expect(unitTestOf(row('guard_positive'), lone, ATOMS, 'h', 'x')).toBe(
-      'guard.settings.g enforces no rule whose quote gives material for a payload',
+      'guard.settings.g requires structured unit payload evidence for its enforced rules',
     );
-    expect(typeof unitTestOf(row('guard_negative'), lone, ATOMS, 'h', 'x')).toBe('object');
+    expect(typeof unitTestOf(row('guard_negative'), lone, ATOMS, 'h', 'x')).toBe('string');
     const script: EstateAtom = {
       id: 'script.a.s',
       kind: 'script',
@@ -132,12 +154,11 @@ describe('the payloads of a guard unit test', () => {
 });
 
 describe('material from a rule the guard cites', () => {
-  it('takes every concrete span of the rule source lines, and never sends a sentence as a tool payload', () => {
+  it('requires a declared tool payload for every enforced rule and keeps text payloads on text events', () => {
     const cited: EstateAtom = {
-      ...rule('r1', 'Every failure reaches you, any spelling'),
-      fields: { spans: ['2>/dev/null', '|| true'] },
+      ...rule('r1', 'Every failure reaches you, any spelling', ['2>/dev/null', '|| true']),
     };
-    const prose = rule('r2', 'Never guess a status.');
+    const prose = rule('r2', 'Never guess a status.', ['Never guess a status.'], [], null);
     const atoms = new Map([
       ['r1', cited],
       ['r2', prose],
@@ -151,7 +172,19 @@ describe('material from a rule the guard cites', () => {
       ],
     });
     const positive = unitTestOf(row('guard_positive'), bash, atoms, 'h', 'p');
-    expect(typeof positive !== 'string' && positive.cases.map((entry) => entry.material)).toEqual([
+    expect(positive).toContain('structured unit payload evidence for r2');
+    const declaredOnly = unitTestOf(
+      row('guard_positive'),
+      guard({
+        event: 'PreToolUse',
+        matcher: 'Bash',
+        enforces: [{ atom: 'r1', by: 'id' }],
+      }),
+      atoms,
+      'h',
+      'p',
+    );
+    expect(typeof declaredOnly !== 'string' && declaredOnly.cases.map((entry) => entry.material)).toEqual([
       '2>/dev/null',
       '|| true',
     ]);
@@ -164,10 +197,10 @@ describe('material from a rule the guard cites', () => {
 });
 
 describe('the rules a guard test takes material from', () => {
-  it('takes the rules linked by registry or cited id, and a rule linked only by a repeated quote when no other link exists', () => {
+  it('takes only rules linked by registry or cited id and fails quote-only links closed', () => {
     const atoms = new Map([
-      ['r1', rule('r1', 'Never run `rm -rf` here.')],
-      ['r2', rule('r2', 'Never write `2>/dev/null` after a command.')],
+      ['r1', rule('r1', 'Never run `rm -rf` here.', ['rm -rf'])],
+      ['r2', rule('r2', 'Never write `2>/dev/null` after a command.', ['2>/dev/null'])],
     ]);
     const linked = guard({
       event: 'PreToolUse',
@@ -187,14 +220,23 @@ describe('the rules a guard test takes material from', () => {
       enforces: [{ atom: 'r1', by: 'quote' }],
     });
     const fallback = unitTestOf(row('guard_positive'), quoteOnly, atoms, 'h', 'q');
-    expect(typeof fallback !== 'string' && fallback.cases.map((entry) => entry.material)).toEqual(['rm -rf']);
+    expect(fallback).toContain('structured unit payload evidence');
   });
 });
 
 describe('the speed test of a guard', () => {
   it('times a spread of at most five positive payloads, not every one', () => {
     const quote = Array.from({ length: 12 }, (_, index) => `\`cmd-${index + 1}\``).join(' ');
-    const many = new Map([['r1', rule('r1', `Never run ${quote}.`)]]);
+    const many = new Map([
+      [
+        'r1',
+        rule(
+          'r1',
+          `Never run ${quote}.`,
+          Array.from({ length: 12 }, (_, index) => `cmd-${index + 1}`),
+        ),
+      ],
+    ]);
     const atom = guard({ event: 'PreToolUse', matcher: 'Bash' });
     const positive = unitTestOf(row('guard_positive'), atom, many, 'h', 'p');
     const speed = unitTestOf(row('guard_speed'), atom, many, 'h', 's');
@@ -306,5 +348,194 @@ describe('minimal fixtures of a script with none declared', () => {
       { id: 'case-02', payload: { args: ['NWX', '123'] }, material: 'NWX 123' },
     ]);
     expect(scriptCases('Run the tracker.', 'x/track.sh')).toHaveLength(1);
+  });
+});
+
+describe('material by what each clause of a cited rule does', () => {
+  // A plant nursery's rules, cited by its guards: nothing here comes from a bank or a fixture.
+  const nursery = new Map([
+    [
+      'n1',
+      rule('n1', 'Never remove a tray under `greenhouse/`; move it to `greenhouse/spare/` instead.', [
+        'rm greenhouse/',
+      ]),
+    ],
+    [
+      'n2',
+      rule(
+        'n2',
+        'Always name the bed when you water, as in `./bin/water.sh B4 20`.',
+        ['./bin/water.sh 20', './bin/water.sh B4'],
+        ['./bin/water.sh B4 20'],
+      ),
+    ],
+  ]);
+  const cites = (atom: string, fields: Record<string, unknown> = {}) =>
+    guard({ event: 'PreToolUse', matcher: 'Bash', enforces: [{ atom, by: 'registry' }], ...fields });
+
+  it('reads clause spans without inferring permission or an act from words', () => {
+    expect(
+      clausesOf('Never remove a tray under `greenhouse/`; move it to `greenhouse/spare/` instead.'),
+    ).toEqual([{ spans: ['greenhouse/'] }, { spans: ['greenhouse/spare/'] }]);
+    expect(brokenForms('./bin/water.sh B4 20')).toEqual(['./bin/water.sh 20', './bin/water.sh B4']);
+    expect(brokenForms('ls')).toEqual([]);
+  });
+
+  it('sends a Bash guard the act a rule forbids on a path, never the path alone nor the allowed alternative', () => {
+    const positive = unitTestOf(row('guard_positive'), cites('n1'), nursery, 'h', 'x');
+    if (typeof positive === 'string') throw new Error(positive);
+    expect(positive.cases.map((entry) => entry.material)).toEqual(['rm greenhouse/']);
+  });
+
+  it('breaks an obligation by leaving out each argument of its example, and lets the example through', () => {
+    const positive = unitTestOf(row('guard_positive'), cites('n2'), nursery, 'h', 'x');
+    if (typeof positive === 'string') throw new Error(positive);
+    expect(positive.cases.map((entry) => entry.material)).toEqual(['./bin/water.sh 20', './bin/water.sh B4']);
+    const negative = unitTestOf(row('guard_negative'), cites('n2'), nursery, 'h', 'x');
+    if (typeof negative === 'string') throw new Error(negative);
+    expect(negative.cases.map((entry) => entry.material)).toEqual(['ls', './bin/water.sh B4 20']);
+  });
+});
+
+describe('the run a unit-mode spec carries', () => {
+  const nursery = new Map([
+    ['n1', rule('n1', 'Never run `rm -rf seeds/` on the potting bench.', ['rm -rf seeds/'])],
+  ]);
+  const watched: EstateAtom = {
+    ...guard({ event: 'PreToolUse', matcher: 'Bash', timeout: 3, enforces: [{ atom: 'n1', by: 'id' }] }),
+    evidence: [{ type: 'guard', name: 'g.sh', verdict: 'deny' }],
+  };
+
+  it('gives a guard spec the payloads of its test type, the declared verdict and the time budget', () => {
+    const register = specUnitOf({ testType: 'guard_register' }, [watched], nursery);
+    if (typeof register === 'string') throw new Error(register);
+    expect(register.target).toMatchObject({ kind: 'guard', name: 'g.sh', verdict: 'deny', timeout: 3 });
+    expect(register.cases.map((entry) => entry.material)).toEqual(['rm -rf seeds/']);
+    expect(register.budgetMs).toBe(3000);
+    // A hostile spec sends the plain act first, then the forms that slip past a naive match.
+    const hostile = specUnitOf({ testType: 'guard_hostile' }, [watched], nursery);
+    if (typeof hostile === 'string') throw new Error(hostile);
+    expect(hostile.cases.map((entry) => entry.material)).toEqual([
+      'rm -rf seeds/',
+      ...hostileForms('rm -rf seeds/'),
+    ]);
+    const negative = specUnitOf({ testType: 'guard_negative' }, [watched], nursery);
+    expect(typeof negative !== 'string' && negative.cases.map((entry) => entry.material)).toEqual(['ls']);
+  });
+
+  it('gives a script spec its minimal fixtures, a helper spec its agent file, and says why other rows have none', () => {
+    const script: EstateAtom = {
+      id: 'script.bench.sow',
+      kind: 'script',
+      title: 'sow',
+      approved: true,
+      evidence: [],
+      fields: { path: '.claude/skills/bench/sow.sh' },
+      provenance: { quote: 'Run `./sow.sh <tray>`.' },
+    };
+    expect(specUnitOf({ testType: 'script_fixture' }, [script], nursery)).toMatchObject({
+      target: { kind: 'script', path: '.claude/skills/bench/sow.sh' },
+      cases: [{ material: 'no argument' }, { material: 'tray' }],
+    });
+    const helper: EstateAtom = {
+      id: 'subagent.potter',
+      kind: 'subagent',
+      title: 'potter',
+      approved: true,
+      evidence: [],
+      fields: { name: 'potter' },
+      provenance: { quote: 'name: potter', file: '.claude/agents/potter.md' },
+    };
+    expect(specUnitOf({ testType: 'contract_alone' }, [helper], nursery)).toEqual({
+      target: { kind: 'subagent', name: 'potter', file: '.claude/agents/potter.md' },
+      cases: [],
+    });
+    expect(specUnitOf({ testType: 'obligation' }, [watched], nursery)).toBe('obligation has no unit run');
+  });
+});
+
+it('uses declared reply boundaries for positive payloads and keeps negative payloads below them', () => {
+  const limit: EstateAtom = {
+    ...rule('limit', 'Keep replies short.'),
+    kind: 'register',
+    evidence: [{ type: 'custom', name: 'max_characters', options: { max: 37 } }],
+  };
+  const g = guard({ event: 'Stop', enforces: [{ atom: 'limit', by: 'registry' }] });
+  const atoms = new Map([['limit', limit]]);
+  for (const testType of ['guard_positive', 'guard_speed', 'guard_hostile', 'guard_register']) {
+    const result = specUnitOf({ testType }, [g], atoms);
+    expect(typeof result).toBe('object');
+    if (typeof result === 'string') throw new Error(result);
+    expect(result.cases.some((c) => String(c.payload.last_reply).length > 37)).toBe(true);
+  }
+  const negative = specUnitOf({ testType: 'guard_negative' }, [g], atoms);
+  if (typeof negative === 'string') throw new Error(negative);
+  expect(negative.cases.every((c) => String(c.payload.last_reply).length <= 37)).toBe(true);
+});
+
+it('reports an unsupported declared reply boundary instead of substituting a short rule quote', () => {
+  const limit: EstateAtom = {
+    ...rule('large-limit', 'Keep replies short.'),
+    evidence: [{ type: 'custom', name: 'max_characters', options: { max: 1000000 } }],
+  };
+  const result = specUnitOf(
+    { testType: 'guard_positive' },
+    [guard({ event: 'Stop', enforces: [{ atom: limit.id, by: 'id' }] })],
+    new Map([[limit.id, limit]]),
+  );
+  expect(result).toContain('outside the supported payload size');
+});
+
+it('can exercise a zero-character limit with a truly empty negative reply', () => {
+  const limit: EstateAtom = {
+    ...rule('zero-limit', 'No reply text.'),
+    evidence: [{ type: 'custom', name: 'max_characters', options: { max: 0 } }],
+  };
+  const result = specUnitOf(
+    { testType: 'guard_negative' },
+    [guard({ event: 'Stop', enforces: [{ atom: limit.id, by: 'id' }] })],
+    new Map([[limit.id, limit]]),
+  );
+  expect(typeof result !== 'string' && result.cases[0]?.payload.last_reply).toBe('');
+});
+
+describe('the JSON run record of a helper run alone', () => {
+  const helper: EstateAtom = {
+    id: 'subagent.harbour.helper-pilot',
+    kind: 'subagent',
+    title: 'Helper pilot',
+    approved: true,
+    evidence: [],
+    fields: { name: 'pilot' },
+    provenance: { quote: 'name: pilot', file: '.claude/agents/pilot.md' },
+  };
+  const at = { id: 'contract_alone.subagent.harbour.helper-pilot' };
+
+  it('holds the task and the seeded files as its one case, and the agent file as the target', () => {
+    const made = helperUnitTestOf(
+      helper,
+      { task: 'Berth the Aster.', files: { 'log/aster.txt': 'Aster, 40 m' } },
+      'hash',
+      'unit.contract_alone.pilot',
+      at,
+    );
+    if (typeof made === 'string') throw new Error(made);
+    expect(made.target).toEqual({ kind: 'subagent', name: 'pilot', file: '.claude/agents/pilot.md' });
+    expect(made.testType).toBe('contract_alone');
+    expect(made.cases).toEqual([
+      {
+        id: 'case-01',
+        payload: { task: 'Berth the Aster.', files: { 'log/aster.txt': 'Aster, 40 m' } },
+        material: 'Berth the Aster.',
+      },
+    ]);
+    expect(made.cases[0]?.expected).toBeUndefined();
+  });
+
+  it('says why a helper with no agent file or no task has none', () => {
+    expect(
+      helperUnitTestOf({ ...helper, provenance: { quote: 'x' } }, { task: 'Go.', files: {} }, 'h', 'i', at),
+    ).toContain('no helper with an agent file');
+    expect(helperUnitTestOf(helper, { task: '  ', files: {} }, 'h', 'i', at)).toContain('no task');
   });
 });

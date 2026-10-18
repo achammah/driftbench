@@ -668,6 +668,11 @@ recording:
           evidence:
             - type: custom
               name: grounded_values
+          replyAct:
+            id: report
+            evidence:
+              type: text_segment
+              part: reply
           line: 9
         - kind: instruction
           title: Never call WebFetch
@@ -676,6 +681,11 @@ recording:
           evidence:
             - type: tool_not_called
               label: WebFetch
+          replyAct:
+            id: refuse
+            evidence:
+              type: text_segment
+              part: reply
           line: 10
         - kind: gate
           title: Before editing any repair ticket file read its rules
@@ -700,6 +710,11 @@ recording:
               name: command_absent
               options:
                 command: git push --force
+          replyAct:
+            id: refuse
+            evidence:
+              type: text_segment
+              part: reply
           line: 12
         - kind: instruction
           title: Re-read the standing instructions after a compaction
@@ -728,6 +743,11 @@ recording:
             - type: ordered
               before: verify
               after: report
+          replyAct:
+            id: report
+            evidence:
+              type: text_segment
+              part: reply
           line: 26
         - kind: register
           title: Never use the words obviously or simply
@@ -737,6 +757,11 @@ recording:
               mustNot:
                 - obviously
                 - simply
+          replyAct:
+            id: answer
+            evidence:
+              type: text_segment
+              part: reply
           line: 31
         - kind: register
           title: End every reply with a line that starts with Next
@@ -745,6 +770,11 @@ recording:
             - type: text
               must:
                 - "Next:"
+          replyAct:
+            id: answer
+            evidence:
+              type: text_segment
+              part: reply
           line: 32
         - kind: register
           title: Lead with the result in the first line
@@ -752,6 +782,11 @@ recording:
           evidence:
             - type: custom
               name: lead_with_result
+          replyAct:
+            id: answer
+            evidence:
+              type: text_segment
+              part: reply
           line: 33
         - kind: register
           title: Keep every reply under 1200 characters
@@ -761,6 +796,11 @@ recording:
               name: max_length
               options:
                 characters: 1200
+          replyAct:
+            id: answer
+            evidence:
+              type: text_segment
+              part: reply
           line: 34
     .claude/skills/menu-review/SKILL.md:
       chunk: .claude/skills/menu-review/SKILL.md
@@ -775,6 +815,11 @@ recording:
           line: 10
         - kind: instruction
           title: Run the check-menu.py script and show its summary
+          replyAct:
+            id: report
+            evidence:
+              type: text_segment
+              part: reply
           quote: Run `python3 scripts/check-menu.py MENU` and show the summary it prints.
           polarity: obligation
           evidence:
@@ -786,6 +831,11 @@ recording:
           line: 11
         - kind: instruction
           title: Never remove an allergen from a dish
+          replyAct:
+            id: refuse
+            evidence:
+              type: text_segment
+              part: reply
           quote: Never remove an allergen from a dish; flag the doubt instead.
           polarity: prohibition
           evidence:
@@ -807,6 +857,11 @@ recording:
           line: 13
         - kind: register
           title: Tag dishes without gluten with GF
+          replyAct:
+            id: answer
+            evidence:
+              type: text_segment
+              part: reply
           quote: Mark every dish without gluten with the tag GF after its name.
           evidence:
             - type: text
@@ -826,6 +881,11 @@ recording:
           line: 10
         - kind: instruction
           title: Run the list-parts.py script and show its summary
+          replyAct:
+            id: report
+            evidence:
+              type: text_segment
+              part: reply
           quote: Run `python3 scripts/list-parts.py TICKET` and show the summary it prints.
           polarity: obligation
           evidence:
@@ -837,6 +897,11 @@ recording:
           line: 11
         - kind: instruction
           title: Never close a repair ticket without a site confirmation
+          replyAct:
+            id: refuse
+            evidence:
+              type: text_segment
+              part: reply
           quote: Never close a repair ticket without a confirmation from the site; leave it open instead.
           polarity: prohibition
           evidence:
@@ -847,6 +912,11 @@ recording:
           line: 12
         - kind: register
           title: Name machines by room and number
+          replyAct:
+            id: answer
+            evidence:
+              type: text_segment
+              part: reply
           quote: Name every machine by its room and its number, as in room 3 machine 2.
           evidence:
             - type: text
@@ -858,6 +928,11 @@ recording:
       atoms:
         - kind: instruction
           title: The helper never edits a file
+          replyAct:
+            id: report
+            evidence:
+              type: text_segment
+              part: reply
           quote: "You never edit a file: you read and you report."
           polarity: prohibition
           evidence:
@@ -868,6 +943,11 @@ recording:
           line: 10
         - kind: instruction
           title: The brief gives the invoice number and the order number
+          replyAct:
+            id: clarify
+            evidence:
+              type: text_segment
+              part: reply
           quote: Your brief gives the invoice number and the order number; when one is missing, answer with a blocked status and stop.
           polarity: obligation
           evidence:
@@ -880,6 +960,11 @@ recording:
           line: 11
         - kind: register
           title: Answer with one JSON object
+          replyAct:
+            id: answer
+            evidence:
+              type: text_segment
+              part: reply
           quote: Answer with one JSON object and nothing else.
           evidence:
             - type: custom
