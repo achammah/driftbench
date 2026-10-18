@@ -142,3 +142,14 @@ describe('the reserved-domain exclusion is an option, on by default', () => {
     expect(failing(included)).toEqual(['pii.email']);
   });
 });
+
+describe('the personal-data scan grows linearly', () => {
+  it('scans a long run of address characters in time proportional to its length', async () => {
+    const { scanPii } = await import('../src/support/pii');
+    const start = performance.now();
+    expect(scanPii('a'.repeat(40000))).toEqual([]);
+    expect(performance.now() - start).toBeLessThan(200);
+    expect(scanPii(`${'a.b'.repeat(5000)} x@y.fr`).map((f) => f.value)).toEqual(['x@y.fr']);
+    expect(scanPii('mail anna.k@mail.be now').map((f) => f.value)).toEqual(['anna.k@mail.be']);
+  });
+});

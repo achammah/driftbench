@@ -109,7 +109,7 @@ const IBAN_CANDIDATE = /\b[A-Z]{2}\d{2}(?:[  ]?[A-Z0-9]){10,32}/g;
 const NATIONAL_CANDIDATE = /(?<![\d.])\d{2}\.?\d{2}\.?\d{2}[-. ]?\d{3}[-. ]?\d{2}(?!\d)/g;
 const INTERNATIONAL_PHONE = /(?<![\w+])\+[1-9][\d \-().]{6,22}\d/g;
 const BELGIAN_MOBILE = /(?<![\d+])(?:00 ?32 ?|0)4[5-9]\d(?:[ ./-]?\d{2}){3}(?!\d)/g;
-const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
+const EMAIL = /(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
 
 const ALLOWED_EMAIL_DOMAINS = new Set(['example.com', 'example.org', 'example.net', 'localhost']);
 const ALLOWED_EMAIL_SUFFIXES = ['.example', '.test', '.invalid', '.localhost', 'users.noreply.github.com'];
