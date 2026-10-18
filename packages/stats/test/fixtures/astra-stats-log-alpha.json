@@ -1,0 +1,45 @@
+{
+  "provenance": "Python Decimal 110-digit arithmetic; exact alpha 2^-1074 and binary64 1e-300; Mills tail, normal CDF Taylor integral, Wilson/Newcombe/kappa and two-proportion power equations",
+  "cases": [
+    {
+      "alpha": 5e-324,
+      "z": 38.48540833556734,
+      "sampleSize": 18010,
+      "mde": 0.19999456001399726,
+      "wilson": {
+        "lower": 0.0036151403356085364,
+        "upper": 0.9983900374950682
+      },
+      "paired": {
+        "lower": -0.3721446191364681,
+        "upper": 0.2875145647249926
+      },
+      "kappa": {
+        "kappa": 0.7,
+        "se": 0.00714142842854285,
+        "lower": 0.42515921082829944,
+        "upper": 0.9748407891717006
+      }
+    },
+    {
+      "alpha": 1e-300,
+      "z": 37.06578788077213,
+      "sampleSize": 16732,
+      "mde": 0.1923616871168892,
+      "wilson": {
+        "lower": 0.0038948021241149077,
+        "upper": 0.998265223160104
+      },
+      "paired": {
+        "lower": -0.37135621394690554,
+        "upper": 0.2865450253412634
+      },
+      "kappa": {
+        "kappa": 0.7,
+        "se": 0.00714142842854285,
+        "lower": 0.43529732870191484,
+        "upper": 0.9647026712980852
+      }
+    }
+  ]
+}

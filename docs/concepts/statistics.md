@@ -2,6 +2,8 @@
 
 One run proves nothing. driftbench repeats runs, reports every rate with an interval, and compares two versions of an agent with paired tests. The functions on this page ship in `@agent-nexus/driftbench-stats`. Each matches a reference value computed in Python with scipy and numpy and committed as a test fixture (`packages/stats/test/reference`).
 
+The [capability and numerical regression evidence](../stats-capabilities-evidence.md) records the independent reference tests, product repairs and validator results.
+
 What is built and what is not:
 
 * Built, phase 1: repeats in a campaign, and the minimum detectable effect `campaign plan` prints. See [running](../running.md).

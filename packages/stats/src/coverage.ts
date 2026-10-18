@@ -80,9 +80,18 @@ export function hillNumber(counts: readonly number[], q: number): number {
   const ps = counts.filter((c) => c > 0).map((c) => c / f.n);
   if (q === 0) return ps.length;
   if (q === 1) return Math.exp(-ps.reduce((s, p) => s + p * Math.log(p), 0));
-  // sum p^q = 1 + sum p (p^(q-1) - 1) because the p sum to 1; expm1 and log1p keep the digits when q is near 1.
-  const excess = ps.reduce((s, p) => s + p * Math.expm1((q - 1) * Math.log(p)), 0);
-  return Math.exp(Math.log1p(excess) / (1 - q));
+  if (Math.abs(q - 1) < 0.5) {
+    // Near one, retain the small difference from sum p = 1 without subtracting rounded powers.
+    const excess = ps.reduce((s, p) => s + p * Math.expm1((q - 1) * Math.log(p)), 0);
+    return Math.exp(Math.log1p(excess) / (1 - q));
+  }
+  // Away from one, sum scaled powers in log space: the near-one identity cancels to zero at large q.
+  // Choose the largest exponent for either sign of q, so every exponential lies in [0, 1].
+  const logs = ps.map(Math.log);
+  const anchor = logs.reduce((a, b) => (q > 0 ? Math.max(a, b) : Math.min(a, b)));
+  const scaled = logs.reduce((sum, value) => sum + Math.exp(q * (value - anchor)), 0);
+  // Divide before multiplying the anchor, avoiding overflow even for a finite q near Number.MAX_VALUE.
+  return Math.exp((q / (1 - q)) * anchor + Math.log(scaled) / (1 - q));
 }
 
 export interface HillNumbers {

@@ -1,6 +1,7 @@
 /** Agreement between judges and hand labels: Cohen's kappa and Krippendorff's alpha. */
 
-import { assertSameLength } from './basics';
+import { assertProbability, assertSameLength } from './basics';
+import { normalQuantileFromLogP } from './special';
 
 export type Label = string | number | boolean;
 
@@ -78,6 +79,44 @@ export function cohenKappa(
   }
   const kappa = expectedDis === 0 ? 1 : 1 - observedDis / expectedDis;
   return { kappa, observed: 1 - observedDis, expected: 1 - expectedDis, n };
+}
+
+export interface KappaIntervalOptions {
+  /** Two-sided significance level; defaults to 0.05. */
+  readonly alpha?: number;
+}
+
+export interface KappaIntervalResult {
+  readonly kappa: number;
+  readonly se: number;
+  readonly lower: number;
+  readonly upper: number;
+}
+
+/**
+ * Unweighted Cohen's kappa with a large-sample normal interval.
+ * Its standard error is sqrt(po (1 - po) / n) / (1 - pe), and normal limits are clipped to
+ * [-1, 1]. Constant identical raters (pe = 1) give a point interval with standard error zero.
+ */
+export function kappaInterval(
+  a: readonly Label[],
+  b: readonly Label[],
+  options: KappaIntervalOptions = {},
+): KappaIntervalResult {
+  const alpha = options.alpha ?? 0.05;
+  assertProbability('kappaInterval', 'alpha', alpha, true);
+  assertSameLength(a, b, 'kappaInterval', ["'a'", "'b'"]);
+  if (a.length === 0) throw new RangeError("kappaInterval: 'a' and 'b' must not be empty");
+  const { kappa, expected, n } = cohenKappa(a, b);
+  if (expected === 1) return { kappa, se: 0, lower: kappa, upper: kappa };
+  // Count agreement directly: subtracting summed disagreement from one can round below zero.
+  // === plus paired NaNs matches the SameValueZero keys used by cohenKappa's category Map.
+  const matches = a.filter((label, i) => label === b[i] || (Number.isNaN(label) && Number.isNaN(b[i])));
+  const observed = matches.length / n;
+  const se = Math.sqrt((observed * (1 - observed)) / n) / (1 - expected);
+  if (se === 0) return { kappa, se, lower: kappa, upper: kappa };
+  const z = -normalQuantileFromLogP(Math.log(alpha) - Math.LN2);
+  return { kappa, se, lower: Math.max(-1, kappa - z * se), upper: Math.min(1, kappa + z * se) };
 }
 
 export type AlphaLevel = 'nominal' | 'ordinal' | 'interval' | 'ratio';
