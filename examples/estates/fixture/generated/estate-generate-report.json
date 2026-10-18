@@ -8,8 +8,8 @@
   },
   "plan": {
     "path": "../../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml",
-    "rows": 1569,
-    "approved": 1569,
+    "rows": 1571,
+    "approved": 1571,
     "proposed": 0,
     "struck": 0
   },
@@ -42,9 +42,9 @@
     "judge": true
   },
   "summary": {
-    "specs": 1562,
-    "blocks": 1557,
-    "complete": 1544,
+    "specs": 1564,
+    "blocks": 1559,
+    "complete": 1546,
     "incomplete": 18,
     "judged": 465
   },
@@ -350,10 +350,10 @@
     ]
   },
   "quality": {
-    "completeShare": 0.9884763124199744,
-    "askedTests": 1536,
+    "completeShare": 0.9884910485933504,
+    "askedTests": 1538,
     "distinctAsks": 132,
-    "distinctAsksPer100": 8.59375
+    "distinctAsksPer100": 8.58257477243173
   },
   "unit": {
     "tests": 29,
@@ -370,13 +370,13 @@
   },
   "sources": {
     "asks": {
-      "bank": 463,
+      "bank": 465,
       "code": 1067,
       "session": 6,
       "none": 8
     },
     "outcomes": {
-      "bank": 1045,
+      "bank": 1047,
       "no-change:guard": 26,
       "no-change:negative": 56,
       "no-change:read-only": 83,
@@ -436,9 +436,9 @@
       "incomplete": 0
     },
     "read_when": {
-      "rows": 9,
-      "specs": 9,
-      "complete": 9,
+      "rows": 10,
+      "specs": 10,
+      "complete": 10,
       "incomplete": 0
     },
     "script_fixture": {
@@ -550,9 +550,9 @@
       "incomplete": 0
     },
     "journey": {
-      "rows": 11,
-      "specs": 11,
-      "complete": 11,
+      "rows": 12,
+      "specs": 12,
+      "complete": 12,
       "incomplete": 0
     }
   },
@@ -570,9 +570,9 @@
       "incomplete": 2
     },
     "live": {
-      "rows": 1526,
-      "specs": 1519,
-      "complete": 1503,
+      "rows": 1528,
+      "specs": 1521,
+      "complete": 1505,
       "incomplete": 16
     }
   },

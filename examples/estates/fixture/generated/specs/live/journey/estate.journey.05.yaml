@@ -58,27 +58,20 @@ blocks:
         - name: weekly-report
           count:
             min: 1
+      references:
+        - path: "**/.claude/skills/weekly-report/templates/report.md"
+          count:
+            min: 1
       workspace:
         created:
           - reports/2026-W42.md
         others_untouched: true
-rules:
-  custom:
-    some_call:
-      calls:
-        - label: Read
-          input:
-            file_path:
-              contains: .claude/skills/weekly-report/references/kpi-definitions.md
-          count:
-            min: 1
-          block: 0
 metadata:
   estate:
     atoms:
       - route.standing.an-ask-to-prepare-the-weekly
       - skill.weekly-report.skill-weekly-report
-      - reference.weekly-report.read-references-kpi-definitions-md
+      - reference.weekly-report.read-templates-report-md
     planRow: journey.05
     cell: {}
     seeder: estate
