@@ -233,6 +233,8 @@ export type Context = ThenContext & {
   routes: ReadonlyMap<string, readonly EstateAtom[]>;
   /** The files the map records as navigation only (examples, templates, histories). */
   navigation: ReadonlySet<string>;
+  /** The lines an atom other than a reference is anchored on: a reference there is acted on. */
+  anchored: ReadonlySet<string>;
   paths: EstateGenerateOptions['paths'];
   fallback: boolean;
   /** The estate's output rules as patterns no message may match, compiled from its register atoms. */

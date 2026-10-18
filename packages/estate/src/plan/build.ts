@@ -1,5 +1,6 @@
 import { contentHash } from '@agent-nexus/driftbench-core';
 import {
+  anchoredLines,
   Feasibility,
   navigationFiles,
   navigationReference,
@@ -126,7 +127,8 @@ export function buildPlan(map: EstateMap, options: PlanOptions = {}): PlanResult
   };
   const notes = [PHRASE_NOTE, ...inferred.notes];
   const navigation = navigationFiles(map.documents);
-  const navigational = approved.filter((atom) => navigationReference(atom, navigation)).length;
+  const anchored = anchoredLines(map.atoms);
+  const navigational = approved.filter((atom) => navigationReference(atom, navigation, anchored)).length;
   if (navigational > 0) {
     notes.push(
       `${navigational} reference${navigational === 1 ? '' : 's'} to documents the map records as navigation only (examples, templates, histories) give no test.`,
