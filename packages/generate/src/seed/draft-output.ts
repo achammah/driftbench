@@ -11,6 +11,7 @@ export function draftOutput(context: SeedContext) {
       return count;
     },
     push(draft: SpecDraft) {
+      context.allocation?.observeDraft(draft);
       count += 1;
       if (context.emit) context.emit(draft);
       else drafts.push(draft);

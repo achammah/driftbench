@@ -66,10 +66,10 @@ rules:
 perturbations:
   - id: p1-D9_out_of_scope
     class: D9_out_of_scope
-    inject_at: 1
+    inject_at: 0
     user: My last bill charged me twice, can you fix it?
     expect:
-      stage: identify
+      stage: needs
       stage_reported: true
       tools:
         - label: catalog.search
@@ -79,7 +79,7 @@ perturbations:
       lang: EN
     recovery:
       within_blocks: 0
-      stage_after: identify
+      stage_after: needs
   - id: p2-D1_off_topic
     class: D1_off_topic
     inject_at: 0

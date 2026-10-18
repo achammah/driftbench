@@ -4,7 +4,7 @@
 id: gen-cover-003
 version: 7a022d4e1380
 kind: conversation
-title: "Cell behaviour=B-009, deviation=D7_silence_or_burst: Path order-named-plan of order: needs > address > offer > details > recap > order_placed, D7_silence_or_burst at offer"
+title: "Cell behaviour=B-009, deviation=D7_silence_or_burst: Path order-named-plan of order: needs > address > offer > details > recap > order_placed, D7_silence_or_burst at details"
 channel: whatsapp
 lang: EN
 tier: generated
@@ -83,27 +83,7 @@ blocks:
         - Acme Fiber 1000, 1000 Mbps for \$60 a month
         - Acme Air 5G, up to 200 Mbps for \$35 a month
       lang: EN
-  - id: b3-D7_silence_or_burst
-    when:
-      injection:
-        class: D7_silence_or_burst
-        user: hello?
-    expect:
-      stage: offer
-      stage_reported: true
-      tools:
-        - label: coverage.check
-          count: 0
-        - label: catalog.search
-          count: 0
-        - label: order.create
-          count: 0
-      must:
-        - I'm here
-      lang: EN
-      criteria:
-        - deviation.D7_silence_or_burst
-  - id: b4-offer-to-details
+  - id: b3-offer-to-details
     when:
       user: I'll take Acme Fiber 1000.
     expect:
@@ -117,6 +97,26 @@ blocks:
         - label: order.create
           count: 0
       lang: EN
+  - id: b4-D7_silence_or_burst
+    when:
+      injection:
+        class: D7_silence_or_burst
+        user: hello?
+    expect:
+      stage: details
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: order.create
+          count: 0
+      must:
+        - I'm here
+      lang: EN
+      criteria:
+        - deviation.D7_silence_or_burst
   - id: b5-details-to-recap
     when:
       user: I'm Jo Okafor and my email is jo.okafor@example.com.
@@ -169,6 +169,27 @@ end_state:
       subset:
         name: Jo Okafor
         email: jo.okafor@example.com
+perturbations:
+  - id: p1-D1_off_topic
+    class: D1_off_topic
+    inject_at: 0
+    user: Are your stores open on Saturday?
+    expect:
+      stage: needs
+      stage_reported: true
+      tools:
+        - label: coverage.check
+          count: 0
+        - label: catalog.search
+          count: 0
+        - label: order.create
+          count: 0
+      must:
+        - Monday to Saturday
+      lang: EN
+    recovery:
+      within_blocks: 0
+      stage_after: needs
 metadata:
   generated:
     by: driftbench generate
@@ -209,16 +230,7 @@ metadata:
         phrase:
           dimension: stage_transition
           value: address-to-offer
-      - block: b3-D7_silence_or_burst
-        seeder: cover
-        cell:
-          spec: metadata.generated.cell
-          deviation: D7_silence_or_burst
-          stage: offer
-        phrase:
-          dimension: deviation
-          value: D7_silence_or_burst
-      - block: b4-offer-to-details
+      - block: b3-offer-to-details
         seeder: cover
         cell:
           spec: metadata.generated.cell
@@ -227,6 +239,15 @@ metadata:
         phrase:
           dimension: stage_transition
           value: offer-to-details
+      - block: b4-D7_silence_or_burst
+        seeder: cover
+        cell:
+          spec: metadata.generated.cell
+          deviation: D7_silence_or_burst
+          stage: details
+        phrase:
+          dimension: deviation
+          value: D7_silence_or_burst
       - block: b5-details-to-recap
         seeder: cover
         cell:

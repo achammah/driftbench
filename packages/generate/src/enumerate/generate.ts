@@ -13,7 +13,9 @@ import {
   tupleValues,
 } from '@agent-nexus/driftbench-space';
 import { stringify } from 'yaml';
+import { ForbidIndex } from '../extract/forbid-index';
 import { seedFolderName } from '../families/instances';
+import { Allocation } from '../seed/allocation';
 import {
   generatedSpecText,
   NO_THEN_CRITERION,
@@ -234,12 +236,14 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
   const t = options.t ?? DEFAULT_T;
   const seed = options.seed ?? DEFAULT_SEED;
   const max = options.max ?? Number.POSITIVE_INFINITY;
+  const allocation = new Allocation(prepared);
   const context: SeedContext = {
     seed,
     t,
     max,
     pathValues: indexPathValues(prepared),
     dimensionIndex: indexDimensions(prepared),
+    allocation,
   };
   const run: RunIdentity = { seed, mapPath: options.mapPath };
 
@@ -303,6 +307,7 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
       cut: cut[seeder],
     };
     for (const draft of list) {
+      context.allocation?.observeDraft(draft);
       const rendered: Rendered = renderDraft(prepared, draft, run);
       const renderText = () => generatedSpecText(rendered, run, prepared.hash);
       const text = options.specCap === undefined ? renderText() : '';
@@ -377,6 +382,7 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
     all.push(loaded.spec);
     complete.push(loaded.spec);
     keep('task', loaded.spec);
+    context.allocation?.observeSpec(loaded.spec);
     const path = `${COMPLETE_DIR}/task/${id}.yaml`;
     if (options.specCap !== undefined) cappedText.set(path, renderText);
     addFile(id, { path, text });
@@ -447,7 +453,18 @@ export function generateSuite(prepared: PreparedMap, options: GenerateOptions): 
   const terminal = new TerminalPerturbations(prepared);
   for (const spec of complete) terminal.observe(spec);
   for (const draft of terminal.drafts(context)) {
-    for (const spec of renderSeeder('deviation', [draft])) terminal.observe(spec);
+    for (const spec of renderSeeder('deviation', [draft])) {
+      terminal.observe(spec);
+      balance.observe(spec);
+    }
+  }
+  // Allocation: stages and behaviours placed less than a third as often as the most placed one get approved
+  // walks, alternating with class probes until all hold.
+  for (const draft of allocation.rounds(context, () => all.length, balance)) {
+    for (const spec of renderSeeder('deviation', [draft])) {
+      terminal.observe(spec);
+      balance.observe(spec);
+    }
   }
   const held = new Set(
     cellsOf(prepared, [], t).flatMap((cell) =>
@@ -689,6 +706,9 @@ export function reachabilityReport(
   const before = { ...prepared, axisMap: reachability.before };
   const counts: Array<{ t: number; before: number; after: number }> = [];
   const excluded: Array<{ cell: Record<string, string>; reasons: string[] }> = [];
+  // The excluding constraints, looked up by the picks they forbid, in list order: one lookup per cell.
+  const index = new ForbidIndex();
+  for (const { forbid } of reachability.excluded) index.add(forbid);
   for (const strength of new Set([2, 3].map((t) => Math.min(t, prepared.axisMap.dimensions.length)))) {
     const original = cellsOf(before, [], strength);
     const current = cellsOf(prepared, [], strength);
@@ -696,9 +716,9 @@ export function reachabilityReport(
     counts.push({ t: strength, before: original.length, after: current.length });
     for (const { values } of original) {
       if (retained.has(cellKey(values))) continue;
-      const reasons = reachability.excluded
-        .filter(({ forbid }) => Object.entries(forbid).every(([key, value]) => values[key] === value))
-        .map(({ reason }) => reason);
+      const reasons = index
+        .within(values)
+        .map((at) => (reachability.excluded[at] as (typeof reachability.excluded)[number]).reason);
       excluded.push({
         cell: values,
         reasons:

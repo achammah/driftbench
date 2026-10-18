@@ -2,6 +2,7 @@ import type { Inventory } from '@agent-nexus/driftbench-core';
 import { NONE } from '@agent-nexus/driftbench-space';
 import { OPENING_CLASSES, TOOL_FAILURE } from '../seed/deviation';
 import { type Relations, readRelations, recoveryFor, stageAfter } from '../seed/relations';
+import { ForbidIndex } from './forbid-index';
 import {
   FLOW_DIMENSION,
   type PathRelation,
@@ -48,11 +49,10 @@ export function derivedConstraints(
   if (relations.paths.length === 0 && relations.taskFamilies.length === 0) return [];
   const stageAxis = axes.find((axis) => axis.kind === 'stage');
   const deviationAxis = axes.find((axis) => axis.kind === 'deviation');
-  const written = proposal.constraints.filter((constraint) => constraint.approved);
-  const allowed = (picks: Picks) =>
-    !written.some((constraint) =>
-      Object.entries(constraint.forbid).every(([dimension, value]) => picks[dimension] === value),
-    );
+  // The written constraints, looked up by the picks they forbid: a check costs the same however many there are.
+  const written = new ForbidIndex();
+  for (const constraint of proposal.constraints) if (constraint.approved) written.add(constraint.forbid);
+  const allowed = (picks: Picks) => !written.holds(picks);
   const phrases = (proposal.phrases ?? []).filter((phrase) => phrase.approved);
 
   /**
@@ -182,6 +182,12 @@ export function derivedConstraints(
   }
 
   const out: Forbid[] = [];
+  // The derived forbids so far, looked up the same way, so a cell is checked against them in constant time.
+  const derived = new ForbidIndex();
+  const derive = (entry: Forbid) => {
+    out.push(entry);
+    derived.add(entry.forbid);
+  };
   const possible = (cell: Picks, ownership = true): boolean =>
     events.some((event) => {
       if (stageAxis && cell[stageAxis.id] !== undefined && cell[stageAxis.id] !== event.stage) return false;
@@ -210,7 +216,7 @@ export function derivedConstraints(
           const cell: Picks = { [first.id]: x, [second.id]: y };
           if (!allowed(cell)) continue;
           if (!possible(cell))
-            out.push({
+            derive({
               forbid: cell,
               reason:
                 inventory && possible(cell, false)
@@ -235,14 +241,9 @@ export function derivedConstraints(
               for (const z of third.values) {
                 const cell = { [first.id]: x, [second.id]: y, [third.id]: z };
                 if (!allowed(cell)) continue;
-                if (
-                  out.some(({ forbid }) =>
-                    Object.entries(forbid).every(([key, value]) => cell[key] === value),
-                  )
-                )
-                  continue;
+                if (derived.holds(cell)) continue;
                 if (!possible(cell) && possible(cell, false))
-                  out.push({
+                  derive({
                     forbid: cell,
                     reason: `derived from inventory and relations: no flow listing the behaviours can carry ${Object.entries(
                       cell,
