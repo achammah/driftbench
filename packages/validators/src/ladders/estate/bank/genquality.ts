@@ -548,7 +548,10 @@ export function holdsTask(ask: string, context: TaskContext = {}): boolean {
   if (context.against !== undefined && context.against.length > 0 && !namesGuardedAct(raw, context.against))
     return false;
   const text = raw.replace(/"[^"]*"|\u201c[^\u201d]*\u201d|\u2018[^\u2019]*\u2019/g, ` ${QUOTE_TOKEN} `);
-  if (QUESTION.test(text)) return !restatesRule(text, rules);
+  // The whole ask is compared with the rules before it is split: a rule of several clauses ("Keep replies short; cite
+  // every figure") is repeated by an ask whose clauses are each only a part of it.
+  if (restatesRule(text, rules)) return false;
+  if (QUESTION.test(text)) return true;
   const parts = segments(text);
   for (const [index, part] of parts.entries()) {
     // A clause that is only the rule's standing condition restated, or the rule itself, holds no task.
@@ -785,7 +788,26 @@ export function coverageFamily(): Family {
         if (!map.ok) return { pass: false, detail: 'the map does not load' };
         const atoms = map.map.atoms.filter((atom) => atom.kind === kind);
         if (atoms.length === 0) return { pass: false, detail: `the fixture holds no ${kind} atom` };
+        // docs/estate.md section 5: a Read of a file the estate copy does not hold waits on `needs-existing-file`, so a
+        // reference to a missing file has no complete spec by contract. It is judged by that marker: a spec of it
+        // that waits there, never a complete one that expects the Read.
+        const waiting = new Set(
+          (suite.report.gaps ?? []).find((entry) => entry.marker === 'needs-existing-file')?.atoms ?? [],
+        );
+        // A reference is absent when its path is no file of the fixture folder the validator holds, whatever the
+        // committed map says of it.
+        const held = new Set(filesOfFixture());
+        const absent = atoms.filter(
+          (atom) => kind === 'reference' && !held.has(String(atom.fields?.path ?? '').replace(/^\.\//, '')),
+        );
+        const unmarked = absent.filter((atom) => !waiting.has(atom.id));
+        if (unmarked.length > 0)
+          return {
+            pass: false,
+            detail: `${unmarked.length} of ${absent.length} references to a missing file are not marked needs-existing-file, such as ${unmarked[0]?.id}`,
+          };
         const short = atoms
+          .filter((atom) => !absent.includes(atom))
           .map(
             (atom) =>
               [
