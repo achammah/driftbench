@@ -124,7 +124,10 @@ export function addFacts(
  * for that tool at that block. A tool the world does not force has no recorded result: an agent that
  * replays its past turns reads it again.
  */
-export function canonicalGiven(spec: Spec, blockIndex: number): { state: RunningGiven; prefix: Message[] } {
+export function canonicalGiven(
+  spec: Spec,
+  blockIndex: number,
+): { state: RunningGiven; prefix: Message[]; history: readonly Message[] } {
   // A run asks for block 0, 1, 2 in turn. The situation before block k's own given, kept from the last ask,
   // lets the next ask build one block more, not the whole prefix again; its messages are the same objects,
   // which the prefix cache and the hashes read once.
@@ -148,7 +151,9 @@ export function canonicalGiven(spec: Spec, blockIndex: number): { state: Running
     ]);
     state = { ...state, ledger: { ...state.ledger, ...block.expect?.ledger_add } };
   }
-  return { state, prefix: copyHistory(prefix) };
+  // `history` is the internal array itself, already validated and frozen: a caller that only reads the history
+  // takes it as it is, and the next copy of it is a pass over pointers, not a validation of every message.
+  return { state, prefix: copyHistory(prefix), history: prefix };
 }
 
 const canonicalKept = new WeakMap<

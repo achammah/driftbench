@@ -2,7 +2,7 @@
 
 A block is the unit driftbench evaluates. It is one stimulus to the agent and everything the agent does before the next stimulus.
 
-A spec is a succession of blocks. Each block is a unit test in three parts: Given (the initial conditions), When (the stimulus) and Then (the expected output and state delta). See [Given, When, Then](given-when-then.md).
+A spec is a succession of blocks, or a forest when blocks declare `parent` links. A child starts from its parent's recorded end state; see [parent blocks](given-when-then.md#parent-blocks). Each block is a unit test in three parts: Given (the initial conditions), When (the stimulus) and Then (the expected output and state delta). See [Given, When, Then](given-when-then.md).
 
 ## Two kinds of block, one model
 

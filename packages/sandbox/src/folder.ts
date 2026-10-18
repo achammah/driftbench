@@ -70,6 +70,14 @@ export abstract class FolderSandbox implements Sandbox {
     for (const [path, content] of Object.entries(workspace.files ?? {})) {
       await this.writeInside(path, Buffer.from(content, 'utf8'));
     }
+    for (const path of Object.keys(workspace.binary ?? {})) {
+      if (Object.hasOwn(workspace.files ?? {}, path)) {
+        throw new Error(`the workspace path ${path} is in both files and binary`);
+      }
+    }
+    for (const [path, content] of Object.entries(workspace.binary ?? {})) {
+      await this.writeInside(path, Buffer.from(content, 'base64'));
+    }
   }
 
   snapshot(): Promise<WorkspaceSnapshot> {

@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readdir, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -105,6 +105,9 @@ describe('driftbench ci with blocks not run', () => {
       );
       // The not-run spec is left out of the comparison: it never reads as a regression.
       expect(summary.regressed).not.toContain('acme-tool-failure · F');
+      // 0 regressed and 1 spec not run: the not-run verdict stands, exit 3.
+      expect(summary.regressed).toEqual([]);
+      expect(summary.notRun?.over).toEqual(['acme-tool-failure']);
     },
     SLOW,
   );
@@ -119,6 +122,110 @@ describe('driftbench ci with blocks not run', () => {
       const summary = JSON.parse(await readFile(join(dir, 'loose.json'), 'utf8')) as CiSummary;
       expect(summary.notRun?.over).toEqual([]);
       expect(summary.notRun?.specs.map((spec) => spec.specId)).toContain('acme-tool-failure');
+    },
+    SLOW,
+  );
+
+  // The fault skips the recap, so the order conversations regress; the specs tagged flow:new-home run on the ops
+  // agent through the process adapter, which cannot force a tool result, so the tool failure spec is not run.
+  const regressing = ['--target', 'fault:x3-skips-recap', '--faults', 'examples/acme/faults'];
+  const route = ['--route', 'flow:new-home=process:acme-ops'];
+
+  it(
+    'a regression wins over blocks not run: 5 regressed and 1 spec not run give regression, exit 1, the goldens named',
+    async () => {
+      const { dir, base } = await setUp();
+      const result = await cli([...args(base, dir, 'both'), ...regressing, ...route]);
+      expect(result.err).toBe('');
+      expect(result.code).toBe(1);
+      expect(result.out).toContain('Verdict: REGRESSION. Exit 1.');
+      const summary = JSON.parse(await readFile(join(dir, 'both.json'), 'utf8')) as CiSummary;
+      expect(summary.regressed).toHaveLength(5);
+      expect(summary.notRun?.over).toEqual(['acme-tool-failure']);
+      expect(summary.verdict).toBe('regression');
+      expect(summary.exitCode).toBe(1);
+      expect(summary.reasons[0]).toBe(`5 goldens regressed: ${summary.regressed.join(', ')}`);
+      expect(summary.reasons.some((reason) => reason.includes('--max-not-run 0: acme-tool-failure'))).toBe(
+        true,
+      );
+      expect(result.out).toContain('Not run (--max-not-run 0): acme-tool-failure');
+    },
+    SLOW,
+  );
+
+  it(
+    'the verdict does not depend on an unrelated spec not run: the same regression with and without it',
+    async () => {
+      const { dir, base } = await setUp();
+      // The same suite without the spec the candidate cannot run.
+      const without = join(dir, 'without');
+      await mkdir(without);
+      for (const name of await readdir(join(ROOT, CONVERSATIONS)))
+        if (name !== 'tool-failure.yaml')
+          await copyFile(join(ROOT, CONVERSATIONS, name), join(without, name));
+      const withSpec = await cli([...args(base, dir, 'with'), ...regressing, ...route]);
+      const withoutSpec = await cli([
+        ...args(base, dir, 'without').map((arg) => (arg === CONVERSATIONS ? without : arg)),
+        ...regressing,
+        ...route,
+      ]);
+      const a = JSON.parse(await readFile(join(dir, 'with.json'), 'utf8')) as CiSummary;
+      const b = JSON.parse(await readFile(join(dir, 'without.json'), 'utf8')) as CiSummary;
+      expect(b.notRun).toBeUndefined();
+      expect([withSpec.code, a.verdict, a.regressed]).toEqual([withoutSpec.code, b.verdict, b.regressed]);
+      expect(a.verdict).toBe('regression');
+      expect(withSpec.code).toBe(1);
+    },
+    SLOW,
+  );
+
+  it(
+    'a regression wins over a failing aggregate too, and the reasons name the goldens and the aggregate',
+    async () => {
+      const { dir, base } = await setUp();
+      const result = await cli([
+        ...args(base, dir, 'aggregate'),
+        ...regressing,
+        ...route,
+        '--aggregate',
+        'pass-rate:>=0.99',
+      ]);
+      expect(result.code).toBe(1);
+      const summary = JSON.parse(await readFile(join(dir, 'aggregate.json'), 'utf8')) as CiSummary;
+      expect(summary.verdict).toBe('regression');
+      expect(summary.reasons[0]).toMatch(/^5 goldens regressed: /);
+      expect(summary.reasons.some((reason) => reason.startsWith('aggregate pass-rate fails'))).toBe(true);
+      expect(summary.reasons.some((reason) => reason.includes('--max-not-run 0: acme-tool-failure'))).toBe(
+        true,
+      );
+    },
+    SLOW,
+  );
+
+  it(
+    'goldens that flipped while compare calls the change noise are no regression: with a spec not run and a failing aggregate, the verdict is not-run, exit 3',
+    async () => {
+      const { dir, base } = await setUp();
+      // The identity control changes nothing, but the flow:new-home conversations run on the ops agent: two of
+      // them flip, one is not run. At a 99 point margin compare shows parity.
+      const result = await cli([
+        ...args(base, dir, 'noise'),
+        '--target',
+        'fault:control-sales-identity',
+        '--faults',
+        'examples/acme/faults',
+        ...route,
+        '--margin',
+        '99',
+        '--aggregate',
+        'pass-rate:>=0.99',
+      ]);
+      expect(result.err).toBe('');
+      expect(result.code).toBe(3);
+      const summary = JSON.parse(await readFile(join(dir, 'noise.json'), 'utf8')) as CiSummary;
+      expect(summary.regressed.length).toBeGreaterThan(0);
+      expect(summary.verdict).toBe('not-run');
+      expect(summary.reasons.some((reason) => reason.includes('regressed'))).toBe(false);
     },
     SLOW,
   );

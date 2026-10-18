@@ -47,6 +47,7 @@ function prepared() {
       kind: 'path',
       id: 'balance-again',
       flow: 'balance',
+      behaviours: ['B-1'],
       stages: ['greet', 'verify', 'verify', 'help'],
       when: { 'lookup.out.found': found },
       ...by,

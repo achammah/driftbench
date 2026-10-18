@@ -1,0 +1,66 @@
+
+ RUN  v5.0.3 <worktree>
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts (34 tests | 2 failed | 32 skipped) 13ms
+   ❯ capacity repair is independent of seed and bank vocabulary (4)
+     × reserves originally owned capacity before assigning an orphan 8ms
+     × adds the minimum number of edges across every three-by-three ownership graph 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > capacity repair is independent of seed and bank vocabulary > reserves originally owned capacity before assigning an orphan
+AssertionError: expected [ [ 'orphan', 'fixed' ], [ 'fixed' ] ] to deeply equal [ [ 'fixed' ], [ 'orphan' ] ]
+
+- Expected
++ Received
+
+  [
+    [
++     "orphan",
+      "fixed",
+    ],
+    [
+-     "orphan",
++     "fixed",
+    ],
+  ]
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts:153:57
+    151|     }));
+    152|     ensureBehaviourCapacity(hidden);
+    153|     expect(hidden.flows.map((flow) => flow.behaviours)).toEqual([['fix…
+       |                                                         ^
+    154|     expect(canSeat(hidden)).toBe(true);
+    155|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  packages/validators/test/generator/behaviour-capacity.test.ts > capacity repair is independent of seed and bank vocabulary > adds the minimum number of edges across every three-by-three ownership graph
+AssertionError: ownership graph 2: expected 3 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ packages/validators/test/generator/behaviour-capacity.test.ts:179:48
+    177|       const added = hidden.flows.reduce((sum, flow, index) =>
+    178|         sum + flow.behaviours.filter((id) => !original[index]?.include…
+    179|       expect(added, `ownership graph ${mask}`).toBe(required);
+       |                                                ^
+    180|       for (const [index, owned] of original.entries())
+    181|         expect(owned.every((id) => hidden.flows[index]?.behaviours.inc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 32 skipped (34)
+   Start at  01:36:54
+   Duration  11.74s (transform 93%, import 7%)
+
+  Transform  transforming modules took 10.57s · 93% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+

@@ -86,7 +86,11 @@ export {
   type CoverageMethod,
   type CoverageOptions,
   type CoverageResult,
+  type FamilyCoverageCell,
+  type FamilyCoverageMethod,
+  type FamilyCoverageResult,
   simulateCoverage,
+  simulateFamilyCoverage,
 } from './simulate';
 export {
   betaQuantile,

@@ -1,4 +1,5 @@
 import { blockStatus, type DriftClass, type RunEvent, type Verdict } from '@agent-nexus/driftbench-core';
+import { parentCausesHtml } from './causes';
 import type { CompareResult } from './compare';
 import type { Estimate } from './estimate';
 import { CASLON_DISPLAY, CASLON_TEXT, GEIST, GEIST_MONO } from './fonts';
@@ -761,7 +762,7 @@ export function renderRun(run: RunDetail, blockExtra: (block: BlockDetail) => st
   return `<section id="run">
 <h2 class="mono">${esc(name)}</h2>
 ${header.replace('</details>', '')}
-${timelineSection(run.events)}
+${parentCausesHtml(run.causes)}${timelineSection(run.events)}
 ${run.blocks.map((block) => blockDetail(block, blockExtra(block))).join('\n')}
 ${stoppedSection(run.stopped)}
 </details>

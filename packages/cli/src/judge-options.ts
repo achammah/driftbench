@@ -258,6 +258,12 @@ function shapingFlags(flags: JudgeFlags): string[] {
   return set.filter(([, value]) => value !== undefined).map(([name]) => name);
 }
 
+/** The refusal of flags that shape a judge given with no judge: `--verify needs ...`, `--a and --b need ...`. */
+export function judgeNeeded(flags: readonly string[]): string {
+  const verb = flags.length === 1 ? 'needs' : 'need';
+  return `${flags.join(' and ')} ${verb} --judge claude:<model>, another --judge <kind>:<model>, or --judges <cassette>`;
+}
+
 /**
  * The judge of a run (`replay`, `estate run`, `campaign rejudge`). With no judge flag every criterion a block
  * names is inconclusive and gates as the criterion does: never a pass. Undefined on bad input, reported.
@@ -270,9 +276,7 @@ export async function runJudgeFrom(
   if (!judgeAsked(options)) {
     const stray = shapingFlags(options);
     if (stray.length > 0) {
-      io.err(
-        `error: ${stray.join(' and ')} need --judge claude:<model>, another --judge <kind>:<model>, or --judges <cassette>\n`,
-      );
+      io.err(`error: ${judgeNeeded(stray)}\n`);
       return undefined;
     }
     const { noJudgeCheck } = await import('@agent-nexus/driftbench-judges');
@@ -301,9 +305,7 @@ export async function optionalJudgeFrom(
   if (!judgeAsked(options)) {
     const stray = shapingFlags(options);
     if (stray.length > 0) {
-      io.err(
-        `error: ${stray.join(' and ')} need --judge claude:<model>, another --judge <kind>:<model>, or --judges <cassette>\n`,
-      );
+      io.err(`error: ${judgeNeeded(stray)}\n`);
       return null;
     }
     return undefined;

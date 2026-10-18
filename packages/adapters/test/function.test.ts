@@ -202,6 +202,8 @@ describe('function adapter', () => {
                     {
                       label: 'lookup',
                       input: { parts: [{ text: 'original' }], metadata: { tag: 'original' } },
+                      // A prefix call carries its result: one without is a Given error, and the block is not run.
+                      output: { found: true },
                     },
                   ],
                 },
