@@ -35,6 +35,7 @@ export {
   type InvariantState,
   invariantAtoms,
   measureInvariants,
+  type PointerScanOptions,
   type ScanAtoms,
   type ScanAtomsOptions,
   scanAtoms,

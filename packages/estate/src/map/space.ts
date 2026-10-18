@@ -116,7 +116,7 @@ export const ESTATE_CONSTRAINTS: SpaceMap['constraints'] = [
 ];
 
 /** The atom kinds whose atoms a block targets, in the order the space map lists their dimensions. */
-const TARGET_KINDS: readonly AtomKind[] = [
+export const TARGET_KINDS: readonly AtomKind[] = [
   'instruction',
   'gate',
   'route',

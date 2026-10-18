@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -20,6 +21,8 @@ import {
 
 const ACME_MAP = fileURLToPath(new URL('../../../../examples/acme/map/', import.meta.url));
 const EXAMPLES = fileURLToPath(new URL('../../../../examples/variables/', import.meta.url));
+
+const HASH = 'a'.repeat(64);
 
 async function proposalAt(path: string): Promise<Proposal> {
   const loaded = await loadProposal(path);
@@ -328,4 +331,94 @@ describe('the quotes of the worked examples', () => {
       expect(await verifyVariableQuotes(result.store, EXAMPLES)).toEqual([]);
     });
   }
+});
+
+describe('verifyVariableQuotes on structure entries', () => {
+  const sha = (text: string) => createHash('sha256').update(text).digest('hex');
+  const SETTINGS = JSON.stringify({ permissions: { deny: ['Bash(rm *)'], allow: ['Read'] } }, null, 2);
+  const SCRIPT = '#!/bin/sh\n# Lock the hall.\necho locked\n';
+
+  async function folder(files: Record<string, string>): Promise<string> {
+    const dir = await mkdtemp(join(tmpdir(), 'driftbench-structure-'));
+    for (const [name, text] of Object.entries(files)) {
+      await mkdir(dirname(join(dir, name)), { recursive: true });
+      await writeFile(join(dir, name), text);
+    }
+    return dir;
+  }
+
+  const storeWith = (...provenance: unknown[]): VariableStore =>
+    checked({
+      format: 1,
+      agent: 'demo',
+      version: '1',
+      prior: { kind: 'declared' },
+      variables: [
+        {
+          id: 'v',
+          title: 'V',
+          kind: 'data',
+          role: 'axis',
+          approved: true,
+          values: provenance.map((entry, index) => ({
+            id: `x${index}`,
+            title: `X${index}`,
+            provenance: [entry as never],
+          })),
+        },
+      ],
+      constraints: [],
+    });
+
+  const codes = (issues: Array<{ code: string; path: string }>) => issues.map((i) => `${i.code} ${i.path}`);
+
+  it('finds a pointer that resolves, with the hash of its value, and a line range with the hash of its lines', async () => {
+    const dir = await folder({ 'settings.json': SETTINGS, 'lock.sh': SCRIPT });
+    const store = storeWith(
+      { kind: 'structure', path: 'settings.json', pointer: '/permissions/deny/0', hash: sha('"Bash(rm *)"') },
+      {
+        kind: 'structure',
+        path: 'lock.sh',
+        lines: { start: 2, end: 3 },
+        hash: sha('# Lock the hall.\necho locked'),
+      },
+    );
+    expect(await verifyVariableQuotes(store, dir)).toEqual([]);
+  });
+
+  it('names a pointer that does not resolve, and a line range past the end of the file, at the pointer and at the lines', async () => {
+    const dir = await folder({ 'settings.json': SETTINGS, 'lock.sh': SCRIPT });
+    const store = storeWith(
+      { kind: 'structure', path: 'settings.json', pointer: '/permissions/ask', hash: HASH },
+      { kind: 'structure', path: 'lock.sh', lines: { start: 3, end: 9 }, hash: HASH },
+    );
+    expect(codes(await verifyVariableQuotes(store, dir))).toEqual([
+      'VARIABLES_POINTER_UNRESOLVED variables.0.values.0.provenance.0.pointer',
+      'VARIABLES_POINTER_UNRESOLVED variables.0.values.1.provenance.0.lines',
+    ]);
+  });
+
+  it('names a place that resolves to something else than the hash says: the file changed since the entry was written', async () => {
+    const dir = await folder({ 'settings.json': SETTINGS, 'lock.sh': SCRIPT });
+    const store = storeWith(
+      { kind: 'structure', path: 'settings.json', pointer: '/permissions/deny/0', hash: HASH },
+      { kind: 'structure', path: 'lock.sh', lines: { start: 2, end: 2 }, hash: sha('# Unlock the hall.') },
+    );
+    expect(codes(await verifyVariableQuotes(store, dir))).toEqual([
+      'VARIABLES_HASH_MISMATCH variables.0.values.0.provenance.0.hash',
+      'VARIABLES_HASH_MISMATCH variables.0.values.1.provenance.0.hash',
+    ]);
+  });
+
+  it('names a file it cannot read once, whatever mix of quotes and structure entries names it', async () => {
+    const dir = await folder({});
+    const store = storeWith(
+      { kind: 'structure', path: 'gone.json', pointer: '/a', hash: HASH },
+      { kind: 'structure', path: 'gone.json', pointer: '/b', hash: HASH },
+      { kind: 'quote', path: 'gone.json', quote: 'One.' },
+    );
+    expect(codes(await verifyVariableQuotes(store, dir))).toEqual([
+      'VARIABLES_SOURCE_UNREADABLE variables.0.values.0.provenance.0.path',
+    ]);
+  });
 });

@@ -1031,7 +1031,7 @@ Review: signed by owner on 2026-10-13.
 Reads an agent estate (its standing instructions, skills, agents, guards and settings) into a map of atoms, lints it, approves the atoms a model split from prose, exports its space map, derives the test plan, generates task specs from it, and keeps the tests true when the estate changes. The runtime today is `claude-code`. What the atoms, the plan and maintenance are is on the [estate](../estate.md) page; the Claude Code mapping is on [its adapter page](../adapters/claude-code.md). [`examples/estates/fixture`](../../examples/estates/fixture/README.md) is the estate the examples below read.
 
 ```
-driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider <name>] [--ceiling <characters>] [--ignore <glob>]... [--force]
+driftbench estate scan <root> --out <file> [--runtime claude-code] [--replay <file>] [--no-model] [--provider <name>] [--ceiling <characters>] [--ignore <glob>]... [--force] [--pointer --cassette <file> [--record] [--labeler <class>:<client>[:<model>]]... [--labeler-threshold <p>] [--labeler-pass-at <p>] [--labeler-fail-at <p>] [--labeler-key <variable>] [--jobs <n>] [--labels <file>] [--ledger <file> [--ledger-check]]]
 driftbench estate lint <map> [--ceiling <characters>] [--ignore <glob>]...
 driftbench estate approve <map> [--kind <kind>]... [--atom <id>]... [--all] [--to <file>]
 driftbench estate map <map> --to <file> [--all] [--agent <name>]
@@ -1067,6 +1067,11 @@ driftbench estate stats --map <map> --plan <plan> --specs <dir> [--sessions <dir
 | `--out` | `scan`: where to write the map (YAML); `plan`: where to write the plan (YAML); `generate`: the folder for the specs and the report; required. `diff`, `impact`: also write the result as JSON |
 | `--runtime <name>` | `scan`: the runtime that reads the estate; default `claude-code` |
 | `--replay <file>` | `scan`: replay recorded answers instead of calling a model |
+| `--pointer` | `scan`: read the prose with the pointer reader: units cut by structure, labelers of two classes point at them, code copies the quotes. Needs `--cassette`; see the topic `validate-estate-scan` |
+| `--cassette <file>`, `--record` | `scan --pointer`: the recorded labeler answers, and record the answers a miss needs |
+| `--labeler <class>:<client>[:<model>]` | `scan --pointer`: a labeler of class `system1` or `system2`; repeat it for one of each, the default stack |
+| `--labeler-threshold <p>`, `--labeler-pass-at <p>`, `--labeler-fail-at <p>`, `--labeler-key <variable>` | `scan --pointer`: the probability at which a system 1 labeler takes a label; in a stack, the two probabilities at which system 1 decides alone; the variable that holds the bearer token of an `http` labeler |
+| `--jobs <n>`, `--labels <file>`, `--ledger <file>`, `--ledger-check` | `scan --pointer`: requests in flight at once, the label sets, the ledger of unit ids and its check |
 | `--no-model` | `scan`: read the structured atoms only; no prose atom |
 | `--provider <name>` | `scan`: `anthropic` or `openai`; default the first whose key is set |
 | `--ceiling <characters>` | `scan`, `lint`: the size ceiling of the standing instructions; default 40000 |

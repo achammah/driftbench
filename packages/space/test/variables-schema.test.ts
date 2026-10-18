@@ -473,7 +473,12 @@ describe('a store the loader refuses', () => {
     // Reported by the tests below: the parse, the object check and the advice.
     for (const code of ['VARIABLES_NOT_OBJECT', 'VARIABLES_PARSE', 'VARIABLES_UNSOURCED']) reported.add(code);
     // Reported by verifyVariableQuotes, in the generate package, and tested there.
-    const elsewhere = ['VARIABLES_SOURCE_UNREADABLE', 'VARIABLES_QUOTE_NOT_FOUND'];
+    const elsewhere = [
+      'VARIABLES_SOURCE_UNREADABLE',
+      'VARIABLES_QUOTE_NOT_FOUND',
+      'VARIABLES_POINTER_UNRESOLVED',
+      'VARIABLES_HASH_MISMATCH',
+    ];
     expect(
       VariableStoreIssueCodes.filter((code) => !reported.has(code) && !elsewhere.includes(code)),
     ).toEqual([]);

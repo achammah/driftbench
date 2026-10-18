@@ -12,7 +12,7 @@ import { VariableStore } from './schema';
 /**
  * Every problem a store can have has a stable code, like the codes of the space map loader. From
  * `VARIABLES_DUPLICATE` to `VARIABLES_GRID_EMPTY` they are the rules of a space map, kept for the axes of
- * the store (the weight and prior rules for every variable). The two quote codes are reported by the check
+ * the store (the weight and prior rules for every variable). The four source codes are reported by the check
  * that reads the sources (`verifyVariableQuotes` in the generate package). `VARIABLES_UNSOURCED` is advice:
  * it never makes a store invalid.
  */
@@ -33,6 +33,8 @@ export const VariableStoreIssueCodes = [
   'VARIABLES_BOUNDARY',
   'VARIABLES_SOURCE_UNREADABLE',
   'VARIABLES_QUOTE_NOT_FOUND',
+  'VARIABLES_POINTER_UNRESOLVED',
+  'VARIABLES_HASH_MISMATCH',
   'VARIABLES_UNSOURCED',
 ] as const;
 

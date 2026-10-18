@@ -47,6 +47,10 @@
     "@agent-nexus/driftbench-space": "workspace:*",
     "@agent-nexus/driftbench-stats": "workspace:*",
     "zod": "^4.6.5",
+    "remark-frontmatter": "5.0.0",
+    "remark-gfm": "4.0.1",
+    "remark-parse": "11.0.0",
+    "unified": "11.0.5",
     "yaml": "^2.9.1",
     "@agent-nexus/driftbench-generate": "workspace:*",
     "@agent-nexus/driftbench-sandbox": "workspace:*"

@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import {
   type QuoteProvenance,
+  resolveStructure,
   type VariableStore,
   type VariableStoreIssue,
   variableProvenance,
@@ -78,13 +79,14 @@ export async function verifyVariableQuotes(
   store: VariableStore,
   baseDir: string,
 ): Promise<VariableStoreIssue[]> {
-  const quotes = variableProvenance(store).flatMap(({ path, entry }) =>
-    entry.kind === 'quote' ? [{ path, entry }] : [],
+  const sourced = variableProvenance(store).flatMap(({ path, entry }) =>
+    entry.kind === 'quote' || entry.kind === 'structure' ? [{ path, entry }] : [],
   );
+  const quotes = sourced.flatMap(({ path, entry }) => (entry.kind === 'quote' ? [{ path, entry }] : []));
   const texts = new Map<string, string>();
   const issues: VariableStoreIssue[] = [];
   const unreadable = new Set<string>();
-  for (const { path, entry } of quotes) {
+  for (const { path, entry } of sourced) {
     if (texts.has(entry.path) || unreadable.has(entry.path)) continue;
     try {
       texts.set(entry.path, await readFile(resolve(baseDir, entry.path), 'utf8'));
@@ -94,6 +96,32 @@ export async function verifyVariableQuotes(
         code: 'VARIABLES_SOURCE_UNREADABLE',
         path: `${path}.path`,
         message: `cannot read ${entry.path}, so its quotes cannot be checked: ${describe(cause)}`,
+      });
+    }
+  }
+  for (const { path, entry } of sourced) {
+    if (entry.kind !== 'structure') continue;
+    const text = texts.get(entry.path);
+    if (text === undefined) continue;
+    const target =
+      entry.pointer !== undefined
+        ? { pointer: entry.pointer }
+        : entry.lines
+          ? { lines: entry.lines }
+          : undefined;
+    if (target === undefined) continue;
+    const found = resolveStructure(text, target);
+    if (!found.ok) {
+      issues.push({
+        code: 'VARIABLES_POINTER_UNRESOLVED',
+        path: `${path}.${entry.pointer === undefined ? 'lines' : 'pointer'}`,
+        message: `${entry.path}: ${found.message}`,
+      });
+    } else if (found.hash !== entry.hash) {
+      issues.push({
+        code: 'VARIABLES_HASH_MISMATCH',
+        path: `${path}.hash`,
+        message: `${entry.path} holds something else at this place than when the entry was written: the file changed`,
       });
     }
   }

@@ -1,0 +1,720 @@
+# driftbench variable store, fed from an estate map (docs/variables.md).
+# Every value quotes its file and carries the ledger id of the pointer unit that holds the quote.
+# Regenerate it from the estate; do not edit it.
+format: 1
+agent: reader-cases
+version: b6d05156e9a0
+prior:
+  kind: declared
+variables:
+  - id: atoms.instruction
+    title: Target instruction atoms
+    kind: behaviour
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: instruction.standing.never-force-push
+        title: Never force-push
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: Never run `git push --force` on any branch.
+            ledger: frayno4pmi
+        polarity: must_not
+      - id: instruction.standing.report-only-numbers-read-during-the
+        title: Report only numbers read during the session
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: Report a number only when you read it in a file or a tool result during this session.
+            ledger: pejftfirny
+        polarity: must
+      - id: instruction.memory-memory.no-delivery-on-a-public-holiday
+        title: No delivery on a public holiday
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/memory/MEMORY.md
+            quote: Never schedule a delivery on a public holiday in the receiving country.
+            ledger: 7wqtvpz2nv
+        polarity: must_not
+      - id: instruction.memory-supplier-languages.write-to-each-supplier-in-its
+        title: Write to each supplier in its language
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/memory/supplier-languages.md
+            quote: Write to each supplier in the language it reads.
+            ledger: klbhgsbv5o
+        polarity: must
+      - id: instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and
+        title: An unlisted supplier gets English and a note to the user
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/memory/supplier-languages.md
+            quote: When a supplier is not in this table, write in English and tell the user.
+            ledger: vbhqgyxxpc
+        polarity: must
+      - id: instruction.parcel-claims.write-the-claim-in-the-supplier
+        title: Write the claim in the supplier's language
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: Write the claim in the supplier's language
+            ledger: ylqfmr6ppi
+        polarity: must
+      - id: instruction.parcel-claims.never-promise-a-refund-date
+        title: Never promise a refund date
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: Never promise the user a refund date; the carrier sets it.
+            ledger: qy6vgb55k4
+        polarity: must_not
+      - id: instruction.parcel-claims.a-claim-names-the-order-the
+        title: A claim names the order, the parcel count and the tracking number
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/references/claim-rules.md
+            quote: A claim names the order number, the parcel count and the carrier's tracking number.
+            ledger: axxs5h4kro
+        polarity: must
+      - id: instruction.parcel-claims.one-photo-of-each-damaged-parcel
+        title: One photo of each damaged parcel
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/references/claim-rules.md
+            quote: Attach one photo of each damaged parcel
+            ledger: 2m7wqwpczt
+        polarity: must
+      - id: instruction.parcel-claims.file-a-damage-claim-within-7
+        title: File a damage claim within 7 days
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/references/claim-rules.md
+            quote: File a damage claim within 7 days of the delivery scan.
+            ledger: eppoqn4q54
+        polarity: must
+      - id: instruction.parcel-claims.claim-a-missing-parcel-only-after
+        title: Claim a missing parcel only after 10 days
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/references/claim-rules.md
+            quote: A missing parcel is claimed only after 10 days without a delivery scan.
+            ledger: rhb3gjoz4g
+        polarity: must
+      - id: instruction.parcel-claims.a-claim-opens-with-the-order
+        title: A claim opens with the order number and the scan date
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/references/notes.md
+            quote: A claim opens with the order number and the date of the delivery scan.
+            ledger: uw5otaigqv
+        polarity: must
+      - id: instruction.parcel-claims.write-to-each-supplier-in-its
+        title: Write to each supplier in its language
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/references/supplier-languages.md
+            quote: Write to each supplier in the language it reads.
+            ledger: s5wuhau5gf
+        polarity: must
+      - id: instruction.shipment-tracker.always-pass-the-carrier-code-to
+        title: Always pass the carrier code to the tracking script
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/shipment-tracker/SKILL.md
+            quote: Always pass the carrier code to track.sh, as in `./scripts/track.sh NWX 123`.
+            ledger: 2pgcgb6enm
+        polarity: must
+      - id: instruction.shipment-tracker.never-guess-a-shipment-status
+        title: Never guess a shipment status
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/shipment-tracker/SKILL.md
+            quote: never guess a status.
+            ledger: 4hasfqfjdt
+        polarity: must_not
+  - id: atoms.gate
+    title: Target gate atoms
+    kind: behaviour
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: gate.parcel-claims.run-the-tracking-script-before-filing
+        title: Run the tracking script before filing a claim
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: Run `./scripts/track.sh <carrier> <number>` first; a claim needs the delivery scan it prints.
+            ledger: 22tewcyoke
+  - id: atoms.route
+    title: Target route atoms
+    kind: behaviour
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: route.parcel-claims.an-ask-that-fits-parcel-claims
+        title: An ask that fits parcel-claims loads it
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: "File a damage claim with a carrier for a parcel that arrived broken. Use when: the user reports a damaged or missing parcel."
+            ledger: 7d5ngsrdqe
+      - id: route.shipment-tracker.an-ask-that-fits-shipment-tracker
+        title: An ask that fits shipment-tracker loads it
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/shipment-tracker/SKILL.md
+            quote: Look up where a shipment is and whether it is late. Use when the user asks about a delivery or a tracking number.
+            ledger: gv2bfxr4fg
+      - id: route.standing.an-ask-to-file-a-claim
+        title: An ask to file a claim for a damaged or missing parcel loads parcel-claims
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "| file a claim for a damaged or missing parcel | `parcel-claims` |"
+            ledger: uwlke5amtz
+      - id: route.standing.an-ask-to-know-where-a
+        title: An ask to know where a shipment is loads shipment-tracker
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "| know where a shipment is | `shipment-tracker` |"
+            ledger: bt4ppn3ukn
+  - id: atoms.skill
+    title: Target skill atoms
+    kind: behaviour
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: skill.parcel-claims.skill-parcel-claims
+        title: Skill parcel-claims
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: "name: parcel-claims"
+            ledger: mqczaabqge
+      - id: skill.shipment-tracker.skill-shipment-tracker
+        title: Skill shipment-tracker
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/shipment-tracker/SKILL.md
+            quote: "name: shipment-tracker"
+            ledger: twlfcpc7zq
+  - id: atoms.guard
+    title: Target guard atoms
+    kind: behaviour
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: guard.settings.pretooluse-bash-guard-block-force-push
+        title: PreToolUse Bash guard block-force-push.sh
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/settings.json
+            pointer: /hooks/PreToolUse/0/hooks/0/command
+            hash: 44cda449e0f88d10c336e94dd89009e4764951f8cbc9e82f4551f9c015c1e3a5
+      - id: guard.settings.stop-guard-claim-window-py
+        title: Stop guard claim-window.py
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/settings.json
+            pointer: /hooks/Stop/0/hooks/0/command
+            hash: c6c7d85c0ea869ac42edaf8c3815d05356b81c525d9c17b9cc0b035cb66357c9
+      - id: guard.registry.stop-guard-c1
+        title: Stop guard C1
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/guards/catalogue.json
+            pointer: /checks/0/id
+            hash: 2ff9633c4dc1451be7f900cce470abcb0a24b167f37374bcc6f587491224f634
+      - id: guard.registry.stop-guard-c2
+        title: Stop guard C2
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/guards/catalogue.json
+            pointer: /checks/1/id
+            hash: ae439f60a25ff59f0f17e9fd52de5094683754c511626754b2e77e48a325c8fe
+      - id: guard.registry.stop-guard-c3
+        title: Stop guard C3
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/guards/catalogue.json
+            pointer: /checks/2/id
+            hash: e2319bd6a1e21a1feb5ee0a71cb8777cf44b42f6086b4d8c6d55470e6638a9e7
+  - id: atoms.stage
+    title: Target stage atoms
+    kind: behaviour
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: stage.steps.stage-claim-scan-read-the-delivery
+        title: "Stage claim/scan: Read the delivery scan"
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/processes.json
+            pointer: /processes/claim/steps/0
+            hash: 62182c936d94ae13c8f2061c5173efcbe40dd0a10cd98c870026aadc3f3bc9b1
+      - id: stage.steps.stage-claim-photos-collect-a-photo
+        title: "Stage claim/photos: Collect a photo of each damaged parcel"
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/processes.json
+            pointer: /processes/claim/steps/1
+            hash: 5428c3d3b5953d5bba86cd08572c5fbc2151183032d004e589b681522c885b7e
+      - id: stage.steps.stage-claim-file-file-the-claim
+        title: "Stage claim/file: File the claim with the carrier"
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/processes.json
+            pointer: /processes/claim/steps/2
+            hash: bb0ca51b0ae5f7f4c5c6cfc0bd0b4e2d61a4adb9452014ef832f9495ef9732f8
+      - id: stage.steps.stage-month-close-reconcile-reconcile-every
+        title: "Stage month-close/reconcile: Reconcile every open invoice"
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/processes.json
+            pointer: /processes/month-close/steps/0
+            hash: b953c1169c338ae382d7b50f0cc187412ef7c028258e7dc7724c435382de0dee
+      - id: stage.steps.stage-month-close-audit-have-the
+        title: "Stage month-close/audit: Have the ledger audited"
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/processes.json
+            pointer: /processes/month-close/steps/1
+            hash: 003b26a6f5ec4f4ba48d7ac862a1df8dad38720afd4b63fd331f551b6bc342f6
+      - id: stage.steps.stage-month-close-report-report-the
+        title: "Stage month-close/report: Report the month to the operations team"
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/processes.json
+            pointer: /processes/month-close/steps/2
+            hash: 78eefb51a62f954391217d5d8683a416f34497754d9681cd991444dac37c587a
+      - id: stage.steps.stage-month-close-note-write-a
+        title: "Stage month-close/note: Write a tracker note"
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/processes.json
+            pointer: /processes/month-close/steps/3
+            hash: 827ff61944dba98e2ce6de7bf4cf3e78c2297be2a4cefd0e82fb2810d1e47709
+  - id: atoms.register
+    title: Target register atoms
+    kind: behaviour
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: register.standing.at-most-one-question-per-reply
+        title: At most one question per reply
+        approved: true
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: Ask at most one question per reply.
+            ledger: hrqlz3osgc
+  - id: details.reference
+    title: Detail reference atoms
+    kind: data
+    role: detail
+    approved: true
+    produced_by: code
+    values:
+      - id: reference.standing.read-claude-processes-json
+        title: Read .claude/processes.json
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: A carrier claim and the month close follow their steps in `.claude/processes.json`. Read
+            ledger: zl7rk326zi
+      - id: reference.standing.read-claude-memory-memory-md
+        title: Read .claude/memory/MEMORY.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "`.claude/memory/MEMORY.md` at the start of every session."
+            ledger: 2z5lfdx7uu
+      - id: reference.standing.read-guards-check-registry-md
+        title: Read guards/CHECK-REGISTRY.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: The check registry is `guards/CHECK-REGISTRY.md`; claims follow `parcel-claims/references/claim-rules.md`.
+            ledger: nim22d35d2
+      - id: reference.standing.read-parcel-claims-references-claim-rules
+        title: Read parcel-claims/references/claim-rules.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: The check registry is `guards/CHECK-REGISTRY.md`; claims follow `parcel-claims/references/claim-rules.md`.
+            ledger: nim22d35d2
+      - id: reference.standing.read-claude-aliases-md
+        title: Read .claude/ALIASES.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: Paths that start with `REF/` follow the alias table `.claude/ALIASES.md`.
+            ledger: zjeq5qpkwd
+      - id: reference.standing.read-companies-fjord-kitchenware-md
+        title: Read companies/fjord-kitchenware.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: When a claim names a supplier, read its file `companies/fjord-kitchenware.md` and the brand rules `_meta/IDENTITY.md`; the project's design is in `docs/DESIGN.md`; your own notes are `~/notes/claims.md`.
+            ledger: zibad5mquq
+      - id: reference.standing.read-meta-identity-md
+        title: Read _meta/IDENTITY.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: When a claim names a supplier, read its file `companies/fjord-kitchenware.md` and the brand rules `_meta/IDENTITY.md`; the project's design is in `docs/DESIGN.md`; your own notes are `~/notes/claims.md`.
+            ledger: zibad5mquq
+      - id: reference.standing.read-docs-design-md
+        title: Read docs/DESIGN.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: When a claim names a supplier, read its file `companies/fjord-kitchenware.md` and the brand rules `_meta/IDENTITY.md`; the project's design is in `docs/DESIGN.md`; your own notes are `~/notes/claims.md`.
+            ledger: zibad5mquq
+      - id: reference.standing.read-notes-claims-md
+        title: Read ~/notes/claims.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: When a claim names a supplier, read its file `companies/fjord-kitchenware.md` and the brand rules `_meta/IDENTITY.md`; the project's design is in `docs/DESIGN.md`; your own notes are `~/notes/claims.md`.
+            ledger: zibad5mquq
+      - id: reference.memory-memory.read-supplier-languages-md
+        title: Read supplier-languages.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/memory/MEMORY.md
+            quote: "- [Supplier languages](supplier-languages.md): which language each supplier reads."
+            ledger: gv2geffhvz
+      - id: reference.parcel-claims.read-references-supplier-languages-md
+        title: Read references/supplier-languages.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: "- Write the claim in the supplier's language, from `references/supplier-languages.md`."
+            ledger: ylqfmr6ppi
+      - id: reference.parcel-claims.read-references-claim-rules-md
+        title: Read references/claim-rules.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: "- A claim follows `references/claim-rules.md`."
+            ledger: psptzwq4ip
+      - id: reference.parcel-claims.read-ref-notes-md
+        title: Read REF/notes.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: "- Open the claim with the wording in `REF/notes.md`."
+            ledger: gpbcug5bbd
+      - id: reference.shipment-tracker.read-claim-rules-md
+        title: Read claim-rules.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/shipment-tracker/SKILL.md
+            quote: "- For a damaged parcel, the claim follows `claim-rules.md`."
+            ledger: evvnctdqe4
+      - id: reference.shipment-tracker.read-notes-md
+        title: Read notes.md
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/shipment-tracker/SKILL.md
+            quote: "- Carrier habits are in `notes.md`."
+            ledger: 6ekeihmkj7
+  - id: details.script
+    title: Detail script atoms
+    kind: data
+    role: detail
+    approved: true
+    produced_by: code
+    values:
+      - id: script.parcel-claims.script-scripts-track-sh
+        title: Script scripts/track.sh
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: "- Run `./scripts/track.sh <carrier> <number>` first; a claim needs the delivery scan it prints."
+            ledger: 22tewcyoke
+      - id: script.shipment-tracker.script-scripts-track-sh
+        title: Script scripts/track.sh
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/shipment-tracker/SKILL.md
+            quote: "- Always pass the carrier code to track.sh, as in `./scripts/track.sh NWX 123`."
+            ledger: 2pgcgb6enm
+  - id: details.tool
+    title: Detail tool atoms
+    kind: data
+    role: detail
+    approved: true
+    produced_by: code
+    values:
+      - id: tool.settings.allow-read
+        title: Allow Read
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/settings.json
+            pointer: /permissions/allow/0
+            hash: dac976f3a02bb127e020ea7c988cf8f2be384ec8e9375ff530147cd5f6414010
+      - id: tool.settings.allow-bash-scripts-track-sh
+        title: Allow Bash(./scripts/track.sh *)
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/settings.json
+            pointer: /permissions/allow/1
+            hash: b3f270daa3d9d738442cd6327a587f62b2124ebfb90dbb03a1ce165045a0294a
+      - id: tool.parcel-claims.declared-bash
+        title: Declared Bash
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/skills/parcel-claims/SKILL.md
+            quote: Bash(./scripts/track.sh *)
+            ledger: rpluft4eez
+  - id: details.setting
+    title: Detail setting atoms
+    kind: data
+    role: detail
+    approved: true
+    produced_by: code
+    values:
+      - id: setting.settings.setting-model-is-opus
+        title: Setting model is opus
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/settings.json
+            pointer: /model
+            hash: 242dbbf670c011d544cda19dacb3c55bfe51a769e1cc083b365e792538ceb90e
+      - id: setting.settings.setting-env-northwind-region
+        title: Setting env.NORTHWIND_REGION
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/settings.json
+            pointer: /env/NORTHWIND_REGION
+            hash: 492a0609619d5a00d2ec5f3a0588edfe94dfd9e8a65e2973f894b52d8aeba0ac
+  - id: details.hazard
+    title: Detail hazard atoms
+    kind: data
+    role: detail
+    approved: true
+    produced_by: code
+    values:
+      - id: hazard.standing.recover-from-a-new-session
+        title: Recover from a new session
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "`.claude/memory/MEMORY.md` at the start of every session."
+            ledger: 2z5lfdx7uu
+  - id: details.invariant
+    title: Detail invariant atoms
+    kind: data
+    role: detail
+    approved: true
+    produced_by: code
+    values:
+      - id: invariant.standing.the-standing-instructions-stay-under-40000
+        title: The standing instructions stay under 40000 characters
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "# Reader cases"
+            ledger: fc2euqu6wb
+      - id: invariant.standing.no-file-of-the-estate-is
+        title: No file of the estate is an orphan
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "# Reader cases"
+            ledger: fc2euqu6wb
+      - id: invariant.settings.every-guard-finds-its-script-from
+        title: Every guard finds its script from an anchor
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: structure
+            path: .claude/settings.json
+            pointer: /hooks/PreToolUse/0/hooks/0/command
+            hash: 44cda449e0f88d10c336e94dd89009e4764951f8cbc9e82f4551f9c015c1e3a5
+      - id: invariant.registry.the-check-registry-lists-every-guard
+        title: The check registry lists every guard and only guards that exist
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: .claude/guards/CHECK-REGISTRY.md
+            quote: "# Check registry"
+            ledger: z2xldlsbuq
+  - id: condition.standing_size
+    title: The standing instructions stay under 40000 characters
+    kind: data
+    role: detail
+    approved: true
+    produced_by: code
+    values:
+      - id: above_40000
+        title: More than 40000 characters
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "# Reader cases"
+            ledger: fc2euqu6wb
+      - id: at_40000
+        title: Exactly 40000 characters
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "# Reader cases"
+            ledger: fc2euqu6wb
+      - id: below_40000
+        title: Under 40000 characters
+        approved: true
+        produced_by: code
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "# Reader cases"
+            ledger: fc2euqu6wb
+    boundaries:
+      - holds: below_40000
+        fails: above_40000
+        edge: at_40000
+        limit: 40000
+        comparison: le
+        unit: characters
+        provenance:
+          - kind: quote
+            path: CLAUDE.md
+            quote: "# Reader cases"
+            ledger: fc2euqu6wb
+constraints: []

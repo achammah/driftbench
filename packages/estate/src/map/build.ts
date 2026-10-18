@@ -1,7 +1,14 @@
 import type { ModelPort } from '@agent-nexus/driftbench-generate';
 import { analyzeGraph, type GraphAnalysis } from '../graph/analyze';
 import { buildGraph } from '../graph/edges';
-import { DEFAULT_STANDING_CEILING, invariantAtoms, measureInvariants, scanAtoms } from '../scan/invariants';
+import {
+  DEFAULT_STANDING_CEILING,
+  invariantAtoms,
+  measureInvariants,
+  type PointerScanOptions,
+  type ScanAtoms,
+  scanAtoms,
+} from '../scan/invariants';
 import type { ChunkRun, ProseRefusal } from '../scan/prose';
 import type { EstateReader, RawEstate } from '../scan/reader';
 import { quoteAtSpan, sha256 } from '../scan/text';
@@ -21,6 +28,8 @@ export type ScanEstateInput = {
   root: string;
   reader: EstateReader;
   port?: ModelPort;
+  /** Read the prose with the pointer reader instead of the model port. Opt-in. */
+  pointer?: PointerScanOptions;
   /** The root as the map records it: relative to where the map is written. Default `.`. */
   rootLabel?: string;
   ceiling?: number;
@@ -36,12 +45,14 @@ export type ScanEstateResult = {
   refusals: ProseRefusal[];
   duplicates: string[];
   calls: number;
+  pointer?: ScanAtoms['pointer'];
 };
 
 export async function scanEstate(input: ScanEstateInput): Promise<ScanEstateResult> {
   const raw = await input.reader.read(input.root);
   const scanned = await scanAtoms(raw, {
     ...(input.port ? { port: input.port } : {}),
+    ...(input.pointer ? { pointer: input.pointer } : {}),
     ...(input.maxTokens !== undefined ? { maxTokens: input.maxTokens } : {}),
   });
   const { builder } = scanned;
@@ -95,9 +106,17 @@ export async function scanEstate(input: ScanEstateInput): Promise<ScanEstateResu
     atoms,
     edges: graph.edges,
     ...(raw.ignored?.chosen && raw.ignored.chosen.length > 0 ? { ignore: raw.ignored.chosen } : {}),
-    ...(input.port
-      ? { producedBy: { family: input.port.family, model: input.port.model ?? 'unknown', at } }
-      : {}),
+    ...(input.pointer
+      ? {
+          producedBy: {
+            family: input.pointer.labelling.members.map((member) => member.family).join('+'),
+            model: input.pointer.labelling.members.map((member) => member.model).join('+'),
+            at,
+          },
+        }
+      : input.port
+        ? { producedBy: { family: input.port.family, model: input.port.model ?? 'unknown', at } }
+        : {}),
     hash: mapHash(atoms, graph.edges),
   };
   return {
@@ -108,6 +127,7 @@ export async function scanEstate(input: ScanEstateInput): Promise<ScanEstateResu
     refusals: scanned.refusals,
     duplicates: scanned.duplicates,
     calls: scanned.calls,
+    ...(scanned.pointer ? { pointer: scanned.pointer } : {}),
   };
 }
 

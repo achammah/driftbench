@@ -197,6 +197,24 @@ Next: driftbench estate lint _captures/docs3/estate/map-nomodel.yaml; driftbench
 
 The map is YAML with a header on how to approve it, `producedBy` per atom and, for the map, the model family and model that split the prose. The loader recomputes every provenance hash and the map hash, so a map whose quote or span was edited is refused; `approved` and `role` may be edited by hand.
 
+### Reading the prose by pointing: `estate scan --pointer`
+
+The model pass above asks a model to quote the rules it finds, and code then looks for each quote in the file. The pointer reader turns that around. Code cuts every prose file into units by its structure, a labeler is shown the units with a number each, and it answers a label for each number. It writes no text, so every quote of an atom is a slice of the file at its lines. No list of words and no grammar rule decides what is a rule: what a label means is data the user declares.
+
+```
+driftbench estate scan <root> --out map.yaml --pointer --cassette pointer-cassette.jsonl --ledger pointer-ledger.json
+```
+
+* **Units.** A unit is a sentence, a list item, a table cell, a paragraph of a block quote, a heading or a value of the front matter. A fence or a comment is opaque: it is never sent, so no label can point at it. Sentences are cut from the text with the inline code, the links and the emphasis marks masked, and the cutter joins when it is unsure, so a wrong cut costs a coarser unit and never a wrong quote.
+* **Label sets.** A label set is a named list of labels, each with a description, up to three examples, an optional `target: required` for a label that links two units, and an optional `atom` mapping that says which kind of atom a unit with that label becomes. The shipped set `agent-rules` (rule, prohibition, gate, reply rule, example, description) is data in the same format as a set of your own, given with `--labels`. The words of the request come from the set, not from the code, so the same code labels a style guide for a bakery.
+* **Two classes of labeler.** The labelers are named by the class the judges use ([judges](concepts/judges.md)). A `system1` labeler asks one yes or no question per unit and label and reads a probability of yes. A `system2` labeler is a chat model that reads the numbered window and answers a label per unit. The default is a stack of both: system 1 decides a unit alone only at an extreme probability (`--labeler-pass-at`, `--labeler-fail-at`), and system 2 decides the rest. Either runs alone with one `--labeler <class>:<client>`. The public system 1 example is the OpenAI Decisions API (`system1:openai-decisions:<model>`); the Nexus platform client is on the [Nexus adapter page](adapters/nexus.md).
+* **A labeler of your own.** `--labeler system2:http:<url>` or `--labeler system1:module:<path>` puts your endpoint or your module behind the same port. Its answers are recorded and replayed like the others, and its id is part of every cassette key.
+* **The cassette.** Every answer is recorded with the hash of the whole request as its key, so a scan without `--record` needs no key and no network, and a changed prompt, set, model, labeler or cut misses and names the field that differs. The models cannot be pinned to one answer, so the cassette is where the scan is deterministic. It holds file names, hashes and answers, never the text of a unit. `--record` appends each answer as it arrives, so a run that stops keeps what it paid for.
+* **The ledger.** Each unit has an id, derived once from its file and its text and then kept in the ledger as the file changes: the ledger follows a unit that is edited, moved, split or merged, and says when it is gone. `--ledger-check` fails when a file changed and the committed ledger did not. A label stays with its unit only while the set and the labelers that made it are the same.
+* **The atoms.** A unit with a label that has an `atom` mapping becomes an unapproved atom of that kind, with `fields.extraction: pointer`, the unit id, the set, the label and the class that decided it, and one `prose_pointer` check that a person reviews before the atom is approved.
+
+The report names the classes and clients, counts the units kept from the ledger, the units labelled by this run and which class decided them, and prints the tokens each service reported. The topic `validate-estate-scan` lists every option and the shape of a user labeler's request and answer.
+
 ### The estate configuration file
 
 An estate may hold `driftbench.estate.yaml` at its root. The scan and the unit runner read it; every key is optional.
