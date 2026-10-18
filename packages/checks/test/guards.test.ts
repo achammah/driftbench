@@ -79,4 +79,28 @@ describe('guards', () => {
     const blind = context(loose, 3, observed('Done.'), { expect: zero });
     expect((await run(guards, blind))[0]?.outcome).toBe('inconclusive');
   });
+
+  it('puts #2 after the guard name when an entry repeats', async () => {
+    const twice = context(
+      acme('acme-price-sheet'),
+      0,
+      observed('Built.', [], fired(['g', 'deny'], ['g', 'deny'])),
+      {
+        expect: {
+          guards: [
+            { name: 'g', verdict: 'deny', count: 2 },
+            { name: 'g', verdict: 'deny', count: 2 },
+            { name: 'h', count: 0 },
+            { name: 'h', count: 0 },
+          ],
+        } as Expect,
+      },
+    );
+    expect(Object.keys(outcomes(await run(guards, twice)))).toEqual([
+      'guards.g.deny',
+      'guards.g#2.deny',
+      'guards.h.any',
+      'guards.h#2.any',
+    ]);
+  });
 });
