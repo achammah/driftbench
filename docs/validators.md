@@ -1,6 +1,6 @@
 # Validators: code that proves driftbench works
 
-Status: designed on 2026-10-11, owner approved. The frame (V0) is built: `driftbench validate`, the floors, the loop files, the brief and the CI job (section 8), with six ladders registered: estate (section 6), generator (section 3), judges (section 4), map (section 2), statistics (section 7) and system (section 5). Floors in `validators/floors.json`: judges 20 (ladder version 2), map 8, stats 7, system 9; estate and generator have none yet. A validator is code. It contains no model. It plants a truth it knows, runs one part of driftbench, and measures what came back against the plant. It prints a ladder of levels. Each level has one metric, one threshold, the observed value, pass or fail, and the named items that failed. The exit code is the level reached. A builder with less judgement than the author climbs the ladder by fixing the named items of the first failing level and running the validator again.
+Status: designed on 2026-10-11, owner approved. The frame (V0) is built: `driftbench validate`, the floors, the loop files, the brief and the CI job (section 8), with seven ladders registered: estate (section 6), generator (section 3), judges (section 4), map (section 2), pointer (the pointer reader), statistics (section 7) and system (section 5). Floors in `validators/floors.json`: judges 20 (ladder version 2), map 8, stats 7, system 9; estate, generator and pointer have none yet. A validator is code. It contains no model. It plants a truth it knows, runs one part of driftbench, and measures what came back against the plant. It prints a ladder of levels. Each level has one metric, one threshold, the observed value, pass or fail, and the named items that failed. The exit code is the level reached. A builder with less judgement than the author climbs the ladder by fixing the named items of the first failing level and running the validator again.
 
 ## 1. The common frame
 
@@ -132,7 +132,7 @@ Option errors that the argument parser itself reports (an unknown flag) exit 2, 
 
 ### 8.3 The registered validators
 
-`registeredLadders()` in `packages/validators/src/ladders/index.ts` returns six validators: `estate`, `generator`, `judges`, `map`, `stats` and `system`. `validators/floors.json` holds a floor for four of them; `estate` and `generator` have none yet. `validate floors` prints the floors:
+`registeredLadders()` in `packages/validators/src/ladders/index.ts` returns seven validators: `estate`, `generator`, `judges`, `map`, `pointer`, `stats` and `system`. `validators/floors.json` holds a floor for four of them; `estate`, `generator` and `pointer` have none yet. `validate floors` prints the floors:
 
 ```
 Floors (validators/floors.json): judges = 20 (ladder version 2), map = 8 (ladder version 2), stats = 7 (ladder version 2), system = 9 (ladder version 5).
@@ -255,6 +255,8 @@ A validator is merged only with its hardness measured, not asserted.
 4. Distinct causes. Many items can fail for one reason, so one fix turns them all green and the forecast overstates the work. Every item carries a `cause`: the one change that would make it pass, written by the bank's author. The gate also requires at least 100 distinct causes among the failing items after the pilot. Items sharing a cause count once.
 5. A forecast under 100, or fewer than 100 distinct causes, sends the lane back to section 12.2 to extend the bank, with the families it extended named in the handoff.
 6. A pilot that fixes nothing in ten iterations means the items are miswritten or the component is missing a foundation; both go to the maintainer.
+
+Composite checks (`causeKind: composite`) retain their bank verdicts but contribute no distinct-cause credit. If only composite checks fail, `failingCauses: 0` is a valid journal measurement. Zero causes still fails the distinct-cause merge gate; accepting the row does not certify hardness or replace the independent cause review.
 
 The iteration 0 row and the ten pilot rows are the first rows of `validators/<component>/journal.jsonl`, and `driftbench validate <component> --hardness` prints the measurement from them: bank size per family and tier, score at iteration 0, score after the pilot, items fixed per iteration, the forecast, and whether the gate holds.
 

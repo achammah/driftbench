@@ -1,5 +1,9 @@
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  appendJournal,
   bankMeasure,
   bankSummary,
   defineLadder,
@@ -7,6 +11,7 @@ import {
   formatItems,
   type JournalRow,
   JournalRowSchema,
+  readJournal,
   runSeeds,
   seedSpecs,
 } from '../src/index';
@@ -69,9 +74,64 @@ describe('the cause counts of the journal row', () => {
     expect(issues(journalRow(1, { failingCauses: 4 }))).toMatch(
       /failingCauses 4 exceeds the 3 failing items/,
     );
-    expect(issues(journalRow(1, { failingCauses: 0 }))).toMatch(/3 items fail, so at least one cause does/);
+    expect(issues(journalRow(1, { failingCauses: 0, failingWithoutCause: 0 }))).toBe('');
     expect(issues(journalRow(1, { failingWithoutCause: 1 }))).toMatch(/goes with failingCauses/);
     expect(issues(journalRow(1, { failingCauses: 1, failingWithoutCause: 2 }))).toMatch(/cannot exceed them/);
+  });
+
+  it('journals an all-composite failing bank without inventing a cause', async () => {
+    const ladder = ladderOf([
+      {
+        id: 'bundle-a',
+        component: 'c',
+        family: 'f',
+        tier: 1,
+        pass: false,
+        cause: 'c:bundle-a',
+        causeKind: 'composite',
+      },
+      {
+        id: 'bundle-b',
+        component: 'c',
+        family: 'f',
+        tier: 2,
+        pass: false,
+        cause: 'c:bundle-b',
+        causeKind: 'composite',
+      },
+    ]);
+    const report = await runSeeds(ladder, seedSpecs([1]));
+    const summary = bankSummary(report);
+    expect(summary).toMatchObject({
+      size: 2,
+      passing: 0,
+      score: 0,
+      failingCauses: 0,
+      failingWithoutCause: 0,
+    });
+    const value = journalRow(0, {
+      seeds: ['1'],
+      level: { before: 0, after: 0 },
+      perSeed: [{ seed: '1', before: 0, after: 0 }],
+      metrics: [{ level: 1, id: 'bank', metric: 'items passing / items', threshold: 1, before: 0, after: 0 }],
+      bankSize: summary.size,
+      passing: summary.passing,
+      failingByFamily: summary.failingByFamily,
+      bankByFamilyTier: summary.byFamilyTier,
+      failingCauses: summary.failingCauses,
+      failingWithoutCause: summary.failingWithoutCause,
+    });
+    const root = mkdtempSync(join(tmpdir(), 'astra-banks-journal-test-'));
+    try {
+      const appended = appendJournal(root, 'caused', value);
+      expect(appended).not.toHaveProperty('refused');
+      const loaded = readJournal(root, 'caused');
+      expect(loaded.problems).toEqual([]);
+      expect(loaded.rows).toHaveLength(1);
+      expect(loaded.rows[0]).toMatchObject({ bankSize: 2, passing: 0, failingCauses: 0 });
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });
 
@@ -95,6 +155,15 @@ describe('the distinct-cause gate of --hardness', () => {
     expect(h.causes).toBeNull();
     expect(h.gate.reasons).toEqual(['the last row of the pilot records no failingCauses']);
     expect(formatHardness('caused', h)).toContain('Distinct failing causes after the pilot: not recorded.');
+  });
+
+  it('still fails the distinct-cause gate when valid journal rows declare zero causes', () => {
+    const measured = hard(rows(() => 0));
+    expect(measured.causes).toEqual({ distinct: 0, withoutCause: 0 });
+    expect(measured.gate.holds).toBe(false);
+    expect(measured.gate.reasons).toContain(
+      '0 distinct failing causes after the pilot, under 100: extend the bank (12.2)',
+    );
   });
 
   it('prints the distinct causes and how many failing items name no cause', () => {

@@ -1,0 +1,432 @@
+{
+  "status": "maintainer-correction-not-independent-audit",
+  "review": "https://github.com/achammah/driftbench/pull/750#issuecomment-6242122858",
+  "baseHead": "3e7a0ca4de616f0eab83b8d98d908618688215d0",
+  "scope": "All prior item IDs retained. Cause names are author-declared repair hypotheses, not certified distinct fixes. Composite checks still affect item pass/fail scores but add no distinct-cause credit.",
+  "counts": {
+    "oldItems": 402,
+    "newItems": 419,
+    "oldDeclaredTags": 256,
+    "newDeclaredTags": 256,
+    "newEligibleDeclaredTags": 249,
+    "changedCauseItems": 24,
+    "compositeItems": 9,
+    "newValidationItems": 5,
+    "newStackItems": 12
+  },
+  "independentReview": {
+    "status": "pending",
+    "reviewedDistinctFixCount": null,
+    "requires": "Merged pointer reader PR 692, then independent blind cause review under docs/validators.md section 12.7."
+  },
+  "causeChanges": [
+    {
+      "id": "adversarial.bold-decoy",
+      "oldCause": "scan:no-emphasis-heuristic",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:67",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:67"
+    },
+    {
+      "id": "adversarial.bullet-decoy",
+      "oldCause": "scan:no-bullet-heuristic",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:59",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:59"
+    },
+    {
+      "id": "adversarial.deontic-words-labelled-none",
+      "oldCause": "scan:no-word-list",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:19",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:19"
+    },
+    {
+      "id": "adversarial.example-imperatives",
+      "oldCause": "scan:no-imperative-heuristic",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:91",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:91"
+    },
+    {
+      "id": "adversarial.heading-decoy",
+      "oldCause": "scan:no-heading-heuristic",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:43",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:43"
+    },
+    {
+      "id": "adversarial.length-decoy",
+      "oldCause": "scan:no-length-heuristic",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:51",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:51"
+    },
+    {
+      "id": "adversarial.mixed-decoys-100",
+      "oldCause": "scan:mixed-decoys",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:107",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:107"
+    },
+    {
+      "id": "adversarial.position-decoy",
+      "oldCause": "scan:no-position-heuristic",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:75",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:75"
+    },
+    {
+      "id": "adversarial.quoted-instruction-decoy",
+      "oldCause": "scan:no-quote-heuristic",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:83",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:83"
+    },
+    {
+      "id": "adversarial.rule-without-deontic-words",
+      "oldCause": "scan:no-word-list",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:27",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:27"
+    },
+    {
+      "id": "adversarial.rules-in-other-languages",
+      "oldCause": "scan:no-word-list",
+      "newCause": "scan:honor-labeller-decisions",
+      "reason": "All eleven run the same decoy helper and require atoms from exactly the planted mapped labels. Surface variants are not independently established fixes.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:35",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts:35"
+    },
+    {
+      "id": "cutting.sentences-lowercase-start-merges",
+      "oldCause": "cutter:merge-lowercase-start",
+      "newCause": "cutter:preserve-lowercase-boundary",
+      "reason": "The oracle now preserves the normative lowercase sentence boundary; the previous cause encoded an observed prototype bug.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/cutting.ts:100",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/cutting.ts:100"
+    },
+    {
+      "id": "radius.block-without-links-never",
+      "oldCause": "radius:only-suspect-links",
+      "newCause": "radius:suspect-tests",
+      "reason": "Positive, negative and mixed-world examples require the same exact set of owners of suspect links. Precision/recall names measurements, not a separate repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:88",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:88"
+    },
+    {
+      "id": "radius.cosmetic-edit-empty",
+      "oldCause": "radius:only-suspect-links",
+      "newCause": "radius:suspect-tests",
+      "reason": "Positive, negative and mixed-world examples require the same exact set of owners of suspect links. Precision/recall names measurements, not a separate repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:40",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:40"
+    },
+    {
+      "id": "radius.edit-unlinked-rule-empty",
+      "oldCause": "radius:only-suspect-links",
+      "newCause": "radius:suspect-tests",
+      "reason": "Positive, negative and mixed-world examples require the same exact set of owners of suspect links. Precision/recall names measurements, not a separate repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:64",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:64"
+    },
+    {
+      "id": "radius.move-rule-empty",
+      "oldCause": "radius:only-suspect-links",
+      "newCause": "radius:suspect-tests",
+      "reason": "Positive, negative and mixed-world examples require the same exact set of owners of suspect links. Precision/recall names measurements, not a separate repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:48",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:48"
+    },
+    {
+      "id": "radius.rename-file-empty",
+      "oldCause": "radius:only-suspect-links",
+      "newCause": "radius:suspect-tests",
+      "reason": "Positive, negative and mixed-world examples require the same exact set of owners of suspect links. Precision/recall names measurements, not a separate repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:56",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:56"
+    },
+    {
+      "id": "radius.world-mixed-precision-recall",
+      "oldCause": "radius:precision-recall",
+      "newCause": "radius:suspect-tests",
+      "reason": "Positive, negative and mixed-world examples require the same exact set of owners of suspect links. Precision/recall names measurements, not a separate repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:184",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/radius.ts:184"
+    },
+    {
+      "id": "re-anchoring.reword-moderate",
+      "oldCause": "anchor:moderate-reword-changed",
+      "newCause": "anchor:pairwise-similarity-changed",
+      "reason": "Moderate and small rewords use the same weighted pairwise acceptance rule; text edit magnitude is an input variant.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts:264",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts:264"
+    },
+    {
+      "id": "re-anchoring.reword-sweep-monotone",
+      "oldCause": "anchor:monotone-acceptance",
+      "newCause": "anchor:weighted-text-context-threshold",
+      "reason": "The oracle now checks the weighted text/context score and text floor, replacing unsupported text-only monotonicity.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts:320",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts:320"
+    },
+    {
+      "id": "replay.fixture-haiku-replays-committed",
+      "oldCause": "cassette:fixture-replays",
+      "newCause": "cassette:miss-names-field",
+      "reason": "The retained ID now checks a single changed readable request field after a complete committed-fixture positive replay; it shares the existing miss-field diagnostic repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/replay.ts:251",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/replay.ts:246"
+    },
+    {
+      "id": "replay.fixture-jev-replays-committed",
+      "oldCause": "cassette:fixture-replays",
+      "newCause": "cassette:miss-names-field",
+      "reason": "The retained ID now checks a single changed readable request field after a complete committed-fixture positive replay; it shares the existing miss-field diagnostic repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/replay.ts:260",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/replay.ts:255"
+    },
+    {
+      "id": "replay.fixture-jev-unit-replays-committed",
+      "oldCause": "cassette:fixture-replays",
+      "newCause": "cassette:miss-names-field",
+      "reason": "The retained ID now checks a single changed readable request field after a complete committed-fixture positive replay; it shares the existing miss-field diagnostic repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/replay.ts:269",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/replay.ts:264"
+    },
+    {
+      "id": "replay.fixture-replay-twice-identical",
+      "oldCause": "cassette:fixture-replays",
+      "newCause": "cassette:miss-names-field",
+      "reason": "The retained ID now checks a single changed readable request field after a complete committed-fixture positive replay; it shares the existing miss-field diagnostic repair.",
+      "sourceBefore": "packages/validators/src/ladders/pointer/bank/specs/replay.ts:278",
+      "sourceAfter": "packages/validators/src/ladders/pointer/bank/specs/replay.ts:273"
+    }
+  ],
+  "compositeClassifications": [
+    {
+      "id": "cutting.mixed-large",
+      "cause": "cutter:mixed-document-large",
+      "oldCauseKind": "atomic",
+      "newCauseKind": "composite",
+      "reason": "Mixed exact-cut fixture plus budget; no unique repair established.",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/cutting.ts:494"
+    },
+    {
+      "id": "cutting.mixed-medium",
+      "cause": "cutter:mixed-document-nested",
+      "oldCauseKind": "atomic",
+      "newCauseKind": "composite",
+      "reason": "Mixed nested-container fixture spans independently fixable parser rules.",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/cutting.ts:485"
+    },
+    {
+      "id": "cutting.mixed-small",
+      "cause": "cutter:mixed-document-cut",
+      "oldCauseKind": "atomic",
+      "newCauseKind": "composite",
+      "reason": "Mixed exact-cut fixture spans independently fixable container rules.",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/cutting.ts:476"
+    },
+    {
+      "id": "labels.haiku-refuse-wrong-window-or-set",
+      "cause": "haiku:validate-response",
+      "oldCauseKind": "atomic",
+      "newCauseKind": "composite",
+      "reason": "Two independently mutated echo fields, window and set; preserve aggregate and add individual diagnostic cases if needed.",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/labels.ts:476"
+    },
+    {
+      "id": "labels.set-validation-errors",
+      "cause": "labelset:validation",
+      "oldCauseKind": "atomic",
+      "newCauseKind": "composite",
+      "reason": "Five independent label-set rejection rules; preserve all old checks and mark composite.",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/labels.ts:323"
+    },
+    {
+      "id": "re-anchoring.no-wrong-anchors-fuzz",
+      "cause": "anchor:no-wrong-anchor-invariant",
+      "oldCauseKind": "atomic",
+      "newCauseKind": "composite",
+      "reason": "Safety invariant across several edit kinds; no single distinct repair established.",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts:435"
+    },
+    {
+      "id": "re-anchoring.script-mixed-20",
+      "cause": "anchor:mixed-edit-script",
+      "oldCauseKind": "atomic",
+      "newCauseKind": "composite",
+      "reason": "Several edit operations including merges; no unique repair established.",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts:417"
+    },
+    {
+      "id": "re-anchoring.script-mixed-6",
+      "cause": "anchor:mixed-edit-script",
+      "oldCauseKind": "atomic",
+      "newCauseKind": "composite",
+      "reason": "Several edit operations with separate anchoring branches; no unique repair established.",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts:408"
+    },
+    {
+      "id": "re-anchoring.script-multi-file",
+      "cause": "anchor:multi-file-anchoring",
+      "oldCauseKind": "atomic",
+      "newCauseKind": "composite",
+      "reason": "Several edit operations and cross-file matching; no unique repair established.",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts:426"
+    }
+  ],
+  "addedItems": [
+    {
+      "id": "labels.set-validation-duplicate-label",
+      "cause": "labelset:unique-label-names",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/families/labelset-validation.ts:13",
+      "kind": "validation"
+    },
+    {
+      "id": "labels.set-validation-duplicate-set",
+      "cause": "labelset:unique-set-names",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/families/labelset-validation.ts:11",
+      "kind": "validation"
+    },
+    {
+      "id": "labels.set-validation-label-identifier",
+      "cause": "labelset:label-identifier",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/families/labelset-validation.ts:14",
+      "kind": "validation"
+    },
+    {
+      "id": "labels.set-validation-reserved-none",
+      "cause": "labelset:none-reserved",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/families/labelset-validation.ts:12",
+      "kind": "validation"
+    },
+    {
+      "id": "labels.set-validation-target-value",
+      "cause": "labelset:target-required-only",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/families/labelset-validation.ts:15",
+      "kind": "validation"
+    },
+    {
+      "id": "labels.stack-malformed-vote",
+      "cause": "stack:validate-system2-votes",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:77",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-margin-boundary",
+      "cause": "stack:route-by-margin",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:23",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-margin-exact",
+      "cause": "stack:sorted-probability-margin",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:5",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-margin-invalid",
+      "cause": "stack:validate-probability-vector",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:14",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-missing-vote",
+      "cause": "stack:system2-unanimity",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:68",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-monotone-routing",
+      "cause": "stack:route-by-margin",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:41",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-no-empty-label",
+      "cause": "stack:validate-system2-votes",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:104",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-require-agreement",
+      "cause": "stack:require-agreement",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:86",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-route-independent",
+      "cause": "stack:route-per-unit",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:95",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-unanimity",
+      "cause": "stack:system2-unanimity",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:50",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-unsure-disagreement",
+      "cause": "stack:system2-unanimity",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:59",
+      "kind": "stack"
+    },
+    {
+      "id": "labels.stack-zero-cut",
+      "cause": "stack:route-by-margin",
+      "causeKind": "atomic",
+      "source": "packages/validators/src/ladders/pointer/bank/specs/stack.ts:32",
+      "kind": "stack"
+    }
+  ],
+  "removedItems": [],
+  "sourceSha256": {
+    "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts": "3fde33dc56942a8db8cc57b8eea0185c96bf4c5f23c2e5736d0e01ab0a12292b",
+    "packages/validators/src/ladders/pointer/bank/specs/cutting.ts": "70c3b7b2f82cb7d7e579b84ca73bded02d9d78e3926edcb80bcc27e36b47ffd9",
+    "packages/validators/src/ladders/pointer/bank/specs/grouping.ts": "1293fe38e2081ea3fba47c3ea0137e247b3d616fb5e9eaa869448edfe522af30",
+    "packages/validators/src/ladders/pointer/bank/specs/ids.ts": "acbef9f1229a3be3be0718f461cac1868363e2414eb6e052db74a8635f7c8994",
+    "packages/validators/src/ladders/pointer/bank/specs/labels.ts": "76c4dfdf7e50962841e012aec74c84fe93be38f7bde3d9c2fdcc1fe795501c73",
+    "packages/validators/src/ladders/pointer/bank/specs/links.ts": "1d7dee167253b722df355173e31d4e5d00ad8cb3d3395d184e6608a728dabb51",
+    "packages/validators/src/ladders/pointer/bank/specs/privacy.ts": "b691f3dee99b8695f221cddab5705c335afd023125c81fcc2c8bc5b74bb4ae03",
+    "packages/validators/src/ladders/pointer/bank/specs/radius.ts": "43252320bcb86d443dd6a09cb5bb802715230b23bef055a96d4524a1d54bf5f8",
+    "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts": "ab746cf3ce837c58a993393dd8241733a54bdae73e126f7cb3832ac6dc3c7c60",
+    "packages/validators/src/ladders/pointer/bank/specs/replay.ts": "0f390dc69e3c2705e8d8f15fe5848615ffd9a2750338dd404f218c4e1d73210f",
+    "packages/validators/src/ladders/pointer/bank/specs/scale.ts": "f4780b45f35186646a3282d615a6d4e6574604f74839c0ccbc74710bf95d3be9",
+    "packages/validators/src/ladders/pointer/bank/specs/stack.ts": "cc0f103cc2a5f532026bd240721cc8fb7d7f81e488f0c10fb5e02e4d17060677",
+    "packages/validators/src/ladders/pointer/bank/families/labelset-validation.ts": "0ca1ca0bb039586c8bc3ae289647614deac6b68187c86245542cde946a437aba"
+  },
+  "verification": {
+    "metadataRegressionTests": "packages/validators/test/pointer/cause-count.test.ts",
+    "causeRegressionTests": "packages/validators/test/pointer/causes.test.ts",
+    "fullBankAndCheatRuns": "Recorded separately in the repair test report and baseline; this registry alone certifies no behavior."
+  }
+}

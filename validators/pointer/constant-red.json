@@ -1,0 +1,16 @@
+{
+  "scope": "Fixed nonempty reader before source-specific controls",
+  "measuredTree": "Uncommitted repair tree based on 3e7a0ca4; 419 items, before the five additional guards",
+  "test": "packages/validators/test/pointer/constant.test.ts",
+  "runtime": "Node 24.18.0; Vitest 5.0.3; maxWorkers=2",
+  "passedItems": [
+    "cutting.html-nested-depth",
+    "grouping.atom-flags",
+    "labels.anchoring-independent-of-labeler",
+    "labels.set-hash-ignores-yaml-formatting",
+    "adversarial.deep-nested-quotes"
+  ],
+  "bankSize": 419,
+  "expectedPassedItems": [],
+  "result": "red: zero-pass assertion failed with these five IDs"
+}

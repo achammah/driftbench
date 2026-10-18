@@ -503,26 +503,26 @@ describe('driftbench validate --items and --hardness', () => {
 });
 
 describe('driftbench validate --hardness and distinct causes', () => {
-  it('exits 1 with fewer than 100 distinct failing causes and prints the count', async () => {
+  it.each([0, 40])('exits 1 with %i distinct failing causes and prints the count', async (causes) => {
     const root = await temp();
     const { ladder } = bankLadder();
     const d: ValidateDeps = { ladders: () => ({ banked: ladder }), root };
     await mkdir(join(root, 'validators/banked'), { recursive: true });
     await writeFile(
       join(root, 'validators/banked/journal.jsonl'),
-      `${journalOf([30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], 300, { '1': 300 }, () => 40)
+      `${journalOf([30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], 300, { '1': 300 }, () => causes)
         .map((row) => JSON.stringify(row))
         .join('\n')}\n`,
     );
     const { io, output } = capture(root);
     expect(await validateCommand('banked', { hardness: true }, io, d)).toBe(1);
     expect(output.out).toContain(
-      'Distinct failing causes after the pilot: 40 (0 failing items name no cause',
+      `Distinct failing causes after the pilot: ${causes} (0 failing items name no cause`,
     );
-    expect(output.out).toContain('40 distinct failing causes after the pilot, under 100');
+    expect(output.out).toContain(`${causes} distinct failing causes after the pilot, under 100`);
     const json = capture(root);
     await validateCommand('banked', { hardness: true, json: true }, json.io, d);
-    expect(JSON.parse(json.output.out).causes).toEqual({ distinct: 40, withoutCause: 0 });
+    expect(JSON.parse(json.output.out).causes).toEqual({ distinct: causes, withoutCause: 0 });
   });
 });
 

@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "scope": "PR750 independent review finding 2: adapter mapping",
+  "method": "Copy reader.ts and adapter.test.ts to an isolated scratch directory, rewrite only import paths, verify unmodified baseline, replace every exact match for one listed mutation, and run the same tests. No shared source is mutated. Restore the copied baseline after the last mutant.",
+  "testCommand": "pnpm exec vitest run packages/validators/test/pointer/adapter.test.ts --maxWorkers=2",
+  "isolatedCommand": "pnpm exec vitest run --config <scratch>/vitest.config.ts --maxWorkers=2",
+  "sourceSha256": {
+    "packages/validators/src/ladders/pointer/sut/reader.ts": "3c5f74ac31453422c0e85edfbcd422b4eec1772a3780def2a01b18a9108c982d",
+    "packages/validators/test/pointer/adapter.test.ts": "25138f28f17dbf3c5a56e23fbfc10226f69a29b4c9a7a804de90828f01696140"
+  },
+  "baseline": {
+    "exitCode": 0,
+    "passedTests": 24
+  },
+  "mutants": [
+    {
+      "name": "events-reconstructed",
+      "file": "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "find": "events: result.eventsById",
+      "replace": "events: Object.fromEntries(result.ledger.entries.map(e => [e.id, 'unchanged']))",
+      "exitCode": 1,
+      "failedTests": 7,
+      "assertionFailureObserved": true,
+      "verdict": "killed"
+    },
+    {
+      "name": "lineage-fabricated",
+      "file": "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "find": "lineage: e.lineage",
+      "replace": "lineage: []",
+      "exitCode": 1,
+      "failedTests": 1,
+      "assertionFailureObserved": true,
+      "verdict": "killed"
+    },
+    {
+      "name": "twins-fabricated",
+      "file": "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "find": "twinOf: e.twinOf",
+      "replace": "twinOf: null",
+      "exitCode": 1,
+      "failedTests": 1,
+      "assertionFailureObserved": true,
+      "verdict": "killed"
+    },
+    {
+      "name": "warnings-discarded",
+      "file": "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "find": "warnings: result.warnings",
+      "replace": "warnings: []",
+      "exitCode": 1,
+      "failedTests": 2,
+      "assertionFailureObserved": true,
+      "verdict": "killed"
+    },
+    {
+      "name": "check-accepted",
+      "file": "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "find": "const checked = reader.checkLedger(request.previousLedger, result.ledger);",
+      "replace": "const checked: {ok:boolean;error?:string} = { ok: true };",
+      "exitCode": 1,
+      "failedTests": 3,
+      "assertionFailureObserved": true,
+      "verdict": "killed"
+    },
+    {
+      "name": "check-implemented-by-adapter",
+      "file": "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "find": "const checked = reader.checkLedger(request.previousLedger, result.ledger);",
+      "replace": "const checked = { ok: view.raw === request.previousLedger, error: 'adapter comparison' };",
+      "exitCode": 1,
+      "failedTests": 2,
+      "assertionFailureObserved": true,
+      "verdict": "killed"
+    },
+    {
+      "name": "stack-decision-discarded",
+      "file": "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "find": "return reader.stackDecision(request);",
+      "replace": "return undefined;",
+      "exitCode": 1,
+      "failedTests": 1,
+      "assertionFailureObserved": true,
+      "verdict": "killed"
+    },
+    {
+      "name": "calls-fabricated",
+      "file": "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "find": "calls: result.calls",
+      "replace": "calls: 0",
+      "exitCode": 1,
+      "failedTests": 1,
+      "assertionFailureObserved": true,
+      "verdict": "killed"
+    },
+    {
+      "name": "replay-overridden",
+      "file": "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "find": "      mode,",
+      "replace": "      mode: 'record',",
+      "exitCode": 1,
+      "failedTests": 1,
+      "assertionFailureObserved": true,
+      "verdict": "killed"
+    }
+  ]
+}

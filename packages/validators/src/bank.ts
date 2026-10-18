@@ -1,4 +1,4 @@
-import { type LadderReport, seedLabel, type Tier } from './ladder';
+import { type CauseKind, type LadderReport, seedLabel, type Tier } from './ladder';
 
 /** The family key of an item that names none, and the tier key of an item that names none. */
 export const NO_FAMILY = 'none';
@@ -18,6 +18,8 @@ export type BankRow = {
   tier: Tier | undefined;
   /** The item's cause, the first one a seed reported; undefined when it names none. */
   cause: string | undefined;
+  /** Author-declared repair scope. Composite checks are excluded only from cause counts. */
+  causeKind?: CauseKind;
   /** One verdict per seed, in the order of the report's seeds. */
   perSeed: BankVerdict[];
   /** True when the item passed on every seed of the run. */
@@ -39,8 +41,8 @@ export type BankSummary = {
   /** Items not passing on every seed, per family; every family of the bank is listed, 0 included. */
   failingByFamily: Record<string, number>;
   /**
-   * Distinct causes among the items not passing on every seed (section 12.4). An item without a cause counts as
-   * its own cause; `failingWithoutCause` says how many such items there are.
+   * Distinct declared atomic causes among items not passing on every seed (section 12.4), not independently
+   * reviewed fixes. An atomic item without a cause counts as its own; composite checks add no cause credit.
    */
   failingCauses: number;
   failingWithoutCause: number;
@@ -79,6 +81,7 @@ export function bankSummary(report: LadderReport): BankSummary {
         family?: string;
         tier?: Tier;
         cause?: string;
+        causeKind?: CauseKind;
         pass: boolean;
       }[] = row.bank ?? [
         { id: row.id, component: report.component, family: LEVEL_FAMILY, pass: row.pass === true },
@@ -92,6 +95,8 @@ export function bankSummary(report: LadderReport): BankSummary {
           rows.set(key, target);
         }
         if (target.cause === undefined && entry.cause !== undefined) target.cause = entry.cause;
+        if (entry.causeKind === 'composite' || target.causeKind === undefined)
+          target.causeKind = entry.causeKind;
         target.perSeed[seedIndex] = entry.pass ? 'pass' : 'fail';
       }
     });
@@ -114,9 +119,12 @@ export function bankSummary(report: LadderReport): BankSummary {
   }
   const passing = list.filter((row) => row.passEverySeed).length;
   const failingRows = list.filter((row) => !row.passEverySeed);
+  const atomicFailures = failingRows.filter((row) => row.causeKind !== 'composite');
   const causesByFamily: Record<string, number> = {};
   for (const family of Object.keys(byFamilyTier)) {
-    causesByFamily[family] = new Set(failingRows.filter((row) => row.family === family).map(causeKey)).size;
+    causesByFamily[family] = new Set(
+      atomicFailures.filter((row) => row.family === family).map(causeKey),
+    ).size;
   }
   return {
     seeds,
@@ -125,8 +133,8 @@ export function bankSummary(report: LadderReport): BankSummary {
     score: list.length === 0 ? 0 : passing / list.length,
     byFamilyTier: sortKeys(byFamilyTier),
     failingByFamily: sortKeys(failingByFamily),
-    failingCauses: new Set(failingRows.map(causeKey)).size,
-    failingWithoutCause: failingRows.filter((row) => causeKey(row).startsWith('item:')).length,
+    failingCauses: new Set(atomicFailures.map(causeKey)).size,
+    failingWithoutCause: atomicFailures.filter((row) => causeKey(row).startsWith('item:')).length,
     failingCausesByFamily: sortKeys(causesByFamily),
     rows: list,
   };
@@ -172,6 +180,9 @@ export function formatItems(
   }, ${summary.passing} pass on every seed (score ${round(summary.score)}).\n`;
   if (!options.blind)
     text += `Failing: ${summary.size - summary.passing} items, ${summary.failingCauses} distinct causes (${summary.failingWithoutCause} items name no cause and count as their own).\n`;
+  if (!options.blind)
+    text +=
+      'Cause counts are author-declared, not independently reviewed. Composite checks retain their item verdicts but add no cause credit.\n';
   const header = ['Item', 'Tier', 'Level', 'Component', ...summary.seeds.map((seed) => `seed ${seed}`)];
   for (const family of families) {
     const members = summary.rows

@@ -7,6 +7,9 @@
 /** A difficulty tier of the hardness contract (docs/validators.md section 12.1), 1 the easiest. */
 export type Tier = 1 | 2 | 3 | 4 | 5;
 
+/** Author-declared repair scope; neither value constitutes an independent cause review. */
+export type CauseKind = 'atomic' | 'composite';
+
 /**
  * One named item behind a count: what failed, the one component it points at, and what to look at. Under the
  * hardness contract an item also names its family and its difficulty tier.
@@ -19,6 +22,8 @@ export type Item = {
   tier?: Tier;
   /** The one change that would make the item pass (section 12.4). Items sharing a cause count once. */
   cause?: string;
+  /** Composite checks retain their item verdict but add no distinct-cause credit. Omitted means atomic. */
+  causeKind?: CauseKind;
 };
 
 /** One item of a level's bank and whether it passed on this seed. */
@@ -29,6 +34,8 @@ export type BankEntry = {
   tier?: Tier;
   /** The one change that would make the item pass; items sharing a cause count once. */
   cause?: string;
+  /** Composite checks retain their item verdict but add no distinct-cause credit. Omitted means atomic. */
+  causeKind?: CauseKind;
   pass: boolean;
   detail?: string;
 };
@@ -64,6 +71,7 @@ export function bankMeasure(entries: readonly BankEntry[], component = 'bank'): 
       ...(entry.family !== undefined ? { family: entry.family } : {}),
       ...(entry.tier !== undefined ? { tier: entry.tier } : {}),
       ...(entry.cause !== undefined ? { cause: entry.cause } : {}),
+      ...(entry.causeKind !== undefined ? { causeKind: entry.causeKind } : {}),
     }));
   return { value: (entries.length - items.length) / entries.length, items, bank: [...entries] };
 }

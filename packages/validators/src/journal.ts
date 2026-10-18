@@ -57,6 +57,8 @@ export const JournalRowSchema = z
     bankSize: count,
     passing: count,
     failingByFamily: z.record(z.string().min(1), count),
+    // Only declared atomic causes count; an all-composite failure set legitimately has zero.
+    // The hardness gate still requires its minimum number of distinct causes.
     failingCauses: count.optional(),
     executor: z.enum(['builder', 'blind']).optional(),
     failingWithoutCause: count.optional(),
@@ -156,13 +158,6 @@ export const JournalRowSchema = z
           code: 'custom',
           path: ['failingCauses'],
           message: `failingCauses ${row.failingCauses} exceeds the ${failingItems} failing items`,
-        });
-      }
-      if (failingItems > 0 && row.failingCauses === 0) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['failingCauses'],
-          message: `${failingItems} items fail, so at least one cause does`,
         });
       }
     }

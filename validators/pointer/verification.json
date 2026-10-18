@@ -1,0 +1,402 @@
+{
+  "bankTestHead": "714857602f4d40c0e7e16167a659ead9ec58cdd5",
+  "runtime": "Node 24.18.0",
+  "packageManager": "pnpm 10.30.2",
+  "checks": [
+    {
+      "check": "biome",
+      "exitCode": 0,
+      "command": [
+        "pnpm",
+        "exec",
+        "biome",
+        "check",
+        "--write",
+        "packages/validators/src/bank.ts",
+        "packages/validators/src/ladder.ts",
+        "packages/validators/src/ladders/pointer/bank/families/adversarial.ts",
+        "packages/validators/src/ladders/pointer/bank/families/cutting.ts",
+        "packages/validators/src/ladders/pointer/bank/families/grouping.ts",
+        "packages/validators/src/ladders/pointer/bank/families/ids.ts",
+        "packages/validators/src/ladders/pointer/bank/families/labels.ts",
+        "packages/validators/src/ladders/pointer/bank/families/labelset-validation.ts",
+        "packages/validators/src/ladders/pointer/bank/families/privacy.ts",
+        "packages/validators/src/ladders/pointer/bank/families/reanchoring.ts",
+        "packages/validators/src/ladders/pointer/bank/families/replay.ts",
+        "packages/validators/src/ladders/pointer/bank/families/stack.ts",
+        "packages/validators/src/ladders/pointer/bank/index.ts",
+        "packages/validators/src/ladders/pointer/bank/ladder.ts",
+        "packages/validators/src/ladders/pointer/bank/specs/adversarial.ts",
+        "packages/validators/src/ladders/pointer/bank/specs/cutting.ts",
+        "packages/validators/src/ladders/pointer/bank/specs/labels.ts",
+        "packages/validators/src/ladders/pointer/bank/specs/labelset-validation.ts",
+        "packages/validators/src/ladders/pointer/bank/specs/radius.ts",
+        "packages/validators/src/ladders/pointer/bank/specs/reanchoring.ts",
+        "packages/validators/src/ladders/pointer/bank/specs/replay.ts",
+        "packages/validators/src/ladders/pointer/bank/specs/stack.ts",
+        "packages/validators/src/ladders/pointer/bank/specs/types.ts",
+        "packages/validators/src/ladders/pointer/bank/types.ts",
+        "packages/validators/src/ladders/pointer/kit/estate.ts",
+        "packages/validators/src/ladders/pointer/kit/fixture.ts",
+        "packages/validators/src/ladders/pointer/kit/scale.ts",
+        "packages/validators/src/ladders/pointer/kit/transport.ts",
+        "packages/validators/src/ladders/pointer/sut/port.ts",
+        "packages/validators/src/ladders/pointer/sut/reader.ts",
+        "packages/validators/test/pointer/adapter-observations.test.ts",
+        "packages/validators/test/pointer/adapter.test.ts",
+        "packages/validators/test/pointer/bank.test.ts",
+        "packages/validators/test/pointer/cause-count.test.ts",
+        "packages/validators/test/pointer/causes.test.ts",
+        "packages/validators/test/pointer/constant-controls.test.ts",
+        "packages/validators/test/pointer/contracts.test.ts",
+        "packages/validators/test/pointer/helpers.ts",
+        "packages/validators/test/pointer/missing-warnings.ts",
+        "packages/validators/test/pointer/mutants.test.ts",
+        "packages/validators/test/pointer/record-baseline.ts",
+        "packages/validators/test/pointer/reference/cut.ts",
+        "packages/validators/test/pointer/reference/index.ts",
+        "packages/validators/test/pointer/reference/ports.ts",
+        "packages/validators/test/pointer/reference/scan.ts",
+        "packages/validators/test/pointer/reference/stack.ts",
+        "packages/validators/test/pointer/replay-contract.test.ts",
+        "packages/validators/test/pointer/stack.test.ts"
+      ]
+    },
+    {
+      "check": "tsc",
+      "exitCode": 0,
+      "command": [
+        "pnpm",
+        "exec",
+        "tsc",
+        "--project",
+        "/private/tmp/astra-banks-pointer-tsconfig.json",
+        "--noEmit"
+      ]
+    },
+    {
+      "check": "tests",
+      "exitCode": 0,
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "packages/validators/test/pointer",
+        "packages/validators/test/bank.test.ts",
+        "packages/validators/test/ladder.test.ts",
+        "packages/cli/test/validate.test.ts",
+        "--maxWorkers=2"
+      ]
+    },
+    {
+      "check": "baseline",
+      "exitCode": 143
+    }
+  ],
+  "testsPassed": 218,
+  "testsSkipped": 3,
+  "journalCompositeFix": {
+    "ready": true,
+    "status": "ready",
+    "files": [
+      "packages/validators/src/journal.ts",
+      "packages/validators/test/causes.test.ts",
+      "packages/cli/test/validate.test.ts",
+      "docs/validators.md"
+    ],
+    "sourceSha256": {
+      "packages/validators/src/journal.ts": "caf103cf37b9c9c2e5ce8e2cb105a6e7bc831c2aee21686facd306ebcddc012d",
+      "packages/validators/test/causes.test.ts": "98ef2f1245988b1ccc85ccbead9c131d25bbff99940bb05d7c3fa680169654be",
+      "packages/cli/test/validate.test.ts": "ca919502e09a463c444667c68f51ee4f6797bef291e2c5c7c12051c8f0fc6046",
+      "docs/validators.md": "50b8137e6fdcd13f21e73361d0a5895a9b6fe119f99b9cadeec83215d296e10f"
+    },
+    "fix": "Allow zero declared atomic causes in a valid journal row when composite checks fail; keep all bank verdicts and the distinct-cause hardness minimum unchanged.",
+    "red": {
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "packages/validators/test/causes.test.ts",
+        "--maxWorkers=2"
+      ],
+      "exit": 1,
+      "log": "/private/tmp/astra-banks-journal-causes-red.log",
+      "failedTests": 3,
+      "passingTests": 5
+    },
+    "mutants": [
+      {
+        "name": "old-journal-refusal-restored",
+        "killed": true,
+        "failedTests": 3,
+        "passingTests": 5,
+        "sourceRestored": true
+      }
+    ],
+    "focusedPassingTests": 26,
+    "cliPassingTests": 2,
+    "commands": [
+      {
+        "name": "old-refusal-mutant",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "packages/validators/test/causes.test.ts",
+          "--maxWorkers=2"
+        ],
+        "exit": 1,
+        "log": "/private/tmp/astra-banks-journal-old-refusal-mutant.log"
+      },
+      {
+        "name": "final-tests",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "packages/validators/test/causes.test.ts",
+          "packages/validators/test/loop.test.ts",
+          "packages/validators/test/hardness.test.ts",
+          "packages/validators/test/pointer/cause-count.test.ts",
+          "--maxWorkers=2"
+        ],
+        "exit": 0,
+        "log": "/private/tmp/astra-banks-journal-final-tests.log"
+      },
+      {
+        "name": "final-cli",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "packages/cli/test/validate.test.ts",
+          "--maxWorkers=2",
+          "-t",
+          "distinct causes"
+        ],
+        "exit": 0,
+        "log": "/private/tmp/astra-banks-journal-final-cli.log"
+      },
+      {
+        "name": "final-biome",
+        "command": [
+          "pnpm",
+          "exec",
+          "biome",
+          "check",
+          "packages/validators/src/journal.ts",
+          "packages/validators/test/causes.test.ts",
+          "packages/cli/test/validate.test.ts"
+        ],
+        "exit": 0,
+        "log": "/private/tmp/astra-banks-journal-final-biome.log"
+      },
+      {
+        "name": "final-types",
+        "command": [
+          "pnpm",
+          "exec",
+          "tsc",
+          "-p",
+          "/private/tmp/astra-banks-pointer-tsconfig.json",
+          "--noEmit"
+        ],
+        "exit": 0,
+        "log": "/private/tmp/astra-banks-journal-final-types.log"
+      },
+      {
+        "name": "final-diff",
+        "command": [
+          "git",
+          "diff",
+          "--check",
+          "--",
+          "packages/validators/src/journal.ts",
+          "packages/validators/test/causes.test.ts",
+          "packages/cli/test/validate.test.ts",
+          "docs/validators.md"
+        ],
+        "exit": 0,
+        "log": "/private/tmp/astra-banks-journal-final-diff.log"
+      }
+    ],
+    "baselineInputsEdited": false,
+    "committed": false,
+    "pushed": false
+  },
+  "baselinePreflightFix": {
+    "status": "ready",
+    "files": [
+      "packages/validators/src/ladders/pointer/sut/reader.ts",
+      "packages/validators/test/pointer/preflight.test.ts",
+      "packages/validators/test/pointer/record-baseline.ts"
+    ],
+    "scope": "Fail fast before baseline scoring or clean-source guard when the actual default reader module or required exports are absent; bound unresolved imports to 5000 ms. No item IDs, causes or semantics changed.",
+    "actualRunner": {
+      "command": "pnpm exec tsx packages/validators/test/pointer/record-baseline.ts",
+      "exitCode": 2,
+      "seconds": 1.2914003749610856,
+      "stdout": "",
+      "stderr": "BASELINE_PENDING PR 692: the pointer reader is not reachable: @agent-nexus/driftbench-estate does not export AGENT_RULES_SET, Cassette, cut, LabelerError, buildLabelling, singleLabelling, denseOpinions, parseDenseAnswer, parseLabelSets, parseLedger, renderLedger, setHash, pointerScan, pointerAtoms (namespace pointer)\n",
+      "before": {
+        "validators/pointer/baseline.json": null,
+        "validators/pointer/journal.jsonl": "2c031698097a36e121c87ce75a560fc81e403e87f57695c1b69a61317afe38a6"
+      },
+      "after": {
+        "validators/pointer/baseline.json": null,
+        "validators/pointer/journal.jsonl": "2c031698097a36e121c87ce75a560fc81e403e87f57695c1b69a61317afe38a6"
+      }
+    },
+    "sourceMutationEvidence": {
+      "sourceSha256": "ba33e0e83e45e698c952877dd1863bd74eb4196fc8acac427b97cf969e430979",
+      "results": [
+        {
+          "mutation": "baseline",
+          "find": null,
+          "replace": null,
+          "exit": 0,
+          "expectedOutcome": true,
+          "command": [
+            "pnpm",
+            "exec",
+            "vitest",
+            "run",
+            "--config",
+            "/private/tmp/astra-banks-preflight-mutations/vitest.config.ts",
+            "--maxWorkers=2"
+          ],
+          "log": "/private/tmp/astra-banks-preflight-mutations/baseline.log",
+          "testSummary": "Tests  5 passed (5)",
+          "assertionFailures": []
+        },
+        {
+          "mutation": "missing-exports-accepted",
+          "find": "if (missing.length > 0)",
+          "replace": "if (false)",
+          "exit": 1,
+          "expectedOutcome": true,
+          "command": [
+            "pnpm",
+            "exec",
+            "vitest",
+            "run",
+            "--config",
+            "/private/tmp/astra-banks-preflight-mutations/vitest.config.ts",
+            "--maxWorkers=2"
+          ],
+          "log": "/private/tmp/astra-banks-preflight-mutations/missing-exports-accepted.log",
+          "testSummary": "Tests  2 failed | 3 passed (5)",
+          "assertionFailures": [
+            "promise resolved \"{ AtomBuilder: [Function AtomBuilder] }\" instead of rejecting",
+            "promise resolved \"{ AGENT_RULES_SET: 'labels: []', \u2026(13) }\" instead of rejecting"
+          ]
+        },
+        {
+          "mutation": "deadline-removed",
+          "find": "return await Promise.race([importing, deadline]);",
+          "replace": "return await importing;",
+          "exit": 1,
+          "expectedOutcome": true,
+          "command": [
+            "pnpm",
+            "exec",
+            "vitest",
+            "run",
+            "--config",
+            "/private/tmp/astra-banks-preflight-mutations/vitest.config.ts",
+            "--maxWorkers=2"
+          ],
+          "log": "/private/tmp/astra-banks-preflight-mutations/deadline-removed.log",
+          "testSummary": "Tests  1 failed | 4 passed (5)",
+          "assertionFailures": [
+            "expected undefined to be an instance of Error"
+          ]
+        },
+        {
+          "mutation": "restored",
+          "find": null,
+          "replace": null,
+          "exit": 0,
+          "expectedOutcome": true,
+          "command": [
+            "pnpm",
+            "exec",
+            "vitest",
+            "run",
+            "--config",
+            "/private/tmp/astra-banks-preflight-mutations/vitest.config.ts",
+            "--maxWorkers=2"
+          ],
+          "log": "/private/tmp/astra-banks-preflight-mutations/restored.log",
+          "testSummary": "Tests  5 passed (5)",
+          "assertionFailures": []
+        }
+      ]
+    },
+    "verification": {
+      "exitCode": 0,
+      "commands": [
+        "pnpm exec biome check packages/validators/src/ladders/pointer/sut/reader.ts packages/validators/test/pointer/preflight.test.ts packages/validators/test/pointer/record-baseline.ts",
+        "pnpm exec tsc --noEmit --project /private/tmp/astra-banks-preflight-tsconfig.json",
+        "pnpm exec vitest run packages/validators/test/pointer/preflight.test.ts packages/validators/test/pointer/adapter.test.ts --maxWorkers=2"
+      ],
+      "log": "/private/tmp/astra-banks-preflight-final.log",
+      "testsPassed": 29,
+      "testFilesPassed": 2,
+      "biome": "3 files; no fixes applied",
+      "typescript": "passed"
+    },
+    "notes": [
+      "Tests contain known-good module controls, missing-module and missing-namespace/partial-export failures, and fake-time unresolved-import deadline verification.",
+      "Mutations ran only on copied source; restored-copy tests passed. Deadline removal caused the expected assertion failure plus an unhandled rejection from its orphaned deadline.",
+      "No baseline score or fake zero-count result is recorded. Real baseline remains pending PR 692."
+    ],
+    "ready": true,
+    "sourceSha256": {
+      "packages/validators/src/ladders/pointer/sut/reader.ts": "ba33e0e83e45e698c952877dd1863bd74eb4196fc8acac427b97cf969e430979",
+      "packages/validators/test/pointer/preflight.test.ts": "7281be2c811368e1f9fd1ad66a5cfc5292570caf2990b22ba052b740af443aee",
+      "packages/validators/test/pointer/record-baseline.ts": "87f368dc8bbab050d31bd002270de22c335e2e0647b5cb32e90ade45a3bc9253"
+    }
+  },
+  "empty": {
+    "originalPassing": 62,
+    "originalItems": 402,
+    "passing": 0,
+    "items": 419
+  },
+  "failedEmpty": {
+    "originalPassing": 24,
+    "originalItems": 402,
+    "passing": 0,
+    "items": 419
+  },
+  "constantNonempty": {
+    "beforePassing": 5,
+    "passing": 0,
+    "items": 419,
+    "redTestCommit": "fbe69248d51d2ea136295005cd6019a0b1fadce0"
+  },
+  "mutationEvidence": {
+    "adapterSourceMutants": 9,
+    "replayRejectionAssertions": 83,
+    "stackMutants": 12,
+    "contractMutants": 4,
+    "missingObservationCases": 7,
+    "labelSetValidationMutants": 5,
+    "causeCountMutants": 2,
+    "note": "Targeted maintainer regression evidence; these are not independent component audits or a distinct-fix count."
+  },
+  "baseline": {
+    "status": "pending PR 692",
+    "requestedSeeds": "1-20 plus canonical hidden",
+    "completed": false,
+    "reason": "The estate package does not export the pointer reader. The incomplete attempt was terminated; no baseline score is inferred. The runner preflights availability before items."
+  },
+  "independentAudit": "pending after real component PR692 merges",
+  "executorIterations": "pending; none claimed"
+}

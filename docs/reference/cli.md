@@ -1222,7 +1222,7 @@ driftbench validate floors [--raise <component> <level> --evidence <json> [--lad
 driftbench validate protect --branch <name> --base <ref>
 ```
 
-Runs a validator ladder: the levels in order, stopping at the first failing level, and exits with the level reached. The registered components are `estate`, `generator`, `judges`, `map`, `stats` and `system`; `all` runs every registered validator. `floors` and `protect` are not validators: they read and raise the floors, and check a pull request. The ladders, the floors, the loop files and the CI job are on the [validators](../validators.md) page, section 8.2.
+Runs a validator ladder: the levels in order, stopping at the first failing level, and exits with the level reached. The registered components are `estate`, `generator`, `judges`, `map`, `pointer`, `stats` and `system`; `all` runs every registered validator. `floors` and `protect` are not validators: they read and raise the floors, and check a pull request. The ladders, the floors, the loop files and the CI job are on the [validators](../validators.md) page, section 8.2.
 
 | Option | Effect |
 |---|---|
