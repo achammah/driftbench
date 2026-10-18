@@ -232,7 +232,7 @@ describe('a helper-owned prerequisite asks for the work to be handed to a helper
 
   it('delegates for a reference and a gate, never for the helper itself or a skill-owned atom', () => {
     expect(codeAsk('trigger', [ref, helper], []).text).toBe(
-      'Please have a helper agent audit the ledger extract for duplicate payments.',
+      'Please have a helper agent audit the ledger extract for duplicate payments, including the codes.',
     );
     expect(codeAsk('trigger', [gate, helper], []).text).toBe(
       'Please have a helper agent audit the ledger extract.',
@@ -241,7 +241,9 @@ describe('a helper-owned prerequisite asks for the work to be handed to a helper
       'Please audit the ledger extract for duplicate payments.',
     );
     const owner = unit('stock', 'Counts stock in the aisles.');
-    expect(codeAsk('trigger', [ref, owner], []).text).toBe('Please count stock in the aisles.');
+    expect(codeAsk('trigger', [ref, owner], []).text).toBe(
+      'Please count stock in the aisles, including the codes.',
+    );
   });
 });
 
@@ -386,7 +388,7 @@ describe('a reference to a navigation document is no test', () => {
       const parsed = parseSpecText(file?.text ?? '', 'yaml', file?.path ?? '');
       if (!parsed.ok) throw new Error(JSON.stringify(parsed.errors));
       expect(parsed.spec.blocks[0]?.when).toEqual({
-        user: 'Please count stock in the aisles. When a count sheet is late.',
+        user: 'Please count stock in the aisles, including the count 014. When a count sheet is late.',
       });
     }
   });

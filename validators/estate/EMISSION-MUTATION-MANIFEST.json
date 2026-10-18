@@ -3329,7 +3329,7 @@
     {
       "seed": 1,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "blocks.0.expect.workspace",
       "kind": "check",
       "provenance": "product",
@@ -3342,12 +3342,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails strict lint"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails strict lint"
     },
     {
       "seed": 1,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "blocks.0.expect.workspace.others_untouched",
       "kind": "field",
       "provenance": "product",
@@ -3360,12 +3360,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.expect.workspace.evidence.diff"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.expect.workspace.evidence.diff"
     },
     {
       "seed": 1,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission",
       "kind": "check",
       "provenance": "product",
@@ -3379,12 +3379,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.custom.permission.0.covered.exists"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.custom.permission.0.covered.exists"
     },
     {
       "seed": 1,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules",
       "kind": "field",
       "provenance": "product",
@@ -3398,12 +3398,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: Cannot read properties of undefined (reading 'every')"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: Cannot read properties of undefined (reading 'every')"
     },
     {
       "seed": 1,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0",
       "kind": "entry",
       "provenance": "product",
@@ -3417,12 +3417,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.custom.permission.0.covered.exists"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.custom.permission.0.covered.exists"
     },
     {
       "seed": 1,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0.effect",
       "kind": "field",
       "provenance": "product",
@@ -3436,12 +3436,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
     },
     {
       "seed": 1,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0.rule",
       "kind": "field",
       "provenance": "product",
@@ -3455,12 +3455,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
     },
     {
       "seed": 1,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.block",
       "kind": "field",
       "provenance": "product",
@@ -13457,7 +13457,7 @@
     {
       "seed": 2,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "blocks.0.expect.workspace",
       "kind": "check",
       "provenance": "product",
@@ -13470,12 +13470,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails strict lint"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails strict lint"
     },
     {
       "seed": 2,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "blocks.0.expect.workspace.others_untouched",
       "kind": "field",
       "provenance": "product",
@@ -13488,12 +13488,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.expect.workspace.evidence.diff"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.expect.workspace.evidence.diff"
     },
     {
       "seed": 2,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission",
       "kind": "check",
       "provenance": "product",
@@ -13507,12 +13507,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.custom.permission.0.covered.exists"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.custom.permission.0.covered.exists"
     },
     {
       "seed": 2,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules",
       "kind": "field",
       "provenance": "product",
@@ -13526,12 +13526,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: Cannot read properties of undefined (reading 'every')"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: Cannot read properties of undefined (reading 'every')"
     },
     {
       "seed": 2,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0",
       "kind": "entry",
       "provenance": "product",
@@ -13545,12 +13545,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.custom.permission.0.covered.exists"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.custom.permission.0.covered.exists"
     },
     {
       "seed": 2,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0.effect",
       "kind": "field",
       "provenance": "product",
@@ -13564,12 +13564,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
     },
     {
       "seed": 2,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0.rule",
       "kind": "field",
       "provenance": "product",
@@ -13583,12 +13583,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
     },
     {
       "seed": 2,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.block",
       "kind": "field",
       "provenance": "product",
@@ -23708,7 +23708,7 @@
     {
       "seed": 3,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "blocks.0.expect.workspace",
       "kind": "check",
       "provenance": "product",
@@ -23721,12 +23721,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails strict lint"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails strict lint"
     },
     {
       "seed": 3,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "blocks.0.expect.workspace.others_untouched",
       "kind": "field",
       "provenance": "product",
@@ -23739,12 +23739,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.expect.workspace.evidence.diff"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.expect.workspace.evidence.diff"
     },
     {
       "seed": 3,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission",
       "kind": "check",
       "provenance": "product",
@@ -23758,12 +23758,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.custom.permission.0.covered.exists"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.custom.permission.0.covered.exists"
     },
     {
       "seed": 3,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules",
       "kind": "field",
       "provenance": "product",
@@ -23777,12 +23777,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: Cannot read properties of undefined (reading 'every')"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: Cannot read properties of undefined (reading 'every')"
     },
     {
       "seed": 3,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0",
       "kind": "entry",
       "provenance": "product",
@@ -23796,12 +23796,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.custom.permission.0.covered.exists"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.custom.permission.0.covered.exists"
     },
     {
       "seed": 3,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0.effect",
       "kind": "field",
       "provenance": "product",
@@ -23815,12 +23815,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
     },
     {
       "seed": 3,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0.rule",
       "kind": "field",
       "provenance": "product",
@@ -23834,12 +23834,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
     },
     {
       "seed": 3,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.block",
       "kind": "field",
       "provenance": "product",
@@ -32676,7 +32676,7 @@
     {
       "seed": 292269655,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "blocks.0.expect.workspace",
       "kind": "check",
       "provenance": "product",
@@ -32689,12 +32689,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails strict lint"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails strict lint"
     },
     {
       "seed": 292269655,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "blocks.0.expect.workspace.others_untouched",
       "kind": "field",
       "provenance": "product",
@@ -32707,12 +32707,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.expect.workspace.evidence.diff"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.expect.workspace.evidence.diff"
     },
     {
       "seed": 292269655,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission",
       "kind": "check",
       "provenance": "product",
@@ -32726,12 +32726,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.custom.permission.0.covered.exists"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.custom.permission.0.covered.exists"
     },
     {
       "seed": 292269655,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules",
       "kind": "field",
       "provenance": "product",
@@ -32745,12 +32745,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: Cannot read properties of undefined (reading 'every')"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: Cannot read properties of undefined (reading 'every')"
     },
     {
       "seed": 292269655,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0",
       "kind": "entry",
       "provenance": "product",
@@ -32764,12 +32764,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: component control failed 0.custom.permission.0.covered.exists"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: component control failed 0.custom.permission.0.covered.exists"
     },
     {
       "seed": 292269655,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0.effect",
       "kind": "field",
       "provenance": "product",
@@ -32783,12 +32783,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
     },
     {
       "seed": 292269655,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.rules.0.rule",
       "kind": "field",
       "provenance": "product",
@@ -32802,12 +32802,12 @@
       "mutant": false,
       "restored": true,
       "schema": "valid",
-      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
+      "reason": "1 of 1: estate.tool_boundary.tool.settings.allow-bash-python3-tools: fails on the rule follower: block 0: custom.permission: the custom check permission threw: permission needs { effect, rule }"
     },
     {
       "seed": 292269655,
       "item": "gen.complete.tool_boundary-tool-allow",
-      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3",
+      "spec": "estate.tool_boundary.tool.settings.allow-bash-python3-tools",
       "path": "rules.custom.permission.block",
       "kind": "field",
       "provenance": "product",

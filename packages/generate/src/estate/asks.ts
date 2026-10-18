@@ -273,6 +273,52 @@ export function actOf(
   routesOf: (unitId: string) => readonly EstateAtom[] = () => [],
   estate: readonly EstateAtom[] = [],
 ): { act: string; context?: string; source: string; describes?: boolean } {
+  const found = unitActOf(atoms, lookup, routesOf, estate);
+  const head = atoms[0];
+  // A file that states no moment of its own is read at the work of the unit that cites it, which every file of
+  // that unit shares. What tells them apart is what each file is about: its own name.
+  if (head?.kind !== 'reference' || found.act === '' || found.source.startsWith(`${head.id} (`)) return found;
+  const subject = fileSubject(head.fields?.path);
+  if (subject === undefined) return found;
+  // A subject whose words the task already holds is not repeated ("weave a panel" holds "weave panel").
+  const taskWords = new Set(lower(found.act).match(/\p{L}+|\d+/gu) ?? []);
+  if (subject.split(' ').every((word) => taskWords.has(word))) return found;
+  return {
+    ...found,
+    act: `${found.act}, including the ${subject}`,
+    source: `${found.source}, file ${subject}`,
+  };
+}
+
+/** Names that say nothing about what a file is about. */
+const GENERIC_FILE_NAMES = new Set(['skill', 'readme', 'index', 'agents', 'claude', 'memory', 'notes']);
+
+/**
+ * What a file is about, from its own name: "references/api-limits.md" gives "api limits", "data-3.json" gives
+ * "data 3". Undefined when the name is generic, has no letters, or is not a file name.
+ */
+function fileSubject(path: unknown): string | undefined {
+  if (typeof path !== 'string') return undefined;
+  const stem =
+    path
+      .replace(/\\/g, '/')
+      .split('/')
+      .pop()
+      ?.replace(/\.[A-Za-z0-9]+$/, '') ?? '';
+  if (stem === '' || GENERIC_FILE_NAMES.has(stem.toLowerCase())) return undefined;
+  const words = stem
+    .split(/[\s._-]+/)
+    .filter((word) => word !== '')
+    .map((word) => word.toLowerCase());
+  return words.some((word) => /\p{L}{2,}/u.test(word)) ? words.join(' ') : undefined;
+}
+
+function unitActOf(
+  atoms: readonly EstateAtom[],
+  lookup: (id: string) => EstateAtom | undefined,
+  routesOf: (unitId: string) => readonly EstateAtom[],
+  estate: readonly EstateAtom[],
+): { act: string; context?: string; source: string; describes?: boolean } {
   const head = atoms[0];
   if (head?.kind === 'guard') {
     const guarded = guardAct(head, lookup);
