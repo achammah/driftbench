@@ -26,7 +26,7 @@ import { openMemoryStore } from '@agent-nexus/driftbench-store';
 import { createScriptedDriver } from '@agent-nexus/driftbench-users';
 import { SYSTEM_COMPONENTS } from '../components';
 import { type Behaviour, followerReply } from '../plant';
-import { measureGrowth, VISIT_GROWTH_BOUND } from './growth';
+import { measureGrowth, TEN_RUNS_PER_ROUND, TIME_ROUNDS, timeGrowth, VISIT_GROWTH_BOUND } from './growth';
 import {
   type BankItem,
   type Draft,
@@ -52,8 +52,10 @@ import {
  * Level 11: scale (section 12.2, item 4). Each subject runs at one, ten and a hundred times a base size. At
  * every size the answer must be the planted one; and the time from ten to a hundred times must grow at most
  * GROWTH_BOUND times (linear growth is ten; a quadratic path is a hundred), with the largest size under its
- * budget. Correct and slow is a failing item. The subjects whose size is the length of the history take their
- * growth from `growth.ts`, which counts the work before it times it.
+ * budget. Correct and slow is a failing item. Every growth item reads the best CPU time of many interleaved
+ * runs at both sizes (`timeGrowth` in `growth.ts`): one run at a size of a few milliseconds measures the load
+ * of the machine as much as the work. The subjects whose size is the length of the history also count the
+ * work before they time it (`measureGrowth`).
  */
 
 export const GROWTH_BOUND = 25;
@@ -591,7 +593,7 @@ export function scaleItems(): BankItem[] {
       source: 'scale',
       title: subject.history
         ? `${subject.name}: from ten to a hundred times the size, the message visits grow at most ${VISIT_GROWTH_BOUND} times and the best CPU time at most ${GROWTH_BOUND} times`
-        : `${subject.name}: the time from ten to a hundred times the size grows at most ${GROWTH_BOUND} times`,
+        : `${subject.name}: from ten to a hundred times the size, the best CPU time of ${TIME_ROUNDS.min} to ${TIME_ROUNDS.max} interleaved rounds grows at most ${GROWTH_BOUND} times`,
       async check({ seed }) {
         if (subject.history) {
           const growth = await measureGrowth((size) => subject.run(seed, size), subject.base, {
@@ -599,14 +601,13 @@ export function scaleItems(): BankItem[] {
           });
           return growth.result;
         }
-        const rows = await measure(seed, subject);
-        const ten = rows[1]?.ms ?? 0;
-        const hundred = rows[2]?.ms ?? 0;
-        const growth = hundred / Math.max(ten, 1);
-        return growth <= GROWTH_BOUND
+        const time = await timeGrowth((size) => subject.run(seed, size), subject.base, {
+          timeBound: GROWTH_BOUND,
+        });
+        return time.pass
           ? PASS
           : fail(
-              `${Math.round(ten)} ms at ${rows[1]?.size}, ${Math.round(hundred)} ms at ${rows[2]?.size}: ${growth.toFixed(1)} times`,
+              `best CPU time ${time.ten.toFixed(1)} ms at ${subject.base * 10}, ${time.hundred.toFixed(1)} ms at ${subject.base * 100}, over ${time.rounds} rounds of ${TEN_RUNS_PER_ROUND} and 1 runs: ${time.growth.toFixed(1)} times, the bound is ${GROWTH_BOUND}`,
             );
       },
     });

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { measureGrowth } from '../../src/ladders/system/bank/growth';
+import { measureGrowth, TIME_ROUNDS, timeGrowth } from '../../src/ladders/system/bank/growth';
 import { GROWTH_BOUND, scaleItems } from '../../src/ladders/system/bank/scale';
 
 /**
@@ -178,16 +178,39 @@ describe('the bank item', () => {
     expect(item?.title).toContain('message visits');
     expect(item?.title).toContain(`${GROWTH_BOUND} times`);
   });
+});
 
-  it('leaves the growth items of the other subjects as they were', () => {
-    const others = scaleItems().filter(
-      (entry) =>
-        entry.id.endsWith('/growth') &&
-        entry.id !== 'scale/flow-blocks/growth' &&
-        entry.id !== 'scale/flow-blocks-teacher-forced/growth',
-    );
-    expect(others).toHaveLength(17);
-    for (const item of others)
-      expect(item.title).toMatch(/: the time from ten to a hundred times the size grows at most 25 times$/);
+describe('the time measure of every growth item (timeGrowth)', () => {
+  /** A run of `size` that costs the next recorded time of its size on a clock of its own. */
+  function replay(ten: number[], hundred: number[]) {
+    let now = 0;
+    const next = { ten: 0, hundred: 0 };
+    return {
+      clock: () => now,
+      run: async (size: number) => {
+        const list = size === 600 ? ten : hundred;
+        const key = size === 600 ? 'ten' : 'hundred';
+        now += list[next[key] % list.length] as number;
+        next[key] += 1;
+      },
+    };
+  }
+
+  it('reads the best case: one slow run at either size changes nothing', async () => {
+    const noisy = replay([2.54, 6.8, 2.6, 13.7], [66, 66, 25.5, 89, 24.9, 30]);
+    const time = await timeGrowth(noisy.run, 60, { clock: noisy.clock, timeBound: GROWTH_BOUND });
+    expect(time.ten).toBeCloseTo(2.54, 6);
+    expect(time.hundred).toBeCloseTo(24.9, 6);
+    expect(time).toMatchObject({ rounds: TIME_ROUNDS.min, pass: true });
+  });
+
+  it('keeps the bound: a best case 26 times larger fails after the most rounds, 24 times passes', async () => {
+    const over = replay([3], [78]);
+    const under = replay([3], [72]);
+    const failed = await timeGrowth(over.run, 60, { clock: over.clock, timeBound: GROWTH_BOUND });
+    const passed = await timeGrowth(under.run, 60, { clock: under.clock, timeBound: GROWTH_BOUND });
+    expect(failed).toMatchObject({ pass: false, rounds: TIME_ROUNDS.max });
+    expect(failed.growth.toFixed(1)).toBe('26.0');
+    expect(passed).toMatchObject({ pass: true, rounds: TIME_ROUNDS.min });
   });
 });

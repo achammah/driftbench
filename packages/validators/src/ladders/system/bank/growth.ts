@@ -316,6 +316,49 @@ export type Growth = {
   result: ItemResult;
 };
 
+export type TimeGrowth = Growth['time'];
+
+/**
+ * The time half of the growth measure, for any run whose cost should grow linearly with its size. A round is
+ * TEN_RUNS_PER_ROUND runs at ten times `base` and then one run at a hundred times. The verdict reads the best
+ * CPU time of each size over all the rounds: the load of the machine only ever adds time, so the best case of
+ * many interleaved runs measures the work, where one run at each size measures the load as well. The measure
+ * stops after the fewest rounds when the best case is within the bound, and goes on to the most when it is
+ * not: more runs only ever lower a best case, on both sizes. The smaller time is taken as at least 1 ms.
+ */
+export async function timeGrowth(
+  run: (size: number) => Promise<unknown>,
+  base: number,
+  options: GrowthOptions,
+): Promise<TimeGrowth> {
+  const sizes = { ten: base * 10, hundred: base * 100 };
+  const clock = options.clock ?? cpuClock;
+  const rounds = options.rounds ?? TIME_ROUNDS;
+  const timed = async (size: number): Promise<number> => {
+    const started = clock();
+    await run(size);
+    return clock() - started;
+  };
+  let bestTen = Number.POSITIVE_INFINITY;
+  let bestHundred = Number.POSITIVE_INFINITY;
+  let done = 0;
+  const growth = () => bestHundred / Math.max(bestTen, 1);
+  while (done < rounds.min || (done < rounds.max && growth() > options.timeBound)) {
+    for (let again = 0; again < TEN_RUNS_PER_ROUND; again += 1)
+      bestTen = Math.min(bestTen, await timed(sizes.ten));
+    bestHundred = Math.min(bestHundred, await timed(sizes.hundred));
+    done += 1;
+  }
+  return {
+    ten: bestTen,
+    hundred: bestHundred,
+    growth: growth(),
+    bound: options.timeBound,
+    rounds: done,
+    pass: growth() <= options.timeBound,
+  };
+}
+
 /**
  * Measures the growth of `run` from ten to a hundred times `base`.
  *
@@ -323,10 +366,7 @@ export type Growth = {
  * time measure takes the smaller time as at least one millisecond, so a run that visits nothing at the
  * smaller size does not divide by zero.
  *
- * Time: a round is TEN_RUNS_PER_ROUND runs at ten times the size and then one run at a hundred times, with
- * the meter off. The verdict reads the best time of each size over all the rounds. The measure stops after
- * the fewest rounds when the best case is within the bound, and goes on to the most when it is not: more
- * runs only ever lower a best case, on both sizes.
+ * Time: `timeGrowth`, with the meter off.
  */
 export async function measureGrowth(
   run: (size: number) => Promise<unknown>,
@@ -348,29 +388,8 @@ export async function measureGrowth(
     pass: visitGrowth <= VISIT_GROWTH_BOUND,
   };
 
-  const timed = async (size: number): Promise<number> => {
-    const started = clock();
-    await run(size);
-    return clock() - started;
-  };
-  let bestTen = Number.POSITIVE_INFINITY;
-  let bestHundred = Number.POSITIVE_INFINITY;
-  let done = 0;
-  const timeGrowth = () => bestHundred / Math.max(bestTen, 1);
-  while (done < rounds.min || (done < rounds.max && timeGrowth() > options.timeBound)) {
-    for (let again = 0; again < TEN_RUNS_PER_ROUND; again += 1)
-      bestTen = Math.min(bestTen, await timed(sizes.ten));
-    bestHundred = Math.min(bestHundred, await timed(sizes.hundred));
-    done += 1;
-  }
-  const time = {
-    ten: bestTen,
-    hundred: bestHundred,
-    growth: timeGrowth(),
-    bound: options.timeBound,
-    rounds: done,
-    pass: timeGrowth() <= options.timeBound,
-  };
+  const time = await timeGrowth(run, base, { ...options, clock, rounds });
+  const { ten: bestTen, hundred: bestHundred, rounds: done } = time;
 
   const found: string[] = [];
   if (!visits.pass)

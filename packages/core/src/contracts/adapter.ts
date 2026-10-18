@@ -1,5 +1,5 @@
 import type { RetryPolicy } from '../retry';
-import type { Message, TargetRef } from '../schema/common';
+import type { Message, TargetRef, WorldState } from '../schema/common';
 import type { Observed, ResolvedGiven } from '../schema/run';
 import type { Stimulus } from '../schema/spec';
 
@@ -90,6 +90,11 @@ export interface AgentAdapter {
   endState?(session: Session, source: string): Promise<unknown>;
   /** Reads a file the agent left in its workspace, bounded; the runner hands it to the artifact checks. */
   readArtifact?(session: Session, path: string): Promise<Uint8Array>;
+  /** Export mutable world/variables after a block so parent branches can seed the recorded end state.
+   * The value must be JSON data. Sandboxes must export their workspace too. Without this hook only
+   * the runner-managed Given and recorded history can be inherited.
+   */
+  snapshotGiven?(session: Session): Promise<{ world: WorldState; vars: Record<string, unknown> }>;
   /** Releases what the session holds. Always called, also after a failure. */
   close(session: Session): Promise<void>;
 }

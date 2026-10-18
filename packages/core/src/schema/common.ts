@@ -209,6 +209,19 @@ export const WorldState = z
           .record(z.string(), z.string())
           .optional()
           .describe('Files the workspace starts with: path to content.'),
+        binary: z
+          .record(z.string(), z.base64())
+          .optional()
+          .describe(
+            'Files the workspace starts with, byte for byte: path to base64 content. For files that are not text, such as the xlsx a parent block left. A path may not be in both files and binary.',
+          ),
+        summary: z
+          .string()
+          .min(1)
+          .optional()
+          .describe(
+            'What the workspace holds, in words, so a reader of the spec sees it. spec lint --summaries warns when a folder named by from has none.',
+          ),
       })
       .optional()
       .describe('The files the agent starts from.'),

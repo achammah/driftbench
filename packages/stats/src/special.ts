@@ -170,6 +170,20 @@ function poly(coefs: readonly number[], x: number): number {
   return r;
 }
 
+/** Below this p the normal quantile refines in scaled form (see normalQuantile). */
+const DEEP_TAIL = 1e-300;
+
+/**
+ * The Mills ratio (1 - cdf(t)) / pdf(t) for t of about 30 and above, from Laplace's continued fraction
+ * 1 / (t + 1 / (t + 2 / (t + 3 / (t + ...)))) evaluated from the 80th term backwards. It does not form
+ * exp(-t^2 / 2), so it holds where the density itself underflows.
+ */
+function millsRatio(t: number): number {
+  let r = t;
+  for (let k = 80; k >= 1; k -= 1) r = t + k / r;
+  return 1 / r;
+}
+
 /** Quantile of the standard normal distribution: Acklam's approximation with one Halley refinement. */
 export function normalQuantile(p: number): number {
   if (!(p > 0 && p < 1)) {
@@ -190,8 +204,19 @@ export function normalQuantile(p: number): number {
     const q = Math.sqrt(-2 * Math.log(1 - p));
     x = -poly(ACKLAM_C, q) / (poly(ACKLAM_D, q) * q + 1);
   }
+  if (p < DEEP_TAIL) {
+    // exp(x^2 / 2) overflows once |x| passes 37.68 (p about 1e-311), and cdf(x) is subnormal there. Scale the Halley
+    // step by the density instead: u = (cdf(x) - p) / pdf(x) = millsRatio(-x) - p sqrt(2 pi) exp(log p + x^2 / 2).
+    for (let i = 0; i < 2; i += 1) {
+      const u = millsRatio(-x) - Math.sqrt(2 * Math.PI) * Math.exp(Math.log(p) + (x * x) / 2);
+      x -= u / (1 + (x * u) / 2);
+    }
+    return x;
+  }
   for (let i = 0; i < 2; i += 1) {
-    const e = normalCdf(x) - p;
+    // Above one half, cdf(x) - p is computed as (1 - p) - sf(x): 1 - p is exact there, and the difference of two
+    // numbers near 1 would keep only the digits that p has left of the gap to 1.
+    const e = p > 0.5 ? 1 - p - normalSf(x) : normalCdf(x) - p;
     const u = e * Math.sqrt(2 * Math.PI) * Math.exp((x * x) / 2);
     x -= u / (1 + (x * u) / 2);
   }

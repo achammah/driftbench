@@ -291,9 +291,59 @@ Always use the agent versions your campaigns record. Without explicit version fl
 
 ## Prompt sections and block links
 
-A prompt can carry a section registry, `prompts/<prompt-id>.sections.yaml`, that names each of its sections by a stable id with its span (UTF-16 code units, the unit of the quotes above), the SHA-256 of its text, an anchor quote, a scope (`global` or `local`) and its `references`, `overrides` and `duplicates`. The Acme example keeps one for its 30-section prompt in `examples/acme/prompts/`. `radius sections init` writes a first registry from the headings, `radius sections check` checks it against the prompt, and `radius sections reanchor` finds every section again in the next version: same text, then the unique quote, then the prefix and suffix window, else `stale`. A section is only placed where its text hashes as before, so an edit inside it makes it stale and it is never anchored to the wrong text; text that changed outside every section is reported.
+A prompt can carry a section registry, `prompts/<prompt-id>.sections.yaml`, that names each of its sections by a stable id with its span (UTF-16 code units, the unit of the quotes above), the SHA-256 of its text, an anchor quote, a scope (`global` or `local`) and its `references`, `overrides` and `duplicates`. The Acme example keeps one for its 30-section prompt in `examples/acme/prompts/`. `radius sections init` writes a first registry from the headings (one section per CommonMark heading of level 1 to `--level`: `#` headings indented up to three spaces with their closing `#` sequence dropped, and titles underlined with `=` or `-`; a `#` line inside a fenced code block, including one opened on a list or quote line, is code; a leading YAML front matter block (`---` to `---`) is not read for headings and stays in the preamble; a heading whose section holds no quote that is unique in the prompt, such as an empty heading next to another, is folded into the section before it; an id is the slugged title, and a repeat takes the next free `_2`, `_3`, so two sections never share an id; HTML blocks and indented code are not parsed), `radius sections check` checks it against the prompt, and `radius sections reanchor` finds every section again in the next version: same text, then the unique quote, then the prefix and suffix window, else `stale`. A section is only placed where its text hashes as before, so an edit inside it makes it stale and it is never anchored to the wrong text; text that changed outside every section is reported.
 
 A block names the sections it tests in the spec's `metadata.links`, each link with a status: `declared`, `attributed`, `verified`, `refuted` or `stale`. `metadata.links` and `metadata.provenance` stay out of the spec hash, so a link added or promoted never changes a run id or a cache key and never invalidates a carry or a rejudge. `spec lint --sections <registries>` checks that every link names a section its registry holds.
+
+### The link
+
+A link is one entry of the spec's `metadata.links`:
+
+```yaml
+metadata:
+  links:
+    - block: 0                      # a block id, or its index (whether or not blocks have ids); absent: every block
+      to: { kind: prompt_section, prompt: support, section: refunds }
+      relation: verifies            # default verifies
+      status: declared
+      created_by: author
+      at_version: v1                # the prompt version the link was made at
+```
+
+* `to` has one of three kinds: `prompt_section` (`prompt`, `section`), `spec_clause` (`spec`, `clause`, optional `sha256`) or `source_turn` (`conversation`, `turn`, optional `cluster` and `redacted`).
+* `relation` is `verifies`, `exercises`, `derived_from` or `observed_in`.
+* `status` is `declared`, `attributed`, `verified`, `refuted` or `stale`, and is required.
+* `created_by` is `generator`, `author`, `attribution`, `citation`, `ir` or `mutation`.
+* `at_version` is the version of the target the link was made at.
+* `evidence` is an optional map keyed by status, such as `verified: { mutant: m1, runs: 3, flips: 3 }`, that holds what supports the status; its values are free.
+* A key outside `block`, `to`, `relation`, `status`, `created_by`, `at_version` and `evidence` is refused.
+
+`spec validate` checks the links. A link with a value outside a list or a missing `status` or `to` is refused as `SCHEMA_CUSTOM` at `metadata.links.<index>.<field>`; an unknown key is refused as `SCHEMA_CUSTOM` at `metadata.links.<index>` (an unknown key inside `to`, at `metadata.links.<index>.to`); a `block` that names no block of the spec, or an index past the last block, is `LINK_BLOCK_UNKNOWN`. A spec with a refused link is invalid, exit 1.
+
+A section registry is read the same way, before any command uses it: an id used twice, or a `references`, `overrides` or `duplicates` entry that names no section, makes it invalid.
+
+### Re-anchoring a registry
+
+`radius sections reanchor` compares the sections in the new text, not in the old: for each section it looks for the old text, by hash, in the new prompt. The result per section is one of three statuses.
+
+| Status | Meaning |
+|---|---|
+| `kept` | the same text, found once, at the same offsets |
+| `moved` | the same text, found once, at other offsets; the registry of the new version holds the new span |
+| `stale` | the text was not found again once: the section was edited inside or removed; its entry keeps the span and hash of the last version where it was found, and every link to it reads as stale |
+
+An edit that keeps the length leaves every other section `kept` at its own span: only the section that was edited turns `stale`. An edit that changes the length moves the sections after it, which become `moved`. A section already stale in the old registry stays stale. The method that found a section is `same_hash`, else `quote` (the anchor quote found once and the old text at the same distance from it), else `window` (the prefix, quote and suffix found once).
+
+```text
+# support v1 to v3: a section "Languages" was added between Tone and Refunds
+sections:
+  - { id: preamble,   status: kept,  method: same_hash }
+  - { id: tone,       status: kept,  method: same_hash }
+  - { id: refunds,    status: moved, method: same_hash }
+  - { id: escalation, status: moved, method: same_hash }
+outside: ["between tone and refunds"]   # text that is in no section, so it can reach any block
+reordered: []
+```
 
 ### Advisory section selection
 
@@ -308,7 +358,7 @@ Why it does not skip tests yet: on the H7 suite (the Acme stand-in prompt of 30 
 
 ### Localisation over sections
 
-`radius localize <specs> --store <file> --campaign <id> --sections <registries>` ranks the local sections of a prompt by Ochiai suspiciousness from a stored campaign: a block covers the sections it links to, `failed` and `passed` sum the failure and pass rates of the linked blocks over the suite runs, and the score is `failed / sqrt(total failure weight x (failed + passed))`. A failure is dropped when an earlier block of the same conversation (or a parent block) failed in the same run; a block that passes after a failing one stays a row. Global sections are not ranked; ties print as a rank range. On the stored H7 runs (`packages/core/test/radius/localize.test.ts`) this rule ranks the planted section worse than flat counting on 3 of 98 faults; dropping every block after a failing one ranks worse on 18 of 98, the registered H5 result. Ranking against each block's own baseline verdict comes with the mutation runner.
+`radius localize <specs> --store <file> --campaign <id> --sections <registries>` ranks the local sections of a prompt by Ochiai suspiciousness from a stored campaign: a block covers the sections it links to, `failed` and `passed` sum the failure and pass rates of the linked blocks over the suite runs, and the score is `failed / sqrt(total failure weight x (failed + passed))`. A failure is dropped when an earlier block of the same conversation (or a parent block) failed in the same run; a block that passes after a failing one stays a row. A link whose status is `refuted` adds nothing to the counts: a block covers only the sections its other links name, and a section reached only by refuted links has no covering block, so it is not ranked. A link to another prompt, to a global section or to a stale section adds nothing either. Global sections are not ranked; ties print as a rank range. On the stored H7 runs (`packages/core/test/radius/localize.test.ts`) this rule ranks the planted section worse than flat counting on 3 of 98 faults; dropping every block after a failing one ranks worse on 18 of 98, the registered H5 result. Ranking against each block's own baseline verdict comes with the mutation runner.
 
 Anthropic Citations give `start_char_index` and `end_char_index` in code points. On a text with two emoji before the cited sentence the API gave 23 where UTF-16 gives 25, so an imported citation is converted (`codePointToUtf16`, `citationSpan`) before it is compared with a span.
 
@@ -484,3 +534,7 @@ Snapshots hold raw values read from the agent's systems. They can hold personal 
 On Acme, a full mode T run of the planted fault `x5-drops-coverage-check` fails 86 blocks. A block rerun with the right manifest fails the same 86 blocks, and every one was sent. With the recap manifest, which does not name this fault, the failing blocks stay unsent, so the check can fail. A fault planted in an offer price, outside the coverage check radius, is found by the audit. `packages/cli/test/radius-blocks-acme.test.ts` runs these cases with no model call.
 
 A block rerun needs no new assumption about the agent beyond the one every radius makes, and one more: in mode T a block depends only on its Given, which the spec writes. [When it is sound](#when-it-is-sound) lists the rest.
+
+## Parent blocks
+
+A block that declares `parent` depends on that parent's recorded end state. A change that reaches a parent also reaches every descendant, in F, T and P, regardless of authored order. Explicit forest roots remain independent. Parent-linked specs conservatively run whole when partial block carry or input reconstruction would be needed. See [parent blocks](given-when-then.md#parent-blocks).

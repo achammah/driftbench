@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { openStore } from '@agent-nexus/driftbench-store';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { type Io, main } from '../src/index';
+import { judgeNeeded } from '../src/judge-options';
 import type { DriftbenchPlugin } from '../src/plugins';
 
 /**
@@ -145,6 +146,17 @@ async function replay(args: string[], suite?: string) {
   const result = await cli(['replay', SESSION, '--suite', dir, '--json', ...args]);
   return { ...result, doc: result.json as unknown as ReplayDoc | undefined, dir };
 }
+
+describe('the refusal of judge flags with no judge', () => {
+  it('says needs after one flag and need after several', () => {
+    expect(judgeNeeded(['--verify'])).toBe(
+      '--verify needs --judge claude:<model>, another --judge <kind>:<model>, or --judges <cassette>',
+    );
+    expect(judgeNeeded(['--panel-weights', '--panel-margin'])).toMatch(
+      /^--panel-weights and --panel-margin need --judge claude:<model>,/,
+    );
+  });
+});
 
 describe('row 2: provider judges by --judge <kind>:<model>', () => {
   it(
@@ -540,7 +552,7 @@ describe('row 1: judges in campaign run, resume, ci and smoke', () => {
       expect(resumed.out).toContain('Judge claude:haiku, 0.0000 USD.');
       const stray = await cli(['campaign', 'resume', '--store', store, '--judge-budget', '1'], dir);
       expect(stray.code).toBe(2);
-      expect(stray.err).toContain('--judge-budget need --judge claude:<model>');
+      expect(stray.err).toContain('error: --judge-budget needs --judge claude:<model>');
     },
     SLOW,
   );

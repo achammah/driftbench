@@ -1,4 +1,4 @@
-import { type RunResult, runOutcome } from '@agent-nexus/driftbench-core';
+import { blockStatus, type RunResult, runOutcome } from '@agent-nexus/driftbench-core';
 import { hierarchicalBetaBinomial, mde } from '@agent-nexus/driftbench-stats';
 import { groupBy, runPassed, scoredRuns } from './data';
 import type { Estimate } from './estimate';
@@ -17,6 +17,8 @@ export const HEADLINE_POWER = 0.8;
  */
 export type SuiteHeadline = Estimate & {
   method: 'hierarchical' | 'none';
+  /** Linked specs contribute one outcome per root tree and repeat: `n` counts those, `runs` the scored runs. */
+  unit?: 'tree-run';
   /** The trees: goldens with at least one scored run. */
   trees: number;
   /** Scored runs in all trees: a run not run or blocked (no block failed) is no measurement and is left out. */
@@ -73,19 +75,66 @@ export function suiteHeadline(
   all: readonly RunResult[],
   treeOf: (run: RunResult) => string,
 ): SuiteHeadline | undefined {
+  // Only scored runs count, linked or not: a run not run or blocked (no failure) is left out of every rate
+  // and count, whatever trees inside it were measured.
   const runs = scoredRuns(all);
   if (runs.length === 0) return undefined;
-  const groups = [...groupBy(runs, treeOf).values()];
-  const counts = groups.map((group) => ({ n: group.length, k: group.filter(runPassed).length }));
+  const linked = runs.some((run) => run.blocks.some((block) => block.parent !== undefined));
+  const samples = new Map<string, boolean[]>();
+  for (const run of runs) {
+    if (!run.blocks.some((block) => block.parent !== undefined)) {
+      const key = treeOf(run);
+      samples.set(key, [...(samples.get(key) ?? []), runPassed(run)]);
+      continue;
+    }
+    const ids = new Map(run.blocks.map((block) => [block.blockId, block]));
+    const trees = groupBy(
+      run.blocks.filter((block) => block.specIndex !== undefined),
+      (block) => {
+        let root = block;
+        const seen = new Set<string>();
+        while (root.parent !== undefined && !seen.has(root.parent)) {
+          seen.add(root.parent);
+          const parent = ids.get(root.parent);
+          if (!parent) break;
+          root = parent;
+        }
+        return root.blockId ?? `block ${root.index}`;
+      },
+    );
+    const outcomes: Array<{ root: string; failed: boolean }> = [];
+    for (const [root, blocks] of trees) {
+      const statuses = blocks.map(blockStatus);
+      const failed = statuses.includes('fail');
+      if (!failed && statuses.some((status) => status === 'not_run' || status === 'blocked')) continue;
+      outcomes.push({ root, failed });
+    }
+    // A run that failed as a whole (incomplete, a failed end verdict or end state) with no failing block
+    // fails every tree it measured: the failure belongs to no one tree.
+    const whole = !runPassed(run) && !outcomes.some((outcome) => outcome.failed);
+    for (const { root, failed } of outcomes) {
+      const key = JSON.stringify([treeOf(run), root]);
+      samples.set(key, [...(samples.get(key) ?? []), !(failed || whole)]);
+    }
+  }
+  const counts = [...samples.values()].map((group) => ({ n: group.length, k: group.filter(Boolean).length }));
+  const measured = counts.reduce((sum, count) => sum + count.n, 0);
+  if (measured === 0) return undefined;
   const outcomes = all.map((run) => runOutcome(run));
   const shares = {
     incomplete: all.filter((run) => run.status !== 'completed').length / all.length,
     blocked: outcomes.filter((outcome) => outcome === 'blocked').length / all.length,
     notRun: outcomes.filter((outcome) => outcome === 'not_run').length / all.length,
   };
-  const pooled = counts.reduce((sum, c) => sum + c.k, 0) / runs.length;
-  const base = { trees: groups.length, runs: runs.length, shares, pooledRate: pooled };
-  if (groups.length < 2) {
+  const pooled = counts.reduce((sum, c) => sum + c.k, 0) / measured;
+  const base = {
+    trees: counts.length,
+    runs: runs.length,
+    shares,
+    pooledRate: pooled,
+    ...(linked ? { unit: 'tree-run' as const } : {}),
+  };
+  if (counts.length < 2) {
     // One tree: the spread between trees cannot be measured, so no interval is drawn.
     const only = counts[0] as { n: number; k: number };
     const estimate = only.k / only.n;
@@ -95,18 +144,18 @@ export function suiteHeadline(
       lower: estimate,
       upper: estimate,
       method: 'none',
-      n: runs.length,
+      n: measured,
       clusters: 1,
       designEffect: 1,
-      effectiveRuns: runs.length,
+      effectiveRuns: measured,
       degenerate: false,
       detectableDrop: null,
     };
   }
   const interval = hierarchicalBetaBinomial(counts);
-  const effective = meanEffective(counts, interval.estimate, runs.length);
+  const effective = meanEffective(counts, interval.estimate, measured);
   // Kept inside (0, 1) so a suite where everything passes still has a detectable drop, as `compare` does.
-  const rate = Math.min(Math.max(interval.estimate, 0.5 / runs.length), 1 - 0.5 / runs.length);
+  const rate = Math.min(Math.max(interval.estimate, 0.5 / measured), 1 - 0.5 / measured);
   const detectable = mde({ n: effective.effective, baselineRate: rate, power: HEADLINE_POWER });
   return {
     ...base,
@@ -114,8 +163,8 @@ export function suiteHeadline(
     lower: interval.lower,
     upper: interval.upper,
     method: 'hierarchical',
-    n: runs.length,
-    clusters: groups.length,
+    n: measured,
+    clusters: counts.length,
     designEffect: effective.designEffect,
     effectiveRuns: effective.effective,
     degenerate: effective.degenerate,
