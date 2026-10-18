@@ -159,11 +159,32 @@ describe('invariance holds the turns fixed too', () => {
 
   it('seed 18: two specs of new-request-full with the same values and other turns are no pair', async () => {
     const generated = await generation(18);
-    const spec = (id: string) => required(generated.complete.find((entry) => entry.spec.id === id)).spec;
-    const cover = spec('gen-cover-096');
-    const phrase = spec('gen-phrase-012');
     const data = (value: string) => (JSON.parse(value) as { data: unknown }).data;
-    expect(data(heldFixed(cover, generated.hidden))).toEqual(data(heldFixed(phrase, generated.hidden)));
-    expect(heldFixed(cover, generated.hidden)).not.toBe(heldFixed(phrase, generated.hidden));
+    // The generator decides which specs exist, so the pair is found by what it is: specs of the path that
+    // hold the same values and say other turns. A suite with no such pair does not exercise the rule.
+    const walking = generated.complete
+      .map((entry) => entry.spec)
+      .filter(
+        (entry) =>
+          (entry.tags ?? []).includes('flow:new-request') &&
+          entry.blocks.some((block) => (block.id ?? '').endsWith('recap-to-done')),
+      );
+    const groups = new Map<string, typeof walking>();
+    for (const entry of walking) {
+      const key = JSON.stringify(data(heldFixed(entry, generated.hidden)));
+      groups.set(key, [...(groups.get(key) ?? []), entry]);
+    }
+    const pairs = [...groups.values()].filter(
+      (group) => new Set(group.map((entry) => heldFixed(entry, generated.hidden))).size > 1,
+    );
+    expect(pairs.length).toBeGreaterThan(0);
+    for (const group of pairs) {
+      const first = required(group[0]);
+      const other = required(
+        group.find((entry) => heldFixed(entry, generated.hidden) !== heldFixed(first, generated.hidden)),
+      );
+      expect(data(heldFixed(first, generated.hidden))).toEqual(data(heldFixed(other, generated.hidden)));
+      expect(heldFixed(first, generated.hidden)).not.toBe(heldFixed(other, generated.hidden));
+    }
   }, 300_000);
 });

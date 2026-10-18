@@ -48,6 +48,8 @@ export type PreparedMap = {
   space: CompiledSpace;
   /** The space map of the approved axes (`toSpaceMap`): the map coverage is counted on. */
   axisMap: SpaceMap;
+  /** Inventory exclusions added to the relation-only target, retained for transparent reporting. */
+  reachability?: { before: SpaceMap; excluded: SpaceMap['constraints'] };
   /** Indices, in `space`, of the axis dimensions. Every other dimension is a detail. */
   axes: ReadonlySet<number>;
   feasibility: Feasibility;
@@ -86,7 +88,14 @@ export function prepareMap(
   // The cell space holds the details too: the same conversion with every dimension read as an axis. The
   // pairs the relations rule out, and the `none` of a data or task axis, come from the axis map: the
   // relations speak of the axes.
-  const axisMap = toSpaceMap(proposal, { approvedOnly: true });
+  const before = toSpaceMap(proposal, { approvedOnly: true });
+  const axisMap = extras.inventory
+    ? toSpaceMap(proposal, { approvedOnly: true, inventory: extras.inventory })
+    : before;
+  const previous = new Set(before.constraints.map((constraint) => JSON.stringify(constraint.forbid)));
+  const excluded = axisMap.constraints.filter(
+    (constraint) => !previous.has(JSON.stringify(constraint.forbid)),
+  );
   const whole = toSpaceMap(
     {
       ...proposal,
@@ -177,6 +186,7 @@ export function prepareMap(
     map,
     space,
     axisMap,
+    ...(excluded.length > 0 ? { reachability: { before, excluded } } : {}),
     axes,
     feasibility: new Feasibility(space),
     phrases,

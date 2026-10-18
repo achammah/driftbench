@@ -1,5 +1,5 @@
-import { mkdtemp, readdir, readFile, rm, symlink } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, mkdtemp, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadRedteamPlugins } from '@agent-nexus/driftbench-users';
 import type { Command } from 'commander';
@@ -133,11 +133,12 @@ describe('red-team help is an executable contract', { timeout: 240_000 }, () => 
           expect(section, `${topic.id} must document ${option.long}`).toContain(option.long);
         // A removed option in the prose must fail even before a snapshot is updated.
         const actual = new Set([...command.options.map((o) => o.long), '--help', '--plugin']);
-        const shared = topic.commands.flatMap((p) => {
-          const c = commandAt(programs.get(root) as Command, p);
-          return c.options.map((o) => o.long);
-        });
-        for (const flag of shared) actual.add(flag);
+        // A topic can cover commands of several top-level programs, such as attack and redteam run.
+        for (const p of topic.commands) {
+          const top = p.split(' ')[0] as string;
+          if (!programs.has(top)) programs.set(top, await createProgram([top, '--help'], io, () => {}));
+          for (const o of commandAt(programs.get(top) as Command, p).options) actual.add(o.long);
+        }
         for (const [, flag] of section.matchAll(/\| `(--[a-z][a-z-]*)/g))
           expect(actual.has(flag), `${topic.id} names removed option ${flag}`).toBe(true);
       }
@@ -148,8 +149,20 @@ describe('red-team help is an executable contract', { timeout: 240_000 }, () => 
   it('executes every documented CLI worked example in its own scratch folder', async () => {
     for (const topic of topics) {
       const cwd = await scratch(topic.id);
-      for (const block of fences(worked(topic.body), 'sh')) {
-        for (const line of block.replace(/\\\n\s*/g, ' ').split('\n')) {
+      // Blocks run in document order: a `file=<path>` block writes the file the next command reads.
+      for (const [, info, block] of worked(topic.body).matchAll(/```([^\n]*)\n([\s\S]*?)\n```/g)) {
+        const file = (info as string)
+          .split(/\s+/)
+          .find((word) => word.startsWith('file='))
+          ?.slice('file='.length);
+        if (file !== undefined) {
+          expect(file, `${topic.id}: a file block writes a new relative path`).toMatch(/^(?!\/)(?!.*\.\.)/);
+          await mkdir(dirname(join(cwd, file)), { recursive: true });
+          await writeFile(join(cwd, file), `${block}\n`);
+          continue;
+        }
+        if (info !== 'sh') continue;
+        for (const line of (block as string).replace(/\\\n\s*/g, ' ').split('\n')) {
           if (!line.startsWith('driftbench ')) continue;
           const expected = Number(/# exit (\d+)$/.exec(line)?.[1] ?? 0);
           const raw = line.replace(/\s+# exit \d+$/, '').slice('driftbench '.length);

@@ -157,7 +157,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: needs-to-address
-          stage: needs
+          stage: address
         phrase:
           dimension: stage_transition
           value: needs-to-address
@@ -167,7 +167,7 @@ metadata:
           spec: metadata.generated.cell
           stage_transition: address-to-offer
           coverage_result: fiber
-          stage: address
+          stage: offer
         phrase:
           dimension: stage_transition
           value: address-to-offer
@@ -176,7 +176,7 @@ metadata:
         cell:
           spec: metadata.generated.cell
           stage_transition: offer-to-callback
-          stage: offer
+          stage: callback
         phrase:
           dimension: stage_transition
           value: offer-to-callback

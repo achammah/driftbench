@@ -1,7 +1,8 @@
-import type { Assertion, Count } from '../schema/common';
-import type { Expect, Spec } from '../schema/spec';
+import type { Assertion, Count, WorldState } from '../schema/common';
+import type { BlockSpec, Expect, Spec } from '../schema/spec';
 import { error, type Issue } from './issues';
 import { isPlainObject } from './normalize';
+import { parentOrder } from './parents';
 
 const CRITERION_REF = /^([A-Za-z0-9][A-Za-z0-9_.-]*)(@gating)?$/;
 
@@ -38,7 +39,14 @@ type Context = {
 
 /** Rules a schema cannot express. Every issue returned is an error. */
 export function checkSemantics(spec: Spec): Issue[] {
-  const issues: Issue[] = [];
+  const issues: Issue[] = parentOrder(spec).issues;
+  checkWorkspace(spec.given?.world, 'given.world', issues);
+  spec.blocks.forEach((block, index) => {
+    checkWorkspace(block.given?.world, `blocks.${index}.given.world`, issues);
+  });
+  spec.perturbations?.forEach((perturbation, index) => {
+    checkWorkspace(perturbation.world, `perturbations.${index}.world`, issues);
+  });
 
   const defined = spec.criteria ? new Set<string>() : undefined;
   spec.criteria?.forEach((criterion, index) => {
@@ -85,7 +93,10 @@ export function checkSemantics(spec: Spec): Issue[] {
       checkRetention(
         block.expect,
         `blocks.${index}.expect`,
-        (fact) => (facts.block.get(fact) ?? Infinity) <= index,
+        (fact) =>
+          spec.blocks.some((entry) => entry.parent !== undefined)
+            ? parentFact(spec, index, fact)
+            : (facts.block.get(fact) ?? Infinity) <= index,
         issues,
       );
   });
@@ -348,4 +359,39 @@ function checkRetention(
       if (problem) issues.push(error('REGEX_INVALID', `${at}.ask`, problem));
     }
   });
+}
+
+/** A linked block can retain only default, own Given, or ancestor facts. */
+function parentFact(spec: Spec, index: number, fact: string): boolean {
+  if (Object.hasOwn(spec.given?.ledger ?? {}, fact)) return true;
+  const ids = new Map(spec.blocks.map((block, at) => [block.id, at]));
+  const seen = new Set<number>();
+  let at: number | undefined = index;
+  while (at !== undefined && !seen.has(at)) {
+    seen.add(at);
+    const block: BlockSpec | undefined = spec.blocks[at];
+    if (
+      Object.hasOwn(block?.given?.ledger ?? {}, fact) ||
+      (at !== index && Object.hasOwn(block?.expect?.ledger_add ?? {}, fact))
+    )
+      return true;
+    at = block?.parent === undefined ? undefined : ids.get(block.parent);
+  }
+  return false;
+}
+
+/** A path written both as text and as bytes is ambiguous: refused, never resolved one way or the other. */
+function checkWorkspace(world: WorldState | undefined, at: string, issues: Issue[]): void {
+  const files = world?.workspace?.files ?? {};
+  for (const path of Object.keys(world?.workspace?.binary ?? {})) {
+    if (Object.hasOwn(files, path)) {
+      issues.push(
+        error(
+          'WORKSPACE_PATH_TWICE',
+          `${at}.workspace.binary.${path}`,
+          `workspace path "${path}" is in both files and binary`,
+        ),
+      );
+    }
+  }
 }

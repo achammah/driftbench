@@ -72,8 +72,10 @@ Environment variables driftbench reads:
 | Variable | Read by | Holds |
 |---|---|---|
 | `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, `ANTHROPIC_BASE_URL` | the model port: `generate`, `extract`, `intake`, `estate`, `attack`, and `simulate` or `campaign run --driver simulated` with `--model` | key; model, default `claude-opus-5-5`; base URL, default `https://api.anthropic.com` |
-| `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL`, `OPENAI_FAMILY` | the model port when no Anthropic key is set; OpenAI judges | key; model, required; base URL, default `https://api.openai.com/v1`; family, optional |
-| `GEMINI_API_KEY` or `GOOGLE_API_KEY`, `GOOGLE_JUDGE_MODEL`, `GOOGLE_BASE_URL` | Google judges | key; model; base URL |
+| `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL`, `OPENAI_FAMILY` | the model port when no Anthropic key is set | key; model, required; base URL, default `https://api.openai.com/v1`; family, optional |
+| `ANTHROPIC_API_KEY`, `ANTHROPIC_JUDGE_MODEL`, `ANTHROPIC_BASE_URL` | Anthropic judges, such as `redteam grade --judge anthropic` | key; judge model, required, no default; base URL |
+| `OPENAI_API_KEY`, `OPENAI_JUDGE_MODEL`, `OPENAI_BASE_URL` | OpenAI judges, such as `redteam grade --judge openai` | key; judge model, required, no default (`OPENAI_MODEL` does not set it); base URL |
+| `GEMINI_API_KEY` or `GOOGLE_API_KEY`, `GOOGLE_JUDGE_MODEL`, `GOOGLE_BASE_URL` | Google judges, such as `redteam grade --judge google` | key; judge model, required, no default; base URL |
 | `OPENAI_DECISIONS_MODEL` | the OpenAI system 1 judge | model |
 | `CLAUDE_JUDGE_MODEL` | the Claude command line judge | model |
 | `JEV_URL`, `JEV_API_KEY`, `JEV_MODEL`, `JEV_ROUTE` | the Jev system 1 judge | endpoint; key; model, default `jev-latest`; route, `gateway` or `typesafe` |

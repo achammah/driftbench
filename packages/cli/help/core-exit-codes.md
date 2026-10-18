@@ -5,6 +5,7 @@ commands: []
 see_also:
   - core-global-options
   - core-getting-started
+  - running-not-run
 next:
   - recipes-test-a-chat-agent
 ---
@@ -35,7 +36,11 @@ One exception: a spec path that does not exist is reported as an invalid spec, `
 
 One rule for the commands that gate a pipeline (`ci`, `campaign run`, `campaign resume`, `campaign rejudge`,
 `family verify`): when nothing failed but something was not run or blocked, they exit 3. Not run is no pass and
-no failure of the agent. `redteam` keeps 1: its result is an attack outcome.
+no failure of the agent. `ci` ranks its verdicts: a radius miss, then a regression (exit 1), then blocks not
+run beyond `--max-not-run` (exit 3), then the rest. So a failing aggregate or an incomplete cell beside blocks
+not run gives 3, and a regression gives 1 (topic running-not-run). `redteam` keeps 1 for a block not run: its result is an attack outcome. One
+exception: `redteam run` exits 3 when its search is unscored (a turn has no score, breach detection is
+off, or it has fewer turns than `--success-confirm-turns`) and no block failed. Nothing failed and nothing was measured, so it is never a pass.
 
 Commands with their own codes:
 
@@ -49,10 +54,11 @@ Commands with their own codes:
 | `smoke` | transcripts identical, every run completed | transcripts differ, or a run did not complete | bad input | |
 | `report` | written | | bad input | |
 | `compare` | non-inferior (parity) | regressed, or not shown non-inferior | bad input | |
-| `ci` | non-inferior (parity) | regressed, not shown non-inferior, incomplete, a failing aggregate, a radius miss | bad input | 3: a gating spec had blocks not run (a Given the target cannot apply) beyond `--max-not-run` |
+| `ci` | non-inferior (parity) | regressed, not shown non-inferior, incomplete, a failing aggregate, a radius miss | bad input | 3: a gating spec had blocks not run (a Given the target cannot apply) beyond `--max-not-run`, and compare finds no regression: a regression exits 1 |
 | `campaign rejudge` | every re-judged run passes | a run fails, or a gating result is inconclusive | bad input | 3: no run fails but a block was not run or blocked (the summary names each with its reason) |
 | `family verify` | the reference passes every spec | the reference fails one, or one is invalid | bad input | 3: none fails but the reference could not run one (a block not run: unverified, counted apart, not shipped) |
 | `monitor` | no shift | two of the three detectors alarm | bad input | |
+| `redteam run` | the search completed with every turn scored, no breach, every block passed | a breach, a grading error, a failed block or a failed run | bad input | 3: the search is unscored and no block failed |
 | `validate` | | | | the level reached, 0 to 63: the lowest over seeds of the highest level passed, 0 when level 1 fails; `all` exits with the lowest level of every validator; an input error exits 64. With `--check-floor`: 1 when below the floor, else 0 |
 | `view` | | | bad input | runs until stopped |
 | `help <topic>` | printed | | no such topic or command | |

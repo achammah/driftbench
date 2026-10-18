@@ -230,6 +230,6 @@ describe('run-wide judge flags', () => {
     expect(errors.join('')).toContain('--prompt-budget takes a whole number of characters above 0, not "0"');
     const without = await cli(['replay', SESSION, '--suite', ROOT, '--verify', 'arithmetic']);
     expect(without.code).toBe(2);
-    expect(without.err).toContain('need --judge claude:<model>');
+    expect(without.err).toContain('error: --verify needs --judge claude:<model>');
   });
 });

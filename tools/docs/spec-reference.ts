@@ -93,6 +93,8 @@ export const VALUE_LINES: Record<string, Record<string, string>> = {
 
 /** Text printed under a section heading, for the sections whose values describe behaviour. */
 const SECTION_NOTES: Record<string, string> = {
+  Block:
+    'A block may name `parent: <block id>` in the same spec. The runner starts it from that parent’s recorded end state, then applies its own Given. Dependencies run first; missing parents and cycles are errors. A failed or unrun parent blocks descendants, which the report lists under the original cause. See [parent blocks](../concepts/given-when-then.md#parent-blocks) and the [Acme example](../../examples/acme/parents/README.md).',
   DeviationClass:
     'Used by `when.injection.class` and `perturbations[].class`. Mode P runs them with the perturbing driver, and `driftbench perturb` runs one. See [recovery](../concepts/recovery.md).',
   DriftClass:
@@ -257,7 +259,9 @@ function scalarParts(node: Node): { base: string; rules: string[] } | undefined 
     else if (min === 1) rules.push('not empty');
     else if (min !== undefined) rules.push(`at least ${min} characters`);
     else if (max !== undefined) rules.push(`at most ${max} characters`);
-    if (typeof node.pattern === 'string') rules.push(`matching ${code(node.pattern)}`);
+    // A base64 string is named as such, not by the long pattern that checks it.
+    if (node.contentEncoding === 'base64' || node.format === 'base64') rules.push('base64');
+    else if (typeof node.pattern === 'string') rules.push(`matching ${code(node.pattern)}`);
     return { base: 'string', rules };
   }
   if (node.type === 'integer' || node.type === 'number') {

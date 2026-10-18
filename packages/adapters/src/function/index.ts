@@ -58,6 +58,12 @@ export type FunctionAdapterOptions<S = undefined> = {
   create?: (given: ResolvedGiven) => S | Promise<S>;
   /** The payload log of the side-effecting tools, oldest first. Enables `endState` for `tool:<label>` and `*`. */
   payloads?: (state: S) => readonly ToolPayload[];
+  /** Exports mutable agent state as seedable world and variables for parent blocks. `create` restores it from Given. */
+  snapshotGiven?: (
+    state: S,
+  ) =>
+    | { world: WorldState; vars: Record<string, unknown> }
+    | Promise<{ world: WorldState; vars: Record<string, unknown> }>;
   /** True when the same input gives the same output. Default false. */
   deterministic?: boolean;
   /** The version the runner's cache key carries. Change it when the agent changes. Default the adapter's. */
@@ -68,6 +74,7 @@ type FunctionState<S> = { readonly kind: 'function'; agent: S; closed: boolean }
 
 export function functionAdapter<S = undefined>(options: FunctionAdapterOptions<S>): AgentAdapter {
   const id = 'function';
+  const snapshotGiven = options.snapshotGiven;
   const capabilities: AdapterCapabilities = {
     variants: false,
     seedPrefix: true,
@@ -155,6 +162,14 @@ export function functionAdapter<S = undefined>(options: FunctionAdapterOptions<S
       if ('all' in read) return log;
       return log.reverse().find((entry) => entry.tool === read.tool)?.input;
     },
+
+    ...(snapshotGiven
+      ? {
+          async snapshotGiven(session: Session) {
+            return structuredClone(await snapshotGiven(own(session).agent));
+          },
+        }
+      : {}),
 
     async close(session) {
       const state = session.state as FunctionState<S> | undefined;
