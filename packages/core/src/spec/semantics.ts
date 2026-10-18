@@ -46,6 +46,7 @@ export function checkSemantics(spec: Spec): Issue[] {
   });
   spec.perturbations?.forEach((perturbation, index) => {
     checkWorkspace(perturbation.world, `perturbations.${index}.world`, issues);
+    if (perturbation.expect) checkPatterns(perturbation.expect, `perturbations.${index}.expect`, issues);
   });
 
   const defined = spec.criteria ? new Set<string>() : undefined;
@@ -196,13 +197,21 @@ export function checkSemantics(spec: Spec): Issue[] {
   return issues;
 }
 
-function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]): void {
-  for (const key of ['must', 'must_not'] as const) {
+/** Every pattern an expectation holds must compile: the lists `must`, `must_not` and `regex`, and the json path assertions. */
+function checkPatterns(expect: Expect, path: string, issues: Issue[]): void {
+  for (const key of ['must', 'must_not', 'regex'] as const) {
     expect[key]?.forEach((pattern, index) => {
       const problem = patternError(pattern);
       if (problem) issues.push(error('REGEX_INVALID', `${path}.${key}.${index}`, problem));
     });
   }
+  expect.json?.paths?.forEach((entry, index) => {
+    checkAssertion(entry.assert, `${path}.json.paths.${index}.assert`, issues);
+  });
+}
+
+function checkExpect(expect: Expect, path: string, ctx: Context, issues: Issue[]): void {
+  checkPatterns(expect, path, issues);
   const mustNot = new Set(expect.must_not ?? []);
   expect.must?.forEach((pattern, index) => {
     if (mustNot.has(pattern)) {

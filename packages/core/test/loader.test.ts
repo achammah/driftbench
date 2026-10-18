@@ -182,6 +182,24 @@ const INVALID: Array<{ name: string; text: string; code: string; path?: string }
     path: 'blocks.0.expect.must.0',
   },
   {
+    name: 'invalid regular expression in the regex list',
+    text: 'id: x\nblocks:\n  - user: hi\n    expect: { regex: ["ok", "(unclosed"] }\n',
+    code: 'REGEX_INVALID',
+    path: 'blocks.0.expect.regex.1',
+  },
+  {
+    name: 'invalid regular expression in a json path assertion',
+    text: 'id: x\nblocks:\n  - user: hi\n    expect: { json: { paths: [{ path: a, assert: { regex: "(unclosed" } }] } }\n',
+    code: 'REGEX_INVALID',
+    path: 'blocks.0.expect.json.paths.0.assert.regex',
+  },
+  {
+    name: 'invalid regular expression in a perturbation expectation',
+    text: 'id: x\nblocks:\n  - user: hi\nperturbations:\n  - id: p\n    class: D1_off_topic\n    inject_at: 0\n    user: hello\n    expect: { regex: ["(unclosed"] }\n',
+    code: 'REGEX_INVALID',
+    path: 'perturbations.0.expect.regex.0',
+  },
+  {
     name: 'malformed criterion reference',
     text: 'id: x\nblocks:\n  - user: hi\n    expect: { criteria: ["polite@gate"] }\n',
     code: 'CRITERION_REF_INVALID',
