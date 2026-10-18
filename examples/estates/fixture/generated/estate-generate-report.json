@@ -44,8 +44,8 @@
   "summary": {
     "specs": 1564,
     "blocks": 1559,
-    "complete": 1546,
-    "incomplete": 18,
+    "complete": 1544,
+    "incomplete": 20,
     "judged": 465
   },
   "incomplete": [
@@ -86,6 +86,18 @@
       ]
     },
     {
+      "spec": "estate.read_when.reference.weekly-report.read-references-kpi-definitions-md",
+      "path": "incomplete/live/read_when/estate.read_when.reference.weekly-report.read-references-kpi-definitions-md.yaml",
+      "row": "read_when.reference.weekly-report.read-references-kpi-definitions-md",
+      "reasons": [
+        {
+          "marker": "needs-existing-file",
+          "atom": "reference.weekly-report.read-references-kpi-definitions-md",
+          "detail": ".claude/skills/weekly-report/references/kpi-definitions.md is no file of the estate"
+        }
+      ]
+    },
+    {
       "spec": "estate.guard_negative.guard.settings.userpromptsubmit-guard-stop-word-sh",
       "path": "incomplete/unit/guard_negative/estate.guard_negative.guard.settings.userpromptsubmit-guard-stop-word-sh.yaml",
       "row": "guard_negative.guard.settings.userpromptsubmit-guard-stop-word-sh",
@@ -106,6 +118,18 @@
           "marker": "needs-askable-act",
           "atom": "guard.settings.stop-guard-reply-length-py",
           "detail": "no task in the atom's words (guard.settings.stop-guard-reply-length-py (rule)): the guard documents no rule or watched act to come near"
+        }
+      ]
+    },
+    {
+      "spec": "estate.journey.12",
+      "path": "incomplete/live/journey/estate.journey.12.yaml",
+      "row": "journey.12",
+      "reasons": [
+        {
+          "marker": "needs-existing-file",
+          "atom": "reference.weekly-report.read-references-kpi-definitions-md",
+          "detail": ".claude/skills/weekly-report/references/kpi-definitions.md is no file of the estate"
         }
       ]
     },
@@ -350,10 +374,10 @@
     ]
   },
   "quality": {
-    "completeShare": 0.9884910485933504,
-    "askedTests": 1538,
+    "completeShare": 0.9872122762148338,
+    "askedTests": 1536,
     "distinctAsks": 132,
-    "distinctAsksPer100": 8.58257477243173
+    "distinctAsksPer100": 8.59375
   },
   "unit": {
     "tests": 29,
@@ -370,17 +394,17 @@
   },
   "sources": {
     "asks": {
-      "bank": 465,
-      "code": 1067,
+      "bank": 464,
+      "code": 1066,
       "session": 6,
       "none": 8
     },
     "outcomes": {
-      "bank": 1047,
+      "bank": 1046,
       "no-change:guard": 26,
       "no-change:negative": 56,
       "no-change:read-only": 83,
-      "no-delete": 326,
+      "no-delete": 325,
       "static": 8
     },
     "judged": 304
@@ -438,8 +462,8 @@
     "read_when": {
       "rows": 10,
       "specs": 10,
-      "complete": 10,
-      "incomplete": 0
+      "complete": 9,
+      "incomplete": 1
     },
     "script_fixture": {
       "rows": 2,
@@ -552,8 +576,8 @@
     "journey": {
       "rows": 12,
       "specs": 12,
-      "complete": 12,
-      "incomplete": 0
+      "complete": 11,
+      "incomplete": 1
     }
   },
   "perMode": {
@@ -572,8 +596,8 @@
     "live": {
       "rows": 1528,
       "specs": 1521,
-      "complete": 1505,
-      "incomplete": 16
+      "complete": 1503,
+      "incomplete": 18
     }
   },
   "gaps": [
@@ -592,6 +616,12 @@
         "no task in the atom's words (guard.settings.userpromptsubmit-guard-stop-word-sh (rule)): the guard documents no rule or watched act to come near",
         "no task in the atom's words (instruction.standing.read-the-memory-index-at-the (title)): the atom's words: it describes the unit, and names no task the user wants done"
       ]
+    },
+    {
+      "marker": "needs-existing-file",
+      "specs": 2,
+      "atoms": ["reference.weekly-report.read-references-kpi-definitions-md"],
+      "details": [".claude/skills/weekly-report/references/kpi-definitions.md is no file of the estate"]
     }
   ],
   "replay": [
