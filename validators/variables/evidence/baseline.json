@@ -1,0 +1,439 @@
+{
+  "iteration": 0,
+  "at": "2026-10-17T23:53:44.411Z",
+  "result": "measured-default-adapter-baseline",
+  "sourceSha256": "a7cc7b4e5169285746fb098ea773c27ce48857cea7a41107c50d3f4564e7f88e",
+  "adapter": "packages/validators/src/ladders/variables/adapter.ts",
+  "providedOperations": [],
+  "bankSize": 471,
+  "perSeed": [
+    {
+      "seed": "1",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "2",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "3",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "4",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "5",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "6",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "7",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "8",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "9",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "10",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "11",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "12",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "13",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "14",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "15",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "16",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "17",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "18",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "19",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "20",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    },
+    {
+      "seed": "hidden",
+      "level": 0,
+      "passing": 0,
+      "items": 471,
+      "failingByFamily": {
+        "sources": 61,
+        "quotes": 54,
+        "values": 33,
+        "boundaries": 55,
+        "impossible-pairs": 32,
+        "weights": 44,
+        "counter": 42,
+        "strength": 43,
+        "seed-rows": 30,
+        "budget-order": 28,
+        "determinism": 25,
+        "scale": 24
+      }
+    }
+  ],
+  "measuredHead": "ba1e62133c1d6dd18410c114380c2ee3e5d2f1bc",
+  "hiddenSeedSource": "head",
+  "canonicalHiddenSeed": 123553363,
+  "command": "pnpm exec tsx validators/variables/baseline.ts",
+  "candidateCauses": 141,
+  "distinctFixCount": null,
+  "executorIterations": 0,
+  "note": "Independent cause audit and ten-iteration real-component pilot pending. Earlier journal row is historical, not fresh evidence."
+}

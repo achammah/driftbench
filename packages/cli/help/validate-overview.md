@@ -35,7 +35,7 @@ the threshold 1: every item of the level passes on the seed, or the level fails 
 items. Levels are ordered by the cost of diagnosis, cheapest first. The run stops at the first failing
 level, so a builder never chases two causes at once.
 
-`driftbench validate <component>` runs one ladder. Six ladders are registered, by component:
+`driftbench validate <component>` runs one ladder. Seven ladders are registered, by component:
 
 | Component | What it proves | Levels | Ladder version | Topic |
 |---|---|---|---|---|
@@ -45,6 +45,7 @@ level, so a builder never chases two causes at once.
 | `map` | extraction finds what an agent's prompt and files specify | 8 | 2 | `validate-map` |
 | `stats` | the statistics functions match their references and their planted truths | 7 | 2 | `validate-stats` |
 | `system` | the whole chain (runner, checks, store, report, CLI) reports the truth | 11 | 5 | `validate-system` |
+| `variables` | the variable store and the planner that reads it: sources, quotes, boundaries, weights, strength, seed rows, budget order, scale | 7 | 1 | `validators/variables/CATALOGUE.md` |
 
 `all` runs every registered ladder. The names `all`, `floors`, `protect` and `list` are reserved: `floors`
 and `protect` are modes of the same command (topics `validate-floors` and `validate-protect`), and no
@@ -80,7 +81,7 @@ Arguments:
 
 | Argument | Meaning |
 |---|---|
-| `<component>` | a registered component (`estate`, `generator`, `judges`, `map`, `stats`, `system`), `all`, `floors` or `protect` |
+| `<component>` | a registered component (`estate`, `generator`, `judges`, `map`, `stats`, `system`, `variables`), `all`, `floors` or `protect` |
 | `[level]` | only with `floors --raise`: the level to raise the floor to. Any other use exits 64 |
 
 Options of a run (this topic):
@@ -210,7 +211,7 @@ From a folder with no `validators/floors.json` above it, and then the errors:
 
 ```text
 Floors (validators/floors.json): none.
-No validator is registered for "nosuch". Registered: estate, generator, judges, map, stats, system.
+No validator is registered for "nosuch". Registered: estate, generator, judges, map, stats, system, variables.
 --seeds takes a..b with whole numbers a <= b, such as 1..20, not "3..1".
 Unexpected argument "2": a level is only taken by floors --raise.
 ```

@@ -132,7 +132,7 @@ Option errors that the argument parser itself reports (an unknown flag) exit 2, 
 
 ### 8.3 The registered validators
 
-`registeredLadders()` in `packages/validators/src/ladders/index.ts` returns six validators: `estate`, `generator`, `judges`, `map`, `stats` and `system`. `validators/floors.json` holds a floor for four of them; `estate` and `generator` have none yet. `validate floors` prints the floors:
+`registeredLadders()` in `packages/validators/src/ladders/index.ts` returns seven validators: `estate`, `generator`, `judges`, `map`, `stats`, `system` and `variables`. `validators/floors.json` holds a floor for four of them; `estate`, `generator` and `variables` have none yet. The catalogue of the `variables` bank is `validators/variables/CATALOGUE.md`. `validate floors` prints the floors:
 
 ```
 Floors (validators/floors.json): judges = 20 (ladder version 2), map = 8 (ladder version 2), stats = 7 (ladder version 2), system = 9 (ladder version 5).

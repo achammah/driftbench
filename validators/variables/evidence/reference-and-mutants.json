@@ -1,0 +1,353 @@
+{
+  "verificationStatus": "Historical, unverified report: the external reference and mutant implementations are unavailable. These numbers do not establish an independent audit pass or current bank soundness.",
+  "currentReproduction": "packages/validators/test/variables and validators/variables/compare-cheats.ts provide limited committed witnesses and mutations; see validators/variables/audit.md for pending gates.",
+  "what": "Evidence that the bank can be passed and that it notices a bug. A reference implementation written from the specification and the store format, kept outside the repository, ran the bank; planted bugs (mutants of that reference) each lost at least one item. Data only: the reference and the mutants are not committed, so an executor cannot copy a solution from them.",
+  "bankSize": 471,
+  "referenceBySeed": {
+    "1": {
+      "pass": 471,
+      "of": 471
+    },
+    "2": {
+      "pass": 471,
+      "of": 471
+    },
+    "3": {
+      "pass": 471,
+      "of": 471
+    },
+    "4": {
+      "pass": 471,
+      "of": 471
+    },
+    "5": {
+      "pass": 471,
+      "of": 471
+    },
+    "6": {
+      "pass": 471,
+      "of": 471
+    },
+    "7": {
+      "pass": 471,
+      "of": 471
+    },
+    "8": {
+      "pass": 471,
+      "of": 471
+    },
+    "9": {
+      "pass": 471,
+      "of": 471
+    },
+    "10": {
+      "pass": 471,
+      "of": 471
+    },
+    "11": {
+      "pass": 471,
+      "of": 471
+    },
+    "12": {
+      "pass": 471,
+      "of": 471
+    },
+    "13": {
+      "pass": 471,
+      "of": 471
+    },
+    "14": {
+      "pass": 471,
+      "of": 471
+    },
+    "15": {
+      "pass": 471,
+      "of": 471
+    },
+    "16": {
+      "pass": 471,
+      "of": 471
+    },
+    "17": {
+      "pass": 471,
+      "of": 471
+    },
+    "18": {
+      "pass": 471,
+      "of": 471
+    },
+    "19": {
+      "pass": 471,
+      "of": 471
+    },
+    "20": {
+      "pass": 471,
+      "of": 471
+    },
+    "1000042": {
+      "pass": 471,
+      "of": 471
+    }
+  },
+  "mutantsOnSeed1": [
+    {
+      "mutant": "conversation-value-auto-approved",
+      "lost": 1,
+      "families": [
+        "sources"
+      ]
+    },
+    {
+      "mutant": "coverage-fills-partial-rows",
+      "lost": 1,
+      "families": [
+        "counter"
+      ]
+    },
+    {
+      "mutant": "coverage-ignores-impossible",
+      "lost": 24,
+      "families": [
+        "counter"
+      ]
+    },
+    {
+      "mutant": "coverage-loses-big-counts",
+      "lost": 2,
+      "families": [
+        "counter"
+      ]
+    },
+    {
+      "mutant": "edge-sample-off-by-one",
+      "lost": 51,
+      "families": [
+        "sources",
+        "boundaries",
+        "determinism"
+      ]
+    },
+    {
+      "mutant": "interval-90-percent",
+      "lost": 3,
+      "families": [
+        "weights"
+      ]
+    },
+    {
+      "mutant": "interval-unclamped",
+      "lost": 9,
+      "families": [
+        "weights"
+      ]
+    },
+    {
+      "mutant": "interval-wald",
+      "lost": 10,
+      "families": [
+        "weights"
+      ]
+    },
+    {
+      "mutant": "no-boundaries",
+      "lost": 42,
+      "families": [
+        "boundaries",
+        "determinism"
+      ]
+    },
+    {
+      "mutant": "owner-date-today",
+      "lost": 7,
+      "families": [
+        "sources",
+        "determinism"
+      ]
+    },
+    {
+      "mutant": "plan-budget-cuts-seeds",
+      "lost": 18,
+      "families": [
+        "budget-order"
+      ]
+    },
+    {
+      "mutant": "plan-drops-last-row",
+      "lost": 116,
+      "families": [
+        "values",
+        "impossible-pairs",
+        "strength",
+        "seed-rows",
+        "budget-order",
+        "determinism",
+        "scale"
+      ]
+    },
+    {
+      "mutant": "plan-ignores-impossible-pairs",
+      "lost": 26,
+      "families": [
+        "impossible-pairs",
+        "strength",
+        "scale"
+      ]
+    },
+    {
+      "mutant": "plan-random-ids",
+      "lost": 39,
+      "families": [
+        "impossible-pairs",
+        "seed-rows",
+        "budget-order",
+        "determinism"
+      ]
+    },
+    {
+      "mutant": "plan-rarest-first",
+      "lost": 21,
+      "families": [
+        "budget-order",
+        "determinism"
+      ]
+    },
+    {
+      "mutant": "plan-report-off-by-one",
+      "lost": 7,
+      "families": [
+        "strength",
+        "determinism"
+      ]
+    },
+    {
+      "mutant": "plan-seed-ignored-nondeterministic",
+      "lost": 30,
+      "families": [
+        "impossible-pairs",
+        "seed-rows",
+        "determinism"
+      ]
+    },
+    {
+      "mutant": "plan-seeds-sorted",
+      "lost": 6,
+      "families": [
+        "seed-rows"
+      ]
+    },
+    {
+      "mutant": "plan-strength-2-on-rules",
+      "lost": 57,
+      "families": [
+        "values",
+        "impossible-pairs",
+        "strength",
+        "seed-rows",
+        "determinism",
+        "scale"
+      ]
+    },
+    {
+      "mutant": "plan-uses-unapproved",
+      "lost": 3,
+      "families": [
+        "values"
+      ]
+    },
+    {
+      "mutant": "quotes-case-insensitive",
+      "lost": 12,
+      "families": [
+        "sources",
+        "quotes",
+        "values",
+        "boundaries"
+      ]
+    },
+    {
+      "mutant": "quotes-trimmed",
+      "lost": 2,
+      "families": [
+        "quotes"
+      ]
+    },
+    {
+      "mutant": "session-text-in-store",
+      "lost": 47,
+      "families": [
+        "sources",
+        "quotes",
+        "values",
+        "weights",
+        "determinism",
+        "scale"
+      ]
+    },
+    {
+      "mutant": "store-drops-refusals",
+      "lost": 42,
+      "families": [
+        "sources",
+        "quotes",
+        "impossible-pairs",
+        "weights"
+      ]
+    },
+    {
+      "mutant": "store-duplicate-value-on-owner-repeat",
+      "lost": 196,
+      "families": [
+        "sources",
+        "quotes",
+        "values",
+        "boundaries",
+        "impossible-pairs",
+        "weights",
+        "determinism",
+        "scale"
+      ]
+    },
+    {
+      "mutant": "store-quote-path-absolute",
+      "lost": 230,
+      "families": [
+        "sources",
+        "quotes",
+        "values",
+        "boundaries",
+        "impossible-pairs",
+        "weights",
+        "determinism",
+        "scale"
+      ]
+    },
+    {
+      "mutant": "total-counts-every-session",
+      "lost": 18,
+      "families": [
+        "sources",
+        "values",
+        "weights",
+        "determinism",
+        "scale"
+      ]
+    },
+    {
+      "mutant": "weights-only-on-seen",
+      "lost": 18,
+      "families": [
+        "sources",
+        "quotes",
+        "values",
+        "weights",
+        "determinism"
+      ]
+    }
+  ],
+  "notMeasured": [
+    {
+      "mutant": "plan-strength-3-everywhere",
+      "why": "the plan grows without bound in process; the isolated runner kills it at the item budget, so no item count was recorded"
+    }
+  ]
+}

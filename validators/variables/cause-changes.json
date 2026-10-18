@@ -1,0 +1,152 @@
+{
+  "from": "07b3a1402c263af1ac1360bffeb377aeae4e816b",
+  "changes": [
+    {
+      "id": "quotes.refuse.absent.unrelated-text",
+      "old": "a value whose quote is not in its source file is refused",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C23",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.absent.other-file-text",
+      "old": "a value whose quote is not in its source file is refused",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C23",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.absent.extra-word-appended",
+      "old": "a value whose quote is not in its source file is refused",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C23",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.inexact.all-caps",
+      "old": "quote matching is exact: case, every character and contiguity count",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C26",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.inexact.first-letter-case",
+      "old": "quote matching is exact: case, every character and contiguity count",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C26",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.inexact.inserted-char",
+      "old": "quote matching is exact: case, every character and contiguity count",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C26",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.inexact.deleted-char",
+      "old": "quote matching is exact: case, every character and contiguity count",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C26",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.inexact.substituted-char",
+      "old": "quote matching is exact: case, every character and contiguity count",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C26",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.inexact.transposed-chars",
+      "old": "quote matching is exact: case, every character and contiguity count",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C26",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.inexact.skipped-word",
+      "old": "quote matching is exact: case, every character and contiguity count",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C26",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.refuse.inexact.joined-lines",
+      "old": "quote matching is exact: case, every character and contiguity count",
+      "new": "a value whose normalized quote is absent from its named source is refused",
+      "oldCode": "C26",
+      "newCode": "C23"
+    },
+    {
+      "id": "quotes.accept.multiline.lf",
+      "old": "a quote that spans line breaks is matched against the raw file text",
+      "new": "quote matching folds whitespace runs while keeping the stored quote unchanged",
+      "oldCode": "C27",
+      "newCode": "C27"
+    },
+    {
+      "id": "quotes.accept.multiline.crlf",
+      "old": "a quote that spans line breaks is matched against the raw file text",
+      "new": "quote matching folds whitespace runs while keeping the stored quote unchanged",
+      "oldCode": "C27",
+      "newCode": "C27"
+    },
+    {
+      "id": "quotes.accept.unicode.accents",
+      "old": "quotes with non-ASCII text are matched code point for code point",
+      "new": "quote matching applies the documented Unicode and typography normalization",
+      "oldCode": "C29",
+      "newCode": "C29"
+    },
+    {
+      "id": "quotes.accept.unicode.cjk",
+      "old": "quotes with non-ASCII text are matched code point for code point",
+      "new": "quote matching applies the documented Unicode and typography normalization",
+      "oldCode": "C29",
+      "newCode": "C29"
+    },
+    {
+      "id": "quotes.accept.unicode.emoji",
+      "old": "quotes with non-ASCII text are matched code point for code point",
+      "new": "quote matching applies the documented Unicode and typography normalization",
+      "oldCode": "C29",
+      "newCode": "C29"
+    },
+    {
+      "id": "quotes.accept.unicode.rtl",
+      "old": "quotes with non-ASCII text are matched code point for code point",
+      "new": "quote matching applies the documented Unicode and typography normalization",
+      "oldCode": "C29",
+      "newCode": "C29"
+    },
+    {
+      "id": "quotes.per-value-granularity.one-of-three",
+      "old": "a refusal removes only the values whose quote is not findable, and a variable left with no value is dropped",
+      "new": "refusing a value preserves its valid sibling values",
+      "oldCode": "C30",
+      "newCode": "C30"
+    },
+    {
+      "id": "quotes.per-value-granularity.two-of-three",
+      "old": "a refusal removes only the values whose quote is not findable, and a variable left with no value is dropped",
+      "new": "refusing a value preserves its valid sibling values",
+      "oldCode": "C30",
+      "newCode": "C30"
+    },
+    {
+      "id": "quotes.per-value-granularity.first-bad",
+      "old": "a refusal removes only the values whose quote is not findable, and a variable left with no value is dropped",
+      "new": "refusing a value preserves its valid sibling values",
+      "oldCode": "C30",
+      "newCode": "C30"
+    },
+    {
+      "id": "quotes.per-value-granularity.all-bad",
+      "old": "a refusal removes only the values whose quote is not findable, and a variable left with no value is dropped",
+      "new": "a variable left with no accepted value is dropped",
+      "oldCode": "C30",
+      "newCode": "C142"
+    }
+  ]
+}
