@@ -1,6 +1,9 @@
 import type { Spec } from '@agent-nexus/driftbench-core';
 import type { EstateRun, GeneratedSpec } from './pipeline';
 
+/** The verdicts by which a guard acts on a call or a prompt; a guard that allows does not act. */
+const ACTING_VERDICTS = ['deny', 'block', 'warn', 'nudge'] as const;
+
 /** Required check structure is the generated structure plus source evidence. The latter
  * prevents deletion of a generated assertion from also deleting its validation probe.
  * No fixture names, item ids, hidden atom ids or product-mutant state select behavior. */
@@ -60,6 +63,40 @@ export function completionContract(run: EstateRun, source: GeneratedSpec): Spec 
       }
       if (atom.kind === 'reference' && typeof atom.fields?.path === 'string')
         append('references', { path: `**/${atom.fields.path}`, count: { min: 1 } });
+      if (atom.kind === 'script') {
+        // A script of the walk ran: the commands of the block include one, and a call of the tool names it. Both come
+        // from the script atom's own evidence, so deleting a generated assertion cannot delete its probe.
+        block.expect.execution = { ...block.expect.execution, ran_code: true };
+        for (const evidence of atom.evidence ?? []) {
+          if (evidence.type !== 'tool_called') continue;
+          const calls = ((custom.some_call as { calls?: Array<Record<string, unknown>> } | undefined)
+            ?.calls ?? []) as Array<Record<string, unknown>>;
+          const at = calls.findIndex(
+            (call) =>
+              call.label === evidence.label &&
+              JSON.stringify(call.input ?? {}) === JSON.stringify(evidence.input ?? {}),
+          );
+          const known = calls[at];
+          if (!known)
+            calls.push({ label: evidence.label, input: evidence.input ?? {}, count: { min: 1 }, block: 0 });
+          else if (known.count !== undefined) {
+            // The script ran at least once: a weaker bound is raised to one, never lowered. An omitted count
+            // already means at least one.
+            const count = known.count as { min?: number; max?: number } | number;
+            calls[at] = {
+              ...known,
+              count:
+                typeof count === 'number' && count >= 1
+                  ? count
+                  : {
+                      ...(typeof count === 'object' ? count : {}),
+                      min: Math.max(1, (count as { min?: number }).min ?? 0),
+                    },
+            };
+          }
+          custom.some_call = { calls };
+        }
+      }
     }
   }
   if (source.record.testType === 'skip_pressure' && head.kind === 'gate' && typeof fields.path === 'string') {
@@ -105,7 +142,31 @@ export function completionContract(run: EstateRun, source: GeneratedSpec): Spec 
   }
   if (source.record.testType === 'guard_negative') {
     const guard = run.estate.guards.find((g) => g.name === fields.name);
-    if (guard?.verdict === 'warn') block.expect.guards = [{ name: guard.name, verdict: 'warn', count: 0 }];
+    // A control forbids the verdicts by which the guard acts. The scanner owns the selector, as for guard_register: the
+    // guard's declared verdict, or every acting verdict when it declares none. The true verdict of a warning guard is
+    // always demanded, so a declaration that names another verdict cannot hide it.
+    if (guard?.verdict === 'warn') {
+      const evidence = (head.evidence ?? []).filter(
+        (item): item is Extract<typeof item, { type: 'guard' }> => item.type === 'guard',
+      );
+      const verdicts = new Set<string>(['warn']);
+      for (const item of evidence)
+        for (const verdict of item.verdict === undefined ? ACTING_VERDICTS : [item.verdict])
+          verdicts.add(verdict);
+      // Keep the product's own order, which names the verdicts of its checks, then add what it left out.
+      const kept = (block.expect.guards ?? []).filter(
+        (known) => known.name !== guard.name || (known.verdict !== undefined && verdicts.has(known.verdict)),
+      );
+      const present = new Set(
+        kept.filter((known) => known.name === guard.name).map((known) => known.verdict),
+      );
+      block.expect.guards = [
+        ...kept.map((known) => (known.name === guard.name ? { ...known, count: 0 } : known)),
+        ...[...verdicts]
+          .filter((verdict) => !present.has(verdict))
+          .map((verdict) => ({ name: guard.name, verdict, count: 0 })),
+      ];
+    }
   }
   if (['stage_order', 'stage_anytime'].includes(source.record.testType) && fields.anytime === true)
     custom.stage_seen ??= { name: fields.id, block: 0 };

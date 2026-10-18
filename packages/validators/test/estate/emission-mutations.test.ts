@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { countAllows, describeCount } from '@agent-nexus/driftbench-checks';
 import {
@@ -15,12 +15,13 @@ import { genCompleteFamily } from '../../src/ladders/estate/bank/loop';
 import { completionComponents } from '../../src/ladders/estate/completion';
 import { completionContract } from '../../src/ladders/estate/completion-contract';
 import * as pipeline from '../../src/ladders/estate/pipeline';
+import { blockOptionCensus, readerCensus as codeCensus, textCensus } from './reader-census';
 import { referenceChecks, referenceRun, required, SUFFIXES, suffix } from './ruling-reference';
 
 type Path = Array<string | number>;
 const REASON_CLASSES = ['default-equivalent', 'empty-demand', 'single-block-scope'] as const;
 /** Entry kinds whose omitted count the evaluators read as at least one (census below). */
-const DEFAULT_COUNT_KINDS = ['guards', 'references', 'skills', 'subagents'];
+const DEFAULT_COUNT_KINDS = ['guards', 'references', 'skills', 'subagents', 'calls'];
 type ReasonClass = (typeof REASON_CLASSES)[number];
 type EmissionSite = {
   path: Path;
@@ -149,23 +150,10 @@ const READER_ROOTS = [
   'packages/validators/test/estate/ruling-reference.ts',
 ];
 
-/** Every non-comment source line under the evaluator roots that matches `pattern`, as
- * `file: line`. A new reader changes this census and reopens the equivalence class. */
+/** Every line of code under the evaluator roots that matches `pattern`, as `file: line`: comments and the text of
+ * literals never count (reader-census.ts). A new reader changes this census and reopens the equivalence class. */
 function readerCensus(pattern: RegExp): string[] {
-  const files: string[] = [];
-  const visit = (path: string) => {
-    if (statSync(`${ROOT}${path}`).isDirectory())
-      for (const name of readdirSync(`${ROOT}${path}`).sort()) visit(`${path}/${name}`);
-    else if (path.endsWith('.ts')) files.push(path);
-  };
-  for (const root of READER_ROOTS) visit(root);
-  return files.flatMap((file) =>
-    readFileSync(`${ROOT}${file}`, 'utf8')
-      .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => !/^(\*|\/\*|\/\/)/.test(line) && pattern.test(line))
-      .map((line) => `${file}: ${line}`),
-  );
+  return codeCensus(ROOT, READER_ROOTS, pattern);
 }
 
 const SEEN = Array.from({ length: 257 }, (_, index) => index);
@@ -177,17 +165,25 @@ const GUARDED_BLOCK = "if (typeof options.block === 'number' && options.block !=
 const CLASS_PROOFS: Record<
   ReasonClass,
   {
-    pattern: RegExp;
+    census: () => string[];
     readers: string[];
     cases: () => void;
     premise: (spec: Spec, site: EmissionSite) => boolean;
   }
 > = {
   'default-equivalent': {
-    // The deleted value is `count: { min: 1 }` on a guards, references, skills or subagents entry.
-    pattern:
-      /expect\.(guards|references|skills|subagents)\b|\b(guard|reference|skill|helper|subagent)\.count\b/,
+    // The deleted value is `count: { min: 1 }` on a guards, references, skills or subagents entry, or on a `some_call` entry
+    // (`calls`): some_call and hazard_recovery read it through `entry.count ?? { min: 1 }` and parseSomeCall's default.
+    census: () =>
+      readerCensus(
+        /expect\.(guards|references|skills|subagents)\b|\b(guard|reference|skill|helper|subagent)\.count\b|\bentry\.count\b/,
+      ),
     readers: [
+      "packages/checks/src/checks/estate.ts: countAllows(entry.count, matching.length) ? 'pass' : 'fail',",
+      'packages/checks/src/checks/estate.ts: `${plural(matching.length, what)} of ${plural(own.length, `${entry.label} call`)} in this block, expected ${describeCount(entry.count)}`,',
+      'packages/checks/src/checks/estate.ts: const count = (entry.count ?? { min: 1 }) as Count;',
+      "packages/checks/src/checks/estate.ts: countAllows(entry.count, matching.length) ? 'pass' : 'fail',",
+      'packages/checks/src/checks/estate.ts: `${plural(matching.length, `${entry.label} call`)} after the ${hazard}, expected ${describeCount(entry.count)}`,',
       'packages/checks/src/checks/guards.ts: applies: (ctx) => (ctx.expect.guards?.length ?? 0) > 0,',
       'packages/checks/src/checks/guards.ts: const expected = ctx.expect.guards ?? [];',
       "packages/checks/src/checks/guards.ts: countAllows(guard.count, count) ? 'pass' : 'fail',",
@@ -228,7 +224,7 @@ const CLASS_PROOFS: Record<
   },
   'empty-demand': {
     // The deleted value is `expect.criteria: []`.
-    pattern: /expect\.criteria\b/,
+    census: () => readerCensus(/expect\.criteria\b/),
     readers: [
       'packages/checks/src/checks/knowledge_retention.ts: const judged = (ctx.expect.criteria ?? []).some(',
       'packages/checks/src/checks/relevancy.ts: if (judged(ctx.expect.criteria)) {',
@@ -275,8 +271,10 @@ const CLASS_PROOFS: Record<
   },
   'single-block-scope': {
     // The deleted value is a custom check's `block: 0` on a one-block spec.
-    pattern: /\b(options|opts|entry)\.block\b/,
+    // Reads of a custom check's `block` option, found by what the receiver is bound to, never by its name.
+    census: () => blockOptionCensus(ROOT, READER_ROOTS),
     readers: [
+      `packages/checks/src/checks/absence.ts: ${GUARDED_BLOCK}`,
       'packages/checks/src/checks/estate.ts: if (entry.block !== undefined && entry.block !== ctx.blockIndex) return;',
       "packages/checks/src/checks/estate.ts: ...(typeof entry.block === 'number' ? { block: entry.block } : {}),",
       `packages/checks/src/checks/estate.ts: ${GUARDED_BLOCK}`,
@@ -293,7 +291,9 @@ const CLASS_PROOFS: Record<
     cases() {
       // The runner refuses a blockIndex outside 0..blocks.length-1 (core runner/run.ts nextStep),
       // and the custom check passes options through unread (checks/custom.ts createCustomCheck).
-      expect(readerCensus(/the driver asked for block \$\{step\.blockIndex\}/)).toHaveLength(1);
+      expect(
+        textCensus(ROOT, READER_ROOTS, /the driver asked for block \$\{step\.blockIndex\}/),
+      ).toHaveLength(1);
       expect(
         readFileSync(`${ROOT}packages/checks/src/checks/custom.ts`, 'utf8').match(/\.block\b/g),
       ).toBeNull();
@@ -657,7 +657,7 @@ describe('estate completion emitted assertion structure', { timeout: 1_200_000 }
     'proves %s for every input from its pinned reader census and case analysis',
     async (reasonClass) => {
       const proof = CLASS_PROOFS[reasonClass];
-      expect(readerCensus(proof.pattern), `${reasonClass} reader census`).toEqual(proof.readers);
+      expect(proof.census(), `${reasonClass} reader census`).toEqual(proof.readers);
       proof.cases();
       // Every site of this class meets the class premise on every pinned seed.
       for (const seed of PINNED_SEEDS) {
