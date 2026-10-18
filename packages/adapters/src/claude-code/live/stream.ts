@@ -289,6 +289,10 @@ function named(
   return { event, check: scripts.length === 0 ? name : (scripts[turn % scripts.length] ?? name) };
 }
 
+/** Whether a hook output carries `additionalContext` as text with something in it. */
+const hasContext = (output: Record<string, unknown>): boolean =>
+  (stringField(output, 'additionalContext') ?? '').trim() !== '';
+
 function verdictOf(record: Record<string, unknown>): string {
   const stdout = stringField(record, 'stdout') ?? '';
   if (stdout.trim().startsWith('{')) {
@@ -298,6 +302,8 @@ function verdictOf(record: Record<string, unknown>): string {
         const specific = isRecord(output.hookSpecificOutput) ? output.hookSpecificOutput : {};
         const decision = stringField(specific, 'permissionDecision') ?? stringField(output, 'decision');
         if (decision !== undefined) return decision === 'block' ? 'deny' : decision;
+        // No decision, exit 0, and context handed back to the agent: the guard spoke without stopping the act.
+        if (record.exit_code === 0 && [specific, output].some(hasContext)) return 'nudge';
       }
     } catch {
       // Not JSON after all: the exit code decides.

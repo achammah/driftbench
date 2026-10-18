@@ -339,6 +339,63 @@ describe('the real stream shapes', () => {
     expect(rows[2]).toMatchObject({ check: 'reply-length.py', exitCode: 0, outcome: 'success' });
   });
 
+  describe('the verdict of a hook whose stdout is structured', () => {
+    const verdictFor = (stdout: string, exit = 0) => {
+      const response = line({
+        type: 'system',
+        subtype: 'hook_response',
+        hook_id: 'h9',
+        hook_name: 'PreToolUse:Bash',
+        hook_event: 'PreToolUse',
+        exit_code: exit,
+        stdout,
+        session_id: sid,
+      });
+      return hookDecisions(parseStream(response), settings, '2026-10-12T10:00:00.000Z')[0]?.verdict;
+    };
+
+    it.each([
+      ['context at the top', { additionalContext: 'Did you mean to stop?' }],
+      [
+        'context in the event output',
+        {
+          hookSpecificOutput: {
+            hookEventName: 'UserPromptSubmit',
+            additionalContext: 'Did you mean to stop?',
+          },
+        },
+      ],
+    ])('is a nudge for %s, with no named decision and exit 0', (_name, output) => {
+      expect(verdictFor(JSON.stringify(output))).toBe('nudge');
+    });
+
+    it.each([
+      ['empty context', { additionalContext: '' }],
+      ['blank context', { additionalContext: '   ' }],
+      ['context that is no text', { additionalContext: 3 }],
+      ['no context', { note: 'nothing to add' }],
+    ])('stays allow for %s', (_name, output) => {
+      expect(verdictFor(JSON.stringify(output))).toBe('allow');
+    });
+
+    it('lets a named decision win over the context', () => {
+      expect(
+        verdictFor(
+          JSON.stringify({
+            hookSpecificOutput: { permissionDecision: 'deny' },
+            additionalContext: 'Did you mean to stop?',
+          }),
+        ),
+      ).toBe('deny');
+      expect(verdictFor(JSON.stringify({ decision: 'block', additionalContext: 'x' }))).toBe('deny');
+    });
+
+    it('keeps the exit code when it is not 0', () => {
+      expect(verdictFor(JSON.stringify({ additionalContext: 'x' }), 2)).toBe('deny');
+      expect(verdictFor(JSON.stringify({ additionalContext: 'x' }), 1)).toBe('error');
+    });
+  });
+
   it('gives a hook that started and never answered a row with outcome no_response', () => {
     const started = line({
       type: 'system',
