@@ -77,4 +77,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: tool.settings.allow-grep
+      fp: 4e683e36ad8b21203e7e0fdea91c83e92c65e61542f909809b8572fb78377937
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

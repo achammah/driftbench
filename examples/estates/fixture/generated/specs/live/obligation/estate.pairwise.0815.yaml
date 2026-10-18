@@ -102,6 +102,18 @@ metadata:
     situation: ledger-auditor-brief
     phrase: 0
     ask: code
+    link:
+      span: instruction.ledger-auditor.look-for-double-payments-and-unapplied
+      fp: e5269a6ee297cc57b2b4c28850659bde990094e051831b39dbcf3d9caa03cffe
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: ledger-auditor
+      target: helper
+    from:
+      bank: ledger-auditor-brief
+      phrase: 0
     outcome: bank
     judged:
       - instruction.ledger-auditor.look-for-double-payments-and-unapplied

@@ -87,4 +87,16 @@ metadata:
     situation: ledger-auditor-brief
     phrase: 0
     ask: bank
+    link:
+      span: register.ledger-auditor.the-auditor-answers-with-one-json
+      fp: 7b7412a93ed8b5105df9ceb03dd6146882a8801ab2708bfdfe5a92a23180b82c
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: ledger-auditor
+      target: helper
+    from:
+      bank: ledger-auditor-brief
+      phrase: 0
     outcome: bank

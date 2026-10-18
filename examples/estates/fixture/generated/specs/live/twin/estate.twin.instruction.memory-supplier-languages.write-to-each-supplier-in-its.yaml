@@ -55,6 +55,21 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.supplier-email.an-ask-that-fits-supplier-email (route nearest the rule)
+    link:
+      span: instruction.memory-supplier-languages.write-to-each-supplier-in-its
+      fp: 3a46c3399d6fdf6662b370edb8070d04e23a8330c1e452ce7025ce3412af9878
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: route nearest the rule
+      field: route.supplier-email.an-ask-that-fits-supplier-email#route nearest the rule
+      fp: 6039dbbf139b5140eedfd1b71e3060c02d6a4998794526966b34231d6b2ab513
+      frame: twin
+      shape: "{}"
+      pieces:
+        - draft, answer or chase an email to a supplier
     outcome: no-delete
     judged:
       - instruction.memory-supplier-languages.write-to-each-supplier-in-its

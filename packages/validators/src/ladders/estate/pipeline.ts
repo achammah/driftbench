@@ -283,6 +283,21 @@ export function replayChecks(): CheckSet {
 
 export type ReplayOutcome = { pass: boolean; failing: string[]; error?: string; run: RunResult };
 
+/**
+ * Whether a replay failed definitely: it ran to its end, and a gating check failed or the end state differs. A run
+ * that broke off, or one whose only non-passing verdicts are inconclusive or not applicable, decided nothing: it is
+ * not a pass, and it is not a failure either, so it kills no mutant (docs/validators.md, the estate's level 5).
+ */
+export function definiteFailure(outcome: Pick<ReplayOutcome, 'run'>): boolean {
+  const run = outcome.run;
+  if (run.status !== 'completed') return false;
+  return (
+    run.blocks.some((block) =>
+      block.verdicts.some((verdict) => verdict.gating && verdict.outcome === 'fail'),
+    ) || run.endState?.match === false
+  );
+}
+
 /** The asks of a spec: the user message of each block, in order. */
 export function asksOf(spec: LoadedSpec): string[] {
   return spec.spec.blocks.map((block) => {

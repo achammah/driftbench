@@ -61,4 +61,21 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.supplier-email.an-ask-that-fits-supplier-email (route nearest the rule)
+    link:
+      span: instruction.memory-supplier-languages.an-unlisted-supplier-gets-english-and
+      fp: df92803514ae0dd121783f91adfd59947061c0c9ff1184672f790017bf3fc07b
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: route nearest the rule
+      field: route.supplier-email.an-ask-that-fits-supplier-email#route nearest the rule
+      fp: 6039dbbf139b5140eedfd1b71e3060c02d6a4998794526966b34231d6b2ab513
+      frame: trigger
+      shape: "{}"
+      context: "{}"
+      pieces:
+        - draft, answer or chase an email to a supplier
+        - The supplier is not in the language table
     outcome: no-delete

@@ -64,4 +64,19 @@ metadata:
     phrase: null
     ask: code
     askFrom: hazard.standing.recover-from-a-compaction-of-the (hazard)
+    link:
+      span: hazard.standing.recover-from-a-compaction-of-the
+      fp: 75beee8288b5e19491848fed65540a234e51e51859517397fab911d07d9d677e
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: hazard
+      field: hazard.standing.recover-from-a-compaction-of-the#hazard
+      fp: 75beee8288b5e19491848fed65540a234e51e51859517397fab911d07d9d677e
+      frame: trigger
+      shape: go on with the task we were doing, after {}
+      pieces:
+        - a compaction of the context
     outcome: no-delete

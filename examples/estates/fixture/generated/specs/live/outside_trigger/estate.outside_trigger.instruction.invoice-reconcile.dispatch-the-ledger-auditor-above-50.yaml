@@ -53,4 +53,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.invoice-reconcile.dispatch-the-ledger-auditor-above-50
+      fp: fddfbbac7c6b57978731b72c6da28cf24c0b0a1cadbf390e61b36fc69a72b80c
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative

@@ -77,4 +77,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: tool.settings.deny-bash-git-push-force
+      fp: 3faa0b42aa0c30f4040328565eab2c4ce5a37a0169456bf3b9a4d55562b8be13
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

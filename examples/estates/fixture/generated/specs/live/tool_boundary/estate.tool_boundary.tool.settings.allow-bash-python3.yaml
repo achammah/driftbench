@@ -77,4 +77,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: tool.settings.allow-bash-python3
+      fp: c3a5cc6f4c234c9fc296e8a323339aabd46eeb949ed4e8bc5c9d63d767077985
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

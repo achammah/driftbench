@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.route-planner.never-load-a-route-over-the
+      fp: 272e5fa035a4a0640874b4bcd29b5f963d00592f18128edf581e8081c7c4dfcf
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: route-planner
+      target: helper
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.route-planner.never-load-a-route-over-the

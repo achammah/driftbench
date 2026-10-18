@@ -91,4 +91,15 @@ metadata:
     situation: ledger-audit
     phrase: 1
     ask: code
+    link:
+      span: subagent.ledger-auditor.helper-ledger-auditor
+      fp: 8fd8b99c2d0e6a54bd70890d02f8e562c04359680c48436154470d321b4efbf3
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: helper
+      name: ledger-auditor
+    from:
+      bank: ledger-audit
+      phrase: 1
     outcome: bank

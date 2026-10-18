@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.shipment-tracker.late-means-past-the-promised-date
+      fp: 5eb428df2163adcfc7046f44cc65cf38fdd0eb9082b19340b3ed7fd526280315
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: shipment-tracker
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.shipment-tracker.late-means-past-the-promised-date

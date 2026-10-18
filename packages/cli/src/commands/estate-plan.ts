@@ -129,6 +129,27 @@ export async function estatePlanCommand(path: string, options: EstatePlanOptions
   return 0;
 }
 
+/**
+ * The most lines one list prints on the console. A real estate holds thousands of edges with no journey, rows
+ * adjusted to the space map and notes: the console gets the count and the first of each, the summary file
+ * gets every one.
+ */
+export const CONSOLE_LIST_LINES = 10;
+
+/** Pushes up to `CONSOLE_LIST_LINES` lines of a list and, past that, one line that counts the rest and names the file. */
+function pushListed<T>(
+  lines: string[],
+  items: readonly T[],
+  line: (item: T) => string,
+  rest: { summaryOut: string; key: string },
+): void {
+  for (const item of items.slice(0, CONSOLE_LIST_LINES)) lines.push(line(item));
+  if (items.length > CONSOLE_LIST_LINES)
+    lines.push(
+      `    and ${items.length - CONSOLE_LIST_LINES} more, all in ${rest.summaryOut} under "${rest.key}".`,
+    );
+}
+
 export function planReport(plan: Plan, details: PlanDetails, out: string, summaryOut: string): string {
   const { summary } = plan;
   const lines = [
@@ -154,13 +175,20 @@ export function planReport(plan: Plan, details: PlanDetails, out: string, summar
   lines.push(`  Unenforced: ${summary.unenforcedAtoms.length} approved rules no guard enforces.`);
   lines.push(`  Cells with no approved phrase: ${summary.cellsWithoutPhrase} of ${summary.cells}.`);
   lines.push(`  Edges with no journey: ${summary.edgesWithoutJourney}.`);
-  for (const edge of details.uncoveredEdges)
-    lines.push(`    ${edge.from} ${edge.kind} ${edge.to}: ${edge.reason}`);
+  pushListed(
+    lines,
+    details.uncoveredEdges,
+    (edge) => `    ${edge.from} ${edge.kind} ${edge.to}: ${edge.reason}`,
+    { summaryOut, key: 'uncoveredEdges' },
+  );
   if (details.droppedConstraints > 0) {
     lines.push(`  Dropped ${details.droppedConstraints} constraints that name target atoms of two kinds.`);
   }
-  for (const change of details.adjusted) lines.push(`  Row ${change.row}: ${change.reason}.`);
-  for (const note of details.notes) lines.push(`  ${note}`);
+  pushListed(lines, details.adjusted, (change) => `  Row ${change.row}: ${change.reason}.`, {
+    summaryOut,
+    key: 'adjusted',
+  });
+  pushListed(lines, details.notes, (note) => `  ${note}`, { summaryOut, key: 'notes' });
   lines.push(
     `Next: driftbench estate plan approve ${out} --all, or strike rows with --row <id> --strike`,
     '',

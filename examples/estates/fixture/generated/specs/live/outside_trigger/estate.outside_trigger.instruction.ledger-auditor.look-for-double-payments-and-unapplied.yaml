@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.ledger-auditor.look-for-double-payments-and-unapplied
+      fp: e5269a6ee297cc57b2b4c28850659bde990094e051831b39dbcf3d9caa03cffe
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: ledger-auditor
+      target: helper
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.ledger-auditor.look-for-double-payments-and-unapplied

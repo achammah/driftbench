@@ -67,4 +67,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.inbox-triager.an-ask-that-fits-inbox-triager (situation)
+    link:
+      span: route.inbox-triager.an-ask-that-fits-inbox-triager
+      fp: 9b3dbfc25fdb4fa0640aa8fe150fef15504d57db97f3642bd986e076301605fe
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: helper
+      name: inbox-triager
+    from:
+      form: situation
+      field: route.inbox-triager.an-ask-that-fits-inbox-triager#situation
+      fp: 9b3dbfc25fdb4fa0640aa8fe150fef15504d57db97f3642bd986e076301605fe
+      frame: variant_3
+      shape: "{}"
+      pieces:
+        - sort the shared operations inbox into invoices, shipment questions and supplier mail
     outcome: no-change:read-only

@@ -83,6 +83,18 @@ metadata:
     situation: inbox-sort
     phrase: 1
     ask: bank
+    link:
+      span: instruction.inbox-triager.a-message-that-fits-no-folder
+      fp: 28577a3e866e296def762f1b2a27fae5538b1eeac35dcfff71aef7a41d964b16
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: inbox-triager
+      target: helper
+    from:
+      bank: inbox-sort
+      phrase: 1
     outcome: bank
     judged:
       - instruction.inbox-triager.a-message-that-fits-no-folder

@@ -1,10 +1,18 @@
-import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { type EstateMap, loadEstateMap } from '@agent-nexus/driftbench-estate';
 import { cli } from './bench';
-import { FIXTURE, fixtureSuite, machineFailure, runOnFake, runOnFakeDetailed } from './fixture-suite';
+import {
+  decidedFailure,
+  FIXTURE,
+  type FixtureSuite,
+  fixtureSuite,
+  runOnFake,
+  runOnFakeDetailed,
+} from './fixture-suite';
 import { type Family, type ItemResult, itemsOf, type Tier } from './frame';
+import { unitRun } from './unit';
 
 /**
  * kill.fake: the mutant kill rate per mutant class, on the fake runtime (docs/estate.md section 8, estate
@@ -85,7 +93,7 @@ export function killFamily(): Family {
         for (const cell of CELLS) {
           out.set(
             `${family}.${keyOf(cell)}`,
-            await judge(cell, map.map, suite.specs, join(FIXTURE, 'approved.yaml'), work, originalVerdict),
+            await judgeCell(cell, map.map, suite, join(FIXTURE, 'approved.yaml'), work, originalVerdict),
           );
         }
       } finally {
@@ -96,14 +104,21 @@ export function killFamily(): Family {
   };
 }
 
-async function judge(
+/**
+ * One cell, on an estate root (the fixture by default): the atom of the cell, then the tests that judge its kind. A
+ * guard that enforces only prohibitions is judged by its unit tests (docs/estate.md section 6, estate mutants);
+ * every other atom with a live test by its live tests.
+ */
+export async function judgeCell(
   cell: Cell,
   estate: EstateMap,
-  specs: Awaited<ReturnType<typeof fixtureSuite>>['specs'],
+  suite: Pick<FixtureSuite, 'specs' | 'natives'>,
   map: string,
   work: string,
   original: Map<string, boolean>,
+  root: string = FIXTURE,
 ): Promise<ItemResult> {
+  const specs = suite.specs;
   const atom = estate.atoms
     .filter((candidate) => candidate.kind === cell.kind)
     .map((candidate) => candidate.id)
@@ -115,13 +130,145 @@ async function judge(
   if (cell.kind === 'setting') return judgeStatic(cell, atom, specs, map, work);
   const same = equivalent(cell, atom, estate);
   if (same) return { pass: true, detail: `not judged, an equivalent mutant: ${same}` };
+  if (cell.kind === 'guard' && cell.op === 'delete' && prohibitionGuard(atom, estate))
+    return judgeByUnits(cell, atom, estate, suite.natives, map, work, root);
+  return judgeLive(cell, atom, specs, map, work, original, root);
+}
+
+/**
+ * Whether a guard enforces only prohibitions: every atom whose enforcement names it is a rule of polarity
+ * `prohibition`, and there is one. Such a guard acts only after or on an act a standing rule forbids, so an agent
+ * that keeps the rule never reaches it (docs/estate.md section 6, estate mutants). Read from the map's typed facts.
+ */
+export function prohibitionGuard(atomId: string, estate: EstateMap): boolean {
+  const enforced = estate.atoms.filter((candidate) => (candidate.enforcement ?? []).includes(atomId));
+  return enforced.length > 0 && enforced.every((candidate) => candidate.fields?.polarity === 'prohibition');
+}
+
+/**
+ * A guard's delete, judged by its `guard_positive` unit tests: their payload does the forbidden act. Their
+ * outcomes are recorded on the original, a test green there must turn red on the mutant, and a test already red on
+ * the original is no kill.
+ */
+export async function judgeByUnits(
+  cell: Cell,
+  atom: string,
+  estate: EstateMap,
+  natives: FixtureSuite['natives'],
+  map: string,
+  work: string,
+  root: string = FIXTURE,
+): Promise<ItemResult> {
+  const named = natives.filter((spec) => spec.testType === 'guard_positive' && spec.atoms.includes(atom));
+  if (named.length === 0) return { pass: false, detail: `no guard_positive unit test names ${atom}` };
+  const folder = join(work, `units-${cell.op}-${cell.kind}-${cell.index}`);
+  await mkdir(folder, { recursive: true });
+  const copies = [];
+  for (const spec of named) {
+    const path = join(folder, `${spec.id}.json`);
+    await cp(spec.path, path);
+    copies.push({ ...spec, path });
+  }
+  const recording = cli(['estate', 'unit', folder, '--estate', root, '--record', '--json']);
+  if (recording.code > 1)
+    return {
+      pass: false,
+      detail: `estate unit --record exited ${recording.code}: ${recording.out.trim().slice(0, 140)}`,
+    };
+  const before = unitRun(root, copies);
+  if (before.error) return { pass: false, detail: before.error };
+  // A kill needs the guard to act on the forbidden act on the original: the recorded outcome of a case is its
+  // intervention (deny, warn or nudge, the verdict the map declares for the guard when it declares one), never an
+  // allow. A guard that lets the act through gives the mutant nothing to lose.
+  const declared = estate.atoms
+    .find((candidate) => candidate.id === atom)
+    ?.evidence.find((item) => item.type === 'guard')?.verdict;
+  const acting = [];
+  for (const spec of copies) {
+    if (before.verdicts.get(spec.id) !== true) continue;
+    const record = JSON.parse(await readFile(spec.path, 'utf8')) as { cases?: RecordedCase[] };
+    if ((record.cases ?? []).some((unitCase) => intervenes(unitCase, declared))) acting.push(spec);
+  }
+  if (acting.length === 0)
+    return {
+      pass: false,
+      detail: `none of the ${copies.length} guard_positive unit tests of ${atom} intervenes on the original${declared ? ` (declared verdict ${declared})` : ''}`,
+    };
+  const green = acting;
+  const mutant = join(work, `${cell.op}-${cell.kind}-${cell.index}`);
+  const made = cli(['estate', 'mutate', map, '--atom', atom, `--${cell.op}`, '--to', mutant]);
+  if (made.code !== 0)
+    return {
+      pass: false,
+      detail: `estate mutate refused the ${cell.op} of ${atom}: ${made.out.trim().slice(0, 140)}`,
+    };
+  const after = unitRun(mutant, green);
+  if (after.error) return { pass: false, detail: after.error };
+  // Exit 2 is an input error (a usage error, or a test with no recorded outcome): it decided nothing, so it kills
+  // nothing (docs/estate.md section 6).
+  if (after.code > 1)
+    return {
+      pass: false,
+      detail: `estate unit exited ${after.code} on the mutant: an input error is no kill`,
+    };
+  const red = green.filter((spec) => after.verdicts.get(spec.id) === false);
+  return red.length > 0
+    ? {
+        pass: true,
+        detail: `${red[0]?.id} turns red (a guard that enforces only prohibitions, judged by its unit tests)`,
+      }
+    : {
+        pass: false,
+        detail: `the ${green.length} guard_positive unit tests green on the original stay green on the ${cell.op} mutant of ${atom}`,
+      };
+}
+
+/** One case of a native unit test, with the outcome `estate unit --record` wrote on the original. */
+type RecordedCase = {
+  inert?: boolean;
+  flaky?: boolean;
+  expected?: { decision?: string; exitCode?: number; message?: string; output?: string };
+};
+
+/**
+ * Whether a recorded case is an intervention of the guard, as docs/estate.md section 6 reads guard outcomes: exit 2 or
+ * a deny decision denies, another nonzero exit warns, and context on standard output with exit 0 nudges. An inert or
+ * flaky case, or an allow, is none. When the map declares the guard's verdict, the intervention must be that one.
+ */
+export function intervenes(unitCase: RecordedCase, declared?: string): boolean {
+  const outcome = unitCase.expected;
+  if (!outcome || unitCase.inert || unitCase.flaky) return false;
+  const verdict =
+    outcome.decision === 'deny' || outcome.decision === 'block' || outcome.exitCode === 2
+      ? 'deny'
+      : outcome.decision === 'ask'
+        ? 'ask'
+        : typeof outcome.exitCode === 'number' && outcome.exitCode !== 0
+          ? 'warn'
+          : (outcome.output ?? '').trim() !== ''
+            ? 'nudge'
+            : 'allow';
+  if (verdict === 'allow') return false;
+  return declared === undefined || declared === verdict || (declared === 'block' && verdict === 'deny');
+}
+
+/** An atom's delete or invert, judged by its complete live specs on the fake runtime. */
+export async function judgeLive(
+  cell: Cell,
+  atom: string,
+  specs: FixtureSuite['specs'],
+  map: string,
+  work: string,
+  original: Map<string, boolean>,
+  root: string = FIXTURE,
+): Promise<ItemResult> {
   const naming = specs.filter((spec) => spec.complete && spec.mode === 'live' && spec.atoms.includes(atom));
   if (naming.length === 0) return { pass: false, detail: `no complete live spec names ${atom}` };
   const chosen = naming.slice(0, SPECS_PER_ATOM);
   const unknown = chosen.filter((spec) => !original.has(spec.id));
   if (unknown.length > 0) {
     const verdicts = runOnFake(
-      FIXTURE,
+      root,
       unknown.map((spec) => spec.path),
       join(work, `original-${original.size}.db`),
       map,
@@ -146,11 +293,11 @@ async function judge(
     green.map((spec) => spec.path),
     join(mutant, 'runs.db'),
   );
-  // Red is a run that reached its end and failed a check the evidence decides: not a run that broke off, and
-  // not a judged criterion, which the stand-in judge cannot decide.
+  // Red is a run that reached its end and failed a check the evidence decides: not a run that broke off, and not a
+  // judged criterion the stand-in judge left inconclusive.
   const red = green.filter((spec) => {
     const run = verdicts.get(spec.id);
-    return run?.completed === true && !run.pass && run.failing.some(machineFailure);
+    return run?.completed === true && !run.pass && run.failing.some(decidedFailure);
   });
   return red.length > 0
     ? { pass: true, detail: `${red[0]?.id} turns red` }

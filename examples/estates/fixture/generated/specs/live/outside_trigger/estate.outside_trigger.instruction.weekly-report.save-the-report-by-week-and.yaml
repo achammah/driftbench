@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.weekly-report.save-the-report-by-week-and
+      fp: a2bfb56398d5a9fdebb6a43d2fc71744761d3cc257883cc607af0fa678a154e9
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: weekly-report
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.weekly-report.save-the-report-by-week-and

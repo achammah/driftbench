@@ -15,13 +15,13 @@
   },
   "phrases": {
     "path": "../phrases.yaml",
-    "situations": 28,
-    "phrases": 54,
+    "situations": 31,
+    "phrases": 60,
     "workspaces": 5
   },
   "sessions": {
     "path": "../sessions/index.yaml",
-    "sessions": 3
+    "sessions": 9
   },
   "options": {
     "seed": 1,
@@ -44,8 +44,8 @@
   "summary": {
     "specs": 1564,
     "blocks": 1559,
-    "complete": 1540,
-    "incomplete": 24,
+    "complete": 1544,
+    "incomplete": 20,
     "judged": 465
   },
   "incomplete": [
@@ -86,50 +86,14 @@
       ]
     },
     {
-      "spec": "estate.guard_positive.guard.settings.pretooluse-bash-guard-block-force-push",
-      "path": "incomplete/replay/guard_positive/estate.guard_positive.guard.settings.pretooluse-bash-guard-block-force-push.yaml",
-      "row": "guard_positive.guard.settings.pretooluse-bash-guard-block-force-push",
+      "spec": "estate.read_when.reference.weekly-report.read-references-kpi-definitions-md",
+      "path": "incomplete/live/read_when/estate.read_when.reference.weekly-report.read-references-kpi-definitions-md.yaml",
+      "row": "read_when.reference.weekly-report.read-references-kpi-definitions-md",
       "reasons": [
         {
-          "marker": "needs-recorded-session",
-          "atom": "guard.settings.pretooluse-bash-guard-block-force-push",
-          "detail": "no recorded session of force-push"
-        }
-      ]
-    },
-    {
-      "spec": "estate.guard_positive.guard.settings.pretooluse-edit-write-guard-read-before",
-      "path": "incomplete/replay/guard_positive/estate.guard_positive.guard.settings.pretooluse-edit-write-guard-read-before.yaml",
-      "row": "guard_positive.guard.settings.pretooluse-edit-write-guard-read-before",
-      "reasons": [
-        {
-          "marker": "needs-recorded-session",
-          "atom": "guard.settings.pretooluse-edit-write-guard-read-before",
-          "detail": "no recorded session of invoice-file-edit"
-        }
-      ]
-    },
-    {
-      "spec": "estate.guard_positive.guard.settings.posttooluse-bash-guard-ledger-guard-py",
-      "path": "incomplete/replay/guard_positive/estate.guard_positive.guard.settings.posttooluse-bash-guard-ledger-guard-py.yaml",
-      "row": "guard_positive.guard.settings.posttooluse-bash-guard-ledger-guard-py",
-      "reasons": [
-        {
-          "marker": "needs-recorded-session",
-          "atom": "guard.settings.posttooluse-bash-guard-ledger-guard-py",
-          "detail": "no recorded session of this situation"
-        }
-      ]
-    },
-    {
-      "spec": "estate.guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh",
-      "path": "incomplete/replay/guard_positive/estate.guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh.yaml",
-      "row": "guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh",
-      "reasons": [
-        {
-          "marker": "needs-recorded-session",
-          "atom": "guard.settings.userpromptsubmit-guard-stop-word-sh",
-          "detail": "no recorded session of stop-word"
+          "marker": "needs-existing-file",
+          "atom": "reference.weekly-report.read-references-kpi-definitions-md",
+          "detail": ".claude/skills/weekly-report/references/kpi-definitions.md is no file of the estate"
         }
       ]
     },
@@ -146,18 +110,6 @@
       ]
     },
     {
-      "spec": "estate.guard_positive.guard.settings.stop-guard-reply-length-py",
-      "path": "incomplete/replay/guard_positive/estate.guard_positive.guard.settings.stop-guard-reply-length-py.yaml",
-      "row": "guard_positive.guard.settings.stop-guard-reply-length-py",
-      "reasons": [
-        {
-          "marker": "needs-recorded-session",
-          "atom": "guard.settings.stop-guard-reply-length-py",
-          "detail": "no recorded session of open-items"
-        }
-      ]
-    },
-    {
       "spec": "estate.guard_negative.guard.settings.stop-guard-reply-length-py",
       "path": "incomplete/unit/guard_negative/estate.guard_negative.guard.settings.stop-guard-reply-length-py.yaml",
       "row": "guard_negative.guard.settings.stop-guard-reply-length-py",
@@ -170,14 +122,14 @@
       ]
     },
     {
-      "spec": "estate.guard_positive.guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh",
-      "path": "incomplete/replay/guard_positive/estate.guard_positive.guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh.yaml",
-      "row": "guard_positive.guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh",
+      "spec": "estate.journey.12",
+      "path": "incomplete/live/journey/estate.journey.12.yaml",
+      "row": "journey.12",
       "reasons": [
         {
-          "marker": "needs-recorded-session",
-          "atom": "guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh",
-          "detail": "no recorded session of shipment-late"
+          "marker": "needs-existing-file",
+          "atom": "reference.weekly-report.read-references-kpi-definitions-md",
+          "detail": ".claude/skills/weekly-report/references/kpi-definitions.md is no file of the estate"
         }
       ]
     },
@@ -422,10 +374,10 @@
     ]
   },
   "quality": {
-    "completeShare": 0.9846547314578005,
-    "askedTests": 1532,
-    "distinctAsks": 130,
-    "distinctAsksPer100": 8.485639686684074
+    "completeShare": 0.9872122762148338,
+    "askedTests": 1536,
+    "distinctAsks": 133,
+    "distinctAsksPer100": 8.658854166666666
   },
   "unit": {
     "tests": 29,
@@ -442,17 +394,17 @@
   },
   "sources": {
     "asks": {
-      "bank": 456,
-      "code": 1076,
-      "session": 0,
+      "bank": 464,
+      "code": 1066,
+      "session": 6,
       "none": 8
     },
     "outcomes": {
-      "bank": 1023,
+      "bank": 1046,
       "no-change:guard": 26,
       "no-change:negative": 56,
       "no-change:read-only": 83,
-      "no-delete": 344,
+      "no-delete": 325,
       "static": 8
     },
     "judged": 304
@@ -510,8 +462,8 @@
     "read_when": {
       "rows": 10,
       "specs": 10,
-      "complete": 10,
-      "incomplete": 0
+      "complete": 9,
+      "incomplete": 1
     },
     "script_fixture": {
       "rows": 2,
@@ -540,8 +492,8 @@
     "guard_positive": {
       "rows": 84,
       "specs": 84,
-      "complete": 78,
-      "incomplete": 6
+      "complete": 84,
+      "incomplete": 0
     },
     "guard_negative": {
       "rows": 6,
@@ -624,16 +576,16 @@
     "journey": {
       "rows": 12,
       "specs": 12,
-      "complete": 12,
-      "incomplete": 0
+      "complete": 11,
+      "incomplete": 1
     }
   },
   "perMode": {
     "replay": {
       "rows": 6,
       "specs": 6,
-      "complete": 0,
-      "incomplete": 6
+      "complete": 6,
+      "incomplete": 0
     },
     "unit": {
       "rows": 37,
@@ -644,8 +596,8 @@
     "live": {
       "rows": 1528,
       "specs": 1521,
-      "complete": 1505,
-      "incomplete": 16
+      "complete": 1503,
+      "incomplete": 18
     }
   },
   "gaps": [
@@ -666,27 +618,50 @@
       ]
     },
     {
-      "marker": "needs-recorded-session",
-      "specs": 6,
-      "atoms": [
-        "guard.settings.posttooluse-bash-guard-ledger-guard-py",
-        "guard.settings.pretooluse-bash-guard-block-force-push",
-        "guard.settings.pretooluse-edit-write-guard-read-before",
-        "guard.settings.stop-guard-reply-length-py",
-        "guard.settings.userpromptsubmit-guard-stop-word-sh",
-        "guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh"
-      ],
-      "details": [
-        "no recorded session of force-push",
-        "no recorded session of invoice-file-edit",
-        "no recorded session of open-items",
-        "no recorded session of shipment-late",
-        "no recorded session of stop-word",
-        "no recorded session of this situation"
-      ]
+      "marker": "needs-existing-file",
+      "specs": 2,
+      "atoms": ["reference.weekly-report.read-references-kpi-definitions-md"],
+      "details": [".claude/skills/weekly-report/references/kpi-definitions.md is no file of the estate"]
     }
   ],
-  "replay": [],
+  "replay": [
+    {
+      "spec": "estate.guard_positive.guard.settings.pretooluse-bash-guard-block-force-push.force-push-blocked",
+      "session": "force-push-blocked",
+      "planRow": "guard_positive.guard.settings.pretooluse-bash-guard-block-force-push",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.pretooluse-edit-write-guard-read-before.invoice-edit-gated",
+      "session": "invoice-edit-gated",
+      "planRow": "guard_positive.guard.settings.pretooluse-edit-write-guard-read-before",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.posttooluse-bash-guard-ledger-guard-py.ledger-file-removed",
+      "session": "ledger-file-removed",
+      "planRow": "guard_positive.guard.settings.posttooluse-bash-guard-ledger-guard-py",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh.stop-word-nudged",
+      "session": "stop-word-nudged",
+      "planRow": "guard_positive.guard.settings.userpromptsubmit-guard-stop-word-sh",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.settings.stop-guard-reply-length-py.long-reply-trimmed",
+      "session": "long-reply-trimmed",
+      "planRow": "guard_positive.guard.settings.stop-guard-reply-length-py",
+      "expect": "pass"
+    },
+    {
+      "spec": "estate.guard_positive.guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh.carrier-code-required",
+      "session": "carrier-code-required",
+      "planRow": "guard_positive.guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh",
+      "expect": "pass"
+    }
+  ],
   "waiting": [],
   "struck": [],
   "invalid": [],

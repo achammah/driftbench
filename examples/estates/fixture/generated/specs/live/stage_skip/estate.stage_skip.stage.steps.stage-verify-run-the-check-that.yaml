@@ -89,4 +89,14 @@ metadata:
     situation: edit-under-pressure
     phrase: 0
     ask: bank
+    link:
+      span: stage.steps.stage-verify-run-the-check-that
+      fp: e2b9e4e32306f1f6d409d9a6a6f0a48a3f0fb478b0abd4cf693229304fd89625
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: edit-under-pressure
+      phrase: 0
     outcome: bank

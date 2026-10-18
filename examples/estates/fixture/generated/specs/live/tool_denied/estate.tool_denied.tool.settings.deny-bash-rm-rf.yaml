@@ -77,4 +77,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: tool.settings.deny-bash-rm-rf
+      fp: a9c57801d1d661c341840a4dd14f84542303c6b575b26f25b09bbe33e38117e8
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

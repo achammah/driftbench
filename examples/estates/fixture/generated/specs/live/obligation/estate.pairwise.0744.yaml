@@ -62,4 +62,23 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.invoice-reconcile.skill-invoice-reconcile (asks it names)
+    link:
+      span: instruction.invoice-reconcile.convert-a-foreign-currency-invoice-with
+      fp: 31f71701b9c1d09dfbe03356c29f45faa9f45ee300ec8f3390feee69422177a4
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      form: asks it names
+      field: skill.invoice-reconcile.skill-invoice-reconcile#asks it names
+      fp: 5d0404156288a5b0c0591447e6bde04acd722aa71b80494f4e2a78413aac4217
+      frame: trigger
+      shape: "{}"
+      context: "{}"
+      pieces:
+        - check, match or reconcile an invoice
+        - The invoice is not in EUR
     outcome: no-delete

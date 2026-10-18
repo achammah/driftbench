@@ -55,6 +55,23 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.weekly-report.an-ask-that-fits-weekly-report (route nearest the rule)
+    link:
+      span: instruction.memory-memory.the-weekly-report-is-due-monday
+      fp: 59c4e2dfc6fe1e84bc8b9ca167db656a00af831b7473487810b4961c88a9edfc
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: route nearest the rule
+      field: route.weekly-report.an-ask-that-fits-weekly-report#route nearest the rule
+      fp: 87ed3871bace9182fea65db638d5470a8f0412d690c5c38967f50ba37d8f30ce
+      frame: twin
+      shape: "{}"
+      context: "{}"
+      pieces:
+        - prepare the weekly operations report from the ledger and the shipment log
+        - The weekly report is prepared
     outcome: no-delete
     judged:
       - instruction.memory-memory.the-weekly-report-is-due-monday

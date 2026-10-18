@@ -93,4 +93,15 @@ metadata:
     situation: route-planning
     phrase: 0
     ask: bank
+    link:
+      span: route.standing.an-ask-to-plan-the-delivery
+      fp: 45a66aac1af73dbdd0935638e401d5f53eb85559d6bd1d5f2954dc33c35e8b78
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: helper
+      name: route-planner
+    from:
+      bank: route-planning
+      phrase: 0
     outcome: bank

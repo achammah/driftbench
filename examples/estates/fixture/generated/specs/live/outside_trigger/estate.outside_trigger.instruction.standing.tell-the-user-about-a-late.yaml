@@ -73,4 +73,14 @@ metadata:
     situation: shipment-on-time
     phrase: 1
     ask: bank
+    link:
+      span: instruction.standing.tell-the-user-about-a-late
+      fp: 1f9d0dfda3cba5f3acd0bddb0756acbe2dbc8d48308ff085bbd5189582686685
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: shipment-on-time
+      phrase: 1
     outcome: bank

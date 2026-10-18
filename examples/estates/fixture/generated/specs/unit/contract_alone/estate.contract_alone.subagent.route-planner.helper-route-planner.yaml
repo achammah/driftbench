@@ -71,6 +71,17 @@ metadata:
     situation: route-planning
     phrase: 0
     ask: bank
+    link:
+      span: subagent.route-planner.helper-route-planner
+      fp: 53cf02c01afd9d7e23c3fe81ea6804738b5502183f36043f43f6d56de139d8a8
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: helper
+      name: route-planner
+    from:
+      bank: route-planning
+      phrase: 0
     outcome: bank
     unit:
       target:

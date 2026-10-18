@@ -76,4 +76,14 @@ metadata:
     situation: carrier-page
     phrase: 1
     ask: bank
+    link:
+      span: tool.settings.deny-webfetch
+      fp: fce6d2099fa4bcd9de06562b0b3ebf82dcc7f290bbf27cf9de72d3d6ea3098a1
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: carrier-page
+      phrase: 1
     outcome: bank

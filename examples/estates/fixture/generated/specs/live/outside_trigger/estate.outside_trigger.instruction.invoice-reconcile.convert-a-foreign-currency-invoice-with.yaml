@@ -53,4 +53,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.invoice-reconcile.convert-a-foreign-currency-invoice-with
+      fp: 31f71701b9c1d09dfbe03356c29f45faa9f45ee300ec8f3390feee69422177a4
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative

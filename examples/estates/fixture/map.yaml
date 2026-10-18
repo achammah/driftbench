@@ -8,7 +8,7 @@
 version: 1
 runtime: claude-code
 root: .
-readAt: 2026-10-16T23:00:45.641Z
+readAt: 2026-10-17T10:09:39.743Z
 atoms:
   - id: skill.invoice-reconcile.skill-invoice-reconcile
     kind: skill
@@ -518,7 +518,7 @@ atoms:
     role: axis
     approved: true
     evidence:
-      - { type: guard, name: reply-length.py }
+      - { type: guard, name: reply-length.py, verdict: deny }
     enforcement: []
     fields:
       name: reply-length.py
@@ -526,21 +526,31 @@ atoms:
       command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/reply-length.py
       anchored: true
       scope: estate
+      verdictFrom: source
       ruleText: |-
         Nudges when the last reply is too long.
+
+        Verdict: deny
         Keep every reply under 1,200 characters unless the user asks for detail.
       ruleSources:
         - kind: documentation
-          text: Nudges when the last reply is too long.
+          text: |-
+            Nudges when the last reply is too long.
+
+            Verdict: deny
           file: .claude/guards/reply-length.py
           startLine: 2
-          endLine: 2
-          quote: '"""Nudges when the last reply is too long."""'
+          endLine: 5
+          quote: |-
+            """Nudges when the last reply is too long.
+
+            Verdict: deny
+            """
         - kind: message
           text: Keep every reply under 1,200 characters unless the user asks for detail.
           file: .claude/guards/reply-length.py
-          startLine: 9
-          endLine: 9
+          startLine: 12
+          endLine: 12
           quote: print("Keep every reply under 1,200 characters unless the user asks for detail.", file=sys.stderr)
       rules: []
       script: .claude/guards/reply-length.py
@@ -2568,6 +2578,111 @@ atoms:
       rowsWithoutGuard:
         - G6
       holds: false
+documents:
+  - path: CLAUDE.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/agents/inbox-triager.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/agents/ledger-auditor.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/agents/route-planner.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/guards/CHECK-REGISTRY.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/guards/block-force-push.sh
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/guards/ledger-guard.py
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/guards/read-before-edit.py
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/guards/reply-length.py
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/guards/stop-word.sh
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/memory/MEMORY.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/memory/supplier-languages.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/settings.json
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/skills/invoice-reconcile/SKILL.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/invoice-reconcile/references/currency-table.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/invoice-reconcile/references/matching-rules.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/invoice-reconcile/references/old-tolerances.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/invoice-reconcile/scripts/reconcile.py
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/skills/shipment-tracker/SKILL.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/shipment-tracker/data/shipments.txt
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/shipment-tracker/scripts/check-carrier.sh
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/skills/shipment-tracker/scripts/track.sh
+    role: normative
+    reasons:
+      - runtime structure or executable
+  - path: .claude/skills/supplier-email/SKILL.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/weekly-report/SKILL.md
+    role: normative
+    reasons:
+      - live document; no whole-document navigation structure
+  - path: .claude/skills/weekly-report/templates/report.md
+    role: template
+    reasons:
+      - "navigation folder: templates"
+  - path: .claude/steps.json
+    role: normative
+    reasons:
+      - runtime structure or executable
 edges:
   - { from: guard.settings.posttooluse-bash-guard-ledger-guard-py, to: instruction.standing.never-delete-a-ledger-file-archive, kind: enforces }
   - { from: guard.settings.posttooluse-bash-guard-ledger-guard-py, to: event.PostToolUse, kind: event }
@@ -2627,5 +2742,5 @@ edges:
 producedBy:
   family: lane
   model: claude-opus-5-5 as the estate lane, by hand
-  at: 2026-10-16T23:00:45.641Z
+  at: 2026-10-17T10:09:39.743Z
 hash: e48ea73788c2fb36e8def0b10b39a3551139beb107f54959237f272c2aa7ba41

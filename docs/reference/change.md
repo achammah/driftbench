@@ -29,8 +29,8 @@ One change to the agent.
 
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `kind` | string, not empty | yes |  | What changed: one of stage, tool, rule, deviation, prompt, map, fixture, criterion, model, agent. Another kind is the whole suite. |
-| `id` | string, not empty | no |  | Which one: a stage, a tool label, a rule (states@<stage>, recovery:<class>, uses_tool:<tool>, path:<id>, reply_language, or a spec rule name), a deviation class, an estate atom id, dimension=value of the map, a fixture name or value, a criterion name. |
+| `kind` | string, not empty | yes |  | What changed: one of stage, tool, rule, deviation, prompt, map, fixture, criterion, model, agent, prompt_section. Another kind is the whole suite. |
+| `id` | string, not empty | no |  | Which one: a stage, a tool label, a rule (states@<stage>, recovery:<class>, uses_tool:<tool>, path:<id>, reply_language, or a spec rule name), a deviation class, an estate atom id, dimension=value of the map, a fixture name or value, a criterion name, or a prompt section as <prompt-id>#<section-id>. |
 | `part` | [ToolPart](#toolpart) | no |  | For a tool: input, result, description or presence. Absent: any part. |
 | `global` | boolean | no |  | True when the change applies to every block, such as a tone rule. The whole suite. |
 | `note` | string | no |  | A free note for the reader. |

@@ -54,4 +54,23 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.shipment-tracker.skill-shipment-tracker (asks it names)
+    link:
+      span: instruction.shipment-tracker.ask-for-the-tracking-number-when
+      fp: 3fa9ef6b787f7a093e5feb3ff3cfcab3eba4bbd79bf2cd3a33213029ef16c0d8
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: shipment-tracker
+      target: skill
+    from:
+      form: asks it names
+      field: skill.shipment-tracker.skill-shipment-tracker#asks it names
+      fp: ef1bf02575dd862062412ec73a2b2428fa0ed65dfad4cc28f7b3f4e45abd3af5
+      frame: trigger
+      shape: help me with {}
+      context: "{}"
+      pieces:
+        - a delivery, a tracking number or a late shipment
+        - The user gives no tracking number
     outcome: no-delete

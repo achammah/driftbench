@@ -78,4 +78,15 @@ metadata:
     situation: ledger-audit
     phrase: 0
     ask: bank
+    link:
+      span: route.ledger-auditor.an-ask-that-fits-ledger-auditor
+      fp: b268e9e133cbdc4743c1d660bb356804ac861d878b2b96e2b6621db1ce80e58e
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: helper
+      name: ledger-auditor
+    from:
+      bank: ledger-audit
+      phrase: 0
     outcome: bank

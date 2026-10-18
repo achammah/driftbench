@@ -94,4 +94,15 @@ metadata:
     situation: shipment-late
     phrase: 1
     ask: code
+    link:
+      span: route.standing.an-ask-to-know-where-a
+      fp: f8ee267adfd511b09ebb8ea660f993e1b5968d02cdd5d87a929a6eb53e9967cc
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: shipment-tracker
+    from:
+      bank: shipment-late
+      phrase: 1
     outcome: bank

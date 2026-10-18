@@ -69,5 +69,22 @@ metadata:
     situation: null
     phrase: null
     ask: code
-    askFrom: instruction.shipment-tracker.always-pass-the-carrier-code-to (enforced by guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh)
+    askFrom: guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh (tool)
+    link:
+      span: guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh
+      fp: ae7d8cdf4db42242e4f0793f8b4b05883f2b0302be4c188e2d3f264803e8c953
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: guard
+      name: check-carrier.sh
+      verdict: deny
+    from:
+      form: tool
+      field: guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh#tool
+      fp: ae7d8cdf4db42242e4f0793f8b4b05883f2b0302be4c188e2d3f264803e8c953
+      frame: trigger
+      shape: run a command in the shell here to {}
+      pieces:
+        - pass the carrier code to the tracking script
     outcome: no-change:guard

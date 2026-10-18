@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Nudges when the last reply is too long."""
+"""Nudges when the last reply is too long.
+
+Verdict: deny
+"""
 import json
 import sys
 

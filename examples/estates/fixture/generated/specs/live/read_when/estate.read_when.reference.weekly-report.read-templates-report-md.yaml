@@ -82,4 +82,15 @@ metadata:
     situation: weekly-report-new
     phrase: 1
     ask: bank
+    link:
+      span: reference.weekly-report.read-templates-report-md
+      fp: 9732610d57bb391eeae9138225f1408016b6c4d636d46c3df429f9ca5bf7369d
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/skills/weekly-report/templates/report.md
+    from:
+      bank: weekly-report-new
+      phrase: 1
     outcome: bank

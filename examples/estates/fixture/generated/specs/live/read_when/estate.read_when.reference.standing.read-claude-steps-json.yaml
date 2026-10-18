@@ -76,4 +76,15 @@ metadata:
     situation: weekly-report-update
     phrase: 0
     ask: bank
+    link:
+      span: reference.standing.read-claude-steps-json
+      fp: ca0c6ef5d700e0d2a7cde5eba9f50e3103be1d3feef0a50a679b29d66d7926dc
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/steps.json
+    from:
+      bank: weekly-report-update
+      phrase: 0
     outcome: bank

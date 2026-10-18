@@ -20,6 +20,7 @@ import { registryFamily } from './scan-registry';
 import { standingFamily } from './scan-standing';
 import { stepsFamily } from './scan-steps';
 import { statsFamily } from './stats';
+import { taskFamilyV2 } from './taskv2';
 import { unitFamily } from './unit';
 
 export { benchFamily } from './bench';
@@ -71,6 +72,7 @@ export const BANK_LEVELS = [
       genCompleteFamily(),
       genAsksFamily(),
       taskFamily(),
+      taskFamilyV2(),
       readsFamily(),
       coverageFamily(),
       unitFamily(),

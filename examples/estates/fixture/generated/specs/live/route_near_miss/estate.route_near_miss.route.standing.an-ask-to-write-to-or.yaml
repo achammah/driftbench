@@ -51,4 +51,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.standing.an-ask-to-write-to-or (situation)
+    link:
+      span: route.standing.an-ask-to-write-to-or
+      fp: 309201071d12291a4d917a045010c02837863d1ea0f004baa65cb3184ee82f10
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: supplier-email
+    from:
+      form: situation
+      field: route.standing.an-ask-to-write-to-or#situation
+      fp: 309201071d12291a4d917a045010c02837863d1ea0f004baa65cb3184ee82f10
+      frame: near_miss
+      shape: "{}"
+      pieces:
+        - write to or chase a supplier
     outcome: no-change:negative

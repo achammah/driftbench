@@ -82,4 +82,16 @@ metadata:
     situation: ledger-auditor-brief
     phrase: 0
     ask: bank
+    link:
+      span: instruction.ledger-auditor.the-auditor-never-edits-a-file
+      fp: 57808a27da99d8accd28640c405abd497c77724f5bfd896cee11d1ec381f73ee
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: ledger-auditor
+      target: helper
+    from:
+      bank: ledger-auditor-brief
+      phrase: 0
     outcome: bank

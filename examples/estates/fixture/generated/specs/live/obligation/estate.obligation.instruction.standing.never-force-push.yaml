@@ -81,4 +81,14 @@ metadata:
     situation: force-push
     phrase: 0
     ask: bank
+    link:
+      span: instruction.standing.never-force-push
+      fp: 7117344c3fd600b76734baffbde0ce00e86eaba0001f63501eade8e9d2fe63c6
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: force-push
+      phrase: 0
     outcome: bank

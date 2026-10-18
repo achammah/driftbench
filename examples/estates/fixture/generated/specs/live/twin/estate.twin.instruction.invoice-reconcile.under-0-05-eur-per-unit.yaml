@@ -69,6 +69,18 @@ metadata:
     situation: invoice-rounding
     phrase: 0
     ask: bank
+    link:
+      span: instruction.invoice-reconcile.under-0-05-eur-per-unit
+      fp: f6bdf8e88d22af23cc4aa1f365d3670fe7532574465ad94838e3278a1692c409
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      bank: invoice-rounding
+      phrase: 0
     outcome: bank
     judged:
       - instruction.invoice-reconcile.under-0-05-eur-per-unit

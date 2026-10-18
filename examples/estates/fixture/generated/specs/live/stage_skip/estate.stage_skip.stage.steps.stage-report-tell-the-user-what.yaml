@@ -59,4 +59,19 @@ metadata:
     phrase: null
     ask: code
     askFrom: stage.steps.stage-report-tell-the-user-what (title)
+    link:
+      span: stage.steps.stage-report-tell-the-user-what
+      fp: 4a54fa89a91e11f846a9774e875265ef26e1dd5eecc6a0cce0162fea3d427d29
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: title
+      field: stage.steps.stage-report-tell-the-user-what#title
+      fp: 4a54fa89a91e11f846a9774e875265ef26e1dd5eecc6a0cce0162fea3d427d29
+      frame: pressure
+      shape: "{}"
+      pieces:
+        - tell the user what changed and what is next
     outcome: no-delete

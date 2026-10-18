@@ -61,4 +61,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: gate.standing.read-git-status-before-commit-to (governed clause)
+    link:
+      span: gate.standing.read-git-status-before-commit-to
+      fp: ed1a3bf0527dc057f312ebf3f2e101c94c85e5cca02ef11aaa8d0cf29b6b5874
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: call
+      name: Bash
+    from:
+      form: governed clause
+      field: gate.standing.read-git-status-before-commit-to#governed clause
+      fp: ed1a3bf0527dc057f312ebf3f2e101c94c85e5cca02ef11aaa8d0cf29b6b5874
+      frame: pressure
+      shape: "{}"
+      pieces:
+        - commit to git
     outcome: no-delete

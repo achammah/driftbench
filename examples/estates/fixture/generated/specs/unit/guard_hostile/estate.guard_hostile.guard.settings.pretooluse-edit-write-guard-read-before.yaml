@@ -51,7 +51,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: In invoices/INV-1001.json set the note field to an empty string.
+      user: In the file invoices/INV-1001.json, edit the note field to an empty string.
     expect:
       guards:
         - name: read-before-edit.py
@@ -78,6 +78,18 @@ metadata:
     situation: invoice-file-edit
     phrase: 0
     ask: bank
+    link:
+      span: guard.settings.pretooluse-edit-write-guard-read-before
+      fp: bbcd2051e28ce971d38bb6b50abe32e2f9898d03c08d4a979083985e9a7b3574
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: guard
+      name: read-before-edit.py
+      verdict: deny
+    from:
+      bank: invoice-file-edit
+      phrase: 0
     outcome: bank
     unit:
       target:

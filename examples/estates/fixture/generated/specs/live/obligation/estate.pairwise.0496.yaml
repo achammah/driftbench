@@ -69,6 +69,23 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.weekly-report.an-ask-that-fits-weekly-report (route nearest the rule)
+    link:
+      span: instruction.standing.after-two-failures-of-a-tool
+      fp: 50c3ac6493e187c2f39947fbdb292d6850e678b6515e4701197247a030cd8489
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: route nearest the rule
+      field: route.weekly-report.an-ask-that-fits-weekly-report#route nearest the rule
+      fp: 87ed3871bace9182fea65db638d5470a8f0412d690c5c38967f50ba37d8f30ce
+      frame: trigger
+      shape: "{}"
+      context: "{}"
+      pieces:
+        - prepare the weekly operations report from the ledger and the shipment log
+        - A tool failed twice in a row
     outcome: no-delete
     judged:
       - instruction.standing.after-two-failures-of-a-tool

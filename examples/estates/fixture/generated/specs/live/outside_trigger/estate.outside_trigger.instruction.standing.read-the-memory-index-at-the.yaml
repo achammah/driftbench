@@ -48,4 +48,13 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.standing.read-the-memory-index-at-the
+      fp: a4f9e7040323d9f3e62fbce02ebc1b2bf15f9c79d5778d9ea949397914d616ae
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      neutral: outside
     outcome: no-change:negative

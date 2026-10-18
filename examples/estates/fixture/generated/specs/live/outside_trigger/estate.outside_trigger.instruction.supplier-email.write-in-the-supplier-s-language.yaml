@@ -53,4 +53,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.supplier-email.write-in-the-supplier-s-language
+      fp: 00666b1df1fa3b1cb8f4ae6ee865deaddbc4544fa6ff8cc43af9f0ef5ca9800d
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: supplier-email
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative

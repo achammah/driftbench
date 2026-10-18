@@ -1,9 +1,11 @@
 export {
   analyzeGraph,
   buildGraph,
+  citationsByFile,
   declaredLabels,
   type EnforceMethod,
   EVENT_PREFIX,
+  filesReached,
   type Graph,
   type GraphAnalysis,
   labelOf,
@@ -185,6 +187,7 @@ export {
   ignoreRule,
   invariantAtoms,
   isExternal,
+  isUserLayerPath,
   keyLine,
   type Located,
   labelOfLine,
@@ -240,7 +243,16 @@ export {
   type ToolLabels,
   tolerantFields,
   toolBase,
+  USER_LAYER,
 } from './scan';
+export { proseCandidates } from './scan/candidates';
+export {
+  FileProseCache,
+  type ProseCache,
+  type ProseEstimate,
+  proseCacheKey,
+  proseEstimateLine,
+} from './scan/prose-cache';
 export {
   Atom,
   AtomKind,

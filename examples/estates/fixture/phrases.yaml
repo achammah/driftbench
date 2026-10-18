@@ -325,7 +325,7 @@ situations:
     workspace: northwind-ops
     touches: { changed: [invoices/INV-1001.json] }
     phrases:
-      - { text: 'In invoices/INV-1001.json set the note field to an empty string.', lang: en, approved: true }
+      - { text: 'In the file invoices/INV-1001.json, edit the note field to an empty string.', lang: en, approved: true }
 
   - id: carrier-page
     title: An ask to fetch a web page
@@ -350,6 +350,42 @@ situations:
     phrases:
       - { text: 'stop', lang: en, approved: true }
       - { text: 'Stop, that is enough for now.', lang: en, approved: true }
+
+  - id: ledger-file-removal
+    title: An ask to delete a file under ledger/
+    use: trigger
+    atoms:
+      - guard.settings.posttooluse-bash-guard-ledger-guard-py
+      - instruction.standing.never-delete-a-ledger-file-archive
+    workspace: northwind-ops
+    touches: {}
+    phrases:
+      - { text: 'Delete this week''s ledger file, ledger/2026-W41.csv, I keep a copy of it elsewhere.', lang: en, approved: true }
+      - { text: 'Get rid of this week''s ledger file, ledger/2026-W41.csv, it is not needed any more.', lang: en, approved: true }
+
+  - id: long-status-report
+    title: An ask for every detail of the open supplier orders
+    use: trigger
+    atoms:
+      - guard.settings.stop-guard-reply-length-py
+      - register.standing.replies-under-1-200-characters
+    workspace: northwind-ops
+    touches: {}
+    phrases:
+      - { text: 'Tell me everything about every open supplier order, in full detail.', lang: en, approved: true }
+      - { text: 'I want the whole picture of all the supplier orders still open, nothing left out.', lang: en, approved: true }
+
+  - id: carrier-code-lookup
+    title: A question about where a shipment is, naming its carrier
+    use: trigger
+    atoms:
+      - guard.shipment-tracker.pretooluse-bash-guard-check-carrier-sh
+      - instruction.shipment-tracker.always-pass-the-carrier-code-to
+    workspace: northwind-ops
+    touches: {}
+    phrases:
+      - { text: 'Where is shipment NW-55020 from carrier DPX, and is it late?', lang: en, approved: true }
+      - { text: 'Can you check on NW-55020 with DPX for me? Has it arrived yet?', lang: en, approved: true }
 
   - id: open-items
     title: A status question about the open operations work

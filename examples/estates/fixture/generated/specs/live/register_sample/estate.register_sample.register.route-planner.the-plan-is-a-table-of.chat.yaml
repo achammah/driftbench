@@ -61,4 +61,21 @@ metadata:
     phrase: null
     ask: code
     askFrom: subagent.route-planner.helper-route-planner (asks it names)
+    link:
+      span: register.route-planner.the-plan-is-a-table-of
+      fp: 4af7db8a12fab75fa7e11db6c3d14920630b1ffebc3aabc7d1315bb9544360b0
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: route-planner
+      target: helper
+    from:
+      form: asks it names
+      field: subagent.route-planner.helper-route-planner#asks it names
+      fp: 53cf02c01afd9d7e23c3fe81ea6804738b5502183f36043f43f6d56de139d8a8
+      frame: trigger
+      shape: help me with {}
+      pieces:
+        - the delivery plan of a day
     outcome: no-delete

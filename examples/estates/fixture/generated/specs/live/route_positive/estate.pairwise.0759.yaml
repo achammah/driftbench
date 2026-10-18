@@ -86,4 +86,15 @@ metadata:
     situation: invoice-reconcile
     phrase: 0
     ask: bank
+    link:
+      span: route.standing.an-ask-to-reconcile-an-invoice
+      fp: 427e359fb34ea68eccbb1e655877a9c5c07c8fedbccc700995e0d68329cf897e
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: invoice-reconcile
+    from:
+      bank: invoice-reconcile
+      phrase: 0
     outcome: bank

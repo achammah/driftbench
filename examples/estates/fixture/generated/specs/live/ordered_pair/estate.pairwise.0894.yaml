@@ -94,4 +94,14 @@ metadata:
     situation: supplier-email
     phrase: 1
     ask: bank
+    link:
+      span: gate.supplier-email.show-the-draft-and-get-an
+      fp: 4044c3c69f381ccaf063331026a1081848719bd318eb090cd4bd92c2f2e2fbc8
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: supplier-email
+      phrase: 1
     outcome: bank

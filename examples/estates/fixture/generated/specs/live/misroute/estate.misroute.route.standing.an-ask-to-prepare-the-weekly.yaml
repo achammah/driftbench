@@ -52,4 +52,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.standing.an-ask-to-prepare-the-weekly (situation)
+    link:
+      span: route.standing.an-ask-to-prepare-the-weekly
+      fp: 9d2dc2e78398b136e571533a62db24a7621b2f43891c5056233a7901cff3a85f
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: weekly-report
+    from:
+      form: situation
+      field: route.standing.an-ask-to-prepare-the-weekly#situation
+      fp: 9d2dc2e78398b136e571533a62db24a7621b2f43891c5056233a7901cff3a85f
+      frame: misroute
+      shape: "{}"
+      pieces:
+        - prepare the weekly report
     outcome: no-delete

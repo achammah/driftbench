@@ -75,4 +75,14 @@ metadata:
     situation: stop-word
     phrase: 0
     ask: bank
+    link:
+      span: instruction.standing.on-stop-stop-all-work-and
+      fp: c9b78e1968c53a4a67958c6ae93ee4b2adb1d6ce24444eb8dd89cf3f9cc6637d
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: stop-word
+      phrase: 0
     outcome: bank

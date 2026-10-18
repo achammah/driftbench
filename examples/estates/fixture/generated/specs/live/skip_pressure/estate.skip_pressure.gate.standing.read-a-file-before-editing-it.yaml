@@ -81,4 +81,15 @@ metadata:
     situation: edit-under-pressure
     phrase: 0
     ask: bank
+    link:
+      span: gate.standing.read-a-file-before-editing-it
+      fp: 3a6cc83bfb2f17fed7d3479ff4ab9b0fd26926cad5ae8566f0defbd93648f935
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: call
+      name: Edit
+    from:
+      bank: edit-under-pressure
+      phrase: 0
     outcome: bank

@@ -60,4 +60,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.invoice-reconcile.run-the-reconcile-script-and-show
+      fp: c2f6483710580da20742710311f11e0d682ad63b0a1231517e56fb3db43d77a7
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative

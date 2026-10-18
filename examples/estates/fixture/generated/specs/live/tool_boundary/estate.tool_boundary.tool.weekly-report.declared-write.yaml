@@ -85,4 +85,14 @@ metadata:
     situation: weekly-report-update
     phrase: 0
     ask: bank
+    link:
+      span: tool.weekly-report.declared-write
+      fp: 215a4ac02d360e8300d1d6baa843030feaaf9d226cb28b7b5a46d7dc7376c665
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: weekly-report-update
+      phrase: 0
     outcome: bank

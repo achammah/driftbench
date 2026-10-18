@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please write to a supplier, answer one, or chase a late delivery or a missing credit note.
+      user: Please write to a supplier, answer one, or chase a late delivery or a missing credit note, including the supplier languages.
     expect:
       skills:
         - name: supplier-email
@@ -54,4 +54,21 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.supplier-email.skill-supplier-email (asks it names)
+    link:
+      span: reference.supplier-email.read-claude-memory-supplier-languages-md
+      fp: 00666b1df1fa3b1cb8f4ae6ee865deaddbc4544fa6ff8cc43af9f0ef5ca9800d
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/memory/supplier-languages.md
+    from:
+      form: asks it names
+      field: skill.supplier-email.skill-supplier-email#asks it names
+      fp: 72bd688b10bca10559cee53e7444ac54c7f319f798013e6f2006e8d702dde788
+      frame: trigger
+      shape: "{}, including the {}"
+      pieces:
+        - write to a supplier, answer one, or chase a late delivery or a missing credit note
+        - supplier languages
     outcome: no-change:read-only

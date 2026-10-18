@@ -74,4 +74,14 @@ metadata:
     situation: supplier-email
     phrase: 1
     ask: bank
+    link:
+      span: instruction.standing.never-send-a-supplier-email-without
+      fp: 7ca63e2910270a74562539289861b9c5a503c13562e01c61c07264326855662b
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: supplier-email
+      phrase: 1
     outcome: bank

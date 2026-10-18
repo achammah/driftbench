@@ -77,4 +77,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: tool.settings.ask-bash-git-commit
+      fp: 8430fb2ceb6dacb5bc0502da6e98fb5c87e6310f340b0a037cf9a5df03ad21f0
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

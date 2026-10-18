@@ -96,4 +96,15 @@ metadata:
     situation: weekly-report-new
     phrase: 0
     ask: code
+    link:
+      span: route.standing.an-ask-to-prepare-the-weekly
+      fp: 9d2dc2e78398b136e571533a62db24a7621b2f43891c5056233a7901cff3a85f
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: weekly-report
+    from:
+      bank: weekly-report-new
+      phrase: 0
     outcome: bank

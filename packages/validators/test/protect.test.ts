@@ -44,6 +44,13 @@ function heavyCondition(id: string): string {
   return `${TRAIN_CONDITION} || (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',${id},'))`;
 }
 
+/** pr fast runs on every pull request, and on a dispatch on a train branch that lists `fast`. */
+const FAST_CONDITION =
+  "github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/train/') && contains(format(',{0},', inputs.jobs), ',fast,'))";
+
+/** The fast job's limit: 20 minutes, on a pull request and on a dispatch. */
+const FAST_TIMEOUT = 20;
+
 const CI_HEAVY = [
   'bench',
   'research-replay',
@@ -204,6 +211,7 @@ function assertTrainValidators(workflow: ReturnType<typeof parse>) {
 }
 
 const OK = 'success,success,success,success,success,success,success';
+const SKIPPED = 'skipped,skipped,skipped,skipped,skipped,skipped,skipped';
 const ONE_RED = 'success,failure,success,success,success,success,success';
 const GATE_CASES: [string, string, string, string, string, number][] = [
   // event, head ref, ref name, jobs, needs results, expected exit code
@@ -228,6 +236,39 @@ const GATE_CASES: [string, string, string, string, string, number][] = [
     0,
   ],
   ['workflow_dispatch', '', 'train/9a', '', 'skipped,skipped,skipped,skipped,skipped,skipped,skipped', 1],
+  ['workflow_dispatch', '', 'train/9a', '', OK, 1],
+  // a pre-flight dispatch (fast only, or no heavy job) never counts as a train pass
+  ['workflow_dispatch', '', 'train/pre-9', 'fast', SKIPPED, 1],
+  ['workflow_dispatch', '', 'train/pre-9', 'fast,unknown', SKIPPED, 1],
+  // the list is matched without regard to case, as GitHub matches it
+  ['workflow_dispatch', '', 'train/pre-9', 'FAST', SKIPPED, 1],
+  ['workflow_dispatch', '', 'train/pre-9', 'Fast', SKIPPED, 1],
+  // a list that names no real job runs nothing, so it never counts
+  ['workflow_dispatch', '', 'train/9a', 'nonsense', SKIPPED, 1],
+  [
+    'workflow_dispatch',
+    '',
+    'train/9a',
+    'build,nonsense',
+    'skipped,skipped,success,skipped,skipped,skipped,skipped',
+    1,
+  ],
+  [
+    'workflow_dispatch',
+    '',
+    'train/9a',
+    'BUILD',
+    'skipped,skipped,success,skipped,skipped,skipped,skipped',
+    0,
+  ],
+  [
+    'workflow_dispatch',
+    '',
+    'train/9a',
+    'build,fast',
+    'skipped,skipped,success,skipped,skipped,skipped,skipped',
+    0,
+  ],
   ['workflow_dispatch', '', 'main', 'build', OK, 1],
   ['workflow_dispatch', '', 'main', 'build,python,bench', OK, 1],
   ['workflow_dispatch', '', 'train-lookalike', 'build', OK, 1],
@@ -270,6 +311,8 @@ function assertGate(command: string) {
     });
     expect(result.status, `${event} ${head} ${refName} [${jobs}] ${results}`).toBe(expected);
     if (expected === 1) expect(result.stdout).toMatch(/::error::/);
+    if (expected === 1 && event === 'workflow_dispatch' && /^fast/i.test(jobs) && results === SKIPPED)
+      expect(result.stdout).toContain('pre-flight run, not a train pass');
     if (expected === 1 && event === 'pull_request' && head === 'fix/ordinary')
       expect(result.stdout).toContain('Merge through a train (train/<n>)');
   }
@@ -280,9 +323,47 @@ function assertGateWaits(workflow: ReturnType<typeof parse>) {
   const job = workflow.jobs['train-gate'];
   expect(job.if).toBe('always()');
   expect([...job.needs].sort()).toEqual([...CI_HEAVY].sort());
+  // the fast job is never an input to the gate, so a green pr fast is never a train pass
+  expect(job.needs).not.toContain('pr-fast');
   const step = job.steps.find((s: { run?: string }) => s.run);
   expect(step.env.RESULTS).toBe("${{ join(needs.*.result, ',') }}");
   expect(step.run).not.toContain('${{');
+}
+
+/** The fast job runs on pull requests and on a fast dispatch on a train branch, and nowhere else. */
+function assertFastBehaviour(workflow: ReturnType<typeof parse>) {
+  const fast = (ctx: Ctx) => runs(ctx, 'pr-fast', workflow);
+  expect(fast(ORDINARY_PR)).toBe(true);
+  expect(fast(TRAIN_PR)).toBe(true);
+  expect(fast(MAIN_PUSH)).toBe(false);
+  for (const jobs of ['fast', 'FAST', 'Fast', 'build,fast', 'fast,build'])
+    expect(fast(dispatchOn('refs/heads/train/pre-9', jobs))).toBe(true);
+  for (const jobs of ['', 'build', 'fast-docs', 'xfast', 'fastx,build'])
+    expect(fast(dispatchOn('refs/heads/train/pre-9', jobs))).toBe(false);
+  for (const ref of [
+    'refs/heads/main',
+    'refs/heads/train-lookalike',
+    'refs/heads/feature/train/9',
+    'refs/tags/train/9',
+  ])
+    expect(fast(dispatchOn(ref, 'fast'))).toBe(false);
+  // the affected tests run on a dispatch (it has no head_ref) and on an ordinary PR, never on a train PR
+  const affected = workflow.jobs['pr-fast'].steps.find(
+    (step: { name?: string }) => step.name === 'Tests affected by this PR',
+  );
+  expect(evaluateTemplate(affected.if, dispatchOn('refs/heads/train/pre-9', 'fast'))).toBe(true);
+  expect(evaluateTemplate(affected.if, ORDINARY_PR)).toBe(true);
+  expect(evaluateTemplate(affected.if, TRAIN_PR)).toBe(false);
+}
+
+/** The docs checks run in every pr-fast run, whatever the diff: no step condition, no --changed. */
+function assertFastDocs(workflow: ReturnType<typeof parse>) {
+  const steps: { run?: string; if?: string }[] = workflow.jobs['pr-fast'].steps;
+  for (const command of ['pnpm docs:reference --check', 'pnpm exec vitest run tools/docs --maxWorkers=2']) {
+    const matching = steps.filter((step) => step.run === command);
+    expect(matching, command).toHaveLength(1);
+    expect(matching[0]?.if, command).toBeUndefined();
+  }
 }
 
 describe('the validators workflow', () => {
@@ -459,8 +540,13 @@ describe('merge train enforcement', () => {
   it('runs a bounded fast check on every PR with full diff history and affected tests', () => {
     const job = workflow.jobs['pr-fast'];
     expect(job.name).toBe('pr fast');
-    expect(job.if).toBe("github.event_name == 'pull_request'");
-    expect(job['timeout-minutes']).toBe(8);
+    expect(job.if).toBe(FAST_CONDITION);
+    // 20 minutes on a pull request and on a pre-flight dispatch: a large diff's affected tests pass 8
+    expect(job['timeout-minutes']).toBe(FAST_TIMEOUT);
+    const limit = (ctx: Ctx) => evaluateTemplate(job['timeout-minutes'], ctx);
+    expect(limit(ORDINARY_PR)).toBe(20);
+    expect(limit(TRAIN_PR)).toBe(20);
+    expect(limit(dispatchOn('refs/heads/train/pre-9', 'fast'))).toBe(20);
     expect(job.steps[0].with['fetch-depth']).toBe(0);
     const commands = job.steps.flatMap((step: { run?: string }) => step.run ?? '');
     expect(commands).toContain('pnpm lint');
@@ -471,6 +557,75 @@ describe('merge train enforcement', () => {
     const affected = job.steps.find((step: { name?: string }) => step.name === 'Tests affected by this PR');
     expect(affected.if).toBe("${{ !startsWith(github.head_ref, 'train/') }}");
     for (const id of ['build']) expect(workflow.jobs[id].if).toBe(heavyCondition(id));
+  });
+  it('runs the fast job on a pre-flight dispatch listing fast, and on no other dispatch', () => {
+    assertFastBehaviour(workflow);
+    const anyRef = structuredClone(workflow);
+    anyRef.jobs['pr-fast'].if = anyRef.jobs['pr-fast'].if.replace(
+      " && startsWith(github.ref, 'refs/heads/train/')",
+      '',
+    );
+    expect(() => assertFastBehaviour(anyRef)).toThrow();
+    const ignoresList = structuredClone(workflow);
+    ignoresList.jobs['pr-fast'].if =
+      "github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'";
+    expect(() => assertFastBehaviour(ignoresList)).toThrow();
+    const prefixMatch = structuredClone(workflow);
+    prefixMatch.jobs['pr-fast'].if = prefixMatch.jobs['pr-fast'].if.replace("',{0},'", "'{0}'");
+    expect(() => assertFastBehaviour(prefixMatch)).toThrow();
+    const pullOnly = structuredClone(workflow);
+    pullOnly.jobs['pr-fast'].if = "github.event_name == 'pull_request'";
+    expect(() => assertFastBehaviour(pullOnly)).toThrow();
+  });
+  it('gives the fast job 20 minutes on a pull request and on a dispatch', () => {
+    const job = workflow.jobs['pr-fast'];
+    const limit = (w: ReturnType<typeof parse>, ctx: Ctx) =>
+      evaluateTemplate(w.jobs['pr-fast']['timeout-minutes'], ctx);
+    const dispatch = dispatchOn('refs/heads/train/pre-9', 'fast');
+    expect(limit(workflow, dispatch)).toBe(20);
+    expect(limit(workflow, ORDINARY_PR)).toBe(20);
+    expect(job['timeout-minutes']).toBe(FAST_TIMEOUT);
+    const old = structuredClone(workflow);
+    old.jobs['pr-fast']['timeout-minutes'] = "${{ github.event_name == 'workflow_dispatch' && 20 || 8 }}";
+    expect(limit(old, dispatch)).toBe(20);
+    expect(limit(old, ORDINARY_PR)).not.toBe(20);
+  });
+  it('compares the affected tests with origin/main on a dispatch, as on a pull request', () => {
+    const affected = workflow.jobs['pr-fast'].steps.find(
+      (step: { name?: string }) => step.name === 'Tests affected by this PR',
+    );
+    expect(affected.run).toBe('pnpm test --maxWorkers=2 --changed origin/main --passWithNoTests');
+    expect(workflow.jobs['pr-fast'].steps[0].with['fetch-depth']).toBe(0);
+  });
+  it('always runs the docs checks in the fast job, and fails if a docs step is removed or made conditional', () => {
+    assertFastDocs(workflow);
+    for (const command of ['pnpm docs:reference --check', 'pnpm exec vitest run tools/docs --maxWorkers=2']) {
+      const removed = structuredClone(workflow);
+      removed.jobs['pr-fast'].steps = removed.jobs['pr-fast'].steps.filter(
+        (step: { run?: string }) => step.run !== command,
+      );
+      expect(() => assertFastDocs(removed), command).toThrow();
+      const conditional = structuredClone(workflow);
+      conditional.jobs['pr-fast'].steps.find((step: { run?: string }) => step.run === command).if =
+        "github.event_name == 'push'";
+      expect(() => assertFastDocs(conditional), command).toThrow();
+    }
+  });
+  it('fails the gate on a dispatch that ran no heavy job or names an unknown job, in any letter case', () => {
+    const command: string = workflow.jobs['train-gate'].steps.find((s: { run?: string }) => s.run).run;
+    expect(() => assertGate(command)).not.toThrow();
+    const noSuccessCheck = command.replace('[[ ",$RESULTS," != *,success,* ]]', 'false');
+    expect(noSuccessCheck).not.toBe(command);
+    expect(() => assertGate(noSuccessCheck)).toThrow();
+    const noLowercase = command.replace("tr '[:upper:]' '[:lower:]'", 'cat');
+    expect(noLowercase).not.toBe(command);
+    expect(() => assertGate(noLowercase)).toThrow();
+    const noIdCheck = command.replace('for id in ${jobs_lc//,/ }; do', 'for id in; do');
+    expect(noIdCheck).not.toBe(command);
+    expect(() => assertGate(noIdCheck)).toThrow();
+    const gateWaitsForFast = structuredClone(workflow);
+    gateWaitsForFast.jobs['train-gate'].needs.push('pr-fast');
+    expect(() => assertGateWaits(gateWaitsForFast)).toThrow();
   });
 });
 

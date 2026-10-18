@@ -79,4 +79,15 @@ metadata:
     situation: weekly-report-update
     phrase: 0
     ask: bank
+    link:
+      span: route.weekly-report.an-ask-that-fits-weekly-report
+      fp: 87ed3871bace9182fea65db638d5470a8f0412d690c5c38967f50ba37d8f30ce
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: weekly-report
+    from:
+      bank: weekly-report-update
+      phrase: 0
     outcome: bank

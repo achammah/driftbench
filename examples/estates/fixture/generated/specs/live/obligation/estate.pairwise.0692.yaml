@@ -102,4 +102,16 @@ metadata:
     situation: invoice-reconcile
     phrase: 2
     ask: bank
+    link:
+      span: instruction.invoice-reconcile.run-the-reconcile-script-and-show
+      fp: c2f6483710580da20742710311f11e0d682ad63b0a1231517e56fb3db43d77a7
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      bank: invoice-reconcile
+      phrase: 2
     outcome: bank

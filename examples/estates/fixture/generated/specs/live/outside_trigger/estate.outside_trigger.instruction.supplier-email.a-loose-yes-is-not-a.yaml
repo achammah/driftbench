@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.supplier-email.a-loose-yes-is-not-a
+      fp: 64e6b5a1470e76fa27a31e4b5f1075435ab1c6520c98b5fc1ae109be4dfd1968
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: supplier-email
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.supplier-email.a-loose-yes-is-not-a

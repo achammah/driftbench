@@ -152,6 +152,79 @@ const texts = (blocks: Array<{ stimulus: { kind: string; phrase?: { text: string
   blocks.map((block) => (block.stimulus.kind === 'phrase' ? block.stimulus.phrase?.text : '(placeholder)'));
 
 describe('buildScenario', () => {
+  it.each(['balance-found', 'balance-missing'])(
+    'preserves the approved retry count, pending stage and failure report on %s',
+    (id) => {
+      const prepared = prepare((draft) => {
+        const recovery = draft.relations?.find(
+          (entry) => entry.kind === 'recovery' && entry.class === 'D8_tool_failure',
+        );
+        if (recovery?.kind !== 'recovery') throw new Error('missing test recovery');
+        recovery.must = ['Lookup is unavailable'];
+        recovery.must_not = ['Completed successfully'];
+      });
+      const built = buildScenario(prepared, rngFor(27, 'retry-contract'), {
+        path: path(prepared, id),
+        fixed: [],
+        probe: { classId: 'D8_tool_failure', stage: 'verify', tool: 'lookup' },
+      });
+      if (!built.ok) throw new Error(built.reason);
+      const failure = built.blocks.find((block) => block.injection === 'D8_tool_failure');
+      expect(failure).toMatchObject({
+        stage: 'verify',
+        must: ['Lookup is unavailable'],
+        must_not: ['Completed successfully'],
+        tools: [{ label: 'lookup', count: 2 }],
+      });
+    },
+  );
+
+  it.each(['balance-found', 'balance-missing'])(
+    'places perturbations after the earlier-value turn on %s',
+    (id) => {
+      const prepared = prepare((draft) => {
+        for (const relation of draft.relations ?? []) if (relation.kind === 'path') delete relation.end_state;
+      });
+      const selected = path(prepared, id);
+      const to = selected.stages[2] as string;
+      const built = buildScenario(prepared, rngFor(27, 'restated-account'), {
+        path: selected,
+        fixed: [],
+        before: {
+          stage: 'verify',
+          to,
+          stimulus: { kind: 'phrase', phrase: phrase('account_state', 'missing', 'Search account 81.') },
+          carries: [],
+          call: { tool: 'lookup', field: 'account', value: '81' },
+        },
+        perturbEvery: true,
+      });
+      if (!built.ok) throw new Error(built.reason);
+      expect(built.blocks).toHaveLength(3);
+      expect(built.blocks[1]?.tools).toContainEqual({
+        label: 'lookup',
+        count: 1,
+        input: { account: '81' },
+        input_closed: true,
+      });
+      const correction = built.blocks[2]?.tools?.find((tool) => tool.label === 'lookup');
+      expect(correction?.input?.account).toBe(id === 'balance-found' ? '4' : '9');
+      const offTopic = built.perturbations?.find((entry) => entry.class === 'D1_off_topic');
+      expect(offTopic).toMatchObject({
+        inject_at: 2,
+        user: 'Are you open on Sunday?',
+        expect: { stage: 'verify' },
+      });
+      expect(built.blocks[(offTopic?.inject_at ?? 0) - 1]?.stage).toBe('verify');
+      const failure = built.perturbations?.find((entry) => entry.class === 'D8_tool_failure');
+      expect(failure).toMatchObject({
+        inject_at: 1,
+        user: 'Search account 81.',
+        expect: { stage: 'verify', tools: [{ label: 'lookup', count: 2, input: { account: '81' } }] },
+      });
+    },
+  );
+
   it('walks the path: each block expects the next stage, the call the map links to it with its input filled', () => {
     const prepared = prepare();
     const built = buildScenario(prepared, rngFor(1, 't'), {
@@ -1163,4 +1236,59 @@ it('preserves scenario choices and RNG draws with generation-local path indices'
       expect(indexed).toEqual(plain);
       expect(second()).toBe(first());
     }
+});
+
+it('uses the actual stage of a later recovered tool after an earlier inserted request', () => {
+  const prepared = prepare((draft) => {
+    const relations = draft.relations;
+    if (!relations) throw new Error('no relations');
+    const p = relations.find((r) => r.kind === 'path' && r.id === 'balance-found');
+    if (p?.kind !== 'path') throw new Error('no path');
+    p.stages = ['greet', 'verify', 'help', 'lost'];
+    delete p.end_state;
+    draft.phrases.push(phrase('stage_transition', 'help-to-lost', 'Record the reviewed result.'));
+    const transitions = draft.dimensions.find((d) => d.id === 'stage_transition');
+    if (!transitions) throw new Error('no transitions');
+    transitions.values.push({ id: 'help-to-lost', title: 'Record', ...by });
+    draft.relations = relations.filter((r) => r.kind !== 'recovery' || r.class !== 'D8_tool_failure');
+    draft.relations.push(
+      {
+        kind: 'uses_tool',
+        subject: { dimension: 'flow', value: 'balance' },
+        tool: 'notify',
+        stage: 'help',
+        input: { reason: 'reviewed' },
+        ...by,
+      },
+      {
+        kind: 'recovery',
+        class: 'D8_tool_failure',
+        flows: ['balance'],
+        tool: 'notify',
+        stage_after: 'help',
+        tools: [{ tool: 'notify', count: 2 }],
+        ...by,
+      },
+    );
+  });
+  const built = buildScenario(prepared, rngFor(1097, 'independent-later-recovery'), {
+    path: path(prepared, 'balance-found'),
+    fixed: [],
+    before: {
+      stage: 'verify',
+      to: 'help',
+      stimulus: { kind: 'phrase', phrase: phrase('account_state', 'missing', 'Search account 81.') },
+      carries: [],
+      call: { tool: 'lookup', field: 'account', value: '81' },
+    },
+    perturbEvery: true,
+  });
+  if (!built.ok) throw new Error(built.reason);
+  expect(built.perturbations?.find((p) => p.class === 'D8_tool_failure')).toMatchObject({
+    inject_at: 3,
+    expect: {
+      stage: 'help',
+      tools: expect.arrayContaining([expect.objectContaining({ label: 'notify', count: 2 })]),
+    },
+  });
 });

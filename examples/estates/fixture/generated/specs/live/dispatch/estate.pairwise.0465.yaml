@@ -86,4 +86,15 @@ metadata:
     situation: inbox-sort
     phrase: 0
     ask: code
+    link:
+      span: subagent.inbox-triager.helper-inbox-triager
+      fp: 5db02f9439154dc4ad6106ee9b57fc0ad03487d328e1c14b02b18eadc6e253da
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: helper
+      name: inbox-triager
+    from:
+      bank: inbox-sort
+      phrase: 0
     outcome: bank

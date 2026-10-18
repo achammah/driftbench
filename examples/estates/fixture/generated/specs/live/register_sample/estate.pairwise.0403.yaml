@@ -92,4 +92,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: register.standing.bullets-for-three-or-more-parallel
+      fp: 7e281d2b19de3fe997724ee2b64ca13bb71f8d8cbd18152f6285cefd9e7a0456
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

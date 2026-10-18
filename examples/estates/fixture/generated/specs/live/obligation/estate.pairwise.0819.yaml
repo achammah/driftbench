@@ -103,4 +103,16 @@ metadata:
     situation: shipment-late
     phrase: 0
     ask: code
+    link:
+      span: instruction.shipment-tracker.always-pass-the-carrier-code-to
+      fp: 93ecbd29ff3507a287a46df73bd37d0fe3fa5f26e297e404a880119f7aca992a
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: shipment-tracker
+      target: skill
+    from:
+      bank: shipment-late
+      phrase: 0
     outcome: bank

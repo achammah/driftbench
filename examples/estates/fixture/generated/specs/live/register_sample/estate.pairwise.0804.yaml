@@ -57,7 +57,7 @@ criteria:
 blocks:
   - id: ask
     when:
-      user: Give me a short status of invoices, shipments and supplier emails.
+      user: Tell me everything about every open supplier order, in full detail.
     expect:
       must_not:
         - "[\\s\\S]{1201}"
@@ -92,7 +92,17 @@ metadata:
     mode: live
     map: ../approved.yaml
     plan: ../../../../packages/generate/test/estate/fixtures/planner-plan.approved.yaml
-    situation: open-items
-    phrase: 1
+    situation: long-status-report
+    phrase: 0
     ask: bank
+    link:
+      span: register.standing.replies-under-1-200-characters
+      fp: e292196f4ab0f347ec69e983ed19e5af37179bd0d8fb99f253113b28c0f7d38c
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: long-status-report
+      phrase: 0
     outcome: bank

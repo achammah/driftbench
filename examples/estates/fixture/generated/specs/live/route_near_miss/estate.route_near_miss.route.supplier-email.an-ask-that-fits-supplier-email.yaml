@@ -51,4 +51,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.supplier-email.an-ask-that-fits-supplier-email (situation)
+    link:
+      span: route.supplier-email.an-ask-that-fits-supplier-email
+      fp: 6039dbbf139b5140eedfd1b71e3060c02d6a4998794526966b34231d6b2ab513
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: supplier-email
+    from:
+      form: situation
+      field: route.supplier-email.an-ask-that-fits-supplier-email#situation
+      fp: 6039dbbf139b5140eedfd1b71e3060c02d6a4998794526966b34231d6b2ab513
+      frame: near_miss
+      shape: "{}"
+      pieces:
+        - write to a supplier, answer one, or chase a late delivery or a missing credit note
     outcome: no-change:negative

@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.invoice-reconcile.a-line-matches-on-article-code
+      fp: c463c6d513337a016e23851f16d2f3d40a7bbf6fb416e2369f97031763c2d73b
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.invoice-reconcile.a-line-matches-on-article-code

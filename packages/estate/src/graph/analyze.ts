@@ -1,4 +1,4 @@
-import type { EstateFile, FileKind } from '../scan/reader';
+import { type EstateFile, type FileKind, isUserLayerPath } from '../scan/reader';
 import type { Atom, Edge } from '../schema';
 
 /**
@@ -15,6 +15,10 @@ import type { Atom, Edge } from '../schema';
  *   helper definition, the check registry, the estate configuration).
  * - orphans: files nothing names.
  * - unenforced: instruction, gate and register atoms no guard enforces.
+ *
+ * The user-level skill layer feeds the walk (its skills, rules and references are atoms of the graph) but is no
+ * part of the project: its files are never listed as orphans or unreachable, and its missing references and
+ * scripts are not findings of the project.
  */
 
 const WALK: ReadonlySet<Edge['kind']> = new Set([
@@ -71,6 +75,10 @@ export function analyzeGraph(
   atoms: readonly Atom[],
   edges: readonly Edge[],
   files: readonly EstateFile[],
+  /** Files documented by navigation-only documents: named, though they never make a file reachable. */
+  navigation: ReadonlySet<string> = new Set(),
+  /** Files that code names: a code file that is reached reaches the files it names. */
+  codeLinks: ReadonlyMap<string, readonly string[]> = new Map(),
 ): GraphAnalysis {
   const kinds = new Map(files.map((file) => [file.path, file.kind]));
   const byId = new Map(atoms.map((atom) => [atom.id, atom]));
@@ -97,6 +105,7 @@ export function analyzeGraph(
     if (reachableFiles.has(path) || !kinds.has(path)) return;
     reachableFiles.add(path);
     for (const atom of inFile.get(path) ?? []) queue.push(atom.id);
+    for (const named of codeLinks.get(path) ?? []) reachFile(named);
   };
   for (const file of files) if (ROOT_FILES.has(file.kind)) reachFile(file.path);
   while (head < queue.length) {
@@ -130,12 +139,27 @@ export function analyzeGraph(
         if (!reachableFiles.has(file.path)) tooling.add(file.path);
       }
   }
+  for (const path of navigation) if (kinds.has(path)) namedFiles.add(path);
+  // A script that is itself named names the files it holds as literals; a stray script legitimises nothing.
+  for (let grew = true; grew; ) {
+    grew = false;
+    for (const [from, named] of codeLinks)
+      if (namedFiles.has(from))
+        for (const path of named)
+          if (kinds.has(path) && !namedFiles.has(path)) {
+            namedFiles.add(path);
+            grew = true;
+          }
+  }
 
-  const orphans = files.filter((file) => !namedFiles.has(file.path)).map((file) => file.path);
+  const orphans = files
+    .filter((file) => file.layer !== 'user' && !namedFiles.has(file.path))
+    .map((file) => file.path);
   const orphanSet = new Set(orphans);
   const unreachableFiles = files
     .filter(
       (file) =>
+        file.layer !== 'user' &&
         file.kind !== 'registry' &&
         !reachableFiles.has(file.path) &&
         !orphanSet.has(file.path) &&
@@ -153,12 +177,20 @@ export function analyzeGraph(
       .filter((atom) => RULE_KINDS.has(atom.kind) && atom.enforcement.length === 0)
       .map((atom) => atom.id),
     missingReferences: atoms
-      .filter((atom) => atom.kind === 'reference' && atom.fields?.exists === false)
+      .filter(
+        (atom) =>
+          atom.kind === 'reference' &&
+          atom.fields?.exists === false &&
+          !isUserLayerPath(atom.provenance.file),
+      )
       .map((atom) => atom.id),
     missingScripts: atoms
       .filter(
         (atom) =>
-          atom.kind === 'guard' && typeof atom.fields?.script === 'string' && !kinds.has(atom.fields.script),
+          atom.kind === 'guard' &&
+          typeof atom.fields?.script === 'string' &&
+          !kinds.has(atom.fields.script) &&
+          !isUserLayerPath(atom.provenance.file),
       )
       .map((atom) => atom.id),
   };

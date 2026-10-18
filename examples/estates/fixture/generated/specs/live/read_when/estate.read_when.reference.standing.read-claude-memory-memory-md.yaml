@@ -76,4 +76,15 @@ metadata:
     situation: weekly-report-update
     phrase: 0
     ask: bank
+    link:
+      span: reference.standing.read-claude-memory-memory-md
+      fp: d6d4113709eb2f56fa5b03113993b02baea85874f2a00d01a3e5da0fe488fd9c
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/memory/MEMORY.md
+    from:
+      bank: weekly-report-update
+      phrase: 0
     outcome: bank

@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.invoice-reconcile.an-invoice-line-with-no-order
+      fp: 3a7e9ad13ddf4be595b65fbf8cde4e91078e907183cc8b7b131bc802c9345e75
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: invoice-reconcile
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.invoice-reconcile.an-invoice-line-with-no-order

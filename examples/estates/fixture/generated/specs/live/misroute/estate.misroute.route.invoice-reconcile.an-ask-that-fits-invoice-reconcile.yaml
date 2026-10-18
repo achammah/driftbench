@@ -52,4 +52,20 @@ metadata:
     phrase: null
     ask: code
     askFrom: route.invoice-reconcile.an-ask-that-fits-invoice-reconcile (situation)
+    link:
+      span: route.invoice-reconcile.an-ask-that-fits-invoice-reconcile
+      fp: d93b4fa8fa438ad670cb24af50281ad13800f37edd5c07119354ed83c19ef73a
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: skill
+      name: invoice-reconcile
+    from:
+      form: situation
+      field: route.invoice-reconcile.an-ask-that-fits-invoice-reconcile#situation
+      fp: d93b4fa8fa438ad670cb24af50281ad13800f37edd5c07119354ed83c19ef73a
+      frame: misroute
+      shape: "{}"
+      pieces:
+        - check, match or reconcile an invoice
     outcome: no-delete

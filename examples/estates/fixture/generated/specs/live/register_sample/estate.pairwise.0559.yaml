@@ -93,4 +93,14 @@ metadata:
     situation: open-items
     phrase: 1
     ask: bank
+    link:
+      span: register.standing.answer-in-the-language-of-the
+      fp: 34a830233f69f525683e9689ef28eb37731585431f70d92541ac14ae3d0a890f
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: open-items
+      phrase: 1
     outcome: bank

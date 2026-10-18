@@ -89,6 +89,18 @@ metadata:
     situation: weekly-report-new
     phrase: 0
     ask: bank
+    link:
+      span: instruction.weekly-report.fill-the-report-sections-in-the
+      fp: 3ed84aca5292dfc0932b8105e67e0628fd85de27ce6bae4053b7f0027d9c48d9
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: weekly-report
+      target: skill
+    from:
+      bank: weekly-report-new
+      phrase: 0
     outcome: bank
     judged:
       - instruction.weekly-report.fill-the-report-sections-in-the

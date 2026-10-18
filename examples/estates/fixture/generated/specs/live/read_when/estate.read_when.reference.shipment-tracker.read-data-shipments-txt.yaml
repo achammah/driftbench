@@ -24,7 +24,7 @@ given:
 blocks:
   - id: ask
     when:
-      user: Please help me with a delivery, a tracking number or a late shipment.
+      user: Please help me with a delivery, a tracking number or a late shipment, including the shipments.
     expect:
       skills:
         - name: shipment-tracker
@@ -54,4 +54,21 @@ metadata:
     phrase: null
     ask: code
     askFrom: skill.shipment-tracker.skill-shipment-tracker (asks it names)
+    link:
+      span: reference.shipment-tracker.read-data-shipments-txt
+      fp: 7c900bf4edbf9ac7c4f86c1e26b8e4e10ca0e13d2c055cb271061a187dbd091f
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: read
+      target: .claude/skills/shipment-tracker/data/shipments.txt
+    from:
+      form: asks it names
+      field: skill.shipment-tracker.skill-shipment-tracker#asks it names
+      fp: ef1bf02575dd862062412ec73a2b2428fa0ed65dfad4cc28f7b3f4e45abd3af5
+      frame: trigger
+      shape: help me with {}, including the {}
+      pieces:
+        - a delivery, a tracking number or a late shipment
+        - shipments
     outcome: no-delete

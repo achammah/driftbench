@@ -60,6 +60,17 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.supplier-email.a-draft-has-a-subject-a
+      fp: 0ab9ff08d3c62af1e52dedfd17b9d8945e587ca0abfb441aaf2d02c945d104c6
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: supplier-email
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.supplier-email.a-draft-has-a-subject-a

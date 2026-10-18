@@ -16,8 +16,10 @@ import { estateMutants } from './mutants';
 import {
   asksOf,
   atomKey,
+  definiteFailure,
   type EstateRun,
   type GeneratedSpec,
+  type ReplayOutcome,
   replayChecks,
   replayOnFollower,
   scanRendered,
@@ -474,6 +476,12 @@ export type MutantVerdict = {
    * its situations and on the asks of the tests that name the atom: no test of any product can tell the two apart. Not counted alive.
    */
   equivalent?: true;
+  /**
+   * The contract gives the atom no complete test: a reference to a file the hidden estate does not hold. A Read of a missing
+   * file waits on `needs-existing-file` (docs/estate.md section 5), so there is no test to kill the mutant with. The
+   * atom is judged by that marker; its mutant is named, not counted alive.
+   */
+  untestable?: true;
   /** Why it lived: no complete test, or the tests that ran and passed. */
   reason?: string;
 };
@@ -501,6 +509,26 @@ export function equivalentMutant(
   });
 }
 
+/**
+ * Whether a mutant dies on its tests that are green on the follower: replayed with the atom deleted, the first one
+ * that fails definitely kills it. An inconclusive or not-applicable verdict, or a run that broke off, is not a kill,
+ * however it changes the pass flag; `undecided` counts those runs.
+ */
+export async function killOf(
+  green: readonly SpecVerdict[],
+  replay: (loaded: NonNullable<GeneratedSpec['loaded']>) => Promise<ReplayOutcome>,
+): Promise<{ killed: boolean; undecided: number }> {
+  let undecided = 0;
+  for (const verdict of green) {
+    const loaded = verdict.spec.loaded;
+    if (!loaded) continue;
+    const outcome = await replay(loaded);
+    if (definiteFailure(outcome)) return { killed: true, undecided };
+    if (!outcome.pass) undecided += 1;
+  }
+  return { killed: false, undecided };
+}
+
 /** Level 5's mutants: each agent-kind atom deleted from the follower, run on its complete green tests. */
 export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
   const all = await specVerdicts(run);
@@ -514,6 +542,7 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
     ...phrases.flatMap((first) => phrases.map((second) => [first, second])),
   ];
   const base = new Map<string, string>();
+  const truthOf = new Map(run.rendered.atoms.map((truth) => [truth.hid, truth]));
   for (const atom of run.scanned.map.atoms.filter((candidate) => AGENT_KINDS.includes(candidate.kind))) {
     const hid = run.scanned.match.hidOf.get(atom.id);
     const named = all.filter((verdict) => (estateMeta(verdict.spec).atoms ?? []).includes(atom.id));
@@ -536,6 +565,30 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
         continue;
       }
     }
+    // The validator holds the hidden estate: a reference is absent when its path is no file of the rendered estate,
+    // whatever the product's scan says of it. The product's marker is the second condition.
+    const truth = hid === undefined ? undefined : truthOf.get(hid);
+    if (
+      truth?.kind === 'reference' &&
+      !(truth.key in run.rendered.files) &&
+      named.length > 0 &&
+      named.every(
+        (verdict) =>
+          !verdict.spec.record.complete &&
+          (estateMeta(verdict.spec).needs ?? []).some((need) => need.marker === 'needs-existing-file'),
+      )
+    ) {
+      out.push({
+        atom: atom.id,
+        kind: atom.kind,
+        tests: named.map((verdict) => verdict.spec.record.id),
+        killed: false,
+        untestable: true,
+        reason:
+          'the estate holds no such file, and a Read of a missing file waits on needs-existing-file: every test naming the atom is incomplete by that marker',
+      });
+      continue;
+    }
     if (hid === undefined || green.length === 0) {
       const markers = [
         ...new Set(
@@ -554,16 +607,7 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
       });
       continue;
     }
-    let killed = false;
-    for (const verdict of green) {
-      const loaded = verdict.spec.loaded;
-      if (!loaded) continue;
-      const outcome = await replayOnFollower(run, loaded, checks, hid);
-      if (!outcome.pass) {
-        killed = true;
-        break;
-      }
-    }
+    const { killed, undecided } = await killOf(green, (loaded) => replayOnFollower(run, loaded, checks, hid));
     out.push({
       atom: atom.id,
       kind: atom.kind,
@@ -572,7 +616,10 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
       ...(killed
         ? {}
         : {
-            reason: `${green.length} complete tests ran on the follower with the atom deleted and all passed; the evidence ${atom.evidence.map((item) => item.type).join(', ')} did not fire`,
+            reason:
+              undecided > 0
+                ? `${green.length} complete tests ran on the follower with the atom deleted; none failed definitely (${undecided} only undecided: inconclusive, not applicable or broken off, which is no kill); the evidence ${atom.evidence.map((item) => item.type).join(', ')} did not fire`
+                : `${green.length} complete tests ran on the follower with the atom deleted and all passed; the evidence ${atom.evidence.map((item) => item.type).join(', ')} did not fire`,
           }),
     });
   }
@@ -582,7 +629,7 @@ export async function agentMutants(run: EstateRun): Promise<MutantVerdict[]> {
 /** Level 5: every atom deleted from the agent fails one of its tests; the lowest kind score is the value. */
 export async function agentMutantLevel(run: EstateRun): Promise<Measure> {
   // An equivalent mutant is the follower itself: it is neither killed nor alive.
-  const mutants = (await agentMutants(run)).filter((mutant) => !mutant.equivalent);
+  const mutants = (await agentMutants(run)).filter((mutant) => !mutant.equivalent && !mutant.untestable);
   const items: Item[] = [];
   let lowest = 1;
   const kinds = [...new Set(mutants.map((mutant) => mutant.kind))];

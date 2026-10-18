@@ -60,4 +60,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.shipment-tracker.always-pass-the-carrier-code-to
+      fp: 93ecbd29ff3507a287a46df73bd37d0fe3fa5f26e297e404a880119f7aca992a
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: owned
+      name: shipment-tracker
+      target: skill
+    from:
+      neutral: outside
     outcome: no-change:negative

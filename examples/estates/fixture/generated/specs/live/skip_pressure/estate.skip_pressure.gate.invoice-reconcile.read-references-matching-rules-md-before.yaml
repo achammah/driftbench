@@ -66,6 +66,21 @@ metadata:
     phrase: null
     ask: code
     askFrom: gate.invoice-reconcile.read-references-matching-rules-md-before (governed clause)
+    link:
+      span: gate.invoice-reconcile.read-references-matching-rules-md-before
+      fp: 325e8f257e9fe79e49ec05ee8fc0924c67745030f686564b5f98cf7dc7532b79
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      form: governed clause
+      field: gate.invoice-reconcile.read-references-matching-rules-md-before#governed clause
+      fp: 325e8f257e9fe79e49ec05ee8fc0924c67745030f686564b5f98cf7dc7532b79
+      frame: pressure
+      shape: "{}"
+      pieces:
+        - match any line
     outcome: no-delete
     judged:
       - gate.invoice-reconcile.read-references-matching-rules-md-before

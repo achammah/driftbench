@@ -100,4 +100,14 @@ metadata:
     situation: weekly-report-update
     phrase: 0
     ask: bank
+    link:
+      span: stage.steps.stage-plan-restate-the-ask-and
+      fp: 9f7b75a6ec103352ba9a2856b49ff3050942a3dcfa6e58a2c6ef06e805b225fe
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: weekly-report-update
+      phrase: 0
     outcome: bank

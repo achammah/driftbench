@@ -141,7 +141,7 @@ reference owned by a helper or a shared folder is asked as the task of an unrela
 The fictional input is `packages/generate/test/estate/real-shape-estate.ts`: 26 skills with different purposes
 and 8 gates each, a catalogue skill that cites every shared document, 6 helper agents, 10 shared documents
 cited by several units, references that are only listed (a table row, a bullet with a label), numbered
-example outputs and a blank form beside each skill, and 10 hook guards (8 with the rule in a docstring,
+example outputs and a blank form beside each skill, and 10 guards (8 with the rule in a docstring,
 2 with only a tool matcher). It names no validator string, bank phrase or private estate text.
 
 ```sh
@@ -208,24 +208,24 @@ changing anything. A guard that named an act with a trailing condition ("send a 
 contract is unsigned") now asks the act alone. The registry-trace gap of script-less guards is unchanged: a live
 trace names the script, never the check inside it.
 
-The real estate showed that a phrase cut from a hook text can read as a broken sentence. The synthetic estate
-gains five such hook texts (a clause with a pronoun, a subordinate clause, a plural noun with a parenthesis, a
-statement about the hook, a possessive phrase). On `89caebf58` each of them gave a complete guard test whose ask
+The real estate showed that a phrase cut from a guard text can read as a broken sentence. The synthetic estate
+gains five such guard texts (a clause with a pronoun, a subordinate clause, a plural noun with a parenthesis, a
+statement about the guard, a possessive phrase). On `89caebf58` each of them gave a complete guard test whose ask
 was a fragment ("Please help me with the bytecode of the file it compiles."); after the change those 44 guard
 rows stay incomplete with the reason, and no other row changes (complete 5,761 to 5,717 of 5,815).
 
 The unit-run guard types (`guard_hostile`, `guard_speed`, `guard_register`) read no ask, so they carry a fixed
 request that names the tool the guard watches. On the synthetic estate each of the three goes from 14 to 21
 complete of 21; `guard_negative` (14) and `guard_positive` (98) are unchanged, because those two do read their ask.
-A hook rule text of the form "before X, have the agent check Y" now asks X alone, and "refill a prescription"
+A guard rule text of the form "before X, have the agent check Y" now asks X alone, and "refill a prescription"
 passes the act floor: an article counts as a word of the act.
 
 ## Guards asked through the tool they watch
 
-The real estate rejected the guard asks built from hook prose twice: hook texts describe mechanics, so a phrase cut
+The real estate rejected the guard asks built from guard prose twice: guard texts describe mechanics, so a phrase cut
 from them reads as a broken sentence. The guard ask is now the act of the tool the guard watches, with the strict
 situation of the rule text as context, and prose replaces it only when it has the strict shape of an act or of a
-situation (see the estate page). Synthetic estate, the 14 hook texts of fictional wording, same input before and
+situation (see the estate page). Synthetic estate, the 14 guard texts of fictional wording, same input before and
 after: complete 5,738 to 5,794 of 5,815. Guard asks go from phrases cut out of the prose ("Please help me with
 writes of shipping labels outside the labels folder.") to "Please change a file here." with the situation as context
 when it is strict ("This involves a time window on every route stop."). The cost is variety: guard negative controls

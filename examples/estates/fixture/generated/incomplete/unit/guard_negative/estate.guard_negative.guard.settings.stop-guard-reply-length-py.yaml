@@ -28,15 +28,6 @@ blocks:
         - name: reply-length.py
           verdict: deny
           count: 0
-        - name: reply-length.py
-          verdict: block
-          count: 0
-        - name: reply-length.py
-          verdict: warn
-          count: 0
-        - name: reply-length.py
-          verdict: nudge
-          count: 0
       workspace:
         others_untouched: true
       criteria:
@@ -58,6 +49,15 @@ metadata:
     situation: null
     phrase: null
     ask: bank
+    link:
+      span: guard.settings.stop-guard-reply-length-py
+      fp: 951eec028bab6a66ec93dad697f2fc42e5ca27fe5fd4f3ceeab1dcd07b950012
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: guard
+      name: reply-length.py
+      verdict: deny
     outcome: no-change:negative
     unit:
       target:
@@ -65,6 +65,7 @@ metadata:
         name: reply-length.py
         event: Stop
         command: python3 "$CLAUDE_PROJECT_DIR"/.claude/guards/reply-length.py
+        verdict: deny
       cases:
         - id: case-01
           payload:

@@ -55,6 +55,15 @@ metadata:
     phrase: null
     ask: code
     askFrom: neutral
+    link:
+      span: instruction.memory-memory.the-weekly-report-is-due-monday
+      fp: 59c4e2dfc6fe1e84bc8b9ca167db656a00af831b7473487810b4961c88a9edfc
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      neutral: outside
     outcome: no-change:negative
     judged:
       - instruction.memory-memory.the-weekly-report-is-due-monday

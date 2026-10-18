@@ -106,6 +106,16 @@ metadata:
     situation: invoice-reconcile
     phrase: 2
     ask: code
+    link:
+      span: gate.invoice-reconcile.read-references-matching-rules-md-before
+      fp: 325e8f257e9fe79e49ec05ee8fc0924c67745030f686564b5f98cf7dc7532b79
+      relation: exercises
+      createdBy: generator
+    act:
+      kind: reply
+    from:
+      bank: invoice-reconcile
+      phrase: 2
     outcome: bank
     judged:
       - gate.invoice-reconcile.read-references-matching-rules-md-before
