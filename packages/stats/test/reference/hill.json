@@ -1,0 +1,302 @@
+{
+  "method": "exact rational sum of p^q (integer q) or 80-digit sum (fractional q), raised to 1 / (1 - q)",
+  "dependencies": {
+    "mpmath": "1.4.1"
+  },
+  "cases": [
+    {
+      "name": "three heavy classes, three light",
+      "counts": [100, 90, 80, 10, 5, 1],
+      "q": 20,
+      "expected": 3.00281762640383
+    },
+    {
+      "name": "three heavy classes, three light",
+      "counts": [100, 90, 80, 10, 5, 1],
+      "q": 50,
+      "expected": 2.9216886834088207
+    },
+    {
+      "name": "three heavy classes, three light",
+      "counts": [100, 90, 80, 10, 5, 1],
+      "q": 100,
+      "expected": 2.8905179756207184
+    },
+    {
+      "name": "three heavy classes, three light",
+      "counts": [100, 90, 80, 10, 5, 1],
+      "q": 400,
+      "expected": 2.8675421323948216
+    },
+    {
+      "name": "three heavy classes, three light",
+      "counts": [100, 90, 80, 10, 5, 1],
+      "q": 2000,
+      "expected": 2.861503821861961
+    },
+    {
+      "name": "three heavy classes, three light",
+      "counts": [100, 90, 80, 10, 5, 1],
+      "q": 2.5,
+      "expected": 3.2651096787795506
+    },
+    {
+      "name": "three heavy classes, three light",
+      "counts": [100, 90, 80, 10, 5, 1],
+      "q": 8.25,
+      "expected": 3.1044882944493764
+    },
+    {
+      "name": "two heavy, four light",
+      "counts": [40, 30, 20, 5, 3, 2],
+      "q": 20,
+      "expected": 2.6230817526963395
+    },
+    {
+      "name": "two heavy, four light",
+      "counts": [40, 30, 20, 5, 3, 2],
+      "q": 50,
+      "expected": 2.5471893387249165
+    },
+    {
+      "name": "two heavy, four light",
+      "counts": [40, 30, 20, 5, 3, 2],
+      "q": 100,
+      "expected": 2.5232460654373785
+    },
+    {
+      "name": "two heavy, four light",
+      "counts": [40, 30, 20, 5, 3, 2],
+      "q": 400,
+      "expected": 2.5057477672549657
+    },
+    {
+      "name": "two heavy, four light",
+      "counts": [40, 30, 20, 5, 3, 2],
+      "q": 2000,
+      "expected": 2.5011461990572057
+    },
+    {
+      "name": "two heavy, four light",
+      "counts": [40, 30, 20, 5, 3, 2],
+      "q": 2.5,
+      "expected": 3.2695567241597185
+    },
+    {
+      "name": "two heavy, four light",
+      "counts": [40, 30, 20, 5, 3, 2],
+      "q": 8.25,
+      "expected": 2.800996495846914
+    },
+    {
+      "name": "one dominant class",
+      "counts": [1, 1, 1, 1, 1, 1, 1, 1, 50],
+      "q": 20,
+      "expected": 1.1690969162741274
+    },
+    {
+      "name": "one dominant class",
+      "counts": [1, 1, 1, 1, 1, 1, 1, 1, 50],
+      "q": 50,
+      "expected": 1.1635189431609492
+    },
+    {
+      "name": "one dominant class",
+      "counts": [1, 1, 1, 1, 1, 1, 1, 1, 50],
+      "q": 100,
+      "expected": 1.1617403669323327
+    },
+    {
+      "name": "one dominant class",
+      "counts": [1, 1, 1, 1, 1, 1, 1, 1, 50],
+      "q": 400,
+      "expected": 1.1604315770207605
+    },
+    {
+      "name": "one dominant class",
+      "counts": [1, 1, 1, 1, 1, 1, 1, 1, 50],
+      "q": 2000,
+      "expected": 1.1600861298637095
+    },
+    {
+      "name": "one dominant class",
+      "counts": [1, 1, 1, 1, 1, 1, 1, 1, 50],
+      "q": 2.5,
+      "expected": 1.2802623841605891
+    },
+    {
+      "name": "one dominant class",
+      "counts": [1, 1, 1, 1, 1, 1, 1, 1, 50],
+      "q": 8.25,
+      "expected": 1.183991941131839
+    },
+    {
+      "name": "uniform",
+      "counts": [7, 7, 7, 7],
+      "q": 20,
+      "expected": 4.0
+    },
+    {
+      "name": "uniform",
+      "counts": [7, 7, 7, 7],
+      "q": 50,
+      "expected": 4.0
+    },
+    {
+      "name": "uniform",
+      "counts": [7, 7, 7, 7],
+      "q": 100,
+      "expected": 4.0
+    },
+    {
+      "name": "uniform",
+      "counts": [7, 7, 7, 7],
+      "q": 400,
+      "expected": 4.0
+    },
+    {
+      "name": "uniform",
+      "counts": [7, 7, 7, 7],
+      "q": 2000,
+      "expected": 4.0
+    },
+    {
+      "name": "uniform",
+      "counts": [7, 7, 7, 7],
+      "q": 2.5,
+      "expected": 4.0
+    },
+    {
+      "name": "uniform",
+      "counts": [7, 7, 7, 7],
+      "q": 8.25,
+      "expected": 4.0
+    },
+    {
+      "name": "single class",
+      "counts": [12],
+      "q": 20,
+      "expected": 1.0
+    },
+    {
+      "name": "single class",
+      "counts": [12],
+      "q": 50,
+      "expected": 1.0
+    },
+    {
+      "name": "single class",
+      "counts": [12],
+      "q": 100,
+      "expected": 1.0
+    },
+    {
+      "name": "single class",
+      "counts": [12],
+      "q": 400,
+      "expected": 1.0
+    },
+    {
+      "name": "single class",
+      "counts": [12],
+      "q": 2000,
+      "expected": 1.0
+    },
+    {
+      "name": "single class",
+      "counts": [12],
+      "q": 2.5,
+      "expected": 1.0
+    },
+    {
+      "name": "single class",
+      "counts": [12],
+      "q": 8.25,
+      "expected": 1.0
+    },
+    {
+      "name": "zero count skipped",
+      "counts": [30, 0, 20, 10],
+      "q": 20,
+      "expected": 2.0742772622411505
+    },
+    {
+      "name": "zero count skipped",
+      "counts": [30, 0, 20, 10],
+      "q": 50,
+      "expected": 2.028492773869729
+    },
+    {
+      "name": "zero count skipped",
+      "counts": [30, 0, 20, 10],
+      "q": 100,
+      "expected": 2.014052108766998
+    },
+    {
+      "name": "zero count skipped",
+      "counts": [30, 0, 20, 10],
+      "q": 400,
+      "expected": 2.0034774416080157
+    },
+    {
+      "name": "zero count skipped",
+      "counts": [30, 0, 20, 10],
+      "q": 2000,
+      "expected": 2.0006936141748786
+    },
+    {
+      "name": "zero count skipped",
+      "counts": [30, 0, 20, 10],
+      "q": 2.5,
+      "expected": 2.5047233015709023
+    },
+    {
+      "name": "zero count skipped",
+      "counts": [30, 0, 20, 10],
+      "q": 8.25,
+      "expected": 2.1901257680329183
+    },
+    {
+      "name": "many near-equal classes",
+      "counts": [90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109],
+      "q": 20,
+      "expected": 19.424260514982027
+    },
+    {
+      "name": "many near-equal classes",
+      "counts": [90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109],
+      "q": 50,
+      "expected": 18.98664398951048
+    },
+    {
+      "name": "many near-equal classes",
+      "counts": [90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109],
+      "q": 100,
+      "expected": 18.705061356759217
+    },
+    {
+      "name": "many near-equal classes",
+      "counts": [90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109],
+      "q": 400,
+      "expected": 18.389099109172967
+    },
+    {
+      "name": "many near-equal classes",
+      "counts": [90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109],
+      "q": 2000,
+      "expected": 18.283427217537167
+    },
+    {
+      "name": "many near-equal classes",
+      "counts": [90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109],
+      "q": 2.5,
+      "expected": 19.91648606714911
+    },
+    {
+      "name": "many near-equal classes",
+      "counts": [90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109],
+      "q": 8.25,
+      "expected": 19.733603122290397
+    }
+  ]
+}

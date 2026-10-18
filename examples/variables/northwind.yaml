@@ -1,0 +1,233 @@
+# The variable store of the Northwind operations assistant, a worked example of an estate.
+# The quotes are copied from the committed fixture in examples/estates/fixture.
+# Invented: the owner's words, the counts and the ledger ids. The 200 conversations do not exist; their
+# set_hash is the SHA-256 of the text northwind-example-conversations. The ledger assigns the real ids.
+# The last two variables are the fixed axes `driftbench estate map` writes for every estate. They come from
+# a space map, so they name no source, and the loader says so (VARIABLES_UNSOURCED) without refusing the store.
+format: 1
+agent: northwind
+version: '1'
+prior:
+  kind: declared
+variables:
+  # A condition span names a variable: "late by more than two days" names how late a shipment is.
+  # "More than" leaves the limit itself on the failing side, so the edge is a value of its own.
+  - id: shipment_days_late
+    title: How many days late a shipment is
+    kind: data
+    role: detail
+    approved: true
+    produced_by: model
+    provenance:
+      - kind: quote
+        path: ../estates/fixture/CLAUDE.md
+        quote: When a shipment is late by more than two days, tell the user and propose a supplier email.
+        ledger: k4jd7xq2mf
+    values:
+      - id: under_two_days
+        title: Not late, or late by one day
+        weight: 0.6
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/CLAUDE.md
+            quote: When a shipment is late by more than two days, tell the user and propose a supplier email.
+            ledger: k4jd7xq2mf
+          - kind: conversations
+            count: 120
+            total: 200
+            set_hash: 660a833739237c697a631393e183b320b543c990a12933b5216941878505d74e
+      - id: exactly_two_days
+        title: Late by exactly two days
+        weight: 0.15
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/CLAUDE.md
+            quote: When a shipment is late by more than two days, tell the user and propose a supplier email.
+            ledger: k4jd7xq2mf
+          - kind: conversations
+            count: 30
+            total: 200
+            set_hash: 660a833739237c697a631393e183b320b543c990a12933b5216941878505d74e
+      - id: more_than_two_days
+        title: Late by three days or more
+        weight: 0.25
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/CLAUDE.md
+            quote: When a shipment is late by more than two days, tell the user and propose a supplier email.
+            ledger: k4jd7xq2mf
+          - kind: conversations
+            count: 50
+            total: 200
+            set_hash: 660a833739237c697a631393e183b320b543c990a12933b5216941878505d74e
+    boundaries:
+      - holds: more_than_two_days
+        fails: under_two_days
+        edge: exactly_two_days
+        limit: 2
+        comparison: gt
+        unit: days
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/CLAUDE.md
+            quote: When a shipment is late by more than two days, tell the user and propose a supplier email.
+            ledger: k4jd7xq2mf
+  - id: invoice_difference_eur
+    title: The total difference between an invoice and its order
+    kind: data
+    role: detail
+    approved: true
+    produced_by: model
+    provenance:
+      - kind: quote
+        path: ../estates/fixture/.claude/skills/invoice-reconcile/SKILL.md
+        quote: When the total difference is above 50.00 EUR, dispatch the `ledger-auditor` agent with the invoice number and the order number.
+        ledger: v6hq3tn2ze
+    values:
+      - id: under_50
+        title: Up to 49.99 EUR
+        weight: 0.88
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/.claude/skills/invoice-reconcile/SKILL.md
+            quote: When the total difference is above 50.00 EUR, dispatch the `ledger-auditor` agent with the invoice number and the order number.
+            ledger: v6hq3tn2ze
+          - kind: owner
+            words: Nearly nine invoices in ten are within 50 EUR of the order; about one in ten is further off.
+            date: 2026-10-14
+      - id: exactly_50
+        title: Exactly 50.00 EUR
+        weight: 0.02
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/.claude/skills/invoice-reconcile/SKILL.md
+            quote: When the total difference is above 50.00 EUR, dispatch the `ledger-auditor` agent with the invoice number and the order number.
+            ledger: v6hq3tn2ze
+          - kind: owner
+            words: Nearly nine invoices in ten are within 50 EUR of the order; about one in ten is further off.
+            date: 2026-10-14
+      - id: over_50
+        title: More than 50.00 EUR
+        weight: 0.1
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/.claude/skills/invoice-reconcile/SKILL.md
+            quote: When the total difference is above 50.00 EUR, dispatch the `ledger-auditor` agent with the invoice number and the order number.
+            ledger: v6hq3tn2ze
+          - kind: owner
+            words: Nearly nine invoices in ten are within 50 EUR of the order; about one in ten is further off.
+            date: 2026-10-14
+    boundaries:
+      - holds: over_50
+        fails: under_50
+        edge: exactly_50
+        limit: 50
+        comparison: gt
+        unit: EUR
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/.claude/skills/invoice-reconcile/SKILL.md
+            quote: When the total difference is above 50.00 EUR, dispatch the `ledger-auditor` agent with the invoice number and the order number.
+            ledger: v6hq3tn2ze
+  # A condition with no number: an explicit yes holds, a change request fails, and "looks fine" is the edge between them.
+  - id: supplier_answer
+    title: How the user answers a draft for a supplier
+    kind: persona
+    role: detail
+    approved: true
+    produced_by: model
+    provenance:
+      - kind: quote
+        path: ../estates/fixture/.claude/skills/supplier-email/SKILL.md
+        quote: 'A "looks fine" or a thumbs up is not a yes: ask once more.'
+        ledger: r3sw5bk7ug
+    values:
+      - id: explicit_yes
+        title: An explicit yes
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/.claude/skills/supplier-email/SKILL.md
+            quote: Show the full draft and wait for an explicit yes before you send it.
+            ledger: r3sw5bk7ug
+      - id: looks_fine
+        title: '"Looks fine" or a thumbs up'
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/.claude/skills/supplier-email/SKILL.md
+            quote: 'A "looks fine" or a thumbs up is not a yes: ask once more.'
+            ledger: r3sw5bk7ug
+      - id: wants_changes
+        title: A request to change the draft
+        produced_by: owner
+        provenance:
+          - kind: owner
+            words: Some answers ask for a change to the draft instead of a yes or a no.
+            date: 2026-10-14
+    boundaries:
+      - holds: explicit_yes
+        fails: wants_changes
+        edge: looks_fine
+        provenance:
+          - kind: quote
+            path: ../estates/fixture/.claude/skills/supplier-email/SKILL.md
+            quote: 'A "looks fine" or a thumbs up is not a yes: ask once more.'
+            ledger: r3sw5bk7ug
+  - id: session_state
+    title: The state of the session when the ask arrives
+    kind: data
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - { id: fresh, title: A new session }
+      - { id: resumed, title: Resumed with an open tracker }
+      - { id: after_compaction, title: After a compaction }
+      - { id: after_restart, title: After a restart }
+      - { id: long, title: A long session }
+      - { id: helpers_running, title: Helpers running in the background }
+  - id: estate_hazard
+    title: A hazard of the runtime during the task
+    kind: data
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - { id: no_hazard, title: No hazard }
+      - { id: compaction_mid_task, title: A compaction in the middle of the task }
+      - { id: process_restart, title: The process restarts }
+      - { id: rate_wave, title: A wave of rate limits }
+      - { id: stale_tracker, title: The tracker is stale }
+      - { id: dead_helper, title: A helper died }
+constraints:
+  - forbid: { session_state: fresh, estate_hazard: compaction_mid_task }
+    reason: a compaction needs a long session
+    approved: true
+    produced_by: code
+    provenance:
+      - kind: owner
+        words: A new session has no compaction, no dead helper and no stale tracker. We have never seen one.
+        date: 2026-10-14
+  - forbid: { session_state: fresh, estate_hazard: dead_helper }
+    reason: a dead helper needs helpers that were running
+    approved: true
+    produced_by: code
+    provenance:
+      - kind: owner
+        words: A new session has no compaction, no dead helper and no stale tracker. We have never seen one.
+        date: 2026-10-14
+  - forbid: { session_state: fresh, estate_hazard: stale_tracker }
+    reason: a stale tracker needs a tracker opened earlier
+    approved: true
+    produced_by: code
+    provenance:
+      - kind: owner
+        words: A new session has no compaction, no dead helper and no stale tracker. We have never seen one.
+        date: 2026-10-14

@@ -215,7 +215,7 @@ function checkReferences(map: SpaceMap): SpaceMapIssue[] {
         );
       }
     }
-    const missing = [...values].filter((value) => !(value in weights));
+    const missing = [...values].filter((value) => !Object.hasOwn(weights, value));
     if (missing.length > 0) {
       issues.push(
         issue(

@@ -1,7 +1,7 @@
 /** Planning: the minimum detectable effect of a campaign. */
 
 import { assertFinite, assertProbability } from './basics';
-import { designEffect } from './intervals';
+import { designEffect, zFor } from './intervals';
 import { normalQuantile } from './special';
 
 export interface MdeInput {
@@ -54,7 +54,7 @@ export function mde(input: MdeInput): MdeResult {
   assertProbability('mde', 'alpha', alpha, true);
   const de = designEffect(repeats, rho);
   const effectiveN = (input.n * repeats) / de;
-  const za = normalQuantile(1 - alpha / 2);
+  const za = zFor(alpha);
   const zb = normalQuantile(power);
   const gap = (delta: number): number => {
     const p2 = p1 - delta;

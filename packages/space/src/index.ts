@@ -81,5 +81,33 @@ export {
   SpaceValue,
 } from './schema';
 export { DEVIATION_TITLES, formatSpaceMap, fromInventory, type SeedOptions } from './seed';
+export {
+  spaceMapToVariables,
+  type VariablesToSpaceMapOptions,
+  variablesToSpaceMap,
+} from './variables/convert';
+export {
+  loadVariableStore,
+  parseVariableStoreText,
+  type VariableStoreIssue,
+  type VariableStoreIssueCode,
+  VariableStoreIssueCodes,
+  type VariableStoreResult,
+  validateVariableStore,
+} from './variables/load';
+export { type ProvenanceEntry, variableProvenance } from './variables/provenance';
+export {
+  ConversationsProvenance,
+  LedgerId,
+  OwnerProvenance,
+  QuoteProvenance,
+  Variable,
+  VariableBoundary,
+  VariableConstraint,
+  VariablePrior,
+  VariableProvenance,
+  VariableStore,
+  VariableValue,
+} from './variables/schema';
 
 export const packageName = '@agent-nexus/driftbench-space';

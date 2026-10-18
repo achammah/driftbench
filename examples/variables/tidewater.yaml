@@ -1,0 +1,239 @@
+# The variable store of the Tidewater Cycles booking assistant, a worked example of a prompt with one tab per
+# channel. Everything here is invented: the shop, the prompt it reads (tidewater-prompt.md, in this folder),
+# the owner's words, the counts and the ledger ids. The 200 conversations do not exist; their set_hash is the
+# SHA-256 of the text tidewater-example-conversations. The ledger assigns the real ids.
+format: 1
+agent: tidewater
+version: '1'
+prior:
+  kind: declared
+variables:
+  # The channel is the axis the tabs of the prompt sit on. The weights are the share of conversations per channel.
+  - id: channel
+    title: The channel a customer writes on
+    kind: channel
+    role: axis
+    approved: true
+    produced_by: code
+    values:
+      - id: whatsapp
+        title: On WhatsApp
+        weight: 0.65
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: '## Tab: WhatsApp'
+          - kind: conversations
+            count: 130
+            total: 200
+            set_hash: 7bdc2ecaebcecbaea6512e4b67ad970f426444db9b81d960f82411422296474b
+      - id: email
+        title: By email
+        weight: 0.2
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: '## Tab: Email'
+          - kind: conversations
+            count: 40
+            total: 200
+            set_hash: 7bdc2ecaebcecbaea6512e4b67ad970f426444db9b81d960f82411422296474b
+      - id: web_chat
+        title: On the web chat
+        weight: 0.15
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: '## Tab: Web chat'
+          - kind: conversations
+            count: 30
+            total: 200
+            set_hash: 7bdc2ecaebcecbaea6512e4b67ad970f426444db9b81d960f82411422296474b
+  # What the assistant offers next. The callback form exists in one tab only; see the constraints.
+  - id: follow_up
+    title: What the assistant offers next
+    kind: behaviour
+    role: axis
+    approved: true
+    produced_by: model
+    values:
+      - id: repair_slot
+        title: A repair slot
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: Offer a repair slot only within the next 14 days.
+            ledger: 5ndq4xw7ta
+      - id: photo_request
+        title: A request for photos of the bike
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: Accept photos of the bike.
+            ledger: b2hm6kc3rj
+      - id: callback_form
+        title: The callback form
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: Offer the callback form after two replies that did not solve the question.
+            ledger: x7pe2vgd4q
+  # A condition span names a variable: "within the next 14 days" names how far ahead the customer wants the slot.
+  # "At most" includes the limit, so the edge is on the side where the condition holds.
+  - id: slot_days_ahead
+    title: How many days ahead the customer wants the slot
+    kind: data
+    role: detail
+    approved: true
+    produced_by: model
+    provenance:
+      - kind: quote
+        path: tidewater-prompt.md
+        quote: Offer a repair slot only within the next 14 days.
+        ledger: 5ndq4xw7ta
+    values:
+      - id: within_14_days
+        title: Within 13 days
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: Offer a repair slot only within the next 14 days.
+            ledger: 5ndq4xw7ta
+      - id: exactly_14_days
+        title: In exactly 14 days
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: Offer a repair slot only within the next 14 days.
+            ledger: 5ndq4xw7ta
+      - id: beyond_14_days
+        title: In 15 days or more
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: Offer a repair slot only within the next 14 days.
+            ledger: 5ndq4xw7ta
+    boundaries:
+      - holds: within_14_days
+        fails: beyond_14_days
+        edge: exactly_14_days
+        limit: 14
+        comparison: le
+        unit: days
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: Offer a repair slot only within the next 14 days.
+            ledger: 5ndq4xw7ta
+  # "Above" leaves the limit on the failing side. The weights are the owner's guess, in the owner's words.
+  - id: repair_quote_eur
+    title: The amount of the repair quote
+    kind: data
+    role: detail
+    approved: true
+    produced_by: model
+    provenance:
+      - kind: quote
+        path: tidewater-prompt.md
+        quote: A repair quote above 200 EUR needs a deposit of 20 EUR before the slot is booked.
+        ledger: m3ra6tz5ch
+    values:
+      - id: under_200
+        title: Under 200 EUR
+        weight: 0.78
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: A repair quote above 200 EUR needs a deposit of 20 EUR before the slot is booked.
+            ledger: m3ra6tz5ch
+          - kind: owner
+            words: Four quotes in five are small repairs under 200 EUR, and one in five is a bigger job.
+            date: 2026-10-15
+      - id: exactly_200
+        title: Exactly 200 EUR
+        weight: 0.02
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: A repair quote above 200 EUR needs a deposit of 20 EUR before the slot is booked.
+            ledger: m3ra6tz5ch
+          - kind: owner
+            words: Four quotes in five are small repairs under 200 EUR, and one in five is a bigger job.
+            date: 2026-10-15
+      - id: over_200
+        title: Over 200 EUR
+        weight: 0.2
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: A repair quote above 200 EUR needs a deposit of 20 EUR before the slot is booked.
+            ledger: m3ra6tz5ch
+          - kind: owner
+            words: Four quotes in five are small repairs under 200 EUR, and one in five is a bigger job.
+            date: 2026-10-15
+    boundaries:
+      - holds: over_200
+        fails: under_200
+        edge: exactly_200
+        limit: 200
+        comparison: gt
+        unit: EUR
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: A repair quote above 200 EUR needs a deposit of 20 EUR before the slot is booked.
+            ledger: m3ra6tz5ch
+  # A value a model proposed and the owner has not approved yet: the space map leaves it out.
+  - id: customer_language
+    title: The language the customer writes in
+    kind: persona
+    role: axis
+    approved: true
+    produced_by: model
+    values:
+      - id: english
+        title: English
+        provenance:
+          - kind: owner
+            words: Most of our customers write in English.
+            date: 2026-10-15
+      - id: french
+        title: French
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: When the customer writes in French, answer in French.
+            ledger: q6dn3yf2ws
+      - id: other_language
+        title: Any other language
+        approved: false
+        produced_by: model
+        provenance:
+          - kind: quote
+            path: tidewater-prompt.md
+            quote: When the customer writes in French, answer in French.
+            ledger: q6dn3yf2ws
+constraints:
+  - forbid: { channel: whatsapp, follow_up: callback_form }
+    reason: the callback form is part of the web chat tab only
+    approved: true
+    produced_by: model
+    provenance:
+      - kind: quote
+        path: tidewater-prompt.md
+        quote: Offer the callback form after two replies that did not solve the question.
+        ledger: x7pe2vgd4q
+  - forbid: { channel: email, follow_up: callback_form }
+    reason: an email carries a link to the shop, not the form
+    approved: true
+    produced_by: owner
+    provenance:
+      - kind: owner
+        words: By email we send a link to the shop page. We never send the callback form.
+        date: 2026-10-15

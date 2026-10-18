@@ -19,12 +19,15 @@ Node.js 22 or newer. ESM only, with TypeScript types.
 * `coverage`
 * `completeness`
 * `chaoCoverage`
+* `loadVariableStore`
+* `spaceMapToVariables`
+* `variablesToSpaceMap`
 
 The full list of exports is in the type declarations (`dist/index.d.ts`).
 
 ## Documentation
 
-[Generating tests](https://github.com/achammah/driftbench/blob/main/docs/generating.md), and the [docs index](https://github.com/achammah/driftbench/blob/main/docs/index.md).
+[Generating tests](https://github.com/achammah/driftbench/blob/main/docs/generating.md), [the variable store](https://github.com/achammah/driftbench/blob/main/docs/variables.md), and the [docs index](https://github.com/achammah/driftbench/blob/main/docs/index.md).
 
 ## License
 

@@ -43,11 +43,14 @@ export const DEFAULT_MAX_CELLS = 250_000;
 export function compileSpace(map: SpaceMap): CompiledSpace {
   let uniform = true;
   const dimensions = map.dimensions.map((dimension): CompiledDimension => {
-    const fitted = map.prior.weights?.[dimension.id];
+    // An own-property lookup: a dimension named constructor or a value named toString is not in a prior that omits it.
+    const weights = map.prior.weights;
+    const fitted =
+      weights !== undefined && Object.hasOwn(weights, dimension.id) ? weights[dimension.id] : undefined;
     const written = dimension.values.some((value) => value.weight !== undefined);
     if (fitted || written) uniform = false;
     const raw = dimension.values.map((value) => {
-      if (fitted) return fitted[value.id] ?? 0;
+      if (fitted) return Object.hasOwn(fitted, value.id) ? (fitted[value.id] ?? 0) : 0;
       return written ? (value.weight ?? 0) : 1;
     });
     const total = raw.reduce((sum, weight) => sum + weight, 0);
